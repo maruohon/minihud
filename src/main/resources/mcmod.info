@@ -1,0 +1,16 @@
+[
+{
+  "modid": "itemscroller",
+  "name": "Item Scroller",
+  "description": "Move items inside inventoru GUIs by scrolling the mouse wheel over the slots",
+  "version": "${mod_version}",
+  "mcversion": "${minecraft_version}",
+  "url": "http://minecraft.curseforge.com/projects/item-scroller",
+  "updateUrl": "",
+  "authorList": ["masa"],
+  "credits": "ChickenBones (original idea, in NEI)",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
