@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION,
-    clientSideOnly=true, acceptedMinecraftVersions = "1.8.8,1.8.9")
+    clientSideOnly=true, acceptedMinecraftVersions = "1.8,1.8.8,1.8.9")
 public class ItemScroller
 {
     @Instance(Reference.MOD_ID)
