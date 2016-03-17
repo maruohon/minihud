@@ -38,6 +38,13 @@ public class InputEventHandler
 
     private void tryMoveItems(GuiContainer gui, boolean scrollingUp)
     {
+        boolean isShiftDown = GuiContainer.isShiftKeyDown();
+
+        if ((Configs.enableScrollingSingle == false && isShiftDown == false) || (Configs.enableScrollingStacks == false && isShiftDown == true))
+        {
+            return;
+        }
+
         Slot slot = gui.getSlotUnderMouse();
         if (slot == null || slot.getHasStack() == false || gui.mc.thePlayer.inventory.getItemStack() != null)
         {
@@ -45,10 +52,9 @@ public class InputEventHandler
         }
 
         ItemStack stack = slot.getStack();
-        boolean moveStacks = GuiContainer.isShiftKeyDown();
 
-        if ((Configs.reverseScrollDirectionSingle == true && moveStacks == false) ||
-            (Configs.reverseScrollDirectionStacks == true && moveStacks == true))
+        if ((Configs.reverseScrollDirectionSingle == true && isShiftDown == false) ||
+            (Configs.reverseScrollDirectionStacks == true && isShiftDown == true))
         {
             scrollingUp = ! scrollingUp;
         }
@@ -56,7 +62,7 @@ public class InputEventHandler
         // Scrolling items from this slot or inventory into the other inventory
         if (scrollingUp == true)
         {
-            if (moveStacks == true)
+            if (isShiftDown == true)
             {
                 this.tryMoveStackToOtherInventory(slot, gui);
             }
@@ -68,7 +74,7 @@ public class InputEventHandler
         // Scrolling items from the other inventory into this slot or inventory
         else if (scrollingUp == false)
         {
-            if (moveStacks == true)
+            if (isShiftDown == true)
             {
                 this.tryMoveStackToThisInventory(slot, gui);
             }

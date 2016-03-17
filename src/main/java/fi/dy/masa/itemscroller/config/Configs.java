@@ -11,6 +11,8 @@ import fi.dy.masa.itemscroller.Reference;
 
 public class Configs
 {
+    public static boolean enableScrollingSingle;
+    public static boolean enableScrollingStacks;
     public static boolean reverseScrollDirectionSingle;
     public static boolean reverseScrollDirectionStacks;
 
@@ -39,7 +41,15 @@ public class Configs
 
     public static void loadConfigs(Configuration conf)
     {
-        Property prop = conf.get(CATEGORY_GENERIC, "reverseScrollDirectionSingle", false).setRequiresMcRestart(false);
+        Property prop = conf.get(CATEGORY_GENERIC, "enableScrollingSingle", true).setRequiresMcRestart(false);
+        prop.comment = "Enable item scrolling one item at a time.";
+        enableScrollingSingle = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "enableScrollingStacks", true).setRequiresMcRestart(false);
+        prop.comment = "Enable item scrolling full stack at a time (ie. while holding shift).";
+        enableScrollingStacks = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "reverseScrollDirectionSingle", false).setRequiresMcRestart(false);
         prop.comment = "Reverse the scrolling direction for single item mode.";
         reverseScrollDirectionSingle = prop.getBoolean();
 
