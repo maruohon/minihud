@@ -135,7 +135,23 @@ public class InputEventHandler
                 if (areStacksEqual(stackTmp, stackOrig) == true)
                 {
                     this.clickSlotsToMoveSingleItem(container, gui.mc, slotTmp.slotNumber, slot.slotNumber);
-                    break;
+                    return;
+                }
+            }
+        }
+
+        // If we weren't able to move any items from another inventory, then try to move items
+        // within the same inventory (mostly between the hotbar and the player inventory)
+        for (Slot slotTmp : container.inventorySlots)
+        {
+            if (slotTmp.slotNumber != slot.slotNumber && (slotTmp instanceof SlotCrafting) == false &&
+                slotTmp.getHasStack() == true && slotTmp.canTakeStack(gui.mc.thePlayer) == true)
+            {
+                ItemStack stackTmp = slotTmp.getStack();
+                if (areStacksEqual(stackTmp, stackOrig) == true)
+                {
+                    this.clickSlotsToMoveSingleItem(container, gui.mc, slotTmp.slotNumber, slot.slotNumber);
+                    return;
                 }
             }
         }
