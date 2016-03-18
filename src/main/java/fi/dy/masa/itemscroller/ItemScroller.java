@@ -13,8 +13,7 @@ import fi.dy.masa.itemscroller.proxy.CommonProxy;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION,
     guiFactory = "fi.dy.masa.itemscroller.config.ItemScrollerGuiFactory",
-    dependencies = "required-after:Forge@[11.15.0.1716,);",
-    clientSideOnly=true, acceptedMinecraftVersions = "1.8.9")
+    clientSideOnly=true, acceptedMinecraftVersions = "1.9")
 public class ItemScroller
 {
     @Instance(Reference.MOD_ID)
