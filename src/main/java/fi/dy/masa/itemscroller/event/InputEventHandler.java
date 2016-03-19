@@ -253,7 +253,7 @@ public class InputEventHandler
 
     private void shiftClickSlot(Container container, Minecraft mc, int slot)
     {
-        mc.playerController.func_187098_a(container.windowId, slot, 0, ClickType.QUICK_MOVE, mc.thePlayer); // windowClick in 1.8
+        mc.playerController.windowClick(container.windowId, slot, 0, ClickType.QUICK_MOVE, mc.thePlayer); // windowClick in 1.8
     }
 
     private void clickSlotsToMoveSingleItem(Container container, Minecraft mc, int slotFrom, int slotTo)
@@ -267,22 +267,22 @@ public class InputEventHandler
         if (moreThanOne == false)
         {
             // Shift + click the last remaining item
-            mc.playerController.func_187098_a(container.windowId, slotFrom, 0, ClickType.QUICK_MOVE, player); // windowClick in 1.8
+            mc.playerController.windowClick(container.windowId, slotFrom, 0, ClickType.QUICK_MOVE, player); // windowClick in 1.8
             return;
         }
 
         // Right click on the from-slot to take items to the cursor
         // if there is more than one item in the from-slot, right click on it, otherwise left click
-        mc.playerController.func_187098_a(container.windowId, slotFrom, moreThanOne == true ? 1 : 0, ClickType.PICKUP, player); // windowClick in 1.8
+        mc.playerController.windowClick(container.windowId, slotFrom, moreThanOne == true ? 1 : 0, ClickType.PICKUP, player); // windowClick in 1.8
 
         // Right click on the target slot to put one item to it
-        mc.playerController.func_187098_a(container.windowId, slotTo, 1, ClickType.PICKUP, player); // windowClick in 1.8
+        mc.playerController.windowClick(container.windowId, slotTo, 1, ClickType.PICKUP, player); // windowClick in 1.8
 
         // If there are items left in the cursor, then return them back to the original slot
         if (player.inventory.getItemStack() != null)
         {
             // Left click again on the from-slot to return the rest of the items to it
-            mc.playerController.func_187098_a(container.windowId, slotFrom, 0, ClickType.PICKUP, player); // windowClick in 1.8
+            mc.playerController.windowClick(container.windowId, slotFrom, 0, ClickType.PICKUP, player); // windowClick in 1.8
         }
     }
 }
