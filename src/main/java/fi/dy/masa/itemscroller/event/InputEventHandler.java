@@ -1,9 +1,6 @@
 package fi.dy.masa.itemscroller.event;
 
 import java.util.List;
-
-import org.lwjgl.input.Mouse;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,14 +9,13 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
-
+import org.lwjgl.input.Mouse;
+import fi.dy.masa.itemscroller.config.Configs;
 import net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.SlotItemHandler;
-
-import fi.dy.masa.itemscroller.config.Configs;
 
 @SideOnly(Side.CLIENT)
 public class InputEventHandler
@@ -31,9 +27,9 @@ public class InputEventHandler
     {
         int dWheel = Mouse.getEventDWheel();
 
-        if (event.gui instanceof GuiContainer && dWheel != 0)
+        if (event.getGui() instanceof GuiContainer && dWheel != 0)
         {
-            this.tryMoveItems((GuiContainer)event.gui, dWheel > 0);
+            this.tryMoveItems((GuiContainer)event.getGui(), dWheel > 0);
         }
     }
 
@@ -214,7 +210,7 @@ public class InputEventHandler
     {
         if ((slot1 instanceof SlotItemHandler) && (slot2 instanceof SlotItemHandler))
         {
-            return ((SlotItemHandler)slot1).itemHandler == ((SlotItemHandler)slot2).itemHandler;
+            return ((SlotItemHandler)slot1).getItemHandler() == ((SlotItemHandler)slot2).getItemHandler();
         }
 
         return slot1.inventory == slot2.inventory;

@@ -1,13 +1,11 @@
 package fi.dy.masa.itemscroller.config;
 
 import java.io.File;
-
+import fi.dy.masa.itemscroller.Reference;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import fi.dy.masa.itemscroller.Reference;
 
 public class Configs
 {
@@ -24,7 +22,7 @@ public class Configs
     @SubscribeEvent
     public void onConfigChangedEvent(OnConfigChangedEvent event)
     {
-        if (Reference.MOD_ID.equals(event.modID) == true)
+        if (Reference.MOD_ID.equals(event.getModID()) == true)
         {
             loadConfigs(config);
         }
@@ -42,19 +40,19 @@ public class Configs
     public static void loadConfigs(Configuration conf)
     {
         Property prop = conf.get(CATEGORY_GENERIC, "enableScrollingSingle", true).setRequiresMcRestart(false);
-        prop.comment = "Enable item scrolling one item at a time.";
+        prop.setComment("Enable item scrolling one item at a time.");
         enableScrollingSingle = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "enableScrollingStacks", true).setRequiresMcRestart(false);
-        prop.comment = "Enable item scrolling full stack at a time (ie. while holding shift).";
+        prop.setComment("Enable item scrolling full stack at a time (ie. while holding shift).");
         enableScrollingStacks = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "reverseScrollDirectionSingle", false).setRequiresMcRestart(false);
-        prop.comment = "Reverse the scrolling direction for single item mode.";
+        prop.setComment("Reverse the scrolling direction for single item mode.");
         reverseScrollDirectionSingle = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "reverseScrollDirectionStacks", false).setRequiresMcRestart(false);
-        prop.comment = "Reverse the scrolling direction for full stacks mode.";
+        prop.setComment("Reverse the scrolling direction for full stacks mode.");
         reverseScrollDirectionStacks = prop.getBoolean();
 
         if (conf.hasChanged() == true)
