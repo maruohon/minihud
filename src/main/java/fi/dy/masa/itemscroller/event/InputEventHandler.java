@@ -38,6 +38,11 @@ public class InputEventHandler
 
     private void tryMoveItems(GuiContainer gui, boolean scrollingUp)
     {
+        if (gui.inventorySlots == null || gui.inventorySlots.inventorySlots == null)
+        {
+            return;
+        }
+
         boolean isShiftDown = GuiContainer.isShiftKeyDown();
 
         if ((Configs.enableScrollingSingle == false && isShiftDown == false) || (Configs.enableScrollingStacks == false && isShiftDown == true))
@@ -46,7 +51,8 @@ public class InputEventHandler
         }
 
         Slot slot = gui.getSlotUnderMouse();
-        if (slot == null || slot.getHasStack() == false || gui.mc.thePlayer.inventory.getItemStack() != null)
+        if (slot == null || gui.inventorySlots.inventorySlots.contains(slot) == false ||
+            slot.getHasStack() == false || gui.mc.thePlayer.inventory.getItemStack() != null)
         {
             return;
         }
