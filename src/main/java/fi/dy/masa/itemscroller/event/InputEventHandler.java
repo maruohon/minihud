@@ -36,7 +36,7 @@ public class InputEventHandler
         }
     }
 
-    private void tryMoveItems(GuiContainer gui, boolean scrollingUp)
+    private void tryMoveItems(GuiContainer gui, boolean moveToOtherInventory)
     {
         if (gui.inventorySlots == null || gui.inventorySlots.inventorySlots == null)
         {
@@ -44,6 +44,7 @@ public class InputEventHandler
         }
 
         boolean isShiftDown = GuiContainer.isShiftKeyDown();
+        boolean isCtrlDown = GuiContainer.isCtrlKeyDown();
 
         if ((Configs.enableScrollingSingle == false && isShiftDown == false) || (Configs.enableScrollingStacks == false && isShiftDown == true))
         {
@@ -57,33 +58,41 @@ public class InputEventHandler
             return;
         }
 
-        ItemStack stack = slot.getStack();
-
         if ((Configs.reverseScrollDirectionSingle == true && isShiftDown == false) ||
             (Configs.reverseScrollDirectionStacks == true && isShiftDown == true))
         {
-            scrollingUp = ! scrollingUp;
+            moveToOtherInventory = ! moveToOtherInventory;
         }
 
-        // Scrolling items from this slot or inventory into the other inventory
-        if (scrollingUp == true)
+        if (isShiftDown == true)
         {
-            if (isShiftDown == true)
+            // Ctrl + Shift + scroll: move everything
+            if (isCtrlDown == true)
             {
-                this.tryMoveStackToOtherInventory(slot, gui);
+                this.tryMoveStacks(slot, gui, false, moveToOtherInventory, false);
             }
+            // Shift + scroll: move one matching stack
             else
+            {
+                this.tryMoveStacks(slot, gui, true, moveToOtherInventory, true);
+            }
+        }
+        // Ctrl + scroll: Move all matching stacks
+        else if (isCtrlDown == true)
+        {
+            this.tryMoveStacks(slot, gui, true, moveToOtherInventory, false);
+        }
+        // No Ctrl or Shift
+        else
+        {
+            ItemStack stack = slot.getStack();
+
+            // Scrolling items from this slot/inventory into the other inventory
+            if (moveToOtherInventory == true)
             {
                 this.tryMoveSingleItemToOtherInventory(slot, gui);
             }
-        }
-        // Scrolling items from the other inventory into this slot or inventory
-        else if (scrollingUp == false)
-        {
-            if (isShiftDown == true)
-            {
-                this.tryMoveStackToThisInventory(slot, gui);
-            }
+            // Scrolling items from the other inventory into this slot/inventory
             else if (stack.stackSize < slot.getItemStackLimit(stack))
             {
                 this.tryMoveSingleItemToThisInventory(slot, gui);
@@ -169,44 +178,30 @@ public class InputEventHandler
         }
     }
 
-    /**
-     * Try to move stacks of matching items to the other inventory.
-     * The stack under the cursor is moved last.
-     */
-    private void tryMoveStackToOtherInventory(Slot slot, GuiContainer gui)
+    private void tryMoveStacks(Slot slot, GuiContainer gui, boolean matchingOnly, boolean toOtherInventory, boolean firstOnly)
     {
         Container container = gui.inventorySlots;
-        ItemStack stackOrig = slot.getStack();
+        ItemStack stack = slot.getStack();
 
         for (Slot slotTmp : container.inventorySlots)
         {
-            // Try to move other stacks than the one hovered over first
             if (slotTmp.slotNumber != slot.slotNumber &&
-                areSlotsInSameInventory(slotTmp, slot) == true &&
-                areStacksEqual(stackOrig, slotTmp.getStack()) == true)
+                areSlotsInSameInventory(slotTmp, slot) == toOtherInventory &&
+                (matchingOnly == false || areStacksEqual(stack, slotTmp.getStack()) == true))
             {
                 this.shiftClickSlot(container, gui.mc, slotTmp.slotNumber);
-                return;
+
+                if (firstOnly == true)
+                {
+                    return;
+                }
             }
         }
 
-        // If there were no other stacks with identical items left in this inventory, then move the hovered stack
-        this.shiftClickSlot(container, gui.mc, slot.slotNumber);
-    }
-
-    private void tryMoveStackToThisInventory(Slot slot, GuiContainer gui)
-    {
-        Container container = gui.inventorySlots;
-        ItemStack stackOrig = slot.getStack();
-
-        for (Slot slotTmp : container.inventorySlots)
+        // If moving to the other inventory, then move the hovered slot's stack last
+        if (toOtherInventory == true)
         {
-            if (areSlotsInSameInventory(slotTmp, slot) == false &&
-                areStacksEqual(stackOrig, slotTmp.getStack()) == true)
-            {
-                this.shiftClickSlot(container, gui.mc, slotTmp.slotNumber);
-                return;
-            }
+            this.shiftClickSlot(container, gui.mc, slot.slotNumber);
         }
     }
 
@@ -272,11 +267,11 @@ public class InputEventHandler
         if (moreThanOne == false)
         {
             // Shift + click the last remaining item
-            mc.playerController.windowClick(container.windowId, slotFrom, 0, 1, player);
+            this.shiftClickSlot(container, mc, slotFrom);
             return;
         }
 
-        // Right click on the from-slot to take items to the cursor
+        // Right click on the from-slot to take items to the cursor. If it's the last item, then left click instead.
         mc.playerController.windowClick(container.windowId, slotFrom, moreThanOne == true ? 1 : 0, 0, player);
 
         // Right click on the target slot to put one item to it
