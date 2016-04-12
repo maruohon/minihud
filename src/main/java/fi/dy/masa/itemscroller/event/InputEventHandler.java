@@ -23,6 +23,8 @@ import fi.dy.masa.itemscroller.config.Configs;
 @SideOnly(Side.CLIENT)
 public class InputEventHandler
 {
+    private boolean leftButtonState;
+    private int slotLast;
     private ItemStack[] originalStacks = new ItemStack[0];
 
     @SubscribeEvent
@@ -30,30 +32,64 @@ public class InputEventHandler
     {
         int dWheel = Mouse.getEventDWheel();
 
-        if (event.gui instanceof GuiContainer && dWheel != 0)
+        if (event.gui instanceof GuiContainer)
         {
-            this.tryMoveItems((GuiContainer)event.gui, dWheel > 0);
+            if (dWheel != 0)
+            {
+                this.tryMoveItems((GuiContainer)event.gui, dWheel > 0);
+            }
+            else
+            {
+                this.dragMoveItems((GuiContainer)event.gui);
+            }
         }
     }
 
-    private void tryMoveItems(GuiContainer gui, boolean moveToOtherInventory)
+    private boolean isValidSlotWithItems(Slot slot, GuiContainer gui)
     {
         if (gui.inventorySlots == null || gui.inventorySlots.inventorySlots == null)
         {
+            return false;
+        }
+
+        return slot != null && gui.inventorySlots.inventorySlots.contains(slot) == true && slot.getHasStack() == true;
+    }
+
+    private void dragMoveItems(GuiContainer gui)
+    {
+        boolean leftButtonPressed = (Mouse.getEventButton() - 100) == gui.mc.gameSettings.keyBindAttack.getKeyCode();
+        if (leftButtonPressed == true)
+        {
+            this.leftButtonState = Mouse.getEventButtonState();
             return;
         }
 
-        boolean isShiftDown = GuiContainer.isShiftKeyDown();
-        boolean isCtrlDown = GuiContainer.isCtrlKeyDown();
-
-        if ((Configs.enableScrollingSingle == false && isShiftDown == false) || (Configs.enableScrollingStacks == false && isShiftDown == true))
+        if (GuiContainer.isShiftKeyDown() == false || this.leftButtonState == false)
         {
             return;
         }
 
         Slot slot = gui.getSlotUnderMouse();
-        if (slot == null || gui.inventorySlots.inventorySlots.contains(slot) == false ||
-            slot.getHasStack() == false || gui.mc.thePlayer.inventory.getItemStack() != null)
+        if (this.isValidSlotWithItems(slot, gui) == true && slot.slotNumber != this.slotLast)
+        {
+            this.shiftClickSlot(gui.inventorySlots, gui.mc, slot.slotNumber);
+            this.slotLast = slot.slotNumber;
+        }
+   }
+
+    private void tryMoveItems(GuiContainer gui, boolean moveToOtherInventory)
+    {
+        boolean isShiftDown = GuiContainer.isShiftKeyDown();
+        boolean isCtrlDown = GuiContainer.isCtrlKeyDown();
+
+        if ((Configs.enableScrollingSingle == false && isShiftDown == false) ||
+            (Configs.enableScrollingStacks == false && isShiftDown == true))
+        {
+            return;
+        }
+
+        Slot slot = gui.getSlotUnderMouse();
+        if (this.isValidSlotWithItems(slot, gui) == false || gui.mc.thePlayer.inventory.getItemStack() != null)
         {
             return;
         }
