@@ -40,7 +40,7 @@ public class InputEventHandler
             {
                 this.tryMoveItems((GuiContainer)event.gui, dWheel > 0);
             }
-            else
+            else if (Configs.enableDragMoving == true)
             {
                 this.dragMoveItems((GuiContainer)event.gui);
             }
@@ -155,8 +155,10 @@ public class InputEventHandler
         boolean isShiftDown = GuiContainer.isShiftKeyDown();
         boolean isCtrlDown = GuiContainer.isCtrlKeyDown();
 
-        if ((Configs.enableScrollingSingle == false && isShiftDown == false) ||
-            (Configs.enableScrollingStacks == false && isShiftDown == true))
+        if ((Configs.enableScrollingSingle == false && isShiftDown == false && isCtrlDown == false) ||
+            (Configs.enableScrollingStacks == false && isShiftDown == true && isCtrlDown == false) ||
+            (Configs.enableScrollingMatchingStacks == false && isShiftDown == false && isCtrlDown == true) ||
+            (Configs.enableMovingEverything == false && isShiftDown == true && isCtrlDown == true))
         {
             return;
         }
