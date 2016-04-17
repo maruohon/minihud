@@ -24,7 +24,9 @@ import fi.dy.masa.itemscroller.config.Configs;
 public class InputEventHandler
 {
     private boolean leftButtonState;
-    private int slotLast;
+    private int lastPosX;
+    private int lastPosY;
+    private int slotNumberLast;
     private ItemStack[] originalStacks = new ItemStack[0];
 
     @SubscribeEvent
@@ -58,24 +60,95 @@ public class InputEventHandler
     private void dragMoveItems(GuiContainer gui)
     {
         boolean leftButtonPressed = (Mouse.getEventButton() - 100) == gui.mc.gameSettings.keyBindAttack.getKeyCode();
+        int mouseX = (Mouse.getEventX() * gui.width / gui.mc.displayWidth) - gui.guiLeft;
+        int mouseY = (gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1) - gui.guiTop;
+
         if (leftButtonPressed == true)
         {
             this.leftButtonState = Mouse.getEventButtonState();
-            return;
+        }
+        else if (GuiContainer.isShiftKeyDown() == true && this.leftButtonState == true)
+        {
+            int distX = mouseX - this.lastPosX;
+            int distY = mouseY - this.lastPosY;
+            int absX = Math.abs(distX);
+            int absY = Math.abs(distY);
+
+            if (absX > absY)
+            {
+                int inc = distX > 0 ? 1 : -1;
+
+                for (int x = this.lastPosX; ; x += inc)
+                {
+                    int y = absX != 0 ? this.lastPosY + ((x - this.lastPosX) * distY / absX) : mouseY;
+                    this.dragMoveFromSlotAtPosition(gui, x, y);
+
+                    if (x == mouseX)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                int inc = distY > 0 ? 1 : -1;
+
+                for (int y = this.lastPosY; ; y += inc)
+                {
+                    int x = absY != 0 ? this.lastPosX + ((y - this.lastPosY) * distX / absY) : mouseX;
+                    this.dragMoveFromSlotAtPosition(gui, x, y);
+
+                    if (y == mouseY)
+                    {
+                        break;
+                    }
+                }
+            }
         }
 
-        if (GuiContainer.isShiftKeyDown() == false || this.leftButtonState == false)
+        this.lastPosX = mouseX;
+        this.lastPosY = mouseY;
+    }
+
+    private void dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y)
+    {
+        Slot slot = this.getSlotAtPosition(gui, x, y);
+
+        if (slot != null && slot.slotNumber != this.slotNumberLast)
         {
-            return;
+            if (this.isValidSlotWithItems(slot, gui) == true)
+            {
+                this.shiftClickSlot(gui.inventorySlots, gui.mc, slot.slotNumber);
+            }
+
+            this.slotNumberLast = slot.slotNumber;
+        }
+    }
+
+    private boolean isMouseOverSlot(Slot slot, int mouseX, int mouseY)
+    {
+        return this.isPointInRegion(slot.xDisplayPosition, slot.yDisplayPosition, 16, 16, mouseX, mouseY);
+    }
+
+    private boolean isPointInRegion(int left, int top, int width, int height, int pointX, int pointY)
+    {
+        return pointX >= left - 1 && pointX < left + width + 1 && pointY >= top - 1 && pointY < top + height + 1;
+    }
+
+    private Slot getSlotAtPosition(GuiContainer gui, int x, int y)
+    {
+        for (int i = 0; i < gui.inventorySlots.inventorySlots.size(); i++)
+        {
+            Slot slot = gui.inventorySlots.inventorySlots.get(i);
+
+            if (this.isMouseOverSlot(slot, x, y) == true)
+            {
+                return slot;
+            }
         }
 
-        Slot slot = gui.getSlotUnderMouse();
-        if (this.isValidSlotWithItems(slot, gui) == true && slot.slotNumber != this.slotLast)
-        {
-            this.shiftClickSlot(gui.inventorySlots, gui.mc, slot.slotNumber);
-            this.slotLast = slot.slotNumber;
-        }
-   }
+        return null;
+    }
 
     private void tryMoveItems(GuiContainer gui, boolean moveToOtherInventory)
     {
