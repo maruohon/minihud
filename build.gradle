@@ -49,6 +49,9 @@ minecraft {
     if (project.hasProperty("mod_signature")) {
         replace "@FINGERPRINT@", project.mod_signature
     }
+
+    // For JEI
+    useDepAts = true
 }
 
 dependencies {
@@ -93,6 +96,9 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+
+    // Move access transformers to META-INF
+    rename '(itemscroller_at.cfg)', 'META-INF/$1'
 }
 
 /*
