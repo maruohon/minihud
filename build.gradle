@@ -49,6 +49,9 @@ minecraft {
     if (project.hasProperty("mod_signature")) {
         replace "@FINGERPRINT@", project.mod_signature
     }
+
+    // For JEI
+    useDepAts = true
 }
 
 dependencies {
@@ -92,6 +95,15 @@ processResources
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+    }
+
+    // Move access transformers to META-INF
+    rename '(' + config.mod_id + '_at.cfg)', 'META-INF/$1'
+}
+
+jar {
+    manifest {
+        attributes 'FMLAT': config.mod_id + '_at.cfg'
     }
 }
 

@@ -9,8 +9,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class Configs
 {
+    public static boolean enableDragMoving;
+    public static boolean enableMovingEverything;
+    public static boolean enableScrollingMatchingStacks;
     public static boolean enableScrollingSingle;
     public static boolean enableScrollingStacks;
+    public static boolean enableScrollingVillager;
     public static boolean reverseScrollDirectionSingle;
     public static boolean reverseScrollDirectionStacks;
 
@@ -39,13 +43,29 @@ public class Configs
 
     public static void loadConfigs(Configuration conf)
     {
-        Property prop = conf.get(CATEGORY_GENERIC, "enableScrollingSingle", true).setRequiresMcRestart(false);
-        prop.setComment("Enable item scrolling one item at a time.");
+        Property prop = conf.get(CATEGORY_GENERIC, "enableDragMoving", true).setRequiresMcRestart(false);
+        prop.setComment("Enable moving items by holding down shift and dragging over slots.");
+        enableDragMoving = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "enableMovingEverything", true).setRequiresMcRestart(false);
+        prop.setComment("Enable moving all items at once (while holding ctrl and shift).");
+        enableMovingEverything = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "enableScrollingMatchingStacks", true).setRequiresMcRestart(false);
+        prop.setComment("Enable moving all matching items at once (while holding ctrl).");
+        enableScrollingMatchingStacks = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "enableScrollingSingle", true).setRequiresMcRestart(false);
+        prop.setComment("Enable scrolling items one item at a time.");
         enableScrollingSingle = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "enableScrollingStacks", true).setRequiresMcRestart(false);
-        prop.setComment("Enable item scrolling full stack at a time (ie. while holding shift).");
+        prop.setComment("Enable item scrolling full stack at a time (while holding shift).");
         enableScrollingStacks = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "enableScrollingVillager", true).setRequiresMcRestart(false);
+        prop.setComment("Enable special handling for Villager GUI (normally you can't shift+click items into them).");
+        enableScrollingVillager = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "reverseScrollDirectionSingle", false).setRequiresMcRestart(false);
         prop.setComment("Reverse the scrolling direction for single item mode.");
