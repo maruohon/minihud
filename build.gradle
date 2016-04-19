@@ -98,7 +98,13 @@ processResources
     }
 
     // Move access transformers to META-INF
-    rename '(itemscroller_at.cfg)', 'META-INF/$1'
+    rename '(' + config.mod_id + '_at.cfg)', 'META-INF/$1'
+}
+
+jar {
+    manifest {
+        attributes 'FMLAT': config.mod_id + '_at.cfg'
+    }
 }
 
 /*
