@@ -5,19 +5,27 @@ import java.util.List;
 import org.lwjgl.input.Mouse;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotCrafting;
+import net.minecraft.inventory.SlotMerchantResult;
 import net.minecraft.item.ItemStack;
+import net.minecraft.village.MerchantRecipe;
+import net.minecraft.village.MerchantRecipeList;
 
 import net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToAccessFieldException;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.SlotItemHandler;
 
+import fi.dy.masa.itemscroller.ItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 
 @SideOnly(Side.CLIENT)
@@ -38,7 +46,14 @@ public class InputEventHandler
         {
             if (dWheel != 0)
             {
-                this.tryMoveItems((GuiContainer)event.gui, dWheel > 0);
+                if (Configs.enableScrollingVillager == true && event.gui instanceof GuiMerchant)
+                {
+                    this.tryMoveItemsVillager((GuiMerchant)event.gui, dWheel > 0);
+                }
+                else
+                {
+                    this.tryMoveItems((GuiContainer)event.gui, dWheel > 0);
+                }
             }
             else if (Configs.enableDragMoving == true)
             {
@@ -47,14 +62,14 @@ public class InputEventHandler
         }
     }
 
-    private boolean isValidSlotWithItems(Slot slot, GuiContainer gui)
+    private boolean isValidSlot(Slot slot, GuiContainer gui, boolean requireItems)
     {
         if (gui.inventorySlots == null || gui.inventorySlots.inventorySlots == null)
         {
             return false;
         }
 
-        return slot != null && gui.inventorySlots.inventorySlots.contains(slot) == true && slot.getHasStack() == true;
+        return slot != null && gui.inventorySlots.inventorySlots.contains(slot) == true && (requireItems == false || slot.getHasStack() == true);
     }
 
     private void dragMoveItems(GuiContainer gui)
@@ -116,7 +131,7 @@ public class InputEventHandler
 
         if (slot != null && slot.slotNumber != this.slotNumberLast)
         {
-            if (this.isValidSlotWithItems(slot, gui) == true)
+            if (this.isValidSlot(slot, gui, true) == true)
             {
                 this.shiftClickSlot(gui.inventorySlots, gui.mc, slot.slotNumber);
             }
@@ -150,6 +165,61 @@ public class InputEventHandler
         return null;
     }
 
+    private void tryMoveItemsVillager(GuiMerchant gui, boolean moveToOtherInventory)
+    {
+        boolean isShiftDown = GuiContainer.isShiftKeyDown();
+
+        Slot slot = gui.getSlotUnderMouse();
+        if (slot == null)
+        {
+            return;
+        }
+
+        // Only do stuff when scrolling over the recipe result slot
+        if ((slot instanceof SlotMerchantResult) == false)
+        {
+            this.tryMoveItems(gui, moveToOtherInventory);
+            return;
+        }
+
+        if (this.isValidSlot(slot, gui, false) == false || gui.mc.thePlayer.inventory.getItemStack() != null)
+        {
+            return;
+        }
+
+        if (isShiftDown == true)
+        {
+            // Try to fill the merchant's buy slots from the player inventory
+            if (moveToOtherInventory == false)
+            {
+                this.tryMoveItemsToMerchantBuySlots(gui, true);
+            }
+            // Move items from sell slot to player inventory
+            else if (slot.getHasStack() == true)
+            {
+                this.tryMoveStacks(slot, gui, true, true, true);
+            }
+            // Scrolling over an empty output slot, clear the buy slots
+            else
+            {
+                this.tryMoveStacks(slot, gui, false, true, false);
+            }
+        }
+        else
+        {
+            // Scrolling items from player inventory into merchant buy slots
+            if (moveToOtherInventory == false)
+            {
+                this.tryMoveItemsToMerchantBuySlots(gui, false);
+            }
+            // Scrolling items from this slot/inventory into the other inventory
+            else if (slot.getHasStack() == true)
+            {
+                this.tryMoveSingleItemToOtherInventory(slot, gui);
+            }
+        }
+    }
+
     private void tryMoveItems(GuiContainer gui, boolean moveToOtherInventory)
     {
         boolean isShiftDown = GuiContainer.isShiftKeyDown();
@@ -164,7 +234,7 @@ public class InputEventHandler
         }
 
         Slot slot = gui.getSlotUnderMouse();
-        if (this.isValidSlotWithItems(slot, gui) == false || gui.mc.thePlayer.inventory.getItemStack() != null)
+        if (this.isValidSlot(slot, gui, true) == false || gui.mc.thePlayer.inventory.getItemStack() != null)
         {
             return;
         }
@@ -316,6 +386,87 @@ public class InputEventHandler
         }
     }
 
+    private void tryMoveItemsToMerchantBuySlots(GuiMerchant gui, boolean fillStacks)
+    {
+        MerchantRecipeList list = gui.getMerchant().getRecipes(gui.mc.thePlayer);
+        int index = 0;
+
+        try
+        {
+            index = ReflectionHelper.getPrivateValue(GuiMerchant.class, gui, "field_147041_z", "selectedMerchantRecipe");
+        }
+        catch (UnableToAccessFieldException e)
+        {
+            ItemScroller.logger.warn("Failed to get the value of GuiMerchant.selectedMerchantRecipe");
+        }
+
+        if (list == null || list.size() <= index)
+        {
+            return;
+        }
+
+        MerchantRecipe recipe = list.get(index);
+        if (recipe == null)
+        {
+            return;
+        }
+
+        ItemStack buy1 = recipe.getItemToBuy();
+        ItemStack buy2 = recipe.getSecondItemToBuy();
+
+        if (buy1 != null)
+        {
+            this.fillBuySlot(gui, 0, buy1, fillStacks);
+        }
+
+        if (buy2 != null)
+        {
+            this.fillBuySlot(gui, 1, buy2, fillStacks);
+        }
+    }
+
+    private void fillBuySlot(GuiContainer gui, int slotNum, ItemStack buyStack, boolean fillStacks)
+    {
+        Slot slot = gui.inventorySlots.getSlot(slotNum);
+
+        // If there are items not matching the merchant recipe, move them out first
+        if (areStacksEqual(buyStack, slot.getStack()) == false)
+        {
+            this.shiftClickSlot(gui.inventorySlots, gui.mc, slotNum);
+        }
+
+        this.moveItemsFromInventory(gui, slotNum, gui.mc.thePlayer.inventory, buyStack, fillStacks);
+    }
+
+    private void moveItemsFromInventory(GuiContainer gui, int slotTo, IInventory invSrc, ItemStack stackTemplate, boolean fillStacks)
+    {
+        Container container = gui.inventorySlots;
+
+        for (Slot slot : container.inventorySlots)
+        {
+            if (slot == null)
+            {
+                continue;
+            }
+
+            if (slot.inventory == invSrc && areStacksEqual(stackTemplate, slot.getStack()) == true)
+            {
+                if (fillStacks == true)
+                {
+                    if (this.clickSlotsToMoveItems(container, gui.mc, slot.slotNumber, slotTo) == false)
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    this.clickSlotsToMoveSingleItem(container, gui.mc, slot.slotNumber, slotTo);
+                    break;
+                }
+            }
+        }
+    }
+
     private static boolean areStacksEqual(ItemStack stack1, ItemStack stack2)
     {
         return ItemStack.areItemsEqual(stack1, stack2) && ItemStack.areItemStackTagsEqual(stack1, stack2);
@@ -370,7 +521,7 @@ public class InputEventHandler
     private void clickSlotsToMoveSingleItem(Container container, Minecraft mc, int slotFrom, int slotTo)
     {
         EntityPlayer player = mc.thePlayer;
-        //System.out.println("clickSlots(from: " + slotFrom + ", to: " + slotTo + ")");
+        //System.out.println("clickSlotsToMoveSingleItem(from: " + slotFrom + ", to: " + slotTo + ")");
 
         ItemStack stack = container.inventorySlots.get(slotFrom).getStack();
         boolean moreThanOne = stack != null && stack.stackSize > 1;
@@ -394,5 +545,41 @@ public class InputEventHandler
             // Left click again on the from-slot to return the rest of the items to it
             mc.playerController.windowClick(container.windowId, slotFrom, 0, 0, player);
         }
+    }
+
+    /**
+     * Try move items from slotFrom to slotTo
+     * @return true if at least some items were moved
+     */
+    private boolean clickSlotsToMoveItems(Container container, Minecraft mc, int slotFrom, int slotTo)
+    {
+        EntityPlayer player = mc.thePlayer;
+        //System.out.println("clickSlotsToMoveItems(from: " + slotFrom + ", to: " + slotTo + ")");
+
+        // Left click to take items
+        mc.playerController.windowClick(container.windowId, slotFrom, 0, 0, player);
+
+        // Couldn't take the items, bail out now
+        if (player.inventory.getItemStack() == null)
+        {
+            return false;
+        }
+
+        boolean ret = true;
+        int size = player.inventory.getItemStack().stackSize;
+
+        // Left click on the target slot to put the items to it
+        mc.playerController.windowClick(container.windowId, slotTo, 0, 0, player);
+
+        // If there are items left in the cursor, then return them back to the original slot
+        if (player.inventory.getItemStack() != null)
+        {
+            ret = player.inventory.getItemStack().stackSize != size;
+
+            // Left click again on the from-slot to return the rest of the items to it
+            mc.playerController.windowClick(container.windowId, slotFrom, 0, 0, player);
+        }
+
+        return ret;
     }
 }

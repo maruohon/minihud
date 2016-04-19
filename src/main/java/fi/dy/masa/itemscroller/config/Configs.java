@@ -16,6 +16,7 @@ public class Configs
     public static boolean enableScrollingMatchingStacks;
     public static boolean enableScrollingSingle;
     public static boolean enableScrollingStacks;
+    public static boolean enableScrollingVillager;
     public static boolean reverseScrollDirectionSingle;
     public static boolean reverseScrollDirectionStacks;
 
@@ -63,6 +64,10 @@ public class Configs
         prop = conf.get(CATEGORY_GENERIC, "enableScrollingStacks", true).setRequiresMcRestart(false);
         prop.comment = "Enable item scrolling full stack at a time (while holding shift).";
         enableScrollingStacks = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "enableScrollingVillager", true).setRequiresMcRestart(false);
+        prop.comment = "Enable special handling for Villager GUI (normally you can't shift+click items into them).";
+        enableScrollingVillager = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "reverseScrollDirectionSingle", false).setRequiresMcRestart(false);
         prop.comment = "Reverse the scrolling direction for single item mode.";
