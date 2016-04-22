@@ -13,7 +13,7 @@ import fi.dy.masa.minihud.proxy.CommonProxy;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION,
     guiFactory = "fi.dy.masa.minihud.config.MiniHudGuiFactory",
-    clientSideOnly=true, acceptedMinecraftVersions = "1.9")
+    clientSideOnly=true, acceptedMinecraftVersions = "1.8.8,1.8.9")
 public class MiniHud
 {
     @Instance(Reference.MOD_ID)

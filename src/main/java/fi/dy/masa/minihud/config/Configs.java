@@ -28,7 +28,7 @@ public class Configs
     @SubscribeEvent
     public void onConfigChangedEvent(OnConfigChangedEvent event)
     {
-        if (Reference.MOD_ID.equals(event.getModID()) == true)
+        if (Reference.MOD_ID.equals(event.modID) == true)
         {
             loadConfigs(config);
         }
@@ -48,28 +48,28 @@ public class Configs
         Property prop;
 
         prop = conf.get(CATEGORY_GENERIC, "useFontShadow", false);
-        prop.setComment("Use font shadow");
+        prop.comment = "Use font shadow";
         useFontShadow = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "useScaledFont", true);
-        prop.setComment("Use 0.5x scale font size");
+        prop.comment = "Use 0.5x scale font size";
         useScaledFont = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "useTextBackground", true);
-        prop.setComment("Use a solid background color behind the text");
+        prop.comment = "Use a solid background color behind the text";
         useTextBackground = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "defaultMode", 1);
-        prop.setComment("Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light (sum together the ones you want enabled by default)");
+        prop.comment = "Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light (sum together the ones you want enabled by default)";
         defaultMode = prop.getInt();
         RenderEventHandler.mask = defaultMode;
 
         prop = conf.get(CATEGORY_GENERIC, "fontColor", 0xE0E0E0);
-        prop.setComment("Font color (default = 0xE0E0E0 = 14737632)");
+        prop.comment = "Font color (default = 0xE0E0E0 = 14737632)";
         fontColor = prop.getInt();
 
         prop = conf.get(CATEGORY_GENERIC, "textBackgroundColor", 0x90505050);
-        prop.setComment("Text background color (default = 0x90505050 = -1873784752)");
+        prop.comment = "Text background color (default = 0x90505050 = -1873784752)";
         textBackgroundColor = prop.getInt();
 
         if (conf.hasChanged() == true)

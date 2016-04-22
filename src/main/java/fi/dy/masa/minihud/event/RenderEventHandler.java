@@ -8,8 +8,8 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.chunk.Chunk;
 
@@ -40,7 +40,7 @@ public class RenderEventHandler
     @SubscribeEvent
     public void onRenderGameOverlay(RenderGameOverlayEvent.Post event)
     {
-        if (enabled == false || event.getType() != ElementType.ALL || this.mc.gameSettings.showDebugInfo == true)
+        if (enabled == false || event.type != ElementType.ALL || this.mc.gameSettings.showDebugInfo == true)
         {
             return;
         }
@@ -62,13 +62,13 @@ public class RenderEventHandler
 
             if ((yawPitchSpeed & MASK_YAW) != 0)
             {
-                str.append(String.format("%syaw: %.1f", pre, MathHelper.wrapDegrees(entity.rotationYaw)));
+                str.append(String.format("%syaw: %.1f", pre, MathHelper.wrapAngleTo180_float(entity.rotationYaw)));
                 pre = " / ";
             }
 
             if ((yawPitchSpeed & MASK_PITCH) != 0)
             {
-                str.append(String.format("%spitch: %.1f", pre, MathHelper.wrapDegrees(entity.rotationPitch)));
+                str.append(String.format("%spitch: %.1f", pre, MathHelper.wrapAngleTo180_float(entity.rotationPitch)));
                 pre = " / ";
             }
 
@@ -97,7 +97,7 @@ public class RenderEventHandler
                 {
                     if ((mask & MASK_BIOME) != 0)
                     {
-                        lines.add("Biome: " + chunk.getBiome(pos, this.mc.theWorld.getBiomeProvider()).getBiomeName());
+                        lines.add("Biome: " + chunk.getBiome(pos, this.mc.theWorld.getWorldChunkManager()).biomeName);
                     }
 
                     if ((mask & MASK_LIGHT) != 0)
