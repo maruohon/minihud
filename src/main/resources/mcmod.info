@@ -1,0 +1,16 @@
+[
+{
+  "modid": "minihud",
+  "name": "Mini HUD",
+  "description": "Adds some basic information like the coordinates to the screen",
+  "version": "${mod_version}",
+  "mcversion": "${minecraft_version}",
+  "url": "http://minecraft.curseforge.com/projects/minihud",
+  "updateUrl": "",
+  "authorList": ["masa"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

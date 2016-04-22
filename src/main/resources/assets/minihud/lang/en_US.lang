@@ -1,0 +1,6 @@
+language.name=English
+language.region=US
+language.code=en_US
+
+category.minihud=Mini HUD
+minihud.key.togglemode=Toggle Mode
