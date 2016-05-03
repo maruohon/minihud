@@ -527,13 +527,6 @@ public class InputEventHandler
         ItemStack stack = container.inventorySlots.get(slotFrom).getStack();
         boolean moreThanOne = stack != null && stack.stackSize > 1;
 
-        if (moreThanOne == false)
-        {
-            // Shift + click the last remaining item
-            this.shiftClickSlot(container, mc, slotFrom);
-            return;
-        }
-
         // Right click on the from-slot to take items to the cursor
         // if there is more than one item in the from-slot, right click on it, otherwise left click
         mc.playerController.windowClick(container.windowId, slotFrom, moreThanOne == true ? 1 : 0, ClickType.PICKUP, player);
