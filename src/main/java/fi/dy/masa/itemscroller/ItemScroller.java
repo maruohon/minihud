@@ -13,6 +13,7 @@ import fi.dy.masa.itemscroller.proxy.CommonProxy;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION,
     guiFactory = "fi.dy.masa.itemscroller.config.ItemScrollerGuiFactory",
+    updateJSON = "https://raw.githubusercontent.com/maruohon/itemscroller/master/update.json",
     clientSideOnly=true, acceptedMinecraftVersions = "1.9")
 public class ItemScroller
 {

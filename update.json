@@ -1,0 +1,26 @@
+{
+    "homepage": "http://minecraft.curseforge.com/projects/item-scroller",
+    "promos": {
+        "1.9-latest": "0.4.1",
+        "1.9-recommended": "0.4.1",
+        "1.8.9-latest": "0.4.1",
+        "1.8.9-recommended": "0.4.1"
+    },
+    "1.9": {
+        "0.4.1": "Fix a minor glitch when scrolling the last item to the hovered stack in some inventories\nAdd Forge update checker support",
+        "0.4.0": "Add config options to enable/disable the new modes\nAdd hold shift + drag to move items (like Mouse Tweaks) - the movement is interpolated: can handle fast cursor movement\nAdd special handling for Villagers: hover over the output slot, hold shift and scroll down to fill the recipe inputs (then scroll up to move the output items as usual). So basically hold shift and scroll down/up repeatedly to trade fast & easy.",
+        "0.3.0": "Add new modifier: Ctrl + scroll to move all matching items\nAdd new modifier: Ctrl + Shift + scroll to move everything",
+        "0.2.3": "Don't try to do things on fake slots. Fixes a cross-mod interaction issue/crash.",
+        "0.2.2": "Update for Forge 1805+",
+        "0.2.1": "Ported the 0.2.1 version from Minecraft 1.8.9 to 1.9"
+    },
+    "1.8.9": {
+        "0.4.1": "Fix a minor glitch when scrolling the last item to the hovered stack in some inventories\nAdd Forge update checker support",
+        "0.4.0": "Add config options to enable/disable the new modes\nAdd hold shift + drag to move items (like Mouse Tweaks) - the movement is interpolated: can handle fast cursor movement\nAdd special handling for Villagers: hover over the output slot, hold shift and scroll down to fill the recipe inputs (then scroll up to move the output items as usual). So basically hold shift and scroll down/up repeatedly to trade fast & easy.",
+        "0.3.0": "Add new modifier: Ctrl + scroll to move all matching items\nAdd new modifier: Ctrl + Shift + scroll to move everything",
+        "0.2.3": "Don't try to do things on fake slots. Fixes a cross-mod interaction issue/crash.",
+        "0.2.1": "Add (better) support for scrolling items to/from the player's hotbar\nAdd config options to individually disable the single item and full stacks modes",
+        "0.2.0": "Add configs for reversing the scrolling direction/behavior\nAdd in-game config GUI support\nAdd support for moving full stacks by holding shift\nAdd support for inventory slots that are or extend SlotItemHandler",
+        "0.1.0": "Initial release"
+    }
+}
