@@ -1,10 +1,9 @@
 package fi.dy.masa.minihud.proxy;
 
 import net.minecraft.client.settings.KeyBinding;
-
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.event.InputEventHandler;
@@ -17,8 +16,8 @@ public class ClientProxy extends CommonProxy
     @Override
     public void registerEventHandlers()
     {
-        MinecraftForge.EVENT_BUS.register(new Configs());
-        MinecraftForge.EVENT_BUS.register(new InputEventHandler());
+        FMLCommonHandler.instance().bus().register(new Configs());
+        FMLCommonHandler.instance().bus().register(new InputEventHandler());
         MinecraftForge.EVENT_BUS.register(new RenderEventHandler());
     }
 
