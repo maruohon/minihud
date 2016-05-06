@@ -30,7 +30,7 @@ public class Configs
     @SubscribeEvent
     public void onConfigChangedEvent(OnConfigChangedEvent event)
     {
-        if (Reference.MOD_ID.equals(event.modID) == true)
+        if (Reference.MOD_ID.equals(event.getModID()) == true)
         {
             loadConfigs(config);
         }
@@ -50,36 +50,36 @@ public class Configs
         Property prop;
 
         prop = conf.get(CATEGORY_GENERIC, "defaultMode", 1);
-        prop.comment = "Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light, 64 = facing, 128 = block, 256 = chunk, 512 = looking at, 1024 = fps (sum together the ones you want enabled by default)";
+        prop.setComment("Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light, 64 = facing, 128 = block, 256 = chunk, 512 = looking at, 1024 = fps (sum together the ones you want enabled by default)");
         defaultMode = prop.getInt();
         RenderEventHandler.getInstance().setEnabledMask(defaultMode);
 
         prop = conf.get(CATEGORY_GENERIC, "fontColor", 0xE0E0E0);
-        prop.comment = "Font color (default: 0xE0E0E0 = 14737632)";
+        prop.setComment("Font color (default: 0xE0E0E0 = 14737632)");
         fontColor = prop.getInt();
 
         prop = conf.get(CATEGORY_GENERIC, "textBackgroundColor", 0x90505050);
-        prop.comment = "Text background color (default: 0x90505050 = -1873784752)";
+        prop.setComment("Text background color (default: 0x90505050 = -1873784752)");
         textBackgroundColor = prop.getInt();
 
         prop = conf.get(CATEGORY_GENERIC, "textPosX", 4);
-        prop.comment = "Text X position (default: 4)";
+        prop.setComment("Text X position (default: 4)");
         textPosX = prop.getInt();
 
         prop = conf.get(CATEGORY_GENERIC, "textPosY", 4);
-        prop.comment = "Text Y position (default: 4)";
+        prop.setComment("Text Y position (default: 4)");
         textPosY = prop.getInt();
 
         prop = conf.get(CATEGORY_GENERIC, "useFontShadow", false);
-        prop.comment = "Use font shadow";
+        prop.setComment("Use font shadow");
         useFontShadow = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "useScaledFont", true);
-        prop.comment = "Use 0.5x scale font size";
+        prop.setComment("Use 0.5x scale font size");
         useScaledFont = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "useTextBackground", true);
-        prop.comment = "Use a solid background color behind the text";
+        prop.setComment("Use a solid background color behind the text");
         useTextBackground = prop.getBoolean();
 
         if (conf.hasChanged() == true)

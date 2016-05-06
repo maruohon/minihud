@@ -7,10 +7,10 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -48,7 +48,7 @@ public class RenderEventHandler
     @SubscribeEvent
     public void onRenderGameOverlay(RenderGameOverlayEvent.Post event)
     {
-        if (this.enabled == false || event.type != ElementType.ALL || this.mc.gameSettings.showDebugInfo == true)
+        if (this.enabled == false || event.getType() != ElementType.ALL || this.mc.gameSettings.showDebugInfo == true)
         {
             return;
         }
@@ -129,13 +129,13 @@ public class RenderEventHandler
 
             if ((yawPitchSpeed & MASK_YAW) != 0)
             {
-                str.append(String.format("%syaw: %.1f", pre, MathHelper.wrapAngleTo180_float(entity.rotationYaw)));
+                str.append(String.format("%syaw: %.1f", pre, MathHelper.wrapDegrees(entity.rotationYaw)));
                 pre = " / ";
             }
 
             if ((yawPitchSpeed & MASK_PITCH) != 0)
             {
-                str.append(String.format("%spitch: %.1f", pre, MathHelper.wrapAngleTo180_float(entity.rotationPitch)));
+                str.append(String.format("%spitch: %.1f", pre, MathHelper.wrapDegrees(entity.rotationPitch)));
                 pre = " / ";
             }
 
@@ -179,7 +179,7 @@ public class RenderEventHandler
                 {
                     if ((enabledMask & MASK_BIOME) != 0)
                     {
-                        lines.add("Biome: " + chunk.getBiome(pos, this.mc.theWorld.getWorldChunkManager()).biomeName);
+                        lines.add("Biome: " + chunk.getBiome(pos, this.mc.theWorld.getBiomeProvider()).getBiomeName());
                     }
 
                     if ((enabledMask & MASK_LIGHT) != 0)
@@ -193,7 +193,7 @@ public class RenderEventHandler
         if ((enabledMask & MASK_LOOKINGAT) != 0)
         {
             if (this.mc.objectMouseOver != null &&
-                this.mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK &&
+                this.mc.objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK &&
                 this.mc.objectMouseOver.getBlockPos() != null)
             {
                 BlockPos lookPos = this.mc.objectMouseOver.getBlockPos();
