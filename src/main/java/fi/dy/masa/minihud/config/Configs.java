@@ -19,6 +19,8 @@ public class Configs
     public static int defaultMode;
     public static int fontColor;
     public static int textBackgroundColor;
+    public static int textPosX;
+    public static int textPosY;
 
     public static File configurationFile;
     public static Configuration config;
@@ -47,6 +49,27 @@ public class Configs
     {
         Property prop;
 
+        prop = conf.get(CATEGORY_GENERIC, "defaultMode", 1);
+        prop.comment = "Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light (sum together the ones you want enabled by default)";
+        defaultMode = prop.getInt();
+        RenderEventHandler.getInstance().setEnabledMask(defaultMode);
+
+        prop = conf.get(CATEGORY_GENERIC, "fontColor", 0xE0E0E0);
+        prop.comment = "Font color (default: 0xE0E0E0 = 14737632)";
+        fontColor = prop.getInt();
+
+        prop = conf.get(CATEGORY_GENERIC, "textBackgroundColor", 0x90505050);
+        prop.comment = "Text background color (default: 0x90505050 = -1873784752)";
+        textBackgroundColor = prop.getInt();
+
+        prop = conf.get(CATEGORY_GENERIC, "textPosX", 4);
+        prop.comment = "Text X position (default: 4)";
+        textPosX = prop.getInt();
+
+        prop = conf.get(CATEGORY_GENERIC, "textPosY", 4);
+        prop.comment = "Text Y position (default: 4)";
+        textPosY = prop.getInt();
+
         prop = conf.get(CATEGORY_GENERIC, "useFontShadow", false);
         prop.comment = "Use font shadow";
         useFontShadow = prop.getBoolean();
@@ -58,19 +81,6 @@ public class Configs
         prop = conf.get(CATEGORY_GENERIC, "useTextBackground", true);
         prop.comment = "Use a solid background color behind the text";
         useTextBackground = prop.getBoolean();
-
-        prop = conf.get(CATEGORY_GENERIC, "defaultMode", 1);
-        prop.comment = "Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light (sum together the ones you want enabled by default)";
-        defaultMode = prop.getInt();
-        RenderEventHandler.mask = defaultMode;
-
-        prop = conf.get(CATEGORY_GENERIC, "fontColor", 0xE0E0E0);
-        prop.comment = "Font color (default = 0xE0E0E0 = 14737632)";
-        fontColor = prop.getInt();
-
-        prop = conf.get(CATEGORY_GENERIC, "textBackgroundColor", 0x90505050);
-        prop.comment = "Text background color (default = 0x90505050 = -1873784752)";
-        textBackgroundColor = prop.getInt();
 
         if (conf.hasChanged() == true)
         {
