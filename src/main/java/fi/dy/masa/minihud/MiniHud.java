@@ -13,6 +13,7 @@ import fi.dy.masa.minihud.proxy.CommonProxy;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION,
     guiFactory = "fi.dy.masa.minihud.config.MiniHudGuiFactory",
+    updateJSON = "https://raw.githubusercontent.com/maruohon/minihud/master/update.json",
     clientSideOnly=true, acceptedMinecraftVersions = "1.8")
 public class MiniHud
 {
