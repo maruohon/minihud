@@ -1,0 +1,17 @@
+{
+    "homepage": "http://minecraft.curseforge.com/projects/minihud",
+    "promos": {
+        "1.9-latest": "0.2.0",
+        "1.9-recommended": "0.2.0",
+        "1.8.9-latest": "0.2.0",
+        "1.8.9-recommended": "0.2.0"
+    },
+    "1.9": {
+        "0.2.0": "Add more information types. Add config option for position. Add Forge update checker support.",
+        "0.1.0": "Initial release"
+    },
+    "1.8.9": {
+        "0.2.0": "Add more information types. Add config option for position. Add Forge update checker support.",
+        "0.1.0": "Initial release"
+    }
+}
