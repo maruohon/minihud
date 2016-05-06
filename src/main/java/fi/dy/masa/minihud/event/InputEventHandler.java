@@ -29,27 +29,34 @@ public class InputEventHandler
                 RenderEventHandler.getInstance().toggleEnabled();
             }
         }
-        else if (key >= Keyboard.KEY_1 && key <= Keyboard.KEY_9)
+        else
         {
-            if (state == true)
+            int bit = this.getBitForKey(key);
+
+            if (bit != 0)
             {
-                this.numKey |= (1 << (key - Keyboard.KEY_1));
-            }
-            else
-            {
-                this.numKey &= ~(1 << (key - Keyboard.KEY_1));
+                this.numKey = state == true ? this.numKey | bit : this.numKey & ~bit;
             }
         }
-        else if (key == Keyboard.KEY_0)
+    }
+
+    private int getBitForKey(int key)
+    {
+        switch (key)
         {
-            if (state == true)
-            {
-                this.numKey |= (1 << 9);
-            }
-            else
-            {
-                this.numKey &= ~(1 << 9);
-            }
+            case Keyboard.KEY_0: return 1 << 9;
+            case Keyboard.KEY_1: return 1 << 0;
+            case Keyboard.KEY_2: return 1 << 1;
+            case Keyboard.KEY_3: return 1 << 2;
+            case Keyboard.KEY_4: return 1 << 3;
+            case Keyboard.KEY_5: return 1 << 4;
+            case Keyboard.KEY_6: return 1 << 5;
+            case Keyboard.KEY_7: return 1 << 6;
+            case Keyboard.KEY_8: return 1 << 7;
+            case Keyboard.KEY_9: return 1 << 8;
+            case Keyboard.KEY_A: return 1 << 10;
         }
+
+        return 0;
     }
 }

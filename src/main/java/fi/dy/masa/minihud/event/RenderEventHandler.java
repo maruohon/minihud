@@ -30,11 +30,15 @@ public class RenderEventHandler
     public static final int MASK_BLOCK          = 0x0080;
     public static final int MASK_CHUNK          = 0x0100;
     public static final int MASK_LOOKINGAT      = 0x0200;
+    public static final int MASK_FPS            = 0x0400;
 
     private static RenderEventHandler instance;
     private final Minecraft mc;
     private boolean enabled;
     private int mask;
+    private int fps;
+    private int fpsCounter;
+    private long fpsUpdateTime = Minecraft.getSystemTime();
 
     public RenderEventHandler()
     {
@@ -84,6 +88,20 @@ public class RenderEventHandler
     {
         Entity entity = this.mc.getRenderViewEntity();
         BlockPos pos = new BlockPos(entity.posX, entity.getEntityBoundingBox().minY, entity.posZ);
+
+        this.fpsCounter++;
+
+        while (Minecraft.getSystemTime() >= this.fpsUpdateTime + 1000L)
+        {
+            this.fps = this.fpsCounter;
+            this.fpsUpdateTime += 1000L;
+            this.fpsCounter = 0;
+        }
+
+        if ((enabledMask & MASK_FPS) != 0)
+        {
+            lines.add(String.format("%d fps", this.fps));
+        }
 
         if ((enabledMask & MASK_COORDINATES) != 0)
         {

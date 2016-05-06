@@ -50,7 +50,7 @@ public class Configs
         Property prop;
 
         prop = conf.get(CATEGORY_GENERIC, "defaultMode", 1);
-        prop.comment = "Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light (sum together the ones you want enabled by default)";
+        prop.comment = "Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light, 64 = facing, 128 = block, 256 = chunk, 512 = looking at, 1024 = fps (sum together the ones you want enabled by default)";
         defaultMode = prop.getInt();
         RenderEventHandler.getInstance().setEnabledMask(defaultMode);
 
