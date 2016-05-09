@@ -1,9 +1,7 @@
 package fi.dy.masa.itemscroller.event;
 
 import java.util.List;
-
 import org.lwjgl.input.Mouse;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -12,12 +10,10 @@ import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
-import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.inventory.SlotMerchantResult;
 import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
-
 import net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
@@ -25,7 +21,6 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToAccessFieldExc
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.SlotItemHandler;
-
 import fi.dy.masa.itemscroller.ItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 
@@ -284,12 +279,13 @@ public class InputEventHandler
 
     private void tryMoveSingleItemToOtherInventory(Slot slot, GuiContainer gui)
     {
-        if (slot.canTakeStack(gui.mc.thePlayer) == false)
+        ItemStack stackOrig = slot.getStack();
+
+        if (slot.canTakeStack(gui.mc.thePlayer) == false || (stackOrig.stackSize > 1 && slot.isItemValid(stackOrig) == false))
         {
             return;
         }
 
-        ItemStack stackOrig = slot.getStack();
         Container container = gui.inventorySlots;
         ItemStack stack = stackOrig.copy();
         stack.stackSize = 1;
@@ -329,10 +325,16 @@ public class InputEventHandler
         Container container = gui.inventorySlots;
         ItemStack stackOrig = slot.getStack();
 
+        if (slot.isItemValid(stackOrig) == false)
+        {
+            return;
+        }
+
         for (Slot slotTmp : container.inventorySlots)
         {
-            if (areSlotsInSameInventory(slotTmp, slot) == false && (slotTmp instanceof SlotCrafting) == false &&
-                slotTmp.getHasStack() == true && slotTmp.canTakeStack(gui.mc.thePlayer) == true)
+            if (areSlotsInSameInventory(slotTmp, slot) == false &&
+                slotTmp.getHasStack() == true && slotTmp.canTakeStack(gui.mc.thePlayer) == true &&
+                (slotTmp.getStack().stackSize == 1 || slotTmp.isItemValid(slotTmp.getStack()) == true))
             {
                 ItemStack stackTmp = slotTmp.getStack();
                 if (areStacksEqual(stackTmp, stackOrig) == true)
@@ -347,8 +349,9 @@ public class InputEventHandler
         // within the same inventory (mostly between the hotbar and the player inventory)
         for (Slot slotTmp : container.inventorySlots)
         {
-            if (slotTmp.slotNumber != slot.slotNumber && (slotTmp instanceof SlotCrafting) == false &&
-                slotTmp.getHasStack() == true && slotTmp.canTakeStack(gui.mc.thePlayer) == true)
+            if (slotTmp.slotNumber != slot.slotNumber &&
+                slotTmp.getHasStack() == true && slotTmp.canTakeStack(gui.mc.thePlayer) == true &&
+                (slotTmp.getStack().stackSize == 1 || slotTmp.isItemValid(slotTmp.getStack()) == true))
             {
                 ItemStack stackTmp = slotTmp.getStack();
                 if (areStacksEqual(stackTmp, stackOrig) == true)
