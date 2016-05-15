@@ -27,7 +27,6 @@ import fi.dy.masa.itemscroller.config.Configs;
 @SideOnly(Side.CLIENT)
 public class InputEventHandler
 {
-    private boolean leftButtonState;
     private int lastPosX;
     private int lastPosY;
     private int slotNumberLast;
@@ -70,15 +69,11 @@ public class InputEventHandler
 
     private void dragMoveItems(GuiContainer gui)
     {
-        boolean leftButtonPressed = (Mouse.getEventButton() - 100) == gui.mc.gameSettings.keyBindAttack.getKeyCode();
         int mouseX = (Mouse.getEventX() * gui.width / gui.mc.displayWidth) - gui.guiLeft;
         int mouseY = (gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1) - gui.guiTop;
 
-        if (leftButtonPressed == true)
-        {
-            this.leftButtonState = Mouse.getEventButtonState();
-        }
-        else if (GuiContainer.isShiftKeyDown() == true && this.leftButtonState == true)
+        // Check that the left mouse button is down
+        if (GuiContainer.isShiftKeyDown() == true && Mouse.isButtonDown(0) == true)
         {
             int distX = mouseX - this.lastPosX;
             int distY = mouseY - this.lastPosY;
