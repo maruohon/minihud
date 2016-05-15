@@ -73,12 +73,14 @@ public class InputEventHandler
         int mouseY = (gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1) - gui.guiTop;
 
         // Check that the left mouse button is down
-        if (GuiContainer.isShiftKeyDown() == true && Mouse.isButtonDown(0) == true)
+        if (GuiContainer.isShiftKeyDown() == true &&
+            (Mouse.isButtonDown(0) == true || Mouse.isButtonDown(1) == true))
         {
             int distX = mouseX - this.lastPosX;
             int distY = mouseY - this.lastPosY;
             int absX = Math.abs(distX);
             int absY = Math.abs(distY);
+            boolean leaveOneItem = Mouse.isButtonDown(0) == false;
 
             if (absX > absY)
             {
@@ -87,7 +89,7 @@ public class InputEventHandler
                 for (int x = this.lastPosX; ; x += inc)
                 {
                     int y = absX != 0 ? this.lastPosY + ((x - this.lastPosX) * distY / absX) : mouseY;
-                    this.dragMoveFromSlotAtPosition(gui, x, y);
+                    this.dragMoveFromSlotAtPosition(gui, x, y, leaveOneItem);
 
                     if (x == mouseX)
                     {
@@ -102,7 +104,7 @@ public class InputEventHandler
                 for (int y = this.lastPosY; ; y += inc)
                 {
                     int x = absY != 0 ? this.lastPosX + ((y - this.lastPosY) * distX / absY) : mouseX;
-                    this.dragMoveFromSlotAtPosition(gui, x, y);
+                    this.dragMoveFromSlotAtPosition(gui, x, y, leaveOneItem);
 
                     if (y == mouseY)
                     {
@@ -116,7 +118,7 @@ public class InputEventHandler
         this.lastPosY = mouseY;
     }
 
-    private void dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y)
+    private void dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y, boolean leaveOneItem)
     {
         Slot slot = this.getSlotAtPosition(gui, x, y);
 
@@ -124,7 +126,14 @@ public class InputEventHandler
         {
             if (this.isValidSlot(slot, gui, true) == true)
             {
-                this.shiftClickSlot(gui.inventorySlots, gui.mc, slot.slotNumber);
+                if (leaveOneItem == true)
+                {
+                    this.tryMoveAllButOneItemToOtherInventory(slot, gui);
+                }
+                else
+                {
+                    this.shiftClickSlot(gui.inventorySlots, gui.mc, slot.slotNumber);
+                }
             }
 
             this.slotNumberLast = slot.slotNumber;
@@ -315,6 +324,41 @@ public class InputEventHandler
         slot.putStack(stackOrig);
     }
 
+    private void tryMoveAllButOneItemToOtherInventory(Slot slot, GuiContainer gui)
+    {
+        ItemStack stackOrig = slot.getStack();
+
+        if (stackOrig.stackSize == 1 || slot.canTakeStack(gui.mc.thePlayer) == false || slot.isItemValid(stackOrig) == false)
+        {
+            return;
+        }
+
+        Container container = gui.inventorySlots;
+        Slot emptySlot = findEmptySlotInSameInventory(slot, container, stackOrig);
+
+        if (emptySlot != null)
+        {
+            // Take the stack by left clicking
+            gui.mc.playerController.windowClick(container.windowId, slot.slotNumber, 0, ClickType.PICKUP, gui.mc.thePlayer);
+
+            // Return one item by right clicking
+            gui.mc.playerController.windowClick(container.windowId, slot.slotNumber, 1, ClickType.PICKUP, gui.mc.thePlayer);
+
+            // Put the rest of the items into the empty slot
+            gui.mc.playerController.windowClick(container.windowId, emptySlot.slotNumber, 0, ClickType.PICKUP, gui.mc.thePlayer);
+
+            // Shift click the stack
+            this.shiftClickSlot(container, gui.mc, emptySlot.slotNumber);
+
+            if (emptySlot.getHasStack() == true)
+            {
+                // If items remain after the shift click, pick them up and return them to the original slot
+                gui.mc.playerController.windowClick(container.windowId, emptySlot.slotNumber, 0, ClickType.PICKUP, gui.mc.thePlayer);
+                gui.mc.playerController.windowClick(container.windowId, slot.slotNumber, 0, ClickType.PICKUP, gui.mc.thePlayer);
+            }
+        }
+    }
+
     private void tryMoveSingleItemToThisInventory(Slot slot, GuiContainer gui)
     {
         Container container = gui.inventorySlots;
@@ -479,6 +523,20 @@ public class InputEventHandler
         }
 
         return slot1.inventory == slot2.inventory;
+    }
+
+    private Slot findEmptySlotInSameInventory(Slot slot, Container container, ItemStack stack)
+    {
+        for (Slot slotTmp : container.inventorySlots)
+        {
+            if (areSlotsInSameInventory(slotTmp, slot) == true &&
+                slotTmp.getHasStack() == false && slotTmp.isItemValid(stack) == true)
+            {
+                return slotTmp;
+            }
+        }
+
+        return null;
     }
 
     private ItemStack[] getOriginalStacks(Container container)
