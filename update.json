@@ -1,12 +1,13 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/item-scroller",
     "promos": {
-        "1.9-latest": "0.4.2",
-        "1.9-recommended": "0.4.2",
-        "1.8.9-latest": "0.4.2",
-        "1.8.9-recommended": "0.4.2"
+        "1.9-latest": "0.4.3",
+        "1.9-recommended": "0.4.3",
+        "1.8.9-latest": "0.4.3",
+        "1.8.9-recommended": "0.4.3"
     },
     "1.9": {
+        "0.4.3": "Add right click dragging\nFix left mouse button's state getting stuck if the inventory is closed while holding the button",
         "0.4.2": "Fix some derps when trying to scroll to/from output-only slots, like Furnace output or crafting output",
         "0.4.1": "Fix a minor glitch when scrolling the last item to the hovered stack in some inventories\nAdd Forge update checker support",
         "0.4.0": "Add config options to enable/disable the new modes\nAdd hold shift + drag to move items (like Mouse Tweaks) - the movement is interpolated: can handle fast cursor movement\nAdd special handling for Villagers: hover over the output slot, hold shift and scroll down to fill the recipe inputs (then scroll up to move the output items as usual). So basically hold shift and scroll down/up repeatedly to trade fast & easy.",
@@ -16,6 +17,7 @@
         "0.2.1": "Ported the 0.2.1 version from Minecraft 1.8.9 to 1.9"
     },
     "1.8.9": {
+        "0.4.3": "Add right click dragging\nFix left mouse button's state getting stuck if the inventory is closed while holding the button",
         "0.4.2": "Fix some derps when trying to scroll to/from output-only slots, like Furnace output or crafting output",
         "0.4.1": "Fix a minor glitch when scrolling the last item to the hovered stack in some inventories\nAdd Forge update checker support",
         "0.4.0": "Add config options to enable/disable the new modes\nAdd hold shift + drag to move items (like Mouse Tweaks) - the movement is interpolated: can handle fast cursor movement\nAdd special handling for Villagers: hover over the output slot, hold shift and scroll down to fill the recipe inputs (then scroll up to move the output items as usual). So basically hold shift and scroll down/up repeatedly to trade fast & easy.",
