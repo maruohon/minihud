@@ -7,7 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
     }
 }
 
@@ -39,7 +39,7 @@ minecraft {
     ext.mod_version = "${config.mod_version}"
 
     if (mod_version.endsWith('-dev')) {
-        mod_version = mod_version + "-" + new Date().format('yyyyMMdd_HHmmss')
+        mod_version = mod_version + "." + new Date().format('yyyy.MM.dd.HH.mm.ss')
     }
 
     replaceIn "Reference.java"
@@ -78,6 +78,9 @@ processResources
     // Exclude the GIMP image files
     exclude '**/*.xcf'
 
+    // Exclude the Cubik model files
+    exclude '**/*.bdc3D'
+
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
@@ -106,25 +109,3 @@ jar {
         attributes 'FMLAT': config.mod_id + '_at.cfg'
     }
 }
-
-/*
-// This task creates a jar file containing the source files of this project
-task sourcesJar(type: Jar, dependsOn: classes) {
-    from sourceSets.main.allSource
-    // This classifier is standard and should not be changed
-    classifier = 'sources'
-}
-
-// This task creates a jar file containing the unobfuscated class files of the project
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    // This classifier is standard and should not be changed
-    classifier = 'deobf'
-}
-
-// This section enables the last two tasks
-artifacts {
-    archives sourcesJar
-    archives deobfJar
-}
-*/
