@@ -1,6 +1,8 @@
 package fi.dy.masa.itemscroller.event;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.lwjgl.input.Mouse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMerchant;
@@ -31,6 +33,7 @@ public class InputEventHandler
     private int lastPosY;
     private int slotNumberLast;
     private ItemStack[] originalStacks = new ItemStack[0];
+    private final Set<Integer> draggedSlots = new HashSet<Integer>();
 
     @SubscribeEvent
     public void onMouseInputEvent(MouseInputEvent.Pre event)
@@ -50,7 +53,7 @@ public class InputEventHandler
                     this.tryMoveItems((GuiContainer)event.getGui(), dWheel > 0);
                 }
             }
-            else if (Configs.enableDragMoving == true)
+            else if (Configs.enableDragMovingShiftLeft || Configs.enableDragMovingShiftRight || Configs.enableDragMovingControlLeft)
             {
                 this.dragMoveItems((GuiContainer)event.getGui());
             }
@@ -69,18 +72,30 @@ public class InputEventHandler
 
     private void dragMoveItems(GuiContainer gui)
     {
+        boolean isShiftDown = GuiContainer.isShiftKeyDown();
+        boolean isControlDown = GuiContainer.isCtrlKeyDown();
+        boolean eitherMouseButtonDown = Mouse.isButtonDown(0) || Mouse.isButtonDown(1);
+
+        if ((isShiftDown && Mouse.isButtonDown(0) && Configs.enableDragMovingShiftLeft == false) ||
+            (isShiftDown && Mouse.isButtonDown(1) && Configs.enableDragMovingShiftRight == false) ||
+            (isControlDown && eitherMouseButtonDown && Configs.enableDragMovingControlLeft == false))
+        {
+            return;
+        }
+
         int mouseX = (Mouse.getEventX() * gui.width / gui.mc.displayWidth) - gui.guiLeft;
         int mouseY = (gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1) - gui.guiTop;
+        Slot slot = this.getSlotAtPosition(gui, mouseX, mouseY);
 
         // Check that the left mouse button is down
-        if (GuiContainer.isShiftKeyDown() == true &&
-            (Mouse.isButtonDown(0) == true || Mouse.isButtonDown(1) == true))
+        if ((isShiftDown == true || isControlDown == true) && eitherMouseButtonDown == true)
         {
             int distX = mouseX - this.lastPosX;
             int distY = mouseY - this.lastPosY;
             int absX = Math.abs(distX);
             int absY = Math.abs(distY);
             boolean leaveOneItem = Mouse.isButtonDown(0) == false;
+            boolean moveOnlyOne = isShiftDown == false;
 
             if (absX > absY)
             {
@@ -89,7 +104,7 @@ public class InputEventHandler
                 for (int x = this.lastPosX; ; x += inc)
                 {
                     int y = absX != 0 ? this.lastPosY + ((x - this.lastPosX) * distY / absX) : mouseY;
-                    this.dragMoveFromSlotAtPosition(gui, x, y, leaveOneItem);
+                    this.dragMoveFromSlotAtPosition(gui, x, y, leaveOneItem, moveOnlyOne);
 
                     if (x == mouseX)
                     {
@@ -104,7 +119,7 @@ public class InputEventHandler
                 for (int y = this.lastPosY; ; y += inc)
                 {
                     int x = absY != 0 ? this.lastPosX + ((y - this.lastPosY) * distX / absY) : mouseX;
-                    this.dragMoveFromSlotAtPosition(gui, x, y, leaveOneItem);
+                    this.dragMoveFromSlotAtPosition(gui, x, y, leaveOneItem, moveOnlyOne);
 
                     if (y == mouseY)
                     {
@@ -116,9 +131,20 @@ public class InputEventHandler
 
         this.lastPosX = mouseX;
         this.lastPosY = mouseY;
+
+        // Always update the slot under the mouse.
+        // This should prevent a "double click/move" when shift + left clicking on slots that have more
+        // than one stack of items. (the regular slotClick() + a "drag move" from the slot that is under the mouse
+        // when the left mouse button is pressed down and this code runs).
+        this.slotNumberLast = slot != null ? slot.slotNumber : -1;
+
+        if (eitherMouseButtonDown == false)
+        {
+            this.draggedSlots.clear();
+        }
     }
 
-    private void dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y, boolean leaveOneItem)
+    private void dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y, boolean leaveOneItem, boolean moveOnlyOne)
     {
         Slot slot = this.getSlotAtPosition(gui, x, y);
 
@@ -126,17 +152,26 @@ public class InputEventHandler
         {
             if (this.isValidSlot(slot, gui, true) == true)
             {
-                if (leaveOneItem == true)
+                if (moveOnlyOne == true)
                 {
-                    this.tryMoveAllButOneItemToOtherInventory(slot, gui);
+                    if (this.draggedSlots.contains(slot.slotNumber) == false)
+                    {
+                        this.tryMoveSingleItemToOtherInventory(slot, gui);
+                        this.draggedSlots.add(slot.slotNumber);
+                    }
                 }
                 else
                 {
-                    this.shiftClickSlot(gui.inventorySlots, gui.mc, slot.slotNumber);
+                    if (leaveOneItem == true)
+                    {
+                        this.tryMoveAllButOneItemToOtherInventory(slot, gui);
+                    }
+                    else
+                    {
+                        this.shiftClickSlot(gui.inventorySlots, gui.mc, slot.slotNumber);
+                    }
                 }
             }
-
-            this.slotNumberLast = slot.slotNumber;
         }
     }
 

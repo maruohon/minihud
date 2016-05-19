@@ -1,15 +1,17 @@
 package fi.dy.masa.itemscroller.config;
 
 import java.io.File;
-import fi.dy.masa.itemscroller.Reference;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import fi.dy.masa.itemscroller.Reference;
 
 public class Configs
 {
-    public static boolean enableDragMoving;
+    public static boolean enableDragMovingShiftLeft;
+    public static boolean enableDragMovingShiftRight;
+    public static boolean enableDragMovingControlLeft;
     public static boolean enableMovingEverything;
     public static boolean enableScrollingMatchingStacks;
     public static boolean enableScrollingSingle;
@@ -35,7 +37,7 @@ public class Configs
     public static void loadConfigsFromFile(File configFile)
     {
         configurationFile = configFile;
-        config = new Configuration(configFile, "0.2.0", true);
+        config = new Configuration(configFile, null, true);
         config.load();
 
         loadConfigs(config);
@@ -43,9 +45,19 @@ public class Configs
 
     public static void loadConfigs(Configuration conf)
     {
-        Property prop = conf.get(CATEGORY_GENERIC, "enableDragMoving", true).setRequiresMcRestart(false);
-        prop.setComment("Enable moving items by holding down shift and dragging over slots.");
-        enableDragMoving = prop.getBoolean();
+        Property prop;
+
+        prop = conf.get(CATEGORY_GENERIC, "enableDragMovingShiftLeft", true).setRequiresMcRestart(false);
+        prop.setComment("Enable moving full stacks of items by holding down Shift and dragging over slots with the left mouse button held down.");
+        enableDragMovingShiftLeft = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "enableDragMovingShiftRight", true).setRequiresMcRestart(false);
+        prop.setComment("Enable moving everything but the last item from all stacks by holding down Shift and dragging over slots with the right mouse button held down.");
+        enableDragMovingShiftRight = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "enableDragMovingControlLeft", true).setRequiresMcRestart(false);
+        prop.setComment("Enable moving one item from all stacks by holding down Control and dragging over slots with the left mouse button held down.");
+        enableDragMovingControlLeft = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "enableMovingEverything", true).setRequiresMcRestart(false);
         prop.setComment("Enable moving all items at once (while holding ctrl and shift).");
