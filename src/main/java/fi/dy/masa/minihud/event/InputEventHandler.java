@@ -55,6 +55,7 @@ public class InputEventHandler
             case Keyboard.KEY_8: return 1 << 7;
             case Keyboard.KEY_9: return 1 << 8;
             case Keyboard.KEY_A: return 1 << 10;
+            case Keyboard.KEY_B: return 1 << 11;
         }
 
         return 0;
