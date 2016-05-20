@@ -1,17 +1,18 @@
 package fi.dy.masa.minihud.config;
 
 import java.io.File;
-
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.event.RenderEventHandler;
 
 public class Configs
 {
+    public static boolean sortLinesByLength;
+    public static boolean sortLinesReversed;
+    public static boolean coordinateFormatCustomized;
     public static boolean useFontShadow;
     public static boolean useScaledFont;
     public static boolean useTextBackground;
@@ -21,6 +22,8 @@ public class Configs
     public static int textBackgroundColor;
     public static int textPosX;
     public static int textPosY;
+
+    public static String coordinateFormat;
 
     public static File configurationFile;
     public static Configuration config;
@@ -39,7 +42,7 @@ public class Configs
     public static void loadConfigsFromFile(File configFile)
     {
         configurationFile = configFile;
-        config = new Configuration(configFile, "0.1.0", true);
+        config = new Configuration(configFile, null, true);
         config.load();
 
         loadConfigs(config);
@@ -49,14 +52,30 @@ public class Configs
     {
         Property prop;
 
+        prop = conf.get(CATEGORY_GENERIC, "coordinateFormat", "XYZ: %.4f / %.4f / %.4f");
+        prop.setComment("The format string for the coordinate line (needs to have three %f format strings!) Default: XYZ: %.4f / %.4f / %.4f");
+        coordinateFormat = prop.getString();
+
+        prop = conf.get(CATEGORY_GENERIC, "coordinateFormatCustomized", false);
+        prop.setComment("Use the customized coordinate format string");
+        coordinateFormatCustomized = prop.getBoolean();
+
         prop = conf.get(CATEGORY_GENERIC, "defaultMode", 1);
-        prop.setComment("Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light, 64 = facing, 128 = block, 256 = chunk, 512 = looking at, 1024 = fps (sum together the ones you want enabled by default)");
+        prop.setComment("Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light, 64 = facing, 128 = block, 256 = chunk, 512 = looking at, 1024 = fps, 2048 = entity count (sum together the ones you want enabled by default)");
         defaultMode = prop.getInt();
         RenderEventHandler.getInstance().setEnabledMask(defaultMode);
 
         prop = conf.get(CATEGORY_GENERIC, "fontColor", 0xE0E0E0);
         prop.setComment("Font color (default: 0xE0E0E0 = 14737632)");
         fontColor = prop.getInt();
+
+        prop = conf.get(CATEGORY_GENERIC, "sortLinesByLength", false);
+        prop.setComment("Sort the lines by their text's length");
+        sortLinesByLength = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "sortLinesReversed", false);
+        prop.setComment("Reverse the line sorting order");
+        sortLinesReversed = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "textBackgroundColor", 0x90505050);
         prop.setComment("Text background color (default: 0x90505050 = -1873784752)");
