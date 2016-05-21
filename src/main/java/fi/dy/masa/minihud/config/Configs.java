@@ -53,6 +53,8 @@ public class Configs
 
     public static void loadConfigs(Configuration conf)
     {
+        int defaultModeNumeric = defaultMode;
+        boolean defaultMoDeNumericEnabled = false;
         Property prop;
 
         prop = conf.get(CATEGORY_GENERIC, "coordinateFormat", "XYZ: %.4f / %.4f / %.4f");
@@ -65,8 +67,11 @@ public class Configs
 
         prop = conf.get(CATEGORY_GENERIC, "defaultMode", 1);
         prop.setComment("Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light, 64 = facing, 128 = block, 256 = chunk, 512 = looking at, 1024 = fps, 2048 = entity count (sum together the ones you want enabled by default)");
-        defaultMode = prop.getInt();
-        RenderEventHandler.getInstance().setEnabledMask(defaultMode);
+        defaultModeNumeric = prop.getInt();
+
+        prop = conf.get(CATEGORY_GENERIC, "defaultModeNumeric", false);
+        prop.setComment("Use the numeric bitmask instead of the individual toggle buttons for the info types");
+        defaultMoDeNumericEnabled = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "fontColor", "0xE0E0E0");
         prop.setComment("Font color (default: 0xE0E0E0 = 14737632)");
@@ -104,9 +109,78 @@ public class Configs
         prop.setComment("Use a solid background color behind the text");
         useTextBackground = prop.getBoolean();
 
+        // Information types individual toggle
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoCoordinates", false);
+        prop.setComment("Show player coordinates");
+        setInfoType(RenderEventHandler.MASK_COORDINATES, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationYaw", false);
+        prop.setComment("Show player yaw rotation");
+        setInfoType(RenderEventHandler.MASK_YAW, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationPitch", false);
+        prop.setComment("Show player pitch rotation");
+        setInfoType(RenderEventHandler.MASK_PITCH, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoSpeed", false);
+        prop.setComment("Show player moving speed");
+        setInfoType(RenderEventHandler.MASK_SPEED, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBiome", false);
+        prop.setComment("Show the current biome");
+        setInfoType(RenderEventHandler.MASK_BIOME, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLightLevel", false);
+        prop.setComment("Show the current light level");
+        setInfoType(RenderEventHandler.MASK_LIGHT, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFacing", false);
+        prop.setComment("Show player facing");
+        setInfoType(RenderEventHandler.MASK_FACING, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockPosition", false);
+        prop.setComment("Show player's block position");
+        setInfoType(RenderEventHandler.MASK_BLOCK, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkPosition", false);
+        prop.setComment("Show player's current position in the chunk");
+        setInfoType(RenderEventHandler.MASK_CHUNK, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAt", false);
+        prop.setComment("Show which block the player is looking at");
+        setInfoType(RenderEventHandler.MASK_LOOKINGAT, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFPS", false);
+        prop.setComment("Show current FPS");
+        setInfoType(RenderEventHandler.MASK_FPS, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoEntities", false);
+        prop.setComment("Show the entity count");
+        setInfoType(RenderEventHandler.MASK_ENTITIES, prop.getBoolean());
+
+        if (defaultMoDeNumericEnabled == true)
+        {
+            defaultMode = defaultModeNumeric;
+        }
+
+        RenderEventHandler.getInstance().setEnabledMask(defaultMode);
+
         if (conf.hasChanged() == true)
         {
             conf.save();
+        }
+    }
+
+    private static void setInfoType(int mask, boolean value)
+    {
+        if (value)
+        {
+            defaultMode |= mask;
+        }
+        else
+        {
+            defaultMode &= ~mask;
         }
     }
 
