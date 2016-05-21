@@ -245,7 +245,15 @@ public class RenderEventHandler
 
         if ((enabledMask & MASK_ENTITIES) != 0)
         {
-            lines.add(new StringHolder(this.mc.renderGlobal.getDebugInfoEntities()));
+            String ent = this.mc.renderGlobal.getDebugInfoEntities();
+
+            int p = ent.indexOf(",");
+            if (p != -1)
+            {
+                ent = ent.substring(0, p);
+            }
+
+            lines.add(new StringHolder(ent));
         }
 
         if ((enabledMask & MASK_LOOKINGAT) != 0)
