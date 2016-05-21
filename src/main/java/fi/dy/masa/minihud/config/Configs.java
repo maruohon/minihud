@@ -1,12 +1,12 @@
 package fi.dy.masa.minihud.config;
 
 import java.io.File;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.event.RenderEventHandler;
 
@@ -31,6 +31,7 @@ public class Configs
     public static Configuration config;
     
     public static final String CATEGORY_GENERIC = "Generic";
+    public static final String CATEGORY_INFO_TOGGLE = "InfoTypes";
 
     @SubscribeEvent
     public void onConfigChangedEvent(OnConfigChangedEvent event)
@@ -67,9 +68,9 @@ public class Configs
         defaultMode = prop.getInt();
         RenderEventHandler.getInstance().setEnabledMask(defaultMode);
 
-        prop = conf.get(CATEGORY_GENERIC, "fontColor", 0xE0E0E0);
+        prop = conf.get(CATEGORY_GENERIC, "fontColor", "0xE0E0E0");
         prop.comment = "Font color (default: 0xE0E0E0 = 14737632)";
-        fontColor = prop.getInt();
+        fontColor = getColor(prop.getString(), 0xE0E0E0);
 
         prop = conf.get(CATEGORY_GENERIC, "sortLinesByLength", false);
         prop.comment = "Sort the lines by their text's length";
@@ -79,9 +80,9 @@ public class Configs
         prop.comment = "Reverse the line sorting order";
         sortLinesReversed = prop.getBoolean();
 
-        prop = conf.get(CATEGORY_GENERIC, "textBackgroundColor", 0x90505050);
-        prop.comment = "Text background color (default: 0x90505050 = -1873784752)";
-        textBackgroundColor = prop.getInt();
+        prop = conf.get(CATEGORY_GENERIC, "textBackgroundColor", "0x70505050");
+        prop.comment = "Text background color (default: 0x70505050 = 1884311632)";
+        textBackgroundColor = getColor(prop.getString(), 0x70505050);
 
         prop = conf.get(CATEGORY_GENERIC, "textPosX", 4);
         prop.comment = "Text X position (default: 4)";
@@ -107,5 +108,20 @@ public class Configs
         {
             conf.save();
         }
+    }
+
+    private static int getColor(String colorStr, int defaultColor)
+    {
+        Pattern pattern = Pattern.compile("0x([0-9A-F]{1,8})");
+        Matcher matcher = pattern.matcher(colorStr);
+
+        if (matcher.matches())
+        {
+            try { return Integer.parseUnsignedInt(matcher.group(1), 16); }
+            catch (NumberFormatException e) { return defaultColor; }
+        }
+
+        try { return Integer.parseInt(colorStr, 10); }
+        catch (NumberFormatException e) { return defaultColor; }
     }
 }
