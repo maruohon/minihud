@@ -23,6 +23,7 @@ public class MiniHudConfigGui extends GuiConfig
         List<IConfigElement> configElements = new ArrayList<IConfigElement>();
 
         configElements.addAll(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_GENERIC)).getChildElements());
+        configElements.addAll(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_INFO_TOGGLE)).getChildElements());
 
         return configElements;
     }
