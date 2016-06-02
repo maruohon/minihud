@@ -1,19 +1,21 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/minihud",
     "promos": {
-        "1.9.4-latest": "0.4.0",
-        "1.9.4-recommended": "0.4.0",
-        "1.9-latest": "0.4.0",
-        "1.9-recommended": "0.4.0",
+        "1.9.4-latest": "0.4.1",
+        "1.9.4-recommended": "0.4.1",
+        "1.9-latest": "0.4.1",
+        "1.9-recommended": "0.4.1",
         "1.8.9-latest": "0.4.0",
         "1.8.9-recommended": "0.4.0"
     },
     "1.9.4": {
+        "0.4.1": "Strip extra stuff from the end of the entity count line",
         "0.4.0": "Add parsing the colors from hex format\nAdd individual toggle options for the information types\nSome configs changed because of this, delete your old config!!",
         "0.3.0": "Add entity count as an available information type\nAdd config option to sort the lines by their length\nAdd a config option to change the coordinate line's formatting",
         "0.2.0": "Port the 0.2.0 version from 1.9 to MC 1.9.4"
     },
     "1.9": {
+        "0.4.1": "Strip extra stuff from the end of the entity count line",
         "0.4.0": "Add parsing the colors from hex format\nAdd individual toggle options for the information types\nSome configs changed because of this, delete your old config!!",
         "0.3.0": "Add entity count as an available information type\nAdd config option to sort the lines by their length\nAdd a config option to change the coordinate line's formatting",
         "0.2.0": "Add more information types. Add config option for position. Add Forge update checker support.",
