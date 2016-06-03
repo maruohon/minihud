@@ -1,17 +1,19 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/item-scroller",
     "promos": {
-        "1.9.4-latest": "0.5.0",
-        "1.9.4-recommended": "0.5.0",
-        "1.9-latest": "0.5.0",
-        "1.9-recommended": "0.5.0",
-        "1.8.9-latest": "0.5.0",
-        "1.8.9-recommended": "0.5.0"
+        "1.9.4-latest": "0.5.1",
+        "1.9.4-recommended": "0.5.1",
+        "1.9-latest": "0.5.1",
+        "1.9-recommended": "0.5.1",
+        "1.8.9-latest": "0.5.1",
+        "1.8.9-recommended": "0.5.1"
     },
     "1.9.4": {
+        "0.5.1": "Prevent the normal shift + click action (= moving the entire stack) when clicking in a \"partial drag mode\"",
         "0.5.0": "Ported the 0.5.0 version from Minecraft 1.9 to 1.9.4"
     },
     "1.9": {
+        "0.5.1": "Prevent the normal shift + click action (= moving the entire stack) when clicking in a \"partial drag mode\"",
         "0.5.0": "Fix a bug where shift + clicking would move two stacks because of the drag feature (only noticeable if the target slot can hold more than one regular stack's worth of items)\nAdd Ctrl + click dragging to move only one item from all the dragged-over slots\nAdd separate configs options for all the different dragging modes\nRenamed the old dragging config option - thus generating a new config is recommended",
         "0.4.3": "Add right click dragging\nFix left mouse button's state getting stuck if the inventory is closed while holding the button",
         "0.4.2": "Fix some derps when trying to scroll to/from output-only slots, like Furnace output or crafting output",
@@ -23,6 +25,7 @@
         "0.2.1": "Ported the 0.2.1 version from Minecraft 1.8.9 to 1.9"
     },
     "1.8.9": {
+        "0.5.1": "Prevent the normal shift + click action (= moving the entire stack) when clicking in a \"partial drag mode\"",
         "0.5.0": "Fix a bug where shift + clicking would move two stacks because of the drag feature (only noticeable if the target slot can hold more than one regular stack's worth of items)\nAdd Ctrl + click dragging to move only one item from all the dragged-over slots\nAdd separate configs options for all the different dragging modes\nRenamed the old dragging config option - thus generating a new config is recommended",
         "0.4.3": "Add right click dragging\nFix left mouse button's state getting stuck if the inventory is closed while holding the button",
         "0.4.2": "Fix some derps when trying to scroll to/from output-only slots, like Furnace output or crafting output",
