@@ -42,20 +42,27 @@ public class InputEventHandler
 
         if (event.getGui() instanceof GuiContainer)
         {
+            boolean cancel = false;
+
             if (dWheel != 0)
             {
                 if (Configs.enableScrollingVillager == true && event.getGui() instanceof GuiMerchant)
                 {
-                    this.tryMoveItemsVillager((GuiMerchant)event.getGui(), dWheel > 0);
+                    cancel = this.tryMoveItemsVillager((GuiMerchant)event.getGui(), dWheel > 0);
                 }
                 else
                 {
-                    this.tryMoveItems((GuiContainer)event.getGui(), dWheel > 0);
+                    cancel = this.tryMoveItems((GuiContainer)event.getGui(), dWheel > 0);
                 }
             }
             else if (Configs.enableDragMovingShiftLeft || Configs.enableDragMovingShiftRight || Configs.enableDragMovingControlLeft)
             {
-                this.dragMoveItems((GuiContainer)event.getGui());
+                cancel = this.dragMoveItems((GuiContainer)event.getGui());
+            }
+
+            if (cancel && event.isCancelable())
+            {
+                event.setCanceled(true);
             }
         }
     }
@@ -70,32 +77,50 @@ public class InputEventHandler
         return slot != null && gui.inventorySlots.inventorySlots.contains(slot) == true && (requireItems == false || slot.getHasStack() == true);
     }
 
-    private void dragMoveItems(GuiContainer gui)
+    private boolean dragMoveItems(GuiContainer gui)
     {
+        boolean leftButtonDown = Mouse.isButtonDown(0);
+        boolean rightButtonDown = Mouse.isButtonDown(1);
         boolean isShiftDown = GuiContainer.isShiftKeyDown();
         boolean isControlDown = GuiContainer.isCtrlKeyDown();
-        boolean eitherMouseButtonDown = Mouse.isButtonDown(0) || Mouse.isButtonDown(1);
+        boolean eitherMouseButtonDown = leftButtonDown || rightButtonDown;
+        boolean eventKeyIsLeftButton = (Mouse.getEventButton() - 100) == gui.mc.gameSettings.keyBindAttack.getKeyCode();
+        boolean eventKeyIsRightButton = (Mouse.getEventButton() - 100) == gui.mc.gameSettings.keyBindUseItem.getKeyCode();
+        boolean eventButtonState = Mouse.getEventButtonState();
 
-        if ((isShiftDown && Mouse.isButtonDown(0) && Configs.enableDragMovingShiftLeft == false) ||
-            (isShiftDown && Mouse.isButtonDown(1) && Configs.enableDragMovingShiftRight == false) ||
+        if ((isShiftDown && leftButtonDown && Configs.enableDragMovingShiftLeft == false) ||
+            (isShiftDown && rightButtonDown && Configs.enableDragMovingShiftRight == false) ||
             (isControlDown && eitherMouseButtonDown && Configs.enableDragMovingControlLeft == false))
         {
-            return;
+            return false;
         }
 
+        boolean leaveOneItem = leftButtonDown == false;
+        boolean moveOnlyOne = isShiftDown == false;
         int mouseX = (Mouse.getEventX() * gui.width / gui.mc.displayWidth) - gui.guiLeft;
         int mouseY = (gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1) - gui.guiTop;
+        boolean cancel = false;
         Slot slot = this.getSlotAtPosition(gui, mouseX, mouseY);
 
-        // Check that the left mouse button is down
-        if ((isShiftDown == true || isControlDown == true) && eitherMouseButtonDown == true)
+        if (eventButtonState == true)
+        {
+            if (((eventKeyIsLeftButton || eventKeyIsRightButton) && isControlDown && Configs.enableDragMovingControlLeft) ||
+                (eventKeyIsRightButton && isShiftDown && Configs.enableDragMovingShiftRight))
+            {
+                // Reset this or the method call won't do anything...
+                this.slotNumberLast = -1;
+                this.dragMoveFromSlotAtPosition(gui, mouseX, mouseY, leaveOneItem, moveOnlyOne);
+                cancel = true;
+            }
+        }
+
+        // Check that either mouse button is down
+        if (cancel == false && (isShiftDown == true || isControlDown == true) && eitherMouseButtonDown == true)
         {
             int distX = mouseX - this.lastPosX;
             int distY = mouseY - this.lastPosY;
             int absX = Math.abs(distX);
             int absY = Math.abs(distY);
-            boolean leaveOneItem = Mouse.isButtonDown(0) == false;
-            boolean moveOnlyOne = isShiftDown == false;
 
             if (absX > absY)
             {
@@ -142,6 +167,8 @@ public class InputEventHandler
         {
             this.draggedSlots.clear();
         }
+
+        return cancel;
     }
 
     private void dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y, boolean leaveOneItem, boolean moveOnlyOne)
@@ -162,13 +189,18 @@ public class InputEventHandler
                 }
                 else
                 {
-                    if (leaveOneItem == true)
+                    if (this.draggedSlots.contains(slot.slotNumber) == false)
                     {
-                        this.tryMoveAllButOneItemToOtherInventory(slot, gui);
-                    }
-                    else
-                    {
-                        this.shiftClickSlot(gui.inventorySlots, gui.mc, slot.slotNumber);
+                        if (leaveOneItem == true)
+                        {
+                            this.tryMoveAllButOneItemToOtherInventory(slot, gui);
+                        }
+                        else
+                        {
+                            this.shiftClickSlot(gui.inventorySlots, gui.mc, slot.slotNumber);
+                        }
+
+                        this.draggedSlots.add(slot.slotNumber);
                     }
                 }
             }
@@ -200,26 +232,25 @@ public class InputEventHandler
         return null;
     }
 
-    private void tryMoveItemsVillager(GuiMerchant gui, boolean moveToOtherInventory)
+    private boolean tryMoveItemsVillager(GuiMerchant gui, boolean moveToOtherInventory)
     {
         boolean isShiftDown = GuiContainer.isShiftKeyDown();
 
         Slot slot = gui.getSlotUnderMouse();
         if (slot == null)
         {
-            return;
+            return false;
         }
 
         // Only do stuff when scrolling over the recipe result slot
         if ((slot instanceof SlotMerchantResult) == false)
         {
-            this.tryMoveItems(gui, moveToOtherInventory);
-            return;
+            return this.tryMoveItems(gui, moveToOtherInventory);
         }
 
         if (this.isValidSlot(slot, gui, false) == false || gui.mc.thePlayer.inventory.getItemStack() != null)
         {
-            return;
+            return false;
         }
 
         if (isShiftDown == true)
@@ -253,9 +284,11 @@ public class InputEventHandler
                 this.tryMoveSingleItemToOtherInventory(slot, gui);
             }
         }
+
+        return false;
     }
 
-    private void tryMoveItems(GuiContainer gui, boolean moveToOtherInventory)
+    private boolean tryMoveItems(GuiContainer gui, boolean moveToOtherInventory)
     {
         boolean isShiftDown = GuiContainer.isShiftKeyDown();
         boolean isCtrlDown = GuiContainer.isCtrlKeyDown();
@@ -265,13 +298,13 @@ public class InputEventHandler
             (Configs.enableScrollingMatchingStacks == false && isShiftDown == false && isCtrlDown == true) ||
             (Configs.enableMovingEverything == false && isShiftDown == true && isCtrlDown == true))
         {
-            return;
+            return false;
         }
 
         Slot slot = gui.getSlotUnderMouse();
         if (this.isValidSlot(slot, gui, true) == false || gui.mc.thePlayer.inventory.getItemStack() != null)
         {
-            return;
+            return false;
         }
 
         if ((Configs.reverseScrollDirectionSingle == true && isShiftDown == false) ||
@@ -314,6 +347,8 @@ public class InputEventHandler
                 this.tryMoveSingleItemToThisInventory(slot, gui);
             }
         }
+
+        return false;
     }
 
     private void tryMoveSingleItemToOtherInventory(Slot slot, GuiContainer gui)
