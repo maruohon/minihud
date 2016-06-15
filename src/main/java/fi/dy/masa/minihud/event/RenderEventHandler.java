@@ -222,7 +222,8 @@ public class RenderEventHandler
 
         if ((enabledMask & (MASK_BIOME | MASK_LIGHT)) != 0)
         {
-            if (this.mc.theWorld.isBlockLoaded(pos) == true)
+            // Prevent a crash when outside of world
+            if (pos.getY() >= 0 && pos.getY() < 256 && this.mc.theWorld.isBlockLoaded(pos) == true)
             {
                 Chunk chunk = this.mc.theWorld.getChunkFromBlockCoords(pos);
 

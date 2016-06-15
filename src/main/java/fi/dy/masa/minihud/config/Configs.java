@@ -191,7 +191,7 @@ public class Configs
 
         if (matcher.matches())
         {
-            try { return Integer.parseUnsignedInt(matcher.group(1), 16); }
+            try { return Integer.parseInt(matcher.group(1), 16); }
             catch (NumberFormatException e) { return defaultColor; }
         }
 

@@ -13,6 +13,9 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
 ext.configFile = file "build.properties"
 
 configFile.withReader {
