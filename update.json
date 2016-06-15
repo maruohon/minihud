@@ -9,6 +9,7 @@
         "1.8.9-recommended": "0.4.0"
     },
     "1.9.4": {
+        "0.4.2": "Prevent a crash when outside of the world (like in the void)\nFix compatibility with Java versions before 8",
         "0.4.1": "Strip extra stuff from the end of the entity count line",
         "0.4.0": "Add parsing the colors from hex format\nAdd individual toggle options for the information types\nSome configs changed because of this, delete your old config!!",
         "0.3.0": "Add entity count as an available information type\nAdd config option to sort the lines by their length\nAdd a config option to change the coordinate line's formatting",
