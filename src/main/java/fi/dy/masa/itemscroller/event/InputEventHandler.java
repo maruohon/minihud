@@ -1,5 +1,6 @@
 package fi.dy.masa.itemscroller.event;
 
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,14 @@ public class InputEventHandler
     private int slotNumberLast;
     private ItemStack[] originalStacks = new ItemStack[0];
     private final Set<Integer> draggedSlots = new HashSet<Integer>();
+    private final Field fieldGuiLeft;
+    private final Field fieldGuiTop;
+
+    public InputEventHandler()
+    {
+        this.fieldGuiLeft = ReflectionHelper.findField(GuiContainer.class, "field_147003_i", "guiLeft");
+        this.fieldGuiTop = ReflectionHelper.findField(GuiContainer.class, "field_147009_r", "guiTop");
+    }
 
     @SubscribeEvent
     public void onMouseInputEvent(MouseInputEvent.Pre event)
@@ -97,9 +106,20 @@ public class InputEventHandler
 
         boolean leaveOneItem = leftButtonDown == false;
         boolean moveOnlyOne = isShiftDown == false;
-        int mouseX = (Mouse.getEventX() * gui.width / gui.mc.displayWidth) - gui.guiLeft;
-        int mouseY = (gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1) - gui.guiTop;
+        int mouseX = 0;
+        int mouseY = 0;
         boolean cancel = false;
+
+        try
+        {
+            mouseX = (Mouse.getEventX() * gui.width / gui.mc.displayWidth) - this.fieldGuiLeft.getInt(gui);
+            mouseY = (gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1) - this.fieldGuiTop.getInt(gui);
+        }
+        catch (IllegalAccessException e)
+        {
+            ItemScroller.logger.warn("Failed to reflect GuiContainer#guiLeft or guiTop");
+        }
+
         Slot slot = this.getSlotAtPosition(gui, mouseX, mouseY);
 
         if (eventButtonState == true)
