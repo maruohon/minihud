@@ -1,12 +1,22 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/minihud",
     "promos": {
-        "1.9.4-latest": "0.4.1",
-        "1.9.4-recommended": "0.4.1",
+        "1.10.2-latest": "0.4.2",
+        "1.10.2-recommended": "0.4.2",
+        "1.10-latest": "0.4.2",
+        "1.10-recommended": "0.4.2",
+        "1.9.4-latest": "0.4.2",
+        "1.9.4-recommended": "0.4.2",
         "1.9-latest": "0.4.1",
         "1.9-recommended": "0.4.1",
         "1.8.9-latest": "0.4.0",
         "1.8.9-recommended": "0.4.0"
+    },
+    "1.10.2": {
+        "0.4.2": "Update to Minecraft 1.10.2"
+    },
+    "1.10": {
+        "0.4.2": "Update to Minecraft 1.10"
     },
     "1.9.4": {
         "0.4.2": "Prevent a crash when outside of the world (like in the void)\nFix compatibility with Java versions before 8",
