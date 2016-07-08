@@ -129,8 +129,7 @@ public class InputEventHandler
             {
                 // Reset this or the method call won't do anything...
                 this.slotNumberLast = -1;
-                this.dragMoveFromSlotAtPosition(gui, mouseX, mouseY, leaveOneItem, moveOnlyOne);
-                cancel = true;
+                cancel = this.dragMoveFromSlotAtPosition(gui, mouseX, mouseY, leaveOneItem, moveOnlyOne);
             }
         }
 
@@ -191,7 +190,7 @@ public class InputEventHandler
         return cancel;
     }
 
-    private void dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y, boolean leaveOneItem, boolean moveOnlyOne)
+    private boolean dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y, boolean leaveOneItem, boolean moveOnlyOne)
     {
         Slot slot = this.getSlotAtPosition(gui, x, y);
 
@@ -223,8 +222,13 @@ public class InputEventHandler
                         this.draggedSlots.add(slot.slotNumber);
                     }
                 }
+
+                // Valid slot, cancel the event to prevent further processing (and thus transferStackInSlot)
+                return true;
             }
         }
+
+        return false;
     }
 
     private boolean isMouseOverSlot(Slot slot, int mouseX, int mouseY)
