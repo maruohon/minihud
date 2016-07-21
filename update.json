@@ -1,31 +1,35 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/item-scroller",
     "promos": {
-        "1.10.2-latest": "0.5.2",
-        "1.10.2-recommended": "0.5.2",
-        "1.10-latest": "0.5.2",
-        "1.10-recommended": "0.5.2",
-        "1.9.4-latest": "0.5.2",
-        "1.9.4-recommended": "0.5.2",
-        "1.9-latest": "0.5.2",
-        "1.9-recommended": "0.5.2",
+        "1.10.2-latest": "0.6.0",
+        "1.10.2-recommended": "0.6.0",
+        "1.10-latest": "0.6.0",
+        "1.10-recommended": "0.6.0",
+        "1.9.4-latest": "0.6.0",
+        "1.9.4-recommended": "0.6.0",
+        "1.9-latest": "0.6.0",
+        "1.9-recommended": "0.6.0",
         "1.8.9-latest": "0.5.1",
         "1.8.9-recommended": "0.5.1"
     },
     "1.10.2": {
+        "0.6.0": "Add shift + placing and shift + dropping to move/drop all matching items",
         "0.5.2": "Don't cancel the input event when it doesn't need to be canceled, fixes a conflict with JEI item hiding",
         "0.5.1": "Update to Minecraft 1.10.2"
     },
     "1.10": {
+        "0.6.0": "Add shift + placing and shift + dropping to move/drop all matching items",
         "0.5.2": "Don't cancel the input event when it doesn't need to be canceled, fixes a conflict with JEI item hiding",
         "0.5.1": "Update to Minecraft 1.10"
     },
     "1.9.4": {
+        "0.6.0": "Add shift + placing and shift + dropping to move/drop all matching items",
         "0.5.2": "Don't cancel the input event when it doesn't need to be canceled, fixes a conflict with JEI item hiding",
         "0.5.1": "Prevent the normal shift + click action (= moving the entire stack) when clicking in a \"partial drag mode\"",
         "0.5.0": "Ported the 0.5.0 version from Minecraft 1.9 to 1.9.4"
     },
     "1.9": {
+        "0.6.0": "Add shift + placing and shift + dropping to move/drop all matching items",
         "0.5.2": "Don't cancel the input event when it doesn't need to be canceled, fixes a conflict with JEI item hiding",
         "0.5.1": "Prevent the normal shift + click action (= moving the entire stack) when clicking in a \"partial drag mode\"",
         "0.5.0": "Fix a bug where shift + clicking would move two stacks because of the drag feature (only noticeable if the target slot can hold more than one regular stack's worth of items)\nAdd Ctrl + click dragging to move only one item from all the dragged-over slots\nAdd separate configs options for all the different dragging modes\nRenamed the old dragging config option - thus generating a new config is recommended",
