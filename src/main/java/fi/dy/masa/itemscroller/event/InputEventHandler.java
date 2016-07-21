@@ -7,6 +7,7 @@ import java.util.Set;
 import org.lwjgl.input.Mouse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMerchant;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
@@ -17,7 +18,7 @@ import net.minecraft.inventory.SlotMerchantResult;
 import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
-import net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToAccessFieldException;
@@ -45,9 +46,10 @@ public class InputEventHandler
     }
 
     @SubscribeEvent
-    public void onMouseInputEvent(MouseInputEvent.Pre event)
+    public void onMouseInputEvent(GuiScreenEvent.MouseInputEvent.Pre event)
     {
         int dWheel = Mouse.getEventDWheel();
+        GuiScreen gui = event.getGui();
 
         if (event.getGui() instanceof GuiContainer)
         {
@@ -57,16 +59,23 @@ public class InputEventHandler
             {
                 if (Configs.enableScrollingVillager == true && event.getGui() instanceof GuiMerchant)
                 {
-                    cancel = this.tryMoveItemsVillager((GuiMerchant)event.getGui(), dWheel > 0);
+                    cancel = this.tryMoveItemsVillager((GuiMerchant) gui, dWheel > 0);
                 }
                 else
                 {
-                    cancel = this.tryMoveItems((GuiContainer)event.getGui(), dWheel > 0);
+                    cancel = this.tryMoveItems((GuiContainer) gui, dWheel > 0);
                 }
             }
-            else if (Configs.enableDragMovingShiftLeft || Configs.enableDragMovingShiftRight || Configs.enableDragMovingControlLeft)
+            else
             {
-                cancel = this.dragMoveItems((GuiContainer)event.getGui());
+                if (Configs.enableShiftPlaceItems && this.canShiftPlaceItems((GuiContainer) gui))
+                {
+                    cancel = this.shiftPlaceItems((GuiContainer) gui);
+                }
+                else if (Configs.enableDragMovingShiftLeft || Configs.enableDragMovingShiftRight || Configs.enableDragMovingControlLeft)
+                {
+                    cancel = this.dragMoveItems((GuiContainer) gui);
+                }
             }
 
             if (cancel && event.isCancelable())
@@ -86,12 +95,41 @@ public class InputEventHandler
         return slot != null && gui.inventorySlots.inventorySlots.contains(slot) == true && (requireItems == false || slot.getHasStack() == true);
     }
 
+    private boolean canShiftPlaceItems(GuiContainer gui)
+    {
+        boolean eventKeyIsLeftButton = (Mouse.getEventButton() - 100) == gui.mc.gameSettings.keyBindAttack.getKeyCode();
+
+        if (GuiScreen.isShiftKeyDown() == false || eventKeyIsLeftButton == false)
+        {
+            return false;
+        }
+
+        Slot slot = gui.getSlotUnderMouse();
+        ItemStack stackCursor = gui.mc.thePlayer.inventory.getItemStack();
+
+        // The target slot needs to be an empty, valid slot, and there needs to be items in the cursor
+        return slot != null && stackCursor != null && this.isValidSlot(slot, gui, false) &&
+               slot.getHasStack() == false && slot.isItemValid(stackCursor);
+    }
+
+    private boolean shiftPlaceItems(GuiContainer gui)
+    {
+        Slot slot = gui.getSlotUnderMouse();
+
+        // Left click to place the items from the cursor to the slot
+        gui.mc.playerController.windowClick(gui.inventorySlots.windowId, slot.slotNumber, 0, ClickType.PICKUP, gui.mc.thePlayer);
+
+        this.tryMoveStacks(slot, gui, true, false, false);
+
+        return true;
+    }
+
     private boolean dragMoveItems(GuiContainer gui)
     {
         boolean leftButtonDown = Mouse.isButtonDown(0);
         boolean rightButtonDown = Mouse.isButtonDown(1);
-        boolean isShiftDown = GuiContainer.isShiftKeyDown();
-        boolean isControlDown = GuiContainer.isCtrlKeyDown();
+        boolean isShiftDown = GuiScreen.isShiftKeyDown();
+        boolean isControlDown = GuiScreen.isCtrlKeyDown();
         boolean eitherMouseButtonDown = leftButtonDown || rightButtonDown;
         boolean eventKeyIsLeftButton = (Mouse.getEventButton() - 100) == gui.mc.gameSettings.keyBindAttack.getKeyCode();
         boolean eventKeyIsRightButton = (Mouse.getEventButton() - 100) == gui.mc.gameSettings.keyBindUseItem.getKeyCode();
@@ -119,8 +157,6 @@ public class InputEventHandler
         {
             ItemScroller.logger.warn("Failed to reflect GuiContainer#guiLeft or guiTop");
         }
-
-        Slot slot = this.getSlotAtPosition(gui, mouseX, mouseY);
 
         if (eventButtonState == true)
         {
@@ -180,6 +216,7 @@ public class InputEventHandler
         // This should prevent a "double click/move" when shift + left clicking on slots that have more
         // than one stack of items. (the regular slotClick() + a "drag move" from the slot that is under the mouse
         // when the left mouse button is pressed down and this code runs).
+        Slot slot = this.getSlotAtPosition(gui, mouseX, mouseY);
         this.slotNumberLast = slot != null ? slot.slotNumber : -1;
 
         if (eitherMouseButtonDown == false)
