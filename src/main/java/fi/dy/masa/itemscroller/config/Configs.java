@@ -17,6 +17,7 @@ public class Configs
     public static boolean enableScrollingSingle;
     public static boolean enableScrollingStacks;
     public static boolean enableScrollingVillager;
+    public static boolean enableShiftDropItems;
     public static boolean enableShiftPlaceItems;
     public static boolean reverseScrollDirectionSingle;
     public static boolean reverseScrollDirectionStacks;
@@ -79,6 +80,10 @@ public class Configs
         prop = conf.get(CATEGORY_GENERIC, "enableScrollingVillager", true).setRequiresMcRestart(false);
         prop.setComment("Enable special handling for Villager GUI (normally you can't shift+click items into them).");
         enableScrollingVillager = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "enableShiftDropItems", true).setRequiresMcRestart(false);
+        prop.setComment("Enable dropping items while holding shift to drop all the matching items at once.");
+        enableShiftDropItems = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "enableShiftPlaceItems", true).setRequiresMcRestart(false);
         prop.setComment("Enable placing items to an empty slot while holding shift to move all the mathing items to that inventory.");

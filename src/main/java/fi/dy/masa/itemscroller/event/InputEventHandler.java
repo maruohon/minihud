@@ -38,11 +38,15 @@ public class InputEventHandler
     private final Set<Integer> draggedSlots = new HashSet<Integer>();
     private final Field fieldGuiLeft;
     private final Field fieldGuiTop;
+    private final Field fieldGuiXSize;
+    private final Field fieldGuiYSize;
 
     public InputEventHandler()
     {
-        this.fieldGuiLeft = ReflectionHelper.findField(GuiContainer.class, "field_147003_i", "guiLeft");
-        this.fieldGuiTop = ReflectionHelper.findField(GuiContainer.class, "field_147009_r", "guiTop");
+        this.fieldGuiLeft =  ReflectionHelper.findField(GuiContainer.class, "field_147003_i", "guiLeft");
+        this.fieldGuiTop =   ReflectionHelper.findField(GuiContainer.class, "field_147009_r", "guiTop");
+        this.fieldGuiXSize = ReflectionHelper.findField(GuiContainer.class, "field_146999_f", "xSize");
+        this.fieldGuiYSize = ReflectionHelper.findField(GuiContainer.class, "field_147000_g", "ySize");
     }
 
     @SubscribeEvent
@@ -71,6 +75,10 @@ public class InputEventHandler
                 if (Configs.enableShiftPlaceItems && this.canShiftPlaceItems((GuiContainer) gui))
                 {
                     cancel = this.shiftPlaceItems((GuiContainer) gui);
+                }
+                else if (Configs.enableShiftDropItems && this.canShiftDropItems((GuiContainer) gui))
+                {
+                    this.shiftDropItems((GuiContainer) gui);
                 }
                 else if (Configs.enableDragMovingShiftLeft || Configs.enableDragMovingShiftRight || Configs.enableDragMovingControlLeft)
                 {
@@ -122,6 +130,64 @@ public class InputEventHandler
         this.tryMoveStacks(slot, gui, true, false, false);
 
         return true;
+    }
+
+    private boolean canShiftDropItems(GuiContainer gui)
+    {
+        boolean eventKeyIsLeftButton = (Mouse.getEventButton() - 100) == gui.mc.gameSettings.keyBindAttack.getKeyCode();
+
+        if (GuiScreen.isShiftKeyDown() == false || eventKeyIsLeftButton == false)
+        {
+            return false;
+        }
+
+        int left = 0;
+        int top = 0;
+        int xSize = 0;
+        int ySize = 0;
+        int mouseAbsX = 0;
+        int mouseAbsY = 0;
+
+        try
+        {
+            left = this.fieldGuiLeft.getInt(gui);
+            top = this.fieldGuiTop.getInt(gui);
+            xSize = this.fieldGuiXSize.getInt(gui);
+            ySize = this.fieldGuiYSize.getInt(gui);
+            mouseAbsX = Mouse.getEventX() * gui.width / gui.mc.displayWidth;
+            mouseAbsY = gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
+        }
+        catch (IllegalAccessException e)
+        {
+            ItemScroller.logger.warn("Failed to reflect GuiContainer#guiLeft or guiTop or xSize or ySize");
+        }
+
+        boolean isOutsideGui = mouseAbsX < left || mouseAbsY < top || mouseAbsX >= left + xSize || mouseAbsY >= top + ySize;
+
+        return isOutsideGui && this.getSlotAtPosition(gui, mouseAbsX - left, top - mouseAbsY) == null &&
+                gui.mc.thePlayer.inventory.getItemStack() != null;
+    }
+
+    private void shiftDropItems(GuiContainer gui)
+    {
+        ItemStack stackCursor = gui.mc.thePlayer.inventory.getItemStack();
+        Container container = gui.inventorySlots;
+        Minecraft mc = gui.mc;
+        EntityPlayer player = mc.thePlayer;
+
+        // First drop the existing stack from the cursor
+        mc.playerController.windowClick(container.windowId, -999, 0, ClickType.PICKUP, player);
+
+        for (Slot slot : container.inventorySlots)
+        {
+            if (areStacksEqual(slot.getStack(), stackCursor))
+            {
+                // Pick up the items
+                mc.playerController.windowClick(container.windowId, slot.slotNumber, 0, ClickType.PICKUP, player);
+                // Drop the items
+                mc.playerController.windowClick(container.windowId, -999, 0, ClickType.PICKUP, player);
+            }
+        }
     }
 
     private boolean dragMoveItems(GuiContainer gui)
