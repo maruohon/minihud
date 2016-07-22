@@ -1,6 +1,8 @@
 package fi.dy.masa.itemscroller.event;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +24,7 @@ import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToAccessFieldException;
+import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindMethodException;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.SlotItemHandler;
@@ -210,19 +213,9 @@ public class InputEventHandler
 
         boolean leaveOneItem = leftButtonDown == false;
         boolean moveOnlyOne = isShiftDown == false;
-        int mouseX = 0;
-        int mouseY = 0;
+        int mouseX = Mouse.getEventX() * gui.width / gui.mc.displayWidth;
+        int mouseY = gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
         boolean cancel = false;
-
-        try
-        {
-            mouseX = (Mouse.getEventX() * gui.width / gui.mc.displayWidth) - this.fieldGuiLeft.getInt(gui);
-            mouseY = (gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1) - this.fieldGuiTop.getInt(gui);
-        }
-        catch (IllegalAccessException e)
-        {
-            ItemScroller.logger.warn("Failed to reflect GuiContainer#guiLeft or guiTop");
-        }
 
         if (eventButtonState == true)
         {
@@ -301,29 +294,22 @@ public class InputEventHandler
         {
             if (this.isValidSlot(slot, gui, true) == true)
             {
-                if (moveOnlyOne == true)
+                if (this.draggedSlots.contains(slot.slotNumber) == false)
                 {
-                    if (this.draggedSlots.contains(slot.slotNumber) == false)
+                    if (moveOnlyOne == true)
                     {
                         this.tryMoveSingleItemToOtherInventory(slot, gui);
-                        this.draggedSlots.add(slot.slotNumber);
                     }
-                }
-                else
-                {
-                    if (this.draggedSlots.contains(slot.slotNumber) == false)
+                    else if (leaveOneItem == true)
                     {
-                        if (leaveOneItem == true)
-                        {
-                            this.tryMoveAllButOneItemToOtherInventory(slot, gui);
-                        }
-                        else
-                        {
-                            this.shiftClickSlot(gui.inventorySlots, gui.mc, slot.slotNumber);
-                        }
-
-                        this.draggedSlots.add(slot.slotNumber);
+                        this.tryMoveAllButOneItemToOtherInventory(slot, gui);
                     }
+                    else
+                    {
+                        this.shiftClickSlot(gui.inventorySlots, gui.mc, slot.slotNumber);
+                    }
+
+                    this.draggedSlots.add(slot.slotNumber);
                 }
 
                 // Valid slot, cancel the event to prevent further processing (and thus transferStackInSlot)
@@ -334,26 +320,29 @@ public class InputEventHandler
         return false;
     }
 
-    private boolean isMouseOverSlot(Slot slot, int mouseX, int mouseY)
-    {
-        return this.isPointInRegion(slot.xDisplayPosition, slot.yDisplayPosition, 16, 16, mouseX, mouseY);
-    }
-
-    private boolean isPointInRegion(int left, int top, int width, int height, int pointX, int pointY)
-    {
-        return pointX >= left - 1 && pointX < left + width + 1 && pointY >= top - 1 && pointY < top + height + 1;
-    }
-
     private Slot getSlotAtPosition(GuiContainer gui, int x, int y)
     {
-        for (int i = 0; i < gui.inventorySlots.inventorySlots.size(); i++)
+        try
         {
-            Slot slot = gui.inventorySlots.inventorySlots.get(i);
+            Method method = ReflectionHelper.findMethod(GuiContainer.class, gui,
+                new String[] { "func_146975_c", "getSlotAtPosition" }, int.class, int.class);
 
-            if (this.isMouseOverSlot(slot, x, y) == true)
-            {
-                return slot;
-            }
+            return (Slot) method.invoke(gui, x, y);
+        }
+        catch (UnableToFindMethodException e)
+        {
+            ItemScroller.logger.error("Error while trying reflect GuiContainer#getSlotAtPosition() from {} (UnableToFindMethodException)", gui.getClass().getSimpleName());
+            e.printStackTrace();
+        }
+        catch (InvocationTargetException e)
+        {
+            ItemScroller.logger.error("Error while trying reflect GuiContainer#getSlotAtPosition() from {} (InvocationTargetException)", gui.getClass().getSimpleName());
+            e.printStackTrace();
+        }
+        catch (IllegalAccessException e)
+        {
+            ItemScroller.logger.error("Error while trying reflect GuiContainer#getSlotAtPosition() from {} (IllegalAccessException)", gui.getClass().getSimpleName());
+            e.printStackTrace();
         }
 
         return null;
