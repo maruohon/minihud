@@ -164,7 +164,7 @@ public class InputEventHandler
 
         boolean isOutsideGui = mouseAbsX < left || mouseAbsY < top || mouseAbsX >= left + xSize || mouseAbsY >= top + ySize;
 
-        return isOutsideGui && this.getSlotAtPosition(gui, mouseAbsX - left, top - mouseAbsY) == null &&
+        return isOutsideGui && this.getSlotAtPosition(gui, mouseAbsX - left, mouseAbsY - top) == null &&
                 gui.mc.thePlayer.inventory.getItemStack() != null;
     }
 
