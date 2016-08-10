@@ -21,6 +21,7 @@ public class Configs
     public static boolean enableShiftPlaceItems;
     public static boolean reverseScrollDirectionSingle;
     public static boolean reverseScrollDirectionStacks;
+    public static boolean useSlotPositionAwareScrollDirection;
 
     public static File configurationFile;
     public static Configuration config;
@@ -96,6 +97,10 @@ public class Configs
         prop = conf.get(CATEGORY_GENERIC, "reverseScrollDirectionStacks", false).setRequiresMcRestart(false);
         prop.setComment("Reverse the scrolling direction for full stacks mode.");
         reverseScrollDirectionStacks = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "useSlotPositionAwareScrollDirection", false).setRequiresMcRestart(false);
+        prop.setComment("When enabled, the item movement direction depends on the slots' y-position on screen. Might be derpy with more complex inventories, use with caution!");
+        useSlotPositionAwareScrollDirection = prop.getBoolean();
 
         if (conf.hasChanged() == true)
         {

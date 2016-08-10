@@ -63,14 +63,7 @@ public class InputEventHandler
 
             if (dWheel != 0)
             {
-                if (Configs.enableScrollingVillager == true && event.getGui() instanceof GuiMerchant)
-                {
-                    cancel = this.tryMoveItemsVillager((GuiMerchant) gui, dWheel > 0);
-                }
-                else
-                {
-                    cancel = this.tryMoveItems((GuiContainer) gui, dWheel > 0);
-                }
+                this.tryMoveItems((GuiContainer) gui, dWheel > 0);
             }
             else
             {
@@ -103,6 +96,22 @@ public class InputEventHandler
         }
 
         return slot != null && gui.inventorySlots.inventorySlots.contains(slot) == true && (requireItems == false || slot.getHasStack() == true);
+    }
+
+    /**
+     * Checks if there are slots belonging to another inventory on screen above the given slot
+     */
+    private boolean inventoryExistsAbove(Slot slot, Container container)
+    {
+        for (Slot slotTmp : container.inventorySlots)
+        {
+            if (slotTmp.yDisplayPosition < slot.yDisplayPosition && areSlotsInSameInventory(slot, slotTmp) == false)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean canShiftPlaceItems(GuiContainer gui)
@@ -352,27 +361,8 @@ public class InputEventHandler
         return null;
     }
 
-    private boolean tryMoveItemsVillager(GuiMerchant gui, boolean moveToOtherInventory)
+    private boolean tryMoveItemsVillager(GuiMerchant gui, Slot slot, boolean moveToOtherInventory, boolean isShiftDown)
     {
-        boolean isShiftDown = GuiContainer.isShiftKeyDown();
-
-        Slot slot = gui.getSlotUnderMouse();
-        if (slot == null)
-        {
-            return false;
-        }
-
-        // Only do stuff when scrolling over the recipe result slot
-        if ((slot instanceof SlotMerchantResult) == false)
-        {
-            return this.tryMoveItems(gui, moveToOtherInventory);
-        }
-
-        if (gui.mc.thePlayer.inventory.getItemStack() != null || this.isValidSlot(slot, gui, false) == false)
-        {
-            return false;
-        }
-
         if (isShiftDown == true)
         {
             // Try to fill the merchant's buy slots from the player inventory
@@ -408,10 +398,38 @@ public class InputEventHandler
         return false;
     }
 
-    private boolean tryMoveItems(GuiContainer gui, boolean moveToOtherInventory)
+    private boolean tryMoveItems(GuiContainer gui, boolean scrollingUp)
     {
-        boolean isShiftDown = GuiContainer.isShiftKeyDown();
+        Slot slot = gui.getSlotUnderMouse();
         boolean isCtrlDown = GuiContainer.isCtrlKeyDown();
+        boolean isShiftDown = GuiContainer.isShiftKeyDown();
+        // Villager handling only happens when scrolling over the trade output slot
+        boolean villagerHandling = Configs.enableScrollingVillager == true && gui instanceof GuiMerchant && slot instanceof SlotMerchantResult;
+
+        // Check that the cursor is empty, and the slot is valid (don't require items in case of the villager output slot)
+        if (gui.mc.thePlayer.inventory.getItemStack() != null || this.isValidSlot(slot, gui, villagerHandling ? false : true) == false)
+        {
+            return false;
+        }
+
+        boolean moveToOtherInventory = scrollingUp;
+
+        if (Configs.useSlotPositionAwareScrollDirection)
+        {
+            boolean above = this.inventoryExistsAbove(slot, gui.inventorySlots);
+            moveToOtherInventory = above == scrollingUp; // so basically: (above && scrollingUp) || (above == false && scrollingUp == false)
+        }
+
+        if ((Configs.reverseScrollDirectionSingle == true && isShiftDown == false) ||
+            (Configs.reverseScrollDirectionStacks == true && isShiftDown == true))
+        {
+            moveToOtherInventory = ! moveToOtherInventory;
+        }
+
+        if (villagerHandling)
+        {
+            return this.tryMoveItemsVillager((GuiMerchant) gui, slot, moveToOtherInventory, isShiftDown);
+        }
 
         if ((Configs.enableScrollingSingle == false && isShiftDown == false && isCtrlDown == false) ||
             (Configs.enableScrollingStacks == false && isShiftDown == true && isCtrlDown == false) ||
@@ -419,19 +437,6 @@ public class InputEventHandler
             (Configs.enableMovingEverything == false && isShiftDown == true && isCtrlDown == true))
         {
             return false;
-        }
-
-        Slot slot = gui.getSlotUnderMouse();
-
-        if (gui.mc.thePlayer.inventory.getItemStack() != null || this.isValidSlot(slot, gui, true) == false)
-        {
-            return false;
-        }
-
-        if ((Configs.reverseScrollDirectionSingle == true && isShiftDown == false) ||
-            (Configs.reverseScrollDirectionStacks == true && isShiftDown == true))
-        {
-            moveToOtherInventory = ! moveToOtherInventory;
         }
 
         if (isShiftDown == true)
@@ -818,12 +823,6 @@ public class InputEventHandler
         if (stack == null)
         {
             return false;
-        }
-
-        // Can take all the items to the cursor at once, use a shift-click method to move one item from the slot
-        if (stack.stackSize <= stack.getMaxStackSize())
-        {
-            return this.clickSlotsToMoveSingleItemByShiftClick(container, mc, slotFrom);
         }
 
         EntityPlayer player = mc.thePlayer;
