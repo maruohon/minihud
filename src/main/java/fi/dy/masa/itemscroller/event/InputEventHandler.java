@@ -422,7 +422,6 @@ public class InputEventHandler
         }
 
         Slot slot = gui.getSlotUnderMouse();
-        //if (slot != null) System.out.printf("slot: %d\n", slot.slotNumber);
 
         if (gui.mc.thePlayer.inventory.getItemStack() != null || this.isValidSlot(slot, gui, true) == false)
         {
@@ -473,7 +472,7 @@ public class InputEventHandler
         return false;
     }
 
-    private void tryMoveSingleItemToOtherInventory(Slot slot, GuiContainer gui)
+    private boolean tryMoveSingleItemToOtherInventory(Slot slot, GuiContainer gui)
     {
         ItemStack stackOrig = slot.getStack();
         Container container = gui.inventorySlots;
@@ -481,18 +480,15 @@ public class InputEventHandler
         if (gui.mc.thePlayer.inventory.getItemStack() != null || slot.canTakeStack(gui.mc.thePlayer) == false ||
             (stackOrig.stackSize > 1 && slot.isItemValid(stackOrig) == false))
         {
-            return;
+            return false;
         }
 
         // Can take all the items to the cursor at once, use a shift-click method to move one item from the slot
         if (stackOrig.stackSize <= stackOrig.getMaxStackSize())
         {
-            System.out.printf("new\n");
-            this.clickSlotsToMoveSingleItemByShiftClick(container, gui.mc, slot.slotNumber);
-            return;
+            return this.clickSlotsToMoveSingleItemByShiftClick(container, gui.mc, slot.slotNumber);
         }
 
-        System.out.printf("old\n");
         ItemStack stack = stackOrig.copy();
         stack.stackSize = 1;
 
@@ -517,14 +513,14 @@ public class InputEventHandler
                 this.restoreOriginalStacks(container, originalStacks);
 
                 // Do the slot clicks to actually move the items (on the server side)
-                this.clickSlotsToMoveSingleItem(container, gui.mc, slot.slotNumber, targetSlot);
-
-                return;
+                return this.clickSlotsToMoveSingleItem(container, gui.mc, slot.slotNumber, targetSlot);
             }
         }
 
         // Restore the original stack to the slot under the cursor (on the client side)
         slot.putStack(stackOrig);
+
+        return false;
     }
 
     private void tryMoveAllButOneItemToOtherInventory(Slot slot, GuiContainer gui)
@@ -607,8 +603,10 @@ public class InputEventHandler
             return;
         }
 
-        for (Slot slotTmp : container.inventorySlots)
+        for (int slotNum = container.inventorySlots.size() - 1; slotNum >= 0; slotNum--)
         {
+            Slot slotTmp = container.inventorySlots.get(slotNum);
+
             if (areSlotsInSameInventory(slotTmp, slot) == false &&
                 slotTmp.getHasStack() == true && slotTmp.canTakeStack(gui.mc.thePlayer) == true &&
                 (slotTmp.getStack().stackSize == 1 || slotTmp.isItemValid(slotTmp.getStack()) == true))
@@ -812,17 +810,27 @@ public class InputEventHandler
         mc.playerController.windowClick(container.windowId, slot, 0, ClickType.QUICK_MOVE, mc.thePlayer);
     }
 
-    private void clickSlotsToMoveSingleItem(Container container, Minecraft mc, int slotFrom, int slotTo)
+    private boolean clickSlotsToMoveSingleItem(Container container, Minecraft mc, int slotFrom, int slotTo)
     {
-        EntityPlayer player = mc.thePlayer;
         //System.out.println("clickSlotsToMoveSingleItem(from: " + slotFrom + ", to: " + slotTo + ")");
 
         ItemStack stack = container.inventorySlots.get(slotFrom).getStack();
-        boolean moreThanOne = stack != null && stack.stackSize > 1;
+        if (stack == null)
+        {
+            return false;
+        }
 
-        // Right click on the from-slot to take items to the cursor
-        // if there is more than one item in the from-slot, right click on it, otherwise left click
-        mc.playerController.windowClick(container.windowId, slotFrom, moreThanOne ? 1 : 0, ClickType.PICKUP, player);
+        // Can take all the items to the cursor at once, use a shift-click method to move one item from the slot
+        if (stack.stackSize <= stack.getMaxStackSize())
+        {
+            return this.clickSlotsToMoveSingleItemByShiftClick(container, mc, slotFrom);
+        }
+
+        EntityPlayer player = mc.thePlayer;
+
+        // Click on the from-slot to take items to the cursor - if there is more than one item in the from-slot,
+        // right click on it, otherwise left click.
+        mc.playerController.windowClick(container.windowId, slotFrom, stack.stackSize > 1 ? 1 : 0, ClickType.PICKUP, player);
 
         // Right click on the target slot to put one item to it
         mc.playerController.windowClick(container.windowId, slotTo, 1, ClickType.PICKUP, player);
@@ -833,12 +841,13 @@ public class InputEventHandler
             // Left click again on the from-slot to return the rest of the items to it
             mc.playerController.windowClick(container.windowId, slotFrom, 0, ClickType.PICKUP, player);
         }
+
+        return true;
     }
 
-    private void clickSlotsToMoveSingleItemByShiftClick(Container container, Minecraft mc, int slotFrom)
+    private boolean clickSlotsToMoveSingleItemByShiftClick(Container container, Minecraft mc, int slotFrom)
     {
         EntityPlayer player = mc.thePlayer;
-
         ItemStack stack = container.inventorySlots.get(slotFrom).getStack();
 
         if (stack.stackSize > 1)
@@ -850,23 +859,25 @@ public class InputEventHandler
             if (container.inventorySlots.get(slotFrom).getHasStack())
             {
                 mc.playerController.windowClick(container.windowId, slotFrom, 0, ClickType.PICKUP, player);
+                return false;
             }
             else
             {
                 // Right click one item back to the slot
                 mc.playerController.windowClick(container.windowId, slotFrom, 1, ClickType.PICKUP, player);
-
-                // ... and then shift-click the slot
-                this.shiftClickSlot(container, mc, slotFrom);
-
-                // ... and then return the rest of the items
-                mc.playerController.windowClick(container.windowId, slotFrom, 0, ClickType.PICKUP, player);
             }
         }
-        else
+
+        // ... and then shift-click on the slot
+        this.shiftClickSlot(container, mc, slotFrom);
+
+        if (player.inventory.getItemStack() != null)
         {
-            this.shiftClickSlot(container, mc, slotFrom);
+            // ... and then return the rest of the items
+            mc.playerController.windowClick(container.windowId, slotFrom, 0, ClickType.PICKUP, player);
         }
+
+        return true;
     }
 
     /**
