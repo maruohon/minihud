@@ -58,12 +58,12 @@ public class InputEventHandler
         int dWheel = Mouse.getEventDWheel();
         GuiScreen gui = event.getGui();
 
-        if (event.getGui() instanceof GuiContainerCreative)
+        if (gui instanceof GuiContainerCreative)
         {
             return;
         }
 
-        if (event.getGui() instanceof GuiContainer)
+        if (gui instanceof GuiContainer)
         {
             boolean cancel = false;
 
