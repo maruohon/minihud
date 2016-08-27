@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
@@ -56,6 +57,11 @@ public class InputEventHandler
     {
         int dWheel = Mouse.getEventDWheel();
         GuiScreen gui = event.getGui();
+
+        if (event.getGui() instanceof GuiContainerCreative)
+        {
+            return;
+        }
 
         if (event.getGui() instanceof GuiContainer)
         {
@@ -848,6 +854,10 @@ public class InputEventHandler
     {
         EntityPlayer player = mc.thePlayer;
         ItemStack stack = container.inventorySlots.get(slotFrom).getStack();
+        if (stack == null)
+        {
+            return false;
+        }
 
         if (stack.stackSize > 1)
         {
