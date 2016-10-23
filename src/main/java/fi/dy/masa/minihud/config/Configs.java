@@ -12,6 +12,7 @@ import fi.dy.masa.minihud.event.RenderEventHandler;
 
 public class Configs
 {
+    public static boolean enableByDefault;
     public static boolean sortLinesByLength;
     public static boolean sortLinesReversed;
     public static boolean coordinateFormatCustomized;
@@ -57,8 +58,12 @@ public class Configs
         boolean defaultMoDeNumericEnabled = false;
         Property prop;
 
-        prop = conf.get(CATEGORY_GENERIC, "coordinateFormat", "XYZ: %.4f / %.4f / %.4f");
-        prop.setComment("The format string for the coordinate line (needs to have three %f format strings!) Default: XYZ: %.4f / %.4f / %.4f");
+        prop = conf.get(CATEGORY_GENERIC, "enableByDefault", true);
+        prop.setComment("If true, the HUD will be enabled by default on game launch");
+        enableByDefault = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "coordinateFormat", "x: %.0f y: %.0f z: %.0f");
+        prop.setComment("The format string for the coordinate line (needs to have three %f format strings!) Default: x: %.0f y: %.0f z: %.0f");
         coordinateFormat = prop.getString();
 
         prop = conf.get(CATEGORY_GENERIC, "coordinateFormatCustomized", false);

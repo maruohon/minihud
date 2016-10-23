@@ -1,14 +1,13 @@
 package fi.dy.masa.minihud;
 
 import org.apache.logging.log4j.Logger;
-
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.event.RenderEventHandler;
 import fi.dy.masa.minihud.proxy.CommonProxy;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION,
@@ -30,7 +29,10 @@ public class MiniHud
     {
         instance = this;
         logger = event.getModLog();
+
         Configs.loadConfigsFromFile(event.getSuggestedConfigurationFile());
+        RenderEventHandler.getInstance().setEnabled(Configs.enableByDefault);
+
         proxy.registerKeyBindings();
         proxy.registerEventHandlers();
     }
