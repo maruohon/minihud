@@ -74,7 +74,7 @@ public class RenderEventHandler
     @SubscribeEvent
     public void onRenderGameOverlay(RenderGameOverlayEvent.Post event)
     {
-        if (this.enabled == false || event.getType() != ElementType.ALL || this.mc.gameSettings.showDebugInfo == true)
+        if (this.enabled == false || event.getType() != ElementType.ALL || this.mc.gameSettings.showDebugInfo)
         {
             return;
         }
@@ -83,11 +83,11 @@ public class RenderEventHandler
 
         this.getLines(lines, this.mask);
 
-        if (Configs.sortLinesByLength == true)
+        if (Configs.sortLinesByLength)
         {
             Collections.sort(lines);
 
-            if (Configs.sortLinesReversed == true)
+            if (Configs.sortLinesReversed)
             {
                 Collections.reverse(lines);
             }
@@ -228,15 +228,15 @@ public class RenderEventHandler
         if ((enabledMask & (MASK_BIOME | MASK_LIGHT)) != 0)
         {
             // Prevent a crash when outside of world
-            if (pos.getY() >= 0 && pos.getY() < 256 && this.mc.theWorld.isBlockLoaded(pos) == true)
+            if (pos.getY() >= 0 && pos.getY() < 256 && this.mc.world.isBlockLoaded(pos))
             {
-                Chunk chunk = this.mc.theWorld.getChunkFromBlockCoords(pos);
+                Chunk chunk = this.mc.world.getChunkFromBlockCoords(pos);
 
                 if (chunk.isEmpty() == false)
                 {
                     if ((enabledMask & MASK_BIOME) != 0)
                     {
-                        lines.add(new StringHolder("Biome: " + chunk.getBiome(pos, this.mc.theWorld.getBiomeProvider()).getBiomeName()));
+                        lines.add(new StringHolder("Biome: " + chunk.getBiome(pos, this.mc.world.getBiomeProvider()).getBiomeName()));
                     }
 
                     if ((enabledMask & MASK_LIGHT) != 0)
@@ -278,7 +278,7 @@ public class RenderEventHandler
     {
         GlStateManager.pushMatrix();
 
-        if (Configs.useScaledFont == true)
+        if (Configs.useScaledFont)
         {
             GlStateManager.scale(0.5, 0.5, 0.5);
         }
@@ -289,12 +289,12 @@ public class RenderEventHandler
         {
             String line = holder.str;
 
-            if (Configs.useTextBackground == true)
+            if (Configs.useTextBackground)
             {
                 Gui.drawRect(xOff - 2, yOff - 2, xOff + fontRenderer.getStringWidth(line) + 2, yOff + fontRenderer.FONT_HEIGHT, Configs.textBackgroundColor);
             }
 
-            if (Configs.useFontShadow == true)
+            if (Configs.useFontShadow)
             {
                 this.mc.ingameGUI.drawString(fontRenderer, line, xOff, yOff, Configs.fontColor);
             }
