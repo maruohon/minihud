@@ -1,13 +1,9 @@
 package fi.dy.masa.itemscroller;
 
 import org.apache.logging.log4j.Logger;
-
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.proxy.CommonProxy;
 
@@ -17,7 +13,7 @@ import fi.dy.masa.itemscroller.proxy.CommonProxy;
     clientSideOnly=true, acceptedMinecraftVersions = "[1.9,1.10.2]")
 public class ItemScroller
 {
-    @Instance(Reference.MOD_ID)
+    @Mod.Instance(Reference.MOD_ID)
     public static ItemScroller instance;
 
     @SidedProxy(clientSide = "fi.dy.masa.itemscroller.proxy.ClientProxy", serverSide = "fi.dy.masa.itemscroller.proxy.CommonProxy")
@@ -25,7 +21,7 @@ public class ItemScroller
 
     public static Logger logger;
 
-    @EventHandler
+    @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         instance = this;
