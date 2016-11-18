@@ -111,7 +111,7 @@ public class InputEventHandler
     {
         for (Slot slotTmp : container.inventorySlots)
         {
-            if (slotTmp.yDisplayPosition < slot.yDisplayPosition && areSlotsInSameInventory(slot, slotTmp) == false)
+            if (slotTmp.yPos < slot.yPos && areSlotsInSameInventory(slot, slotTmp) == false)
             {
                 return true;
             }
