@@ -1,6 +1,8 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/item-scroller",
     "promos": {
+        "1.11-latest": "0.7.2",
+        "1.11-recommended": "0.7.2",
         "1.10.2-latest": "0.7.1",
         "1.10.2-recommended": "0.7.1",
         "1.10-latest": "0.7.1",
@@ -11,6 +13,9 @@
         "1.9-recommended": "0.7.1",
         "1.8.9-latest": "0.5.1",
         "1.8.9-recommended": "0.5.1"
+    },
+    "1.11": {
+        "0.7.2": "Update to Minecraft 1.11"
     },
     "1.10.2": {
         "0.7.1": "Ignore the creative inventory, fix a possible crash",
