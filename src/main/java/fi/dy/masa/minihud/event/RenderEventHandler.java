@@ -33,6 +33,8 @@ public class RenderEventHandler
     public static final int MASK_LOOKINGAT      = 0x0200;
     public static final int MASK_FPS            = 0x0400;
     public static final int MASK_ENTITIES       = 0x0800;
+    public static final int MASK_DIMENSION      = 0x1000;
+    public static final int MASK_TIME           = 0x2000;
 
     private static RenderEventHandler instance;
     private final Minecraft mc;
@@ -145,23 +147,48 @@ public class RenderEventHandler
             lines.add(new StringHolder(String.format("%d fps", this.fps)));
         }
 
-        if ((enabledMask & MASK_COORDINATES) != 0)
+        int coordsDim = enabledMask & (MASK_COORDINATES | MASK_DIMENSION);
+
+        if (coordsDim != 0)
         {
-            if (Configs.coordinateFormatCustomized == true)
+            String pre = "";
+            StringBuilder str = new StringBuilder(128);
+
+            if ((coordsDim & MASK_COORDINATES) != 0)
             {
-                try
+                if (Configs.coordinateFormatCustomized )
                 {
-                    lines.add(new StringHolder(String.format(Configs.coordinateFormat,
-                        entity.posX, entity.getEntityBoundingBox().minY, entity.posZ)));
+                    try
+                    {
+                        str.append(String.format(Configs.coordinateFormat,
+                            entity.posX, entity.getEntityBoundingBox().minY, entity.posZ));
+                    }
+                    // Uh oh, someone done goofed their format string... :P
+                    catch (Exception e)
+                    {
+                        str.append("broken coordinate format string!");
+                    }
                 }
-                // Uh oh, someone done goofed their format string... :P
-                catch (Exception e) { }
+                else
+                {
+                    str.append(String.format("XYZ: %.2f / %.4f / %.2f",
+                        entity.posX, entity.getEntityBoundingBox().minY, entity.posZ));
+                }
+
+                pre = " / ";
             }
-            else
+
+            if ((coordsDim & MASK_DIMENSION) != 0)
             {
-                lines.add(new StringHolder(String.format("XYZ: %.4f / %.4f / %.4f",
-                    entity.posX, entity.getEntityBoundingBox().minY, entity.posZ)));
+                str.append(String.format(String.format("%sdim: %d", pre, entity.getEntityWorld().provider.getDimension())));
             }
+
+            lines.add(new StringHolder(str.toString()));
+        }
+
+        if ((enabledMask & MASK_TIME) != 0)
+        {
+            lines.add(new StringHolder(String.format("World time: %d", entity.getEntityWorld().getWorldTime())));
         }
 
         if ((enabledMask & MASK_BLOCK) != 0)

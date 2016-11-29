@@ -66,12 +66,12 @@ public class Configs
         prop.setComment("The format string for the coordinate line (needs to have three %f format strings!) Default: x: %.0f y: %.0f z: %.0f");
         coordinateFormat = prop.getString();
 
-        prop = conf.get(CATEGORY_GENERIC, "coordinateFormatCustomized", false);
+        prop = conf.get(CATEGORY_GENERIC, "coordinateFormatCustomized", true);
         prop.setComment("Use the customized coordinate format string");
         coordinateFormatCustomized = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "defaultMode", 1);
-        prop.setComment("Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light, 64 = facing, 128 = block, 256 = chunk, 512 = looking at, 1024 = fps, 2048 = entity count (sum together the ones you want enabled by default)");
+        prop.setComment("Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light, 64 = facing, 128 = block, 256 = chunk, 512 = looking at, 1024 = fps, 2048 = entity count, 4096 = dimension id, 8192 = world time (sum together the ones you want enabled by default)");
         defaultModeNumeric = prop.getInt();
 
         prop = conf.get(CATEGORY_GENERIC, "defaultModeNumeric", false);
@@ -116,9 +116,17 @@ public class Configs
 
         // Information types individual toggle
 
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoCoordinates", false);
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoCoordinates", true);
         prop.setComment("Show player coordinates");
         setInfoType(RenderEventHandler.MASK_COORDINATES, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoDimensionId", true);
+        prop.setComment("Show the current dimension ID (might not be accurate in every case, depending on the server!)");
+        setInfoType(RenderEventHandler.MASK_DIMENSION, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTime", true);
+        prop.setComment("Show the current world time");
+        setInfoType(RenderEventHandler.MASK_TIME, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationYaw", false);
         prop.setComment("Show player yaw rotation");
@@ -140,7 +148,7 @@ public class Configs
         prop.setComment("Show the current light level");
         setInfoType(RenderEventHandler.MASK_LIGHT, prop.getBoolean());
 
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFacing", false);
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFacing", true);
         prop.setComment("Show player facing");
         setInfoType(RenderEventHandler.MASK_FACING, prop.getBoolean());
 
