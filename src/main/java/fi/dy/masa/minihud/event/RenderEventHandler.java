@@ -1,7 +1,9 @@
 package fi.dy.masa.minihud.event;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -34,10 +36,13 @@ public class RenderEventHandler
     public static final int MASK_FPS            = 0x0400;
     public static final int MASK_ENTITIES       = 0x0800;
     public static final int MASK_DIMENSION      = 0x1000;
-    public static final int MASK_TIME           = 0x2000;
+    public static final int MASK_TIME_TICKS     = 0x2000;
+    public static final int MASK_TIME_MC        = 0x4000;
+    public static final int MASK_TIME_REAL      = 0x8000;
 
     private static RenderEventHandler instance;
     private final Minecraft mc;
+    private final Date date;
     private boolean enabled;
     private int mask;
     private int fps;
@@ -71,6 +76,7 @@ public class RenderEventHandler
     public RenderEventHandler()
     {
         this.mc = Minecraft.getMinecraft();
+        this.date = new Date();
     }
 
     @SubscribeEvent
@@ -142,6 +148,20 @@ public class RenderEventHandler
             this.fpsCounter = 0;
         }
 
+        if ((enabledMask & MASK_TIME_REAL) != 0)
+        {
+            try
+            {
+                SimpleDateFormat sdf = new SimpleDateFormat(Configs.dateFormatReal);
+                this.date.setTime(System.currentTimeMillis());
+                lines.add(new StringHolder(sdf.format(this.date)));
+            }
+            catch (Exception e)
+            {
+                lines.add(new StringHolder("Date formatting failed - Invalid date format string?"));
+            }
+        }
+
         if ((enabledMask & MASK_FPS) != 0)
         {
             lines.add(new StringHolder(String.format("%d fps", this.fps)));
@@ -186,9 +206,30 @@ public class RenderEventHandler
             lines.add(new StringHolder(str.toString()));
         }
 
-        if ((enabledMask & MASK_TIME) != 0)
+        if ((enabledMask & MASK_TIME_TICKS) != 0)
         {
-            lines.add(new StringHolder(String.format("World time: %d", entity.getEntityWorld().getWorldTime())));
+            long current = entity.getEntityWorld().getWorldTime();
+            long total = entity.getEntityWorld().getTotalWorldTime();
+            lines.add(new StringHolder(String.format("World time: %5d - total: %d", current, total)));
+        }
+
+        if ((enabledMask & MASK_TIME_MC) != 0)
+        {
+            try
+            {
+                long timeDay = (int) entity.getEntityWorld().getWorldTime();
+                int day = (int) (timeDay / 24000);
+                // 1 tick = 3.6 seconds in MC (0.2777... seconds IRL)
+                int hour = (int) ((timeDay / 1000) + 6) % 24;
+                int min = (int) (timeDay / 16.666666) % 60;
+                int sec = (int) (timeDay / 0.277777) % 60;
+
+                lines.add(new StringHolder(String.format("Time: %02d:%02d:%02d (day %d)", hour, min, sec, day)));
+            }
+            catch (Exception e)
+            {
+                lines.add(new StringHolder("Date formatting failed - Invalid date format string?"));
+            }
         }
 
         if ((enabledMask & MASK_BLOCK) != 0)

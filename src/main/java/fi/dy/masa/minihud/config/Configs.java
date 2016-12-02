@@ -27,6 +27,7 @@ public class Configs
     public static int textPosY;
 
     public static String coordinateFormat;
+    public static String dateFormatReal;
 
     public static File configurationFile;
     public static Configuration config;
@@ -69,6 +70,10 @@ public class Configs
         prop = conf.get(CATEGORY_GENERIC, "coordinateFormatCustomized", true);
         prop.setComment("Use the customized coordinate format string");
         coordinateFormatCustomized = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "dateFormatReal", "HH:mm:ss");
+        prop.setComment("The format string for real time, see the Java SimpleDateFormat class for the format patterns, if needed");
+        dateFormatReal = prop.getString();
 
         prop = conf.get(CATEGORY_GENERIC, "defaultMode", 1);
         prop.setComment("Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light, 64 = facing, 128 = block, 256 = chunk, 512 = looking at, 1024 = fps, 2048 = entity count, 4096 = dimension id, 8192 = world time (sum together the ones you want enabled by default)");
@@ -124,9 +129,17 @@ public class Configs
         prop.setComment("Show the current dimension ID (might not be accurate in every case, depending on the server!)");
         setInfoType(RenderEventHandler.MASK_DIMENSION, prop.getBoolean());
 
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTime", true);
-        prop.setComment("Show the current world time");
-        setInfoType(RenderEventHandler.MASK_TIME, prop.getBoolean());
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTime", false);
+        prop.setComment("Show the current world time in ticks");
+        setInfoType(RenderEventHandler.MASK_TIME_TICKS, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTimeFormatted", true);
+        prop.setComment("Show the current world time formatted according to dateFormatMC");
+        setInfoType(RenderEventHandler.MASK_TIME_MC, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRealTime", false);
+        prop.setComment("Show the current real time formatted according to dateFormatReal");
+        setInfoType(RenderEventHandler.MASK_TIME_REAL, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationYaw", false);
         prop.setComment("Show player yaw rotation");
