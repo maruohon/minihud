@@ -438,7 +438,7 @@ public class InputEventHandler
         if ((Configs.enableScrollingSingle == false && isShiftDown == false && isCtrlDown == false) ||
             (Configs.enableScrollingStacks == false && isShiftDown && isCtrlDown == false) ||
             (Configs.enableScrollingMatchingStacks == false && isShiftDown == false && isCtrlDown) ||
-            (Configs.enableMovingEverything == false && isShiftDown && isCtrlDown))
+            (Configs.enableScrollingEverything == false && isShiftDown && isCtrlDown))
         {
             return false;
         }
@@ -664,7 +664,13 @@ public class InputEventHandler
                 areSlotsInSameInventory(slotTmp, slot) == toOtherInventory &&
                 (matchingOnly == false || areStacksEqual(stack, slotTmp.getStack())))
             {
-                this.shiftClickSlot(container, gui.mc, slotTmp.slotNumber);
+                boolean success = this.shiftClickSlotWithCheck(container, gui.mc, slotTmp.slotNumber);
+
+                // Failed to shift-click items, try a manual method
+                if (success == false && Configs.enableScrollingStacksFallback)
+                {
+                    this.clickSlotsToMoveItems(slot, container, gui.mc, matchingOnly, toOtherInventory);
+                }
 
                 if (firstOnly)
                 {
@@ -674,9 +680,9 @@ public class InputEventHandler
         }
 
         // If moving to the other inventory, then move the hovered slot's stack last
-        if (toOtherInventory)
+        if (toOtherInventory && this.shiftClickSlotWithCheck(container, gui.mc, slot.slotNumber) == false)
         {
-            this.shiftClickSlot(container, gui.mc, slot.slotNumber);
+            this.clickSlotsToMoveItems(slot, container, gui.mc, matchingOnly, toOtherInventory);
         }
     }
 
@@ -821,9 +827,77 @@ public class InputEventHandler
         return -1;
     }
 
+    private boolean shiftClickSlotWithCheck(Container container, Minecraft mc, int slotNum)
+    {
+        Slot slot = container.getSlot(slotNum);
+        if (slot == null || slot.getHasStack() == false)
+        {
+            return false;
+        }
+
+        int sizeOrig = slot.getStack().getCount();
+        this.shiftClickSlot(container, mc, slotNum);
+
+        return slot.getHasStack() == false || slot.getStack().getCount() != sizeOrig;
+    }
+
     private void shiftClickSlot(Container container, Minecraft mc, int slot)
     {
         mc.playerController.windowClick(container.windowId, slot, 0, ClickType.QUICK_MOVE, mc.player);
+    }
+
+    private void clickSlotsToMoveItems(Slot slot, Container container, Minecraft mc, boolean matchingOnly, boolean toOtherInventory)
+    {
+        for (Slot slotTmp : container.inventorySlots)
+        {
+            if (slotTmp.slotNumber != slot.slotNumber && areSlotsInSameInventory(slotTmp, slot) == toOtherInventory &&
+                slotTmp.getHasStack() && (matchingOnly == false || areStacksEqual(slot.getStack(), slotTmp.getStack())))
+            {
+                this.clickSlotsToMoveItemsFromSlot(slotTmp, slot, container, mc, toOtherInventory);
+                return;
+            }
+        }
+
+        // Move the hovered-over slot's stack last
+        if (toOtherInventory)
+        {
+            this.clickSlotsToMoveItemsFromSlot(slot, slot, container, mc, toOtherInventory);
+        }
+    }
+
+    private void clickSlotsToMoveItemsFromSlot(Slot slotFrom, Slot slotCursor, Container container, Minecraft mc, boolean toOtherInventory)
+    {
+        EntityPlayer player = mc.player;
+        // Left click to pick up the found source stack
+        mc.playerController.windowClick(container.windowId, slotFrom.slotNumber, 0, ClickType.PICKUP, player);
+
+        if (player.inventory.getItemStack().isEmpty())
+        {
+            return;
+        }
+
+        for (Slot slotDst : container.inventorySlots)
+        {
+            ItemStack stackDst = slotDst.getStack();
+
+            if (areSlotsInSameInventory(slotDst, slotCursor) != toOtherInventory &&
+                (stackDst.isEmpty() || areStacksEqual(stackDst, player.inventory.getItemStack())))
+            {
+                // Left click to (try and) place items to the slot
+                mc.playerController.windowClick(container.windowId, slotDst.slotNumber, 0, ClickType.PICKUP, player);
+            }
+
+            if (player.inventory.getItemStack().isEmpty())
+            {
+                return;
+            }
+        }
+
+        // Couldn't fit the entire stack to the target inventory, return the rest of the items
+        if (player.inventory.getItemStack().isEmpty() == false)
+        {
+            mc.playerController.windowClick(container.windowId, slotFrom.slotNumber, 0, ClickType.PICKUP, player);
+        }
     }
 
     private boolean clickSlotsToMoveSingleItem(Container container, Minecraft mc, int slotFrom, int slotTo)

@@ -12,10 +12,11 @@ public class Configs
     public static boolean enableDragMovingShiftLeft;
     public static boolean enableDragMovingShiftRight;
     public static boolean enableDragMovingControlLeft;
-    public static boolean enableMovingEverything;
+    public static boolean enableScrollingEverything;
     public static boolean enableScrollingMatchingStacks;
     public static boolean enableScrollingSingle;
     public static boolean enableScrollingStacks;
+    public static boolean enableScrollingStacksFallback;
     public static boolean enableScrollingVillager;
     public static boolean enableShiftDropItems;
     public static boolean enableShiftPlaceItems;
@@ -64,7 +65,7 @@ public class Configs
 
         prop = conf.get(CATEGORY_GENERIC, "enableMovingEverything", true).setRequiresMcRestart(false);
         prop.setComment("Enable moving all items at once (while holding ctrl and shift).");
-        enableMovingEverything = prop.getBoolean();
+        enableScrollingEverything = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "enableScrollingMatchingStacks", true).setRequiresMcRestart(false);
         prop.setComment("Enable moving all matching items at once (while holding ctrl).");
@@ -77,6 +78,10 @@ public class Configs
         prop = conf.get(CATEGORY_GENERIC, "enableScrollingStacks", true).setRequiresMcRestart(false);
         prop.setComment("Enable item scrolling full stack at a time (while holding shift).");
         enableScrollingStacks = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "enableScrollingStacksFallback", true).setRequiresMcRestart(false);
+        prop.setComment("Enable a \"fallback\" mode for scrolling entire stacks (for example to a vanilla crafting table, where shift + click doesn't work).");
+        enableScrollingStacksFallback = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "enableScrollingVillager", true).setRequiresMcRestart(false);
         prop.setComment("Enable special handling for Villager GUI (normally you can't shift+click items into them).");
