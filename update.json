@@ -1,23 +1,25 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/item-scroller",
     "promos": {
-        "1.11-latest": "0.7.2",
-        "1.11-recommended": "0.7.2",
-        "1.10.2-latest": "0.7.1",
-        "1.10.2-recommended": "0.7.1",
-        "1.10-latest": "0.7.1",
-        "1.10-recommended": "0.7.1",
-        "1.9.4-latest": "0.7.1",
-        "1.9.4-recommended": "0.7.1",
-        "1.9-latest": "0.7.1",
-        "1.9-recommended": "0.7.1",
+        "1.11-latest": "0.8.0",
+        "1.11-recommended": "0.8.0",
+        "1.10.2-latest": "0.8.0",
+        "1.10.2-recommended": "0.8.0",
+        "1.10-latest": "0.8.0",
+        "1.10-recommended": "0.8.0",
+        "1.9.4-latest": "0.8.0",
+        "1.9.4-recommended": "0.8.0",
+        "1.9-latest": "0.8.0",
+        "1.9-recommended": "0.8.0",
         "1.8.9-latest": "0.5.1",
         "1.8.9-recommended": "0.5.1"
     },
     "1.11": {
+        "0.8.0": "Add better checks for drag handler, to only cancel the event when necessary (fixes a compat. issue)\nAdd a fallback handler for shift/ctrl + scrolling",
         "0.7.2": "Update to Minecraft 1.11"
     },
     "1.10.2": {
+        "0.8.0": "Add better checks for drag handler, to only cancel the event when necessary (fixes a compat. issue)\nAdd a fallback handler for shift/ctrl + scrolling",
         "0.7.1": "Ignore the creative inventory, fix a possible crash",
         "0.7.0": "Change single item scrolling code, fixes some incompatibilities (like a crash with Chisel)\nAdd an option for slot position aware scroll direction (\"natural scroll direction\")",
         "0.6.1": "Fix drag moving being broken in some inventories that use wrapped slots, for example Tinkers' Construct\nChange the code of the \"move everything except the last item\" drag mode to not need an empty slot in the source inventory",
@@ -26,6 +28,7 @@
         "0.5.1": "Update to Minecraft 1.10.2"
     },
     "1.10": {
+        "0.8.0": "Add better checks for drag handler, to only cancel the event when necessary (fixes a compat. issue)\nAdd a fallback handler for shift/ctrl + scrolling",
         "0.7.1": "Ignore the creative inventory, fix a possible crash",
         "0.7.0": "Change single item scrolling code, fixes some incompatibilities (like a crash with Chisel)\nAdd an option for slot position aware scroll direction (\"natural scroll direction\")",
         "0.6.1": "Fix drag moving being broken in some inventories that use wrapped slots, for example Tinkers' Construct\nChange the code of the \"move everything except the last item\" drag mode to not need an empty slot in the source inventory",
@@ -34,6 +37,7 @@
         "0.5.1": "Update to Minecraft 1.10"
     },
     "1.9.4": {
+        "0.8.0": "Add better checks for drag handler, to only cancel the event when necessary (fixes a compat. issue)\nAdd a fallback handler for shift/ctrl + scrolling",
         "0.7.1": "Ignore the creative inventory, fix a possible crash",
         "0.7.0": "Change single item scrolling code, fixes some incompatibilities (like a crash with Chisel)\nAdd an option for slot position aware scroll direction (\"natural scroll direction\")",
         "0.6.1": "Fix drag moving being broken in some inventories that use wrapped slots, for example Tinkers' Construct\nChange the code of the \"move everything except the last item\" drag mode to not need an empty slot in the source inventory",
@@ -43,6 +47,7 @@
         "0.5.0": "Ported the 0.5.0 version from Minecraft 1.9 to 1.9.4"
     },
     "1.9": {
+        "0.8.0": "Add better checks for drag handler, to only cancel the event when necessary (fixes a compat. issue)\nAdd a fallback handler for shift/ctrl + scrolling",
         "0.7.1": "Ignore the creative inventory, fix a possible crash",
         "0.7.0": "Change single item scrolling code, fixes some incompatibilities (like a crash with Chisel)\nAdd an option for slot position aware scroll direction (\"natural scroll direction\")",
         "0.6.1": "Fix drag moving being broken in some inventories that use wrapped slots, for example Tinkers' Construct\nChange the code of the \"move everything except the last item\" drag mode to not need an empty slot in the source inventory",
