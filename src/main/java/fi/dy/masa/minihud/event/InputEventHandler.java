@@ -18,7 +18,7 @@ public class InputEventHandler
         int key = Keyboard.getEventKey();
         boolean state = Keyboard.getEventKeyState();
 
-        if (state == true && key == ClientProxy.keyToggleMode.getKeyCode())
+        if (state && key == ClientProxy.keyToggleMode.getKeyCode())
         {
             if (this.numKey != 0)
             {
@@ -35,7 +35,7 @@ public class InputEventHandler
 
             if (bit != 0)
             {
-                this.numKey = state == true ? this.numKey | bit : this.numKey & ~bit;
+                this.numKey = state ? (this.numKey | bit) : (this.numKey & ~bit);
             }
         }
     }
@@ -44,7 +44,6 @@ public class InputEventHandler
     {
         switch (key)
         {
-            case Keyboard.KEY_0: return 1 << 9;
             case Keyboard.KEY_1: return 1 << 0;
             case Keyboard.KEY_2: return 1 << 1;
             case Keyboard.KEY_3: return 1 << 2;
@@ -54,8 +53,14 @@ public class InputEventHandler
             case Keyboard.KEY_7: return 1 << 6;
             case Keyboard.KEY_8: return 1 << 7;
             case Keyboard.KEY_9: return 1 << 8;
+            case Keyboard.KEY_0: return 1 << 9;
             case Keyboard.KEY_A: return 1 << 10;
             case Keyboard.KEY_B: return 1 << 11;
+            case Keyboard.KEY_C: return 1 << 12;
+            case Keyboard.KEY_D: return 1 << 13;
+            case Keyboard.KEY_E: return 1 << 14;
+            case Keyboard.KEY_F: return 1 << 15;
+            case Keyboard.KEY_G: return 1 << 16;
         }
 
         return 0;

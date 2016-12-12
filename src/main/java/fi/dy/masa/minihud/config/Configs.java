@@ -177,12 +177,16 @@ public class Configs
         prop.setComment("Show which block the player is looking at");
         setInfoType(RenderEventHandler.MASK_LOOKINGAT, prop.getBoolean());
 
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAtEntity", false);
+        prop.setComment("Show entity name and health when looked at");
+        setInfoType(RenderEventHandler.MASK_LOOKING_AT_ENTITY, prop.getBoolean());
+
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFPS", false);
         prop.setComment("Show current FPS");
         setInfoType(RenderEventHandler.MASK_FPS, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoEntities", false);
-        prop.setComment("Show the entity count");
+        prop.setComment("Show the visible/loaded entity count");
         setInfoType(RenderEventHandler.MASK_ENTITIES, prop.getBoolean());
 
         if (defaultMoDeNumericEnabled == true)

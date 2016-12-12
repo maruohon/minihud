@@ -10,6 +10,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -23,22 +24,23 @@ import fi.dy.masa.minihud.config.Configs;
 
 public class RenderEventHandler
 {
-    public static final int MASK_COORDINATES    = 0x0001;
-    public static final int MASK_YAW            = 0x0002;
-    public static final int MASK_PITCH          = 0x0004;
-    public static final int MASK_SPEED          = 0x0008;
-    public static final int MASK_BIOME          = 0x0010;
-    public static final int MASK_LIGHT          = 0x0020;
-    public static final int MASK_FACING         = 0x0040;
-    public static final int MASK_BLOCK          = 0x0080;
-    public static final int MASK_CHUNK          = 0x0100;
-    public static final int MASK_LOOKINGAT      = 0x0200;
-    public static final int MASK_FPS            = 0x0400;
-    public static final int MASK_ENTITIES       = 0x0800;
-    public static final int MASK_DIMENSION      = 0x1000;
-    public static final int MASK_TIME_TICKS     = 0x2000;
-    public static final int MASK_TIME_MC        = 0x4000;
-    public static final int MASK_TIME_REAL      = 0x8000;
+    public static final int MASK_COORDINATES    = 0x00000001;
+    public static final int MASK_YAW            = 0x00000002;
+    public static final int MASK_PITCH          = 0x00000004;
+    public static final int MASK_SPEED          = 0x00000008;
+    public static final int MASK_BIOME          = 0x00000010;
+    public static final int MASK_LIGHT          = 0x00000020;
+    public static final int MASK_FACING         = 0x00000040;
+    public static final int MASK_BLOCK          = 0x00000080;
+    public static final int MASK_CHUNK          = 0x00000100;
+    public static final int MASK_LOOKINGAT      = 0x00000200;
+    public static final int MASK_FPS            = 0x00000400;
+    public static final int MASK_ENTITIES       = 0x00000800;
+    public static final int MASK_DIMENSION      = 0x00001000;
+    public static final int MASK_TIME_TICKS     = 0x00002000;
+    public static final int MASK_TIME_MC        = 0x00004000;
+    public static final int MASK_TIME_REAL      = 0x00008000;
+    public static final int MASK_LOOKING_AT_ENTITY = 0x00010000;
 
     private static RenderEventHandler instance;
     private final Minecraft mc;
@@ -148,7 +150,7 @@ public class RenderEventHandler
 
             if ((coordsDim & MASK_COORDINATES) != 0)
             {
-                if (Configs.coordinateFormatCustomized )
+                if (Configs.coordinateFormatCustomized)
                 {
                     try
                     {
@@ -310,6 +312,17 @@ public class RenderEventHandler
             {
                 BlockPos lookPos = this.mc.objectMouseOver.getBlockPos();
                 lines.add(new StringHolder(String.format("Looking at: %d %d %d", lookPos.getX(), lookPos.getY(), lookPos.getZ())));
+            }
+        }
+
+        if ((enabledMask & MASK_LOOKING_AT_ENTITY) != 0)
+        {
+            if (this.mc.objectMouseOver != null &&
+                this.mc.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY &&
+                this.mc.objectMouseOver.entityHit != null && this.mc.objectMouseOver.entityHit instanceof EntityLivingBase)
+            {
+                EntityLivingBase target = (EntityLivingBase) this.mc.objectMouseOver.entityHit;
+                lines.add(new StringHolder(String.format("%s - HP: %.1f / %.1f", target.getName(), target.getHealth(), target.getMaxHealth())));
             }
         }
 
