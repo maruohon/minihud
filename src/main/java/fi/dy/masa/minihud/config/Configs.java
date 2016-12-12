@@ -134,7 +134,7 @@ public class Configs
         setInfoType(RenderEventHandler.MASK_TIME_TICKS, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTimeFormatted", true);
-        prop.setComment("Show the current world time formatted according to dateFormatMC");
+        prop.setComment("Show the current world time formatted to days, hours, minutes");
         setInfoType(RenderEventHandler.MASK_TIME_MC, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRealTime", false);

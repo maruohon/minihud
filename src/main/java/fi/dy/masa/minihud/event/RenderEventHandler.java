@@ -48,30 +48,8 @@ public class RenderEventHandler
     private int fps;
     private int fpsCounter;
     private long fpsUpdateTime = Minecraft.getSystemTime();
-
-    private class StringHolder implements Comparable<StringHolder>
-    {
-        public final String str;
-
-        public StringHolder(String str)
-        {
-            this.str = str;
-        }
-
-        @Override
-        public int compareTo(StringHolder other)
-        {
-            int lenThis = this.str.length();
-            int lenOther = other.str.length();
-
-            if (lenThis == lenOther)
-            {
-                return 0;
-            }
-
-            return this.str.length() > other.str.length() ? -1 : 1;
-        }
-    }
+    private float partialTicksLast;
+    List<StringHolder> lines = new ArrayList<StringHolder>();
 
     public RenderEventHandler()
     {
@@ -87,21 +65,14 @@ public class RenderEventHandler
             return;
         }
 
-        List<StringHolder> lines = new ArrayList<StringHolder>();
-
-        this.getLines(lines, this.mask);
-
-        if (Configs.sortLinesByLength)
+        // Only update the text once per game tick
+        if (event.getPartialTicks() < this.partialTicksLast)
         {
-            Collections.sort(lines);
-
-            if (Configs.sortLinesReversed)
-            {
-                Collections.reverse(lines);
-            }
+            this.getLines(this.lines, this.mask);
         }
 
-        this.renderText(Configs.textPosX, Configs.textPosY, lines);
+        this.renderText(Configs.textPosX, Configs.textPosY, this.lines);
+        this.partialTicksLast = event.getPartialTicks();
     }
 
     public static RenderEventHandler getInstance()
@@ -139,6 +110,7 @@ public class RenderEventHandler
         Entity entity = this.mc.getRenderViewEntity();
         BlockPos pos = new BlockPos(entity.posX, entity.getEntityBoundingBox().minY, entity.posZ);
 
+        lines.clear();
         this.fpsCounter++;
 
         while (Minecraft.getSystemTime() >= this.fpsUpdateTime + 1000L)
@@ -218,7 +190,7 @@ public class RenderEventHandler
             try
             {
                 long timeDay = (int) entity.getEntityWorld().getWorldTime();
-                int day = (int) (timeDay / 24000);
+                int day = (int) (timeDay / 24000) + 1;
                 // 1 tick = 3.6 seconds in MC (0.2777... seconds IRL)
                 int hour = (int) ((timeDay / 1000) + 6) % 24;
                 int min = (int) (timeDay / 16.666666) % 60;
@@ -340,14 +312,25 @@ public class RenderEventHandler
                 lines.add(new StringHolder(String.format("Looking at: %d %d %d", lookPos.getX(), lookPos.getY(), lookPos.getZ())));
             }
         }
+
+        if (Configs.sortLinesByLength)
+        {
+            Collections.sort(lines);
+
+            if (Configs.sortLinesReversed)
+            {
+                Collections.reverse(lines);
+            }
+        }
     }
 
     private void renderText(int xOff, int yOff, List<StringHolder> lines)
     {
-        GlStateManager.pushMatrix();
+        boolean scale = Configs.useScaledFont;
 
-        if (Configs.useScaledFont)
+        if (scale)
         {
+            GlStateManager.pushMatrix();
             GlStateManager.scale(0.5, 0.5, 0.5);
         }
 
@@ -364,7 +347,7 @@ public class RenderEventHandler
 
             if (Configs.useFontShadow)
             {
-                this.mc.ingameGUI.drawString(fontRenderer, line, xOff, yOff, Configs.fontColor);
+                fontRenderer.drawStringWithShadow(line, xOff, yOff, Configs.fontColor);
             }
             else
             {
@@ -374,6 +357,33 @@ public class RenderEventHandler
             yOff += fontRenderer.FONT_HEIGHT + 2;
         }
 
-        GlStateManager.popMatrix();
+        if (scale)
+        {
+            GlStateManager.popMatrix();
+        }
+    }
+
+    private class StringHolder implements Comparable<StringHolder>
+    {
+        public final String str;
+
+        public StringHolder(String str)
+        {
+            this.str = str;
+        }
+
+        @Override
+        public int compareTo(StringHolder other)
+        {
+            int lenThis = this.str.length();
+            int lenOther = other.str.length();
+
+            if (lenThis == lenOther)
+            {
+                return 0;
+            }
+
+            return this.str.length() > other.str.length() ? -1 : 1;
+        }
     }
 }
