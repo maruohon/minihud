@@ -84,7 +84,7 @@ public class Configs
         defaultMoDeNumericEnabled = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "fontColor", "0xE0E0E0");
-        prop.setComment("Font color (default: 0xE0E0E0 = 14737632)");
+        prop.setComment("Font color (RGB, default: 0xE0E0E0 = 14737632)");
         fontColor = getColor(prop.getString(), 0xE0E0E0);
 
         prop = conf.get(CATEGORY_GENERIC, "sortLinesByLength", false);
@@ -96,7 +96,7 @@ public class Configs
         sortLinesReversed = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "textBackgroundColor", "0x70505050");
-        prop.setComment("Text background color (default: 0x70505050 = 1884311632)");
+        prop.setComment("Text background color (ARGB, default: 0x70505050 = 1884311632)");
         textBackgroundColor = getColor(prop.getString(), 0x70505050);
 
         prop = conf.get(CATEGORY_GENERIC, "textPosX", 4);
@@ -212,12 +212,12 @@ public class Configs
 
     private static int getColor(String colorStr, int defaultColor)
     {
-        Pattern pattern = Pattern.compile("0x([0-9A-F]{1,8})");
+        Pattern pattern = Pattern.compile("0x([a-fA-F0-9]{1,8})");
         Matcher matcher = pattern.matcher(colorStr);
 
         if (matcher.matches())
         {
-            try { return Integer.parseInt(matcher.group(1), 16); }
+            try { return (int) Long.parseLong(matcher.group(1), 16); }
             catch (NumberFormatException e) { return defaultColor; }
         }
 
