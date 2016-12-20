@@ -67,10 +67,15 @@ public class RenderEventHandler
             return;
         }
 
+        if ((this.mask & MASK_FPS) != 0)
+        {
+            this.updateFps();
+        }
+
         // Only update the text once per game tick
         if (event.getPartialTicks() < this.partialTicksLast)
         {
-            this.getLines(this.lines, this.mask);
+            this.lines = this.getLines(this.mask);
         }
 
         this.renderText(Configs.textPosX, Configs.textPosY, this.lines);
@@ -107,20 +112,23 @@ public class RenderEventHandler
         this.enabled = ! this.enabled;
     }
 
-    private void getLines(List<StringHolder> lines, int enabledMask)
+    private void updateFps()
     {
-        Entity entity = this.mc.getRenderViewEntity();
-        BlockPos pos = new BlockPos(entity.posX, entity.getEntityBoundingBox().minY, entity.posZ);
-
-        lines.clear();
         this.fpsCounter++;
 
-        while (Minecraft.getSystemTime() >= this.fpsUpdateTime + 1000L)
+        if (Minecraft.getSystemTime() >= (this.fpsUpdateTime + 1000L))
         {
+            this.fpsUpdateTime = Minecraft.getSystemTime();
             this.fps = this.fpsCounter;
-            this.fpsUpdateTime += 1000L;
             this.fpsCounter = 0;
         }
+    }
+
+    private List<StringHolder> getLines(int enabledMask)
+    {
+        List<StringHolder> lines = new ArrayList<StringHolder>();
+        Entity entity = this.mc.getRenderViewEntity();
+        BlockPos pos = new BlockPos(entity.posX, entity.getEntityBoundingBox().minY, entity.posZ);
 
         if ((enabledMask & MASK_TIME_REAL) != 0)
         {
@@ -335,6 +343,8 @@ public class RenderEventHandler
                 Collections.reverse(lines);
             }
         }
+
+        return lines;
     }
 
     private void renderText(int xOff, int yOff, List<StringHolder> lines)
