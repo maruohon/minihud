@@ -1,6 +1,8 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/item-scroller",
     "promos": {
+        "1.11.2-latest": "0.8.1",
+        "1.11.2-recommended": "0.8.1",
         "1.11-latest": "0.8.0",
         "1.11-recommended": "0.8.0",
         "1.10.2-latest": "0.8.0",
@@ -13,6 +15,9 @@
         "1.9-recommended": "0.8.0",
         "1.8.9-latest": "0.5.1",
         "1.8.9-recommended": "0.5.1"
+    },
+    "1.11.2": {
+        "0.8.1": "Update to Minecraft 1.11.2"
     },
     "1.11": {
         "0.8.0": "Add better checks for drag handler, to only cancel the event when necessary (fixes a compat. issue)\nAdd a fallback handler for shift/ctrl + scrolling",
