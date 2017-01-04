@@ -9,6 +9,7 @@ import fi.dy.masa.itemscroller.Reference;
 
 public class Configs
 {
+    public static boolean enableControlShiftDropkeyDropItems;
     public static boolean enableDragMovingShiftLeft;
     public static boolean enableDragMovingShiftRight;
     public static boolean enableDragMovingControlLeft;
@@ -50,6 +51,10 @@ public class Configs
     public static void loadConfigs(Configuration conf)
     {
         Property prop;
+
+        prop = conf.get(CATEGORY_GENERIC, "enableControlShiftDropkeyDropItems", true).setRequiresMcRestart(false);
+        prop.setComment("Enable dropping all matching items from the same inventory when pressing Ctrl + Shift + the drop key");
+        enableControlShiftDropkeyDropItems = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "enableDragMovingShiftLeft", true).setRequiresMcRestart(false);
         prop.setComment("Enable moving full stacks of items by holding down Shift and dragging over slots with the left mouse button held down.");
