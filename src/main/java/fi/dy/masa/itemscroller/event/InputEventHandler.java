@@ -44,19 +44,11 @@ public class InputEventHandler
     private WeakReference<Slot> sourceSlotCandidate = new WeakReference<Slot>(null);
     private WeakReference<Slot> sourceSlot = new WeakReference<Slot>(null);
     private ItemStack stackInCursorLast = null;
-    private final Field fieldGuiLeft;
-    private final Field fieldGuiTop;
-    private final Field fieldGuiXSize;
-    private final Field fieldGuiYSize;
     private final Field fieldSelectedMerchantRecipe;
     private final MethodHandle methodHandle_getSlotAtPosition;
 
     public InputEventHandler()
     {
-        this.fieldGuiLeft =  ReflectionHelper.findField(GuiContainer.class, "field_147003_i", "guiLeft");
-        this.fieldGuiTop =   ReflectionHelper.findField(GuiContainer.class, "field_147009_r", "guiTop");
-        this.fieldGuiXSize = ReflectionHelper.findField(GuiContainer.class, "field_146999_f", "xSize");
-        this.fieldGuiYSize = ReflectionHelper.findField(GuiContainer.class, "field_147000_g", "ySize");
         this.fieldSelectedMerchantRecipe = ReflectionHelper.findField(GuiMerchant.class, "field_147041_z", "selectedMerchantRecipe");
         this.methodHandle_getSlotAtPosition = MethodHandleUtils.getMethodHandleVirtual(GuiContainer.class,
                 new String[] { "func_146975_c", "getSlotAtPosition" }, int.class, int.class);
@@ -257,24 +249,16 @@ public class InputEventHandler
             return false;
         }
 
-        try
-        {
-            int left = this.fieldGuiLeft.getInt(gui);
-            int top = this.fieldGuiTop.getInt(gui);
-            int xSize = this.fieldGuiXSize.getInt(gui);
-            int ySize = this.fieldGuiYSize.getInt(gui);
-            int mouseAbsX = Mouse.getEventX() * gui.width / gui.mc.displayWidth;
-            int mouseAbsY = gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
-            boolean isOutsideGui = mouseAbsX < left || mouseAbsY < top || mouseAbsX >= left + xSize || mouseAbsY >= top + ySize;
+        int left = gui.getGuiLeft();
+        int top = gui.getGuiTop();
+        int xSize = gui.getXSize();
+        int ySize = gui.getYSize();
+        int mouseAbsX = Mouse.getEventX() * gui.width / gui.mc.displayWidth;
+        int mouseAbsY = gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
+        boolean isOutsideGui = mouseAbsX < left || mouseAbsY < top || mouseAbsX >= left + xSize || mouseAbsY >= top + ySize;
 
-            return isOutsideGui && this.getSlotAtPosition(gui, mouseAbsX - left, mouseAbsY - top) == null;
-        }
-        catch (IllegalAccessException e)
-        {
-            ItemScroller.logger.warn("Failed to reflect GuiContainer#guiLeft or guiTop or xSize or ySize");
-        }
+        return isOutsideGui && this.getSlotAtPosition(gui, mouseAbsX - left, mouseAbsY - top) == null;
 
-        return false;
     }
 
     private boolean shiftDropItems(GuiContainer gui)
