@@ -1,6 +1,8 @@
 package fi.dy.masa.itemscroller.config;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
@@ -24,6 +26,9 @@ public class Configs
     public static boolean reverseScrollDirectionSingle;
     public static boolean reverseScrollDirectionStacks;
     public static boolean useSlotPositionAwareScrollDirection;
+
+    public static Set<String> guiBlackList;
+    public static Set<String> slotTypeBlackList;
 
     public static File configurationFile;
     public static Configuration config;
@@ -51,6 +56,16 @@ public class Configs
     public static void loadConfigs(Configuration conf)
     {
         Property prop;
+
+        prop = conf.get(CATEGORY_GENERIC, "blackListedGuis", new String[0]).setRequiresMcRestart(false);
+        prop.setComment("A list of GuiContainer classes where Item Scroller shouldn't do anything");
+        guiBlackList = new HashSet<String>();
+        for (String str : prop.getStringList()) { guiBlackList.add(str); }
+
+        prop = conf.get(CATEGORY_GENERIC, "blackListedSlots", new String[] { "appeng.client.me.SlotME", "slimeknights.mantle.inventory.SlotWrapper" }).setRequiresMcRestart(false);
+        prop.setComment("A list of Slot classes that Item Scroller shouldn't use");
+        slotTypeBlackList = new HashSet<String>();
+        for (String str : prop.getStringList()) { slotTypeBlackList.add(str); }
 
         prop = conf.get(CATEGORY_GENERIC, "enableControlShiftDropkeyDropItems", true).setRequiresMcRestart(false);
         prop.setComment("Enable dropping all matching items from the same inventory when pressing Ctrl + Shift + the drop key");

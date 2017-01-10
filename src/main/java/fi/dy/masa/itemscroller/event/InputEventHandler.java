@@ -58,7 +58,8 @@ public class InputEventHandler
     public void onMouseInputEventPre(GuiScreenEvent.MouseInputEvent.Pre event)
     {
         if (this.disabled == false && event.getGui() instanceof GuiContainer &&
-            (event.getGui() instanceof GuiContainerCreative) == false)
+            (event.getGui() instanceof GuiContainerCreative) == false &&
+            Configs.guiBlackList.contains(event.getGui().getClass().getName()) == false)
         {
             GuiContainer gui = (GuiContainer) event.getGui();
             int dWheel = Mouse.getEventDWheel();
@@ -97,8 +98,21 @@ public class InputEventHandler
     @SubscribeEvent
     public void onKeyInputEventPre(GuiScreenEvent.KeyboardInputEvent.Pre event)
     {
+        if (event.getGui() instanceof GuiContainer && Keyboard.getEventKey() == Keyboard.KEY_I && Keyboard.getEventKeyState() &&
+            GuiScreen.isAltKeyDown() && GuiScreen.isCtrlKeyDown() && GuiScreen.isShiftKeyDown())
+        {
+            if (((GuiContainer) event.getGui()).getSlotUnderMouse() != null)
+            {
+                debugPrintSlotInfo((GuiContainer) event.getGui(), ((GuiContainer) event.getGui()).getSlotUnderMouse());
+            }
+            else
+            {
+                ItemScroller.logger.info("GUI class: {}", event.getGui().getClass().getName());
+            }
+        }
         // Drop all matching stacks from the same inventory when pressing Ctrl + Shift + Drop key
-        if (Configs.enableControlShiftDropkeyDropItems && Keyboard.getEventKeyState() &&
+        else if (Configs.enableControlShiftDropkeyDropItems && Keyboard.getEventKeyState() &&
+            Configs.guiBlackList.contains(event.getGui().getClass().getName()) == false &&
             GuiScreen.isCtrlKeyDown() && GuiScreen.isShiftKeyDown() && event.getGui() instanceof GuiContainer &&
             event.getGui().mc.gameSettings.keyBindDrop.isActiveAndMatches(Keyboard.getEventKey()))
         {
@@ -116,11 +130,11 @@ public class InputEventHandler
 
             if (this.disabled)
             {
-                event.getGui().mc.player.playSound(SoundEvents.BLOCK_PISTON_CONTRACT, 0.5f, 0.8f);
+                event.getGui().mc.player.playSound(SoundEvents.BLOCK_NOTE_BASS, 0.8f, 0.8f);
             }
             else
             {
-                event.getGui().mc.player.playSound(SoundEvents.BLOCK_PISTON_EXTEND, 0.5f, 0.8f);
+                event.getGui().mc.player.playSound(SoundEvents.BLOCK_NOTE_PLING, 0.5f, 1.0f);
             }
         }
     }
@@ -173,16 +187,27 @@ public class InputEventHandler
     {
         if (slot == null)
         {
-            System.out.printf("slot was null\n");
+            ItemScroller.logger.info("slot was null");
             return;
         }
 
         boolean hasSlot = gui.inventorySlots.inventorySlots.contains(slot);
         Object inv = slot instanceof SlotItemHandler ? ((SlotItemHandler) slot).getItemHandler() : slot.inventory;
+        ItemStack stack = slot.getStack();
+        String stackStr = "<empty>";
 
-        System.out.printf("slot: slotNum: %3d - invIndex: %4d - Container has slot: %s - Slot#hasStack(): %5s - class: %s - inv: %s - stack: %s\n",
+        if (isStackEmpty(stack) == false)
+        {
+            stackStr = String.format("[%s @ %d - display: %s - NBT: %s] (%s)",
+                    stack.getItem().getRegistryName(), stack.getMetadata(), stack.getDisplayName(),
+                    stack.getTagCompound() != null ? stack.getTagCompound().toString() : "<no NBT>",
+                    stack.toString());
+        }
+
+        ItemScroller.logger.info(String.format("slot: slotNumber: %3d - getSlotIndex(): %3d - Container list has slot: %s" +
+                " - Slot#getHasStack(): %5s - slot class: %s - inv class: %s - stack: %s",
                 slot.slotNumber, slot.getSlotIndex(), hasSlot ? " true" : "false", slot.getHasStack(), slot.getClass().getName(),
-                inv != null ? inv.getClass().getName() : "null", slot.getStack());
+                inv != null ? inv.getClass().getName() : "null", stackStr));
     }
 
     private boolean isValidSlot(Slot slot, GuiContainer gui, boolean requireItems)
@@ -192,7 +217,8 @@ public class InputEventHandler
             return false;
         }
 
-        return slot != null && gui.inventorySlots.inventorySlots.contains(slot) && (requireItems == false || slot.getHasStack());
+        return slot != null && gui.inventorySlots.inventorySlots.contains(slot) &&
+                Configs.slotTypeBlackList.contains(slot.getClass().getName()) == false && (requireItems == false || slot.getHasStack());
     }
 
     /**
@@ -402,28 +428,26 @@ public class InputEventHandler
     private boolean dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y, boolean leaveOneItem, boolean moveOnlyOne)
     {
         Slot slot = this.getSlotAtPosition(gui, x, y);
-        boolean cancel = slot != null && (leaveOneItem || moveOnlyOne);
+        boolean flag = slot != null && this.isValidSlot(slot, gui, true) && slot.canTakeStack(gui.mc.player);
+        boolean cancel = flag && (leaveOneItem || moveOnlyOne);
 
-        if (slot != null && slot.slotNumber != this.slotNumberLast && this.isValidSlot(slot, gui, true))
+        if (flag && slot.slotNumber != this.slotNumberLast && this.draggedSlots.contains(slot.slotNumber) == false)
         {
-            if (this.draggedSlots.contains(slot.slotNumber) == false)
+            if (moveOnlyOne)
             {
-                if (moveOnlyOne)
-                {
-                    cancel = this.tryMoveSingleItemToOtherInventory(slot, gui);
-                }
-                else if (leaveOneItem)
-                {
-                    cancel = this.tryMoveAllButOneItemToOtherInventory(slot, gui);
-                }
-                else
-                {
-                    this.shiftClickSlot(gui, slot.slotNumber);
-                    cancel = true;
-                }
-
-                this.draggedSlots.add(slot.slotNumber);
+                cancel = this.tryMoveSingleItemToOtherInventory(slot, gui);
             }
+            else if (leaveOneItem)
+            {
+                cancel = this.tryMoveAllButOneItemToOtherInventory(slot, gui);
+            }
+            else
+            {
+                this.shiftClickSlot(gui, slot.slotNumber);
+                cancel = true;
+            }
+
+            this.draggedSlots.add(slot.slotNumber);
         }
 
         return cancel;
