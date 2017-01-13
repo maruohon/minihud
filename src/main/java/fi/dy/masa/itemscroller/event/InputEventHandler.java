@@ -43,7 +43,7 @@ public class InputEventHandler
     private final Set<Integer> draggedSlots = new HashSet<Integer>();
     private WeakReference<Slot> sourceSlotCandidate = new WeakReference<Slot>(null);
     private WeakReference<Slot> sourceSlot = new WeakReference<Slot>(null);
-    private ItemStack stackInCursorLast = null;
+    private ItemStack stackInCursorLast = EMPTY_STACK;
     private final Field fieldSelectedMerchantRecipe;
     private final MethodHandle methodHandle_getSlotAtPosition;
 
