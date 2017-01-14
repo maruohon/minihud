@@ -98,25 +98,32 @@ public class InputEventHandler
     @SubscribeEvent
     public void onKeyInputEventPre(GuiScreenEvent.KeyboardInputEvent.Pre event)
     {
-        if (event.getGui() instanceof GuiContainer && Keyboard.getEventKey() == Keyboard.KEY_I && Keyboard.getEventKeyState() &&
+        if ((event.getGui() instanceof GuiContainer) == false ||
+            event.getGui().mc == null || event.getGui().mc.player == null)
+        {
+            return;
+        }
+
+        GuiContainer gui = (GuiContainer) event.getGui();
+
+        if (Keyboard.getEventKey() == Keyboard.KEY_I && Keyboard.getEventKeyState() &&
             GuiScreen.isAltKeyDown() && GuiScreen.isCtrlKeyDown() && GuiScreen.isShiftKeyDown())
         {
-            if (((GuiContainer) event.getGui()).getSlotUnderMouse() != null)
+            if (gui.getSlotUnderMouse() != null)
             {
-                debugPrintSlotInfo((GuiContainer) event.getGui(), ((GuiContainer) event.getGui()).getSlotUnderMouse());
+                debugPrintSlotInfo(gui, gui.getSlotUnderMouse());
             }
             else
             {
-                ItemScroller.logger.info("GUI class: {}", event.getGui().getClass().getName());
+                ItemScroller.logger.info("GUI class: {}", gui.getClass().getName());
             }
         }
         // Drop all matching stacks from the same inventory when pressing Ctrl + Shift + Drop key
         else if (Configs.enableControlShiftDropkeyDropItems && Keyboard.getEventKeyState() &&
-            Configs.guiBlackList.contains(event.getGui().getClass().getName()) == false &&
-            GuiScreen.isCtrlKeyDown() && GuiScreen.isShiftKeyDown() && event.getGui() instanceof GuiContainer &&
-            event.getGui().mc.gameSettings.keyBindDrop.isActiveAndMatches(Keyboard.getEventKey()))
+            Configs.guiBlackList.contains(gui.getClass().getName()) == false &&
+            GuiScreen.isCtrlKeyDown() && GuiScreen.isShiftKeyDown() &&
+            gui.mc.gameSettings.keyBindDrop.isActiveAndMatches(Keyboard.getEventKey()))
         {
-            GuiContainer gui = (GuiContainer) event.getGui();
             Slot slot = gui.getSlotUnderMouse();
 
             if (slot != null && slot.getHasStack())
@@ -130,11 +137,11 @@ public class InputEventHandler
 
             if (this.disabled)
             {
-                event.getGui().mc.player.playSound(SoundEvents.BLOCK_NOTE_BASS, 0.8f, 0.8f);
+                gui.mc.player.playSound(SoundEvents.BLOCK_NOTE_BASS, 0.8f, 0.8f);
             }
             else
             {
-                event.getGui().mc.player.playSound(SoundEvents.BLOCK_NOTE_PLING, 0.5f, 1.0f);
+                gui.mc.player.playSound(SoundEvents.BLOCK_NOTE_PLING, 0.5f, 1.0f);
             }
         }
     }
