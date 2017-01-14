@@ -314,9 +314,10 @@ public class InputEventHandler
 
     private void dropStacks(GuiContainer gui, ItemStack stackReference, Slot sourceInvSlot)
     {
-        if (sourceInvSlot != null)
+        if (sourceInvSlot != null && isStackEmpty(stackReference) == false)
         {
             Container container = gui.inventorySlots;
+            stackReference = stackReference.copy();
 
             for (Slot slot : container.inventorySlots)
             {
