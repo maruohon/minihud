@@ -357,7 +357,7 @@ public class RenderEventHandler
             GlStateManager.scale(0.5, 0.5, 0.5);
         }
 
-        FontRenderer fontRenderer = this.mc.fontRendererObj;
+        FontRenderer fontRenderer = this.mc.fontRenderer;
 
         for (StringHolder holder : lines)
         {
