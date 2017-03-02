@@ -62,7 +62,10 @@ public class RenderEventHandler
     @SubscribeEvent
     public void onRenderGameOverlay(RenderGameOverlayEvent.Post event)
     {
-        if (this.enabled == false || event.getType() != ElementType.ALL || this.mc.gameSettings.showDebugInfo)
+        if (this.enabled == false || event.getType() != ElementType.ALL ||
+            this.mc.gameSettings.showDebugInfo || this.mc.player == null ||
+            (Configs.requireSneak && this.mc.player.isSneaking() == false) ||
+            (Configs.requireHoldingKey && InputEventHandler.isRequiredKeyActive(Configs.requiredKey) == false))
         {
             return;
         }

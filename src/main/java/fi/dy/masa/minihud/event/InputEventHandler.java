@@ -1,6 +1,8 @@
 package fi.dy.masa.minihud.event;
 
 import org.lwjgl.input.Keyboard;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -38,6 +40,31 @@ public class InputEventHandler
                 this.numKey = state ? (this.numKey | bit) : (this.numKey & ~bit);
             }
         }
+    }
+
+    public static boolean isRequiredKeyActive(KeyModifier key)
+    {
+        if (key == KeyModifier.NONE)
+        {
+            return true;
+        }
+
+        if (key == KeyModifier.ALT)
+        {
+            return GuiScreen.isAltKeyDown();
+        }
+
+        if (key == KeyModifier.CONTROL)
+        {
+            return GuiScreen.isCtrlKeyDown();
+        }
+
+        if (key == KeyModifier.SHIFT)
+        {
+            return GuiScreen.isShiftKeyDown();
+        }
+
+        return false;
     }
 
     private int getBitForKey(int key)
