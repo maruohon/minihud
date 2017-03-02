@@ -3,6 +3,7 @@ package fi.dy.masa.minihud.config;
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
@@ -16,6 +17,8 @@ public class Configs
     public static boolean sortLinesByLength;
     public static boolean sortLinesReversed;
     public static boolean coordinateFormatCustomized;
+    public static boolean requireSneak;
+    public static boolean requireHoldingKey;
     public static boolean useFontShadow;
     public static boolean useScaledFont;
     public static boolean useTextBackground;
@@ -28,6 +31,7 @@ public class Configs
 
     public static String coordinateFormat;
     public static String dateFormatReal;
+    public static KeyModifier requiredKey;
 
     public static File configurationFile;
     public static Configuration config;
@@ -90,6 +94,18 @@ public class Configs
         prop = conf.get(CATEGORY_GENERIC, "sortLinesByLength", false);
         prop.setComment("Sort the lines by their text's length");
         sortLinesByLength = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "requireSneak", false);
+        prop.setComment("Require the player to be sneaking to render the HUD");
+        requireSneak = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "requireHoldingKey", false);
+        prop.setComment("Require holding a key to render the HUD. Valid keys are Alt, Ctrl and Shift.");
+        requireHoldingKey = prop.getBoolean();
+
+        prop = conf.get(CATEGORY_GENERIC, "requiredKey", "none");
+        prop.setComment("The key required to render the HUD, if 'requireHoldingKey' is enabled. Valid values are 'alt', 'ctrl' and 'shift'.");
+        requiredKey = getKeyModifier(prop.getString());
 
         prop = conf.get(CATEGORY_GENERIC, "sortLinesReversed", false);
         prop.setComment("Reverse the line sorting order");
@@ -227,5 +243,30 @@ public class Configs
 
         try { return Integer.parseInt(colorStr, 10); }
         catch (NumberFormatException e) { return defaultColor; }
+    }
+
+    private static KeyModifier getKeyModifier(String value)
+    {
+        if (value == null)
+        {
+            return KeyModifier.NONE;
+        }
+
+        if (value.equalsIgnoreCase("shift"))
+        {
+            return KeyModifier.SHIFT;
+        }
+
+        if (value.equalsIgnoreCase("ctrl") || value.equalsIgnoreCase("control"))
+        {
+            return KeyModifier.CONTROL;
+        }
+
+        if (value.equalsIgnoreCase("alt"))
+        {
+            return KeyModifier.ALT;
+        }
+
+        return KeyModifier.NONE;
     }
 }
