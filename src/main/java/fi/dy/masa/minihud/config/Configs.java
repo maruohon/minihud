@@ -60,7 +60,7 @@ public class Configs
     public static void loadConfigs(Configuration conf)
     {
         int defaultModeNumeric = defaultMode;
-        boolean defaultMoDeNumericEnabled = false;
+        boolean defaultModeNumericEnabled = false;
         Property prop;
 
         prop = conf.get(CATEGORY_GENERIC, "enableByDefault", true);
@@ -85,7 +85,7 @@ public class Configs
 
         prop = conf.get(CATEGORY_GENERIC, "defaultModeNumeric", false);
         prop.setComment("Use the numeric bitmask instead of the individual toggle buttons for the info types");
-        defaultMoDeNumericEnabled = prop.getBoolean();
+        defaultModeNumericEnabled = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "fontColor", "0xE0E0E0");
         prop.setComment("Font color (RGB, default: 0xE0E0E0 = 14737632)");
@@ -205,14 +205,20 @@ public class Configs
         prop.setComment("Show the visible/loaded entity count");
         setInfoType(RenderEventHandler.MASK_ENTITIES, prop.getBoolean());
 
-        if (defaultMoDeNumericEnabled == true)
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoSlimeChunk", false);
+        prop.setComment("Show whether the player is currently in a slime chunk.\n" +
+                "NOTE: This only works in single player without any user intervention!\n" +
+                "On a server the player needs to be admin/OP and run the /seed command manually EVERY TIME they join or change dimensions!");
+        setInfoType(RenderEventHandler.MASK_SLIME_CHUNK, prop.getBoolean());
+
+        if (defaultModeNumericEnabled)
         {
             defaultMode = defaultModeNumeric;
         }
 
         RenderEventHandler.getInstance().setEnabledMask(defaultMode);
 
-        if (conf.hasChanged() == true)
+        if (conf.hasChanged())
         {
             conf.save();
         }
