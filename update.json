@@ -1,26 +1,28 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/minihud",
     "promos": {
-        "1.11.2-latest": "0.6.0",
-        "1.11.2-recommended": "0.6.0",
-        "1.11-latest": "0.6.0",
-        "1.11-recommended": "0.6.0",
-        "1.10.2-latest": "0.6.0",
-        "1.10.2-recommended": "0.6.0",
-        "1.10-latest": "0.6.0",
-        "1.10-recommended": "0.6.0",
-        "1.9.4-latest": "0.6.0",
-        "1.9.4-recommended": "0.6.0",
+        "1.11.2-latest": "0.7.0",
+        "1.11.2-recommended": "0.7.0",
+        "1.11-latest": "0.7.0",
+        "1.11-recommended": "0.7.0",
+        "1.10.2-latest": "0.7.0",
+        "1.10.2-recommended": "0.7.0",
+        "1.10-latest": "0.7.0",
+        "1.10-recommended": "0.7.0",
+        "1.9.4-latest": "0.7.0",
+        "1.9.4-recommended": "0.7.0",
         "1.9-latest": "0.4.1",
         "1.9-recommended": "0.4.1",
         "1.8.9-latest": "0.4.0",
         "1.8.9-recommended": "0.4.0"
     },
     "1.11.2": {
+        "0.7.0": "Add the option to show slime chunks",
         "0.6.0": "Add options to require sneaking or holding a key to render the HUD",
         "0.5.2": "Update to Minecraft 1.11.2"
     },
     "1.11": {
+        "0.7.0": "Add the option to show slime chunks",
         "0.6.0": "Add options to require sneaking or holding a key to render the HUD",
         "0.5.1": "Fix the FPS counter that broke in the 0.5.0 version",
         "0.5.0": "Add an option to display real world time\nAdd an option to display the looked-at entity name and health\nFix a bug in parsing the text background color\nOnly update the text once per game tick instead of each frame",
@@ -28,6 +30,7 @@
         "0.4.4": "Update to Minecraft 1.11"
     },
     "1.10.2": {
+        "0.7.0": "Add the option to show slime chunks",
         "0.6.0": "Add options to require sneaking or holding a key to render the HUD",
         "0.5.1": "Fix the FPS counter that broke in the 0.5.0 version",
         "0.5.0": "Add an option to display real world time\nAdd an option to display the looked-at entity name and health\nFix a bug in parsing the text background color\nOnly update the text once per game tick instead of each frame",
@@ -36,6 +39,7 @@
         "0.4.2": "Update to Minecraft 1.10.2"
     },
     "1.10": {
+        "0.7.0": "Add the option to show slime chunks",
         "0.6.0": "Add options to require sneaking or holding a key to render the HUD",
         "0.5.1": "Fix the FPS counter that broke in the 0.5.0 version",
         "0.5.0": "Add an option to display real world time\nAdd an option to display the looked-at entity name and health\nFix a bug in parsing the text background color\nOnly update the text once per game tick instead of each frame",
@@ -44,6 +48,7 @@
         "0.4.2": "Update to Minecraft 1.10"
     },
     "1.9.4": {
+        "0.7.0": "Add the option to show slime chunks",
         "0.6.0": "Add options to require sneaking or holding a key to render the HUD",
         "0.5.1": "Fix the FPS counter that broke in the 0.5.0 version",
         "0.5.0": "Add an option to display real world time\nAdd an option to display the looked-at entity name and health\nFix a bug in parsing the text background color\nOnly update the text once per game tick instead of each frame",
