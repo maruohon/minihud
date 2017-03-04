@@ -51,7 +51,7 @@ public class RenderEventHandler
     public static final int MASK_TIME_MC        = 0x00004000;
     public static final int MASK_TIME_REAL      = 0x00008000;
     public static final int MASK_LOOKING_AT_ENTITY = 0x00010000;
-    public static final int MASK_SLIME_CHUNK    = 0x0002000;
+    public static final int MASK_SLIME_CHUNK    = 0x00020000;
 
     private static RenderEventHandler instance;
     private final Minecraft mc;
