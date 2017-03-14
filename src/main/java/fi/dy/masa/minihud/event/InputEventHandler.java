@@ -69,6 +69,12 @@ public class InputEventHandler
 
     private int getBitForKey(int key)
     {
+        // Don't toggle an info type every time when toggling the HUD on/off, if the key overlaps (like the default does)
+        if (ClientProxy.keyToggleMode.getKeyCode() == key)
+        {
+            return 0;
+        }
+
         switch (key)
         {
             case Keyboard.KEY_1: return 1 << 0;
@@ -88,6 +94,8 @@ public class InputEventHandler
             case Keyboard.KEY_E: return 1 << 14;
             case Keyboard.KEY_F: return 1 << 15;
             case Keyboard.KEY_G: return 1 << 16;
+            case Keyboard.KEY_H: return 1 << 17;
+            case Keyboard.KEY_I: return 1 << 18;
         }
 
         return 0;

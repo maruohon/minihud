@@ -5,7 +5,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
+import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -22,6 +26,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -50,8 +55,9 @@ public class RenderEventHandler
     public static final int MASK_TIME_TICKS     = 0x00002000;
     public static final int MASK_TIME_MC        = 0x00004000;
     public static final int MASK_TIME_REAL      = 0x00008000;
-    public static final int MASK_LOOKING_AT_ENTITY = 0x00010000;
-    public static final int MASK_SLIME_CHUNK    = 0x00020000;
+    public static final int MASK_LOOKING_AT_ENTITY  = 0x00010000;
+    public static final int MASK_SLIME_CHUNK        = 0x00020000;
+    public static final int MASK_BLOCK_PROPERTIES   = 0x00040000;
 
     private static RenderEventHandler instance;
     private final Minecraft mc;
@@ -415,6 +421,11 @@ public class RenderEventHandler
             lines.add(new StringHolder("Slime chunk: " + result));
         }
 
+        if ((enabledMask & MASK_BLOCK_PROPERTIES) != 0)
+        {
+            this.getBlockProperties(lines);
+        }
+
         if (Configs.sortLinesByLength)
         {
             Collections.sort(lines);
@@ -426,6 +437,47 @@ public class RenderEventHandler
         }
 
         return lines;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends Comparable<T>> void getBlockProperties(List<StringHolder> lines)
+    {
+        if (this.mc.objectMouseOver != null &&
+                this.mc.objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK &&
+                this.mc.objectMouseOver.getBlockPos() != null)
+        {
+            BlockPos posLooking = this.mc.objectMouseOver.getBlockPos();
+            IBlockState state = this.mc.world.getBlockState(posLooking);
+
+            if (this.mc.world.getWorldType() != WorldType.DEBUG_WORLD)
+            {
+                state = state.getActualState(this.mc.world, posLooking);
+            }
+
+            lines.add(new StringHolder(String.valueOf(Block.REGISTRY.getNameForObject(state.getBlock()))));
+
+            for (Entry <IProperty<?>, Comparable<?>> entry : state.getProperties().entrySet())
+            {
+                IProperty<T> property = (IProperty<T>) entry.getKey();
+                T value = (T) entry.getValue();
+                String valueName = property.getName(value);
+
+                if (Boolean.TRUE.equals(value))
+                {
+                    valueName = TextFormatting.GREEN + valueName;
+                }
+                else if (Boolean.FALSE.equals(value))
+                {
+                    valueName = TextFormatting.RED + valueName;
+                }
+                else if (Integer.class.equals(property.getValueClass()))
+                {
+                    valueName = TextFormatting.AQUA + valueName;
+                }
+
+                lines.add(new StringHolder(property.getName() + ": " + valueName));
+            }
+        }
     }
 
     private void renderText(int xOff, int yOff, List<StringHolder> lines)
