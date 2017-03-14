@@ -137,6 +137,10 @@ public class Configs
 
         // Information types individual toggle
 
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockProperties", false);
+        prop.setComment("Show the BlockState properties and values");
+        setInfoType(RenderEventHandler.MASK_BLOCK_PROPERTIES, prop.getBoolean());
+
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoCoordinates", true);
         prop.setComment("Show player coordinates");
         setInfoType(RenderEventHandler.MASK_COORDINATES, prop.getBoolean());
