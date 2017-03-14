@@ -1,28 +1,30 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/minihud",
     "promos": {
-        "1.11.2-latest": "0.7.1",
-        "1.11.2-recommended": "0.7.1",
-        "1.11-latest": "0.7.1",
-        "1.11-recommended": "0.7.1",
-        "1.10.2-latest": "0.7.1",
-        "1.10.2-recommended": "0.7.1",
-        "1.10-latest": "0.7.1",
-        "1.10-recommended": "0.7.1",
-        "1.9.4-latest": "0.7.1",
-        "1.9.4-recommended": "0.7.1",
+        "1.11.2-latest": "0.8.0",
+        "1.11.2-recommended": "0.8.0",
+        "1.11-latest": "0.8.0",
+        "1.11-recommended": "0.8.0",
+        "1.10.2-latest": "0.8.0",
+        "1.10.2-recommended": "0.8.0",
+        "1.10-latest": "0.8.0",
+        "1.10-recommended": "0.8.0",
+        "1.9.4-latest": "0.8.0",
+        "1.9.4-recommended": "0.8.0",
         "1.9-latest": "0.4.1",
         "1.9-recommended": "0.4.1",
         "1.8.9-latest": "0.4.0",
         "1.8.9-recommended": "0.4.0"
     },
     "1.11.2": {
+        "0.8.0": "Add BlockState properties as a new available info type",
         "0.7.1": "Fix a typo in the slime chunk data type bitmask >_>",
         "0.7.0": "Add the option to show slime chunks",
         "0.6.0": "Add options to require sneaking or holding a key to render the HUD",
         "0.5.2": "Update to Minecraft 1.11.2"
     },
     "1.11": {
+        "0.8.0": "Add BlockState properties as a new available info type",
         "0.7.1": "Fix a typo in the slime chunk data type bitmask >_>",
         "0.7.0": "Add the option to show slime chunks",
         "0.6.0": "Add options to require sneaking or holding a key to render the HUD",
@@ -32,6 +34,7 @@
         "0.4.4": "Update to Minecraft 1.11"
     },
     "1.10.2": {
+        "0.8.0": "Add BlockState properties as a new available info type",
         "0.7.1": "Fix a typo in the slime chunk data type bitmask >_>",
         "0.7.0": "Add the option to show slime chunks",
         "0.6.0": "Add options to require sneaking or holding a key to render the HUD",
@@ -42,6 +45,7 @@
         "0.4.2": "Update to Minecraft 1.10.2"
     },
     "1.10": {
+        "0.8.0": "Add BlockState properties as a new available info type",
         "0.7.1": "Fix a typo in the slime chunk data type bitmask >_>",
         "0.7.0": "Add the option to show slime chunks",
         "0.6.0": "Add options to require sneaking or holding a key to render the HUD",
@@ -52,6 +56,7 @@
         "0.4.2": "Update to Minecraft 1.10"
     },
     "1.9.4": {
+        "0.8.0": "Add BlockState properties as a new available info type",
         "0.7.1": "Fix a typo in the slime chunk data type bitmask >_>",
         "0.7.0": "Add the option to show slime chunks",
         "0.6.0": "Add options to require sneaking or holding a key to render the HUD",
