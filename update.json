@@ -1,12 +1,12 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/item-scroller",
     "promos": {
-        "1.11.2-latest": "0.10.3",
-        "1.11.2-recommended": "0.10.3",
-        "1.11-latest": "0.10.3",
-        "1.11-recommended": "0.10.3",
-        "1.10.2-latest": "0.10.3",
-        "1.10.2-recommended": "0.10.3",
+        "1.11.2-latest": "0.11.0",
+        "1.11.2-recommended": "0.11.0",
+        "1.11-latest": "0.11.0",
+        "1.11-recommended": "0.11.0",
+        "1.10.2-latest": "0.11.0",
+        "1.10.2-recommended": "0.11.0",
         "1.10-latest": "0.10.3",
         "1.10-recommended": "0.10.3",
         "1.9.4-latest": "0.10.3",
@@ -17,6 +17,7 @@
         "1.8.9-recommended": "0.5.1"
     },
     "1.11.2": {
+        "0.11.0": "Added a crafting scrolling mode with recipe memory\nAdded right click crafting one stack\nConfig category re-organizing\nInternal refactoring",
         "0.10.3": "Fix a NPE crash in some weird cases or GUIs",
         "0.10.2": "Fix a possible crash in some GUIs with the toggle-disable keybind\nFix Ctrl + Shift + drop key not using a copy of the reference stack",
         "0.10.1": "Fix not using the empty ItemStack for the pickup detection initialization - fixes a NPE",
@@ -26,6 +27,7 @@
         "0.8.1": "Update to Minecraft 1.11.2"
     },
     "1.11": {
+        "0.11.0": "Added a crafting scrolling mode with recipe memory\nAdded right click crafting one stack\nConfig category re-organizing\nInternal refactoring",
         "0.10.3": "Fix a NPE crash in some weird cases or GUIs",
         "0.10.2": "Fix a possible crash in some GUIs with the toggle-disable keybind\nFix Ctrl + Shift + drop key not using a copy of the reference stack",
         "0.10.1": "Fix not using the empty ItemStack for the pickup detection initialization - fixes a NPE",
@@ -36,6 +38,7 @@
         "0.7.2": "Update to Minecraft 1.11"
     },
     "1.10.2": {
+        "0.11.0": "Added a crafting scrolling mode with recipe memory\nAdded right click crafting one stack\nConfig category re-organizing\nInternal refactoring",
         "0.10.3": "Fix a NPE crash in some weird cases or GUIs",
         "0.10.2": "Fix a possible crash in some GUIs with the toggle-disable keybind\nFix Ctrl + Shift + drop key not using a copy of the reference stack",
         "0.10.0": "Add GUI and Slot blacklists.\nAdd Ctrl+Alt+Shift + I to print debug info.\nBlacklisted AE2 terminal slots and TiCo Crafting Station side inventory slots by default.",

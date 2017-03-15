@@ -24,9 +24,8 @@ public class ItemScroller
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-        instance = this;
         logger = event.getModLog();
-        Configs.loadConfigsFromFile(event.getSuggestedConfigurationFile());
         proxy.registerEventHandlers();
+        Configs.loadConfigsFromFile(event.getSuggestedConfigurationFile());
     }
 }

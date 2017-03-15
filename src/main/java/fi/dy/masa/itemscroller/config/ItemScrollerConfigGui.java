@@ -2,13 +2,10 @@ package fi.dy.masa.itemscroller.config;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.minecraft.client.gui.GuiScreen;
-
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.IConfigElement;
-
 import fi.dy.masa.itemscroller.Reference;
 
 public class ItemScrollerConfigGui extends GuiConfig
@@ -22,7 +19,10 @@ public class ItemScrollerConfigGui extends GuiConfig
     {
         List<IConfigElement> configElements = new ArrayList<IConfigElement>();
 
-        configElements.addAll(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_GENERIC)).getChildElements());
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_GENERIC)));
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_LISTS)));
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_DRAG_ENABLE)));
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_SCROLLING_ENABLE)));
 
         return configElements;
     }
