@@ -1,9 +1,13 @@
 package fi.dy.masa.minihud.config;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.lwjgl.input.Keyboard;
 import net.minecraftforge.client.settings.KeyModifier;
+import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
@@ -32,12 +36,14 @@ public class Configs
     public static String coordinateFormat;
     public static String dateFormatReal;
     public static KeyModifier requiredKey;
+    private static final Map<Integer, Integer> HOTKEY_INFO_MAP = new HashMap<Integer, Integer>();
 
     public static File configurationFile;
     public static Configuration config;
     
     public static final String CATEGORY_GENERIC = "Generic";
     public static final String CATEGORY_INFO_TOGGLE = "InfoTypes";
+    public static final String CATEGORY_INFO_HOTKEYS = "InfoToggleHotkeys";
 
     @SubscribeEvent
     public void onConfigChangedEvent(OnConfigChangedEvent event)
@@ -215,6 +221,38 @@ public class Configs
                 "On a server the player needs to be admin/OP and run the /seed command manually EVERY TIME they join or change dimensions!");
         setInfoType(RenderEventHandler.MASK_SLIME_CHUNK, prop.getBoolean());
 
+
+        // Info hotkey assignments
+        ConfigCategory cat = conf.getCategory(CATEGORY_INFO_HOTKEYS);
+        cat.setComment("Here you can assign hotkeys to toggle the different information types on/off.\n" +
+                        "NOTE: Make sure you don't have the same value for more than one info type, or " +
+                        "the latest one will override all the earlier ones.\n" +
+                        "You can give the key \"names\", like \"a\" or \"7\", or you can give " +
+                        "the raw numeric LWJGL keycodes (only works for key codes > 11).\n" +
+                        "To toggle the info type while in-game, press and hold the Toggle key and then " +
+                        "press the keys set here to toggle the info types on/off.");
+        HOTKEY_INFO_MAP.clear();
+
+        assignInfoHotkey(conf, "infoCoordinates",           RenderEventHandler.MASK_COORDINATES         , "1");
+        assignInfoHotkey(conf, "infoRotationYaw",           RenderEventHandler.MASK_YAW                 , "2");
+        assignInfoHotkey(conf, "infoRotationPitch",         RenderEventHandler.MASK_PITCH               , "3");
+        assignInfoHotkey(conf, "infoSpeed",                 RenderEventHandler.MASK_SPEED               , "4");
+        assignInfoHotkey(conf, "infoBiome",                 RenderEventHandler.MASK_BIOME               , "5");
+        assignInfoHotkey(conf, "infoLightLevel",            RenderEventHandler.MASK_LIGHT               , "6");
+        assignInfoHotkey(conf, "infoFacing",                RenderEventHandler.MASK_FACING              , "7");
+        assignInfoHotkey(conf, "infoBlockPosition",         RenderEventHandler.MASK_BLOCK               , "8");
+        assignInfoHotkey(conf, "infoChunkPosition",         RenderEventHandler.MASK_CHUNK               , "9");
+        assignInfoHotkey(conf, "infoLookingAt",             RenderEventHandler.MASK_LOOKINGAT           , "0");
+        assignInfoHotkey(conf, "infoFPS",                   RenderEventHandler.MASK_FPS                 , "a");
+        assignInfoHotkey(conf, "infoEntities",              RenderEventHandler.MASK_ENTITIES            , "b");
+        assignInfoHotkey(conf, "infoDimensionId",           RenderEventHandler.MASK_DIMENSION           , "c");
+        assignInfoHotkey(conf, "infoWorldTime",             RenderEventHandler.MASK_TIME_TICKS          , "d");
+        assignInfoHotkey(conf, "infoWorldTimeFormatted",    RenderEventHandler.MASK_TIME_MC             , "e");
+        assignInfoHotkey(conf, "infoRealTime",              RenderEventHandler.MASK_TIME_REAL           , "f");
+        assignInfoHotkey(conf, "infoLookingAtEntity",       RenderEventHandler.MASK_LOOKING_AT_ENTITY   , "g");
+        assignInfoHotkey(conf, "infoSlimeChunk",            RenderEventHandler.MASK_SLIME_CHUNK         , "i");
+        assignInfoHotkey(conf, "infoBlockProperties",       RenderEventHandler.MASK_BLOCK_PROPERTIES    , "j");
+
         if (defaultModeNumericEnabled)
         {
             defaultMode = defaultModeNumeric;
@@ -278,5 +316,38 @@ public class Configs
         }
 
         return KeyModifier.NONE;
+    }
+
+    private static void assignInfoHotkey(Configuration conf, String configKey, int infoBitmask, String defaultValue)
+    {
+        String keyName = conf.get(CATEGORY_INFO_HOTKEYS, configKey, defaultValue).getString();
+
+        try
+        {
+            int keyCode = Integer.parseInt(keyName);
+
+            // Don't interpret the numbers 0..9 as raw keycodes, but instead as the number keys (below)
+            if (keyCode > Keyboard.KEY_0)
+            {
+                HOTKEY_INFO_MAP.put(keyCode, infoBitmask);
+                return;
+            }
+        }
+        catch (NumberFormatException e)
+        {
+        }
+
+        int keyCode = Keyboard.getKeyIndex(keyName.toUpperCase());
+
+        if (keyCode != Keyboard.KEY_NONE)
+        {
+            HOTKEY_INFO_MAP.put(keyCode, infoBitmask);
+        }
+    }
+
+    public static int getBitmaskForKey(int keyCode)
+    {
+        Integer mask = HOTKEY_INFO_MAP.get(keyCode);
+        return mask != null ? mask.intValue() : 0;
     }
 }
