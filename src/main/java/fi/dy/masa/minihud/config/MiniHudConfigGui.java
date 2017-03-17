@@ -24,6 +24,7 @@ public class MiniHudConfigGui extends GuiConfig
 
         configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_GENERIC)));
         configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_INFO_TOGGLE)));
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_INFO_HOTKEYS)));
 
         return configElements;
     }
