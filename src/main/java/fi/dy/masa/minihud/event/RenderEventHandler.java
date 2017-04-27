@@ -125,13 +125,13 @@ public class RenderEventHandler
             {
                 try
                 {
-                    this.serverSeed = (Long) text.getFormatArgs()[0];
+                    this.serverSeed = Long.parseLong(text.getFormatArgs()[0].toString());
                     this.serverSeedValid = true;
                     MiniHud.logger.info("Received world seed from the vanilla /seed command: {}", this.serverSeed);
                 }
                 catch (Exception e)
                 {
-                    MiniHud.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[0]);
+                    MiniHud.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[0], e);
                 }
             }
             // The "/jed seed" command
@@ -139,13 +139,13 @@ public class RenderEventHandler
             {
                 try
                 {
-                    this.serverSeed = (Long) text.getFormatArgs()[1];
+                    this.serverSeed = Long.parseLong(text.getFormatArgs()[1].toString());
                     this.serverSeedValid = true;
                     MiniHud.logger.info("Received world seed from the JED '/jed seed' command: {}", this.serverSeed);
                 }
                 catch (Exception e)
                 {
-                    MiniHud.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[1]);
+                    MiniHud.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[1], e);
                 }
             }
         }
