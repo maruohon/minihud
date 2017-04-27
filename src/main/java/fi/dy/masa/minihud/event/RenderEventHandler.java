@@ -35,6 +35,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import fi.dy.masa.minihud.MiniHud;
 import fi.dy.masa.minihud.config.Configs;
 
 public class RenderEventHandler
@@ -119,14 +120,33 @@ public class RenderEventHandler
         {
             TextComponentTranslation text = (TextComponentTranslation) message;
 
+            // The vanilla "/seed" command
             if ("commands.seed.success".equals(text.getKey()))
             {
                 try
                 {
                     this.serverSeed = (Long) text.getFormatArgs()[0];
                     this.serverSeedValid = true;
+                    MiniHud.logger.info("Received world seed from the vanilla /seed command: {}", this.serverSeed);
                 }
-                catch (Exception e) {}
+                catch (Exception e)
+                {
+                    MiniHud.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[0]);
+                }
+            }
+            // The "/jed seed" command
+            else if ("jed.commands.seed.success".equals(text.getKey()))
+            {
+                try
+                {
+                    this.serverSeed = (Long) text.getFormatArgs()[1];
+                    this.serverSeedValid = true;
+                    MiniHud.logger.info("Received world seed from the JED '/jed seed' command: {}", this.serverSeed);
+                }
+                catch (Exception e)
+                {
+                    MiniHud.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[1]);
+                }
             }
         }
     }
