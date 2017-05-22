@@ -15,6 +15,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
@@ -56,9 +57,11 @@ public class RenderEventHandler
     public static final int MASK_TIME_TICKS     = 0x00002000;
     public static final int MASK_TIME_MC        = 0x00004000;
     public static final int MASK_TIME_REAL      = 0x00008000;
-    public static final int MASK_LOOKING_AT_ENTITY  = 0x00010000;
-    public static final int MASK_SLIME_CHUNK        = 0x00020000;
-    public static final int MASK_BLOCK_PROPERTIES   = 0x00040000;
+    public static final int MASK_LOOKING_AT_ENTITY          = 0x00010000;
+    public static final int MASK_SLIME_CHUNK                = 0x00020000;
+    public static final int MASK_BLOCK_PROPERTIES           = 0x00040000;
+    public static final int MASK_LOOKING_AT_ENTITY_REGNAME  = 0x00080000;
+    public static final int MASK_BIOME_REGISTRY_NAME        = 0x00100000;
 
     private static RenderEventHandler instance;
     private final Minecraft mc;
@@ -344,7 +347,7 @@ public class RenderEventHandler
             lines.add(new StringHolder(String.format("Facing: %s (%s)", facing, str)));
         }
 
-        if ((enabledMask & (MASK_BIOME | MASK_LIGHT)) != 0)
+        if ((enabledMask & (MASK_BIOME | MASK_LIGHT | MASK_BIOME_REGISTRY_NAME)) != 0)
         {
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && this.mc.world.isBlockLoaded(pos))
@@ -356,6 +359,12 @@ public class RenderEventHandler
                     if ((enabledMask & MASK_BIOME) != 0)
                     {
                         lines.add(new StringHolder("Biome: " + chunk.getBiome(pos, this.mc.world.getBiomeProvider()).getBiomeName()));
+                    }
+
+                    if ((enabledMask & MASK_BIOME_REGISTRY_NAME) != 0)
+                    {
+                        lines.add(new StringHolder("Biome reg name: " +
+                                chunk.getBiome(pos, this.mc.world.getBiomeProvider()).getRegistryName().toString()));
                     }
 
                     if ((enabledMask & MASK_LIGHT) != 0)
@@ -392,14 +401,28 @@ public class RenderEventHandler
             }
         }
 
-        if ((enabledMask & MASK_LOOKING_AT_ENTITY) != 0)
+        if ((enabledMask & (MASK_LOOKING_AT_ENTITY | MASK_LOOKING_AT_ENTITY_REGNAME)) != 0)
         {
             if (this.mc.objectMouseOver != null &&
                 this.mc.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY &&
                 this.mc.objectMouseOver.entityHit != null && this.mc.objectMouseOver.entityHit instanceof EntityLivingBase)
             {
                 EntityLivingBase target = (EntityLivingBase) this.mc.objectMouseOver.entityHit;
-                lines.add(new StringHolder(String.format("%s - HP: %.1f / %.1f", target.getName(), target.getHealth(), target.getMaxHealth())));
+
+                if ((enabledMask & MASK_LOOKING_AT_ENTITY) != 0)
+                {
+                    lines.add(new StringHolder(String.format("%s - HP: %.1f / %.1f", target.getName(), target.getHealth(), target.getMaxHealth())));
+                }
+
+                if ((enabledMask & MASK_LOOKING_AT_ENTITY_REGNAME) != 0)
+                {
+                    String name = EntityList.CLASS_TO_NAME.get(target.getClass());
+
+                    if (name != null)
+                    {
+                        lines.add(new StringHolder(String.format("Entity reg name: %s", name)));
+                    }
+                }
             }
         }
 

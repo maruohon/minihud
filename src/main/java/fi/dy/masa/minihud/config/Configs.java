@@ -144,8 +144,12 @@ public class Configs
         // Information types individual toggle
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBiome", false);
-        prop.setComment("Show the current biome");
+        prop.setComment("Show the name of the current biome");
         setInfoType(RenderEventHandler.MASK_BIOME, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBiomeRegistryName", false);
+        prop.setComment("Show the registry name of the current biome");
+        setInfoType(RenderEventHandler.MASK_BIOME_REGISTRY_NAME, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockPosition", false);
         prop.setComment("Show player's block position");
@@ -170,6 +174,10 @@ public class Configs
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoEntities", false);
         prop.setComment("Show the visible/loaded entity count");
         setInfoType(RenderEventHandler.MASK_ENTITIES, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoEntityRegistryName", false);
+        prop.setComment("Show the registry name of the entity the player is currently looking at");
+        setInfoType(RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFacing", true);
         prop.setComment("Show player facing");
@@ -252,6 +260,8 @@ public class Configs
         assignInfoHotkey(conf, "infoLookingAtEntity",       RenderEventHandler.MASK_LOOKING_AT_ENTITY   , "g");
         assignInfoHotkey(conf, "infoSlimeChunk",            RenderEventHandler.MASK_SLIME_CHUNK         , "i");
         assignInfoHotkey(conf, "infoBlockProperties",       RenderEventHandler.MASK_BLOCK_PROPERTIES    , "j");
+        assignInfoHotkey(conf, "infoEntityRegistryName",    RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME , "k");
+        assignInfoHotkey(conf, "infoBiomeRegistryName",     RenderEventHandler.MASK_BIOME_REGISTRY_NAME , "l");
 
         if (defaultModeNumericEnabled)
         {
