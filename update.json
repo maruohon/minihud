@@ -1,12 +1,12 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/minihud",
     "promos": {
-        "1.11.2-latest": "0.9.0",
-        "1.11.2-recommended": "0.9.0",
+        "1.11.2-latest": "0.10.0",
+        "1.11.2-recommended": "0.10.0",
         "1.11-latest": "0.9.0",
         "1.11-recommended": "0.9.0",
-        "1.10.2-latest": "0.9.0",
-        "1.10.2-recommended": "0.9.0",
+        "1.10.2-latest": "0.10.0",
+        "1.10.2-recommended": "0.10.0",
         "1.10-latest": "0.9.0",
         "1.10-recommended": "0.9.0",
         "1.9.4-latest": "0.9.0",
@@ -17,6 +17,8 @@
         "1.8.9-recommended": "0.4.0"
     },
     "1.11.2": {
+        "0.10.0": "Added biome registry name and looked-at-entity registry name info types",
+        "0.9.1": "Fixed getting the world seed from a chat message in multiplayer\n",
         "0.9.0": "Added configurable info toggle hotkeys\nChanged the key press logic",
         "0.8.0": "Add BlockState properties as a new available info type",
         "0.7.1": "Fix a typo in the slime chunk data type bitmask >_>",
@@ -36,6 +38,8 @@
         "0.4.4": "Update to Minecraft 1.11"
     },
     "1.10.2": {
+        "0.10.0": "Added biome registry name and looked-at-entity registry name info types",
+        "0.9.1": "Fixed getting the world seed from a chat message in multiplayer\n",
         "0.9.0": "Added configurable info toggle hotkeys\nChanged the key press logic",
         "0.8.0": "Add BlockState properties as a new available info type",
         "0.7.1": "Fix a typo in the slime chunk data type bitmask >_>",
