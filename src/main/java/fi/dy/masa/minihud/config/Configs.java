@@ -143,9 +143,21 @@ public class Configs
 
         // Information types individual toggle
 
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBiome", false);
+        prop.setComment("Show the current biome");
+        setInfoType(RenderEventHandler.MASK_BIOME, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockPosition", false);
+        prop.setComment("Show player's block position");
+        setInfoType(RenderEventHandler.MASK_BLOCK, prop.getBoolean());
+
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockProperties", false);
         prop.setComment("Show the BlockState properties and values");
         setInfoType(RenderEventHandler.MASK_BLOCK_PROPERTIES, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkPosition", false);
+        prop.setComment("Show player's current position in the chunk");
+        setInfoType(RenderEventHandler.MASK_CHUNK, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoCoordinates", true);
         prop.setComment("Show player coordinates");
@@ -155,49 +167,21 @@ public class Configs
         prop.setComment("Show the current dimension ID (might not be accurate in every case, depending on the server!)");
         setInfoType(RenderEventHandler.MASK_DIMENSION, prop.getBoolean());
 
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTime", false);
-        prop.setComment("Show the current world time in ticks");
-        setInfoType(RenderEventHandler.MASK_TIME_TICKS, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTimeFormatted", true);
-        prop.setComment("Show the current world time formatted to days, hours, minutes");
-        setInfoType(RenderEventHandler.MASK_TIME_MC, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRealTime", false);
-        prop.setComment("Show the current real time formatted according to dateFormatReal");
-        setInfoType(RenderEventHandler.MASK_TIME_REAL, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationYaw", false);
-        prop.setComment("Show player yaw rotation");
-        setInfoType(RenderEventHandler.MASK_YAW, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationPitch", false);
-        prop.setComment("Show player pitch rotation");
-        setInfoType(RenderEventHandler.MASK_PITCH, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoSpeed", false);
-        prop.setComment("Show player moving speed");
-        setInfoType(RenderEventHandler.MASK_SPEED, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBiome", false);
-        prop.setComment("Show the current biome");
-        setInfoType(RenderEventHandler.MASK_BIOME, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLightLevel", false);
-        prop.setComment("Show the current light level");
-        setInfoType(RenderEventHandler.MASK_LIGHT, prop.getBoolean());
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoEntities", false);
+        prop.setComment("Show the visible/loaded entity count");
+        setInfoType(RenderEventHandler.MASK_ENTITIES, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFacing", true);
         prop.setComment("Show player facing");
         setInfoType(RenderEventHandler.MASK_FACING, prop.getBoolean());
 
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockPosition", false);
-        prop.setComment("Show player's block position");
-        setInfoType(RenderEventHandler.MASK_BLOCK, prop.getBoolean());
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFPS", false);
+        prop.setComment("Show current FPS");
+        setInfoType(RenderEventHandler.MASK_FPS, prop.getBoolean());
 
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkPosition", false);
-        prop.setComment("Show player's current position in the chunk");
-        setInfoType(RenderEventHandler.MASK_CHUNK, prop.getBoolean());
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLightLevel", false);
+        prop.setComment("Show the current light level");
+        setInfoType(RenderEventHandler.MASK_LIGHT, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAt", false);
         prop.setComment("Show which block the player is looking at");
@@ -207,20 +191,36 @@ public class Configs
         prop.setComment("Show entity name and health when looked at");
         setInfoType(RenderEventHandler.MASK_LOOKING_AT_ENTITY, prop.getBoolean());
 
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFPS", false);
-        prop.setComment("Show current FPS");
-        setInfoType(RenderEventHandler.MASK_FPS, prop.getBoolean());
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRealTime", false);
+        prop.setComment("Show the current real time formatted according to dateFormatReal");
+        setInfoType(RenderEventHandler.MASK_TIME_REAL, prop.getBoolean());
 
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoEntities", false);
-        prop.setComment("Show the visible/loaded entity count");
-        setInfoType(RenderEventHandler.MASK_ENTITIES, prop.getBoolean());
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationPitch", false);
+        prop.setComment("Show player pitch rotation");
+        setInfoType(RenderEventHandler.MASK_PITCH, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationYaw", false);
+        prop.setComment("Show player yaw rotation");
+        setInfoType(RenderEventHandler.MASK_YAW, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoSlimeChunk", false);
         prop.setComment("Show whether the player is currently in a slime chunk.\n" +
-                "NOTE: This only works in single player without any user intervention!\n" +
-                "On a server the player needs to be admin/OP and run the /seed command manually EVERY TIME they join or change dimensions!");
+                        "NOTE: This only works in single player without any user intervention!\n" +
+                        "On a server the player needs to be admin/OP and\n" +
+                        "run the /seed command manually EVERY TIME they join or change dimensions!");
         setInfoType(RenderEventHandler.MASK_SLIME_CHUNK, prop.getBoolean());
 
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoSpeed", false);
+        prop.setComment("Show player moving speed");
+        setInfoType(RenderEventHandler.MASK_SPEED, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTime", false);
+        prop.setComment("Show the current world time in ticks");
+        setInfoType(RenderEventHandler.MASK_TIME_TICKS, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTimeFormatted", true);
+        prop.setComment("Show the current world time formatted to days, hours, minutes");
+        setInfoType(RenderEventHandler.MASK_TIME_MC, prop.getBoolean());
 
         // Info hotkey assignments
         ConfigCategory cat = conf.getCategory(CATEGORY_INFO_HOTKEYS);
