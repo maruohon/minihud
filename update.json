@@ -1,6 +1,8 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/minihud",
     "promos": {
+        "1.12-latest": "0.10.0",
+        "1.12-recommended": "0.10.0",
         "1.11.2-latest": "0.10.0",
         "1.11.2-recommended": "0.10.0",
         "1.11-latest": "0.9.0",
@@ -15,6 +17,9 @@
         "1.9-recommended": "0.4.1",
         "1.8.9-latest": "0.4.0",
         "1.8.9-recommended": "0.4.0"
+    },
+    "1.12": {
+        "0.10.0": "Update to Minecraft 1.12"
     },
     "1.11.2": {
         "0.10.0": "Added biome registry name and looked-at-entity registry name info types",

@@ -502,7 +502,7 @@ public class RenderEventHandler
             BlockPos posLooking = this.mc.objectMouseOver.getBlockPos();
             IBlockState state = this.mc.world.getBlockState(posLooking);
 
-            if (this.mc.world.getWorldType() != WorldType.DEBUG_WORLD)
+            if (this.mc.world.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES)
             {
                 state = state.getActualState(this.mc.world, posLooking);
             }
