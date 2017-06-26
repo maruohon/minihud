@@ -1,32 +1,40 @@
 package fi.dy.masa.minihud.config;
 
-import java.util.Set;
-import net.minecraft.client.Minecraft;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.fml.client.IModGuiFactory;
+import net.minecraftforge.common.config.ConfigElement;
+import net.minecraftforge.fml.client.DefaultGuiFactory;
+import net.minecraftforge.fml.client.config.GuiConfig;
+import net.minecraftforge.fml.client.config.IConfigElement;
+import fi.dy.masa.minihud.Reference;
 
-public class MiniHudGuiFactory implements IModGuiFactory
+public class MiniHudGuiFactory extends DefaultGuiFactory
 {
-    @Override
-    public void initialize(Minecraft minecraftInstance)
+    public MiniHudGuiFactory()
     {
+        super(Reference.MOD_ID, getTitle());
     }
 
     @Override
-    public boolean hasConfigGui()
+    public GuiScreen createConfigGui(GuiScreen parent)
     {
-        return true;
+        return new GuiConfig(parent, getConfigElements(), Reference.MOD_ID, false, false, getTitle());
     }
 
-    @Override
-    public GuiScreen createConfigGui(GuiScreen parentScreen)
+    private static List<IConfigElement> getConfigElements()
     {
-        return new MiniHudConfigGui(parentScreen);
+        List<IConfigElement> configElements = new ArrayList<IConfigElement>();
+
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_GENERIC)));
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_INFO_TOGGLE)));
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_INFO_HOTKEYS)));
+
+        return configElements;
     }
 
-    @Override
-    public Set<RuntimeOptionCategoryElement> runtimeGuiCategories()
+    private static String getTitle()
     {
-        return null;
+        return GuiConfig.getAbridgedConfigPath(Configs.configurationFile.toString());
     }
 }
