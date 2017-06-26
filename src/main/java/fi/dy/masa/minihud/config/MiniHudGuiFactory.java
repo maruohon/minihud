@@ -1,45 +1,35 @@
 package fi.dy.masa.minihud.config;
 
-import java.util.Set;
-import net.minecraft.client.Minecraft;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.fml.client.IModGuiFactory;
+import net.minecraftforge.common.config.ConfigElement;
+import net.minecraftforge.fml.client.DefaultGuiFactory;
+import net.minecraftforge.fml.client.config.GuiConfig;
+import net.minecraftforge.fml.client.config.IConfigElement;
+import fi.dy.masa.minihud.Reference;
 
-public class MiniHudGuiFactory implements IModGuiFactory
+public class MiniHudGuiFactory extends DefaultGuiFactory
 {
-    @Override
-    public void initialize(Minecraft minecraftInstance)
+    public MiniHudGuiFactory()
     {
+        super(Reference.MOD_ID, GuiConfig.getAbridgedConfigPath(Configs.configurationFile.toString()));
     }
 
     @Override
-    public Class<? extends GuiScreen> mainConfigGuiClass()
+    public GuiScreen createConfigGui(GuiScreen parent)
     {
-        return MiniHudConfigGui.class;
+        return new GuiConfig(parent, getConfigElements(), this.modid, false, false, this.title);
     }
 
-    @Override
-    public boolean hasConfigGui()
+    private static List<IConfigElement> getConfigElements()
     {
-        return true;
-    }
+        List<IConfigElement> configElements = new ArrayList<IConfigElement>();
 
-    @Override
-    public GuiScreen createConfigGui(GuiScreen parentScreen)
-    {
-        return new MiniHudConfigGui(parentScreen);
-    }
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_GENERIC)));
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_INFO_TOGGLE)));
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_INFO_HOTKEYS)));
 
-    @Override
-    public Set<RuntimeOptionCategoryElement> runtimeGuiCategories()
-    {
-        return null;
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element)
-    {
-        return null;
+        return configElements;
     }
 }
