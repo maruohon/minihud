@@ -1,32 +1,41 @@
 package fi.dy.masa.itemscroller.config;
 
-import java.util.Set;
-import net.minecraft.client.Minecraft;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.fml.client.IModGuiFactory;
+import net.minecraftforge.common.config.ConfigElement;
+import net.minecraftforge.fml.client.DefaultGuiFactory;
+import net.minecraftforge.fml.client.config.GuiConfig;
+import net.minecraftforge.fml.client.config.IConfigElement;
+import fi.dy.masa.itemscroller.Reference;
 
-public class ItemScrollerGuiFactory implements IModGuiFactory
+public class ItemScrollerGuiFactory extends DefaultGuiFactory
 {
-    @Override
-    public void initialize(Minecraft minecraftInstance)
+    public ItemScrollerGuiFactory()
     {
+        super(Reference.MOD_ID, getTitle());
     }
 
     @Override
-    public boolean hasConfigGui()
+    public GuiScreen createConfigGui(GuiScreen parent)
     {
-        return true;
+        return new GuiConfig(parent, getConfigElements(), Reference.MOD_ID, false, false, getTitle());
     }
 
-    @Override
-    public GuiScreen createConfigGui(GuiScreen parentScreen)
+    private static List<IConfigElement> getConfigElements()
     {
-        return new ItemScrollerConfigGui(parentScreen);
+        List<IConfigElement> configElements = new ArrayList<IConfigElement>();
+
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_GENERIC)));
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_LISTS)));
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_DRAG_ENABLE)));
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_SCROLLING_ENABLE)));
+
+        return configElements;
     }
 
-    @Override
-    public Set<RuntimeOptionCategoryElement> runtimeGuiCategories()
+    private static String getTitle()
     {
-        return null;
+        return GuiConfig.getAbridgedConfigPath(Configs.configurationFile.toString());
     }
 }
