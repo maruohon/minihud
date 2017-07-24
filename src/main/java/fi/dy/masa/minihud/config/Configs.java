@@ -27,7 +27,7 @@ public class Configs
     public static boolean useScaledFont;
     public static boolean useTextBackground;
 
-    public static int defaultMode;
+    public static int enabledInfoTypes;
     public static int fontColor;
     public static int textBackgroundColor;
     public static int textPosX;
@@ -37,6 +37,7 @@ public class Configs
     public static String dateFormatReal;
     public static KeyModifier requiredKey;
     private static final Map<Integer, Integer> HOTKEY_INFO_MAP = new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> LINE_ORDER_MAP = new HashMap<Integer, Integer>();
 
     public static File configurationFile;
     public static Configuration config;
@@ -44,11 +45,12 @@ public class Configs
     public static final String CATEGORY_GENERIC = "Generic";
     public static final String CATEGORY_INFO_TOGGLE = "InfoTypes";
     public static final String CATEGORY_INFO_HOTKEYS = "InfoToggleHotkeys";
+    public static final String CATEGORY_INFO_LINE_ORDER = "InfoLineOrder";
 
     @SubscribeEvent
     public void onConfigChangedEvent(OnConfigChangedEvent event)
     {
-        if (Reference.MOD_ID.equals(event.getModID()) == true)
+        if (Reference.MOD_ID.equals(event.getModID()))
         {
             loadConfigs(config);
         }
@@ -65,33 +67,23 @@ public class Configs
 
     public static void loadConfigs(Configuration conf)
     {
-        int defaultModeNumeric = defaultMode;
-        boolean defaultModeNumericEnabled = false;
         Property prop;
 
         prop = conf.get(CATEGORY_GENERIC, "enableByDefault", true);
         prop.setComment("If true, the HUD will be enabled by default on game launch");
         enableByDefault = prop.getBoolean();
 
-        prop = conf.get(CATEGORY_GENERIC, "coordinateFormat", "x: %.0f y: %.0f z: %.0f");
-        prop.setComment("The format string for the coordinate line (needs to have three %f format strings!) Default: x: %.0f y: %.0f z: %.0f");
+        prop = conf.get(CATEGORY_GENERIC, "coordinateFormat", "x: %.1f y: %.1f z: %.1f");
+        prop.setComment("The format string for the coordinate line (needs to have three %f format strings!) Default: x: %.1f y: %.1f z: %.1f");
         coordinateFormat = prop.getString();
 
         prop = conf.get(CATEGORY_GENERIC, "coordinateFormatCustomized", true);
         prop.setComment("Use the customized coordinate format string");
         coordinateFormatCustomized = prop.getBoolean();
 
-        prop = conf.get(CATEGORY_GENERIC, "dateFormatReal", "HH:mm:ss");
+        prop = conf.get(CATEGORY_GENERIC, "dateFormatReal", "yyyy-MM-dd HH:mm:ss");
         prop.setComment("The format string for real time, see the Java SimpleDateFormat class for the format patterns, if needed");
         dateFormatReal = prop.getString();
-
-        prop = conf.get(CATEGORY_GENERIC, "defaultMode", 1);
-        prop.setComment("Bit mask of the enabled information. 1 = coordinates, 2 = yaw, 4 = pitch, 8 = speed, 16 = biome, 32 = light, 64 = facing, 128 = block, 256 = chunk, 512 = looking at, 1024 = fps, 2048 = entity count, 4096 = dimension id, 8192 = world time (sum together the ones you want enabled by default)");
-        defaultModeNumeric = prop.getInt();
-
-        prop = conf.get(CATEGORY_GENERIC, "defaultModeNumeric", false);
-        prop.setComment("Use the numeric bitmask instead of the individual toggle buttons for the info types");
-        defaultModeNumericEnabled = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "fontColor", "0xE0E0E0");
         prop.setComment("Font color (RGB, default: 0xE0E0E0 = 14737632)");
@@ -117,9 +109,9 @@ public class Configs
         prop.setComment("Reverse the line sorting order");
         sortLinesReversed = prop.getBoolean();
 
-        prop = conf.get(CATEGORY_GENERIC, "textBackgroundColor", "0x70505050");
-        prop.setComment("Text background color (ARGB, default: 0x70505050 = 1884311632)");
-        textBackgroundColor = getColor(prop.getString(), 0x70505050);
+        prop = conf.get(CATEGORY_GENERIC, "textBackgroundColor", "0xA0505050");
+        prop.setComment("Text background color (ARGB, default: 0xA0505050)");
+        textBackgroundColor = getColor(prop.getString(), 0xA0505050);
 
         prop = conf.get(CATEGORY_GENERIC, "textPosX", 4);
         prop.setComment("Text X position (default: 4)");
@@ -203,9 +195,13 @@ public class Configs
         prop.setComment("Show the current light level");
         setInfoType(RenderEventHandler.MASK_LIGHT, prop.getBoolean());
 
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAt", false);
-        prop.setComment("Show which block the player is looking at");
-        setInfoType(RenderEventHandler.MASK_LOOKINGAT, prop.getBoolean());
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAtBlock", false);
+        prop.setComment("Show which block the player is currently looking at");
+        setInfoType(RenderEventHandler.MASK_LOOKING_AT_BLOCK, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAtBlockInChunk", false);
+        prop.setComment("Show which block within its containing chunk the player is currently looking at");
+        setInfoType(RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAtEntity", false);
         prop.setComment("Show entity name and health when looked at");
@@ -215,7 +211,7 @@ public class Configs
         prop.setComment("Show the currently renderer particle count (P from F3)");
         setInfoType(RenderEventHandler.MASK_PARTICLE_COUNT, prop.getBoolean());
 
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRealTime", false);
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRealTime", true);
         prop.setComment("Show the current real time formatted according to dateFormatReal");
         setInfoType(RenderEventHandler.MASK_TIME_REAL, prop.getBoolean());
 
@@ -242,7 +238,7 @@ public class Configs
         prop.setComment("Show the current world time in ticks");
         setInfoType(RenderEventHandler.MASK_TIME_TICKS, prop.getBoolean());
 
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTimeFormatted", true);
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTimeFormatted", false);
         prop.setComment("Show the current world time formatted to days, hours, minutes");
         setInfoType(RenderEventHandler.MASK_TIME_MC, prop.getBoolean());
 
@@ -255,40 +251,73 @@ public class Configs
                         "the raw numeric LWJGL keycodes (only works for key codes > 11).\n" +
                         "To toggle the info type while in-game, press and hold the Toggle key and then " +
                         "press the keys set here to toggle the info types on/off.");
+
         HOTKEY_INFO_MAP.clear();
 
-        assignInfoHotkey(conf, "infoCoordinates",           RenderEventHandler.MASK_COORDINATES         , "1");
-        assignInfoHotkey(conf, "infoRotationYaw",           RenderEventHandler.MASK_YAW                 , "2");
-        assignInfoHotkey(conf, "infoRotationPitch",         RenderEventHandler.MASK_PITCH               , "3");
-        assignInfoHotkey(conf, "infoSpeed",                 RenderEventHandler.MASK_SPEED               , "4");
-        assignInfoHotkey(conf, "infoBiome",                 RenderEventHandler.MASK_BIOME               , "5");
-        assignInfoHotkey(conf, "infoLightLevel",            RenderEventHandler.MASK_LIGHT               , "6");
-        assignInfoHotkey(conf, "infoFacing",                RenderEventHandler.MASK_FACING              , "7");
-        assignInfoHotkey(conf, "infoBlockPosition",         RenderEventHandler.MASK_BLOCK               , "8");
-        assignInfoHotkey(conf, "infoChunkPosition",         RenderEventHandler.MASK_CHUNK               , "9");
-        assignInfoHotkey(conf, "infoLookingAt",             RenderEventHandler.MASK_LOOKINGAT           , "0");
-        assignInfoHotkey(conf, "infoFPS",                   RenderEventHandler.MASK_FPS                 , "a");
-        assignInfoHotkey(conf, "infoEntities",              RenderEventHandler.MASK_ENTITIES            , "b");
-        assignInfoHotkey(conf, "infoDimensionId",           RenderEventHandler.MASK_DIMENSION           , "c");
-        assignInfoHotkey(conf, "infoWorldTime",             RenderEventHandler.MASK_TIME_TICKS          , "d");
-        assignInfoHotkey(conf, "infoWorldTimeFormatted",    RenderEventHandler.MASK_TIME_MC             , "e");
-        assignInfoHotkey(conf, "infoRealTime",              RenderEventHandler.MASK_TIME_REAL           , "f");
-        assignInfoHotkey(conf, "infoLookingAtEntity",       RenderEventHandler.MASK_LOOKING_AT_ENTITY   , "g");
-        assignInfoHotkey(conf, "infoSlimeChunk",            RenderEventHandler.MASK_SLIME_CHUNK         , "i");
-        assignInfoHotkey(conf, "infoBlockProperties",       RenderEventHandler.MASK_BLOCK_PROPERTIES    , "j");
-        assignInfoHotkey(conf, "infoEntityRegistryName",    RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME , "k");
-        assignInfoHotkey(conf, "infoBiomeRegistryName",     RenderEventHandler.MASK_BIOME_REGISTRY_NAME , "l");
-        assignInfoHotkey(conf, "infoChunkSections",         RenderEventHandler.MASK_CHUNK_SECTIONS      , "m");
-        assignInfoHotkey(conf, "infoChunkUpdates",          RenderEventHandler.MASK_CHUNK_UPDATES       , "n");
-        assignInfoHotkey(conf, "infoParticleCount",         RenderEventHandler.MASK_PARTICLE_COUNT      , "o");
-        assignInfoHotkey(conf, "infoDifficulty",            RenderEventHandler.MASK_DIFFICULTY          , "p");
+        assignInfoHotkey(conf, "infoFPS",                   RenderEventHandler.MASK_FPS                         , "0");
+        assignInfoHotkey(conf, "infoRealTime",              RenderEventHandler.MASK_TIME_REAL                   , "1");
+        assignInfoHotkey(conf, "infoWorldTime",             RenderEventHandler.MASK_TIME_TICKS                  , "2");
+        assignInfoHotkey(conf, "infoWorldTimeFormatted",    RenderEventHandler.MASK_TIME_MC                     , "3");
+        assignInfoHotkey(conf, "infoCoordinates",           RenderEventHandler.MASK_COORDINATES                 , "4");
+        assignInfoHotkey(conf, "infoDimensionId",           RenderEventHandler.MASK_DIMENSION                   , "5");
+        assignInfoHotkey(conf, "infoBlockPosition",         RenderEventHandler.MASK_BLOCK                       , "6");
+        assignInfoHotkey(conf, "infoChunkPosition",         RenderEventHandler.MASK_CHUNK                       , "7");
+        assignInfoHotkey(conf, "infoFacing",                RenderEventHandler.MASK_FACING                      , "8");
+        assignInfoHotkey(conf, "infoLightLevel",            RenderEventHandler.MASK_LIGHT                       , "9");
+        assignInfoHotkey(conf, "infoRotationYaw",           RenderEventHandler.MASK_YAW                         , "a");
+        assignInfoHotkey(conf, "infoRotationPitch",         RenderEventHandler.MASK_PITCH                       , "b");
+        assignInfoHotkey(conf, "infoSpeed",                 RenderEventHandler.MASK_SPEED                       , "c");
+        assignInfoHotkey(conf, "infoChunkSections",         RenderEventHandler.MASK_CHUNK_SECTIONS              , "d");
+        assignInfoHotkey(conf, "infoChunkUpdates",          RenderEventHandler.MASK_CHUNK_UPDATES               , "e");
+        assignInfoHotkey(conf, "infoParticleCount",         RenderEventHandler.MASK_PARTICLE_COUNT              , "f");
+        assignInfoHotkey(conf, "infoDifficulty",            RenderEventHandler.MASK_DIFFICULTY                  , "g");
+        assignInfoHotkey(conf, "infoBiome",                 RenderEventHandler.MASK_BIOME                       , "h");
+        assignInfoHotkey(conf, "infoBiomeRegistryName",     RenderEventHandler.MASK_BIOME_REGISTRY_NAME         , "i");
+        assignInfoHotkey(conf, "infoEntities",              RenderEventHandler.MASK_ENTITIES                    , "j");
+        assignInfoHotkey(conf, "infoSlimeChunk",            RenderEventHandler.MASK_SLIME_CHUNK                 , "k");
+        assignInfoHotkey(conf, "infoLookingAtEntity",       RenderEventHandler.MASK_LOOKING_AT_ENTITY           , "l");
+        assignInfoHotkey(conf, "infoEntityRegistryName",    RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME   , "m");
+        assignInfoHotkey(conf, "infoLookingAtBlock",        RenderEventHandler.MASK_LOOKING_AT_BLOCK            , "n");
+        assignInfoHotkey(conf, "infoLookingAtBlockInChunk", RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK      , "o");
+        assignInfoHotkey(conf, "infoBlockProperties",       RenderEventHandler.MASK_BLOCK_PROPERTIES            , "p");
 
-        if (defaultModeNumericEnabled)
-        {
-            defaultMode = defaultModeNumeric;
-        }
+        cat = conf.getCategory(CATEGORY_INFO_LINE_ORDER);
+        cat.setComment("Here you can set the order of the info lines.\n" +
+                       "The number is the position in the list the line gets added to.\n" +
+                       "The indexing starts from 0.\n" +
+                       "If multiple types have the same index, then the last one that\n" +
+                       "is actually added internally, will bump previous entries downwards.");
 
-        RenderEventHandler.getInstance().setEnabledMask(defaultMode);
+        LINE_ORDER_MAP.clear();
+
+        setLinePosition(conf, "infoFPS",                   RenderEventHandler.MASK_FPS);
+        setLinePosition(conf, "infoRealTime",              RenderEventHandler.MASK_TIME_REAL);
+        setLinePosition(conf, "infoWorldTime",             RenderEventHandler.MASK_TIME_TICKS);
+        setLinePosition(conf, "infoWorldTimeFormatted",    RenderEventHandler.MASK_TIME_MC);
+        setLinePosition(conf, "infoCoordinates",           RenderEventHandler.MASK_COORDINATES);
+        setLinePosition(conf, "infoDimensionId",           RenderEventHandler.MASK_DIMENSION);
+        setLinePosition(conf, "infoBlockPosition",         RenderEventHandler.MASK_BLOCK);
+        setLinePosition(conf, "infoChunkPosition",         RenderEventHandler.MASK_CHUNK);
+        setLinePosition(conf, "infoFacing",                RenderEventHandler.MASK_FACING);
+        setLinePosition(conf, "infoLightLevel",            RenderEventHandler.MASK_LIGHT);
+        setLinePosition(conf, "infoRotationYaw",           RenderEventHandler.MASK_YAW);
+        setLinePosition(conf, "infoRotationPitch",         RenderEventHandler.MASK_PITCH);
+        setLinePosition(conf, "infoSpeed",                 RenderEventHandler.MASK_SPEED);
+        setLinePosition(conf, "infoChunkSections",         RenderEventHandler.MASK_CHUNK_SECTIONS);
+        setLinePosition(conf, "infoChunkUpdates",          RenderEventHandler.MASK_CHUNK_UPDATES);
+        setLinePosition(conf, "infoParticleCount",         RenderEventHandler.MASK_PARTICLE_COUNT);
+        setLinePosition(conf, "infoDifficulty",            RenderEventHandler.MASK_DIFFICULTY);
+        setLinePosition(conf, "infoBiome",                 RenderEventHandler.MASK_BIOME);
+        setLinePosition(conf, "infoBiomeRegistryName",     RenderEventHandler.MASK_BIOME_REGISTRY_NAME);
+        setLinePosition(conf, "infoEntities",              RenderEventHandler.MASK_ENTITIES);
+        setLinePosition(conf, "infoSlimeChunk",            RenderEventHandler.MASK_SLIME_CHUNK);
+        setLinePosition(conf, "infoLookingAtEntity",       RenderEventHandler.MASK_LOOKING_AT_ENTITY);
+        setLinePosition(conf, "infoEntityRegistryName",    RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME);
+        setLinePosition(conf, "infoLookingAtBlock",        RenderEventHandler.MASK_LOOKING_AT_BLOCK);
+        setLinePosition(conf, "infoLookingAtBlockInChunk", RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK);
+        setLinePosition(conf, "infoBlockProperties",       RenderEventHandler.MASK_BLOCK_PROPERTIES);
+
+        RenderEventHandler.getInstance().setEnabledMask(enabledInfoTypes);
 
         if (conf.hasChanged())
         {
@@ -300,11 +329,11 @@ public class Configs
     {
         if (value)
         {
-            defaultMode |= mask;
+            enabledInfoTypes |= mask;
         }
         else
         {
-            defaultMode &= ~mask;
+            enabledInfoTypes &= ~mask;
         }
     }
 
@@ -379,5 +408,17 @@ public class Configs
     {
         Integer mask = HOTKEY_INFO_MAP.get(keyCode);
         return mask != null ? mask.intValue() : 0;
+    }
+
+    private static void setLinePosition(Configuration conf, String configKey, int infoBitmask)
+    {
+        int value = conf.get(CATEGORY_INFO_LINE_ORDER, configKey, -1).getInt();
+        LINE_ORDER_MAP.put(infoBitmask, value);
+    }
+
+    public static int getLinePositionFor(int infoType)
+    {
+        Integer value = LINE_ORDER_MAP.get(infoType);
+        return value != null ? value.intValue() : -1;
     }
 }
