@@ -14,9 +14,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -26,6 +28,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -63,6 +66,10 @@ public class RenderEventHandler
     public static final int MASK_BLOCK_PROPERTIES           = 0x00040000;
     public static final int MASK_LOOKING_AT_ENTITY_REGNAME  = 0x00080000;
     public static final int MASK_BIOME_REGISTRY_NAME        = 0x00100000;
+    public static final int MASK_CHUNK_SECTIONS             = 0x00200000;
+    public static final int MASK_CHUNK_UPDATES              = 0x00400000;
+    public static final int MASK_PARTICLE_COUNT             = 0x00800000;
+    public static final int MASK_DIFFICULTY                 = 0x01000000;
 
     private static RenderEventHandler instance;
     private final Minecraft mc;
@@ -346,6 +353,39 @@ public class RenderEventHandler
             }
 
             lines.add(new StringHolder(String.format("Facing: %s (%s)", facing, str)));
+        }
+
+        if ((enabledMask & MASK_CHUNK_SECTIONS) != 0)
+        {
+            lines.add(new StringHolder(this.mc.renderGlobal.getDebugInfoRenders()));
+        }
+
+        if ((enabledMask & MASK_CHUNK_UPDATES) != 0)
+        {
+            lines.add(new StringHolder(String.format("Chunk updates: %d", RenderChunk.renderChunksUpdated)));
+        }
+
+        if ((enabledMask & MASK_PARTICLE_COUNT) != 0)
+        {
+            lines.add(new StringHolder(String.format("P: %s", this.mc.effectRenderer.getStatistics())));
+        }
+
+        if ((enabledMask & MASK_DIFFICULTY) != 0 && this.mc.world.isBlockLoaded(pos))
+        {
+            DifficultyInstance diff = this.mc.world.getDifficultyForLocation(pos);
+
+            if (this.mc.isIntegratedServerRunning() && this.mc.getIntegratedServer() != null)
+            {
+                EntityPlayerMP player = this.mc.getIntegratedServer().getPlayerList().getPlayerByUUID(this.mc.player.getUniqueID());
+
+                if (player != null)
+                {
+                    diff = player.world.getDifficultyForLocation(new BlockPos(player));
+                }
+            }
+
+            lines.add(new StringHolder(String.format("Local Difficulty: %.2f // %.2f (Day %d)",
+                    diff.getAdditionalDifficulty(), diff.getClampedAdditionalDifficulty(), this.mc.world.getWorldTime() / 24000L)));
         }
 
         if ((enabledMask & (MASK_BIOME | MASK_LIGHT | MASK_BIOME_REGISTRY_NAME)) != 0)

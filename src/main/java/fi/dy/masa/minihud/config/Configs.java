@@ -163,9 +163,21 @@ public class Configs
         prop.setComment("Show player's current position in the chunk");
         setInfoType(RenderEventHandler.MASK_CHUNK, prop.getBoolean());
 
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkSections", false);
+        prop.setComment("Show the currently rendered number of Chunk sections (the C value from F3)");
+        setInfoType(RenderEventHandler.MASK_CHUNK_SECTIONS, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkUpdates", false);
+        prop.setComment("Show current number of chunk updates per second");
+        setInfoType(RenderEventHandler.MASK_CHUNK_UPDATES, prop.getBoolean());
+
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoCoordinates", true);
         prop.setComment("Show player coordinates");
         setInfoType(RenderEventHandler.MASK_COORDINATES, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoDifficulty", false);
+        prop.setComment("Show the local difficulty");
+        setInfoType(RenderEventHandler.MASK_DIFFICULTY, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoDimensionId", true);
         prop.setComment("Show the current dimension ID (might not be accurate in every case, depending on the server!)");
@@ -198,6 +210,10 @@ public class Configs
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAtEntity", false);
         prop.setComment("Show entity name and health when looked at");
         setInfoType(RenderEventHandler.MASK_LOOKING_AT_ENTITY, prop.getBoolean());
+
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoParticleCount", false);
+        prop.setComment("Show the currently renderer particle count (P from F3)");
+        setInfoType(RenderEventHandler.MASK_PARTICLE_COUNT, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRealTime", false);
         prop.setComment("Show the current real time formatted according to dateFormatReal");
@@ -262,6 +278,10 @@ public class Configs
         assignInfoHotkey(conf, "infoBlockProperties",       RenderEventHandler.MASK_BLOCK_PROPERTIES    , "j");
         assignInfoHotkey(conf, "infoEntityRegistryName",    RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME , "k");
         assignInfoHotkey(conf, "infoBiomeRegistryName",     RenderEventHandler.MASK_BIOME_REGISTRY_NAME , "l");
+        assignInfoHotkey(conf, "infoChunkSections",         RenderEventHandler.MASK_CHUNK_SECTIONS      , "m");
+        assignInfoHotkey(conf, "infoChunkUpdates",          RenderEventHandler.MASK_CHUNK_UPDATES       , "n");
+        assignInfoHotkey(conf, "infoParticleCount",         RenderEventHandler.MASK_PARTICLE_COUNT      , "o");
+        assignInfoHotkey(conf, "infoDifficulty",            RenderEventHandler.MASK_DIFFICULTY          , "p");
 
         if (defaultModeNumericEnabled)
         {
