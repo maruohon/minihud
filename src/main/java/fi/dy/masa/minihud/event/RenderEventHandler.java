@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.event;
 
+import java.lang.invoke.MethodHandle;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -42,6 +44,8 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import fi.dy.masa.minihud.MiniHud;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.util.MethodHandleUtils;
+import fi.dy.masa.minihud.util.MethodHandleUtils.UnableToFindMethodHandleException;
 
 public class RenderEventHandler
 {
@@ -59,22 +63,25 @@ public class RenderEventHandler
     public static final int MASK_PITCH                      = 0x00000800;
     public static final int MASK_SPEED                      = 0x00001000;
     public static final int MASK_CHUNK_SECTIONS             = 0x00002000;
-    public static final int MASK_CHUNK_UPDATES              = 0x00004000;
-    public static final int MASK_PARTICLE_COUNT             = 0x00008000;
-    public static final int MASK_DIFFICULTY                 = 0x00010000;
-    public static final int MASK_BIOME                      = 0x00020000;
-    public static final int MASK_BIOME_REGISTRY_NAME        = 0x00040000;
-    public static final int MASK_ENTITIES                   = 0x00080000;
-    public static final int MASK_SLIME_CHUNK                = 0x00100000;
-    public static final int MASK_LOOKING_AT_ENTITY          = 0x00200000;
-    public static final int MASK_LOOKING_AT_ENTITY_REGNAME  = 0x00400000;
-    public static final int MASK_LOOKING_AT_BLOCK           = 0x00800000;
-    public static final int MASK_LOOKING_AT_BLOCK_CHUNK     = 0x01000000;
-    public static final int MASK_BLOCK_PROPERTIES           = 0x02000000;
+    public static final int MASK_CHUNK_SECTIONS_LINE        = 0x00004000;
+    public static final int MASK_CHUNK_UPDATES              = 0x00008000;
+    public static final int MASK_PARTICLE_COUNT             = 0x00010000;
+    public static final int MASK_DIFFICULTY                 = 0x00020000;
+    public static final int MASK_BIOME                      = 0x00040000;
+    public static final int MASK_BIOME_REGISTRY_NAME        = 0x00080000;
+    public static final int MASK_ENTITIES                   = 0x00100000;
+    public static final int MASK_SLIME_CHUNK                = 0x00200000;
+    public static final int MASK_LOOKING_AT_ENTITY          = 0x00400000;
+    public static final int MASK_LOOKING_AT_ENTITY_REGNAME  = 0x00800000;
+    public static final int MASK_LOOKING_AT_BLOCK           = 0x01000000;
+    public static final int MASK_LOOKING_AT_BLOCK_CHUNK     = 0x02000000;
+    public static final int MASK_BLOCK_PROPERTIES           = 0x04000000;
 
     private static RenderEventHandler instance;
+    private final MethodHandle methodHandle_RenderGlobal_getRenderedChunks;
     private final Minecraft mc;
     private final Date date;
+    private final Random rand = new Random();
     private boolean enabled;
     private int mask;
     private int fps;
@@ -90,6 +97,20 @@ public class RenderEventHandler
     {
         this.mc = Minecraft.getMinecraft();
         this.date = new Date();
+        this.methodHandle_RenderGlobal_getRenderedChunks = this.getMethodHandle_getRenderedChunks();
+    }
+
+    private MethodHandle getMethodHandle_getRenderedChunks()
+    {
+        try
+        {
+            return MethodHandleUtils.getMethodHandleVirtual(RenderGlobal.class, new String[] { "func_184382_g", "getRenderedChunks" });
+        }
+        catch (UnableToFindMethodHandleException e)
+        {
+            MiniHud.logger.error("Failed to get a MethodHandle for RenderGlobal#getRenderedChunks()", e);
+            return null;
+        }
     }
 
     @SubscribeEvent
@@ -426,6 +447,10 @@ public class RenderEventHandler
             }
 
             case MASK_CHUNK_SECTIONS:
+                this.addLine(String.format("C: %d", this.getRenderedChunks()));
+                break;
+
+            case MASK_CHUNK_SECTIONS_LINE:
                 this.addLine(this.mc.renderGlobal.getDebugInfoRenders());
                 break;
 
@@ -696,7 +721,23 @@ public class RenderEventHandler
         long rngSeed = worldSeed +
                        (long) (chunkX * chunkX *  4987142) + (long) (chunkX * 5947611) +
                        (long) (chunkZ * chunkZ) * 4392871L + (long) (chunkZ * 389711) ^ slimeSeed;
-        return (new Random(rngSeed)).nextInt(10) == 0;
+
+        this.rand.setSeed(rngSeed);
+
+        return this.rand.nextInt(10) == 0;
+    }
+
+    private int getRenderedChunks()
+    {
+        try
+        {
+            return (int) methodHandle_RenderGlobal_getRenderedChunks.invokeExact(this.mc.renderGlobal);
+        }
+        catch (Throwable t)
+        {
+            MiniHud.logger.error("Error while trying invoke RenderGlobal#getRenderedChunks()", t);
+            return -1;
+        }
     }
 
     private class StringHolder implements Comparable<StringHolder>
