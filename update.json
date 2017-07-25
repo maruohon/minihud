@@ -1,10 +1,10 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/minihud",
     "promos": {
-        "1.12-latest": "0.11.0",
-        "1.12-recommended": "0.11.0",
-        "1.11.2-latest": "0.11.0",
-        "1.11.2-recommended": "0.11.0",
+        "1.12-latest": "0.11.1",
+        "1.12-recommended": "0.11.1",
+        "1.11.2-latest": "0.11.1",
+        "1.11.2-recommended": "0.11.1",
         "1.11-latest": "0.9.0",
         "1.11-recommended": "0.9.0",
         "1.10.2-latest": "0.10.0",
@@ -19,10 +19,12 @@
         "1.8.9-recommended": "0.4.0"
     },
     "1.12": {
+        "0.11.1": "Changed the info toggle hotkeys to be able to work as \"key groups\", so that you can toggle multiple info types with the same key\nAdded a separate info type for the entire C-line from the F3 screen and changed the old option to only show the number of rendered chunk sections",
         "0.11.0": "Added more info type\nAdded the option to select the order of the info lines",
         "0.10.0": "Update to Minecraft 1.12"
     },
     "1.11.2": {
+        "0.11.1": "Changed the info toggle hotkeys to be able to work as \"key groups\", so that you can toggle multiple info types with the same key\nAdded a separate info type for the entire C-line from the F3 screen and changed the old option to only show the number of rendered chunk sections",
         "0.11.0": "Added more info type\nAdded the option to select the order of the info lines",
         "0.10.0": "Added biome registry name and looked-at-entity registry name info types",
         "0.9.1": "Fixed getting the world seed from a chat message in multiplayer\n",
