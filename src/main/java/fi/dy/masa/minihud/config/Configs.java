@@ -159,6 +159,10 @@ public class Configs
         prop.setComment("Show the currently rendered number of Chunk sections (the C value from F3)");
         setInfoType(RenderEventHandler.MASK_CHUNK_SECTIONS, prop.getBoolean());
 
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkSectionsLine", false);
+        prop.setComment("Show the entire line of the C value from the F3 screen");
+        setInfoType(RenderEventHandler.MASK_CHUNK_SECTIONS_LINE, prop.getBoolean());
+
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkUpdates", false);
         prop.setComment("Show current number of chunk updates per second");
         setInfoType(RenderEventHandler.MASK_CHUNK_UPDATES, prop.getBoolean());
@@ -268,6 +272,7 @@ public class Configs
         assignInfoHotkey(conf, "infoRotationPitch",         RenderEventHandler.MASK_PITCH                       , "b");
         assignInfoHotkey(conf, "infoSpeed",                 RenderEventHandler.MASK_SPEED                       , "c");
         assignInfoHotkey(conf, "infoChunkSections",         RenderEventHandler.MASK_CHUNK_SECTIONS              , "d");
+        assignInfoHotkey(conf, "infoChunkSectionsLine",     RenderEventHandler.MASK_CHUNK_SECTIONS_LINE         , "q");
         assignInfoHotkey(conf, "infoChunkUpdates",          RenderEventHandler.MASK_CHUNK_UPDATES               , "e");
         assignInfoHotkey(conf, "infoParticleCount",         RenderEventHandler.MASK_PARTICLE_COUNT              , "f");
         assignInfoHotkey(conf, "infoDifficulty",            RenderEventHandler.MASK_DIFFICULTY                  , "g");
@@ -304,6 +309,7 @@ public class Configs
         setLinePosition(conf, "infoRotationPitch",         RenderEventHandler.MASK_PITCH);
         setLinePosition(conf, "infoSpeed",                 RenderEventHandler.MASK_SPEED);
         setLinePosition(conf, "infoChunkSections",         RenderEventHandler.MASK_CHUNK_SECTIONS);
+        setLinePosition(conf, "infoChunkSectionsLine",     RenderEventHandler.MASK_CHUNK_SECTIONS_LINE);
         setLinePosition(conf, "infoChunkUpdates",          RenderEventHandler.MASK_CHUNK_UPDATES);
         setLinePosition(conf, "infoParticleCount",         RenderEventHandler.MASK_PARTICLE_COUNT);
         setLinePosition(conf, "infoDifficulty",            RenderEventHandler.MASK_DIFFICULTY);
