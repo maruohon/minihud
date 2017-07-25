@@ -1,11 +1,14 @@
 package fi.dy.masa.minihud.config;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.lwjgl.input.Keyboard;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
@@ -36,7 +39,7 @@ public class Configs
     public static String coordinateFormat;
     public static String dateFormatReal;
     public static KeyModifier requiredKey;
-    private static final Map<Integer, Integer> HOTKEY_INFO_MAP = new HashMap<Integer, Integer>();
+    private static final Multimap<Integer, Integer> HOTKEY_INFO_MAP = HashMultimap.create();
     private static final Map<Integer, Integer> LINE_ORDER_MAP = new HashMap<Integer, Integer>();
 
     public static File configurationFile;
@@ -412,8 +415,18 @@ public class Configs
 
     public static int getBitmaskForKey(int keyCode)
     {
-        Integer mask = HOTKEY_INFO_MAP.get(keyCode);
-        return mask != null ? mask.intValue() : 0;
+        Collection<Integer> masks = HOTKEY_INFO_MAP.get(keyCode);
+        int fullMask = 0;
+
+        if (masks != null)
+        {
+            for (Integer mask : masks)
+            {
+                fullMask |= mask;
+            }
+        }
+
+        return fullMask;
     }
 
     private static void setLinePosition(Configuration conf, String configKey, int infoBitmask)
