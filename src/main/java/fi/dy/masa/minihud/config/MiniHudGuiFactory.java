@@ -26,6 +26,7 @@ public class MiniHudGuiFactory extends DefaultGuiFactory
     {
         List<IConfigElement> configElements = new ArrayList<IConfigElement>();
 
+        configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_DEBUG_HOTKEYS)));
         configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_GENERIC)));
         configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_INFO_TOGGLE)));
         configElements.add(new ConfigElement(Configs.config.getCategory(Configs.CATEGORY_INFO_HOTKEYS)));
