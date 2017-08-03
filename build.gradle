@@ -90,3 +90,15 @@ processResources
     // Move access transformers to META-INF
     // rename '(' + config.mod_id + '_at.cfg)', 'META-INF/$1'
 }
+
+task signJar(type: SignJar, dependsOn: reobfJar) {
+    inputFile = jar.archivePath
+    outputFile = jar.archivePath
+
+    keyStore = config.keyStore
+    alias = config.alias
+    storePass = config.storePass
+    keyPass = config.keyPass
+}
+
+build.dependsOn signJar
