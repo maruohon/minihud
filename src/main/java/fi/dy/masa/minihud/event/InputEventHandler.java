@@ -1,19 +1,30 @@
 package fi.dy.masa.minihud.event;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 import org.lwjgl.input.Keyboard;
+import com.google.common.collect.MapMaker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.client.renderer.debug.DebugRendererNeighborsUpdate;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.pathfinding.Path;
+import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.World;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.event.world.BlockEvent.NeighborNotifyEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindFieldException;
 import net.minecraftforge.fml.relauncher.Side;
@@ -21,6 +32,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import fi.dy.masa.minihud.MiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.proxy.ClientProxy;
+import fi.dy.masa.minihud.util.DebugInfoUtils;
 
 @SideOnly(Side.CLIENT)
 public class InputEventHandler
@@ -43,6 +55,9 @@ public class InputEventHandler
     private Field field_DebugRenderer_solidFaceEnabled;
     private Field field_DebugRenderer_waterEnabled;
     private boolean neighborUpdateEnabled;
+    private boolean pathfindingEnabled;
+    private int tickCounter;
+    private final Map<Entity, Path> oldPaths = new MapMaker().weakKeys().weakValues().<Entity, Path>makeMap();
 
     public InputEventHandler()
     {
@@ -123,6 +138,41 @@ public class InputEventHandler
         }
     }
 
+    @SubscribeEvent
+    public void onServerTick(ServerTickEvent event)
+    {
+        // Send the custom packet with the Path data, if that debug renderer is enabled
+        if (this.pathfindingEnabled && event.phase == TickEvent.Phase.END && this.mc.world != null && ++this.tickCounter >= 10)
+        {
+            this.tickCounter = 0;
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            World world = server != null ? server.getWorld(this.mc.world.provider.getDimension()) : null;
+
+            if (world != null)
+            {
+                for (Entity entity : world.loadedEntityList)
+                {
+                    PathNavigate navigator = entity instanceof EntityLiving ? ((EntityLiving) entity).getNavigator() : null;
+
+                    if (navigator != null)
+                    {
+                        final Path path = navigator.getPath();
+                        Path old = this.oldPaths.get(entity);
+
+                        if (path != null && (old == null || old.isSamePath(path) == false))
+                        {
+                            final int id = entity.getEntityId();
+                            final float maxDistance = Configs.debugRendererPathfindingEnableMaxDistance ? navigator.getPathSearchRange() : 0F;
+                            this.oldPaths.put(entity, path);
+
+                            DebugInfoUtils.sendPacketDebugPath(server, id, path, maxDistance);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void toggleDebugRenderers(int mask)
     {
         for (int i = 0; i < 6; i++)
@@ -150,6 +200,7 @@ public class InputEventHandler
 
                 case MASK_DEBUG_PATHFINDING:
                     status = this.toggleBoolean(this.field_DebugRenderer_pathfindingEnabled, this.mc.debugRenderer);
+                    this.pathfindingEnabled = status;
                     this.printMessage("pathfinding", status ? "ON" : "OFF");
                     break;
 

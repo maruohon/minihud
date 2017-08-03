@@ -31,6 +31,8 @@ public class Configs
     public static boolean useScaledFont;
     public static boolean useTextBackground;
 
+    public static boolean debugRendererPathfindingEnableMaxDistance;
+
     public static int enabledInfoTypes;
     public static int fontColor;
     public static int textBackgroundColor;
@@ -48,6 +50,7 @@ public class Configs
     public static Configuration config;
     
     public static final String CATEGORY_DEBUG_HOTKEYS = "VanillaDebugRendererHotkeys";
+    public static final String CATEGORY_DEBUG_RENDERER = "VanillaDebugRendererOptions";
     public static final String CATEGORY_GENERIC = "Generic";
     public static final String CATEGORY_INFO_TOGGLE = "InfoTypes";
     public static final String CATEGORY_INFO_HOTKEYS = "InfoToggleHotkeys";
@@ -75,10 +78,6 @@ public class Configs
     {
         Property prop;
 
-        prop = conf.get(CATEGORY_GENERIC, "enableByDefault", true);
-        prop.setComment("If true, the HUD will be enabled by default on game launch");
-        enableByDefault = prop.getBoolean();
-
         prop = conf.get(CATEGORY_GENERIC, "coordinateFormat", "x: %.1f y: %.1f z: %.1f");
         prop.setComment("The format string for the coordinate line (needs to have three %f format strings!) Default: x: %.1f y: %.1f z: %.1f");
         coordinateFormat = prop.getString();
@@ -90,6 +89,10 @@ public class Configs
         prop = conf.get(CATEGORY_GENERIC, "dateFormatReal", "yyyy-MM-dd HH:mm:ss");
         prop.setComment("The format string for real time, see the Java SimpleDateFormat class for the format patterns, if needed");
         dateFormatReal = prop.getString();
+
+        prop = conf.get(CATEGORY_GENERIC, "enableByDefault", true);
+        prop.setComment("If true, the HUD will be enabled by default on game launch");
+        enableByDefault = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "fontColor", "0xE0E0E0");
         prop.setComment("Font color (RGB, default: 0xE0E0E0 = 14737632)");
@@ -138,6 +141,15 @@ public class Configs
         prop = conf.get(CATEGORY_GENERIC, "useTextBackground", true);
         prop.setComment("Use a solid background color behind the text");
         useTextBackground = prop.getBoolean();
+
+
+        // Debug renderer related options
+
+        prop = conf.get(CATEGORY_DEBUG_RENDERER, "debugRendererPathfindingEnableMaxDistance", false);
+        prop.setComment("If true, then the vanilla pathfinding debug renderer will render the max distance boxes.\n" +
+                        "Those obstruct most other things quite badly when enabled, so this is disabled by default.");
+        debugRendererPathfindingEnableMaxDistance = prop.getBoolean();
+
 
         // Information types individual toggle
 
