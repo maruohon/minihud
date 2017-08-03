@@ -16,6 +16,7 @@ import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import fi.dy.masa.minihud.Reference;
+import fi.dy.masa.minihud.event.InputEventHandler;
 import fi.dy.masa.minihud.event.RenderEventHandler;
 
 public class Configs
@@ -39,12 +40,14 @@ public class Configs
     public static String coordinateFormat;
     public static String dateFormatReal;
     public static KeyModifier requiredKey;
+    private static final Multimap<Integer, Integer> HOTKEY_DEBUG_MAP = HashMultimap.create();
     private static final Multimap<Integer, Integer> HOTKEY_INFO_MAP = HashMultimap.create();
     private static final Map<Integer, Integer> LINE_ORDER_MAP = new HashMap<Integer, Integer>();
 
     public static File configurationFile;
     public static Configuration config;
     
+    public static final String CATEGORY_DEBUG_HOTKEYS = "VanillaDebugRendererHotkeys";
     public static final String CATEGORY_GENERIC = "Generic";
     public static final String CATEGORY_INFO_TOGGLE = "InfoTypes";
     public static final String CATEGORY_INFO_HOTKEYS = "InfoToggleHotkeys";
@@ -289,6 +292,21 @@ public class Configs
         assignInfoHotkey(conf, "infoLookingAtBlockInChunk", RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK      , "o");
         assignInfoHotkey(conf, "infoBlockProperties",       RenderEventHandler.MASK_BLOCK_PROPERTIES            , "p");
 
+
+        cat = conf.getCategory(CATEGORY_DEBUG_HOTKEYS);
+        cat.setComment("Hotkeys to toggle ON/OFF the vanilla debug renderers.\n" +
+                       "To use these, first press down F3 and then press the\n" +
+                       "keys defined here to toggle the feature ON/OFF.");
+
+        HOTKEY_DEBUG_MAP.clear();
+
+        assignDebugRendererHotkey(conf, "debugCollisionBoxEnabled",     InputEventHandler.MASK_DEBUG_COLLISION_BOXES,   "1");
+        assignDebugRendererHotkey(conf, "debugHeightMapEnabled",        InputEventHandler.MASK_DEBUG_HEIGHT_MAP,        "2");
+        assignDebugRendererHotkey(conf, "debugNeighborsUpdateEnabled",  InputEventHandler.MASK_DEBUG_NEIGHBOR_UPDATE,   "3");
+        assignDebugRendererHotkey(conf, "debugPathfindingEnabled",      InputEventHandler.MASK_DEBUG_PATHFINDING,       "4");
+        assignDebugRendererHotkey(conf, "debugWaterEnabled",            InputEventHandler.MASK_DEBUG_WATER,             "6");
+
+
         cat = conf.getCategory(CATEGORY_INFO_LINE_ORDER);
         cat.setComment("Here you can set the order of the info lines.\n" +
                        "The number is the position in the list the line gets added to.\n" +
@@ -388,7 +406,17 @@ public class Configs
 
     private static void assignInfoHotkey(Configuration conf, String configKey, int infoBitmask, String defaultValue)
     {
-        String keyName = conf.get(CATEGORY_INFO_HOTKEYS, configKey, defaultValue).getString();
+        assignHotkey(HOTKEY_INFO_MAP, conf, CATEGORY_INFO_HOTKEYS, configKey, defaultValue, infoBitmask);
+    }
+
+    private static void assignDebugRendererHotkey(Configuration conf, String configKey, int bitmask, String defaultValue)
+    {
+        assignHotkey(HOTKEY_DEBUG_MAP, conf, CATEGORY_DEBUG_HOTKEYS, configKey, defaultValue, bitmask);
+    }
+
+    private static void assignHotkey(Multimap<Integer, Integer> map, Configuration conf, String configCategory, String configKey, String defaultValue, int bitmask)
+    {
+        String keyName = conf.get(configCategory, configKey, defaultValue).getString();
 
         try
         {
@@ -397,7 +425,7 @@ public class Configs
             // Don't interpret the numbers 0..9 as raw keycodes, but instead as the number keys (below)
             if (keyCode > Keyboard.KEY_0)
             {
-                HOTKEY_INFO_MAP.put(keyCode, infoBitmask);
+                map.put(keyCode, bitmask);
                 return;
             }
         }
@@ -409,13 +437,23 @@ public class Configs
 
         if (keyCode != Keyboard.KEY_NONE)
         {
-            HOTKEY_INFO_MAP.put(keyCode, infoBitmask);
+            map.put(keyCode, bitmask);
         }
     }
 
-    public static int getBitmaskForKey(int keyCode)
+    public static int getBitmaskForInfoKey(int keyCode)
     {
-        Collection<Integer> masks = HOTKEY_INFO_MAP.get(keyCode);
+        return getBitmaskForKey(HOTKEY_INFO_MAP, keyCode);
+    }
+
+    public static int getBitmaskForDebugKey(int keyCode)
+    {
+        return getBitmaskForKey(HOTKEY_DEBUG_MAP, keyCode);
+    }
+
+    public static int getBitmaskForKey(Multimap<Integer, Integer> map, int keyCode)
+    {
+        Collection<Integer> masks = map.get(keyCode);
         int fullMask = 0;
 
         if (masks != null)
