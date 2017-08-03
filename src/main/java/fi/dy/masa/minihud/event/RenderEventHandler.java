@@ -308,7 +308,13 @@ public class RenderEventHandler
                     int min = (int) (timeDay / 16.666666) % 60;
                     int sec = (int) (timeDay / 0.277777) % 60;
 
-                    this.addLine(String.format("Time: %02d:%02d:%02d (day %d)", hour, min, sec, day));
+                    String str = Configs.dateFormatMinecraft;
+                    str = str.replace("{DAY}",  String.format("%d", day));
+                    str = str.replace("{HOUR}", String.format("%02d", hour));
+                    str = str.replace("{MIN}",  String.format("%02d", min));
+                    str = str.replace("{SEC}",  String.format("%02d", sec));
+
+                    this.addLine(str);
                 }
                 catch (Exception e)
                 {
