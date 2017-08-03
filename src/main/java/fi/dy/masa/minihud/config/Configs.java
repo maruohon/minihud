@@ -40,7 +40,9 @@ public class Configs
     public static int textPosY;
 
     public static String coordinateFormat;
+    public static String dateFormatMinecraft;
     public static String dateFormatReal;
+
     public static KeyModifier requiredKey;
     private static final Multimap<Integer, Integer> HOTKEY_DEBUG_MAP = HashMultimap.create();
     private static final Multimap<Integer, Integer> HOTKEY_INFO_MAP = HashMultimap.create();
@@ -89,6 +91,11 @@ public class Configs
         prop = conf.get(CATEGORY_GENERIC, "dateFormatReal", "yyyy-MM-dd HH:mm:ss");
         prop.setComment("The format string for real time, see the Java SimpleDateFormat class for the format patterns, if needed");
         dateFormatReal = prop.getString();
+
+        prop = conf.get(CATEGORY_GENERIC, "dateFormatMinecraft", "MC time: (day {DAY}) {HOUR}:{MIN}:xx");
+        prop.setComment("The format string for the Minecraft time.\n" +
+                        "The supported placeholders are: {DAY}, {HOUR}, {MIN}, {SEC}");
+        dateFormatMinecraft = prop.getString();
 
         prop = conf.get(CATEGORY_GENERIC, "enableByDefault", true);
         prop.setComment("If true, the HUD will be enabled by default on game launch");
