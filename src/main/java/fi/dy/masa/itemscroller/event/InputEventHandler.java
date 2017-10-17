@@ -188,7 +188,7 @@ public class InputEventHandler
     }
 
     @SubscribeEvent
-    public void onWorldUnload(WorldEvent.Load event)
+    public void onWorldUnload(WorldEvent.Unload event)
     {
         this.recipes.writeToDisk();
     }
