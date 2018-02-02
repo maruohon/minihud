@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import javax.annotation.Nonnull;
+import fi.dy.masa.itemscroller.ItemScroller;
+import fi.dy.masa.itemscroller.Reference;
+import fi.dy.masa.itemscroller.config.Configs;
+import fi.dy.masa.itemscroller.util.Constants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.ServerData;
@@ -12,10 +16,6 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraftforge.common.util.Constants;
-import fi.dy.masa.itemscroller.ItemScroller;
-import fi.dy.masa.itemscroller.Reference;
-import fi.dy.masa.itemscroller.config.Configs;
 
 public class RecipeStorage
 {

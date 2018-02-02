@@ -1,6 +1,9 @@
 package fi.dy.masa.itemscroller.event;
 
 import java.util.List;
+import fi.dy.masa.itemscroller.recipes.RecipeStorage;
+import fi.dy.masa.itemscroller.util.ContainerUtils;
+import fi.dy.masa.itemscroller.util.InventoryUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -12,10 +15,6 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import fi.dy.masa.itemscroller.recipes.RecipeStorage;
-import fi.dy.masa.itemscroller.util.InventoryUtils;
 
 public class RenderEventHandler
 {
@@ -35,7 +34,7 @@ public class RenderEventHandler
             for (int recipeId = 0; recipeId < count; recipeId++)
             {
                 this.renderStoredRecipeStack(recipeId, count, recipes.getRecipe(recipeId).getResult(),
-                        gui, gui.mc, recipeId == recipes.getSelection());
+                        gui, Minecraft.getMinecraft(), recipeId == recipes.getSelection());
             }
         }
     }
@@ -45,9 +44,10 @@ public class RenderEventHandler
     {
         if (renderRecipes && event.getGui() instanceof GuiContainer)
         {
+            Minecraft mc = Minecraft.getMinecraft();
             GuiContainer gui = (GuiContainer) event.getGui();
             RecipeStorage recipes = InputEventHandler.instance().getRecipes();
-            this.renderHoverTooltip(event.getMouseX(), event.getMouseY(), recipes, gui, gui.mc);
+            this.renderHoverTooltip(event.getMouseX(), event.getMouseY(), recipes, gui, mc);
         }
     }
 
@@ -79,7 +79,7 @@ public class RenderEventHandler
         {
             // Leave a small gap from the rendered stack to the gui's left edge
             final int columnOffsetCount = (recipeCount / recipesPerColumn) - (slot / recipesPerColumn);
-            final float x = gui.getGuiLeft() - (columnOffsetCount + 0.2f) * stackScaledSize - (columnOffsetCount - 1) * scale * 20;
+            final float x = ContainerUtils.getGuiLeft(gui) - (columnOffsetCount + 0.2f) * stackScaledSize - (columnOffsetCount - 1) * scale * 20;
             final int y = (int) (gap + 0.25f * stackScaledSize + (slot % recipesPerColumn) * entryHeight);
 
             if (mouseX >= x && mouseX < x + stackScaledSize && mouseY >= y && mouseY < y + stackScaledSize)
@@ -98,7 +98,7 @@ public class RenderEventHandler
 
     private void renderStoredRecipeStack(int recipeId, int recipeCount, ItemStack stack, GuiContainer gui, Minecraft mc, boolean selected)
     {
-        FontRenderer font = getFontRenderer(mc, stack);
+        FontRenderer font = mc.fontRenderer;
         final String indexStr = String.valueOf(recipeId + 1);
         final int strWidth = font.getStringWidth(indexStr);
 
@@ -114,7 +114,7 @@ public class RenderEventHandler
         final int stackScaledSize = (int) (stackBaseHeight * scale);
         // Leave a small gap from the rendered stack to the gui's left edge. The +12 is some space for the recipe's number text.
         final int columnOffsetCount = (recipeCount / recipesPerColumn) - (recipeId / recipesPerColumn);
-        final float xPosition = gui.getGuiLeft() - (columnOffsetCount + 0.2f) * stackScaledSize - (columnOffsetCount - 1) * scale * 20;
+        final float xPosition = ContainerUtils.getGuiLeft(gui) - (columnOffsetCount + 0.2f) * stackScaledSize - (columnOffsetCount - 1) * scale * 20;
         final float yPosition = gap + 0.25f * stackScaledSize + (recipeId % recipesPerColumn) * entryHeight;
 
         //System.out.printf("sw: %d sh: %d scale: %.3f left: %d usable h: %d entry h: %d\n",
@@ -196,18 +196,6 @@ public class RenderEventHandler
         GlStateManager.glLightModel(2899, RenderHelper.setColorBuffer(ambientLightStrength, ambientLightStrength, ambientLightStrength, 1.0F));
     }
 
-    private static FontRenderer getFontRenderer(Minecraft mc, ItemStack stack)
-    {
-        FontRenderer fontRenderer = null;
-
-        if (InventoryUtils.isStackEmpty(stack) == false)
-        {
-            fontRenderer = stack.getItem().getFontRenderer(stack);
-        }
-
-        return fontRenderer != null ? fontRenderer : mc.fontRenderer;
-    }
-
     private void renderStackToolTip(int x, int y, ItemStack stack, GuiContainer gui, Minecraft mc)
     {
         List<String> list = stack.getTooltip(mc.player, mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
@@ -224,12 +212,7 @@ public class RenderEventHandler
             }
         }
 
-        FontRenderer font = stack.getItem().getFontRenderer(stack);
-
-        if (font == null)
-        {
-            font = mc.fontRenderer;
-        }
+        FontRenderer font = mc.fontRenderer;
 
         net.minecraftforge.fml.client.config.GuiUtils.preItemToolTip(stack);
         net.minecraftforge.fml.client.config.GuiUtils.drawHoveringText(list, x, y, gui.width, gui.height, -1, font);
