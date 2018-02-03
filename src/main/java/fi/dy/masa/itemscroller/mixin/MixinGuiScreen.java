@@ -15,10 +15,8 @@ import net.minecraft.client.gui.GuiScreen;
 @Mixin(GuiScreen.class)
 public abstract class MixinGuiScreen extends Gui
 {
-    @Shadow
-    public abstract void handleMouseInput();
-    @Shadow
-    public abstract void handleKeyboardInput();
+    @Shadow public abstract void handleMouseInput();
+    @Shadow public abstract void handleKeyboardInput();
 
     @Inject(method = "drawDefaultBackground()V", at = @At("RETURN"))
     protected void onDrawDefaultBackgroundPost(CallbackInfo ci)

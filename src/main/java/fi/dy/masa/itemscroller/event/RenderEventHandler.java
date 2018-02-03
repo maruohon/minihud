@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import org.lwjgl.input.Mouse;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
-import fi.dy.masa.itemscroller.util.ContainerUtils;
+import fi.dy.masa.itemscroller.util.AccessorUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -104,7 +104,7 @@ public class RenderEventHandler
         {
             // Leave a small gap from the rendered stack to the gui's left edge
             final int columnOffsetCount = (recipeCount / recipesPerColumn) - (slot / recipesPerColumn);
-            final float x = ContainerUtils.getGuiLeft(gui) - (columnOffsetCount + 0.2f) * stackScaledSize - (columnOffsetCount - 1) * scale * 20;
+            final float x = AccessorUtils.getGuiLeft(gui) - (columnOffsetCount + 0.2f) * stackScaledSize - (columnOffsetCount - 1) * scale * 20;
             final int y = (int) (gap + 0.25f * stackScaledSize + (slot % recipesPerColumn) * entryHeight);
 
             if (mouseX >= x && mouseX < x + stackScaledSize && mouseY >= y && mouseY < y + stackScaledSize)
@@ -139,7 +139,7 @@ public class RenderEventHandler
         final int stackScaledSize = (int) (stackBaseHeight * scale);
         // Leave a small gap from the rendered stack to the gui's left edge. The +12 is some space for the recipe's number text.
         final int columnOffsetCount = (recipeCount / recipesPerColumn) - (recipeId / recipesPerColumn);
-        final float xPosition = ContainerUtils.getGuiLeft(gui) - (columnOffsetCount + 0.2f) * stackScaledSize - (columnOffsetCount - 1) * scale * 20;
+        final float xPosition = AccessorUtils.getGuiLeft(gui) - (columnOffsetCount + 0.2f) * stackScaledSize - (columnOffsetCount - 1) * scale * 20;
         final float yPosition = gap + 0.25f * stackScaledSize + (recipeId % recipesPerColumn) * entryHeight;
 
         //System.out.printf("sw: %d sh: %d scale: %.3f left: %d usable h: %d entry h: %d\n",

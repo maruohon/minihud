@@ -1,6 +1,5 @@
 package fi.dy.masa.itemscroller.event;
 
-import java.lang.invoke.MethodHandle;
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,9 +8,8 @@ import org.lwjgl.input.Mouse;
 import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
-import fi.dy.masa.itemscroller.util.ContainerUtils;
+import fi.dy.masa.itemscroller.util.AccessorUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
-import fi.dy.masa.itemscroller.util.MethodHandleUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -33,9 +31,6 @@ public class InputEventHandler
     private WeakReference<Slot> sourceSlot = new WeakReference<Slot>(null);
     private ItemStack stackInCursorLast = InventoryUtils.EMPTY_STACK;
     private RecipeStorage recipes;
-
-    private static final MethodHandle methodHandle_getSlotAtPosition = MethodHandleUtils.getMethodHandleVirtual(GuiContainer.class,
-            new String[] { "func_146975_c", "getSlotAtPosition" }, int.class, int.class);
 
     public InputEventHandler()
     {
@@ -82,12 +77,12 @@ public class InputEventHandler
             }
             else
             {
-                Slot slot = ContainerUtils.getSlotUnderMouse(guiContainer);
+                Slot slot = AccessorUtils.getSlotUnderMouse(guiContainer);
                 this.checkForItemPickup(guiContainer);
                 this.storeSourceSlotCandidate(guiContainer);
 
                 if (Configs.enableRightClickCraftingOneStack && Mouse.getEventButton() == 1 &&
-                    InventoryUtils.isCraftingSlot(guiContainer, ContainerUtils.getSlotUnderMouse(guiContainer)))
+                    InventoryUtils.isCraftingSlot(guiContainer, AccessorUtils.getSlotUnderMouse(guiContainer)))
                 {
                     InventoryUtils.rightClickCraftOneStack(guiContainer);
                 }
@@ -128,7 +123,7 @@ public class InputEventHandler
         }
 
         GuiContainer gui = (GuiContainer) guiScreen;
-        Slot slot = ContainerUtils.getSlotUnderMouse(gui);
+        Slot slot = AccessorUtils.getSlotUnderMouse(gui);
 
         if (Keyboard.getEventKey() == Keyboard.KEY_I && Keyboard.getEventKeyState() &&
             GuiScreen.isAltKeyDown() && GuiScreen.isCtrlKeyDown() && GuiScreen.isShiftKeyDown())
@@ -217,7 +212,7 @@ public class InputEventHandler
         // Left or right mouse button was pressed
         if (Mouse.getEventButtonState() && (Mouse.getEventButton() == 0 || Mouse.getEventButton() == 1))
         {
-            Slot slot = ContainerUtils.getSlotUnderMouse(gui);
+            Slot slot = AccessorUtils.getSlotUnderMouse(gui);
 
             if (slot != null)
             {
@@ -267,13 +262,13 @@ public class InputEventHandler
 
         LiteModItemScroller.logger.info(String.format("slot: slotNumber: %d, getSlotIndex(): %d, getHasStack(): %s, " +
                 "slot class: %s, inv class: %s, Container's slot list has slot: %s, stack: %s",
-                slot.slotNumber, InventoryUtils.getSlotIndex(slot), slot.getHasStack(), slot.getClass().getName(),
+                slot.slotNumber, AccessorUtils.getSlotIndex(slot), slot.getHasStack(), slot.getClass().getName(),
                 inv != null ? inv.getClass().getName() : "<null>", hasSlot ? " true" : "false", stackStr));
     }
 
     private boolean shiftPlaceItems(GuiContainer gui)
     {
-        Slot slot = ContainerUtils.getSlotUnderMouse(gui);
+        Slot slot = AccessorUtils.getSlotUnderMouse(gui);
 
         // Left click to place the items from the cursor to the slot
         InventoryUtils.leftClickSlot(gui, slot.slotNumber);
@@ -314,15 +309,15 @@ public class InputEventHandler
             return false;
         }
 
-        int left = ContainerUtils.getGuiLeft(gui);
-        int top = ContainerUtils.getGuiTop(gui);
-        int xSize = ContainerUtils.getGuiXSize(gui);
-        int ySize = ContainerUtils.getGuiYSize(gui);
+        int left = AccessorUtils.getGuiLeft(gui);
+        int top = AccessorUtils.getGuiTop(gui);
+        int xSize = AccessorUtils.getGuiXSize(gui);
+        int ySize = AccessorUtils.getGuiYSize(gui);
         int mouseAbsX = Mouse.getEventX() * gui.width / mc.displayWidth;
         int mouseAbsY = gui.height - Mouse.getEventY() * gui.height / mc.displayHeight - 1;
         boolean isOutsideGui = mouseAbsX < left || mouseAbsY < top || mouseAbsX >= left + xSize || mouseAbsY >= top + ySize;
 
-        return isOutsideGui && this.getSlotAtPosition(gui, mouseAbsX - left, mouseAbsY - top) == null;
+        return isOutsideGui && AccessorUtils.getSlotAtPosition(gui, mouseAbsX - left, mouseAbsY - top) == null;
     }
 
     private boolean dragMoveItems(GuiContainer gui)
@@ -416,7 +411,7 @@ public class InputEventHandler
         // This should prevent a "double click/move" when shift + left clicking on slots that have more
         // than one stack of items. (the regular slotClick() + a "drag move" from the slot that is under the mouse
         // when the left mouse button is pressed down and this code runs).
-        Slot slot = this.getSlotAtPosition(gui, mouseX, mouseY);
+        Slot slot = AccessorUtils.getSlotAtPosition(gui, mouseX, mouseY);
         this.slotNumberLast = slot != null ? slot.slotNumber : -1;
 
         if (eitherMouseButtonDown == false)
@@ -429,7 +424,7 @@ public class InputEventHandler
 
     private boolean dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y, boolean leaveOneItem, boolean moveOnlyOne)
     {
-        Slot slot = this.getSlotAtPosition(gui, x, y);
+        Slot slot = AccessorUtils.getSlotAtPosition(gui, x, y);
         Minecraft mc = Minecraft.getMinecraft();
         boolean flag = slot != null && InventoryUtils.isValidSlot(slot, gui, true) && slot.canTakeStack(mc.player);
         boolean cancel = flag && (leaveOneItem || moveOnlyOne);
@@ -454,19 +449,5 @@ public class InputEventHandler
         }
 
         return cancel;
-    }
-
-    private Slot getSlotAtPosition(GuiContainer gui, int x, int y)
-    {
-        try
-        {
-            return (Slot) methodHandle_getSlotAtPosition.invokeExact(gui, x, y);
-        }
-        catch (Throwable e)
-        {
-            LiteModItemScroller.logger.error("Error while trying invoke GuiContainer#getSlotAtPosition() from {}", gui.getClass().getSimpleName(), e);
-        }
-
-        return null;
     }
 }

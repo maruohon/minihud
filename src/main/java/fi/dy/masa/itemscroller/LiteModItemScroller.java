@@ -19,7 +19,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.world.World;
 
-@ExposableOptions(strategy = ConfigStrategy.Unversioned, filename="itemscroller.json")
+@ExposableOptions(strategy = ConfigStrategy.Versioned, filename="itemscroller.json")
 public class LiteModItemScroller implements LiteMod, InitCompleteListener, RenderListener, WorldObserver
 {
     public static final KeyBinding KEY_DISABLE = new KeyBinding("itemscroller.desc.toggledisable", Keyboard.KEY_N, "itemscroller.category");

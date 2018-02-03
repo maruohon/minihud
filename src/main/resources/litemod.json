@@ -1,0 +1,6 @@
+{
+    "name": "itemscroller",
+    "version": "dev",
+    "mcversion": "1.12",
+    "mixinConfigs": [ "mixins.itemscroller.json" ]
+}

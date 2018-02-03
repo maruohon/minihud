@@ -1,11 +1,9 @@
 package fi.dy.masa.itemscroller.util;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.lwjgl.input.Mouse;
-import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Configs.SlotRange;
 import fi.dy.masa.itemscroller.event.InputEventHandler;
@@ -29,9 +27,6 @@ import net.minecraft.village.MerchantRecipeList;
 
 public class InventoryUtils
 {
-    public static final Field field_GuiMerchant_selectedMerchantRecipe = ReflectionHelper.findField(GuiMerchant.class, "field_147041_z", "selectedMerchantRecipe");
-    private static final Field field_Slot_slotIndex = ReflectionHelper.findField(Slot.class, "field_75225_a", "slotIndex");
-
     public static String getStackString(ItemStack stack)
     {
         if (isStackEmpty(stack) == false)
@@ -45,22 +40,6 @@ public class InventoryUtils
         }
 
         return "<empty>";
-    }
-
-    public static int getSlotIndex(Slot slot)
-    {
-        int slotIndex = 0;
-
-        try
-        {
-            slotIndex = (int) field_Slot_slotIndex.get(slot);
-        }
-        catch (IllegalAccessException | IllegalArgumentException e)
-        {
-            LiteModItemScroller.logger.warn("Exception while trying to reflect Slot.slotIndex", e);
-        }
-
-        return slotIndex;
     }
 
     public static boolean isValidSlot(Slot slot, GuiContainer gui, boolean requireItems)
@@ -99,7 +78,7 @@ public class InventoryUtils
             return false;
         }
 
-        Slot slot = ContainerUtils.getSlotUnderMouse(gui);
+        Slot slot = AccessorUtils.getSlotUnderMouse(gui);
         Minecraft mc = Minecraft.getMinecraft();
         ItemStack stackCursor = mc.player.inventory.getItemStack();
 
@@ -110,7 +89,7 @@ public class InventoryUtils
 
     public static boolean tryMoveItems(GuiContainer gui, RecipeStorage recipes, boolean scrollingUp)
     {
-        Slot slot = ContainerUtils.getSlotUnderMouse(gui);
+        Slot slot = AccessorUtils.getSlotUnderMouse(gui);
         Minecraft mc = Minecraft.getMinecraft();
 
         // We require an empty cursor
@@ -480,16 +459,7 @@ public class InventoryUtils
     {
         Minecraft mc = Minecraft.getMinecraft();
         MerchantRecipeList list = gui.getMerchant().getRecipes(mc.player);
-        int index = 0;
-
-        try
-        {
-            index = field_GuiMerchant_selectedMerchantRecipe.getInt(gui);
-        }
-        catch (IllegalAccessException e)
-        {
-            LiteModItemScroller.logger.warn("Failed to get the value of GuiMerchant.selectedMerchantRecipe");
-        }
+        int index = AccessorUtils.getSelectedMerchantRecipe(gui);
 
         if (list == null || list.size() <= index)
         {
@@ -538,7 +508,7 @@ public class InventoryUtils
 
     public static void storeOrLoadRecipe(GuiContainer gui, int index)
     {
-        Slot slot = ContainerUtils.getSlotUnderMouse(gui);
+        Slot slot = AccessorUtils.getSlotUnderMouse(gui);
         RecipeStorage recipes = InputEventHandler.instance().getRecipes();
 
         // A crafting output slot with a stack under the cursor, store a recipe
@@ -829,7 +799,7 @@ public class InventoryUtils
 
     public static void rightClickCraftOneStack(GuiContainer gui)
     {
-        Slot slot = ContainerUtils.getSlotUnderMouse(gui);
+        Slot slot = AccessorUtils.getSlotUnderMouse(gui);
         Minecraft mc = Minecraft.getMinecraft();
         InventoryPlayer inv = mc.player.inventory;
         ItemStack stackCursor = inv.getItemStack();
