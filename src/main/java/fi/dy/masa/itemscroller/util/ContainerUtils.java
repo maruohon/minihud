@@ -1,7 +1,7 @@
 package fi.dy.masa.itemscroller.util;
 
 import java.lang.reflect.Field;
-import fi.dy.masa.itemscroller.ItemScroller;
+import fi.dy.masa.itemscroller.LiteModItemScroller;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 
@@ -23,7 +23,7 @@ public class ContainerUtils
         }
         catch (IllegalAccessException | IllegalArgumentException e)
         {
-            ItemScroller.logger.warn("Exception while trying to reflect GuiContainer.hoveredSlot", e);
+            LiteModItemScroller.logger.warn("Exception while trying to reflect GuiContainer.hoveredSlot", e);
         }
 
         return slot;
@@ -39,7 +39,7 @@ public class ContainerUtils
         }
         catch (IllegalAccessException | IllegalArgumentException e)
         {
-            ItemScroller.logger.warn("Exception while trying to reflect GuiContainer.guiLeft", e);
+            LiteModItemScroller.logger.warn("Exception while trying to reflect GuiContainer.guiLeft", e);
         }
 
         return value;
@@ -55,7 +55,7 @@ public class ContainerUtils
         }
         catch (IllegalAccessException | IllegalArgumentException e)
         {
-            ItemScroller.logger.warn("Exception while trying to reflect GuiContainer.guiTop", e);
+            LiteModItemScroller.logger.warn("Exception while trying to reflect GuiContainer.guiTop", e);
         }
 
         return value;
@@ -71,7 +71,7 @@ public class ContainerUtils
         }
         catch (IllegalAccessException | IllegalArgumentException e)
         {
-            ItemScroller.logger.warn("Exception while trying to reflect GuiContainer.xSize", e);
+            LiteModItemScroller.logger.warn("Exception while trying to reflect GuiContainer.xSize", e);
         }
 
         return value;
@@ -87,7 +87,7 @@ public class ContainerUtils
         }
         catch (IllegalAccessException | IllegalArgumentException e)
         {
-            ItemScroller.logger.warn("Exception while trying to reflect GuiContainer.ySize", e);
+            LiteModItemScroller.logger.warn("Exception while trying to reflect GuiContainer.ySize", e);
         }
 
         return value;

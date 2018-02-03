@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.lwjgl.input.Mouse;
-import fi.dy.masa.itemscroller.ItemScroller;
+import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Configs.SlotRange;
 import fi.dy.masa.itemscroller.event.InputEventHandler;
@@ -57,7 +57,7 @@ public class InventoryUtils
         }
         catch (IllegalAccessException | IllegalArgumentException e)
         {
-            ItemScroller.logger.warn("Exception while trying to reflect Slot.slotIndex", e);
+            LiteModItemScroller.logger.warn("Exception while trying to reflect Slot.slotIndex", e);
         }
 
         return slotIndex;
@@ -488,7 +488,7 @@ public class InventoryUtils
         }
         catch (IllegalAccessException e)
         {
-            ItemScroller.logger.warn("Failed to get the value of GuiMerchant.selectedMerchantRecipe");
+            LiteModItemScroller.logger.warn("Failed to get the value of GuiMerchant.selectedMerchantRecipe");
         }
 
         if (list == null || list.size() <= index)

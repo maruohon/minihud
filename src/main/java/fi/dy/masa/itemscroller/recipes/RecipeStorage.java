@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import javax.annotation.Nonnull;
-import fi.dy.masa.itemscroller.ItemScroller;
+import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.Reference;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.util.Constants;
@@ -212,7 +212,7 @@ public class RecipeStorage
         }
         catch (Exception e)
         {
-            ItemScroller.logger.warn("Failed to read recipes from file");
+            LiteModItemScroller.logger.warn("Failed to read recipes from file");
         }
     }
 
@@ -236,7 +236,7 @@ public class RecipeStorage
             {
                 if (saveDir.mkdirs() == false)
                 {
-                    ItemScroller.logger.warn("Failed to create the recipe storage directory '{}'", saveDir.getPath());
+                    LiteModItemScroller.logger.warn("Failed to create the recipe storage directory '{}'", saveDir.getPath());
                     return;
                 }
             }
@@ -255,7 +255,7 @@ public class RecipeStorage
         }
         catch (Exception e)
         {
-            ItemScroller.logger.warn("Failed to write recipes to file!");
+            LiteModItemScroller.logger.warn("Failed to write recipes to file!");
         }
     }
 }

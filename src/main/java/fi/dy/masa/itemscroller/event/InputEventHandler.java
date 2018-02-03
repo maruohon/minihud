@@ -6,9 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import fi.dy.masa.itemscroller.ItemScroller;
+import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
-import fi.dy.masa.itemscroller.proxy.ClientProxy;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.ContainerUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
@@ -41,25 +40,33 @@ public class InputEventHandler
     public InputEventHandler()
     {
         this.initializeRecipeStorage();
-        instance = this;
     }
 
     public static InputEventHandler instance()
     {
+        if (instance == null)
+        {
+            instance = new InputEventHandler();
+        }
+
         return instance;
     }
 
-    @SubscribeEvent
-    public void onMouseInputEventPre(GuiScreenEvent.MouseInputEvent.Pre event)
+    public boolean onMouseInput()
     {
-        if (this.disabled == false && event.getGui() instanceof GuiContainer &&
-            (event.getGui() instanceof GuiContainerCreative) == false &&
-            event.getGui().mc != null && event.getGui().mc.player != null &&
-            Configs.GUI_BLACKLIST.contains(event.getGui().getClass().getName()) == false)
+        boolean cancel = false;
+        Minecraft mc = Minecraft.getMinecraft();
+        GuiScreen guiScreen = mc.currentScreen;
+
+        if (this.disabled == false &&
+            mc != null &&
+            mc.player != null &&
+            guiScreen instanceof GuiContainer &&
+            (guiScreen instanceof GuiContainerCreative) == false &&
+            Configs.GUI_BLACKLIST.contains(guiScreen.getClass().getName()) == false)
         {
-            GuiContainer gui = (GuiContainer) event.getGui();
+            GuiContainer guiContainer = (GuiContainer) guiScreen;
             int dWheel = Mouse.getEventDWheel();
-            boolean cancel = false;
 
             if (dWheel != 0)
             {
@@ -70,51 +77,57 @@ public class InputEventHandler
                 }
                 else
                 {
-                    cancel = InventoryUtils.tryMoveItems(gui, this.recipes, dWheel > 0);
+                    cancel = InventoryUtils.tryMoveItems(guiContainer, this.recipes, dWheel > 0);
                 }
             }
             else
             {
-                this.checkForItemPickup(gui);
-                this.storeSourceSlotCandidate(gui);
+                Slot slot = ContainerUtils.getSlotUnderMouse(guiContainer);
+                this.checkForItemPickup(guiContainer);
+                this.storeSourceSlotCandidate(guiContainer);
 
                 if (Configs.enableRightClickCraftingOneStack && Mouse.getEventButton() == 1 &&
-                    InventoryUtils.isCraftingSlot(gui, ContainerUtils.getSlotUnderMouse(gui)))
+                    InventoryUtils.isCraftingSlot(guiContainer, ContainerUtils.getSlotUnderMouse(guiContainer)))
                 {
-                    InventoryUtils.rightClickCraftOneStack(gui);
+                    InventoryUtils.rightClickCraftOneStack(guiContainer);
                 }
-                else if (Configs.enableShiftPlaceItems && InventoryUtils.canShiftPlaceItems(gui))
+                else if (Configs.enableShiftPlaceItems && InventoryUtils.canShiftPlaceItems(guiContainer))
                 {
-                    cancel = this.shiftPlaceItems(gui);
+                    cancel = this.shiftPlaceItems(guiContainer);
                 }
-                else if (Configs.enableShiftDropItems && this.canShiftDropItems(gui))
+                else if (Configs.enableShiftDropItems && this.canShiftDropItems(guiContainer))
                 {
-                    cancel = this.shiftDropItems(gui);
+                    cancel = this.shiftDropItems(guiContainer);
+                }
+                else if (GuiScreen.isAltKeyDown() && Mouse.getEventButtonState() && Mouse.getEventButton() == 0 &&
+                         slot != null && InventoryUtils.isStackEmpty(slot.getStack()) == false)
+                {
+                    InventoryUtils.tryMoveStacks(slot, guiContainer, true, true, false);
+                    cancel = true;
                 }
                 else if (Configs.enableDragMovingShiftLeft || Configs.enableDragMovingShiftRight || Configs.enableDragMovingControlLeft)
                 {
-                    cancel = this.dragMoveItems(gui);
+                    cancel = this.dragMoveItems(guiContainer);
                 }
             }
 
-            if (cancel)
-            {
-                event.setCanceled(true);
-            }
+            this.recipes.writeToDisk();
         }
+
+        return cancel;
     }
 
-    @SubscribeEvent
-    public void onKeyInputEventPre(GuiScreenEvent.KeyboardInputEvent.Pre event)
+    public boolean onKeyInput()
     {
-        if ((event.getGui() instanceof GuiContainer) == false ||
-            event.getGui().mc == null || event.getGui().mc.player == null)
+        Minecraft mc = Minecraft.getMinecraft();
+        GuiScreen guiScreen = mc.currentScreen;
+
+        if (mc == null || mc.player == null || (guiScreen instanceof GuiContainer) == false)
         {
-            return;
+            return false;
         }
 
-        GuiContainer gui = (GuiContainer) event.getGui();
-        Minecraft mc = Minecraft.getMinecraft();
+        GuiContainer gui = (GuiContainer) guiScreen;
         Slot slot = ContainerUtils.getSlotUnderMouse(gui);
 
         if (Keyboard.getEventKey() == Keyboard.KEY_I && Keyboard.getEventKeyState() &&
@@ -126,7 +139,7 @@ public class InputEventHandler
             }
             else
             {
-                ItemScroller.logger.info("GUI class: {}", gui.getClass().getName());
+                LiteModItemScroller.logger.info("GUI class: {}", gui.getClass().getName());
             }
         }
         // Drop all matching stacks from the same inventory when pressing Ctrl + Shift + Drop key
@@ -141,7 +154,7 @@ public class InputEventHandler
             }
         }
         // Toggle mouse functionality on/off
-        else if (Keyboard.getEventKeyState() && ClientProxy.KEY_DISABLE.getKeyCode() == Keyboard.getEventKey())
+        else if (Keyboard.getEventKeyState() && LiteModItemScroller.KEY_DISABLE.getKeyCode() == Keyboard.getEventKey())
         {
             this.disabled = ! this.disabled;
 
@@ -155,7 +168,7 @@ public class InputEventHandler
             }
         }
         // Show or hide the recipe selection
-        else if (Keyboard.getEventKey() == ClientProxy.KEY_RECIPE.getKeyCode())
+        else if (Keyboard.getEventKey() == LiteModItemScroller.KEY_RECIPE.getKeyCode())
         {
             if (Keyboard.getEventKeyState())
             {
@@ -167,25 +180,21 @@ public class InputEventHandler
             }
         }
         // Store or load a recipe
-        else if (Keyboard.getEventKeyState() && Keyboard.isKeyDown(ClientProxy.KEY_RECIPE.getKeyCode()) &&
+        else if (Keyboard.getEventKeyState() && Keyboard.isKeyDown(LiteModItemScroller.KEY_RECIPE.getKeyCode()) &&
                  Keyboard.getEventKey() >= Keyboard.KEY_1 && Keyboard.getEventKey() <= Keyboard.KEY_9)
         {
             int index = MathHelper.clamp(Keyboard.getEventKey() - Keyboard.KEY_1, 0, 8);
             InventoryUtils.storeOrLoadRecipe(gui, index);
-            event.setCanceled(true);
+            //event.setCanceled(true);
+            return true;
         }
+
+        return false;
     }
 
-    @SubscribeEvent
-    public void onWorldLoad(WorldEvent.Load event)
+    public void onWorldChanged()
     {
         this.recipes.readFromDisk();
-    }
-
-    @SubscribeEvent
-    public void onWorldUnload(WorldEvent.Unload event)
-    {
-        this.recipes.writeToDisk();
     }
 
     public void initializeRecipeStorage()
@@ -248,7 +257,7 @@ public class InputEventHandler
     {
         if (slot == null)
         {
-            ItemScroller.logger.info("slot was null");
+            LiteModItemScroller.logger.info("slot was null");
             return;
         }
 
@@ -256,7 +265,7 @@ public class InputEventHandler
         Object inv = slot.inventory;
         String stackStr = InventoryUtils.getStackString(slot.getStack());
 
-        ItemScroller.logger.info(String.format("slot: slotNumber: %d, getSlotIndex(): %d, getHasStack(): %s, " +
+        LiteModItemScroller.logger.info(String.format("slot: slotNumber: %d, getSlotIndex(): %d, getHasStack(): %s, " +
                 "slot class: %s, inv class: %s, Container's slot list has slot: %s, stack: %s",
                 slot.slotNumber, InventoryUtils.getSlotIndex(slot), slot.getHasStack(), slot.getClass().getName(),
                 inv != null ? inv.getClass().getName() : "<null>", hasSlot ? " true" : "false", stackStr));
@@ -455,7 +464,7 @@ public class InputEventHandler
         }
         catch (Throwable e)
         {
-            ItemScroller.logger.error("Error while trying invoke GuiContainer#getSlotAtPosition() from {}", gui.getClass().getSimpleName(), e);
+            LiteModItemScroller.logger.error("Error while trying invoke GuiContainer#getSlotAtPosition() from {}", gui.getClass().getSimpleName(), e);
         }
 
         return null;

@@ -9,15 +9,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.annotation.Nullable;
+import fi.dy.masa.itemscroller.LiteModItemScroller;
+import fi.dy.masa.itemscroller.event.InputEventHandler;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import fi.dy.masa.itemscroller.ItemScroller;
-import fi.dy.masa.itemscroller.Reference;
-import fi.dy.masa.itemscroller.event.InputEventHandler;
 
 public class Configs
 {
@@ -55,6 +50,7 @@ public class Configs
     public static final String CATEGORY_SCROLLING_ENABLE = "ScrollingModesToggle";
     public static final String CATEGORY_LISTS = "Lists";
 
+    /*
     @SubscribeEvent
     public void onConfigChangedEvent(OnConfigChangedEvent event)
     {
@@ -63,6 +59,7 @@ public class Configs
             loadConfigs(config);
         }
     }
+    */
 
     public static void loadConfigsFromFile(File configFile)
     {
@@ -261,23 +258,23 @@ public class Configs
 
                         CRAFTING_GRID_SLOTS.put(new CraftingOutputSlot(guiClassName, slotClassName, outputSlot), new SlotRange(gridStart, gridSize));
 
-                        ItemScroller.logger.info("addCraftingGrids(): Added crafting grid slots for gui: {}, slot: {} @ {}, grid: {} - {}",
+                        LiteModItemScroller.logger.info("addCraftingGrids(): Added crafting grid slots for gui: {}, slot: {} @ {}, grid: {} - {}",
                                 guiClassName, slotClassName, outputSlot, gridStart, gridStart + gridSize - 1);
                     }
                     catch (NumberFormatException e)
                     {
-                        ItemScroller.logger.warn("addCraftingGrids(): Error while parsing crafting grid slot numbers for specifier '{}'", line, e);
+                        LiteModItemScroller.logger.warn("addCraftingGrids(): Error while parsing crafting grid slot numbers for specifier '{}'", line, e);
                     }
                 }
                 else
                 {
-                    ItemScroller.logger.warn("addCraftingGrids(): Invalid crafting grid specifier '{}'", line);
+                    LiteModItemScroller.logger.warn("addCraftingGrids(): Invalid crafting grid specifier '{}'", line);
                 }
             }
         }
         catch (PatternSyntaxException e)
         {
-            ItemScroller.logger.warn("addCraftingGrids(): Pattern syntax exception", e);
+            LiteModItemScroller.logger.warn("addCraftingGrids(): Pattern syntax exception", e);
         }
     }
 
