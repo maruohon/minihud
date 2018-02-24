@@ -1,8 +1,8 @@
 package fi.dy.masa.itemscroller.util;
 
-import fi.dy.masa.itemscroller.interfaces.IGuiContainerAccessor;
-import fi.dy.masa.itemscroller.interfaces.IGuiMerchantAccessor;
-import fi.dy.masa.itemscroller.interfaces.ISlotAccessor;
+import fi.dy.masa.itemscroller.mixin.IMixinGuiContainer;
+import fi.dy.masa.itemscroller.mixin.IMixinGuiMerchant;
+import fi.dy.masa.itemscroller.mixin.IMixinSlot;
 import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
@@ -11,41 +11,41 @@ public class AccessorUtils
 {
     public static Slot getSlotUnderMouse(GuiContainer gui)
     {
-        return ((IGuiContainerAccessor) gui).getHoveredSlot();
+        return ((IMixinGuiContainer) gui).getHoveredSlot();
     }
 
     public static Slot getSlotAtPosition(GuiContainer gui, int x, int y)
     {
-        return ((IGuiContainerAccessor) gui).getSlotAt(x, y);
+        return ((IMixinGuiContainer) gui).getSlotAt(x, y);
     }
 
     public static int getGuiLeft(GuiContainer gui)
     {
-        return ((IGuiContainerAccessor) gui).getGuiLeft();
+        return ((IMixinGuiContainer) gui).getGuiLeft();
     }
 
     public static int getGuiTop(GuiContainer gui)
     {
-        return ((IGuiContainerAccessor) gui).getGuiTop();
+        return ((IMixinGuiContainer) gui).getGuiTop();
     }
 
     public static int getGuiXSize(GuiContainer gui)
     {
-        return ((IGuiContainerAccessor) gui).getGuiSizeX();
+        return ((IMixinGuiContainer) gui).getGuiSizeX();
     }
 
     public static int getGuiYSize(GuiContainer gui)
     {
-        return ((IGuiContainerAccessor) gui).getGuiSizeY();
+        return ((IMixinGuiContainer) gui).getGuiSizeY();
     }
 
     public static int getSelectedMerchantRecipe(GuiMerchant gui)
     {
-        return ((IGuiMerchantAccessor) gui).getSelectedMerchantRecipe();
+        return ((IMixinGuiMerchant) gui).getSelectedMerchantRecipe();
     }
 
     public static int getSlotIndex(Slot slot)
     {
-        return ((ISlotAccessor) slot).getSlotIndex();
+        return ((IMixinSlot) slot).getSlotIndex();
     }
 }

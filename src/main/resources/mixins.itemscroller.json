@@ -4,10 +4,10 @@
     "refmap": "mixins.itemscroller.refmap.json",
     "minVersion": "0.6",
     "client": [
-        "MixinGuiContainer",
-        "MixinGuiMerchant",
-        "MixinGuiScreen",
-        "MixinSlot"
+        "IMixinGuiContainer",
+        "IMixinGuiMerchant",
+        "IMixinSlot",
+        "MixinGuiScreen"
     ],
     "injectors": {
         "defaultRequire": 1
