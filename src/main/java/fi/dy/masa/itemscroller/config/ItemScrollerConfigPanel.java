@@ -5,12 +5,13 @@ import java.util.List;
 import com.mumfrey.liteloader.modconfig.AbstractConfigPanel;
 import com.mumfrey.liteloader.modconfig.ConfigPanelHost;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
 
 public class ItemScrollerConfigPanel extends AbstractConfigPanel
 {
     private final ConfigOptionListenerBoolean listener = new ConfigOptionListenerBoolean();
-    private final List<GuiLabelHoverInfo> configComments = new ArrayList<>();
+    private final List<HoverInfo> configComments = new ArrayList<>();
 
     @Override
     public String getPanelTitle()
@@ -39,24 +40,18 @@ public class ItemScrollerConfigPanel extends AbstractConfigPanel
         for (Configs.Toggles toggle : Configs.Toggles.values())
         {
             this.addLabel(i, x, y + 6, labelWidth, 8, 0xFFFFFFFF, toggle.getName());
-            this.addConfigComment(i + 2, x, y + 2, labelWidth, 10, 0xFFFFFFFF, toggle.getComment());
+            this.addConfigComment(x, y + 2, labelWidth, 10, toggle.getComment());
             this.addControl(new ConfigButtonBoolean(i + 1, x + labelWidth + 2, y, toggle), this.listener);
-            i += 3;
+            i += 2;
             y += 21;
         }
     }
 
-    protected void addConfigComment(int id, int x, int y, int width, int height, int colour, String comment)
+    protected void addConfigComment(int x, int y, int width, int height, String comment)
     {
-        GuiLabelHoverInfo label = new GuiLabelHoverInfo(this.mc.fontRenderer, id, x, y, width, height, colour);
-        String[] lines = comment.split("\n");
-
-        for (String line : lines)
-        {
-            label.addLine(line);
-        }
-
-        this.configComments.add(label);
+        HoverInfo info = new HoverInfo(x, y, width, height);
+        info.addLines(comment);
+        this.configComments.add(info);
     }
 
     @Override
@@ -64,12 +59,11 @@ public class ItemScrollerConfigPanel extends AbstractConfigPanel
     {
         super.drawPanel(host, mouseX, mouseY, partialTicks);
 
-        for (GuiLabelHoverInfo label : this.configComments)
+        for (HoverInfo label : this.configComments)
         {
             if (label.isMouseOver(mouseX, mouseY))
             {
-                this.drawHoveringText(label.getText(), label.x, label.y + 30);
-                //label.drawLabel(this.mc, mouseX, mouseY);
+                this.drawHoveringText(label.getLines(), label.x, label.y + 30);
                 break;
             }
         }
@@ -126,6 +120,48 @@ public class ItemScrollerConfigPanel extends AbstractConfigPanel
             {
                 this.displayString = TextFormatting.DARK_RED + valueStr + TextFormatting.RESET;
             }
+        }
+    }
+
+    private class HoverInfo
+    {
+        protected final List<String> lines;
+        protected int x;
+        protected int y;
+        protected int width;
+        protected int height;
+
+        public HoverInfo(int x, int y, int width, int height)
+        {
+            this.lines = new ArrayList<>();
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+
+        public void addLines(String... lines)
+        {
+            for (String line : lines)
+            {
+                line = I18n.format(line);
+                String[] split = line.split("\n");
+
+                for (String str : split)
+                {
+                    this.lines.add(str);
+                }
+            }
+        }
+
+        public List<String> getLines()
+        {
+            return this.lines;
+        }
+
+        public boolean isMouseOver(int mouseX, int mouseY)
+        {
+            return mouseX >= this.x && mouseX <= (this.x + this.width) && mouseY >= this.y && mouseY <= (this.y + this.height);
         }
     }
 }
