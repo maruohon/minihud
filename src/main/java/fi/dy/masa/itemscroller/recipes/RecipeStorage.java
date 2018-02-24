@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import javax.annotation.Nonnull;
 import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.Reference;
-import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.util.Constants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -190,35 +189,32 @@ public class RecipeStorage
 
     public void readFromDisk()
     {
-        if (Configs.craftingScrollingSaveToFile)
+        try
         {
-            try
+            File saveDir = this.getSaveDir();
+
+            if (saveDir != null)
             {
-                File saveDir = this.getSaveDir();
+                File file = new File(saveDir, this.getFileName());
 
-                if (saveDir != null)
+                if (file.exists() && file.isFile() && file.canRead())
                 {
-                    File file = new File(saveDir, this.getFileName());
-
-                    if (file.exists() && file.isFile() && file.canRead())
-                    {
-                        FileInputStream is = new FileInputStream(file);
-                        this.readFromNBT(CompressedStreamTools.readCompressed(is));
-                        is.close();
-                        //ItemScroller.logger.info("Read recipes from file '{}'", file.getPath());
-                    }
+                    FileInputStream is = new FileInputStream(file);
+                    this.readFromNBT(CompressedStreamTools.readCompressed(is));
+                    is.close();
+                    //ItemScroller.logger.info("Read recipes from file '{}'", file.getPath());
                 }
             }
-            catch (Exception e)
-            {
-                LiteModItemScroller.logger.warn("Failed to read recipes from file", e);
-            }
+        }
+        catch (Exception e)
+        {
+            LiteModItemScroller.logger.warn("Failed to read recipes from file", e);
         }
     }
 
     public void writeToDisk()
     {
-        if (this.dirty && Configs.craftingScrollingSaveToFile)
+        if (this.dirty)
         {
             try
             {

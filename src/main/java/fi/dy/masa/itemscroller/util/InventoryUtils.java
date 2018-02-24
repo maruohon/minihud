@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Map;
 import org.lwjgl.input.Mouse;
 import fi.dy.masa.itemscroller.config.Configs;
-import fi.dy.masa.itemscroller.config.Configs.SlotRange;
 import fi.dy.masa.itemscroller.event.InputEventHandler;
+import fi.dy.masa.itemscroller.recipes.CraftingHandler;
+import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMerchant;
@@ -52,7 +53,7 @@ public class InventoryUtils
 
     public static boolean isCraftingSlot(GuiContainer gui, Slot slot)
     {
-        return slot != null && Configs.getCraftingGridSlots(gui, slot) != null;
+        return slot != null && CraftingHandler.getCraftingGridSlots(gui, slot) != null;
     }
 
     /**
@@ -99,21 +100,21 @@ public class InventoryUtils
         }
 
         // Villager handling only happens when scrolling over the trade output slot
-        boolean villagerHandling = Configs.enableScrollingVillager && gui instanceof GuiMerchant && slot instanceof SlotMerchantResult;
-        boolean craftingHandling = Configs.enableScrollingCrafting && isCraftingSlot(gui, slot);
+        boolean villagerHandling = Configs.Toggles.SCROLL_VILLAGER.getValue() && gui instanceof GuiMerchant && slot instanceof SlotMerchantResult;
+        boolean craftingHandling = Configs.Toggles.SCROLL_CRAFT.getValue() && isCraftingSlot(gui, slot);
         boolean isCtrlDown = GuiContainer.isCtrlKeyDown();
         boolean isShiftDown = GuiContainer.isShiftKeyDown();
         boolean moveToOtherInventory = scrollingUp;
 
-        if (Configs.useSlotPositionAwareScrollDirection)
+        if (Configs.Toggles.SLOT_POSITION_AWARE_SCROLL_DIRECTION.getValue())
         {
             boolean above = inventoryExistsAbove(slot, gui.inventorySlots);
             // so basically: (above && scrollingUp) || (above == false && scrollingUp == false)
             moveToOtherInventory = above == scrollingUp;
         }
 
-        if ((Configs.reverseScrollDirectionSingle && isShiftDown == false) ||
-            (Configs.reverseScrollDirectionStacks && isShiftDown))
+        if ((Configs.Toggles.REVERSE_SCROLL_DIRECTION_SINGLE.getValue() && isShiftDown == false) ||
+            (Configs.Toggles.REVERSE_SCROLL_DIRECTION_STACKS.getValue() && isShiftDown))
         {
             moveToOtherInventory = ! moveToOtherInventory;
         }
@@ -140,10 +141,10 @@ public class InventoryUtils
             return tryMoveItemsVillager((GuiMerchant) gui, slot, moveToOtherInventory, isShiftDown);
         }
 
-        if ((Configs.enableScrollingSingle == false && isShiftDown == false && isCtrlDown == false) ||
-            (Configs.enableScrollingStacks == false && isShiftDown && isCtrlDown == false) ||
-            (Configs.enableScrollingMatchingStacks == false && isShiftDown == false && isCtrlDown) ||
-            (Configs.enableScrollingEverything == false && isShiftDown && isCtrlDown))
+        if ((Configs.Toggles.SCROLL_SINGLE.getValue() == false && isShiftDown == false && isCtrlDown == false) ||
+            (Configs.Toggles.SCROLL_STACKS.getValue() == false && isShiftDown && isCtrlDown == false) ||
+            (Configs.Toggles.SCROLL_MATCHING.getValue() == false && isShiftDown == false && isCtrlDown) ||
+            (Configs.Toggles.SCROLL_EVERYTHING.getValue() == false && isShiftDown && isCtrlDown))
         {
             return false;
         }
@@ -436,7 +437,7 @@ public class InventoryUtils
                 boolean success = shiftClickSlotWithCheck(gui, slotTmp.slotNumber);
 
                 // Failed to shift-click items, try a manual method
-                if (success == false && Configs.enableScrollingStacksFallback)
+                if (success == false && Configs.Toggles.SCROLL_STACKS_FALLBACK.getValue())
                 {
                     clickSlotsToMoveItemsFromSlot(slotTmp, gui, toOtherInventory);
                 }
@@ -543,10 +544,12 @@ public class InventoryUtils
             // Try to fill the crafting grid
             if (moveToOtherInventory == false)
             {
+                /* TODO remove
                 if (Configs.craftingScrollingStoreRecipeOnFill && slot.getHasStack())
                 {
                     recipes.storeCraftingRecipeToCurrentSelection(gui, slot);
                 }
+                */
 
                 if (isStackEmpty(recipes.getSelectedRecipe().getResult()) == false)
                 {
@@ -570,7 +573,7 @@ public class InventoryUtils
             // Scrolling over an empty crafting output slot, clear the crafting grid
             else
             {
-                SlotRange range = Configs.getCraftingGridSlots(gui, slot);
+                SlotRange range = CraftingHandler.getCraftingGridSlots(gui, slot);
 
                 if (range != null)
                 {
@@ -586,10 +589,12 @@ public class InventoryUtils
             // Scrolling items from player inventory into crafting grid slots
             if (moveToOtherInventory == false)
             {
+                /* TODO remove
                 if (Configs.craftingScrollingStoreRecipeOnFill && slot.getHasStack())
                 {
                     recipes.storeCraftingRecipeToCurrentSelection(gui, slot);
                 }
+                */
 
                 if (isStackEmpty(recipes.getSelectedRecipe().getResult()) == false)
                 {
@@ -605,7 +610,7 @@ public class InventoryUtils
             // Scrolling over an empty crafting output slot, clear the crafting grid
             else
             {
-                SlotRange range = Configs.getCraftingGridSlots(gui, slot);
+                SlotRange range = CraftingHandler.getCraftingGridSlots(gui, slot);
 
                 if (range != null)
                 {
@@ -674,7 +679,7 @@ public class InventoryUtils
     {
         Container container = gui.inventorySlots;
         int numSlots = container.inventorySlots.size();
-        SlotRange range = Configs.getCraftingGridSlots(gui, slot);
+        SlotRange range = CraftingHandler.getCraftingGridSlots(gui, slot);
 
         // Check that the slot range is valid and that the recipe can fit into this type of crafting grid
         if (range != null && range.getLast() < numSlots && recipes.getSelectedRecipe().getRecipeLength() <= range.getSlotCount())

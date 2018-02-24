@@ -1,8 +1,7 @@
 package fi.dy.masa.itemscroller.recipes;
 
 import javax.annotation.Nonnull;
-import fi.dy.masa.itemscroller.config.Configs;
-import fi.dy.masa.itemscroller.config.Configs.SlotRange;
+import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
 import fi.dy.masa.itemscroller.util.Constants;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -47,7 +46,7 @@ public class CraftingRecipe
 
     public void storeCraftingRecipe(GuiContainer gui, Slot slot)
     {
-        SlotRange range = Configs.getCraftingGridSlots(gui, slot);
+        SlotRange range = CraftingHandler.getCraftingGridSlots(gui, slot);
 
         if (range != null && slot.getHasStack())
         {

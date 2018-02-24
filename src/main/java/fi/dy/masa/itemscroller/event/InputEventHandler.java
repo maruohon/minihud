@@ -81,16 +81,16 @@ public class InputEventHandler
                 this.checkForItemPickup(guiContainer);
                 this.storeSourceSlotCandidate(guiContainer);
 
-                if (Configs.enableRightClickCraftingOneStack && Mouse.getEventButton() == 1 &&
+                if (Configs.Toggles.RIGHT_CLICK_CRAFT_STACK.getValue() && Mouse.getEventButton() == 1 &&
                     InventoryUtils.isCraftingSlot(guiContainer, AccessorUtils.getSlotUnderMouse(guiContainer)))
                 {
                     InventoryUtils.rightClickCraftOneStack(guiContainer);
                 }
-                else if (Configs.enableShiftPlaceItems && InventoryUtils.canShiftPlaceItems(guiContainer))
+                else if (Configs.Toggles.SHIFT_PLACE_ITEMS.getValue() && InventoryUtils.canShiftPlaceItems(guiContainer))
                 {
                     cancel = this.shiftPlaceItems(guiContainer);
                 }
-                else if (Configs.enableShiftDropItems && this.canShiftDropItems(guiContainer))
+                else if (Configs.Toggles.SHIFT_DROP_ITEMS.getValue() && this.canShiftDropItems(guiContainer))
                 {
                     cancel = this.shiftDropItems(guiContainer);
                 }
@@ -100,13 +100,18 @@ public class InputEventHandler
                     InventoryUtils.tryMoveStacks(slot, guiContainer, true, true, false);
                     cancel = true;
                 }
-                else if (Configs.enableDragMovingShiftLeft || Configs.enableDragMovingShiftRight || Configs.enableDragMovingControlLeft)
+                else if (Configs.Toggles.DRAG_MOVE_SHIFT_LEFT.getValue() ||
+                         Configs.Toggles.DRAG_MOVE_SHIFT_RIGHT.getValue() ||
+                         Configs.Toggles.DRAG_MOVE_CONTROL_LEFT.getValue())
                 {
                     cancel = this.dragMoveItems(guiContainer);
                 }
             }
 
-            this.recipes.writeToDisk();
+            if (Configs.Toggles.SCROLL_CRAFT_STORE_RECIPES_TO_FILE.getValue())
+            {
+                this.recipes.writeToDisk();
+            }
         }
 
         return cancel;
@@ -138,7 +143,7 @@ public class InputEventHandler
             }
         }
         // Drop all matching stacks from the same inventory when pressing Ctrl + Shift + Drop key
-        else if (Configs.enableControlShiftDropkeyDropItems && Keyboard.getEventKeyState() &&
+        else if (Configs.Toggles.CONTROL_SHIFT_DROP.getValue() && Keyboard.getEventKeyState() &&
             Configs.GUI_BLACKLIST.contains(gui.getClass().getName()) == false &&
             GuiScreen.isCtrlKeyDown() && GuiScreen.isShiftKeyDown() &&
             mc.gameSettings.keyBindDrop.getKeyCode() == Keyboard.getEventKey())
@@ -189,12 +194,15 @@ public class InputEventHandler
 
     public void onWorldChanged()
     {
-        this.recipes.readFromDisk();
+        if (Configs.Toggles.SCROLL_CRAFT_STORE_RECIPES_TO_FILE.getValue())
+        {
+            this.recipes.readFromDisk();
+        }
     }
 
     public void initializeRecipeStorage()
     {
-        this.recipes = new RecipeStorage(18, Configs.craftingScrollingSaveFileIsGlobal);
+        this.recipes = new RecipeStorage(18, Configs.Toggles.SCROLL_CRAFT_RECIPE_FILE_GLOBAL.getValue());
     }
 
     public RecipeStorage getRecipes()
@@ -342,9 +350,9 @@ public class InputEventHandler
         boolean isControlDown = GuiScreen.isCtrlKeyDown();
         boolean eitherMouseButtonDown = leftButtonDown || rightButtonDown;
 
-        if ((isShiftDown && leftButtonDown && Configs.enableDragMovingShiftLeft == false) ||
-            (isShiftDown && rightButtonDown && Configs.enableDragMovingShiftRight == false) ||
-            (isControlDown && eitherMouseButtonDown && Configs.enableDragMovingControlLeft == false))
+        if ((isShiftDown && leftButtonDown && Configs.Toggles.DRAG_MOVE_SHIFT_LEFT.getValue() == false) ||
+            (isShiftDown && rightButtonDown && Configs.Toggles.DRAG_MOVE_SHIFT_RIGHT.getValue() == false) ||
+            (isControlDown && eitherMouseButtonDown && Configs.Toggles.DRAG_MOVE_CONTROL_LEFT.getValue() == false))
         {
             return false;
         }
@@ -355,8 +363,8 @@ public class InputEventHandler
 
         if (Mouse.getEventButtonState())
         {
-            if (((eventKeyIsLeftButton || eventKeyIsRightButton) && isControlDown && Configs.enableDragMovingControlLeft) ||
-                (eventKeyIsRightButton && isShiftDown && Configs.enableDragMovingShiftRight))
+            if (((eventKeyIsLeftButton || eventKeyIsRightButton) && isControlDown && Configs.Toggles.DRAG_MOVE_CONTROL_LEFT.getValue()) ||
+                (eventKeyIsRightButton && isShiftDown && Configs.Toggles.DRAG_MOVE_SHIFT_RIGHT.getValue()))
             {
                 // Reset this or the method call won't do anything...
                 this.slotNumberLast = -1;
