@@ -190,72 +190,72 @@ public class RecipeStorage
 
     public void readFromDisk()
     {
-        if (Configs.craftingScrollingSaveToFile == false)
+        if (Configs.craftingScrollingSaveToFile)
         {
-            return;
-        }
-
-        try
-        {
-            File saveDir = this.getSaveDir();
-
-            if (saveDir != null)
+            try
             {
-                File file = new File(saveDir, this.getFileName());
+                File saveDir = this.getSaveDir();
 
-                if (file.exists() && file.isFile())
+                if (saveDir != null)
                 {
-                    this.readFromNBT(CompressedStreamTools.readCompressed(new FileInputStream(file)));
-                    //ItemScroller.logger.info("Read recipes from file '{}'", file.getPath());
+                    File file = new File(saveDir, this.getFileName());
+
+                    if (file.exists() && file.isFile() && file.canRead())
+                    {
+                        FileInputStream is = new FileInputStream(file);
+                        this.readFromNBT(CompressedStreamTools.readCompressed(is));
+                        is.close();
+                        //ItemScroller.logger.info("Read recipes from file '{}'", file.getPath());
+                    }
                 }
             }
-        }
-        catch (Exception e)
-        {
-            LiteModItemScroller.logger.warn("Failed to read recipes from file");
+            catch (Exception e)
+            {
+                LiteModItemScroller.logger.warn("Failed to read recipes from file", e);
+            }
         }
     }
 
     public void writeToDisk()
     {
-        if (this.dirty == false || Configs.craftingScrollingSaveToFile == false)
+        if (this.dirty && Configs.craftingScrollingSaveToFile)
         {
-            return;
-        }
-
-        try
-        {
-            File saveDir = this.getSaveDir();
-
-            if (saveDir == null)
+            try
             {
-                return;
-            }
+                File saveDir = this.getSaveDir();
 
-            if (saveDir.exists() == false)
-            {
-                if (saveDir.mkdirs() == false)
+                if (saveDir == null)
                 {
-                    LiteModItemScroller.logger.warn("Failed to create the recipe storage directory '{}'", saveDir.getPath());
                     return;
                 }
+
+                if (saveDir.exists() == false)
+                {
+                    if (saveDir.mkdirs() == false)
+                    {
+                        LiteModItemScroller.logger.warn("Failed to create the recipe storage directory '{}'", saveDir.getPath());
+                        return;
+                    }
+                }
+
+                File fileTmp  = new File(saveDir, this.getFileName() + ".tmp");
+                File fileReal = new File(saveDir, this.getFileName());
+                FileOutputStream os = new FileOutputStream(fileTmp);
+                CompressedStreamTools.writeCompressed(this.writeToNBT(new NBTTagCompound()), os);
+                os.close();
+
+                if (fileReal.exists())
+                {
+                    fileReal.delete();
+                }
+
+                fileTmp.renameTo(fileReal);
+                this.dirty = false;
             }
-
-            File fileTmp  = new File(saveDir, this.getFileName() + ".tmp");
-            File fileReal = new File(saveDir, this.getFileName());
-            CompressedStreamTools.writeCompressed(this.writeToNBT(new NBTTagCompound()), new FileOutputStream(fileTmp));
-
-            if (fileReal.exists())
+            catch (Exception e)
             {
-                fileReal.delete();
+                LiteModItemScroller.logger.warn("Failed to write recipes to file!", e);
             }
-
-            fileTmp.renameTo(fileReal);
-            this.dirty = false;
-        }
-        catch (Exception e)
-        {
-            LiteModItemScroller.logger.warn("Failed to write recipes to file!");
         }
     }
 }
