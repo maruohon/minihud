@@ -23,6 +23,7 @@ public class Configs
 
     public enum Toggles
     {
+        ALT_CLICK_MATCHING                      ("enableAltClickMoveMatchingStacks",   true),
         CONTROL_SHIFT_DROP                      ("enableControlShiftDropkeyDropItems", true),
         DRAG_MOVE_SHIFT_LEFT                    ("enableDragMovingShiftLeft",          true),
         DRAG_MOVE_SHIFT_RIGHT                   ("enableDragMovingShiftRight",         true),
@@ -85,6 +86,8 @@ public class Configs
 
     static
     {
+        Toggles.ALT_CLICK_MATCHING.setComment("Enable Alt + click to move all matching stacks\n" +
+                                              "(same as the Ctrl + scroll functionality).");
         Toggles.CONTROL_SHIFT_DROP.setComment("Enable dropping all matching items from the same inventory\n" +
                                               "when pressing Ctrl + Shift + the drop item key.");
         Toggles.DRAG_MOVE_SHIFT_LEFT.setComment("Enable moving full stacks of items by holding down\n" +

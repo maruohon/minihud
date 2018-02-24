@@ -94,7 +94,8 @@ public class InputEventHandler
                 {
                     cancel = this.shiftDropItems(guiContainer);
                 }
-                else if (GuiScreen.isAltKeyDown() && Mouse.getEventButtonState() && Mouse.getEventButton() == 0 &&
+                else if (Configs.Toggles.ALT_CLICK_MATCHING.getValue() &&
+                         GuiScreen.isAltKeyDown() && Mouse.getEventButtonState() && Mouse.getEventButton() == 0 &&
                          slot != null && InventoryUtils.isStackEmpty(slot.getStack()) == false)
                 {
                     InventoryUtils.tryMoveStacks(slot, guiContainer, true, true, false);
