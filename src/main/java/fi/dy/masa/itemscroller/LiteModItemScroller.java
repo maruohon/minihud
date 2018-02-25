@@ -4,11 +4,12 @@ import java.io.File;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
+import com.mojang.realmsclient.dto.RealmsServer;
 import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.InitCompleteListener;
+import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.RenderListener;
-import com.mumfrey.liteloader.api.WorldObserver;
 import com.mumfrey.liteloader.core.LiteLoader;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.itemscroller.config.Configs;
@@ -17,10 +18,12 @@ import fi.dy.masa.itemscroller.event.InputEventHandler;
 import fi.dy.masa.itemscroller.event.RenderEventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.world.World;
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.play.server.SPacketJoinGame;
 
-public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteListener, RenderListener, WorldObserver
+public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteListener, RenderListener, JoinGameListener
 {
     public static final KeyBinding KEY_DISABLE = new KeyBinding("itemscroller.desc.toggledisable", Keyboard.KEY_N, "itemscroller.category");
     public static final KeyBinding KEY_RECIPE = new KeyBinding("itemscroller.desc.recipe", Keyboard.KEY_S, "itemscroller.category");
@@ -86,7 +89,7 @@ public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteL
     }
 
     @Override
-    public void onWorldChanged(World world)
+    public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
     {
         InputEventHandler.instance().onWorldChanged();
     }
