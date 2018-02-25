@@ -5,6 +5,7 @@ import fi.dy.masa.itemscroller.mixin.IMixinGuiMerchant;
 import fi.dy.masa.itemscroller.mixin.IMixinSlot;
 import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 
 public class AccessorUtils
@@ -16,7 +17,12 @@ public class AccessorUtils
 
     public static Slot getSlotAtPosition(GuiContainer gui, int x, int y)
     {
-        return ((IMixinGuiContainer) gui).getSlotAt(x, y);
+        return ((IMixinGuiContainer) gui).getSlotAtPositionInvoker(x, y);
+    }
+
+    public static void handleMouseClick(GuiContainer gui, Slot slotIn, int slotId, int mouseButton, ClickType type)
+    {
+        ((IMixinGuiContainer) gui).handleMouseClickInvoker(slotIn, slotId, mouseButton, type);
     }
 
     public static int getGuiLeft(GuiContainer gui)

@@ -14,7 +14,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
@@ -57,11 +59,24 @@ public class InputEventHandler
             mc != null &&
             mc.player != null &&
             guiScreen instanceof GuiContainer &&
-            (guiScreen instanceof GuiContainerCreative) == false &&
             Configs.GUI_BLACKLIST.contains(guiScreen.getClass().getName()) == false)
         {
             GuiContainer guiContainer = (GuiContainer) guiScreen;
             int dWheel = Mouse.getEventDWheel();
+
+            // Allow drag moving alone if the GUI is the creative inventory
+            if (guiScreen instanceof GuiContainerCreative)
+            {
+                if (dWheel == 0 &&
+                    Configs.Toggles.DRAG_MOVE_SHIFT_LEFT.getValue() ||
+                    Configs.Toggles.DRAG_MOVE_SHIFT_RIGHT.getValue() ||
+                    Configs.Toggles.DRAG_MOVE_CONTROL_LEFT.getValue())
+                {
+                    cancel = this.dragMoveItems(guiContainer);
+                }
+
+                return cancel;
+            }
 
             if (dWheel != 0)
             {
@@ -270,9 +285,10 @@ public class InputEventHandler
         String stackStr = InventoryUtils.getStackString(slot.getStack());
 
         LiteModItemScroller.logger.info(String.format("slot: slotNumber: %d, getSlotIndex(): %d, getHasStack(): %s, " +
-                "slot class: %s, inv class: %s, Container's slot list has slot: %s, stack: %s",
+                "slot class: %s, inv class: %s, Container's slot list has slot: %s, stack: %s, numSlots: %d",
                 slot.slotNumber, AccessorUtils.getSlotIndex(slot), slot.getHasStack(), slot.getClass().getName(),
-                inv != null ? inv.getClass().getName() : "<null>", hasSlot ? " true" : "false", stackStr));
+                inv != null ? inv.getClass().getName() : "<null>", hasSlot ? " true" : "false", stackStr,
+                gui.inventorySlots.inventorySlots.size()));
     }
 
     private boolean shiftPlaceItems(GuiContainer gui)
@@ -421,7 +437,24 @@ public class InputEventHandler
         // than one stack of items. (the regular slotClick() + a "drag move" from the slot that is under the mouse
         // when the left mouse button is pressed down and this code runs).
         Slot slot = AccessorUtils.getSlotAtPosition(gui, mouseX, mouseY);
-        this.slotNumberLast = slot != null ? slot.slotNumber : -1;
+
+        if (slot != null)
+        {
+            if (gui instanceof GuiContainerCreative)
+            {
+                boolean isPlayerInv = ((GuiContainerCreative) gui).getSelectedTabIndex() == CreativeTabs.INVENTORY.getTabIndex();
+                int slotNumber = isPlayerInv ? AccessorUtils.getSlotIndex(slot) : slot.slotNumber;
+                this.slotNumberLast = slotNumber;
+            }
+            else
+            {
+                this.slotNumberLast = slot.slotNumber;
+            }
+        }
+        else
+        {
+            this.slotNumberLast = -1;
+        }
 
         if (eitherMouseButtonDown == false)
         {
@@ -433,6 +466,11 @@ public class InputEventHandler
 
     private boolean dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y, boolean leaveOneItem, boolean moveOnlyOne)
     {
+        if (gui instanceof GuiContainerCreative)
+        {
+            return this.dragMoveFromSlotAtPositionCreative(gui, x, y, leaveOneItem, moveOnlyOne);
+        }
+
         Slot slot = AccessorUtils.getSlotAtPosition(gui, x, y);
         Minecraft mc = Minecraft.getMinecraft();
         boolean flag = slot != null && InventoryUtils.isValidSlot(slot, gui, true) && slot.canTakeStack(mc.player);
@@ -458,5 +496,78 @@ public class InputEventHandler
         }
 
         return cancel;
+    }
+
+    private boolean dragMoveFromSlotAtPositionCreative(GuiContainer gui, int x, int y, boolean leaveOneItem, boolean moveOnlyOne)
+    {
+        GuiContainerCreative guiCreative = (GuiContainerCreative) gui;
+        Slot slot = AccessorUtils.getSlotAtPosition(gui, x, y);
+        boolean isPlayerInv = guiCreative.getSelectedTabIndex() == CreativeTabs.INVENTORY.getTabIndex();
+
+        // Only allow dragging from the hotbar slots
+        if (slot == null || (slot.getClass() != Slot.class && isPlayerInv == false))
+        {
+            return false;
+        }
+
+        Minecraft mc = Minecraft.getMinecraft();
+        boolean flag = slot != null && InventoryUtils.isValidSlot(slot, gui, true) && slot.canTakeStack(mc.player);
+        boolean cancel = flag && (leaveOneItem || moveOnlyOne);
+        // The player inventory tab of the creative inventory uses stupid wrapped
+        // slots that all have slotNumber = 0 on the outer instance ;_;
+        // However in that case we can use the slotIndex which is easy enough to get.
+        int slotNumber = isPlayerInv ? AccessorUtils.getSlotIndex(slot) : slot.slotNumber;
+
+        if (flag && slotNumber != this.slotNumberLast && this.draggedSlots.contains(slotNumber) == false)
+        {
+            if (moveOnlyOne)
+            {
+                this.leftClickSlot(guiCreative, slot, slotNumber);
+                this.rightClickSlot(guiCreative, slot, slotNumber);
+                this.shiftClickSlot(guiCreative, slot, slotNumber);
+                this.leftClickSlot(guiCreative, slot, slotNumber);
+
+                cancel = true;
+            }
+            else if (leaveOneItem)
+            {
+                // Too lazy to try to duplicate the proper code for the weird creative inventory...
+                if (isPlayerInv == false)
+                {
+                    this.leftClickSlot(guiCreative, slot, slotNumber);
+                    this.rightClickSlot(guiCreative, slot, slotNumber);
+
+                    // Delete the rest of the stack by placing it in the first creative "source slot"
+                    Slot slotFirst = gui.inventorySlots.inventorySlots.get(0);
+                    this.leftClickSlot(guiCreative, slotFirst, slotFirst.slotNumber);
+                }
+
+                cancel = true;
+            }
+            else
+            {
+                this.shiftClickSlot(gui, slot, slotNumber);
+                cancel = true;
+            }
+
+            this.draggedSlots.add(slotNumber);
+        }
+
+        return cancel;
+    }
+
+    private void leftClickSlot(GuiContainer gui, Slot slot, int slotNumber)
+    {
+        AccessorUtils.handleMouseClick(gui, slot, slotNumber, 0, ClickType.PICKUP);
+    }
+
+    private void rightClickSlot(GuiContainer gui, Slot slot, int slotNumber)
+    {
+        AccessorUtils.handleMouseClick(gui, slot, slotNumber, 1, ClickType.PICKUP);
+    }
+
+    private void shiftClickSlot(GuiContainer gui, Slot slot, int slotNumber)
+    {
+        AccessorUtils.handleMouseClick(gui, slot, slotNumber, 0, ClickType.QUICK_MOVE);
     }
 }
