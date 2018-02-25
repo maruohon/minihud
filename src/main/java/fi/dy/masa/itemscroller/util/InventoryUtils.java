@@ -10,6 +10,7 @@ import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -18,16 +19,43 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCraftResult;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotMerchantResult;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
+import net.minecraft.world.World;
 
 public class InventoryUtils
 {
+    public static void onSlotChangedCraftingGrid(World world, EntityPlayer player, InventoryCrafting inventoryCrafting, InventoryCraftResult inventoryCraftResult)
+    {
+        if (Configs.Toggles.CLIENT_CRAFTING_FIX.getValue() &&
+            world.isRemote && player instanceof EntityPlayerSP)
+        {
+            ItemStack stack = ItemStack.EMPTY;
+            IRecipe recipe = CraftingManager.func_192413_b(inventoryCrafting, world);
+
+            if (recipe != null &&
+                    (recipe.func_192399_d() ||
+                     world.getGameRules().getBoolean("doLimitedCrafting") == false ||
+                     ((EntityPlayerSP) player).func_192035_E().func_193830_f(recipe))
+            )
+            {
+                inventoryCraftResult.func_193056_a(recipe);
+                stack = recipe.getCraftingResult(inventoryCrafting);
+            }
+
+            inventoryCraftResult.setInventorySlotContents(0, stack);
+        }
+    }
+
     public static String getStackString(ItemStack stack)
     {
         if (isStackEmpty(stack) == false)

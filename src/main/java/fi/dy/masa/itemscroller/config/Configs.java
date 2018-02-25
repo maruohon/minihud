@@ -23,28 +23,29 @@ public class Configs
 
     public enum Toggles
     {
-        ALT_CLICK_MATCHING                      ("enableAltClickMoveMatchingStacks",   true),
-        ALT_SHIFT_CLICK_EVERYTHING              ("enableAltShiftClickMoveEverything",  true),
-        CONTROL_SHIFT_DROP                      ("enableControlShiftDropkeyDropItems", true),
-        DRAG_MOVE_SHIFT_LEFT                    ("enableDragMovingShiftLeft",          true),
-        DRAG_MOVE_SHIFT_RIGHT                   ("enableDragMovingShiftRight",         true),
-        DRAG_MOVE_CONTROL_LEFT                  ("enableDragMovingControlLeft",        true),
-        REVERSE_SCROLL_DIRECTION_SINGLE         ("reverseScrollDirectionSingle",       false),
-        REVERSE_SCROLL_DIRECTION_STACKS         ("reverseScrollDirectionStacks",       false),
-        RIGHT_CLICK_CRAFT_STACK                 ("enableRightClickCraftingOneStack",   true),
-        SCROLL_CRAFT                            ("enableScrollingCrafting",            true),
+        ALT_CLICK_MATCHING                      ("enableAltClickMoveMatchingStacks",    true),
+        ALT_SHIFT_CLICK_EVERYTHING              ("enableAltShiftClickMoveEverything",   true),
+        CLIENT_CRAFTING_FIX                     ("enableClientCraftingFixOn1.12",       true),
+        CONTROL_SHIFT_DROP                      ("enableControlShiftDropkeyDropItems",  true),
+        DRAG_MOVE_SHIFT_LEFT                    ("enableDragMovingShiftLeft",           true),
+        DRAG_MOVE_SHIFT_RIGHT                   ("enableDragMovingShiftRight",          true),
+        DRAG_MOVE_CONTROL_LEFT                  ("enableDragMovingControlLeft",         true),
+        REVERSE_SCROLL_DIRECTION_SINGLE         ("reverseScrollDirectionSingle",        false),
+        REVERSE_SCROLL_DIRECTION_STACKS         ("reverseScrollDirectionStacks",        false),
+        RIGHT_CLICK_CRAFT_STACK                 ("enableRightClickCraftingOneStack",    true),
+        SCROLL_CRAFT                            ("enableScrollingCrafting",             true),
         //SCROLL_CRAFT_STORE_RECIPE_ON_FILL       ("craftingScrollingStoreRecipeOnFill", true),
-        SCROLL_CRAFT_STORE_RECIPES_TO_FILE      ("craftingScrollingSaveToFile",        true),
-        SCROLL_CRAFT_RECIPE_FILE_GLOBAL         ("craftingScrollingSaveFileIsGlobal",  false),
-        SCROLL_EVERYTHING                       ("enableScrollingEverything",          true),
-        SCROLL_MATCHING                         ("enableScrollingMatchingStacks",      true),
-        SCROLL_SINGLE                           ("enableScrollingSingle",              true),
-        SCROLL_STACKS                           ("enableScrollingStacks",              true),
-        SCROLL_STACKS_FALLBACK                  ("enableScrollingStacksFallback",      true),
-        SCROLL_VILLAGER                         ("enableScrollingVillager",            true),
-        SHIFT_DROP_ITEMS                        ("enableShiftDropItems",               true),
-        SHIFT_PLACE_ITEMS                       ("enableShiftPlaceItems",              true),
-        SLOT_POSITION_AWARE_SCROLL_DIRECTION    ("useSlotPositionAwareScrollDirection",false);
+        SCROLL_CRAFT_STORE_RECIPES_TO_FILE      ("craftingScrollingSaveToFile",         true),
+        SCROLL_CRAFT_RECIPE_FILE_GLOBAL         ("craftingScrollingSaveFileIsGlobal",   false),
+        SCROLL_EVERYTHING                       ("enableScrollingEverything",           true),
+        SCROLL_MATCHING                         ("enableScrollingMatchingStacks",       true),
+        SCROLL_SINGLE                           ("enableScrollingSingle",               true),
+        SCROLL_STACKS                           ("enableScrollingStacks",               true),
+        SCROLL_STACKS_FALLBACK                  ("enableScrollingStacksFallback",       true),
+        SCROLL_VILLAGER                         ("enableScrollingVillager",             true),
+        SHIFT_DROP_ITEMS                        ("enableShiftDropItems",                true),
+        SHIFT_PLACE_ITEMS                       ("enableShiftPlaceItems",               true),
+        SLOT_POSITION_AWARE_SCROLL_DIRECTION    ("useSlotPositionAwareScrollDirection", false);
 
         private final String name;
         private String comment;
@@ -91,6 +92,9 @@ public class Configs
                                               "(same as the Ctrl + scroll functionality).");
         Toggles.ALT_SHIFT_CLICK_EVERYTHING.setComment("Enable Alt + Shift + click to move everything\n" +
                                                       "(same as the Ctrl + Shift + scroll functionality).");
+        Toggles.CLIENT_CRAFTING_FIX.setComment("Enable setting/updating the crafting recipe output also directly\n" +
+                                               "on the client side. This fixes the previously-broken-in-1.12 mass\n" +
+                                               "crafting function and the right-click-to-craft-a-stack function.");
         Toggles.CONTROL_SHIFT_DROP.setComment("Enable dropping all matching items from the same inventory\n" +
                                               "when pressing Ctrl + Shift + the drop item key.");
         Toggles.DRAG_MOVE_SHIFT_LEFT.setComment("Enable moving full stacks of items by holding down\n" +

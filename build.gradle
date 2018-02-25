@@ -63,6 +63,7 @@ litemod {
         name = config.mod_id
         displayName = config.mod_name
         mcversion = config.minecraft_version
+        version = config.mod_version
         author = 'masa'
 
         // Uncomment any of the following lines and fill in your own details as required
@@ -81,12 +82,14 @@ litemod {
 jar {
     from litemod.outputs
 
+    /*
     manifest.mainAttributes (
         'Built-By': System.properties['user.name'],
         'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
         'Implementation-Title': config.mod_id,
         'Implementation-Version': project.version
     )
+    */
 }
 
 mixin {

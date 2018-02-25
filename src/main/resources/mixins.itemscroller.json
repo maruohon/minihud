@@ -7,6 +7,7 @@
         "IMixinGuiContainer",
         "IMixinGuiMerchant",
         "IMixinSlot",
+        "MixinContainer",
         "MixinGuiScreen"
     ],
     "injectors": {

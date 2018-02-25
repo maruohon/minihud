@@ -24,7 +24,7 @@ public abstract class MixinGuiScreen extends Gui
         RenderEventHandler.instance().onDrawBackgroundPost();
     }
 
-    @Inject(method = "handleInput()V", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "handleInput()V", at = @At("HEAD"))
     protected void onHandleInput(CallbackInfo ci)
     {
         if (Mouse.isCreated())
@@ -32,7 +32,9 @@ public abstract class MixinGuiScreen extends Gui
             while (Mouse.next())
             {
                 if (InputEventHandler.instance().onMouseInput() == false)
+                {
                     this.handleMouseInput();
+                }
             }
         }
 
@@ -41,7 +43,9 @@ public abstract class MixinGuiScreen extends Gui
             while (Keyboard.next())
             {
                 if (InputEventHandler.instance().onKeyInput() == false)
+                {
                     this.handleKeyboardInput();
+                }
             }
         }
     }
