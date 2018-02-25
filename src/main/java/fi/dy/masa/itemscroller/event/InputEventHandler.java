@@ -109,8 +109,20 @@ public class InputEventHandler
                 {
                     cancel = this.shiftDropItems(guiContainer);
                 }
+                else if (Configs.Toggles.ALT_SHIFT_CLICK_EVERYTHING.getValue() &&
+                         GuiScreen.isAltKeyDown() &&
+                         GuiScreen.isShiftKeyDown() &&
+                         Mouse.getEventButtonState() &&
+                         Mouse.getEventButton() == mc.gameSettings.keyBindAttack.getKeyCode() + 100 &&
+                         slot != null && InventoryUtils.isStackEmpty(slot.getStack()) == false)
+                {
+                    InventoryUtils.tryMoveStacks(slot, guiContainer, false, true, false);
+                    cancel = true;
+                }
                 else if (Configs.Toggles.ALT_CLICK_MATCHING.getValue() &&
-                         GuiScreen.isAltKeyDown() && Mouse.getEventButtonState() && Mouse.getEventButton() == 0 &&
+                         GuiScreen.isAltKeyDown() &&
+                         Mouse.getEventButtonState() &&
+                         Mouse.getEventButton() == mc.gameSettings.keyBindAttack.getKeyCode() + 100 &&
                          slot != null && InventoryUtils.isStackEmpty(slot.getStack()) == false)
                 {
                     InventoryUtils.tryMoveStacks(slot, guiContainer, true, true, false);
