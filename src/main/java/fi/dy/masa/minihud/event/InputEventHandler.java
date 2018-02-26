@@ -7,6 +7,7 @@ import org.lwjgl.input.Keyboard;
 import com.google.common.collect.MapMaker;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.mixin.IMixinPathNavigate;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
 import fi.dy.masa.minihud.util.ReflectionHelper;
 import fi.dy.masa.minihud.util.ReflectionHelper.UnableToFindFieldException;
@@ -17,6 +18,7 @@ import net.minecraft.client.renderer.debug.DebugRendererNeighborsUpdate;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.server.MinecraftServer;
@@ -74,13 +76,12 @@ public class InputEventHandler
         return INSTANCE;
     }
 
-    public boolean onKeyInput()
+    public void onKeyInput()
     {
         Minecraft mc = Minecraft.getMinecraft();
         int eventKey = Keyboard.getEventKey();
         boolean eventKeyState = Keyboard.getEventKeyState();
         int bitMaskForEventKey = Configs.getBitmaskForDebugKey(eventKey);
-        boolean cancel = false;
 
         if (eventKeyState && Keyboard.isKeyDown(Keyboard.KEY_F3) && bitMaskForEventKey != 0)
         {
@@ -89,7 +90,7 @@ public class InputEventHandler
 
             // This prevent the F3 screen from opening after releasing the F3 key
             this.setBoolean(this.field_Minecraft_actionKeyF3, mc, true);
-            cancel = true;
+            KeyBinding.unPressAllKeys();
         }
 
         int toggleKey = LiteModMiniHud.KEY_TOGGLE_MODE.getKeyCode();
@@ -101,7 +102,6 @@ public class InputEventHandler
             if (this.toggledInfo == false)
             {
                 RenderEventHandler.getInstance().toggleEnabled();
-                cancel = true;
             }
 
             this.toggledInfo = false;
@@ -111,10 +111,7 @@ public class InputEventHandler
             RenderEventHandler.getInstance().xorEnabledMask(bitMaskForEventKey);
             this.toggledInfo = true;
             KeyBinding.unPressAllKeys();
-            cancel = true;
         }
-
-        return cancel;
     }
 
     public void onNeighborNotify(World world, BlockPos pos, EnumSet<EnumFacing> notifiedSides)
@@ -156,15 +153,15 @@ public class InputEventHandler
                 {
                     PathNavigate navigator = entity instanceof EntityLiving ? ((EntityLiving) entity).getNavigator() : null;
 
-                    if (navigator != null)
+                    if (navigator != null && this.isAnyPlayerWithinRange(world, entity, 64))
                     {
                         final Path path = navigator.getPath();
                         Path old = this.oldPaths.get(entity);
 
-                        if (path != null && (old == null || old.isSamePath(path) == false))
+                        if (path != null && (old == null || old.isSamePath(path) == false || old.getCurrentPathIndex() != path.getCurrentPathIndex()))
                         {
                             final int id = entity.getEntityId();
-                            final float maxDistance = Configs.Generic.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? navigator.getPathSearchRange() : 0F;
+                            final float maxDistance = Configs.Generic.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? ((IMixinPathNavigate) navigator).getMaxDistanceToWaypoint() : 0F;
                             this.oldPaths.put(entity, path);
 
                             DebugInfoUtils.sendPacketDebugPath(server, id, path, maxDistance);
@@ -173,6 +170,23 @@ public class InputEventHandler
                 }
             }
         }
+    }
+
+    private boolean isAnyPlayerWithinRange(World world, Entity entity, double range)
+    {
+        for (int i = 0; i < world.playerEntities.size(); ++i)
+        {
+            EntityPlayer player = world.playerEntities.get(i);
+
+            double distSq = player.getDistanceSq(entity.posX, entity.posY, entity.posZ);
+
+            if (range < 0.0D || distSq < range * range)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void toggleDebugRenderers(Minecraft mc, int mask)
