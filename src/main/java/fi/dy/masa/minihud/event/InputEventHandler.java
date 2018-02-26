@@ -1,19 +1,17 @@
 package fi.dy.masa.minihud.event;
 
-import java.lang.reflect.Field;
 import java.util.EnumSet;
 import java.util.Map;
 import org.lwjgl.input.Keyboard;
 import com.google.common.collect.MapMaker;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.mixin.IMixinDebugRenderer;
 import fi.dy.masa.minihud.mixin.IMixinPathNavigate;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
-import fi.dy.masa.minihud.util.ReflectionHelper;
-import fi.dy.masa.minihud.util.ReflectionHelper.UnableToFindFieldException;
+import fi.dy.masa.minihud.util.IMinecraftAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.client.renderer.debug.DebugRendererNeighborsUpdate;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
@@ -39,37 +37,11 @@ public class InputEventHandler
 
     private static final InputEventHandler INSTANCE = new InputEventHandler();
 
-    private boolean toggledInfo;
-
-    private Field field_Minecraft_actionKeyF3;
-    private Field field_DebugRenderer_collisionBoxEnabled;
-    private Field field_DebugRenderer_heightMapEnabled;
-    private Field field_DebugRenderer_neighborsUpdateEnabled;
-    private Field field_DebugRenderer_pathfindingEnabled;
-    private Field field_DebugRenderer_solidFaceEnabled;
-    private Field field_DebugRenderer_waterEnabled;
     private boolean neighborUpdateEnabled;
     private boolean pathfindingEnabled;
+    private boolean toggledInfo;
     private int tickCounter;
     private final Map<Entity, Path> oldPaths = new MapMaker().weakKeys().weakValues().<Entity, Path>makeMap();
-
-    public InputEventHandler()
-    {
-        try
-        {
-            this.field_Minecraft_actionKeyF3                = ReflectionHelper.findField(Minecraft.class, "field_184129_aV", "actionKeyF3");
-            this.field_DebugRenderer_collisionBoxEnabled    = ReflectionHelper.findField(DebugRenderer.class, "field_191326_j", "collisionBoxEnabled");
-            this.field_DebugRenderer_heightMapEnabled       = ReflectionHelper.findField(DebugRenderer.class, "field_190082_h", "heightMapEnabled");
-            this.field_DebugRenderer_neighborsUpdateEnabled = ReflectionHelper.findField(DebugRenderer.class, "field_191558_l", "neighborsUpdateEnabled");
-            this.field_DebugRenderer_pathfindingEnabled     = ReflectionHelper.findField(DebugRenderer.class, "field_190080_f", "pathfindingEnabled");
-            this.field_DebugRenderer_solidFaceEnabled       = ReflectionHelper.findField(DebugRenderer.class, "field_193853_n", "solidFaceEnabled");
-            this.field_DebugRenderer_waterEnabled           = ReflectionHelper.findField(DebugRenderer.class, "field_190081_g", "waterEnabled");
-        }
-        catch (UnableToFindFieldException e)
-        {
-            LiteModMiniHud.logger.warn("Failed to reflect DebugRenderer fields");
-        }
-    }
 
     public static InputEventHandler getInstance()
     {
@@ -89,7 +61,7 @@ public class InputEventHandler
             KeyBinding.setKeyBindState(eventKey, false);
 
             // This prevent the F3 screen from opening after releasing the F3 key
-            this.setBoolean(this.field_Minecraft_actionKeyF3, mc, true);
+            ((IMinecraftAccessor) mc).setActionKeyF3(true);
             KeyBinding.unPressAllKeys();
         }
 
@@ -199,34 +171,40 @@ public class InputEventHandler
             switch (bit)
             {
                 case MASK_DEBUG_COLLISION_BOXES:
-                    status = this.toggleBoolean(this.field_DebugRenderer_collisionBoxEnabled, mc.debugRenderer);
+                    status = ! ((IMixinDebugRenderer) mc.debugRenderer).getCollisionBoxEnabled();
+                    ((IMixinDebugRenderer) mc.debugRenderer).setCollisionBoxEnabled(status);
                     this.printMessage(mc, "collisions", status ? "ON" : "OFF");
                     break;
 
                 case MASK_DEBUG_HEIGHT_MAP:
-                    status = this.toggleBoolean(this.field_DebugRenderer_heightMapEnabled, mc.debugRenderer);
+                    status = ! ((IMixinDebugRenderer) mc.debugRenderer).getHeightMapEnabled();
+                    ((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(status);
                     this.printMessage(mc, "height_map", status ? "ON" : "OFF");
                     break;
 
                 case MASK_DEBUG_NEIGHBOR_UPDATE:
-                    status = this.toggleBoolean(this.field_DebugRenderer_neighborsUpdateEnabled, mc.debugRenderer);
+                    status = ! ((IMixinDebugRenderer) mc.debugRenderer).getField_191558_l();
+                    ((IMixinDebugRenderer) mc.debugRenderer).setField_191558_l(status);
                     this.neighborUpdateEnabled = status;
                     this.printMessage(mc, "neighbor_updates", status ? "ON" : "OFF");
                     break;
 
                 case MASK_DEBUG_PATHFINDING:
-                    status = this.toggleBoolean(this.field_DebugRenderer_pathfindingEnabled, mc.debugRenderer);
+                    status = ! ((IMixinDebugRenderer) mc.debugRenderer).getPathfindingEnabled();
+                    ((IMixinDebugRenderer) mc.debugRenderer).setPathfindingEnabled(status);
                     this.pathfindingEnabled = status;
                     this.printMessage(mc, "pathfinding", status ? "ON" : "OFF");
                     break;
 
                 case MASK_DEBUG_SOLID_FACES:
-                    status = this.toggleBoolean(this.field_DebugRenderer_solidFaceEnabled, mc.debugRenderer);
+                    status = ! ((IMixinDebugRenderer) mc.debugRenderer).getField_193853_n();
+                    ((IMixinDebugRenderer) mc.debugRenderer).setField_193853_n(status);
                     this.printMessage(mc, "solid_faces", status ? "ON" : "OFF");
                     break;
 
                 case MASK_DEBUG_WATER:
-                    status = this.toggleBoolean(this.field_DebugRenderer_waterEnabled, mc.debugRenderer);
+                    status = ! ((IMixinDebugRenderer) mc.debugRenderer).getWaterEnabled();
+                    ((IMixinDebugRenderer) mc.debugRenderer).setWaterEnabled(status);
                     this.printMessage(mc, "water", status ? "ON" : "OFF");
                     break;
 
@@ -240,34 +218,6 @@ public class InputEventHandler
     {
         // func_191742_a() = addChatMessage()
         mc.ingameGUI.func_191742_a(ChatType.GAME_INFO, new TextComponentTranslation("minihud.message.toggled_debug_mode." + key, args));
-    }
-
-    private void setBoolean(Field field, Object obj, boolean value)
-    {
-        try
-        {
-            field.set(obj, value);
-        }
-        catch (Exception e)
-        {
-            LiteModMiniHud.logger.warn("InputEventHandler: Failed set a boolean on a reflected field");
-        }
-    }
-
-    private boolean toggleBoolean(Field field, Object obj)
-    {
-        try
-        {
-            boolean newValue = ! field.getBoolean(obj);
-            field.set(obj, newValue);
-            return newValue;
-        }
-        catch (Exception e)
-        {
-            LiteModMiniHud.logger.warn("InputEventHandler: Failed to toggle a boolean on a reflected field");
-        }
-
-        return false;
     }
 
     public static boolean isRequiredKeyActive()
