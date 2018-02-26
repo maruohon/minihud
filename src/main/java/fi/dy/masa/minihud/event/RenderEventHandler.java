@@ -64,6 +64,13 @@ public class RenderEventHandler
         return INSTANCE;
     }
 
+    public static void fixDebugRendererState()
+    {
+        GlStateManager.disableLighting();
+        //GlStateManager.color(1, 1, 1, 1);
+        //OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f);
+    }
+
     public void onRenderGameOverlayPost(float partialTicks)
     {
         Minecraft mc = Minecraft.getMinecraft();

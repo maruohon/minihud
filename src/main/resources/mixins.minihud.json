@@ -6,6 +6,10 @@
     "client": [
         "IMixinPathNavigate",
         "IMixinRenderGlobal",
+        "MixinDebugRendererCollisionBox",
+        "MixinDebugRendererHeightMap",
+        "MixinDebugRendererNeighborsUpdate",
+        "MixinDebugRendererSolidFace",
         "MixinGuiIngame",
         "MixinMinecraft",
         "MixinMinecraftServer",
