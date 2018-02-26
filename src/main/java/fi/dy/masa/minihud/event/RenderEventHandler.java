@@ -48,7 +48,7 @@ public class RenderEventHandler
     private int fps;
     private int fpsCounter;
     private long fpsUpdateTime = Minecraft.getSystemTime();
-    private float partialTicksLast;
+    private long infoUpdateTime;
     private long serverSeed;
     private boolean serverSeedValid;
     private int addedTypes;
@@ -79,14 +79,16 @@ public class RenderEventHandler
                 this.updateFps();
             }
 
+            long currentTime = System.currentTimeMillis();
+
             // Only update the text once per game tick
-            if (partialTicks < this.partialTicksLast)
+            if (currentTime - this.infoUpdateTime >= 50)
             {
                 this.updateLines(this.mask);
+                this.infoUpdateTime = currentTime;
             }
 
             this.renderText(mc, Configs.Generic.TEXT_POS_X.getIntegerValue(), Configs.Generic.TEXT_POS_Y.getIntegerValue(), this.lines);
-            this.partialTicksLast = partialTicks;
         }
     }
 
