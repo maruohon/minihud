@@ -1,3 +1,4 @@
+
 buildscript {
     repositories {
         jcenter()
@@ -5,16 +6,20 @@ buildscript {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
+        maven {
+            name = 'sponge'
+            url = 'http://repo.spongepowered.org/maven'
+        }
     }
+
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+apply plugin: 'net.minecraftforge.gradle.liteloader'
+apply plugin: 'org.spongepowered.mixin'
 
 ext.configFile = file "build.properties"
 
@@ -24,22 +29,13 @@ configFile.withReader {
     project.ext.config = new ConfigSlurper().parse prop
 }
 
-group = config.group + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = config.mod_id + '-' + config.minecraft_version_out
-
 minecraft {
-    version = config.minecraft_version + "-" + config.forge_version
-    runDir = "../minecraft"
+    version = config.minecraft_version
+    mappings = config.mappings_version
+    runDir = 'minecraft'
+    makeObfSourceJar = false
 
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not allways work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings =  config.mappings_version
-    makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-
-    ext.mod_version = "${config.mod_version}"
+    ext.mod_version = config.mod_version
 
     if (mod_version.endsWith('-dev')) {
         mod_version = mod_version + "." + new Date().format('yyyyMMdd.HHmmss')
@@ -49,27 +45,62 @@ minecraft {
     replace "@MOD_VERSION@", mod_version
 }
 
-dependencies {
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-      
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+sourceSets {
+    main {
+        ext.refMap = 'mixins.' + config.mod_id + '.refmap.json'
+    }
 }
 
+group = config.group + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = config.mod_id + '-' + config.minecraft_version_out
 version = project.minecraft.mod_version
+
+/**
+ * This section allows you to customise the generated litemod.json file
+ */
+litemod {
+    json {
+        name = config.mod_id
+        displayName = config.mod_name
+        mcversion = config.minecraft_version
+        version = config.mod_version
+        author = config.author
+
+        // Uncomment any of the following lines and fill in your own details as required
+        //dependsOn = [ 'modid', 'othermod' ]
+        //requiredAPIs = [ 'someapi' ]
+        //tweakClass = 'name.of.tweaker.here'
+        mixinConfigs = [ 'mixins.' + config.mod_id + '.json' ]
+    }
+}
+
+/**
+ * This section allows you to customise your generated jar (litemod) file. By
+ * default it includes the generated litemod.json file, however if you prefer to
+ * include your own file from resources, simply remove the line below.
+ */
+jar {
+    from litemod.outputs
+
+    /*
+    manifest.mainAttributes (
+        'Built-By': System.properties['user.name'],
+        'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
+        'Implementation-Title': config.mod_id,
+        'Implementation-Version': project.version
+    )
+    */
+}
+
+mixin {
+    defaultObfuscationEnv notch
+}
+
+// Don't append a 'mod-' filename prefix >_>
+tasks.withType(Jar)*.baseName = archivesBaseName
 
 processResources
 {
-    // Exclude the GIMP image files
-    exclude '**/*.xcf'
-
-    // Exclude the Cubik model files
-    exclude '**/*.bdc3D'
-
     // this will ensure that this task is redone when the versions change.
     inputs.property "mod_version", project.minecraft.mod_version
     inputs.property "minecraft_version", project.config.minecraft_version
@@ -81,24 +112,9 @@ processResources
         // replace version and mcversion
         expand 'mod_version': project.minecraft.mod_version, 'minecraft_version': project.config.minecraft_version
     }
-        
+      
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
-
-    // Move access transformers to META-INF
-    // rename '(' + config.mod_id + '_at.cfg)', 'META-INF/$1'
 }
-
-task signJar(type: SignJar, dependsOn: reobfJar) {
-    inputFile = jar.archivePath
-    outputFile = jar.archivePath
-
-    keyStore = config.keyStore
-    alias = config.alias
-    storePass = config.storePass
-    keyPass = config.keyPass
-}
-
-build.dependsOn signJar

@@ -1,9 +1,15 @@
 package fi.dy.masa.minihud.event;
 
 import java.lang.reflect.Field;
+import java.util.EnumSet;
 import java.util.Map;
 import org.lwjgl.input.Keyboard;
 import com.google.common.collect.MapMaker;
+import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.util.DebugInfoUtils;
+import fi.dy.masa.minihud.util.ReflectionHelper;
+import fi.dy.masa.minihud.util.ReflectionHelper.UnableToFindFieldException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.debug.DebugRenderer;
@@ -14,27 +20,12 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.minecraftforge.client.settings.KeyModifier;
-import net.minecraftforge.event.world.BlockEvent.NeighborNotifyEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindFieldException;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import fi.dy.masa.minihud.MiniHud;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.proxy.ClientProxy;
-import fi.dy.masa.minihud.util.DebugInfoUtils;
 
-@SideOnly(Side.CLIENT)
 public class InputEventHandler
 {
     public static final int MASK_DEBUG_COLLISION_BOXES  = 0x01;
@@ -44,7 +35,8 @@ public class InputEventHandler
     public static final int MASK_DEBUG_SOLID_FACES      = 0x10;
     public static final int MASK_DEBUG_WATER            = 0x20;
 
-    private final Minecraft mc;
+    private static final InputEventHandler INSTANCE = new InputEventHandler();
+
     private boolean toggledInfo;
 
     private Field field_Minecraft_actionKeyF3;
@@ -61,8 +53,6 @@ public class InputEventHandler
 
     public InputEventHandler()
     {
-        this.mc = Minecraft.getMinecraft();
-
         try
         {
             this.field_Minecraft_actionKeyF3                = ReflectionHelper.findField(Minecraft.class, "field_184129_aV", "actionKeyF3");
@@ -75,78 +65,90 @@ public class InputEventHandler
         }
         catch (UnableToFindFieldException e)
         {
-            MiniHud.logger.warn("Failed to reflect DebugRenderer fields");
+            LiteModMiniHud.logger.warn("Failed to reflect DebugRenderer fields");
         }
     }
 
-    @SubscribeEvent
-    public void onKeyInputEvent(KeyInputEvent event)
+    public static InputEventHandler getInstance()
     {
-        int key = Keyboard.getEventKey();
-        boolean state = Keyboard.getEventKeyState();
-        int mask = Configs.getBitmaskForDebugKey(key);
+        return INSTANCE;
+    }
 
-        if (state && Keyboard.isKeyDown(Keyboard.KEY_F3) && mask != 0)
+    public boolean onKeyInput()
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+        int eventKey = Keyboard.getEventKey();
+        boolean eventKeyState = Keyboard.getEventKeyState();
+        int bitMaskForEventKey = Configs.getBitmaskForDebugKey(eventKey);
+        boolean cancel = false;
+
+        if (eventKeyState && Keyboard.isKeyDown(Keyboard.KEY_F3) && bitMaskForEventKey != 0)
         {
-            this.toggleDebugRenderers(mask);
-            KeyBinding.setKeyBindState(key, false);
+            this.toggleDebugRenderers(mc, bitMaskForEventKey);
+            KeyBinding.setKeyBindState(eventKey, false);
 
             // This prevent the F3 screen from opening after releasing the F3 key
-            this.setBoolean(this.field_Minecraft_actionKeyF3, this.mc, true);
-
-            return;
+            this.setBoolean(this.field_Minecraft_actionKeyF3, mc, true);
+            cancel = true;
         }
 
-        int toggleKey = ClientProxy.keyToggleMode.getKeyCode();
-        mask = Configs.getBitmaskForInfoKey(key);
+        int toggleKey = LiteModMiniHud.KEY_TOGGLE_MODE.getKeyCode();
+        bitMaskForEventKey = Configs.getBitmaskForInfoKey(eventKey);
 
         // Toggle the HUD when releasing the toggle key, if no infos were toggled while it was down
-        if (state == false && key == toggleKey)
+        if (eventKeyState == false && eventKey == toggleKey)
         {
             if (this.toggledInfo == false)
             {
                 RenderEventHandler.getInstance().toggleEnabled();
+                cancel = true;
             }
 
             this.toggledInfo = false;
         }
-        else if (state && mask != 0 && Keyboard.isKeyDown(toggleKey))
+        else if (eventKeyState && bitMaskForEventKey != 0 && Keyboard.isKeyDown(toggleKey))
         {
-            RenderEventHandler.getInstance().xorEnabledMask(mask);
+            RenderEventHandler.getInstance().xorEnabledMask(bitMaskForEventKey);
             this.toggledInfo = true;
             KeyBinding.unPressAllKeys();
+            cancel = true;
         }
+
+        return cancel;
     }
 
-    @SubscribeEvent
-    public void onNeighborNotify(NeighborNotifyEvent event)
+    public void onNeighborNotify(World world, BlockPos pos, EnumSet<EnumFacing> notifiedSides)
     {
         // This will only work in single player...
         // We are catching updates from the server world, and adding them to the debug renderer directly
-        if (this.neighborUpdateEnabled && event.getWorld().isRemote == false)
+        if (this.neighborUpdateEnabled && world.isRemote == false)
         {
-            final long time = event.getWorld().getTotalWorldTime();
-            final BlockPos pos = event.getPos();
+            final long time = world.getTotalWorldTime();
 
-            this.mc.addScheduledTask(new Runnable()
+            Minecraft.getMinecraft().addScheduledTask(new Runnable()
             {
                 public void run()
                 {
-                    ((DebugRendererNeighborsUpdate) Minecraft.getMinecraft().debugRenderer.neighborsUpdate).addUpdate(time, pos);
+                    // field_191557_f = neighborsUpdate
+                    // func_191553_a() = addUpdate()
+                    for (EnumFacing side : notifiedSides)
+                    {
+                        ((DebugRendererNeighborsUpdate) Minecraft.getMinecraft().debugRenderer.field_191557_f).func_191553_a(time, pos.offset(side));
+                    }
                 }
             });
         }
     }
 
-    @SubscribeEvent
-    public void onServerTick(ServerTickEvent event)
+    public void onServerTickEnd(MinecraftServer server)
     {
+        Minecraft mc = Minecraft.getMinecraft();
+
         // Send the custom packet with the Path data, if that debug renderer is enabled
-        if (this.pathfindingEnabled && event.phase == TickEvent.Phase.END && this.mc.world != null && ++this.tickCounter >= 10)
+        if (this.pathfindingEnabled && mc.world != null && ++this.tickCounter >= 10)
         {
             this.tickCounter = 0;
-            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-            World world = server != null ? server.getWorld(this.mc.world.provider.getDimension()) : null;
+            World world = server.getWorld(mc.world.provider.getDimensionType().getId());
 
             if (world != null)
             {
@@ -162,7 +164,7 @@ public class InputEventHandler
                         if (path != null && (old == null || old.isSamePath(path) == false))
                         {
                             final int id = entity.getEntityId();
-                            final float maxDistance = Configs.debugRendererPathfindingEnableMaxDistance ? navigator.getPathSearchRange() : 0F;
+                            final float maxDistance = Configs.Generic.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? navigator.getPathSearchRange() : 0F;
                             this.oldPaths.put(entity, path);
 
                             DebugInfoUtils.sendPacketDebugPath(server, id, path, maxDistance);
@@ -173,7 +175,7 @@ public class InputEventHandler
         }
     }
 
-    private void toggleDebugRenderers(int mask)
+    private void toggleDebugRenderers(Minecraft mc, int mask)
     {
         for (int i = 0; i < 6; i++)
         {
@@ -183,35 +185,35 @@ public class InputEventHandler
             switch (bit)
             {
                 case MASK_DEBUG_COLLISION_BOXES:
-                    status = this.toggleBoolean(this.field_DebugRenderer_collisionBoxEnabled, this.mc.debugRenderer);
-                    this.printMessage("collisions", status ? "ON" : "OFF");
+                    status = this.toggleBoolean(this.field_DebugRenderer_collisionBoxEnabled, mc.debugRenderer);
+                    this.printMessage(mc, "collisions", status ? "ON" : "OFF");
                     break;
 
                 case MASK_DEBUG_HEIGHT_MAP:
-                    status = this.toggleBoolean(this.field_DebugRenderer_heightMapEnabled, this.mc.debugRenderer);
-                    this.printMessage("height_map", status ? "ON" : "OFF");
+                    status = this.toggleBoolean(this.field_DebugRenderer_heightMapEnabled, mc.debugRenderer);
+                    this.printMessage(mc, "height_map", status ? "ON" : "OFF");
                     break;
 
                 case MASK_DEBUG_NEIGHBOR_UPDATE:
-                    status = this.toggleBoolean(this.field_DebugRenderer_neighborsUpdateEnabled, this.mc.debugRenderer);
+                    status = this.toggleBoolean(this.field_DebugRenderer_neighborsUpdateEnabled, mc.debugRenderer);
                     this.neighborUpdateEnabled = status;
-                    this.printMessage("neighbor_updates", status ? "ON" : "OFF");
+                    this.printMessage(mc, "neighbor_updates", status ? "ON" : "OFF");
                     break;
 
                 case MASK_DEBUG_PATHFINDING:
-                    status = this.toggleBoolean(this.field_DebugRenderer_pathfindingEnabled, this.mc.debugRenderer);
+                    status = this.toggleBoolean(this.field_DebugRenderer_pathfindingEnabled, mc.debugRenderer);
                     this.pathfindingEnabled = status;
-                    this.printMessage("pathfinding", status ? "ON" : "OFF");
+                    this.printMessage(mc, "pathfinding", status ? "ON" : "OFF");
                     break;
 
                 case MASK_DEBUG_SOLID_FACES:
-                    status = this.toggleBoolean(this.field_DebugRenderer_solidFaceEnabled, this.mc.debugRenderer);
-                    this.printMessage("solid_faces", status ? "ON" : "OFF");
+                    status = this.toggleBoolean(this.field_DebugRenderer_solidFaceEnabled, mc.debugRenderer);
+                    this.printMessage(mc, "solid_faces", status ? "ON" : "OFF");
                     break;
 
                 case MASK_DEBUG_WATER:
-                    status = this.toggleBoolean(this.field_DebugRenderer_waterEnabled, this.mc.debugRenderer);
-                    this.printMessage("water", status ? "ON" : "OFF");
+                    status = this.toggleBoolean(this.field_DebugRenderer_waterEnabled, mc.debugRenderer);
+                    this.printMessage(mc, "water", status ? "ON" : "OFF");
                     break;
 
                 default:
@@ -220,9 +222,10 @@ public class InputEventHandler
         }
     }
 
-    private void printMessage(String key, Object... args)
+    private void printMessage(Minecraft mc, String key, Object... args)
     {
-        this.mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation("minihud.message.toggled_debug_mode." + key, args));
+        // func_191742_a() = addChatMessage()
+        mc.ingameGUI.func_191742_a(ChatType.GAME_INFO, new TextComponentTranslation("minihud.message.toggled_debug_mode." + key, args));
     }
 
     private void setBoolean(Field field, Object obj, boolean value)
@@ -233,7 +236,7 @@ public class InputEventHandler
         }
         catch (Exception e)
         {
-            MiniHud.logger.warn("InputEventHandler: Failed set a boolean via a reflected field");
+            LiteModMiniHud.logger.warn("InputEventHandler: Failed set a boolean on a reflected field");
         }
     }
 
@@ -247,18 +250,28 @@ public class InputEventHandler
         }
         catch (Exception e)
         {
-            MiniHud.logger.warn("InputEventHandler: Failed to toggle a boolean via a reflected field");
+            LiteModMiniHud.logger.warn("InputEventHandler: Failed to toggle a boolean on a reflected field");
         }
 
         return false;
     }
 
-    public static boolean isRequiredKeyActive(KeyModifier key)
+    public static boolean isRequiredKeyActive()
     {
+        KeyModifier key = Configs.requiredKey;
+
         if (key == KeyModifier.NONE)    { return true;                       }
         if (key == KeyModifier.ALT)     { return GuiScreen.isAltKeyDown();   }
         if (key == KeyModifier.CONTROL) { return GuiScreen.isCtrlKeyDown();  }
         if (key == KeyModifier.SHIFT)   { return GuiScreen.isShiftKeyDown(); }
         return false;
+    }
+
+    public enum KeyModifier
+    {
+        NONE,
+        ALT,
+        CONTROL,
+        SHIFT;
     }
 }

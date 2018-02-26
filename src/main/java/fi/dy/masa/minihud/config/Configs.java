@@ -1,56 +1,38 @@
 package fi.dy.masa.minihud.config;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraftforge.client.settings.KeyModifier;
-import net.minecraftforge.common.config.ConfigCategory;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.mumfrey.liteloader.core.LiteLoader;
+import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.event.InputEventHandler;
+import fi.dy.masa.minihud.event.InputEventHandler.KeyModifier;
 import fi.dy.masa.minihud.event.RenderEventHandler;
+import fi.dy.masa.minihud.util.JsonUtils;
 
 public class Configs
 {
-    public static boolean enableByDefault;
-    public static boolean sortLinesByLength;
-    public static boolean sortLinesReversed;
-    public static boolean coordinateFormatCustomized;
-    public static boolean requireSneak;
-    public static boolean requireHoldingKey;
-    public static boolean useFontShadow;
-    public static boolean useScaledFont;
-    public static boolean useTextBackground;
-
-    public static boolean debugRendererPathfindingEnableMaxDistance;
+    private static final String CONFIG_FILE_NAME = Reference.MOD_ID + ".json";
 
     public static int enabledInfoTypes;
-    public static int fontColor;
-    public static int textBackgroundColor;
-    public static int textPosX;
-    public static int textPosY;
-
-    public static String coordinateFormat;
-    public static String dateFormatMinecraft;
-    public static String dateFormatReal;
-
     public static KeyModifier requiredKey;
     private static final Multimap<Integer, Integer> HOTKEY_DEBUG_MAP = HashMultimap.create();
     private static final Multimap<Integer, Integer> HOTKEY_INFO_MAP = HashMultimap.create();
     private static final Map<Integer, Integer> LINE_ORDER_MAP = new HashMap<Integer, Integer>();
 
-    public static File configurationFile;
-    public static Configuration config;
-    
     public static final String CATEGORY_DEBUG_HOTKEYS = "VanillaDebugRendererHotkeys";
     public static final String CATEGORY_DEBUG_RENDERER = "VanillaDebugRendererOptions";
     public static final String CATEGORY_GENERIC = "Generic";
@@ -58,220 +40,485 @@ public class Configs
     public static final String CATEGORY_INFO_HOTKEYS = "InfoToggleHotkeys";
     public static final String CATEGORY_INFO_LINE_ORDER = "InfoLineOrder";
 
-    @SubscribeEvent
-    public void onConfigChangedEvent(OnConfigChangedEvent event)
+    public enum ConfigType
     {
-        if (Reference.MOD_ID.equals(event.getModID()))
+        BOOLEAN,
+        INTEGER,
+        STRING,
+        HEX_STRING,
+        HOTKEY;
+    }
+
+    public enum Generic implements IConfigGeneric, IConfigBoolean
+    {
+        COORDINATE_FORMAT_STRING        ("coordinateFormat", "x: %.1f y: %.1f z: %.1f",
+                                        "The format string for the coordinate line.\n" +
+                                        "Needs to have three %f format strings! Default: x: %.1f y: %.1f z: %.1f"),
+        DATE_FORMAT_REAL                ("dateFormatReal", "yyyy-MM-dd HH:mm:ss",
+                                        "The format string for real time, see the Java SimpleDateFormat\n" +
+                                        "class for the format patterns, if needed."),
+        DATE_FORMAT_MINECRAFT           ("dateFormatMinecraft", "MC time: (day {DAY}) {HOUR}:{MIN}:xx",
+                                        "The format string for the Minecraft time.\n" +
+                                        "The supported placeholders are: {DAY}, {HOUR}, {MIN}, {SEC}"),
+        DEBUG_RENDERER_PATH_MAX_DIST    ("debugRendererPathfindingEnableMaxDistance", false,
+                                        "If true, then the vanilla pathfinding debug renderer will render the max distance boxes.\n" +
+                                        "Those obstruct most other things quite badly when enabled, so this is disabled by default."),
+        ENABLE_BY_DEFAULT               ("enableByDefault", true, "If true, the HUD will be enabled by default on game launch"),
+        FONT_COLOR                      ("fontColor", "0xE0E0E0", true, "Font color (RGB, default: 0xE0E0E0 = 14737632)"),
+        REQUIRE_SNEAK                   ("requireSneak", false, "Require the player to be sneaking to render the HUD"),
+        REQUIRE_HOLDING_KEY             ("requireHoldingKey", "none", "Require holding a key to render the HUD. Valid keys are 'alt', 'ctrl' and 'shift'."),
+        SORT_LINES_BY_LENGTH            ("sortLinesByLength", false, "Sort the lines by their text's length"),
+        SORT_LINES_REVERSED             ("sortLinesReversed", false, "Reverse the line sorting order"),
+        TEXT_BACKGROUND_COLOR           ("textBackgroundColor", "0xA0505050", true, "Text background color (ARGB, default: 0xA0505050)"),
+        TEXT_POS_X                      ("textPosX", 4, "Text X position from the screen edge (default: 4)"),
+        TEXT_POS_Y                      ("textPosY", 4, "Text Y position from the screen edge (default: 4)"),
+        USE_CUSTOMIZED_COORDINATES      ("useCustomizedCoordinateFormat", true, "Use the customized coordinate format string"),
+        USE_FONT_SHADOW                 ("useFontShadow", false, "Use font shadow"),
+        USE_SCALED_FONT                 ("useScaledFont", true, "Use 0.5x scale font size"),
+        USE_TEXT_BACKGROUND             ("useTextBackground", true, "Use a solid background color behind the text");
+
+        private final String name;
+        private final ConfigType type;
+        private String comment;
+        private boolean valueBoolean;
+        private int valueInteger;
+        private String valueString;
+
+        private Generic(String name, boolean defaultValue, String comment)
         {
-            loadConfigs(config);
+            this.type = ConfigType.BOOLEAN;
+            this.name = name;
+            this.valueBoolean = defaultValue;
+            this.comment = comment;
+        }
+
+        private Generic(String name, int defaultValue, String comment)
+        {
+            this.type = ConfigType.INTEGER;
+            this.name = name;
+            this.valueInteger = defaultValue;
+            this.comment = comment;
+        }
+
+        private Generic(String name, String defaultValue, String comment)
+        {
+            this.type = ConfigType.STRING;
+            this.name = name;
+            this.valueString = defaultValue;
+            this.comment = comment;
+        }
+
+        private Generic(String name, String defaultValue, boolean isColor, String comment)
+        {
+            this.type = ConfigType.HEX_STRING;
+            this.name = name;
+            this.valueString = defaultValue;
+            this.valueInteger = getColor(defaultValue, 0);
+            this.comment = comment;
+        }
+
+        @Override
+        public ConfigType getType()
+        {
+            return this.type;
+        }
+
+        @Override
+        public String getName()
+        {
+            return this.name;
+        }
+
+        @Override
+        @Nullable
+        public String getComment()
+        {
+            return comment;
+        }
+
+        public void setComment(String comment)
+        {
+            this.comment = comment;
+        }
+
+        @Override
+        public boolean getBooleanValue()
+        {
+            return this.valueBoolean;
+        }
+
+        @Override
+        public void setBooleanValue(boolean value)
+        {
+            this.valueBoolean = value;
+        }
+
+        public int getIntegerValue()
+        {
+            return this.valueInteger;
+        }
+
+        public void setIntegerValue(int value)
+        {
+            this.valueInteger = value;
+        }
+
+        public String getStringValue()
+        {
+            switch (this.type)
+            {
+                case BOOLEAN:       return String.valueOf(this.valueBoolean);
+                case INTEGER:       return String.valueOf(this.valueInteger);
+                case HEX_STRING:    return String.format("0x%08X", this.valueInteger);
+                case STRING:
+                default:            return this.valueString;
+            }
+        }
+
+        public void setStringValue(String value)
+        {
+            this.valueString = value;
+        }
+
+        public void setColorValue(String str)
+        {
+            this.valueInteger = getColor(str, 0);
+        }
+
+        @Override
+        public void setValueFromString(String value)
+        {
+            try
+            {
+                switch (this.type)
+                {
+                    case BOOLEAN:
+                        this.valueBoolean = Boolean.getBoolean(value);
+                        break;
+                    case INTEGER:
+                        this.valueInteger = Integer.parseInt(value);
+                        break;
+                    case STRING:
+                        this.valueString = value;
+                        break;
+                    case HEX_STRING:
+                        this.valueInteger = getColor(value, 0);
+                        break;
+                    default:
+                }
+            }
+            catch (Exception e)
+            {
+                LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", this.getName(), e);
+            }
+        }
+
+        public void setValueFromJsonPrimitive(JsonPrimitive value)
+        {
+            try
+            {
+                switch (this.type)
+                {
+                    case BOOLEAN:
+                        this.valueBoolean = value.getAsBoolean();
+                        break;
+                    case INTEGER:
+                        this.valueInteger = value.getAsInt();
+                        break;
+                    case STRING:
+                        this.valueString = value.getAsString();
+                        break;
+                    case HEX_STRING:
+                        this.valueInteger = getColor(value.getAsString(), 0);
+                        break;
+                    default:
+                }
+            }
+            catch (Exception e)
+            {
+                LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", this.getName(), e);
+            }
+        }
+
+        public JsonPrimitive getAsJsonPrimitive()
+        {
+            switch (this.type)
+            {
+                case BOOLEAN:       return new JsonPrimitive(this.getBooleanValue());
+                case INTEGER:       return new JsonPrimitive(this.getIntegerValue());
+                case STRING:        return new JsonPrimitive(this.getStringValue());
+                case HEX_STRING:    return new JsonPrimitive(String.format("0x%08X", this.getIntegerValue()));
+                default:
+            }
+
+            return new JsonPrimitive(this.getStringValue());
         }
     }
 
-    public static void loadConfigsFromFile(File configFile)
+    // Note: the bitmask affects the default ordering of the info lines!
+    public enum InfoToggle implements IConfigBoolean, IConfigHotkey
     {
-        configurationFile = configFile;
-        config = new Configuration(configFile, null, true);
-        config.load();
+        BIOME                   ("infoBiome",                   false, 0x00040000, "B", "Show the name of the current biome"),
+        BIOME_REG_NAME          ("infoBiomeRegistryName",       false, 0x00080000, "B", "Show the registry name of the current biome"),
+        BLOCK_POS               ("infoBlockPosition",           false, 0x00000040, "",  "Show the player's block position"),
+        BLOCK_PROPS             ("infoBlockProperties",         false, 0x04000000, "P", "Show the BlockState properties and values"),
+        CHUNK_POS               ("infoChunkPosition",           false, 0x00000080, "C", "Show the player's current position in the chunk"),
+        CHUNK_SECTIONS          ("infoChunkSections",           false, 0x00002000, "C", "Show the currently rendered number of Chunk sections (the C value from F3)"),
+        CHUNK_SECTIONS_FULL     ("infoChunkSectionsLine",       false, 0x00004000, "",  "Show the entire line of the C value from the F3 screen"),
+        CHUNK_UPDATES           ("infoChunkUpdates",            false, 0x00008000, "U", "Show the current number of chunk updates per second"),
+        COORDINATES             ("infoCoordinates",             true,  0x00000010, "O", "Show the player's coordinates"),
+        DIFFICULTY              ("infoDifficulty",              false, 0x00020000, "D", "Show the local difficulty"),
+        DIMENSION               ("infoDimensionId",             true,  0x00000020, "I", "Show the current dimension ID\n(might not be accurate in every case, depending on the server (Sponge?)!)"),
+        ENTITIES                ("infoEntities",                false, 0x00100000, "E", "Show the visible/loaded entity count"),
+        ENTITY_REG_NAME         ("infoEntityRegistryName",      false, 0x00800000, "E", "Show the registry name of the entity the player is currently looking at"),
+        FACING                  ("infoFacing",                  true,  0x00000100, "F", "Show the player's current facing"),
+        FPS                     ("infoFPS",                     false, 0x00000001, "",  "Show the current FPS"),
+        LIGHT_LEVEL             ("infoLightLevel",              false, 0x00000200, "L", "Show the current light level"),
+        LOOKING_AT_BLOCK        ("infoLookingAtBlock",          false, 0x01000000, "A", "Show which block the player is currently looking at"),
+        LOOKING_AT_BLOCK_CHUNK  ("infoLookingAtBlockInChunk",   false, 0x02000000, "",  "Show which block within its containing chunk the player is currently looking at"),
+        LOOKING_AT_ENTITY       ("infoLookingAtEntity",         false, 0x00400000, "A", "Show the entity name and health when looked at"),
+        PARTICLE_COUNT          ("infoParticleCount",           false, 0x00010000, "",  "Show the currently renderer particle count (P from F3)"),
+        TIME_REAL               ("infoTimeIRL",                 true,  0x00000002, "T", "Show the current real time formatted according to dateFormatReal"),
+        TIME_WORLD              ("infoTimeWorld",               false, 0x00000004, "",  "Show the current world time in ticks"),
+        TIME_WORLD_FORMATTED    ("infoWorldTimeFormatted",      false, 0x00000008, "",  "Show the current world time formatted to days, hours, minutes"),
+        ROTATION_PITCH          ("infoRotationPitch",           false, 0x00000800, "R", "Show the player's pitch rotation"),
+        ROTATION_YAW            ("infoRotationYaw",             false, 0x00000400, "R", "Show the player's yaw rotation"),
+        SLIME_CHUNK             ("infoSlimeChunk",              false, 0x00200000, "M",
+                                "Show whether the player is currently in a slime chunk.\n" +
+                                "NOTE: This only works in single player without any user intervention!\n" +
+                                "On a server the player needs to be admin/OP and\n" +
+                                "run the /seed command manually EVERY TIME they join or change dimensions!"),
+        SPEED                   ("infoSpeed",                   false, 0x00001000, "S", "Show the player's current moving speed");
 
-        loadConfigs(config);
+        private final String name;
+        private final String comment;
+        private final int bitMask;
+        private boolean valueBoolean;
+        private String hotkey;
+        private int linePosition = -1;
+
+        private InfoToggle(String name, boolean defaultValue, int bitMask, String defaultHotkey, String comment)
+        {
+            this.name = name;
+            this.valueBoolean = defaultValue;
+            this.bitMask = bitMask;
+            this.hotkey = defaultHotkey;
+            this.comment = comment;
+        }
+
+        @Override
+        public ConfigType getType()
+        {
+            return ConfigType.BOOLEAN;
+        }
+
+        @Override
+        public String getName()
+        {
+            return this.name;
+        }
+
+        @Override
+        public String getStringValue()
+        {
+            return String.valueOf(this.valueBoolean);
+        }
+
+        @Override
+        public String getComment()
+        {
+            return comment != null ? comment : "";
+        }
+
+        public int getBitMask()
+        {
+            return this.bitMask;
+        }
+
+        @Override
+        public String getHotkey()
+        {
+            return this.hotkey;
+        }
+
+        @Override
+        public void setHotkey(String hotkey)
+        {
+            this.hotkey = hotkey;
+        }
+
+        public int getLinePosition()
+        {
+            return this.linePosition;
+        }
+
+        public void setLinePosition(int position)
+        {
+            this.linePosition = position;
+        }
+
+        public int applyBitMask(int mask)
+        {
+            if (this.valueBoolean)
+            {
+                mask |= this.bitMask;
+            }
+            else
+            {
+                mask &= ~this.bitMask;
+            }
+
+            return mask;
+        }
+
+        @Override
+        public boolean getBooleanValue()
+        {
+            return this.valueBoolean;
+        }
+
+        @Override
+        public void setBooleanValue(boolean value)
+        {
+            this.valueBoolean = value;
+        }
     }
 
-    public static void loadConfigs(Configuration conf)
+    public enum DebugHotkeys implements IConfig, IConfigHotkey
     {
-        Property prop;
+        COLLISION_BOXES     ("debugCollisionBoxEnabled",    InputEventHandler.MASK_DEBUG_COLLISION_BOXES,   "1"),
+        HEIGHT_MAP          ("debugHeightMapEnabled",       InputEventHandler.MASK_DEBUG_HEIGHT_MAP,        "2"),
+        NEIGHBOR_UPDATES    ("debugNeighborsUpdateEnabled", InputEventHandler.MASK_DEBUG_NEIGHBOR_UPDATE,   "3"),
+        PATH_FINDING        ("debugPathfindingEnabled",     InputEventHandler.MASK_DEBUG_PATHFINDING,       "4"),
+        SOLID_FACES         ("debugSolidFaceEnabled",       InputEventHandler.MASK_DEBUG_SOLID_FACES,       "5"),
+        WATER               ("debugWaterEnabled",           InputEventHandler.MASK_DEBUG_WATER,             "6");
 
-        prop = conf.get(CATEGORY_GENERIC, "coordinateFormat", "x: %.1f y: %.1f z: %.1f");
-        prop.setComment("The format string for the coordinate line (needs to have three %f format strings!) Default: x: %.1f y: %.1f z: %.1f");
-        coordinateFormat = prop.getString();
+        private final String name;
+        private final int bitMask;
+        private String hotkey;
 
-        prop = conf.get(CATEGORY_GENERIC, "coordinateFormatCustomized", true);
-        prop.setComment("Use the customized coordinate format string");
-        coordinateFormatCustomized = prop.getBoolean();
+        private DebugHotkeys(String name, int bitMask, String defaultHotkey)
+        {
+            this.name = name;
+            this.bitMask = bitMask;
+            this.hotkey = defaultHotkey;
+        }
 
-        prop = conf.get(CATEGORY_GENERIC, "dateFormatReal", "yyyy-MM-dd HH:mm:ss");
-        prop.setComment("The format string for real time, see the Java SimpleDateFormat class for the format patterns, if needed");
-        dateFormatReal = prop.getString();
+        @Override
+        public ConfigType getType()
+        {
+            return ConfigType.HOTKEY;
+        }
 
-        prop = conf.get(CATEGORY_GENERIC, "dateFormatMinecraft", "MC time: (day {DAY}) {HOUR}:{MIN}:xx");
-        prop.setComment("The format string for the Minecraft time.\n" +
-                        "The supported placeholders are: {DAY}, {HOUR}, {MIN}, {SEC}");
-        dateFormatMinecraft = prop.getString();
+        @Override
+        public String getName()
+        {
+            return this.name;
+        }
 
-        prop = conf.get(CATEGORY_GENERIC, "enableByDefault", true);
-        prop.setComment("If true, the HUD will be enabled by default on game launch");
-        enableByDefault = prop.getBoolean();
+        @Override
+        @Nullable
+        public String getComment()
+        {
+            return null;
+        }
 
-        prop = conf.get(CATEGORY_GENERIC, "fontColor", "0xE0E0E0");
-        prop.setComment("Font color (RGB, default: 0xE0E0E0 = 14737632)");
-        fontColor = getColor(prop.getString(), 0xE0E0E0);
+        @Override
+        public String getStringValue()
+        {
+            return this.hotkey;
+        }
 
-        prop = conf.get(CATEGORY_GENERIC, "sortLinesByLength", false);
-        prop.setComment("Sort the lines by their text's length");
-        sortLinesByLength = prop.getBoolean();
+        public int getBitMask()
+        {
+            return this.bitMask;
+        }
 
-        prop = conf.get(CATEGORY_GENERIC, "requireSneak", false);
-        prop.setComment("Require the player to be sneaking to render the HUD");
-        requireSneak = prop.getBoolean();
+        @Override
+        public String getHotkey()
+        {
+            return this.hotkey;
+        }
 
-        prop = conf.get(CATEGORY_GENERIC, "requireHoldingKey", false);
-        prop.setComment("Require holding a key to render the HUD. Valid keys are Alt, Ctrl and Shift.");
-        requireHoldingKey = prop.getBoolean();
+        @Override
+        public void setHotkey(String hotkey)
+        {
+            this.hotkey = hotkey;
+        }
+    }
 
-        prop = conf.get(CATEGORY_GENERIC, "requiredKey", "none");
-        prop.setComment("The key required to render the HUD, if 'requireHoldingKey' is enabled. Valid values are 'alt', 'ctrl' and 'shift'.");
-        requiredKey = getKeyModifier(prop.getString());
+    public static void load()
+    {
+        File configFile = new File(LiteLoader.getCommonConfigFolder(), CONFIG_FILE_NAME);
 
-        prop = conf.get(CATEGORY_GENERIC, "sortLinesReversed", false);
-        prop.setComment("Reverse the line sorting order");
-        sortLinesReversed = prop.getBoolean();
+        if (configFile.exists() && configFile.isFile() && configFile.canRead())
+        {
+            JsonElement element = JsonUtils.parseJsonFile(configFile);
 
-        prop = conf.get(CATEGORY_GENERIC, "textBackgroundColor", "0xA0505050");
-        prop.setComment("Text background color (ARGB, default: 0xA0505050)");
-        textBackgroundColor = getColor(prop.getString(), 0xA0505050);
+            if (element != null && element.isJsonObject())
+            {
+                JsonObject root = element.getAsJsonObject();
+                JsonObject objToggles           = JsonUtils.getNestedObject(root, "InfoTypeToggles", false);
+                JsonObject objInfoHotkeys       = JsonUtils.getNestedObject(root, "InfoTypeHotkeys", false);
+                JsonObject objInfoLineOrders    = JsonUtils.getNestedObject(root, "InfoLineOrders", false);
+                JsonObject objGeneric           = JsonUtils.getNestedObject(root, "Generic", false);
+                JsonObject objDebugHotkeys      = JsonUtils.getNestedObject(root, "DebugRendererHotkeys", false);
 
-        prop = conf.get(CATEGORY_GENERIC, "textPosX", 4);
-        prop.setComment("Text X position (default: 4)");
-        textPosX = prop.getInt();
+                if (objGeneric != null)
+                {
+                    for (Generic gen : Generic.values())
+                    {
+                        if (objGeneric.has(gen.getName()) && objGeneric.get(gen.getName()).isJsonPrimitive())
+                        {
+                            gen.setValueFromJsonPrimitive(objGeneric.get(gen.getName()).getAsJsonPrimitive());
+                        }
+                    }
+                }
 
-        prop = conf.get(CATEGORY_GENERIC, "textPosY", 4);
-        prop.setComment("Text Y position (default: 4)");
-        textPosY = prop.getInt();
+                requiredKey = getKeyModifier(Generic.REQUIRE_HOLDING_KEY.getStringValue());
+                enabledInfoTypes = 0;
+                HOTKEY_INFO_MAP.clear();
 
-        prop = conf.get(CATEGORY_GENERIC, "useFontShadow", false);
-        prop.setComment("Use font shadow");
-        useFontShadow = prop.getBoolean();
+                for (InfoToggle toggle : InfoToggle.values())
+                {
+                    if (objToggles != null && JsonUtils.hasBoolean(objToggles, toggle.getName()))
+                    {
+                        toggle.setBooleanValue(JsonUtils.getBoolean(objToggles, toggle.getName()));
+                    }
 
-        prop = conf.get(CATEGORY_GENERIC, "useScaledFont", true);
-        prop.setComment("Use 0.5x scale font size");
-        useScaledFont = prop.getBoolean();
+                    if (objInfoHotkeys != null && JsonUtils.hasString(objInfoHotkeys, toggle.getName()))
+                    {
+                        toggle.setHotkey(JsonUtils.getString(objInfoHotkeys, toggle.getName()));
+                    }
 
-        prop = conf.get(CATEGORY_GENERIC, "useTextBackground", true);
-        prop.setComment("Use a solid background color behind the text");
-        useTextBackground = prop.getBoolean();
+                    if (objInfoLineOrders != null && JsonUtils.hasInteger(objInfoLineOrders, toggle.getName()))
+                    {
+                        toggle.setLinePosition(JsonUtils.getInteger(objInfoLineOrders, toggle.getName()));
+                    }
 
+                    enabledInfoTypes = toggle.applyBitMask(enabledInfoTypes);
+                    assignHotkey(HOTKEY_INFO_MAP, toggle);
+                    LINE_ORDER_MAP.put(toggle.getBitMask(), toggle.getLinePosition());
+                }
 
-        // Debug renderer related options
+                if (objDebugHotkeys != null)
+                {
+                    HOTKEY_DEBUG_MAP.clear();
 
-        prop = conf.get(CATEGORY_DEBUG_RENDERER, "debugRendererPathfindingEnableMaxDistance", false);
-        prop.setComment("If true, then the vanilla pathfinding debug renderer will render the max distance boxes.\n" +
-                        "Those obstruct most other things quite badly when enabled, so this is disabled by default.");
-        debugRendererPathfindingEnableMaxDistance = prop.getBoolean();
-
-
-        // Information types individual toggle
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBiome", false);
-        prop.setComment("Show the name of the current biome");
-        setInfoType(RenderEventHandler.MASK_BIOME, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBiomeRegistryName", false);
-        prop.setComment("Show the registry name of the current biome");
-        setInfoType(RenderEventHandler.MASK_BIOME_REGISTRY_NAME, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockPosition", false);
-        prop.setComment("Show player's block position");
-        setInfoType(RenderEventHandler.MASK_BLOCK, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockProperties", false);
-        prop.setComment("Show the BlockState properties and values");
-        setInfoType(RenderEventHandler.MASK_BLOCK_PROPERTIES, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkPosition", false);
-        prop.setComment("Show player's current position in the chunk");
-        setInfoType(RenderEventHandler.MASK_CHUNK, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkSections", false);
-        prop.setComment("Show the currently rendered number of Chunk sections (the C value from F3)");
-        setInfoType(RenderEventHandler.MASK_CHUNK_SECTIONS, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkSectionsLine", false);
-        prop.setComment("Show the entire line of the C value from the F3 screen");
-        setInfoType(RenderEventHandler.MASK_CHUNK_SECTIONS_LINE, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkUpdates", false);
-        prop.setComment("Show current number of chunk updates per second");
-        setInfoType(RenderEventHandler.MASK_CHUNK_UPDATES, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoCoordinates", true);
-        prop.setComment("Show player coordinates");
-        setInfoType(RenderEventHandler.MASK_COORDINATES, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoDifficulty", false);
-        prop.setComment("Show the local difficulty");
-        setInfoType(RenderEventHandler.MASK_DIFFICULTY, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoDimensionId", true);
-        prop.setComment("Show the current dimension ID (might not be accurate in every case, depending on the server!)");
-        setInfoType(RenderEventHandler.MASK_DIMENSION, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoEntities", false);
-        prop.setComment("Show the visible/loaded entity count");
-        setInfoType(RenderEventHandler.MASK_ENTITIES, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoEntityRegistryName", false);
-        prop.setComment("Show the registry name of the entity the player is currently looking at");
-        setInfoType(RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFacing", true);
-        prop.setComment("Show player facing");
-        setInfoType(RenderEventHandler.MASK_FACING, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFPS", false);
-        prop.setComment("Show current FPS");
-        setInfoType(RenderEventHandler.MASK_FPS, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLightLevel", false);
-        prop.setComment("Show the current light level");
-        setInfoType(RenderEventHandler.MASK_LIGHT, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAtBlock", false);
-        prop.setComment("Show which block the player is currently looking at");
-        setInfoType(RenderEventHandler.MASK_LOOKING_AT_BLOCK, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAtBlockInChunk", false);
-        prop.setComment("Show which block within its containing chunk the player is currently looking at");
-        setInfoType(RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAtEntity", false);
-        prop.setComment("Show entity name and health when looked at");
-        setInfoType(RenderEventHandler.MASK_LOOKING_AT_ENTITY, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoParticleCount", false);
-        prop.setComment("Show the currently renderer particle count (P from F3)");
-        setInfoType(RenderEventHandler.MASK_PARTICLE_COUNT, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRealTime", true);
-        prop.setComment("Show the current real time formatted according to dateFormatReal");
-        setInfoType(RenderEventHandler.MASK_TIME_REAL, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationPitch", false);
-        prop.setComment("Show player pitch rotation");
-        setInfoType(RenderEventHandler.MASK_PITCH, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationYaw", false);
-        prop.setComment("Show player yaw rotation");
-        setInfoType(RenderEventHandler.MASK_YAW, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoSlimeChunk", false);
-        prop.setComment("Show whether the player is currently in a slime chunk.\n" +
-                        "NOTE: This only works in single player without any user intervention!\n" +
-                        "On a server the player needs to be admin/OP and\n" +
-                        "run the /seed command manually EVERY TIME they join or change dimensions!");
-        setInfoType(RenderEventHandler.MASK_SLIME_CHUNK, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoSpeed", false);
-        prop.setComment("Show player moving speed");
-        setInfoType(RenderEventHandler.MASK_SPEED, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTime", false);
-        prop.setComment("Show the current world time in ticks");
-        setInfoType(RenderEventHandler.MASK_TIME_TICKS, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTimeFormatted", false);
-        prop.setComment("Show the current world time formatted to days, hours, minutes");
-        setInfoType(RenderEventHandler.MASK_TIME_MC, prop.getBoolean());
+                    for (DebugHotkeys dbg : DebugHotkeys.values())
+                    {
+                        if (JsonUtils.hasString(objDebugHotkeys, dbg.getName()))
+                        {
+                            dbg.setHotkey(JsonUtils.getString(objDebugHotkeys, dbg.getName()));
+                            assignHotkey(HOTKEY_DEBUG_MAP, dbg.getHotkey(), dbg.getBitMask());
+                        }
+                    }
+                }
+            }
+        }
 
         // Info hotkey assignments
+        /*
         ConfigCategory cat = conf.getCategory(CATEGORY_INFO_HOTKEYS);
         cat.setComment("Here you can assign hotkeys to toggle the different information types on/off.\n" +
                         "NOTE: Make sure you don't have the same value for more than one info type, or " +
@@ -280,107 +527,83 @@ public class Configs
                         "the raw numeric LWJGL keycodes (only works for key codes > 11).\n" +
                         "To toggle the info type while in-game, press and hold the Toggle key and then " +
                         "press the keys set here to toggle the info types on/off.");
+        */
 
-        HOTKEY_INFO_MAP.clear();
-
-        assignInfoHotkey(conf, "infoFPS",                   RenderEventHandler.MASK_FPS                         , "0");
-        assignInfoHotkey(conf, "infoRealTime",              RenderEventHandler.MASK_TIME_REAL                   , "1");
-        assignInfoHotkey(conf, "infoWorldTime",             RenderEventHandler.MASK_TIME_TICKS                  , "2");
-        assignInfoHotkey(conf, "infoWorldTimeFormatted",    RenderEventHandler.MASK_TIME_MC                     , "3");
-        assignInfoHotkey(conf, "infoCoordinates",           RenderEventHandler.MASK_COORDINATES                 , "4");
-        assignInfoHotkey(conf, "infoDimensionId",           RenderEventHandler.MASK_DIMENSION                   , "5");
-        assignInfoHotkey(conf, "infoBlockPosition",         RenderEventHandler.MASK_BLOCK                       , "6");
-        assignInfoHotkey(conf, "infoChunkPosition",         RenderEventHandler.MASK_CHUNK                       , "7");
-        assignInfoHotkey(conf, "infoFacing",                RenderEventHandler.MASK_FACING                      , "8");
-        assignInfoHotkey(conf, "infoLightLevel",            RenderEventHandler.MASK_LIGHT                       , "9");
-        assignInfoHotkey(conf, "infoRotationYaw",           RenderEventHandler.MASK_YAW                         , "a");
-        assignInfoHotkey(conf, "infoRotationPitch",         RenderEventHandler.MASK_PITCH                       , "b");
-        assignInfoHotkey(conf, "infoSpeed",                 RenderEventHandler.MASK_SPEED                       , "c");
-        assignInfoHotkey(conf, "infoChunkSections",         RenderEventHandler.MASK_CHUNK_SECTIONS              , "d");
-        assignInfoHotkey(conf, "infoChunkSectionsLine",     RenderEventHandler.MASK_CHUNK_SECTIONS_LINE         , "q");
-        assignInfoHotkey(conf, "infoChunkUpdates",          RenderEventHandler.MASK_CHUNK_UPDATES               , "e");
-        assignInfoHotkey(conf, "infoParticleCount",         RenderEventHandler.MASK_PARTICLE_COUNT              , "f");
-        assignInfoHotkey(conf, "infoDifficulty",            RenderEventHandler.MASK_DIFFICULTY                  , "g");
-        assignInfoHotkey(conf, "infoBiome",                 RenderEventHandler.MASK_BIOME                       , "h");
-        assignInfoHotkey(conf, "infoBiomeRegistryName",     RenderEventHandler.MASK_BIOME_REGISTRY_NAME         , "i");
-        assignInfoHotkey(conf, "infoEntities",              RenderEventHandler.MASK_ENTITIES                    , "j");
-        assignInfoHotkey(conf, "infoSlimeChunk",            RenderEventHandler.MASK_SLIME_CHUNK                 , "k");
-        assignInfoHotkey(conf, "infoLookingAtEntity",       RenderEventHandler.MASK_LOOKING_AT_ENTITY           , "l");
-        assignInfoHotkey(conf, "infoEntityRegistryName",    RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME   , "m");
-        assignInfoHotkey(conf, "infoLookingAtBlock",        RenderEventHandler.MASK_LOOKING_AT_BLOCK            , "n");
-        assignInfoHotkey(conf, "infoLookingAtBlockInChunk", RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK      , "o");
-        assignInfoHotkey(conf, "infoBlockProperties",       RenderEventHandler.MASK_BLOCK_PROPERTIES            , "p");
-
-
+        /*
         cat = conf.getCategory(CATEGORY_DEBUG_HOTKEYS);
         cat.setComment("Hotkeys to toggle ON/OFF the vanilla debug renderers.\n" +
                        "To use these, first press down F3 and then press the\n" +
                        "keys defined here to toggle the feature ON/OFF.");
+        */
 
-        HOTKEY_DEBUG_MAP.clear();
-
-        assignDebugRendererHotkey(conf, "debugCollisionBoxEnabled",     InputEventHandler.MASK_DEBUG_COLLISION_BOXES,   "1");
-        assignDebugRendererHotkey(conf, "debugHeightMapEnabled",        InputEventHandler.MASK_DEBUG_HEIGHT_MAP,        "2");
-        assignDebugRendererHotkey(conf, "debugNeighborsUpdateEnabled",  InputEventHandler.MASK_DEBUG_NEIGHBOR_UPDATE,   "3");
-        assignDebugRendererHotkey(conf, "debugPathfindingEnabled",      InputEventHandler.MASK_DEBUG_PATHFINDING,       "4");
-        assignDebugRendererHotkey(conf, "debugSolidFaceEnabled",        InputEventHandler.MASK_DEBUG_SOLID_FACES,       "5");
-        assignDebugRendererHotkey(conf, "debugWaterEnabled",            InputEventHandler.MASK_DEBUG_WATER,             "6");
-
-
+        /*
         cat = conf.getCategory(CATEGORY_INFO_LINE_ORDER);
         cat.setComment("Here you can set the order of the info lines.\n" +
                        "The number is the position in the list the line gets added to.\n" +
                        "The indexing starts from 0.\n" +
                        "If multiple types have the same index, then the last one that\n" +
                        "is actually added internally, will bump previous entries downwards.");
-
-        LINE_ORDER_MAP.clear();
-
-        setLinePosition(conf, "infoFPS",                   RenderEventHandler.MASK_FPS);
-        setLinePosition(conf, "infoRealTime",              RenderEventHandler.MASK_TIME_REAL);
-        setLinePosition(conf, "infoWorldTime",             RenderEventHandler.MASK_TIME_TICKS);
-        setLinePosition(conf, "infoWorldTimeFormatted",    RenderEventHandler.MASK_TIME_MC);
-        setLinePosition(conf, "infoCoordinates",           RenderEventHandler.MASK_COORDINATES);
-        setLinePosition(conf, "infoDimensionId",           RenderEventHandler.MASK_DIMENSION);
-        setLinePosition(conf, "infoBlockPosition",         RenderEventHandler.MASK_BLOCK);
-        setLinePosition(conf, "infoChunkPosition",         RenderEventHandler.MASK_CHUNK);
-        setLinePosition(conf, "infoFacing",                RenderEventHandler.MASK_FACING);
-        setLinePosition(conf, "infoLightLevel",            RenderEventHandler.MASK_LIGHT);
-        setLinePosition(conf, "infoRotationYaw",           RenderEventHandler.MASK_YAW);
-        setLinePosition(conf, "infoRotationPitch",         RenderEventHandler.MASK_PITCH);
-        setLinePosition(conf, "infoSpeed",                 RenderEventHandler.MASK_SPEED);
-        setLinePosition(conf, "infoChunkSections",         RenderEventHandler.MASK_CHUNK_SECTIONS);
-        setLinePosition(conf, "infoChunkSectionsLine",     RenderEventHandler.MASK_CHUNK_SECTIONS_LINE);
-        setLinePosition(conf, "infoChunkUpdates",          RenderEventHandler.MASK_CHUNK_UPDATES);
-        setLinePosition(conf, "infoParticleCount",         RenderEventHandler.MASK_PARTICLE_COUNT);
-        setLinePosition(conf, "infoDifficulty",            RenderEventHandler.MASK_DIFFICULTY);
-        setLinePosition(conf, "infoBiome",                 RenderEventHandler.MASK_BIOME);
-        setLinePosition(conf, "infoBiomeRegistryName",     RenderEventHandler.MASK_BIOME_REGISTRY_NAME);
-        setLinePosition(conf, "infoEntities",              RenderEventHandler.MASK_ENTITIES);
-        setLinePosition(conf, "infoSlimeChunk",            RenderEventHandler.MASK_SLIME_CHUNK);
-        setLinePosition(conf, "infoLookingAtEntity",       RenderEventHandler.MASK_LOOKING_AT_ENTITY);
-        setLinePosition(conf, "infoEntityRegistryName",    RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME);
-        setLinePosition(conf, "infoLookingAtBlock",        RenderEventHandler.MASK_LOOKING_AT_BLOCK);
-        setLinePosition(conf, "infoLookingAtBlockInChunk", RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK);
-        setLinePosition(conf, "infoBlockProperties",       RenderEventHandler.MASK_BLOCK_PROPERTIES);
+        */
 
         RenderEventHandler.getInstance().setEnabledMask(enabledInfoTypes);
-
-        if (conf.hasChanged())
-        {
-            conf.save();
-        }
     }
 
-    private static void setInfoType(int mask, boolean value)
+    public static void save()
     {
-        if (value)
+        File dir = LiteLoader.getCommonConfigFolder();
+
+        if (dir.exists() && dir.isDirectory())
         {
-            enabledInfoTypes |= mask;
-        }
-        else
-        {
-            enabledInfoTypes &= ~mask;
+            File configFile = new File(dir, CONFIG_FILE_NAME);
+            FileWriter writer = null;
+            JsonObject root = new JsonObject();
+            JsonObject objToggles           = JsonUtils.getNestedObject(root, "InfoTypeToggles", true);
+            JsonObject objInfoHotkeys       = JsonUtils.getNestedObject(root, "InfoTypeHotkeys", true);
+            JsonObject objInfoLineOrders    = JsonUtils.getNestedObject(root, "InfoLineOrders", true);
+            JsonObject objGeneric           = JsonUtils.getNestedObject(root, "Generic", true);
+            JsonObject objDebugHotkeys      = JsonUtils.getNestedObject(root, "DebugRendererHotkeys", true);
+
+            for (Generic gen : Generic.values())
+            {
+                objGeneric.add(gen.getName(), gen.getAsJsonPrimitive());
+            }
+
+            for (InfoToggle toggle : InfoToggle.values())
+            {
+                objToggles.add(toggle.getName(), new JsonPrimitive(toggle.getBooleanValue()));
+                objInfoHotkeys.add(toggle.getName(), new JsonPrimitive(toggle.getHotkey()));
+                objInfoLineOrders.add(toggle.getName(), new JsonPrimitive(toggle.getLinePosition()));
+            }
+
+            for (DebugHotkeys dbg : DebugHotkeys.values())
+            {
+                objDebugHotkeys.add(dbg.getName(), new JsonPrimitive(dbg.getHotkey()));
+            }
+
+            try
+            {
+                writer = new FileWriter(configFile);
+                writer.write(JsonUtils.GSON.toJson(root));
+                writer.close();
+            }
+            catch (IOException e)
+            {
+                LiteModMiniHud.logger.warn("Failed to write configs to file '{}'", configFile.getAbsolutePath(), e);
+            }
+            finally
+            {
+                try
+                {
+                    if (writer != null)
+                    {
+                        writer.close();
+                    }
+                }
+                catch (Exception e)
+                {
+                    LiteModMiniHud.logger.warn("Failed to close config file", e);
+                }
+            }
         }
     }
 
@@ -424,20 +647,13 @@ public class Configs
         return KeyModifier.NONE;
     }
 
-    private static void assignInfoHotkey(Configuration conf, String configKey, int infoBitmask, String defaultValue)
+    private static void assignHotkey(Multimap<Integer, Integer> map, InfoToggle toggle)
     {
-        assignHotkey(HOTKEY_INFO_MAP, conf, CATEGORY_INFO_HOTKEYS, configKey, defaultValue, infoBitmask);
+        assignHotkey(map, toggle.getHotkey(), toggle.getBitMask());
     }
 
-    private static void assignDebugRendererHotkey(Configuration conf, String configKey, int bitmask, String defaultValue)
+    private static void assignHotkey(Multimap<Integer, Integer> map, String keyName, int bitmask)
     {
-        assignHotkey(HOTKEY_DEBUG_MAP, conf, CATEGORY_DEBUG_HOTKEYS, configKey, defaultValue, bitmask);
-    }
-
-    private static void assignHotkey(Multimap<Integer, Integer> map, Configuration conf, String configCategory, String configKey, String defaultValue, int bitmask)
-    {
-        String keyName = conf.get(configCategory, configKey, defaultValue).getString();
-
         try
         {
             int keyCode = Integer.parseInt(keyName);
@@ -471,7 +687,7 @@ public class Configs
         return getBitmaskForKey(HOTKEY_DEBUG_MAP, keyCode);
     }
 
-    public static int getBitmaskForKey(Multimap<Integer, Integer> map, int keyCode)
+    private static int getBitmaskForKey(Multimap<Integer, Integer> map, int keyCode)
     {
         Collection<Integer> masks = map.get(keyCode);
         int fullMask = 0;
@@ -485,12 +701,6 @@ public class Configs
         }
 
         return fullMask;
-    }
-
-    private static void setLinePosition(Configuration conf, String configKey, int infoBitmask)
-    {
-        int value = conf.get(CATEGORY_INFO_LINE_ORDER, configKey, -1).getInt();
-        LINE_ORDER_MAP.put(infoBitmask, value);
     }
 
     public static int getLinePositionFor(int infoType)
