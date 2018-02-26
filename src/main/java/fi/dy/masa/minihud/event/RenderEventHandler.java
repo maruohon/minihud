@@ -66,9 +66,12 @@ public class RenderEventHandler
 
     public static void fixDebugRendererState()
     {
-        GlStateManager.disableLighting();
-        //GlStateManager.color(1, 1, 1, 1);
-        //OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f);
+        if (Configs.Generic.FIX_VANILLA_DEBUG_RENDERERS.getBooleanValue())
+        {
+            GlStateManager.disableLighting();
+            //GlStateManager.color(1, 1, 1, 1);
+            //OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f);
+        }
     }
 
     public void onRenderGameOverlayPost(float partialTicks)

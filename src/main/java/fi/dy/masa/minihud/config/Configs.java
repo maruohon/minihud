@@ -64,6 +64,7 @@ public class Configs
                                         "If true, then the vanilla pathfinding debug renderer will render the max distance boxes.\n" +
                                         "Those obstruct most other things quite badly when enabled, so this is disabled by default."),
         ENABLE_BY_DEFAULT               ("enableByDefault", true, "If true, the HUD will be enabled by default on game launch"),
+        FIX_VANILLA_DEBUG_RENDERERS     ("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed."),
         FONT_COLOR                      ("fontColor", "0xE0E0E0", true, "Font color (RGB, default: 0xE0E0E0 = 14737632)"),
         REQUIRE_SNEAK                   ("requireSneak", false, "Require the player to be sneaking to render the HUD"),
         REQUIRE_HOLDING_KEY             ("requireHoldingKey", "none", "Require holding a key to render the HUD. Valid keys are 'alt', 'ctrl' and 'shift'."),
