@@ -80,6 +80,9 @@ litemod {
  * include your own file from resources, simply remove the line below.
  */
 jar {
+    // Remove the "-mc1.12" suffix from the file name
+    classifier = ""
+
     from litemod.outputs
 
     /*

@@ -475,10 +475,6 @@ public class Configs
                     }
                 }
 
-                requiredKey = getKeyModifier(Generic.REQUIRE_HOLDING_KEY.getStringValue());
-                enabledInfoTypes = 0;
-                HOTKEY_INFO_MAP.clear();
-
                 for (InfoToggle toggle : InfoToggle.values())
                 {
                     if (objToggles != null && JsonUtils.hasBoolean(objToggles, toggle.getName()))
@@ -495,55 +491,38 @@ public class Configs
                     {
                         toggle.setLinePosition(JsonUtils.getInteger(objInfoLineOrders, toggle.getName()));
                     }
-
-                    enabledInfoTypes = toggle.applyBitMask(enabledInfoTypes);
-                    assignHotkey(HOTKEY_INFO_MAP, toggle);
-                    LINE_ORDER_MAP.put(toggle.getBitMask(), toggle.getLinePosition());
                 }
 
                 if (objDebugHotkeys != null)
                 {
-                    HOTKEY_DEBUG_MAP.clear();
-
                     for (DebugHotkeys dbg : DebugHotkeys.values())
                     {
                         if (JsonUtils.hasString(objDebugHotkeys, dbg.getName()))
                         {
                             dbg.setHotkey(JsonUtils.getString(objDebugHotkeys, dbg.getName()));
-                            assignHotkey(HOTKEY_DEBUG_MAP, dbg.getHotkey(), dbg.getBitMask());
                         }
                     }
                 }
             }
         }
 
-        // Info hotkey assignments
-        /*
-        ConfigCategory cat = conf.getCategory(CATEGORY_INFO_HOTKEYS);
-        cat.setComment("Here you can assign hotkeys to toggle the different information types on/off.\n" +
-                        "NOTE: Make sure you don't have the same value for more than one info type, or " +
-                        "the latest one will override all the earlier ones.\n" +
-                        "You can give the key \"names\", like \"a\" or \"7\", or you can give " +
-                        "the raw numeric LWJGL keycodes (only works for key codes > 11).\n" +
-                        "To toggle the info type while in-game, press and hold the Toggle key and then " +
-                        "press the keys set here to toggle the info types on/off.");
-        */
+        requiredKey = getKeyModifier(Generic.REQUIRE_HOLDING_KEY.getStringValue());
+        enabledInfoTypes = 0;
+        HOTKEY_INFO_MAP.clear();
 
-        /*
-        cat = conf.getCategory(CATEGORY_DEBUG_HOTKEYS);
-        cat.setComment("Hotkeys to toggle ON/OFF the vanilla debug renderers.\n" +
-                       "To use these, first press down F3 and then press the\n" +
-                       "keys defined here to toggle the feature ON/OFF.");
-        */
+        for (InfoToggle toggle : InfoToggle.values())
+        {
+            enabledInfoTypes = toggle.applyBitMask(enabledInfoTypes);
+            assignHotkey(HOTKEY_INFO_MAP, toggle);
+            LINE_ORDER_MAP.put(toggle.getBitMask(), toggle.getLinePosition());
+        }
 
-        /*
-        cat = conf.getCategory(CATEGORY_INFO_LINE_ORDER);
-        cat.setComment("Here you can set the order of the info lines.\n" +
-                       "The number is the position in the list the line gets added to.\n" +
-                       "The indexing starts from 0.\n" +
-                       "If multiple types have the same index, then the last one that\n" +
-                       "is actually added internally, will bump previous entries downwards.");
-        */
+        HOTKEY_DEBUG_MAP.clear();
+
+        for (DebugHotkeys dbg : DebugHotkeys.values())
+        {
+            assignHotkey(HOTKEY_DEBUG_MAP, dbg.getHotkey(), dbg.getBitMask());
+        }
 
         RenderEventHandler.getInstance().setEnabledMask(enabledInfoTypes);
     }
