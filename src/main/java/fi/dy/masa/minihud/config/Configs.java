@@ -60,7 +60,7 @@ public class Configs
         DATE_FORMAT_MINECRAFT           ("dateFormatMinecraft", "MC time: (day {DAY}) {HOUR}:{MIN}:xx",
                                         "The format string for the Minecraft time.\n" +
                                         "The supported placeholders are: {DAY}, {HOUR}, {MIN}, {SEC}"),
-        DEBUG_RENDERER_PATH_MAX_DIST    ("debugRendererPathfindingEnableMaxDistance", false,
+        DEBUG_RENDERER_PATH_MAX_DIST    ("debugRendererPathfindingEnableMaxDistance", true,
                                         "If true, then the vanilla pathfinding debug renderer will render the max distance boxes.\n" +
                                         "Those obstruct most other things quite badly when enabled, so this is disabled by default."),
         ENABLE_BY_DEFAULT               ("enableByDefault", true, "If true, the HUD will be enabled by default on game launch"),
