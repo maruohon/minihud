@@ -24,30 +24,25 @@ import net.minecraft.util.text.TextFormatting;
 
 public class RenderEventHandler
 {
-    private static RenderEventHandler instance;
+    private static final RenderEventHandler INSTANCE = new RenderEventHandler();
     private static final Vec3d LIGHT0_POS = (new Vec3d( 0.2D, 1.0D, -0.7D)).normalize();
     private static final Vec3d LIGHT1_POS = (new Vec3d(-0.2D, 1.0D,  0.7D)).normalize();
-    private static boolean renderRecipes;
+    private boolean renderRecipes;
 
     public static RenderEventHandler instance()
     {
-        if (instance == null)
-        {
-            instance = new RenderEventHandler();
-        }
-
-        return instance;
+        return INSTANCE;
     }
 
     public void onDrawBackgroundPost()
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (renderRecipes && mc.currentScreen instanceof GuiContainer)
+        if (this.renderRecipes && mc.currentScreen instanceof GuiContainer)
         {
             GuiContainer gui = (GuiContainer) mc.currentScreen;
             RecipeStorage recipes = InputEventHandler.instance().getRecipes();
-            int count = recipes.getRecipeCount();
+            final int count = recipes.getRecipeCount();
 
             for (int recipeId = 0; recipeId < count; recipeId++)
             {
@@ -57,15 +52,15 @@ public class RenderEventHandler
         }
     }
 
-    public void onDrawScreen()
+    public void onDrawScreenPost()
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (renderRecipes && mc.currentScreen instanceof GuiContainer)
+        if (this.renderRecipes && mc.currentScreen instanceof GuiContainer)
         {
             final ScaledResolution scaledresolution = new ScaledResolution(mc);
-            int w = scaledresolution.getScaledWidth();
-            int h = scaledresolution.getScaledHeight();
+            final int w = scaledresolution.getScaledWidth();
+            final int h = scaledresolution.getScaledHeight();
             final int mouseX = Mouse.getX() * w / mc.displayWidth;
             final int mouseY = h - Mouse.getY() * h / mc.displayHeight - 1;
 
@@ -76,14 +71,14 @@ public class RenderEventHandler
         }
     }
 
-    public static void setRenderStoredRecipes(boolean render)
+    public void setRenderStoredRecipes(boolean render)
     {
-        renderRecipes = render;
+        this.renderRecipes = render;
     }
 
-    public static boolean getRenderStoredRecipes()
+    public boolean getRenderStoredRecipes()
     {
-        return renderRecipes;
+        return this.renderRecipes;
     }
 
     private void renderHoverTooltip(int mouseX, int mouseY, RecipeStorage recipes, GuiContainer gui, Minecraft mc)

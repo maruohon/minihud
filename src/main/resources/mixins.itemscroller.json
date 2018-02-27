@@ -6,6 +6,7 @@
     "client": [
         "IMixinGuiContainer",
         "IMixinGuiMerchant",
+        "MixinEntityRenderer",
         "IMixinSlot",
         "MixinContainer",
         "MixinGuiScreen"

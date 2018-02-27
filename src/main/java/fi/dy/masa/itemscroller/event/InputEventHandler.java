@@ -59,7 +59,7 @@ public class InputEventHandler
         // (for example by closing the GUI while the recipe view was held open)
         if (Keyboard.isKeyDown(LiteModItemScroller.KEY_RECIPE.getKeyCode()) == false)
         {
-            RenderEventHandler.setRenderStoredRecipes(false);
+            RenderEventHandler.instance().setRenderStoredRecipes(false);
         }
 
         if (this.disabled == false &&
@@ -88,7 +88,7 @@ public class InputEventHandler
             if (dWheel != 0)
             {
                 // When scrolling while the recipe view is open, change the selection instead of moving items
-                if (RenderEventHandler.getRenderStoredRecipes())
+                if (RenderEventHandler.instance().getRenderStoredRecipes())
                 {
                     this.recipes.scrollSelection(dWheel < 0);
                 }
@@ -207,11 +207,11 @@ public class InputEventHandler
         {
             if (Keyboard.getEventKeyState())
             {
-                RenderEventHandler.setRenderStoredRecipes(true);
+                RenderEventHandler.instance().setRenderStoredRecipes(true);
             }
             else
             {
-                RenderEventHandler.setRenderStoredRecipes(false);
+                RenderEventHandler.instance().setRenderStoredRecipes(false);
             }
         }
         // Store or load a recipe
