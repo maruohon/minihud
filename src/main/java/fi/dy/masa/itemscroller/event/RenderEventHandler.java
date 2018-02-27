@@ -286,6 +286,7 @@ public class RenderEventHandler
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, 0);
         GlStateManager.scale(scale, scale, 1);
+        GlStateManager.disableLighting();
         final int w = stackBaseHeight;
 
         if (border)
