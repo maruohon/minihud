@@ -2,12 +2,12 @@ package fi.dy.masa.minihud.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SPacketCustomPayload;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.server.MinecraftServer;
-import io.netty.buffer.Unpooled;
 
 public class DebugInfoUtils
 {
@@ -34,6 +34,13 @@ public class DebugInfoUtils
         buf.writeBoolean(point.visited);
         buf.writeInt(point.nodeType.ordinal());
         buf.writeFloat(point.distanceToTarget);
+    }
+
+    public static PacketBuffer writePathTobuffer(Path path)
+    {
+        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        writePathToBuffer(buffer, path);
+        return buffer;
     }
 
     private static void writePathToBuffer(PacketBuffer buf, Path path)

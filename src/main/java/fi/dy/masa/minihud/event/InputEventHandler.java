@@ -17,6 +17,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.server.MinecraftServer;
@@ -130,13 +131,30 @@ public class InputEventHandler
                         final Path path = navigator.getPath();
                         Path old = this.oldPaths.get(entity);
 
-                        if (path != null && (old == null || old.isSamePath(path) == false || old.getCurrentPathIndex() != path.getCurrentPathIndex()))
+                        if (path == null)
+                        {
+                            continue;
+                        }
+
+                        boolean isSamepath = old != null && old.isSamePath(path);
+
+                        if (old == null || isSamepath == false || old.getCurrentPathIndex() != path.getCurrentPathIndex())
                         {
                             final int id = entity.getEntityId();
                             final float maxDistance = Configs.Generic.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? ((IMixinPathNavigate) navigator).getMaxDistanceToWaypoint() : 0F;
-                            this.oldPaths.put(entity, path);
 
                             DebugInfoUtils.sendPacketDebugPath(server, id, path, maxDistance);
+
+                            if (isSamepath == false)
+                            {
+                                // Make a copy via a PacketBuffer... :/
+                                PacketBuffer buf = DebugInfoUtils.writePathTobuffer(path);
+                                this.oldPaths.put(entity, Path.read(buf));
+                            }
+                            else if (old != null)
+                            {
+                                old.setCurrentPathIndex(path.getCurrentPathIndex());
+                            }
                         }
                     }
                 }
