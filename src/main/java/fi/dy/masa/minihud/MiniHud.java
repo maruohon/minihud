@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -12,7 +13,7 @@ import fi.dy.masa.minihud.proxy.CommonProxy;
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, certificateFingerprint = Reference.FINGERPRINT,
     guiFactory = "fi.dy.masa.minihud.config.MiniHudGuiFactory",
     updateJSON = "https://raw.githubusercontent.com/maruohon/minihud/master/update.json",
-    clientSideOnly=true, acceptedMinecraftVersions = "[1.12]")
+    clientSideOnly=true, acceptedMinecraftVersions = "1.12")
 public class MiniHud
 {
     @Mod.Instance(Reference.MOD_ID)
@@ -21,13 +22,12 @@ public class MiniHud
     @SidedProxy(clientSide = "fi.dy.masa.minihud.proxy.ClientProxy", serverSide = "fi.dy.masa.minihud.proxy.CommonProxy")
     public static CommonProxy proxy;
 
-    public static Logger logger;
+    public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         instance = this;
-        logger = event.getModLog();
 
         Configs.loadConfigsFromFile(event.getSuggestedConfigurationFile());
         RenderEventHandler.getInstance().setEnabled(Configs.enableByDefault);

@@ -47,6 +47,10 @@ minecraft {
 
     replaceIn "Reference.java"
     replace "@MOD_VERSION@", mod_version
+
+    if (project.hasProperty("signJarKeyStore")) {
+        replace "@FINGERPRINT@", signJarFingerprint
+    }
 }
 
 dependencies {
@@ -91,14 +95,16 @@ processResources
     // rename '(' + config.mod_id + '_at.cfg)', 'META-INF/$1'
 }
 
-task signJar(type: SignJar, dependsOn: reobfJar) {
-    inputFile = jar.archivePath
-    outputFile = jar.archivePath
+if (project.hasProperty("signJarKeyStore")) {
+    task signJar(type: SignJar, dependsOn: reobfJar) {
+        inputFile = jar.archivePath
+        outputFile = jar.archivePath
 
-    keyStore = config.keyStore
-    alias = config.alias
-    storePass = config.storePass
-    keyPass = config.keyPass
+        keyStore = signJarKeyStore
+        alias = signJarAlias
+        storePass = signJarStorePass
+        keyPass = signJarKeyPass
+    }
+
+    build.dependsOn signJar
 }
-
-build.dependsOn signJar
