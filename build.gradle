@@ -47,7 +47,7 @@ minecraft {
 
 sourceSets {
     main {
-        ext.refMap = 'mixins.itemscroller.refmap.json'
+        ext.refMap = 'mixins.' + config.mod_id + '.refmap.json'
     }
 }
 
@@ -64,13 +64,13 @@ litemod {
         displayName = config.mod_name
         mcversion = config.minecraft_version
         version = config.mod_version
-        author = 'masa'
+        author = config.author
 
         // Uncomment any of the following lines and fill in your own details as required
         //dependsOn = [ 'modid', 'othermod' ]
         //requiredAPIs = [ 'someapi' ]
         //tweakClass = 'name.of.tweaker.here'
-        mixinConfigs = [ 'mixins.itemscroller.json' ]
+        mixinConfigs = [ 'mixins.' + config.mod_id + '.json' ]
     }
 }
 
@@ -80,6 +80,12 @@ litemod {
  * include your own file from resources, simply remove the line below.
  */
 jar {
+    // Remove the "-mc1.12" suffix from the file name
+    classifier = ""
+
+    // Don't append a 'mod-' filename prefix >_>
+    baseName = archivesBaseName
+
     from litemod.outputs
 
     /*
@@ -96,8 +102,7 @@ mixin {
     defaultObfuscationEnv notch
 }
 
-// Don't append a 'mod-' filename prefix >_>
-tasks.withType(Jar)*.baseName = archivesBaseName
+//tasks.withType(Jar)*.baseName = archivesBaseName
 
 processResources
 {
