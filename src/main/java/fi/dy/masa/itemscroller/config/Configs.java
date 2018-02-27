@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nullable;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -24,6 +25,7 @@ public class Configs
         ALT_SHIFT_CLICK_EVERYTHING              ("enableAltShiftClickMoveEverything",   true),
         CLIENT_CRAFTING_FIX                     ("enableClientCraftingFixOn1.12",       true),
         CONTROL_SHIFT_DROP                      ("enableControlShiftDropkeyDropItems",  true),
+        CRAFTING_RENDER_RECIPE_ITEMS            ("craftingRenderRecipeItems",           true),
         DRAG_MOVE_SHIFT_LEFT                    ("enableDragMovingShiftLeft",           true),
         DRAG_MOVE_SHIFT_RIGHT                   ("enableDragMovingShiftRight",          true),
         DRAG_MOVE_CONTROL_LEFT                  ("enableDragMovingControlLeft",         true),
@@ -59,9 +61,10 @@ public class Configs
             return this.name;
         }
 
+        @Nullable
         public String getComment()
         {
-            return comment != null ? comment : "";
+            return comment;
         }
 
         public void setComment(String comment)

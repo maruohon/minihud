@@ -40,7 +40,13 @@ public class ItemScrollerConfigPanel extends AbstractConfigPanel
         for (Configs.Toggles toggle : Configs.Toggles.values())
         {
             this.addLabel(i, x, y + 6, labelWidth, 8, 0xFFFFFFFF, toggle.getName());
-            this.addConfigComment(x, y + 2, labelWidth, 10, toggle.getComment());
+            String comment = toggle.getComment();
+
+            if (comment != null)
+            {
+                this.addConfigComment(x, y + 2, labelWidth, 10, comment);
+            }
+
             this.addControl(new ConfigButtonBoolean(i + 1, x + labelWidth + 2, y, toggle), this.listener);
             i += 2;
             y += 21;
