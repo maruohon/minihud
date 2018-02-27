@@ -114,7 +114,7 @@ public class InputEventHandler
                     // Hovering over an item in the recipe view
                     if (hoveredRecipeId >= 0)
                     {
-                        if (isLeftClick || isPickBlock)
+                        if (isLeftClick || isRightClick)
                         {
                             boolean changed = this.recipes.getSelection() != hoveredRecipeId;
 
@@ -128,11 +128,11 @@ public class InputEventHandler
                                     InventoryUtils.clearFirstCraftingGridOfItems(this.recipes.getSelectedRecipe(), gui, false);
                                 }
                             }
-                            // Pick block on a recipe: Only load items to the grid
+                            // Right click on a recipe: Only load items to the grid
 
                             InventoryUtils.tryMoveItemsToFirstCraftingGrid(this.recipes.getRecipe(hoveredRecipeId), gui, GuiScreen.isShiftKeyDown());
                         }
-                        else if (isRightClick)
+                        else if (isPickBlock)
                         {
                             InventoryUtils.clearFirstCraftingGridOfAllItems(gui);
                         }
