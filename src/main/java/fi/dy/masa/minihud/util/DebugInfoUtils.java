@@ -36,6 +36,13 @@ public class DebugInfoUtils
         buf.writeFloat(point.distanceToTarget);
     }
 
+    public static PacketBuffer writePathTobuffer(Path path)
+    {
+        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        writePathToBuffer(buffer, path);
+        return buffer;
+    }
+
     private static void writePathToBuffer(PacketBuffer buf, Path path)
     {
         PathPoint target = path.getFinalPathPoint(); // FIXME is this the target?

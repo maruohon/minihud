@@ -11,6 +11,8 @@ import net.minecraft.client.renderer.debug.DebugRendererNeighborsUpdate;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.server.MinecraftServer;
@@ -54,6 +56,7 @@ public class InputEventHandler
     private Field field_DebugRenderer_pathfindingEnabled;
     private Field field_DebugRenderer_solidFaceEnabled;
     private Field field_DebugRenderer_waterEnabled;
+    private Field field_PathNavigate_maxDistanceToWaypoint;
     private boolean neighborUpdateEnabled;
     private boolean pathfindingEnabled;
     private int tickCounter;
@@ -72,6 +75,7 @@ public class InputEventHandler
             this.field_DebugRenderer_pathfindingEnabled     = ReflectionHelper.findField(DebugRenderer.class, "field_190080_f", "pathfindingEnabled");
             this.field_DebugRenderer_solidFaceEnabled       = ReflectionHelper.findField(DebugRenderer.class, "field_193853_n", "solidFaceEnabled");
             this.field_DebugRenderer_waterEnabled           = ReflectionHelper.findField(DebugRenderer.class, "field_190081_g", "waterEnabled");
+            this.field_PathNavigate_maxDistanceToWaypoint   = ReflectionHelper.findField(PathNavigate.class, "field_188561_o", "maxDistanceToWaypoint");
         }
         catch (UnableToFindFieldException e)
         {
@@ -93,6 +97,7 @@ public class InputEventHandler
 
             // This prevent the F3 screen from opening after releasing the F3 key
             this.setBoolean(this.field_Minecraft_actionKeyF3, this.mc, true);
+            KeyBinding.unPressAllKeys();
 
             return;
         }
@@ -154,23 +159,71 @@ public class InputEventHandler
                 {
                     PathNavigate navigator = entity instanceof EntityLiving ? ((EntityLiving) entity).getNavigator() : null;
 
-                    if (navigator != null)
+                    if (navigator != null && this.isAnyPlayerWithinRange(world, entity, 64))
                     {
                         final Path path = navigator.getPath();
                         Path old = this.oldPaths.get(entity);
 
-                        if (path != null && (old == null || old.isSamePath(path) == false))
+                        if (path == null)
+                        {
+                            continue;
+                        }
+
+                        boolean isSamepath = old != null && old.isSamePath(path);
+
+                        if (old == null || isSamepath == false || old.getCurrentPathIndex() != path.getCurrentPathIndex())
                         {
                             final int id = entity.getEntityId();
-                            final float maxDistance = Configs.debugRendererPathfindingEnableMaxDistance ? navigator.getPathSearchRange() : 0F;
-                            this.oldPaths.put(entity, path);
+                            final float maxDistance = Configs.debugRendererPathfindingEnablePointWidth ? this.getPathPointWidth(navigator) : 0F;
 
                             DebugInfoUtils.sendPacketDebugPath(server, id, path, maxDistance);
+
+                            if (isSamepath == false)
+                            {
+                                // Make a copy via a PacketBuffer... :/
+                                PacketBuffer buf = DebugInfoUtils.writePathTobuffer(path);
+                                this.oldPaths.put(entity, Path.read(buf));
+                            }
+                            else if (old != null)
+                            {
+                                old.setCurrentPathIndex(path.getCurrentPathIndex());
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    private boolean isAnyPlayerWithinRange(World world, Entity entity, double range)
+    {
+        for (int i = 0; i < world.playerEntities.size(); ++i)
+        {
+            EntityPlayer player = world.playerEntities.get(i);
+
+            double distSq = player.getDistanceSq(entity.posX, entity.posY, entity.posZ);
+
+            if (range < 0.0D || distSq < range * range)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private float getPathPointWidth(PathNavigate navigator)
+    {
+        try
+        {
+            return (float) this.field_PathNavigate_maxDistanceToWaypoint.getFloat(navigator);
+        }
+        catch (Exception e)
+        {
+            MiniHud.logger.warn("Failed to reflect PathNavigate#maxDistanceToWaypoint value", e);
+        }
+
+        return 0f;
     }
 
     private void toggleDebugRenderers(int mask)

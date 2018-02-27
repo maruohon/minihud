@@ -31,7 +31,7 @@ public class Configs
     public static boolean useScaledFont;
     public static boolean useTextBackground;
 
-    public static boolean debugRendererPathfindingEnableMaxDistance;
+    public static boolean debugRendererPathfindingEnablePointWidth;
 
     public static int enabledInfoTypes;
     public static int fontColor;
@@ -152,10 +152,9 @@ public class Configs
 
         // Debug renderer related options
 
-        prop = conf.get(CATEGORY_DEBUG_RENDERER, "debugRendererPathfindingEnableMaxDistance", false);
-        prop.setComment("If true, then the vanilla pathfinding debug renderer will render the max distance boxes.\n" +
-                        "Those obstruct most other things quite badly when enabled, so this is disabled by default.");
-        debugRendererPathfindingEnableMaxDistance = prop.getBoolean();
+        prop = conf.get(CATEGORY_DEBUG_RENDERER, "debugRendererPathfindingEnablePointWidth", true);
+        prop.setComment("If true, then the vanilla pathfinding debug renderer will render the max distance boxes.");
+        debugRendererPathfindingEnablePointWidth = prop.getBoolean();
 
 
         // Information types individual toggle
