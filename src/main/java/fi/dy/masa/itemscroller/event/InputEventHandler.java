@@ -55,6 +55,13 @@ public class InputEventHandler
         Minecraft mc = Minecraft.getMinecraft();
         GuiScreen guiScreen = mc.currentScreen;
 
+        // Just check and update this here in case the key release event was missed
+        // (for example by closing the GUI while the recipe view was held open)
+        if (Keyboard.isKeyDown(LiteModItemScroller.KEY_RECIPE.getKeyCode()) == false)
+        {
+            RenderEventHandler.setRenderStoredRecipes(false);
+        }
+
         if (this.disabled == false &&
             mc != null &&
             mc.player != null &&
