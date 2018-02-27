@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 import org.lwjgl.input.Mouse;
 import fi.dy.masa.itemscroller.config.Configs;
-import fi.dy.masa.itemscroller.event.InputEventHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
+import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -150,18 +150,12 @@ public class InventoryUtils
         // Check that the slot is valid, (don't require items in case of the villager output slot or a crafting slot)
         if (isValidSlot(slot, gui, villagerHandling || craftingHandling ? false : true) == false)
         {
-            // Not a valid proper slot, but set as a crafting slot, store the recipe (mainly for storing a recipe from JEI etc)
-            if (craftingHandling && moveToOtherInventory)
-            {
-                recipes.storeCraftingRecipeToCurrentSelection(gui, slot);
-            }
-
             return false;
         }
 
         if (craftingHandling)
         {
-            return tryMoveItemsCrafting(gui, slot, recipes, moveToOtherInventory, isShiftDown, isCtrlDown);
+            return tryMoveItemsCrafting(recipes, slot, gui, moveToOtherInventory, isShiftDown, isCtrlDown);
         }
 
         if (villagerHandling)
@@ -535,63 +529,51 @@ public class InventoryUtils
         }
     }
 
-    public static void storeOrLoadRecipe(GuiContainer gui, int index)
+    public static void tryMoveItemsToFirstCraftingGrid(CraftingRecipe recipe, GuiContainer gui, boolean fillStacks)
     {
-        Slot slot = AccessorUtils.getSlotUnderMouse(gui);
-        RecipeStorage recipes = InputEventHandler.instance().getRecipes();
+        Slot craftingOutputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
 
-        // A crafting output slot with a stack under the cursor, store a recipe
-        if (GuiScreen.isShiftKeyDown() && slot != null && isCraftingSlot(gui, slot))
+        if (craftingOutputSlot != null)
         {
-            if (slot.getHasStack())
-            {
-                recipes.storeCraftingRecipe(index, gui, slot);
-            }
-            else
-            {
-                recipes.clearRecipe(index);
-            }
-        }
-        // Not a crafting output slot with a stack, load a stored recipe
-        else
-        {
-            recipes.changeSelectedRecipe(index);
-
-            if (slot != null && isStackEmpty(recipes.getSelectedRecipe().getResult()) == false)
-            {
-                tryMoveItemsToCraftingGridSlots(gui, slot, recipes, false);
-            }
+            tryMoveItemsToCraftingGridSlots(recipe, craftingOutputSlot, gui, fillStacks);
         }
     }
 
-    private static boolean tryMoveItemsCrafting(GuiContainer gui, Slot slot, RecipeStorage recipes,
+    public static void loadRecipeItemsToGridForOutputSlotUnderMouse(CraftingRecipe recipe, GuiContainer gui)
+    {
+        Slot slot = AccessorUtils.getSlotUnderMouse(gui);
+        loadRecipeItemsToGridForOutputSlot(recipe, gui, slot);
+    }
+
+    public static void loadRecipeItemsToGridForOutputSlot(CraftingRecipe recipe, GuiContainer gui, Slot outputSlot)
+    {
+        if (outputSlot != null && isCraftingSlot(gui, outputSlot) && isStackEmpty(recipe.getResult()) == false)
+        {
+            tryMoveItemsToCraftingGridSlots(recipe, outputSlot, gui, false);
+        }
+    }
+
+    private static boolean tryMoveItemsCrafting(RecipeStorage recipes, Slot slot, GuiContainer gui,
             boolean moveToOtherInventory, boolean isShiftDown, boolean isCtrlDown)
     {
+        CraftingRecipe recipe = recipes.getSelectedRecipe();
+
         if (isShiftDown)
         {
             // Try to fill the crafting grid
             if (moveToOtherInventory == false)
             {
-                /* TODO remove
-                if (Configs.craftingScrollingStoreRecipeOnFill && slot.getHasStack())
-                {
-                    recipes.storeCraftingRecipeToCurrentSelection(gui, slot);
-                }
-                */
-
                 if (isStackEmpty(recipes.getSelectedRecipe().getResult()) == false)
                 {
-                    tryMoveItemsToCraftingGridSlots(gui, slot, recipes, true);
+                    tryMoveItemsToCraftingGridSlots(recipe, slot, gui, true);
                 }
             }
             // Move items from the crafting output slot
             else if (slot.getHasStack())
             {
-                recipes.storeCraftingRecipeToCurrentSelection(gui, slot);
-
                 if (isCtrlDown)
                 {
-                    craftAsManyItemsAsPossible(gui, slot, recipes);
+                    craftAsManyItemsAsPossible(recipe, slot, gui);
                 }
                 else
                 {
@@ -617,22 +599,14 @@ public class InventoryUtils
             // Scrolling items from player inventory into crafting grid slots
             if (moveToOtherInventory == false)
             {
-                /* TODO remove
-                if (Configs.craftingScrollingStoreRecipeOnFill && slot.getHasStack())
-                {
-                    recipes.storeCraftingRecipeToCurrentSelection(gui, slot);
-                }
-                */
-
                 if (isStackEmpty(recipes.getSelectedRecipe().getResult()) == false)
                 {
-                    tryMoveItemsToCraftingGridSlots(gui, slot, recipes, false);
+                    tryMoveItemsToCraftingGridSlots(recipe, slot, gui, false);
                 }
             }
             // Scrolling items from this crafting slot into the other inventory
             else if (slot.getHasStack())
             {
-                recipes.storeCraftingRecipeToCurrentSelection(gui, slot);
                 moveOneSetOfItemsFromSlotToOtherInventory(gui, slot);
             }
             // Scrolling over an empty crafting output slot, clear the crafting grid
@@ -653,9 +627,9 @@ public class InventoryUtils
         return false;
     }
 
-    private static void craftAsManyItemsAsPossible(GuiContainer gui, Slot slot, RecipeStorage recipes)
+    private static void craftAsManyItemsAsPossible(CraftingRecipe recipe, Slot slot, GuiContainer gui)
     {
-        ItemStack result = recipes.getSelectedRecipe().getResult();
+        ItemStack result = recipe.getResult();
         int failSafe = 1024;
 
         while (failSafe > 0 && slot.getHasStack() && areStacksEqual(slot.getStack(), result))
@@ -665,7 +639,7 @@ public class InventoryUtils
             // Ran out of some or all ingredients for the recipe
             if (slot.getHasStack() == false || areStacksEqual(slot.getStack(), result) == false)
             {
-                tryMoveItemsToCraftingGridSlots(gui, slot, recipes, true);
+                tryMoveItemsToCraftingGridSlots(recipe, slot, gui, true);
             }
             // No change in the result slot after shift clicking, let's assume the craft failed and stop here
             else
@@ -677,18 +651,41 @@ public class InventoryUtils
         }
     }
 
-    private static boolean clearCraftingGridOfItems(GuiContainer gui, SlotRange range, RecipeStorage recipes, boolean nonMatchingOnly)
+    public static void clearFirstCraftingGridOfItems(CraftingRecipe recipe, GuiContainer gui, boolean clearNonMatchingOnly)
     {
-        int numSlots = gui.inventorySlots.inventorySlots.size();
+        Slot craftingOutputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
 
-        for (int i = 0, slotNum = range.getFirst();
-            i < range.getSlotCount() && i < recipes.getSelectedRecipe().getRecipeLength() && slotNum < numSlots;
-            i++, slotNum++)
+        if (craftingOutputSlot != null)
+        {
+            SlotRange range = CraftingHandler.getCraftingGridSlots(gui, craftingOutputSlot);
+            clearCraftingGridOfItems(recipe, gui, range, clearNonMatchingOnly);
+        }
+    }
+
+    public static void clearFirstCraftingGridOfAllItems(GuiContainer gui)
+    {
+        Slot craftingOutputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
+
+        if (craftingOutputSlot != null)
+        {
+            SlotRange range = CraftingHandler.getCraftingGridSlots(gui, craftingOutputSlot);
+            clearCraftingGridOfAllItems(gui, range);
+        }
+    }
+
+    private static boolean clearCraftingGridOfItems(CraftingRecipe recipe, GuiContainer gui, SlotRange range, boolean clearNonMatchingOnly)
+    {
+        final int invSlots = gui.inventorySlots.inventorySlots.size();
+        final int rangeSlots = range.getSlotCount();
+        final int recipeSize = recipe.getRecipeLength();
+        final int slotCount = Math.min(rangeSlots, recipeSize);
+
+        for (int i = 0, slotNum = range.getFirst(); i < slotCount && slotNum < invSlots; i++, slotNum++)
         {
             Slot slotTmp = gui.inventorySlots.getSlot(slotNum);
 
             if (slotTmp != null && slotTmp.getHasStack() &&
-                (nonMatchingOnly == false || areStacksEqual(recipes.getSelectedRecipe().getRecipe()[i], slotTmp.getStack()) == false))
+                (clearNonMatchingOnly == false || areStacksEqual(recipe.getRecipeItems()[i], slotTmp.getStack()) == false))
             {
                 shiftClickSlot(gui, slotNum);
 
@@ -703,24 +700,49 @@ public class InventoryUtils
         return true;
     }
 
-    private static boolean tryMoveItemsToCraftingGridSlots(GuiContainer gui, Slot slot, RecipeStorage recipes, boolean fillStacks)
+    private static boolean clearCraftingGridOfAllItems(GuiContainer gui, SlotRange range)
+    {
+        final int invSlots = gui.inventorySlots.inventorySlots.size();
+        final int rangeSlots = range.getSlotCount();
+        boolean clearedAll = true;
+
+        for (int i = 0, slotNum = range.getFirst(); i < rangeSlots && slotNum < invSlots; i++, slotNum++)
+        {
+            Slot slotTmp = gui.inventorySlots.getSlot(slotNum);
+
+            if (slotTmp != null && slotTmp.getHasStack())
+            {
+                shiftClickSlot(gui, slotNum);
+
+                // Failed to clear the slot
+                if (slotTmp.getHasStack())
+                {
+                    clearedAll = false;
+                }
+            }
+        }
+
+        return clearedAll;
+    }
+
+    private static boolean tryMoveItemsToCraftingGridSlots(CraftingRecipe recipe, Slot slot, GuiContainer gui, boolean fillStacks)
     {
         Container container = gui.inventorySlots;
         int numSlots = container.inventorySlots.size();
         SlotRange range = CraftingHandler.getCraftingGridSlots(gui, slot);
 
         // Check that the slot range is valid and that the recipe can fit into this type of crafting grid
-        if (range != null && range.getLast() < numSlots && recipes.getSelectedRecipe().getRecipeLength() <= range.getSlotCount())
+        if (range != null && range.getLast() < numSlots && recipe.getRecipeLength() <= range.getSlotCount())
         {
             // Clear non-matching items from the grid first
-            if (clearCraftingGridOfItems(gui, range, recipes, true) == false)
+            if (clearCraftingGridOfItems(recipe, gui, range, true) == false)
             {
                 return false;
             }
 
             // This slot is used to check that we get items from a DIFFERENT inventory than where this slot is in
             Slot slotGridFirst = container.getSlot(range.getFirst());
-            Map<ItemType, List<Integer>> ingredientSlots = ItemType.getSlotsPerItem(recipes.getSelectedRecipe().getRecipe());
+            Map<ItemType, List<Integer>> ingredientSlots = ItemType.getSlotsPerItem(recipe.getRecipeItems());
 
             for (Map.Entry<ItemType, List<Integer>> entry : ingredientSlots.entrySet())
             {

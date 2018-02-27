@@ -27,6 +27,7 @@ public class RenderEventHandler
     private static final RenderEventHandler INSTANCE = new RenderEventHandler();
     private static final Vec3d LIGHT0_POS = (new Vec3d( 0.2D, 1.0D, -0.7D)).normalize();
     private static final Vec3d LIGHT1_POS = (new Vec3d(-0.2D, 1.0D,  0.7D)).normalize();
+    private ScaledResolution scaledResolution;
     private boolean renderRecipes;
 
     public static RenderEventHandler instance()
@@ -58,17 +59,35 @@ public class RenderEventHandler
 
         if (this.renderRecipes && mc.currentScreen instanceof GuiContainer)
         {
-            final ScaledResolution scaledresolution = new ScaledResolution(mc);
-            final int w = scaledresolution.getScaledWidth();
-            final int h = scaledresolution.getScaledHeight();
-            final int mouseX = Mouse.getX() * w / mc.displayWidth;
-            final int mouseY = h - Mouse.getY() * h / mc.displayHeight - 1;
-
             GuiContainer gui = (GuiContainer) mc.currentScreen;
             RecipeStorage recipes = InputEventHandler.instance().getRecipes();
 
-            this.renderHoverTooltip(mouseX, mouseY, recipes, gui, mc);
+            this.renderHoverTooltip(this.getMouseX(), this.getMouseY(), recipes, gui, mc);
         }
+    }
+
+    public ScaledResolution getScaledResolution()
+    {
+        if (this.scaledResolution == null)
+        {
+            this.scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
+        }
+
+        return this.scaledResolution;
+    }
+
+    public int getMouseX()
+    {
+        final ScaledResolution scaledresolution = this.getScaledResolution();
+        final int w = scaledresolution.getScaledWidth();
+        return Mouse.getX() * w / Minecraft.getMinecraft().displayWidth;
+    }
+
+    public int getMouseY()
+    {
+        final ScaledResolution scaledresolution = this.getScaledResolution();
+        final int h = scaledresolution.getScaledHeight();
+        return h - Mouse.getY() * h / Minecraft.getMinecraft().displayHeight - 1;
     }
 
     public void setRenderStoredRecipes(boolean render)
@@ -76,44 +95,57 @@ public class RenderEventHandler
         this.renderRecipes = render;
     }
 
-    public boolean getRenderStoredRecipes()
+    public boolean getRenderRecipes()
     {
         return this.renderRecipes;
     }
 
     private void renderHoverTooltip(int mouseX, int mouseY, RecipeStorage recipes, GuiContainer gui, Minecraft mc)
     {
-        ScaledResolution scaledResolution = new ScaledResolution(mc);
-        final int gap = 40;
-        final int recipesPerColumn = 9;
-        final int stackBaseHeight = 16;
-        final int usableHeight = scaledResolution.getScaledHeight() - 2 * gap; // leave a gap on the top and bottom
-        // height of each entry; 9 stored recipes
-        final int entryHeight = (int) (usableHeight / recipesPerColumn);
-        // leave 0.25-th of a stack height gap between each entry
-        final float scale = entryHeight / (stackBaseHeight * 1.25f);
-        final int stackScaledSize = (int) (stackBaseHeight * scale);
-        int recipeCount = recipes.getRecipeCount();
+        final int recipeId = this.getHoveredRecipeId(mouseX, mouseY, recipes, gui, mc);
 
-        for (int slot = 0; slot < recipeCount; slot++)
+        if (recipeId >= 0)
         {
-            // Leave a small gap from the rendered stack to the gui's left edge
-            final int columnOffsetCount = (recipeCount / recipesPerColumn) - (slot / recipesPerColumn);
-            final float x = AccessorUtils.getGuiLeft(gui) - (columnOffsetCount + 0.2f) * stackScaledSize - (columnOffsetCount - 1) * scale * 20;
-            final int y = (int) (gap + 0.25f * stackScaledSize + (slot % recipesPerColumn) * entryHeight);
+            ItemStack stack = recipes.getRecipe(recipeId).getResult();
 
-            if (mouseX >= x && mouseX < x + stackScaledSize && mouseY >= y && mouseY < y + stackScaledSize)
+            if (InventoryUtils.isStackEmpty(stack) == false)
             {
-                ItemStack stack = recipes.getRecipe(slot).getResult();
-
-                if (InventoryUtils.isStackEmpty(stack) == false)
-                {
-                    this.renderStackToolTip(mouseX, mouseY, stack, gui, mc);
-                }
-
-                break;
+                this.renderStackToolTip(mouseX, mouseY, stack, gui, mc);
             }
         }
+    }
+
+    public int getHoveredRecipeId(int mouseX, int mouseY, RecipeStorage recipes, GuiContainer gui, Minecraft mc)
+    {
+        if (this.renderRecipes)
+        {
+            ScaledResolution scaledResolution = new ScaledResolution(mc);
+            final int gap = 40;
+            final int recipesPerColumn = 9;
+            final int stackBaseHeight = 16;
+            final int usableHeight = scaledResolution.getScaledHeight() - 2 * gap; // leave a gap on the top and bottom
+            // height of each entry; 9 stored recipes
+            final int entryHeight = (int) (usableHeight / recipesPerColumn);
+            // leave 0.25-th of a stack height gap between each entry
+            final float scale = entryHeight / (stackBaseHeight * 1.25f);
+            final int stackScaledSize = (int) (stackBaseHeight * scale);
+            final int recipeCount = recipes.getRecipeCount();
+
+            for (int recipeId = 0; recipeId < recipeCount; recipeId++)
+            {
+                // Leave a small gap from the rendered stack to the gui's left edge
+                final int columnOffsetCount = (recipeCount / recipesPerColumn) - (recipeId / recipesPerColumn);
+                final float x = AccessorUtils.getGuiLeft(gui) - (columnOffsetCount + 0.2f) * stackScaledSize - (columnOffsetCount - 1) * scale * 20;
+                final int y = (int) (gap + 0.25f * stackScaledSize + (recipeId % recipesPerColumn) * entryHeight);
+
+                if (mouseX >= x && mouseX < x + stackScaledSize && mouseY >= y && mouseY < y + stackScaledSize)
+                {
+                    return recipeId;
+                }
+            }
+        }
+
+        return -1;
     }
 
     private void renderStoredRecipeStack(int recipeId, int recipeCount, ItemStack stack, GuiContainer gui, Minecraft mc, boolean selected)

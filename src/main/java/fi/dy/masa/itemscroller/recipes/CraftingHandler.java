@@ -41,6 +41,20 @@ public class CraftingHandler
         return null;
     }
 
+    @Nullable
+    public static Slot getFirstCraftingOutputSlotForGui(GuiContainer gui)
+    {
+        for (Slot slot : gui.inventorySlots.inventorySlots)
+        {
+            if (getCraftingGridSlots(gui, slot) != null)
+            {
+                return slot;
+            }
+        }
+
+        return null;
+    }
+
     public static class CraftingOutputSlot
     {
         private final Class<? extends GuiContainer> guiClass;

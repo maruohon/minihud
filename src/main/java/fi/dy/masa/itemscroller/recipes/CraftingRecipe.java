@@ -44,27 +44,34 @@ public class CraftingRecipe
         this.clearRecipe();
     }
 
-    public void storeCraftingRecipe(GuiContainer gui, Slot slot)
+    public void storeCraftingRecipe(Slot slot, GuiContainer gui, boolean clearIfEmpty)
     {
         SlotRange range = CraftingHandler.getCraftingGridSlots(gui, slot);
 
-        if (range != null && slot.getHasStack())
+        if (range != null)
         {
-            if (InventoryUtils.areStacksEqual(this.getResult(), slot.getStack()) == false ||
-                this.getRecipeLength() != range.getSlotCount())
+            if (slot.getHasStack())
             {
-                int gridSize = range.getSlotCount();
-                int numSlots = gui.inventorySlots.inventorySlots.size();
+                if (InventoryUtils.areStacksEqual(this.getResult(), slot.getStack()) == false ||
+                        this.getRecipeLength() != range.getSlotCount())
+                    {
+                        int gridSize = range.getSlotCount();
+                        int numSlots = gui.inventorySlots.inventorySlots.size();
 
-                this.ensureRecipeSizeAndClearRecipe(gridSize);
+                        this.ensureRecipeSizeAndClearRecipe(gridSize);
 
-                for (int i = 0, s = range.getFirst(); i < gridSize && s < numSlots; i++, s++)
-                {
-                    Slot slotTmp = gui.inventorySlots.getSlot(s);
-                    this.recipe[i] = slotTmp.getHasStack() ? slotTmp.getStack().copy() : InventoryUtils.EMPTY_STACK;
-                }
+                        for (int i = 0, s = range.getFirst(); i < gridSize && s < numSlots; i++, s++)
+                        {
+                            Slot slotTmp = gui.inventorySlots.getSlot(s);
+                            this.recipe[i] = slotTmp.getHasStack() ? slotTmp.getStack().copy() : InventoryUtils.EMPTY_STACK;
+                        }
 
-                this.result = slot.getStack().copy();
+                        this.result = slot.getStack().copy();
+                    }
+            }
+            else if (clearIfEmpty)
+            {
+                this.clearRecipe();
             }
         }
     }
@@ -72,7 +79,7 @@ public class CraftingRecipe
     public void copyRecipeFrom(CraftingRecipe other)
     {
         int size = other.getRecipeLength();
-        ItemStack[] otherRecipe = other.getRecipe();
+        ItemStack[] otherRecipe = other.getRecipeItems();
 
         this.ensureRecipeSizeAndClearRecipe(size);
 
@@ -152,7 +159,7 @@ public class CraftingRecipe
         return this.recipe.length;
     }
 
-    public ItemStack[] getRecipe()
+    public ItemStack[] getRecipeItems()
     {
         return this.recipe;
     }

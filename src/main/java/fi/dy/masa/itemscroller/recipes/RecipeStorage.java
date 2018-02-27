@@ -85,15 +85,15 @@ public class RecipeStorage
         return this.getRecipe(this.getSelection());
     }
 
-    public void storeCraftingRecipe(int index, GuiContainer gui, Slot slot)
+    public void storeCraftingRecipeToCurrentSelection(Slot slot, GuiContainer gui, boolean clearIfEmpty)
     {
-        this.getRecipe(index).storeCraftingRecipe(gui, slot);
-        this.dirty = true;
+        this.storeCraftingRecipe(this.getSelection(), slot, gui, clearIfEmpty);
     }
 
-    public void storeCraftingRecipeToCurrentSelection(GuiContainer gui, Slot slot)
+    public void storeCraftingRecipe(int index, Slot slot, GuiContainer gui, boolean clearIfEmpty)
     {
-        this.storeCraftingRecipe(this.getSelection(), gui, slot);
+        this.getRecipe(index).storeCraftingRecipe(slot, gui, clearIfEmpty);
+        this.dirty = true;
     }
 
     public void clearRecipe(int index)
