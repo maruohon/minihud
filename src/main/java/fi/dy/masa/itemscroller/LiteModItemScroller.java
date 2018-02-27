@@ -29,7 +29,6 @@ public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteL
     public static final KeyBinding KEY_RECIPE = new KeyBinding("itemscroller.desc.recipe", Keyboard.KEY_S, "itemscroller.category");
 
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
-    public static File configDir;
 
     public LiteModItemScroller()
     {
@@ -56,7 +55,6 @@ public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteL
     @Override
     public void init(File configPath)
     {
-        configDir = configPath;
         Configs.load();
     }
 
