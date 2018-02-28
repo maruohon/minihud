@@ -348,7 +348,9 @@ public class InventoryUtils
         // Find some other slot where to store one of the items temporarily
         for (Slot slotTmp : gui.inventorySlots.inventorySlots)
         {
-            if (slotTmp.slotNumber != slot.slotNumber && slotTmp.isItemValid(stackInCursor))
+            if (slotTmp.slotNumber != slot.slotNumber &&
+                areSlotsInSameInventory(slotTmp, slot) &&
+                slotTmp.isItemValid(stackInCursor))
             {
                 ItemStack stackInSlot = slotTmp.getStack();
 
