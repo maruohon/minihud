@@ -350,7 +350,8 @@ public class InventoryUtils
         {
             if (slotTmp.slotNumber != slot.slotNumber &&
                 areSlotsInSameInventory(slotTmp, slot) &&
-                slotTmp.isItemValid(stackInCursor))
+                slotTmp.isItemValid(stackInCursor) &&
+                slotTmp.canTakeStack(player))
             {
                 ItemStack stackInSlot = slotTmp.getStack();
 
@@ -393,6 +394,48 @@ public class InventoryUtils
             }
 
             return true;
+        }
+        // No temporary slot found, try to move the stack manually
+        else
+        {
+            List<Integer> slots = getSlotNumbersOfEmptySlotsFromDifferentInventory(gui.inventorySlots, slot);
+
+            if (slots.isEmpty())
+            {
+                slots = getSlotNumbersOfMatchingStacksFromDifferentInventory(gui.inventorySlots, slot, slot.getStack(), true);
+            }
+
+            if (slots.isEmpty() == false)
+            {
+                // Take the stack
+                leftClickSlot(gui, slot.slotNumber);
+
+                // Return one item
+                rightClickSlot(gui, slot.slotNumber);
+
+                // Try to place the stack in the cursor to any valid empty or matching slots in a different inventory
+                for (int slotNum : slots)
+                {
+                    Slot slotTmp = gui.inventorySlots.getSlot(slotNum);
+                    stackInCursor = player.inventory.getItemStack();
+
+                    if (isStackEmpty(stackInCursor))
+                    {
+                        return true;
+                    }
+
+                    if (slotTmp.isItemValid(stackInCursor))
+                    {
+                        leftClickSlot(gui, slotNum);
+                    }
+                }
+
+                // Items left, return them
+                if (isStackEmpty(stackInCursor) == false)
+                {
+                    leftClickSlot(gui, slot.slotNumber);
+                }
+            }
         }
 
         return false;

@@ -547,15 +547,16 @@ public class InputEventHandler
         boolean flag = slot != null && InventoryUtils.isValidSlot(slot, gui, true) && slot.canTakeStack(mc.player);
         boolean cancel = flag && (leaveOneItem || moveOnlyOne);
 
-        if (flag && slot.slotNumber != this.slotNumberLast && this.draggedSlots.contains(slot.slotNumber) == false)
+        if (flag && slot.slotNumber != this.slotNumberLast &&
+            (moveOnlyOne == false || this.draggedSlots.contains(slot.slotNumber) == false))
         {
             if (moveOnlyOne)
             {
-                cancel = InventoryUtils.tryMoveSingleItemToOtherInventory(slot, gui);
+                InventoryUtils.tryMoveSingleItemToOtherInventory(slot, gui);
             }
             else if (leaveOneItem)
             {
-                cancel = InventoryUtils.tryMoveAllButOneItemToOtherInventory(slot, gui);
+                InventoryUtils.tryMoveAllButOneItemToOtherInventory(slot, gui);
             }
             else
             {
