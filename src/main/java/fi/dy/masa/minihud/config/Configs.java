@@ -160,7 +160,7 @@ public class Configs
         // Information types individual toggle
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBiome", false);
-        prop.setComment("Show the name of the current biome");
+        prop.setComment("Show the the name of the current biome");
         setInfoType(RenderEventHandler.MASK_BIOME, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBiomeRegistryName", false);
@@ -168,15 +168,19 @@ public class Configs
         setInfoType(RenderEventHandler.MASK_BIOME_REGISTRY_NAME, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockPosition", false);
-        prop.setComment("Show player's block position");
+        prop.setComment("Show the player's current block position");
         setInfoType(RenderEventHandler.MASK_BLOCK, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockProperties", false);
-        prop.setComment("Show the BlockState properties and values");
+        prop.setComment("Show the BlockState properties and values of the looked-at block");
         setInfoType(RenderEventHandler.MASK_BLOCK_PROPERTIES, prop.getBoolean());
 
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockInChunk", false);
+        prop.setComment("Show the player's current position within the chunk");
+        setInfoType(RenderEventHandler.MASK_BLOCK_IN_CHUNK, prop.getBoolean());
+
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkPosition", false);
-        prop.setComment("Show player's current position in the chunk");
+        prop.setComment("Show the chunk position the player is currently in");
         setInfoType(RenderEventHandler.MASK_CHUNK, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkSections", false);
@@ -188,11 +192,11 @@ public class Configs
         setInfoType(RenderEventHandler.MASK_CHUNK_SECTIONS_LINE, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkUpdates", false);
-        prop.setComment("Show current number of chunk updates per second");
+        prop.setComment("Show the current number of chunk updates per second");
         setInfoType(RenderEventHandler.MASK_CHUNK_UPDATES, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoCoordinates", true);
-        prop.setComment("Show player coordinates");
+        prop.setComment("Show the player's current coordinates");
         setInfoType(RenderEventHandler.MASK_COORDINATES, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoDifficulty", false);
@@ -212,11 +216,11 @@ public class Configs
         setInfoType(RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFacing", true);
-        prop.setComment("Show player facing");
+        prop.setComment("Show the player's current facing");
         setInfoType(RenderEventHandler.MASK_FACING, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFPS", false);
-        prop.setComment("Show current FPS");
+        prop.setComment("Show the current FPS");
         setInfoType(RenderEventHandler.MASK_FPS, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLightLevel", false);
@@ -232,7 +236,7 @@ public class Configs
         setInfoType(RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAtEntity", false);
-        prop.setComment("Show entity name and health when looked at");
+        prop.setComment("Show the entity name and health when looked at");
         setInfoType(RenderEventHandler.MASK_LOOKING_AT_ENTITY, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoParticleCount", false);
@@ -243,12 +247,16 @@ public class Configs
         prop.setComment("Show the current real time formatted according to dateFormatReal");
         setInfoType(RenderEventHandler.MASK_TIME_REAL, prop.getBoolean());
 
+        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRegionFile", false);
+        prop.setComment("Show the region file the player is currently in");
+        setInfoType(RenderEventHandler.MASK_REGION_FILE, prop.getBoolean());
+
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationPitch", false);
-        prop.setComment("Show player pitch rotation");
+        prop.setComment("Show the player's current pitch rotation");
         setInfoType(RenderEventHandler.MASK_PITCH, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationYaw", false);
-        prop.setComment("Show player yaw rotation");
+        prop.setComment("Show the player's current yaw rotation");
         setInfoType(RenderEventHandler.MASK_YAW, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoSlimeChunk", false);
@@ -259,7 +267,7 @@ public class Configs
         setInfoType(RenderEventHandler.MASK_SLIME_CHUNK, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoSpeed", false);
-        prop.setComment("Show player moving speed");
+        prop.setComment("Show the player's current moving speed");
         setInfoType(RenderEventHandler.MASK_SPEED, prop.getBoolean());
 
         prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTime", false);
@@ -282,33 +290,35 @@ public class Configs
 
         HOTKEY_INFO_MAP.clear();
 
-        assignInfoHotkey(conf, "infoFPS",                   RenderEventHandler.MASK_FPS                         , "0");
-        assignInfoHotkey(conf, "infoRealTime",              RenderEventHandler.MASK_TIME_REAL                   , "1");
-        assignInfoHotkey(conf, "infoWorldTime",             RenderEventHandler.MASK_TIME_TICKS                  , "2");
-        assignInfoHotkey(conf, "infoWorldTimeFormatted",    RenderEventHandler.MASK_TIME_MC                     , "3");
-        assignInfoHotkey(conf, "infoCoordinates",           RenderEventHandler.MASK_COORDINATES                 , "4");
-        assignInfoHotkey(conf, "infoDimensionId",           RenderEventHandler.MASK_DIMENSION                   , "5");
-        assignInfoHotkey(conf, "infoBlockPosition",         RenderEventHandler.MASK_BLOCK                       , "6");
-        assignInfoHotkey(conf, "infoChunkPosition",         RenderEventHandler.MASK_CHUNK                       , "7");
-        assignInfoHotkey(conf, "infoFacing",                RenderEventHandler.MASK_FACING                      , "8");
-        assignInfoHotkey(conf, "infoLightLevel",            RenderEventHandler.MASK_LIGHT                       , "9");
-        assignInfoHotkey(conf, "infoRotationYaw",           RenderEventHandler.MASK_YAW                         , "a");
-        assignInfoHotkey(conf, "infoRotationPitch",         RenderEventHandler.MASK_PITCH                       , "b");
-        assignInfoHotkey(conf, "infoSpeed",                 RenderEventHandler.MASK_SPEED                       , "c");
-        assignInfoHotkey(conf, "infoChunkSections",         RenderEventHandler.MASK_CHUNK_SECTIONS              , "d");
-        assignInfoHotkey(conf, "infoChunkSectionsLine",     RenderEventHandler.MASK_CHUNK_SECTIONS_LINE         , "q");
-        assignInfoHotkey(conf, "infoChunkUpdates",          RenderEventHandler.MASK_CHUNK_UPDATES               , "e");
-        assignInfoHotkey(conf, "infoParticleCount",         RenderEventHandler.MASK_PARTICLE_COUNT              , "f");
-        assignInfoHotkey(conf, "infoDifficulty",            RenderEventHandler.MASK_DIFFICULTY                  , "g");
-        assignInfoHotkey(conf, "infoBiome",                 RenderEventHandler.MASK_BIOME                       , "h");
-        assignInfoHotkey(conf, "infoBiomeRegistryName",     RenderEventHandler.MASK_BIOME_REGISTRY_NAME         , "i");
-        assignInfoHotkey(conf, "infoEntities",              RenderEventHandler.MASK_ENTITIES                    , "j");
-        assignInfoHotkey(conf, "infoSlimeChunk",            RenderEventHandler.MASK_SLIME_CHUNK                 , "k");
+        assignInfoHotkey(conf, "infoFPS",                   RenderEventHandler.MASK_FPS                         , "");
+        assignInfoHotkey(conf, "infoRealTime",              RenderEventHandler.MASK_TIME_REAL                   , "t");
+        assignInfoHotkey(conf, "infoWorldTime",             RenderEventHandler.MASK_TIME_TICKS                  , "");
+        assignInfoHotkey(conf, "infoWorldTimeFormatted",    RenderEventHandler.MASK_TIME_MC                     , "");
+        assignInfoHotkey(conf, "infoCoordinates",           RenderEventHandler.MASK_COORDINATES                 , "n");
+        assignInfoHotkey(conf, "infoDimensionId",           RenderEventHandler.MASK_DIMENSION                   , "d");
+        assignInfoHotkey(conf, "infoBlockPosition",         RenderEventHandler.MASK_BLOCK                       , "o");
+        assignInfoHotkey(conf, "infoBlockInChunk",          RenderEventHandler.MASK_BLOCK_IN_CHUNK              , "");
+        assignInfoHotkey(conf, "infoFacing",                RenderEventHandler.MASK_FACING                      , "f");
+        assignInfoHotkey(conf, "infoLightLevel",            RenderEventHandler.MASK_LIGHT                       , "l");
+        assignInfoHotkey(conf, "infoRotationYaw",           RenderEventHandler.MASK_YAW                         , "r");
+        assignInfoHotkey(conf, "infoRotationPitch",         RenderEventHandler.MASK_PITCH                       , "r");
+        assignInfoHotkey(conf, "infoSpeed",                 RenderEventHandler.MASK_SPEED                       , "s");
+        assignInfoHotkey(conf, "infoChunkSections",         RenderEventHandler.MASK_CHUNK_SECTIONS              , "");
+        assignInfoHotkey(conf, "infoChunkSectionsLine",     RenderEventHandler.MASK_CHUNK_SECTIONS_LINE         , "");
+        assignInfoHotkey(conf, "infoChunkUpdates",          RenderEventHandler.MASK_CHUNK_UPDATES               , "");
+        assignInfoHotkey(conf, "infoParticleCount",         RenderEventHandler.MASK_PARTICLE_COUNT              , "");
+        assignInfoHotkey(conf, "infoDifficulty",            RenderEventHandler.MASK_DIFFICULTY                  , "");
+        assignInfoHotkey(conf, "infoBiome",                 RenderEventHandler.MASK_BIOME                       , "b");
+        assignInfoHotkey(conf, "infoBiomeRegistryName",     RenderEventHandler.MASK_BIOME_REGISTRY_NAME         , "b");
+        assignInfoHotkey(conf, "infoEntities",              RenderEventHandler.MASK_ENTITIES                    , "");
+        assignInfoHotkey(conf, "infoSlimeChunk",            RenderEventHandler.MASK_SLIME_CHUNK                 , "i");
         assignInfoHotkey(conf, "infoLookingAtEntity",       RenderEventHandler.MASK_LOOKING_AT_ENTITY           , "l");
-        assignInfoHotkey(conf, "infoEntityRegistryName",    RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME   , "m");
-        assignInfoHotkey(conf, "infoLookingAtBlock",        RenderEventHandler.MASK_LOOKING_AT_BLOCK            , "n");
-        assignInfoHotkey(conf, "infoLookingAtBlockInChunk", RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK      , "o");
+        assignInfoHotkey(conf, "infoEntityRegistryName",    RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME   , "l");
+        assignInfoHotkey(conf, "infoLookingAtBlock",        RenderEventHandler.MASK_LOOKING_AT_BLOCK            , "l");
+        assignInfoHotkey(conf, "infoLookingAtBlockInChunk", RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK      , "");
         assignInfoHotkey(conf, "infoBlockProperties",       RenderEventHandler.MASK_BLOCK_PROPERTIES            , "p");
+        assignInfoHotkey(conf, "infoChunkPosition",         RenderEventHandler.MASK_CHUNK                       , "c");
+        assignInfoHotkey(conf, "infoRegionFile",            RenderEventHandler.MASK_REGION_FILE                 , "g");
 
 
         cat = conf.getCategory(CATEGORY_DEBUG_HOTKEYS);
@@ -335,33 +345,35 @@ public class Configs
 
         LINE_ORDER_MAP.clear();
 
-        setLinePosition(conf, "infoFPS",                   RenderEventHandler.MASK_FPS);
-        setLinePosition(conf, "infoRealTime",              RenderEventHandler.MASK_TIME_REAL);
-        setLinePosition(conf, "infoWorldTime",             RenderEventHandler.MASK_TIME_TICKS);
-        setLinePosition(conf, "infoWorldTimeFormatted",    RenderEventHandler.MASK_TIME_MC);
-        setLinePosition(conf, "infoCoordinates",           RenderEventHandler.MASK_COORDINATES);
-        setLinePosition(conf, "infoDimensionId",           RenderEventHandler.MASK_DIMENSION);
-        setLinePosition(conf, "infoBlockPosition",         RenderEventHandler.MASK_BLOCK);
-        setLinePosition(conf, "infoChunkPosition",         RenderEventHandler.MASK_CHUNK);
-        setLinePosition(conf, "infoFacing",                RenderEventHandler.MASK_FACING);
-        setLinePosition(conf, "infoLightLevel",            RenderEventHandler.MASK_LIGHT);
-        setLinePosition(conf, "infoRotationYaw",           RenderEventHandler.MASK_YAW);
-        setLinePosition(conf, "infoRotationPitch",         RenderEventHandler.MASK_PITCH);
-        setLinePosition(conf, "infoSpeed",                 RenderEventHandler.MASK_SPEED);
-        setLinePosition(conf, "infoChunkSections",         RenderEventHandler.MASK_CHUNK_SECTIONS);
-        setLinePosition(conf, "infoChunkSectionsLine",     RenderEventHandler.MASK_CHUNK_SECTIONS_LINE);
-        setLinePosition(conf, "infoChunkUpdates",          RenderEventHandler.MASK_CHUNK_UPDATES);
-        setLinePosition(conf, "infoParticleCount",         RenderEventHandler.MASK_PARTICLE_COUNT);
-        setLinePosition(conf, "infoDifficulty",            RenderEventHandler.MASK_DIFFICULTY);
-        setLinePosition(conf, "infoBiome",                 RenderEventHandler.MASK_BIOME);
-        setLinePosition(conf, "infoBiomeRegistryName",     RenderEventHandler.MASK_BIOME_REGISTRY_NAME);
-        setLinePosition(conf, "infoEntities",              RenderEventHandler.MASK_ENTITIES);
-        setLinePosition(conf, "infoSlimeChunk",            RenderEventHandler.MASK_SLIME_CHUNK);
-        setLinePosition(conf, "infoLookingAtEntity",       RenderEventHandler.MASK_LOOKING_AT_ENTITY);
-        setLinePosition(conf, "infoEntityRegistryName",    RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME);
-        setLinePosition(conf, "infoLookingAtBlock",        RenderEventHandler.MASK_LOOKING_AT_BLOCK);
-        setLinePosition(conf, "infoLookingAtBlockInChunk", RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK);
-        setLinePosition(conf, "infoBlockProperties",       RenderEventHandler.MASK_BLOCK_PROPERTIES);
+        setLinePosition(conf, "infoFPS",                    RenderEventHandler.MASK_FPS);
+        setLinePosition(conf, "infoRealTime",               RenderEventHandler.MASK_TIME_REAL);
+        setLinePosition(conf, "infoWorldTime",              RenderEventHandler.MASK_TIME_TICKS);
+        setLinePosition(conf, "infoWorldTimeFormatted",     RenderEventHandler.MASK_TIME_MC);
+        setLinePosition(conf, "infoCoordinates",            RenderEventHandler.MASK_COORDINATES);
+        setLinePosition(conf, "infoDimensionId",            RenderEventHandler.MASK_DIMENSION);
+        setLinePosition(conf, "infoBlockPosition",          RenderEventHandler.MASK_BLOCK);
+        setLinePosition(conf, "infoBlockInChunk",           RenderEventHandler.MASK_BLOCK_IN_CHUNK);
+        setLinePosition(conf, "infoChunkPosition",          RenderEventHandler.MASK_CHUNK);
+        setLinePosition(conf, "infoRegionFile",             RenderEventHandler.MASK_REGION_FILE);
+        setLinePosition(conf, "infoFacing",                 RenderEventHandler.MASK_FACING);
+        setLinePosition(conf, "infoLightLevel",             RenderEventHandler.MASK_LIGHT);
+        setLinePosition(conf, "infoRotationYaw",            RenderEventHandler.MASK_YAW);
+        setLinePosition(conf, "infoRotationPitch",          RenderEventHandler.MASK_PITCH);
+        setLinePosition(conf, "infoSpeed",                  RenderEventHandler.MASK_SPEED);
+        setLinePosition(conf, "infoChunkSections",          RenderEventHandler.MASK_CHUNK_SECTIONS);
+        setLinePosition(conf, "infoChunkSectionsLine",      RenderEventHandler.MASK_CHUNK_SECTIONS_LINE);
+        setLinePosition(conf, "infoChunkUpdates",           RenderEventHandler.MASK_CHUNK_UPDATES);
+        setLinePosition(conf, "infoParticleCount",          RenderEventHandler.MASK_PARTICLE_COUNT);
+        setLinePosition(conf, "infoDifficulty",             RenderEventHandler.MASK_DIFFICULTY);
+        setLinePosition(conf, "infoBiome",                  RenderEventHandler.MASK_BIOME);
+        setLinePosition(conf, "infoBiomeRegistryName",      RenderEventHandler.MASK_BIOME_REGISTRY_NAME);
+        setLinePosition(conf, "infoEntities",               RenderEventHandler.MASK_ENTITIES);
+        setLinePosition(conf, "infoSlimeChunk",             RenderEventHandler.MASK_SLIME_CHUNK);
+        setLinePosition(conf, "infoLookingAtEntity",        RenderEventHandler.MASK_LOOKING_AT_ENTITY);
+        setLinePosition(conf, "infoEntityRegistryName",     RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME);
+        setLinePosition(conf, "infoLookingAtBlock",         RenderEventHandler.MASK_LOOKING_AT_BLOCK);
+        setLinePosition(conf, "infoLookingAtBlockInChunk",  RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK);
+        setLinePosition(conf, "infoBlockProperties",        RenderEventHandler.MASK_BLOCK_PROPERTIES);
 
         RenderEventHandler.getInstance().setEnabledMask(enabledInfoTypes);
 

@@ -56,7 +56,7 @@ public class RenderEventHandler
     public static final int MASK_COORDINATES                = 0x00000010;
     public static final int MASK_DIMENSION                  = 0x00000020;
     public static final int MASK_BLOCK                      = 0x00000040;
-    public static final int MASK_CHUNK                      = 0x00000080;
+    public static final int MASK_BLOCK_IN_CHUNK             = 0x00000080;
     public static final int MASK_FACING                     = 0x00000100;
     public static final int MASK_LIGHT                      = 0x00000200;
     public static final int MASK_YAW                        = 0x00000400;
@@ -76,6 +76,8 @@ public class RenderEventHandler
     public static final int MASK_LOOKING_AT_BLOCK           = 0x01000000;
     public static final int MASK_LOOKING_AT_BLOCK_CHUNK     = 0x02000000;
     public static final int MASK_BLOCK_PROPERTIES           = 0x04000000;
+    public static final int MASK_CHUNK                      = 0x08000000;
+    public static final int MASK_REGION_FILE                = 0x10000000;
 
     private static RenderEventHandler instance;
     private final MethodHandle methodHandle_RenderGlobal_getRenderedChunks;
@@ -371,11 +373,43 @@ public class RenderEventHandler
             }
 
             case MASK_BLOCK:
-                this.addLine(String.format("Block: %d / %d / %d", pos.getX(), pos.getY(), pos.getZ()));
-                break;
-
             case MASK_CHUNK:
-                this.addLine(String.format("Block: %d %d %d in Chunk: %d %d %d",
+            case MASK_REGION_FILE:
+            {
+                // Don't add the same line multiple times
+                if ((this.addedTypes & (MASK_BLOCK | MASK_CHUNK | MASK_REGION_FILE)) != 0)
+                {
+                    break;
+                }
+
+                String pre = "";
+                StringBuilder str = new StringBuilder(128);
+
+                if ((this.mask & MASK_BLOCK) != 0)
+                {
+                    str.append(String.format("Block: %d, %d, %d", pos.getX(), pos.getY(), pos.getZ()));
+                    pre = " / ";
+                }
+
+                if ((this.mask & MASK_CHUNK) != 0)
+                {
+                    str.append(pre).append(String.format("Sub-Chunk: %d, %d, %d", pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4));
+                    pre = " / ";
+                }
+
+                if ((this.mask & MASK_REGION_FILE) != 0)
+                {
+                    str.append(pre).append(String.format("Region: r.%d.%d", pos.getX() >> 9, pos.getZ() >> 9));
+                    pre = " / ";
+                }
+
+                this.addLine(str.toString());
+                this.addedTypes |= (MASK_BLOCK | MASK_CHUNK | MASK_REGION_FILE);
+                break;
+            }
+
+            case MASK_BLOCK_IN_CHUNK:
+                this.addLine(String.format("Block: %d, %d, %d in Sub-Chunk: %d, %d, %d",
                         pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF,
                         pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4));
                 break;
