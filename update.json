@@ -1,10 +1,10 @@
 {
     "homepage": "http://minecraft.curseforge.com/projects/minihud",
     "promos": {
-        "1.12.2-latest":        "0.12.1",
-        "1.12.2-recommended":   "0.12.1",
-        "1.12-latest":          "0.12.1",
-        "1.12-recommended":     "0.12.1",
+        "1.12.2-latest":        "0.13.0",
+        "1.12.2-recommended":   "0.13.0",
+        "1.12-latest":          "0.13.0",
+        "1.12-recommended":     "0.13.0",
         "1.11.2-latest":        "0.12.0",
         "1.11.2-recommended":   "0.12.0",
         "1.11-latest":          "0.9.0",
@@ -21,9 +21,11 @@
         "1.8.9-recommended":    "0.4.0"
     },
     "1.12.2": {
+        "0.13.0": "Added Chunk and Region file info types\nAdded region file border overlay renderer",
         "0.12.1": "Fixed info line updates on low (< ~25) FPS values\nFixed the vanilla path finding debug renderer handling"
     },
     "1.12": {
+        "0.13.0": "Added Chunk and Region file info types\nAdded region file border overlay renderer",
         "0.12.1": "Fixed info line updates on low (< ~25) FPS values\nFixed the vanilla path finding debug renderer handling",
         "0.12.0": "Added hotkeys and support for toggling the vanilla debug renderers\nAdded a config option to set the format of the Minecraft time info line\nSigned the JAR",
         "0.11.1": "Changed the info toggle hotkeys to be able to work as \"key groups\", so that you can toggle multiple info types with the same key\nAdded a separate info type for the entire C-line from the F3 screen and changed the old option to only show the number of rendered chunk sections",
