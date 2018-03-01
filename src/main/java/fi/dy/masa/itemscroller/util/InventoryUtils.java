@@ -372,8 +372,11 @@ public class InventoryUtils
             }
         }
 
-        // Return the rest of the items into the original slot
-        leftClickSlot(gui, slot.slotNumber);
+        if (isStackEmpty(player.inventory.getItemStack()) == false)
+        {
+            // Return the rest of the items into the original slot
+            leftClickSlot(gui, slot.slotNumber);
+        }
 
         // Successfully stored one item in a temporary slot
         if (tempSlotNum != -1)
