@@ -212,34 +212,53 @@ public class InputEventHandler
             return false;
         }
 
+        final int eventKey = Keyboard.getEventKey();
         GuiContainer gui = (GuiContainer) guiScreen;
         Slot slot = AccessorUtils.getSlotUnderMouse(gui);
 
-        if (Keyboard.getEventKey() == Keyboard.KEY_I && Keyboard.getEventKeyState() &&
-            GuiScreen.isAltKeyDown() && GuiScreen.isCtrlKeyDown() && GuiScreen.isShiftKeyDown())
+        if (Keyboard.getEventKeyState() &&
+            GuiScreen.isAltKeyDown() &&
+            GuiScreen.isShiftKeyDown() &&
+            GuiScreen.isCtrlKeyDown())
         {
-            if (slot != null)
+            if (eventKey == Keyboard.KEY_C)
             {
-                debugPrintSlotInfo(gui, slot);
+                InventoryUtils.craftEverythingPossibleWithCurrentRecipe(this.recipes.getSelectedRecipe(), gui);
             }
-            else
+            else if (eventKey == Keyboard.KEY_T)
             {
-                LiteModItemScroller.logger.info("GUI class: {}", gui.getClass().getName());
+                InventoryUtils.throwAllCraftingResultsToGround(this.recipes.getSelectedRecipe(), gui);
+            }
+            else if (eventKey == Keyboard.KEY_M)
+            {
+                InventoryUtils.moveAllCraftingResultsToOtherInventory(this.recipes.getSelectedRecipe(), gui);
+            }
+            else if (eventKey == Keyboard.KEY_I)
+            {
+                if (slot != null)
+                {
+                    debugPrintSlotInfo(gui, slot);
+                }
+                else
+                {
+                    LiteModItemScroller.logger.info("GUI class: {}", gui.getClass().getName());
+                }
             }
         }
+
         // Drop all matching stacks from the same inventory when pressing Ctrl + Shift + Drop key
-        else if (Configs.Toggles.CONTROL_SHIFT_DROP.getValue() && Keyboard.getEventKeyState() &&
+        if (Configs.Toggles.CONTROL_SHIFT_DROP.getValue() && Keyboard.getEventKeyState() &&
             Configs.GUI_BLACKLIST.contains(gui.getClass().getName()) == false &&
             GuiScreen.isCtrlKeyDown() && GuiScreen.isShiftKeyDown() &&
-            mc.gameSettings.keyBindDrop.getKeyCode() == Keyboard.getEventKey())
+            eventKey == mc.gameSettings.keyBindDrop.getKeyCode())
         {
             if (slot != null && slot.getHasStack())
             {
-                InventoryUtils.dropStacks(gui, slot.getStack(), slot);
+                InventoryUtils.dropStacks(gui, slot.getStack(), slot, true);
             }
         }
         // Toggle mouse functionality on/off
-        else if (Keyboard.getEventKeyState() && LiteModItemScroller.KEY_DISABLE.getKeyCode() == Keyboard.getEventKey())
+        else if (Keyboard.getEventKeyState() && eventKey == LiteModItemScroller.KEY_DISABLE.getKeyCode())
         {
             this.disabled = ! this.disabled;
 
@@ -253,7 +272,7 @@ public class InputEventHandler
             }
         }
         // Show or hide the recipe selection
-        else if (Keyboard.getEventKey() == LiteModItemScroller.KEY_RECIPE.getKeyCode())
+        else if (eventKey == LiteModItemScroller.KEY_RECIPE.getKeyCode())
         {
             if (Keyboard.getEventKeyState())
             {
@@ -266,9 +285,9 @@ public class InputEventHandler
         }
         // Store or load a recipe
         else if (Keyboard.getEventKeyState() && Keyboard.isKeyDown(LiteModItemScroller.KEY_RECIPE.getKeyCode()) &&
-                 Keyboard.getEventKey() >= Keyboard.KEY_1 && Keyboard.getEventKey() <= Keyboard.KEY_9)
+                 eventKey >= Keyboard.KEY_1 && eventKey <= Keyboard.KEY_9)
         {
-            int index = MathHelper.clamp(Keyboard.getEventKey() - Keyboard.KEY_1, 0, 8);
+            int index = MathHelper.clamp(eventKey - Keyboard.KEY_1, 0, 8);
             this.recipes.changeSelectedRecipe(index);
             return true;
         }
@@ -391,7 +410,7 @@ public class InputEventHandler
             // First drop the existing stack from the cursor
             InventoryUtils.dropItemsFromCursor(gui);
 
-            InventoryUtils.dropStacks(gui, stackReference, this.sourceSlot.get());
+            InventoryUtils.dropStacks(gui, stackReference, this.sourceSlot.get(), true);
             return true;
         }
 

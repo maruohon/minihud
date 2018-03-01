@@ -212,9 +212,9 @@ public class InventoryUtils
         return false;
     }
 
-    public static void dropStacks(GuiContainer gui, ItemStack stackReference, Slot sourceInvSlot)
+    public static void dropStacks(GuiContainer gui, ItemStack stackReference, Slot slotReference, boolean sameInventory)
     {
-        if (sourceInvSlot != null && isStackEmpty(stackReference) == false)
+        if (slotReference != null && isStackEmpty(stackReference) == false)
         {
             Container container = gui.inventorySlots;
             stackReference = stackReference.copy();
@@ -223,7 +223,7 @@ public class InventoryUtils
             {
                 // If this slot is in the same inventory that the items were picked up to the cursor from
                 // and the stack is identical to the one in the cursor, then this stack will get dropped.
-                if (areSlotsInSameInventory(slot, sourceInvSlot) && areStacksEqual(slot.getStack(), stackReference))
+                if (areSlotsInSameInventory(slot, slotReference) == sameInventory && areStacksEqual(slot.getStack(), stackReference))
                 {
                     // Drop the stack
                     dropStack(gui, slot.slotNumber);
@@ -401,11 +401,11 @@ public class InventoryUtils
         // No temporary slot found, try to move the stack manually
         else
         {
-            List<Integer> slots = getSlotNumbersOfEmptySlotsFromDifferentInventory(gui.inventorySlots, slot);
+            List<Integer> slots = getSlotNumbersOfEmptySlots(gui.inventorySlots, slot, false);
 
             if (slots.isEmpty())
             {
-                slots = getSlotNumbersOfMatchingStacksFromDifferentInventory(gui.inventorySlots, slot, slot.getStack(), true);
+                slots = getSlotNumbersOfMatchingStacks(gui.inventorySlots, slot, false, slot.getStack(), true);
             }
 
             if (slots.isEmpty() == false)
@@ -495,8 +495,12 @@ public class InventoryUtils
 
     public static void tryMoveStacks(Slot slot, GuiContainer gui, boolean matchingOnly, boolean toOtherInventory, boolean firstOnly)
     {
+        tryMoveStacks(slot.getStack(), slot, gui, matchingOnly, toOtherInventory, firstOnly);
+    }
+
+    private static void tryMoveStacks(ItemStack stackReference, Slot slot, GuiContainer gui, boolean matchingOnly, boolean toOtherInventory, boolean firstOnly)
+    {
         Container container = gui.inventorySlots;
-        ItemStack stackReference = slot.getStack();
 
         for (Slot slotTmp : container.inventorySlots)
         {
@@ -932,6 +936,71 @@ public class InventoryUtils
         }
     }
 
+    public static void craftEverythingPossibleWithCurrentRecipe(CraftingRecipe recipe, GuiContainer gui)
+    {
+        Slot slot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
+
+        if (slot != null && isStackEmpty(recipe.getResult()) == false)
+        {
+            SlotRange range = CraftingHandler.getCraftingGridSlots(gui, slot);
+
+            if (range != null)
+            {
+                // Clear all items from the grid first, to avoid unbalanced stacks
+                if (clearCraftingGridOfItems(recipe, gui, range, false) == false)
+                {
+                    return;
+                }
+
+                tryMoveItemsToCraftingGridSlots(recipe, slot, gui, true);
+
+                if (slot.getHasStack())
+                {
+                    craftAsManyItemsAsPossible(recipe, slot, gui);
+                }
+            }
+        }
+    }
+
+    public static void moveAllCraftingResultsToOtherInventory(CraftingRecipe recipe, GuiContainer gui)
+    {
+        if (isStackEmpty(recipe.getResult()) == false)
+        {
+            Slot slot = null;
+            ItemStack stackResult = recipe.getResult().copy();
+
+            for (Slot slotTmp : gui.inventorySlots.inventorySlots)
+            {
+                if (areStacksEqual(slotTmp.getStack(), stackResult) &&
+                    inventoryExistsAbove(slotTmp, gui.inventorySlots))
+                {
+                    slot = slotTmp;
+                    break;
+                }
+            }
+
+            if (slot != null)
+            {
+                List<Integer> slots = getSlotNumbersOfMatchingStacks(gui.inventorySlots, slot, true, stackResult, false);
+
+                for (int slotNum : slots)
+                {
+                    shiftClickSlot(gui, slotNum);
+                }
+            }
+        }
+    }
+
+    public static void throwAllCraftingResultsToGround(CraftingRecipe recipe, GuiContainer gui)
+    {
+        Slot slot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
+
+        if (slot != null && isStackEmpty(recipe.getResult()) == false)
+        {
+            dropStacks(gui, recipe.getResult(), slot, false);
+        }
+    }
+
     private static int putSingleItemIntoSlots(GuiContainer gui, List<Integer> targetSlots, int startIndex)
     {
         Minecraft mc = Minecraft.getMinecraft();
@@ -972,11 +1041,11 @@ public class InventoryUtils
 
         if (isStackEmpty(stackCursor) == false)
         {
-            List<Integer> slots = getSlotNumbersOfMatchingStacksFromDifferentInventory(gui.inventorySlots, slot, stackCursor, true);
+            List<Integer> slots = getSlotNumbersOfMatchingStacks(gui.inventorySlots, slot, false, stackCursor, true);
 
             if (moveItemFromCursorToSlots(gui, slots) == false)
             {
-                slots = getSlotNumbersOfEmptySlotsFromDifferentInventory(gui.inventorySlots, slot);
+                slots = getSlotNumbersOfEmptySlots(gui.inventorySlots, slot, false);
                 moveItemFromCursorToSlots(gui, slots);
             }
         }
@@ -1158,12 +1227,13 @@ public class InventoryUtils
      * at the beginning of the list (not ordered though) and full stacks are at the end, otherwise the reverse is true.
      * @param container
      * @param slotReference
+     * @param sameInventory if true, then the returned slots are from the same inventory, if false, then from a different inventory
      * @param stackReference
      * @param preferPartial
      * @return
      */
-    private static List<Integer> getSlotNumbersOfMatchingStacksFromDifferentInventory(Container container, Slot slotReference,
-            ItemStack stackReference, boolean preferPartial)
+    private static List<Integer> getSlotNumbersOfMatchingStacks(
+            Container container, Slot slotReference, boolean sameInventory, ItemStack stackReference, boolean preferPartial)
     {
         List<Integer> slots = new ArrayList<Integer>(64);
 
@@ -1172,7 +1242,7 @@ public class InventoryUtils
             Slot slot = container.getSlot(i);
 
             if (slot != null && slot.getHasStack() &&
-                areSlotsInSameInventory(slot, slotReference) == false &&
+                areSlotsInSameInventory(slot, slotReference) == sameInventory &&
                 areStacksEqual(slot.getStack(), stackReference))
             {
                 if ((getStackSize(slot.getStack()) < stackReference.getMaxStackSize()) == preferPartial)
@@ -1189,7 +1259,7 @@ public class InventoryUtils
         return slots;
     }
 
-    private static List<Integer> getSlotNumbersOfEmptySlotsFromDifferentInventory(Container container, Slot slotReference)
+    private static List<Integer> getSlotNumbersOfEmptySlots(Container container, Slot slotReference, boolean sameInventory)
     {
         List<Integer> slots = new ArrayList<Integer>(64);
 
@@ -1197,7 +1267,7 @@ public class InventoryUtils
         {
             Slot slot = container.getSlot(i);
 
-            if (slot != null && slot.getHasStack() == false && areSlotsInSameInventory(slot, slotReference) == false)
+            if (slot != null && slot.getHasStack() == false && areSlotsInSameInventory(slot, slotReference) == sameInventory)
             {
                 slots.add(slot.slotNumber);
             }
