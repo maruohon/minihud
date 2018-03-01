@@ -14,6 +14,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -232,9 +233,9 @@ public class InventoryUtils
         }
     }
 
-    public static boolean tryMoveItemsVillager(GuiMerchant gui, Slot slot, boolean moveToOtherInventory, boolean isShiftDown)
+    public static boolean tryMoveItemsVillager(GuiMerchant gui, Slot slot, boolean moveToOtherInventory, boolean fullStacks)
     {
-        if (isShiftDown)
+        if (fullStacks)
         {
             // Try to fill the merchant's buy slots from the player inventory
             if (moveToOtherInventory == false)
@@ -349,7 +350,7 @@ public class InventoryUtils
         for (Slot slotTmp : gui.inventorySlots.inventorySlots)
         {
             if (slotTmp.slotNumber != slot.slotNumber &&
-                areSlotsInSameInventory(slotTmp, slot) &&
+                areSlotsInSameInventory(slotTmp, slot, true) &&
                 slotTmp.isItemValid(stackInCursor) &&
                 slotTmp.canTakeStack(player))
             {
@@ -401,11 +402,12 @@ public class InventoryUtils
         // No temporary slot found, try to move the stack manually
         else
         {
-            List<Integer> slots = getSlotNumbersOfEmptySlots(gui.inventorySlots, slot, false);
+            boolean treatHotbarAsDifferent = gui.getClass() == GuiInventory.class;
+            List<Integer> slots = getSlotNumbersOfEmptySlots(gui.inventorySlots, slot, false, treatHotbarAsDifferent, false);
 
             if (slots.isEmpty())
             {
-                slots = getSlotNumbersOfMatchingStacks(gui.inventorySlots, slot, false, slot.getStack(), true);
+                slots = getSlotNumbersOfMatchingStacks(gui.inventorySlots, slot, false, slot.getStack(), true, treatHotbarAsDifferent, false);
             }
 
             if (slots.isEmpty() == false)
@@ -501,9 +503,12 @@ public class InventoryUtils
     private static void tryMoveStacks(ItemStack stackReference, Slot slot, GuiContainer gui, boolean matchingOnly, boolean toOtherInventory, boolean firstOnly)
     {
         Container container = gui.inventorySlots;
+        final int maxSlot = container.inventorySlots.size() - 1;
 
-        for (Slot slotTmp : container.inventorySlots)
+        for (int i = maxSlot; i >= 0; i--)
         {
+            Slot slotTmp = container.inventorySlots.get(i);
+
             if (slotTmp.slotNumber != slot.slotNumber &&
                 areSlotsInSameInventory(slotTmp, slot) == toOtherInventory && slotTmp.getHasStack() &&
                 (matchingOnly == false || areStacksEqual(stackReference, slotTmp.getStack())))
@@ -971,6 +976,7 @@ public class InventoryUtils
 
             for (Slot slotTmp : gui.inventorySlots.inventorySlots)
             {
+                // This slot is likely in the player inventory, as there is another inventory above
                 if (areStacksEqual(slotTmp.getStack(), stackResult) &&
                     inventoryExistsAbove(slotTmp, gui.inventorySlots))
                 {
@@ -981,7 +987,9 @@ public class InventoryUtils
 
             if (slot != null)
             {
-                List<Integer> slots = getSlotNumbersOfMatchingStacks(gui.inventorySlots, slot, true, stackResult, false);
+                // Get a list of slots with matching items, which are in the same inventory
+                // as the slot that is assumed to be in the player inventory.
+                List<Integer> slots = getSlotNumbersOfMatchingStacks(gui.inventorySlots, slot, true, stackResult, false, false, false);
 
                 for (int slotNum : slots)
                 {
@@ -1041,11 +1049,11 @@ public class InventoryUtils
 
         if (isStackEmpty(stackCursor) == false)
         {
-            List<Integer> slots = getSlotNumbersOfMatchingStacks(gui.inventorySlots, slot, false, stackCursor, true);
+            List<Integer> slots = getSlotNumbersOfMatchingStacks(gui.inventorySlots, slot, false, stackCursor, true, true, false);
 
             if (moveItemFromCursorToSlots(gui, slots) == false)
             {
-                slots = getSlotNumbersOfEmptySlots(gui.inventorySlots, slot, false);
+                slots = getSlotNumbersOfEmptySlots(gui.inventorySlots, slot, false, true, false);
                 moveItemFromCursorToSlots(gui, slots);
             }
         }
@@ -1230,19 +1238,24 @@ public class InventoryUtils
      * @param sameInventory if true, then the returned slots are from the same inventory, if false, then from a different inventory
      * @param stackReference
      * @param preferPartial
+     * @param treatHotbarAsDifferent
+     * @param reverse if true, returns the slots starting from the end of the inventory
      * @return
      */
     private static List<Integer> getSlotNumbersOfMatchingStacks(
-            Container container, Slot slotReference, boolean sameInventory, ItemStack stackReference, boolean preferPartial)
+            Container container, Slot slotReference, boolean sameInventory,
+            ItemStack stackReference, boolean preferPartial, boolean treatHotbarAsDifferent, boolean reverse)
     {
         List<Integer> slots = new ArrayList<Integer>(64);
+        final int maxSlot = container.inventorySlots.size() - 1;
+        final int increment = reverse ? -1 : 1;
 
-        for (int i = container.inventorySlots.size() - 1; i >= 0; i--)
+        for (int i = reverse ? maxSlot : 0; i >= 0 && i <= maxSlot; i += increment)
         {
             Slot slot = container.getSlot(i);
 
             if (slot != null && slot.getHasStack() &&
-                areSlotsInSameInventory(slot, slotReference) == sameInventory &&
+                areSlotsInSameInventory(slot, slotReference, treatHotbarAsDifferent) == sameInventory &&
                 areStacksEqual(slot.getStack(), stackReference))
             {
                 if ((getStackSize(slot.getStack()) < stackReference.getMaxStackSize()) == preferPartial)
@@ -1259,15 +1272,19 @@ public class InventoryUtils
         return slots;
     }
 
-    private static List<Integer> getSlotNumbersOfEmptySlots(Container container, Slot slotReference, boolean sameInventory)
+    private static List<Integer> getSlotNumbersOfEmptySlots(
+            Container container, Slot slotReference, boolean sameInventory, boolean treatHotbarAsDifferent, boolean reverse)
     {
         List<Integer> slots = new ArrayList<Integer>(64);
+        final int maxSlot = container.inventorySlots.size() - 1;
+        final int increment = reverse ? -1 : 1;
 
-        for (int i = container.inventorySlots.size() - 1; i >= 0; i--)
+        for (int i = reverse ? maxSlot : 0; i >= 0 && i <= maxSlot; i += increment)
         {
             Slot slot = container.getSlot(i);
 
-            if (slot != null && slot.getHasStack() == false && areSlotsInSameInventory(slot, slotReference) == sameInventory)
+            if (slot != null && slot.getHasStack() == false &&
+                areSlotsInSameInventory(slot, slotReference, treatHotbarAsDifferent) == sameInventory)
             {
                 slots.add(slot.slotNumber);
             }
@@ -1283,7 +1300,25 @@ public class InventoryUtils
 
     private static boolean areSlotsInSameInventory(Slot slot1, Slot slot2)
     {
-        return slot1.inventory == slot2.inventory;
+        return areSlotsInSameInventory(slot1, slot2, false);
+    }
+
+    private static boolean areSlotsInSameInventory(Slot slot1, Slot slot2, boolean treatHotbarAsDifferent)
+    {
+        if (slot1.inventory == slot2.inventory)
+        {
+            if (treatHotbarAsDifferent && slot1.inventory instanceof InventoryPlayer)
+            {
+                int index1 = AccessorUtils.getSlotIndex(slot1);
+                int index2 = AccessorUtils.getSlotIndex(slot2);
+                // Don't ever treat the offhand slot as a different inventory
+                return index1 == 40 || index2 == 40 || (index1 < 9) == (index2 < 9);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     private static ItemStack[] getOriginalStacks(Container container)
