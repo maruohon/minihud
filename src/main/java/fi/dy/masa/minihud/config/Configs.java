@@ -35,6 +35,7 @@ public class Configs
 
     public static int enabledInfoTypes;
     public static int fontColor;
+    public static int regionOverlayColor;
     public static int textBackgroundColor;
     public static int textPosX;
     public static int textPosY;
@@ -44,9 +45,9 @@ public class Configs
     public static String dateFormatReal;
 
     public static KeyModifier requiredKey;
-    private static final Multimap<Integer, Integer> HOTKEY_DEBUG_MAP = HashMultimap.create();
-    private static final Multimap<Integer, Integer> HOTKEY_INFO_MAP = HashMultimap.create();
-    private static final Map<Integer, Integer> LINE_ORDER_MAP = new HashMap<Integer, Integer>();
+    private static final Multimap<Integer, Long> HOTKEY_DEBUG_MAP = HashMultimap.create();
+    private static final Multimap<Integer, Long> HOTKEY_INFO_MAP = HashMultimap.create();
+    private static final Map<Long, Integer> LINE_ORDER_MAP = new HashMap<>();
 
     public static File configurationFile;
     public static Configuration config;
@@ -57,6 +58,7 @@ public class Configs
     public static final String CATEGORY_INFO_TOGGLE = "InfoTypes";
     public static final String CATEGORY_INFO_HOTKEYS = "InfoToggleHotkeys";
     public static final String CATEGORY_INFO_LINE_ORDER = "InfoLineOrder";
+    public static final String CATEGORY_RENDERER_HOTKEYS = "RenderHotkeys";
 
     @SubscribeEvent
     public void onConfigChangedEvent(OnConfigChangedEvent event)
@@ -105,9 +107,9 @@ public class Configs
         prop.setComment("Font color (RGB, default: 0xE0E0E0 = 14737632)");
         fontColor = getColor(prop.getString(), 0xE0E0E0);
 
-        prop = conf.get(CATEGORY_GENERIC, "sortLinesByLength", false);
-        prop.setComment("Sort the lines by their text's length");
-        sortLinesByLength = prop.getBoolean();
+        prop = conf.get(CATEGORY_GENERIC, "regionOverlayColor", "0xFFFF8019");
+        prop.setComment("Color for the region file overlay rendering (RGB, default: 0xFFFF8019)");
+        regionOverlayColor = getColor(prop.getString(), 0xFFFF8019);
 
         prop = conf.get(CATEGORY_GENERIC, "requireSneak", false);
         prop.setComment("Require the player to be sneaking to render the HUD");
@@ -120,6 +122,10 @@ public class Configs
         prop = conf.get(CATEGORY_GENERIC, "requiredKey", "none");
         prop.setComment("The key required to render the HUD, if 'requireHoldingKey' is enabled. Valid values are 'alt', 'ctrl' and 'shift'.");
         requiredKey = getKeyModifier(prop.getString());
+
+        prop = conf.get(CATEGORY_GENERIC, "sortLinesByLength", false);
+        prop.setComment("Sort the lines by their text's length");
+        sortLinesByLength = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "sortLinesReversed", false);
         prop.setComment("Reverse the line sorting order");
@@ -320,6 +326,8 @@ public class Configs
         assignInfoHotkey(conf, "infoChunkPosition",         RenderEventHandler.MASK_CHUNK                       , "c");
         assignInfoHotkey(conf, "infoRegionFile",            RenderEventHandler.MASK_REGION_FILE                 , "g");
 
+        assignHotkey(HOTKEY_INFO_MAP, conf, CATEGORY_RENDERER_HOTKEYS, "renderRegionOverlay", "j", RenderEventHandler.MASK_REGION_OVERLAY);
+
 
         cat = conf.getCategory(CATEGORY_DEBUG_HOTKEYS);
         cat.setComment("Hotkeys to toggle ON/OFF the vanilla debug renderers.\n" +
@@ -397,7 +405,7 @@ public class Configs
 
     private static int getColor(String colorStr, int defaultColor)
     {
-        Pattern pattern = Pattern.compile("0x([a-fA-F0-9]{1,8})");
+        Pattern pattern = Pattern.compile("(?:0x|#)([a-fA-F0-9]{1,8})");
         Matcher matcher = pattern.matcher(colorStr);
 
         if (matcher.matches())
@@ -435,19 +443,19 @@ public class Configs
         return KeyModifier.NONE;
     }
 
-    private static void assignInfoHotkey(Configuration conf, String configKey, int infoBitmask, String defaultValue)
+    private static void assignInfoHotkey(Configuration conf, String configKey, long infoBitmask, String defaultKey)
     {
-        assignHotkey(HOTKEY_INFO_MAP, conf, CATEGORY_INFO_HOTKEYS, configKey, defaultValue, infoBitmask);
+        assignHotkey(HOTKEY_INFO_MAP, conf, CATEGORY_INFO_HOTKEYS, configKey, defaultKey, infoBitmask);
     }
 
-    private static void assignDebugRendererHotkey(Configuration conf, String configKey, int bitmask, String defaultValue)
+    private static void assignDebugRendererHotkey(Configuration conf, String configKey, int bitmask, String defaultKey)
     {
-        assignHotkey(HOTKEY_DEBUG_MAP, conf, CATEGORY_DEBUG_HOTKEYS, configKey, defaultValue, bitmask);
+        assignHotkey(HOTKEY_DEBUG_MAP, conf, CATEGORY_DEBUG_HOTKEYS, configKey, defaultKey, bitmask);
     }
 
-    private static void assignHotkey(Multimap<Integer, Integer> map, Configuration conf, String configCategory, String configKey, String defaultValue, int bitmask)
+    private static void assignHotkey(Multimap<Integer, Long> map, Configuration conf, String configCategory, String configKey, String defaultKey, long bitmask)
     {
-        String keyName = conf.get(configCategory, configKey, defaultValue).getString();
+        String keyName = conf.get(configCategory, configKey, defaultKey).getString();
 
         try
         {
@@ -472,24 +480,24 @@ public class Configs
         }
     }
 
-    public static int getBitmaskForInfoKey(int keyCode)
+    public static long getBitmaskForInfoKey(int keyCode)
     {
         return getBitmaskForKey(HOTKEY_INFO_MAP, keyCode);
     }
 
-    public static int getBitmaskForDebugKey(int keyCode)
+    public static long getBitmaskForDebugKey(int keyCode)
     {
         return getBitmaskForKey(HOTKEY_DEBUG_MAP, keyCode);
     }
 
-    public static int getBitmaskForKey(Multimap<Integer, Integer> map, int keyCode)
+    public static long getBitmaskForKey(Multimap<Integer, Long> map, int keyCode)
     {
-        Collection<Integer> masks = map.get(keyCode);
-        int fullMask = 0;
+        Collection<Long> masks = map.get(keyCode);
+        long fullMask = 0;
 
         if (masks != null)
         {
-            for (Integer mask : masks)
+            for (Long mask : masks)
             {
                 fullMask |= mask;
             }
@@ -498,13 +506,13 @@ public class Configs
         return fullMask;
     }
 
-    private static void setLinePosition(Configuration conf, String configKey, int infoBitmask)
+    private static void setLinePosition(Configuration conf, String configKey, long infoBitmask)
     {
         int value = conf.get(CATEGORY_INFO_LINE_ORDER, configKey, -1).getInt();
         LINE_ORDER_MAP.put(infoBitmask, value);
     }
 
-    public static int getLinePositionFor(int infoType)
+    public static int getLinePositionFor(long infoType)
     {
         Integer value = LINE_ORDER_MAP.get(infoType);
         return value != null ? value.intValue() : -1;

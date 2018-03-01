@@ -38,6 +38,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -79,13 +80,15 @@ public class RenderEventHandler
     public static final int MASK_CHUNK                      = 0x08000000;
     public static final int MASK_REGION_FILE                = 0x10000000;
 
+    public static final long MASK_REGION_OVERLAY            = 0x010000000000L;
+
     private static RenderEventHandler instance;
     private final MethodHandle methodHandle_RenderGlobal_getRenderedChunks;
     private final Minecraft mc;
     private final Date date;
     private final Random rand = new Random();
     private boolean enabled;
-    private int mask;
+    private long mask;
     private int fps;
     private int fpsCounter;
     private long fpsUpdateTime = Minecraft.getSystemTime();
@@ -141,6 +144,15 @@ public class RenderEventHandler
         }
 
         this.renderText(Configs.textPosX, Configs.textPosY, this.lines);
+    }
+
+    @SubscribeEvent
+    public void onRenderWorldLast(RenderWorldLastEvent event)
+    {
+        if (this.enabled && (this.mask & 0xFFFFFFFF00000000L) != 0L && this.mc.player != null)
+        {
+            OverlayRenderer.renderOverlays(this.mask, this.mc.player, event.getPartialTicks());
+        }
     }
 
     @SubscribeEvent
@@ -204,7 +216,7 @@ public class RenderEventHandler
         this.mask = mask;
     }
 
-    public void xorEnabledMask(int mask)
+    public void xorEnabledMask(long mask)
     {
         this.mask ^= mask;
     }
@@ -231,7 +243,7 @@ public class RenderEventHandler
         }
     }
 
-    private void updateLines(int enabledMask)
+    private void updateLines(long enabledMask)
     {
         this.lines.clear();
         this.addedTypes = 0;
@@ -241,7 +253,7 @@ public class RenderEventHandler
 
         for (int i = 0; i < 32; i++)
         {
-            int mask = (1 << i);
+            long mask = (1 << i);
 
             if ((enabledMask & mask) != 0)
             {
@@ -272,12 +284,13 @@ public class RenderEventHandler
         this.lines.add(new StringHolder(text));
     }
 
-    private void addLine(int type)
+    private void addLine(long type)
     {
         Entity entity = this.mc.getRenderViewEntity();
         BlockPos pos = new BlockPos(entity.posX, entity.getEntityBoundingBox().minY, entity.posZ);
 
-        switch (type)
+        // FIXME Java y u no switch on long?!
+        switch ((int) type)
         {
             case MASK_FPS:
                 this.addLine(String.format("%d fps", this.fps));
@@ -809,9 +822,9 @@ public class RenderEventHandler
     private static class LinePos implements Comparable<LinePos>
     {
         private final int position;
-        private final int type;
+        private final long type;
 
-        private LinePos(int position, int type)
+        private LinePos(int position, long type)
         {
             this.position = position;
             this.type = type;

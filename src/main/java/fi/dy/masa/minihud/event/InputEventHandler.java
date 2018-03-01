@@ -88,11 +88,11 @@ public class InputEventHandler
     {
         int key = Keyboard.getEventKey();
         boolean state = Keyboard.getEventKeyState();
-        int mask = Configs.getBitmaskForDebugKey(key);
+        long mask = Configs.getBitmaskForDebugKey(key);
 
         if (state && Keyboard.isKeyDown(Keyboard.KEY_F3) && mask != 0)
         {
-            this.toggleDebugRenderers(mask);
+            this.toggleDebugRenderers((int) mask);
             KeyBinding.setKeyBindState(key, false);
 
             // This prevent the F3 screen from opening after releasing the F3 key
