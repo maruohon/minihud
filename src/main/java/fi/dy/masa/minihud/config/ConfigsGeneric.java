@@ -25,6 +25,7 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean
     ENABLE_BY_DEFAULT               ("enableByDefault", true, "If true, the HUD will be enabled by default on game launch"),
     FIX_VANILLA_DEBUG_RENDERERS     ("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed."),
     FONT_COLOR                      ("fontColor", "0xE0E0E0", true, "Font color (RGB, default: 0xE0E0E0 = 14737632)"),
+    REGION_OVERLAY_COLOR            ("regionOverlayColor", "0xFFFF8019", true, "Color for the region file overlay (ARGB, default: 0xFFFF8019)"),
     REQUIRE_SNEAK                   ("requireSneak", false, "Require the player to be sneaking to render the HUD"),
     REQUIRE_HOLDING_KEY             ("requireHoldingKey", "none", "Require holding a key to render the HUD. Valid keys are 'alt', 'ctrl' and 'shift'."),
     SORT_LINES_BY_LENGTH            ("sortLinesByLength", false, "Sort the lines by their text's length"),
@@ -216,7 +217,7 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean
 
     public static int getColor(String colorStr, int defaultColor)
     {
-        Pattern pattern = Pattern.compile("0x([a-fA-F0-9]{1,8})");
+        Pattern pattern = Pattern.compile("(?:0x|#)([a-fA-F0-9]{1,8})");
         Matcher matcher = pattern.matcher(colorStr);
 
         if (matcher.matches())

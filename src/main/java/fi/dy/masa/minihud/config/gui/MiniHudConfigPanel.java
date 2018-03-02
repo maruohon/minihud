@@ -167,6 +167,7 @@ public class MiniHudConfigPanel extends AbstractConfigPanel
         this.addSubPanel(new ConfigPanelGeneric(this));
         this.addSubPanel(new ConfigPanelInfoToggles(this));
         this.addSubPanel(new ConfigPanelInfoHotkeys(this));
+        this.addSubPanel(new ConfigPanelOverlayHotkeys(this));
         this.addSubPanel(new ConfigPanelDebugHotkeys(this));
         this.addSubPanel(new ConfigPanelInfoLineOrder(this));
     }

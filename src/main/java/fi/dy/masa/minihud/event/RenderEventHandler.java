@@ -46,7 +46,8 @@ public class RenderEventHandler
     private final Date date;
     private final Random rand = new Random();
     private boolean enabled;
-    private int mask;
+    private int infoLineMask;
+    private int overlayMask;
     private int fps;
     private int fpsCounter;
     private long fpsUpdateTime = Minecraft.getSystemTime();
@@ -86,7 +87,7 @@ public class RenderEventHandler
             (ConfigsGeneric.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
             (ConfigsGeneric.REQUIRE_HOLDING_KEY.getBooleanValue() == false || InputEventHandler.isRequiredKeyActive()))
         {
-            if ((this.mask & InfoToggle.FPS.getBitMask()) != 0)
+            if ((this.infoLineMask & InfoToggle.FPS.getBitMask()) != 0)
             {
                 this.updateFps();
             }
@@ -96,11 +97,21 @@ public class RenderEventHandler
             // Only update the text once per game tick
             if (currentTime - this.infoUpdateTime >= 50)
             {
-                this.updateLines(this.mask);
+                this.updateLines(this.infoLineMask);
                 this.infoUpdateTime = currentTime;
             }
 
             this.renderText(mc, ConfigsGeneric.TEXT_POS_X.getIntegerValue(), ConfigsGeneric.TEXT_POS_Y.getIntegerValue(), this.lines);
+        }
+    }
+
+    public void onRenderWorldLast(float partialTicks)
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (this.enabled && mc.player != null)
+        {
+            OverlayRenderer.renderOverlays(this.overlayMask, mc.player, partialTicks);
         }
     }
 
@@ -148,12 +159,17 @@ public class RenderEventHandler
 
     public void setEnabledMask(int mask)
     {
-        this.mask = mask;
+        this.infoLineMask = mask;
     }
 
-    public void xorEnabledMask(int mask)
+    public void xorInfoLineEnabledMask(int mask)
     {
-        this.mask ^= mask;
+        this.infoLineMask ^= mask;
+    }
+
+    public void xorOverlayRendererEnabledMask(int mask)
+    {
+        this.overlayMask ^= mask;
     }
 
     public void setEnabled(boolean enabled)

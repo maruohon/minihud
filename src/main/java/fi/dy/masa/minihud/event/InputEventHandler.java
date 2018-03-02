@@ -62,7 +62,6 @@ public class InputEventHandler
         }
 
         int toggleKey = LiteModMiniHud.KEY_TOGGLE_MODE.getKeyCode();
-        bitMaskForEventKey = Configs.getBitmaskForInfoKey(eventKey);
 
         // Toggle the HUD when releasing the toggle key, if no infos were toggled while it was down
         if (eventKeyState == false && eventKey == toggleKey)
@@ -74,11 +73,27 @@ public class InputEventHandler
 
             this.toggledInfo = false;
         }
-        else if (eventKeyState && bitMaskForEventKey != 0 && Keyboard.isKeyDown(toggleKey))
+        else if (eventKeyState && Keyboard.isKeyDown(toggleKey))
         {
-            RenderEventHandler.getInstance().xorEnabledMask(bitMaskForEventKey);
-            this.toggledInfo = true;
-            KeyBinding.unPressAllKeys();
+            bitMaskForEventKey = Configs.getBitmaskForInfoKey(eventKey);
+
+            if (bitMaskForEventKey != 0)
+            {
+                RenderEventHandler.getInstance().xorInfoLineEnabledMask(bitMaskForEventKey);
+                this.toggledInfo = true;
+                KeyBinding.unPressAllKeys();
+                return;
+            }
+
+            bitMaskForEventKey = Configs.getBitmaskForOverlayKey(eventKey);
+
+            if (bitMaskForEventKey != 0)
+            {
+                RenderEventHandler.getInstance().xorOverlayRendererEnabledMask(bitMaskForEventKey);
+                this.toggledInfo = true;
+                KeyBinding.unPressAllKeys();
+                return;
+            }
         }
     }
 

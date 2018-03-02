@@ -15,6 +15,7 @@ import com.google.gson.JsonPrimitive;
 import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
+import fi.dy.masa.minihud.config.interfaces.IConfigHotkey;
 import fi.dy.masa.minihud.event.InputEventHandler.KeyModifier;
 import fi.dy.masa.minihud.event.RenderEventHandler;
 import fi.dy.masa.minihud.util.JsonUtils;
@@ -26,6 +27,7 @@ public class Configs
     public static KeyModifier requiredKey;
     private static final Multimap<Integer, Integer> HOTKEY_DEBUG_MAP = HashMultimap.create();
     private static final Multimap<Integer, Integer> HOTKEY_INFO_MAP = HashMultimap.create();
+    private static final Multimap<Integer, Integer> HOTKEY_OVERLAY_MAP = HashMultimap.create();
     private static final Map<Integer, Integer> LINE_ORDER_MAP = new HashMap<Integer, Integer>();
 
     public enum ConfigType
@@ -50,6 +52,7 @@ public class Configs
                 JsonObject root = element.getAsJsonObject();
                 JsonObject objToggles           = JsonUtils.getNestedObject(root, "InfoTypeToggles", false);
                 JsonObject objInfoHotkeys       = JsonUtils.getNestedObject(root, "InfoTypeHotkeys", false);
+                JsonObject objOverlayHotkeys    = JsonUtils.getNestedObject(root, "OverlayHotkeys", false);
                 JsonObject objInfoLineOrders    = JsonUtils.getNestedObject(root, "InfoLineOrders", false);
                 JsonObject objGeneric           = JsonUtils.getNestedObject(root, "Generic", false);
                 JsonObject objDebugHotkeys      = JsonUtils.getNestedObject(root, "DebugRendererHotkeys", false);
@@ -83,6 +86,14 @@ public class Configs
                     }
                 }
 
+                for (OverlayHotkeys hotkey : OverlayHotkeys.values())
+                {
+                    if (objOverlayHotkeys != null && JsonUtils.hasString(objOverlayHotkeys, hotkey.getName()))
+                    {
+                        hotkey.setHotkey(JsonUtils.getString(objOverlayHotkeys, hotkey.getName()));
+                    }
+                }
+
                 if (objDebugHotkeys != null)
                 {
                     for (DebugHotkeys dbg : DebugHotkeys.values())
@@ -107,6 +118,13 @@ public class Configs
             LINE_ORDER_MAP.put(toggle.getBitMask(), toggle.getLinePosition());
         }
 
+        HOTKEY_OVERLAY_MAP.clear();
+
+        for (OverlayHotkeys toggle : OverlayHotkeys.values())
+        {
+            assignHotkey(HOTKEY_OVERLAY_MAP, toggle);
+        }
+
         HOTKEY_DEBUG_MAP.clear();
 
         for (DebugHotkeys dbg : DebugHotkeys.values())
@@ -128,6 +146,7 @@ public class Configs
             JsonObject root = new JsonObject();
             JsonObject objToggles           = JsonUtils.getNestedObject(root, "InfoTypeToggles", true);
             JsonObject objInfoHotkeys       = JsonUtils.getNestedObject(root, "InfoTypeHotkeys", true);
+            JsonObject objOverlayHotkeys    = JsonUtils.getNestedObject(root, "OverlayHotkeys", true);
             JsonObject objInfoLineOrders    = JsonUtils.getNestedObject(root, "InfoLineOrders", true);
             JsonObject objGeneric           = JsonUtils.getNestedObject(root, "Generic", true);
             JsonObject objDebugHotkeys      = JsonUtils.getNestedObject(root, "DebugRendererHotkeys", true);
@@ -142,6 +161,11 @@ public class Configs
                 objToggles.add(toggle.getName(), new JsonPrimitive(toggle.getBooleanValue()));
                 objInfoHotkeys.add(toggle.getName(), new JsonPrimitive(toggle.getHotkey()));
                 objInfoLineOrders.add(toggle.getName(), new JsonPrimitive(toggle.getLinePosition()));
+            }
+
+            for (OverlayHotkeys hotkey : OverlayHotkeys.values())
+            {
+                objOverlayHotkeys.add(hotkey.getName(), new JsonPrimitive(hotkey.getHotkey()));
             }
 
             for (DebugHotkeys dbg : DebugHotkeys.values())
@@ -201,7 +225,7 @@ public class Configs
         return KeyModifier.NONE;
     }
 
-    private static void assignHotkey(Multimap<Integer, Integer> map, InfoToggle toggle)
+    private static void assignHotkey(Multimap<Integer, Integer> map, IConfigHotkey toggle)
     {
         assignHotkey(map, toggle.getHotkey(), toggle.getBitMask());
     }
@@ -234,6 +258,11 @@ public class Configs
     public static int getBitmaskForInfoKey(int keyCode)
     {
         return getBitmaskForKey(HOTKEY_INFO_MAP, keyCode);
+    }
+
+    public static int getBitmaskForOverlayKey(int keyCode)
+    {
+        return getBitmaskForKey(HOTKEY_OVERLAY_MAP, keyCode);
     }
 
     public static int getBitmaskForDebugKey(int keyCode)
