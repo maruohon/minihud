@@ -3,7 +3,7 @@ package fi.dy.masa.minihud.config.gui;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.modconfig.ConfigPanelHost;
-import fi.dy.masa.minihud.config.IConfigHotkey;
+import fi.dy.masa.minihud.config.interfaces.IConfigHotkey;
 import net.minecraft.util.text.TextFormatting;
 
 public abstract class ConfigPanelHotkeysBase extends ConfigPanelSub

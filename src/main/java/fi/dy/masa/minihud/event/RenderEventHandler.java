@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import java.util.Random;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.ConfigsGeneric;
+import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
@@ -66,7 +68,7 @@ public class RenderEventHandler
 
     public static void fixDebugRendererState()
     {
-        if (Configs.Generic.FIX_VANILLA_DEBUG_RENDERERS.getBooleanValue())
+        if (ConfigsGeneric.FIX_VANILLA_DEBUG_RENDERERS.getBooleanValue())
         {
             GlStateManager.disableLighting();
             //GlStateManager.color(1, 1, 1, 1);
@@ -81,10 +83,10 @@ public class RenderEventHandler
         if (this.enabled &&
             mc.gameSettings.showDebugInfo == false &&
             mc.player != null &&
-            (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
-            (Configs.Generic.REQUIRE_HOLDING_KEY.getBooleanValue() == false || InputEventHandler.isRequiredKeyActive()))
+            (ConfigsGeneric.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
+            (ConfigsGeneric.REQUIRE_HOLDING_KEY.getBooleanValue() == false || InputEventHandler.isRequiredKeyActive()))
         {
-            if ((this.mask & Configs.InfoToggle.FPS.getBitMask()) != 0)
+            if ((this.mask & InfoToggle.FPS.getBitMask()) != 0)
             {
                 this.updateFps();
             }
@@ -98,7 +100,7 @@ public class RenderEventHandler
                 this.infoUpdateTime = currentTime;
             }
 
-            this.renderText(mc, Configs.Generic.TEXT_POS_X.getIntegerValue(), Configs.Generic.TEXT_POS_Y.getIntegerValue(), this.lines);
+            this.renderText(mc, ConfigsGeneric.TEXT_POS_X.getIntegerValue(), ConfigsGeneric.TEXT_POS_Y.getIntegerValue(), this.lines);
         }
     }
 
@@ -201,11 +203,11 @@ public class RenderEventHandler
             this.addLine(pos.type, enabledMask);
         }
 
-        if (Configs.Generic.SORT_LINES_BY_LENGTH.getBooleanValue())
+        if (ConfigsGeneric.SORT_LINES_BY_LENGTH.getBooleanValue())
         {
             Collections.sort(this.lines);
 
-            if (Configs.Generic.SORT_LINES_REVERSED.getBooleanValue())
+            if (ConfigsGeneric.SORT_LINES_REVERSED.getBooleanValue())
             {
                 Collections.reverse(this.lines);
             }
@@ -223,15 +225,15 @@ public class RenderEventHandler
         Entity entity = mc.getRenderViewEntity();
         BlockPos pos = new BlockPos(entity.posX, entity.getEntityBoundingBox().minY, entity.posZ);
 
-        if (type == Configs.InfoToggle.FPS.getBitMask())
+        if (type == InfoToggle.FPS.getBitMask())
         {
             this.addLine(String.format("%d fps", this.fps));
         }
-        else if (type == Configs.InfoToggle.TIME_REAL.getBitMask())
+        else if (type == InfoToggle.TIME_REAL.getBitMask())
         {
             try
             {
-                SimpleDateFormat sdf = new SimpleDateFormat(Configs.Generic.DATE_FORMAT_REAL.getStringValue());
+                SimpleDateFormat sdf = new SimpleDateFormat(ConfigsGeneric.DATE_FORMAT_REAL.getStringValue());
                 this.date.setTime(System.currentTimeMillis());
                 this.addLine(sdf.format(this.date));
             }
@@ -240,13 +242,13 @@ public class RenderEventHandler
                 this.addLine("Date formatting failed - Invalid date format string?");
             }
         }
-        else if (type == Configs.InfoToggle.TIME_WORLD.getBitMask())
+        else if (type == InfoToggle.TIME_WORLD.getBitMask())
         {
             long current = entity.getEntityWorld().getWorldTime();
             long total = entity.getEntityWorld().getTotalWorldTime();
             this.addLine(String.format("World time: %5d - total: %d", current, total));
         }
-        else if (type == Configs.InfoToggle.TIME_WORLD_FORMATTED.getBitMask())
+        else if (type == InfoToggle.TIME_WORLD_FORMATTED.getBitMask())
         {
             try
             {
@@ -257,7 +259,7 @@ public class RenderEventHandler
                 int min = (int) (timeDay / 16.666666) % 60;
                 int sec = (int) (timeDay / 0.277777) % 60;
 
-                String str = Configs.Generic.DATE_FORMAT_MINECRAFT.getStringValue();
+                String str = ConfigsGeneric.DATE_FORMAT_MINECRAFT.getStringValue();
                 str = str.replace("{DAY}",  String.format("%d", day));
                 str = str.replace("{HOUR}", String.format("%02d", hour));
                 str = str.replace("{MIN}",  String.format("%02d", min));
@@ -270,11 +272,11 @@ public class RenderEventHandler
                 this.addLine("Date formatting failed - Invalid date format string?");
             }
         }
-        else if (type == Configs.InfoToggle.COORDINATES.getBitMask() ||
-                 type == Configs.InfoToggle.DIMENSION.getBitMask())
+        else if (type == InfoToggle.COORDINATES.getBitMask() ||
+                 type == InfoToggle.DIMENSION.getBitMask())
         {
             // Don't add the same line multiple times
-            if ((this.addedTypes & (Configs.InfoToggle.COORDINATES.getBitMask() | Configs.InfoToggle.DIMENSION.getBitMask())) != 0)
+            if ((this.addedTypes & (InfoToggle.COORDINATES.getBitMask() | InfoToggle.DIMENSION.getBitMask())) != 0)
             {
                 return;
             }
@@ -282,13 +284,13 @@ public class RenderEventHandler
             String pre = "";
             StringBuilder str = new StringBuilder(128);
 
-            if ((enabledMask & Configs.InfoToggle.COORDINATES.getBitMask()) != 0)
+            if ((enabledMask & InfoToggle.COORDINATES.getBitMask()) != 0)
             {
-                if (Configs.Generic.USE_CUSTOMIZED_COORDINATES.getBooleanValue())
+                if (ConfigsGeneric.USE_CUSTOMIZED_COORDINATES.getBooleanValue())
                 {
                     try
                     {
-                        str.append(String.format(Configs.Generic.COORDINATE_FORMAT_STRING.getStringValue(),
+                        str.append(String.format(ConfigsGeneric.COORDINATE_FORMAT_STRING.getStringValue(),
                             entity.posX, entity.getEntityBoundingBox().minY, entity.posZ));
                     }
                     // Uh oh, someone done goofed their format string... :P
@@ -306,23 +308,23 @@ public class RenderEventHandler
                 pre = " / ";
             }
 
-            if ((enabledMask & Configs.InfoToggle.DIMENSION.getBitMask()) != 0)
+            if ((enabledMask & InfoToggle.DIMENSION.getBitMask()) != 0)
             {
                 int dimension = entity.getEntityWorld().provider.getDimensionType().getId();
                 str.append(String.format(String.format("%sDimensionType ID: %d", pre, dimension)));
             }
 
             this.addLine(str.toString());
-            this.addedTypes |= (Configs.InfoToggle.COORDINATES.getBitMask() | Configs.InfoToggle.DIMENSION.getBitMask());
+            this.addedTypes |= (InfoToggle.COORDINATES.getBitMask() | InfoToggle.DIMENSION.getBitMask());
         }
-        else if (type == Configs.InfoToggle.BLOCK_POS.getBitMask() ||
-                 type == Configs.InfoToggle.CHUNK_POS.getBitMask() ||
-                 type == Configs.InfoToggle.REGION_FILE.getBitMask())
+        else if (type == InfoToggle.BLOCK_POS.getBitMask() ||
+                 type == InfoToggle.CHUNK_POS.getBitMask() ||
+                 type == InfoToggle.REGION_FILE.getBitMask())
         {
             // Don't add the same line multiple times
-            if ((this.addedTypes & (Configs.InfoToggle.BLOCK_POS.getBitMask() |
-                                    Configs.InfoToggle.CHUNK_POS.getBitMask() |
-                                    Configs.InfoToggle.REGION_FILE.getBitMask())) != 0)
+            if ((this.addedTypes & (InfoToggle.BLOCK_POS.getBitMask() |
+                                    InfoToggle.CHUNK_POS.getBitMask() |
+                                    InfoToggle.REGION_FILE.getBitMask())) != 0)
             {
                 return;
             }
@@ -330,35 +332,35 @@ public class RenderEventHandler
             String pre = "";
             StringBuilder str = new StringBuilder(256);
 
-            if ((enabledMask & Configs.InfoToggle.BLOCK_POS.getBitMask()) != 0)
+            if ((enabledMask & InfoToggle.BLOCK_POS.getBitMask()) != 0)
             {
                 str.append(String.format("Block: %d, %d, %d", pos.getX(), pos.getY(), pos.getZ()));
                 pre = " / ";
             }
 
-            if ((enabledMask & Configs.InfoToggle.CHUNK_POS.getBitMask()) != 0)
+            if ((enabledMask & InfoToggle.CHUNK_POS.getBitMask()) != 0)
             {
                 str.append(pre).append(String.format("Sub-Chunk: %d, %d, %d", pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4));
                 pre = " / ";
             }
 
-            if ((enabledMask & Configs.InfoToggle.REGION_FILE.getBitMask()) != 0)
+            if ((enabledMask & InfoToggle.REGION_FILE.getBitMask()) != 0)
             {
                 str.append(pre).append(String.format("Region: r.%d.%d", pos.getX() >> 9, pos.getZ() >> 9));
             }
 
             this.addLine(str.toString());
-            this.addedTypes |= (Configs.InfoToggle.BLOCK_POS.getBitMask() |
-                                Configs.InfoToggle.CHUNK_POS.getBitMask() |
-                                Configs.InfoToggle.REGION_FILE.getBitMask());
+            this.addedTypes |= (InfoToggle.BLOCK_POS.getBitMask() |
+                                InfoToggle.CHUNK_POS.getBitMask() |
+                                InfoToggle.REGION_FILE.getBitMask());
         }
-        else if (type == Configs.InfoToggle.BLOCK_IN_CHUNK.getBitMask())
+        else if (type == InfoToggle.BLOCK_IN_CHUNK.getBitMask())
         {
             this.addLine(String.format("Block: %d, %d, %d within Sub-Chunk: %d, %d, %d",
                         pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF,
                         pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4));
         }
-        else if (type == Configs.InfoToggle.FACING.getBitMask())
+        else if (type == InfoToggle.FACING.getBitMask())
         {
             EnumFacing facing = entity.getHorizontalFacing();
             String str = "Invalid";
@@ -374,7 +376,7 @@ public class RenderEventHandler
 
             this.addLine(String.format("Facing: %s (%s)", facing, str));
         }
-        else if (type == Configs.InfoToggle.LIGHT_LEVEL.getBitMask())
+        else if (type == InfoToggle.LIGHT_LEVEL.getBitMask())
         {
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
@@ -390,14 +392,14 @@ public class RenderEventHandler
                 }
             }
         }
-        else if (type == Configs.InfoToggle.ROTATION_YAW.getBitMask() ||
-                 type == Configs.InfoToggle.ROTATION_PITCH.getBitMask() ||
-                 type == Configs.InfoToggle.SPEED.getBitMask())
+        else if (type == InfoToggle.ROTATION_YAW.getBitMask() ||
+                 type == InfoToggle.ROTATION_PITCH.getBitMask() ||
+                 type == InfoToggle.SPEED.getBitMask())
         {
             // Don't add the same line multiple times
-            if ((this.addedTypes & (Configs.InfoToggle.ROTATION_YAW.getBitMask() |
-                                    Configs.InfoToggle.ROTATION_PITCH.getBitMask() |
-                                    Configs.InfoToggle.SPEED.getBitMask())) != 0)
+            if ((this.addedTypes & (InfoToggle.ROTATION_YAW.getBitMask() |
+                                    InfoToggle.ROTATION_PITCH.getBitMask() |
+                                    InfoToggle.SPEED.getBitMask())) != 0)
             {
                 return;
             }
@@ -405,19 +407,19 @@ public class RenderEventHandler
             String pre = "";
             StringBuilder str = new StringBuilder(128);
 
-            if ((enabledMask & Configs.InfoToggle.ROTATION_YAW.getBitMask()) != 0)
+            if ((enabledMask & InfoToggle.ROTATION_YAW.getBitMask()) != 0)
             {
                 str.append(String.format("yaw: %.1f", MathHelper.wrapDegrees(entity.rotationYaw)));
                 pre = " / ";
             }
 
-            if ((enabledMask & Configs.InfoToggle.ROTATION_PITCH.getBitMask()) != 0)
+            if ((enabledMask & InfoToggle.ROTATION_PITCH.getBitMask()) != 0)
             {
                 str.append(pre).append(String.format("pitch: %.1f", MathHelper.wrapDegrees(entity.rotationPitch)));
                 pre = " / ";
             }
 
-            if ((enabledMask & Configs.InfoToggle.SPEED.getBitMask()) != 0)
+            if ((enabledMask & InfoToggle.SPEED.getBitMask()) != 0)
             {
                 double dx = entity.posX - entity.lastTickPosX;
                 double dy = entity.posY - entity.lastTickPosY;
@@ -427,27 +429,27 @@ public class RenderEventHandler
             }
 
             this.addLine(str.toString());
-            this.addedTypes |= (Configs.InfoToggle.ROTATION_YAW.getBitMask() |
-                                Configs.InfoToggle.ROTATION_PITCH.getBitMask() |
-                                Configs.InfoToggle.SPEED.getBitMask());
+            this.addedTypes |= (InfoToggle.ROTATION_YAW.getBitMask() |
+                                InfoToggle.ROTATION_PITCH.getBitMask() |
+                                InfoToggle.SPEED.getBitMask());
         }
-        else if (type == Configs.InfoToggle.CHUNK_SECTIONS.getBitMask())
+        else if (type == InfoToggle.CHUNK_SECTIONS.getBitMask())
         {
             this.addLine(String.format("C: %d", ((IMixinRenderGlobal) mc.renderGlobal).getRenderedChunksInvoker()));
         }
-        else if (type == Configs.InfoToggle.CHUNK_SECTIONS_FULL.getBitMask())
+        else if (type == InfoToggle.CHUNK_SECTIONS_FULL.getBitMask())
         {
             this.addLine(mc.renderGlobal.getDebugInfoRenders());
         }
-        else if (type == Configs.InfoToggle.CHUNK_UPDATES.getBitMask())
+        else if (type == InfoToggle.CHUNK_UPDATES.getBitMask())
         {
             this.addLine(String.format("Chunk updates: %d", RenderChunk.renderChunksUpdated));
         }
-        else if (type == Configs.InfoToggle.PARTICLE_COUNT.getBitMask())
+        else if (type == InfoToggle.PARTICLE_COUNT.getBitMask())
         {
             this.addLine(String.format("P: %s", mc.effectRenderer.getStatistics()));
         }
-        else if (type == Configs.InfoToggle.DIFFICULTY.getBitMask())
+        else if (type == InfoToggle.DIFFICULTY.getBitMask())
         {
             if (mc.world.isBlockLoaded(pos))
             {
@@ -467,7 +469,7 @@ public class RenderEventHandler
                         diff.getAdditionalDifficulty(), diff.getClampedAdditionalDifficulty(), mc.world.getWorldTime() / 24000L));
             }
         }
-        else if (type == Configs.InfoToggle.BIOME.getBitMask())
+        else if (type == InfoToggle.BIOME.getBitMask())
         {
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
@@ -480,7 +482,7 @@ public class RenderEventHandler
                 }
             }
         }
-        else if (type == Configs.InfoToggle.BIOME_REG_NAME.getBitMask())
+        else if (type == InfoToggle.BIOME_REG_NAME.getBitMask())
         {
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
@@ -496,7 +498,7 @@ public class RenderEventHandler
                 }
             }
         }
-        else if (type == Configs.InfoToggle.ENTITIES.getBitMask())
+        else if (type == InfoToggle.ENTITIES.getBitMask())
         {
             String ent = mc.renderGlobal.getDebugInfoEntities();
 
@@ -509,7 +511,7 @@ public class RenderEventHandler
 
             this.addLine(ent);
         }
-        else if (type == Configs.InfoToggle.SLIME_CHUNK.getBitMask())
+        else if (type == InfoToggle.SLIME_CHUNK.getBitMask())
         {
             boolean valid = false;
             long seed = 0;
@@ -546,7 +548,7 @@ public class RenderEventHandler
 
             this.addLine("Slime chunk: " + result);
         }
-        else if (type == Configs.InfoToggle.LOOKING_AT_ENTITY.getBitMask())
+        else if (type == InfoToggle.LOOKING_AT_ENTITY.getBitMask())
         {
             if (mc.objectMouseOver != null &&
                 mc.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY &&
@@ -566,7 +568,7 @@ public class RenderEventHandler
                 }
             }
         }
-        else if (type == Configs.InfoToggle.ENTITY_REG_NAME.getBitMask())
+        else if (type == InfoToggle.ENTITY_REG_NAME.getBitMask())
         {
             if (mc.objectMouseOver != null &&
                 mc.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY &&
@@ -580,11 +582,12 @@ public class RenderEventHandler
                 }
             }
         }
-        else if (type == Configs.InfoToggle.LOOKING_AT_BLOCK.getBitMask() ||
-                 type == Configs.InfoToggle.LOOKING_AT_BLOCK_CHUNK.getBitMask())
+        else if (type == InfoToggle.LOOKING_AT_BLOCK.getBitMask() ||
+                 type == InfoToggle.LOOKING_AT_BLOCK_CHUNK.getBitMask())
         {
             // Don't add the same line multiple times
-            if ((this.addedTypes & (Configs.InfoToggle.LOOKING_AT_BLOCK.getBitMask() | Configs.InfoToggle.LOOKING_AT_BLOCK_CHUNK.getBitMask())) != 0)
+            if ((this.addedTypes & (InfoToggle.LOOKING_AT_BLOCK.getBitMask() |
+                                    InfoToggle.LOOKING_AT_BLOCK_CHUNK.getBitMask())) != 0)
             {
                 return;
             }
@@ -597,13 +600,13 @@ public class RenderEventHandler
                 String pre = "";
                 StringBuilder str = new StringBuilder(128);
 
-                if ((enabledMask & Configs.InfoToggle.LOOKING_AT_BLOCK.getBitMask()) != 0)
+                if ((enabledMask & InfoToggle.LOOKING_AT_BLOCK.getBitMask()) != 0)
                 {
                     str.append(String.format("Looking at block: %d, %d, %d", lookPos.getX(), lookPos.getY(), lookPos.getZ()));
                     pre = " // ";
                 }
 
-                if ((enabledMask & Configs.InfoToggle.LOOKING_AT_BLOCK_CHUNK.getBitMask()) != 0)
+                if ((enabledMask & InfoToggle.LOOKING_AT_BLOCK_CHUNK.getBitMask()) != 0)
                 {
                     str.append(pre).append(String.format("Block: %d, %d, %d in Sub-Chunk: %d, %d, %d",
                             lookPos.getX() & 0xF, lookPos.getY() & 0xF, lookPos.getZ() & 0xF,
@@ -611,10 +614,11 @@ public class RenderEventHandler
                 }
 
                 this.addLine(str.toString());
-                this.addedTypes |= (Configs.InfoToggle.LOOKING_AT_BLOCK.getBitMask() | Configs.InfoToggle.LOOKING_AT_BLOCK_CHUNK.getBitMask());
+                this.addedTypes |= (InfoToggle.LOOKING_AT_BLOCK.getBitMask() |
+                                    InfoToggle.LOOKING_AT_BLOCK_CHUNK.getBitMask());
             }
         }
-        else if (type == Configs.InfoToggle.BLOCK_PROPS.getBitMask())
+        else if (type == InfoToggle.BLOCK_PROPS.getBitMask())
         {
             this.getBlockProperties(mc);
         }
@@ -663,7 +667,7 @@ public class RenderEventHandler
 
     private void renderText(Minecraft mc, int xOff, int yOff, List<StringHolder> lines)
     {
-        boolean scale = Configs.Generic.USE_SCALED_FONT.getBooleanValue();
+        boolean scale = ConfigsGeneric.USE_SCALED_FONT.getBooleanValue();
 
         if (scale)
         {
@@ -677,18 +681,18 @@ public class RenderEventHandler
         {
             String line = holder.str;
 
-            if (Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue())
+            if (ConfigsGeneric.USE_TEXT_BACKGROUND.getBooleanValue())
             {
-                Gui.drawRect(xOff - 2, yOff - 2, xOff + fontRenderer.getStringWidth(line) + 2, yOff + fontRenderer.FONT_HEIGHT, Configs.Generic.TEXT_BACKGROUND_COLOR.getIntegerValue());
+                Gui.drawRect(xOff - 2, yOff - 2, xOff + fontRenderer.getStringWidth(line) + 2, yOff + fontRenderer.FONT_HEIGHT, ConfigsGeneric.TEXT_BACKGROUND_COLOR.getIntegerValue());
             }
 
-            if (Configs.Generic.USE_FONT_SHADOW.getBooleanValue())
+            if (ConfigsGeneric.USE_FONT_SHADOW.getBooleanValue())
             {
-                fontRenderer.drawStringWithShadow(line, xOff, yOff, Configs.Generic.FONT_COLOR.getIntegerValue());
+                fontRenderer.drawStringWithShadow(line, xOff, yOff, ConfigsGeneric.FONT_COLOR.getIntegerValue());
             }
             else
             {
-                fontRenderer.drawString(line, xOff, yOff, Configs.Generic.FONT_COLOR.getIntegerValue());
+                fontRenderer.drawString(line, xOff, yOff, ConfigsGeneric.FONT_COLOR.getIntegerValue());
             }
 
             yOff += fontRenderer.FONT_HEIGHT + 2;

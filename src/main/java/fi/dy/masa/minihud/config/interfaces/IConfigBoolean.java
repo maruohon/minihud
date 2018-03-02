@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.config;
+package fi.dy.masa.minihud.config.interfaces;
 
 public interface IConfigBoolean extends IConfig
 {

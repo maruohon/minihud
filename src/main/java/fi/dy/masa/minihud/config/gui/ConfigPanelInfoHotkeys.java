@@ -3,8 +3,8 @@ package fi.dy.masa.minihud.config.gui;
 import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.modconfig.ConfigPanelHost;
 import fi.dy.masa.minihud.LiteModMiniHud;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.IConfigHotkey;
+import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.interfaces.IConfigHotkey;
 
 public class ConfigPanelInfoHotkeys extends ConfigPanelHotkeysBase
 {
@@ -14,9 +14,9 @@ public class ConfigPanelInfoHotkeys extends ConfigPanelHotkeysBase
     }
 
     @Override
-    protected Configs.InfoToggle[] getConfigs()
+    protected InfoToggle[] getConfigs()
     {
-        return Configs.InfoToggle.values();
+        return InfoToggle.values();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package fi.dy.masa.minihud.config.gui;
 
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.IConfig;
+import fi.dy.masa.minihud.config.ConfigsGeneric;
+import fi.dy.masa.minihud.config.interfaces.IConfig;
 
 public class ConfigPanelGeneric extends ConfigPanelSub
 {
@@ -13,6 +13,6 @@ public class ConfigPanelGeneric extends ConfigPanelSub
     @Override
     protected IConfig[] getConfigs()
     {
-        return Configs.Generic.values();
+        return ConfigsGeneric.values();
     }
 }

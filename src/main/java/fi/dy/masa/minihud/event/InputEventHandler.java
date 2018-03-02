@@ -6,6 +6,7 @@ import org.lwjgl.input.Keyboard;
 import com.google.common.collect.MapMaker;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.ConfigsGeneric;
 import fi.dy.masa.minihud.mixin.IMixinDebugRenderer;
 import fi.dy.masa.minihud.mixin.IMixinPathNavigate;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
@@ -141,7 +142,7 @@ public class InputEventHandler
                         if (old == null || isSamepath == false || old.getCurrentPathIndex() != path.getCurrentPathIndex())
                         {
                             final int id = entity.getEntityId();
-                            final float maxDistance = Configs.Generic.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? ((IMixinPathNavigate) navigator).getMaxDistanceToWaypoint() : 0F;
+                            final float maxDistance = ConfigsGeneric.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? ((IMixinPathNavigate) navigator).getMaxDistanceToWaypoint() : 0F;
 
                             DebugInfoUtils.sendPacketDebugPath(server, id, path, maxDistance);
 

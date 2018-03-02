@@ -2,7 +2,7 @@ package fi.dy.masa.minihud.config.gui;
 
 import com.mumfrey.liteloader.modconfig.ConfigPanelHost;
 import fi.dy.masa.minihud.LiteModMiniHud;
-import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.InfoToggle;
 
 public class ConfigPanelInfoLineOrder extends ConfigPanelSub
 {
@@ -12,9 +12,9 @@ public class ConfigPanelInfoLineOrder extends ConfigPanelSub
     }
 
     @Override
-    protected Configs.InfoToggle[] getConfigs()
+    protected InfoToggle[] getConfigs()
     {
-        return Configs.InfoToggle.values();
+        return InfoToggle.values();
     }
 
     @Override
@@ -27,7 +27,7 @@ public class ConfigPanelInfoLineOrder extends ConfigPanelSub
         int configHeight = 20;
         int labelWidth = this.getMaxLabelWidth(this.getConfigs()) + 10;
 
-        for (Configs.InfoToggle toggle : this.getConfigs())
+        for (InfoToggle toggle : this.getConfigs())
         {
             this.addLabel(0, x, y + 7, labelWidth, 8, 0xFFFFFFFF, toggle.getName());
 
@@ -44,7 +44,7 @@ public class ConfigPanelInfoLineOrder extends ConfigPanelSub
     {
         boolean dirty = false;
 
-        for (Configs.InfoToggle config : this.getConfigs())
+        for (InfoToggle config : this.getConfigs())
         {
             ConfigTextField field = this.getTextFieldFor(config);
 

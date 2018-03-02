@@ -1,6 +1,6 @@
 package fi.dy.masa.minihud.config.gui;
 
-import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.InfoToggle;
 
 public class ConfigPanelInfoToggles extends ConfigPanelSub
 {
@@ -10,8 +10,8 @@ public class ConfigPanelInfoToggles extends ConfigPanelSub
     }
 
     @Override
-    protected Configs.InfoToggle[] getConfigs()
+    protected InfoToggle[] getConfigs()
     {
-        return Configs.InfoToggle.values();
+        return InfoToggle.values();
     }
 }

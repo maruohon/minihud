@@ -12,6 +12,7 @@ import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.core.LiteLoader;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.ConfigsGeneric;
 import fi.dy.masa.minihud.config.gui.MiniHudConfigPanel;
 import fi.dy.masa.minihud.event.RenderEventHandler;
 import net.minecraft.client.Minecraft;
@@ -51,7 +52,7 @@ public class LiteModMiniHud implements LiteMod, Configurable, InitCompleteListen
     public void init(File configPath)
     {
         Configs.load();
-        RenderEventHandler.getInstance().setEnabled(Configs.Generic.ENABLE_BY_DEFAULT.getBooleanValue());
+        RenderEventHandler.getInstance().setEnabled(ConfigsGeneric.ENABLE_BY_DEFAULT.getBooleanValue());
     }
 
     @Override

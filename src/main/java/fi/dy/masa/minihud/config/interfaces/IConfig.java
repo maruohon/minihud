@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.config;
+package fi.dy.masa.minihud.config.interfaces;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.minihud.config.Configs.ConfigType;

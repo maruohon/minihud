@@ -1,8 +1,8 @@
 package fi.dy.masa.minihud.config.gui;
 
 import com.mumfrey.liteloader.modconfig.ConfigPanelHost;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.IConfigHotkey;
+import fi.dy.masa.minihud.config.DebugHotkeys;
+import fi.dy.masa.minihud.config.interfaces.IConfigHotkey;
 
 public class ConfigPanelDebugHotkeys extends ConfigPanelHotkeysBase
 {
@@ -12,9 +12,9 @@ public class ConfigPanelDebugHotkeys extends ConfigPanelHotkeysBase
     }
 
     @Override
-    protected Configs.DebugHotkeys[] getConfigs()
+    protected DebugHotkeys[] getConfigs()
     {
-        return Configs.DebugHotkeys.values();
+        return DebugHotkeys.values();
     }
 
     @Override
