@@ -198,7 +198,7 @@ public class RenderEventHandler
 
         for (LinePos pos : positions)
         {
-            this.addLine(pos.type);
+            this.addLine(pos.type, enabledMask);
         }
 
         if (Configs.Generic.SORT_LINES_BY_LENGTH.getBooleanValue())
@@ -217,7 +217,7 @@ public class RenderEventHandler
         this.lines.add(new StringHolder(text));
     }
 
-    private void addLine(int type)
+    private void addLine(int type, int enabledMask)
     {
         Minecraft mc = Minecraft.getMinecraft();
         Entity entity = mc.getRenderViewEntity();
@@ -282,7 +282,7 @@ public class RenderEventHandler
             String pre = "";
             StringBuilder str = new StringBuilder(128);
 
-            if ((this.mask & Configs.InfoToggle.COORDINATES.getBitMask()) != 0)
+            if ((enabledMask & Configs.InfoToggle.COORDINATES.getBitMask()) != 0)
             {
                 if (Configs.Generic.USE_CUSTOMIZED_COORDINATES.getBooleanValue())
                 {
@@ -306,7 +306,7 @@ public class RenderEventHandler
                 pre = " / ";
             }
 
-            if ((this.mask & Configs.InfoToggle.DIMENSION.getBitMask()) != 0)
+            if ((enabledMask & Configs.InfoToggle.DIMENSION.getBitMask()) != 0)
             {
                 int dimension = entity.getEntityWorld().provider.getDimensionType().getId();
                 str.append(String.format(String.format("%sDimensionType ID: %d", pre, dimension)));
@@ -315,13 +315,46 @@ public class RenderEventHandler
             this.addLine(str.toString());
             this.addedTypes |= (Configs.InfoToggle.COORDINATES.getBitMask() | Configs.InfoToggle.DIMENSION.getBitMask());
         }
-        else if (type == Configs.InfoToggle.BLOCK_POS.getBitMask())
+        else if (type == Configs.InfoToggle.BLOCK_POS.getBitMask() ||
+                 type == Configs.InfoToggle.CHUNK_POS.getBitMask() ||
+                 type == Configs.InfoToggle.REGION_FILE.getBitMask())
         {
-            this.addLine(String.format("Block: %d / %d / %d", pos.getX(), pos.getY(), pos.getZ()));
+            // Don't add the same line multiple times
+            if ((this.addedTypes & (Configs.InfoToggle.BLOCK_POS.getBitMask() |
+                                    Configs.InfoToggle.CHUNK_POS.getBitMask() |
+                                    Configs.InfoToggle.REGION_FILE.getBitMask())) != 0)
+            {
+                return;
+            }
+
+            String pre = "";
+            StringBuilder str = new StringBuilder(256);
+
+            if ((enabledMask & Configs.InfoToggle.BLOCK_POS.getBitMask()) != 0)
+            {
+                str.append(String.format("Block: %d, %d, %d", pos.getX(), pos.getY(), pos.getZ()));
+                pre = " / ";
+            }
+
+            if ((enabledMask & Configs.InfoToggle.CHUNK_POS.getBitMask()) != 0)
+            {
+                str.append(pre).append(String.format("Sub-Chunk: %d, %d, %d", pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4));
+                pre = " / ";
+            }
+
+            if ((enabledMask & Configs.InfoToggle.REGION_FILE.getBitMask()) != 0)
+            {
+                str.append(pre).append(String.format("Region: r.%d.%d", pos.getX() >> 9, pos.getZ() >> 9));
+            }
+
+            this.addLine(str.toString());
+            this.addedTypes |= (Configs.InfoToggle.BLOCK_POS.getBitMask() |
+                                Configs.InfoToggle.CHUNK_POS.getBitMask() |
+                                Configs.InfoToggle.REGION_FILE.getBitMask());
         }
-        else if (type == Configs.InfoToggle.CHUNK_POS.getBitMask())
+        else if (type == Configs.InfoToggle.BLOCK_IN_CHUNK.getBitMask())
         {
-            this.addLine(String.format("Block: %d %d %d in Chunk: %d %d %d",
+            this.addLine(String.format("Block: %d, %d, %d within Sub-Chunk: %d, %d, %d",
                         pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF,
                         pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4));
         }
@@ -372,26 +405,25 @@ public class RenderEventHandler
             String pre = "";
             StringBuilder str = new StringBuilder(128);
 
-            if ((this.mask & Configs.InfoToggle.ROTATION_YAW.getBitMask()) != 0)
+            if ((enabledMask & Configs.InfoToggle.ROTATION_YAW.getBitMask()) != 0)
             {
-                str.append(String.format("%syaw: %.1f", pre, MathHelper.wrapDegrees(entity.rotationYaw)));
+                str.append(String.format("yaw: %.1f", MathHelper.wrapDegrees(entity.rotationYaw)));
                 pre = " / ";
             }
 
-            if ((this.mask & Configs.InfoToggle.ROTATION_PITCH.getBitMask()) != 0)
+            if ((enabledMask & Configs.InfoToggle.ROTATION_PITCH.getBitMask()) != 0)
             {
-                str.append(String.format("%spitch: %.1f", pre, MathHelper.wrapDegrees(entity.rotationPitch)));
+                str.append(pre).append(String.format("pitch: %.1f", MathHelper.wrapDegrees(entity.rotationPitch)));
                 pre = " / ";
             }
 
-            if ((this.mask & Configs.InfoToggle.SPEED.getBitMask()) != 0)
+            if ((enabledMask & Configs.InfoToggle.SPEED.getBitMask()) != 0)
             {
                 double dx = entity.posX - entity.lastTickPosX;
                 double dy = entity.posY - entity.lastTickPosY;
                 double dz = entity.posZ - entity.lastTickPosZ;
                 double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                str.append(String.format("%sspeed: %.3f m/s", pre, dist * 20));
-                pre = " / ";
+                str.append(pre).append(String.format("speed: %.3f m/s", dist * 20));
             }
 
             this.addLine(str.toString());
@@ -565,15 +597,15 @@ public class RenderEventHandler
                 String pre = "";
                 StringBuilder str = new StringBuilder(128);
 
-                if ((this.mask & Configs.InfoToggle.LOOKING_AT_BLOCK.getBitMask()) != 0)
+                if ((enabledMask & Configs.InfoToggle.LOOKING_AT_BLOCK.getBitMask()) != 0)
                 {
-                    str.append(String.format("Looking at block: %d %d %d", lookPos.getX(), lookPos.getY(), lookPos.getZ()));
+                    str.append(String.format("Looking at block: %d, %d, %d", lookPos.getX(), lookPos.getY(), lookPos.getZ()));
                     pre = " // ";
                 }
 
-                if ((this.mask & Configs.InfoToggle.LOOKING_AT_BLOCK_CHUNK.getBitMask()) != 0)
+                if ((enabledMask & Configs.InfoToggle.LOOKING_AT_BLOCK_CHUNK.getBitMask()) != 0)
                 {
-                    str.append(pre).append(String.format("Block: %d %d %d within chunk section: %d %d %d",
+                    str.append(pre).append(String.format("Block: %d, %d, %d in Sub-Chunk: %d, %d, %d",
                             lookPos.getX() & 0xF, lookPos.getY() & 0xF, lookPos.getZ() & 0xF,
                             lookPos.getX() >> 4, lookPos.getY() >> 4, lookPos.getZ() >> 4));
                 }
