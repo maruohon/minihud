@@ -4,16 +4,15 @@ import javax.annotation.Nullable;
 import fi.dy.masa.minihud.config.Configs.ConfigType;
 import fi.dy.masa.minihud.config.interfaces.IConfig;
 import fi.dy.masa.minihud.config.interfaces.IConfigHotkey;
-import fi.dy.masa.minihud.event.InputEventHandler;
 
 public enum DebugHotkeys implements IConfig, IConfigHotkey
 {
-    COLLISION_BOXES     ("debugCollisionBoxEnabled",    InputEventHandler.MASK_DEBUG_COLLISION_BOXES,   "1"),
-    HEIGHT_MAP          ("debugHeightMapEnabled",       InputEventHandler.MASK_DEBUG_HEIGHT_MAP,        "2"),
-    NEIGHBOR_UPDATES    ("debugNeighborsUpdateEnabled", InputEventHandler.MASK_DEBUG_NEIGHBOR_UPDATE,   "3"),
-    PATH_FINDING        ("debugPathfindingEnabled",     InputEventHandler.MASK_DEBUG_PATHFINDING,       "4"),
-    SOLID_FACES         ("debugSolidFaceEnabled",       InputEventHandler.MASK_DEBUG_SOLID_FACES,       "5"),
-    WATER               ("debugWaterEnabled",           InputEventHandler.MASK_DEBUG_WATER,             "6");
+    COLLISION_BOXES     ("debugCollisionBoxEnabled",    0x01, "1"),
+    HEIGHT_MAP          ("debugHeightMapEnabled",       0x02, "2"),
+    NEIGHBOR_UPDATES    ("debugNeighborsUpdateEnabled", 0x04, "3"),
+    PATH_FINDING        ("debugPathfindingEnabled",     0x08, "4"),
+    SOLID_FACES         ("debugSolidFaceEnabled",       0x10, "5"),
+    WATER               ("debugWaterEnabled",           0x20, "6");
 
     private final String name;
     private final int bitMask;
