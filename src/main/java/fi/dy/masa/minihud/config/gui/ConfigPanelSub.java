@@ -122,6 +122,7 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
             {
                 ConfigTextField field = this.addTextField(0, x + labelWidth, y + 1, 200, configHeight - 3);
                 field.setText(config.getStringValue());
+                field.getNativeTextField().setMaxStringLength(128);
                 this.addTextField(config, field);
             }
 
