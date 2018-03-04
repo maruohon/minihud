@@ -41,15 +41,15 @@ public class InventoryUtils
             world.isRemote && player instanceof EntityPlayerSP)
         {
             ItemStack stack = ItemStack.EMPTY;
-            IRecipe recipe = CraftingManager.func_192413_b(inventoryCrafting, world);
+            IRecipe recipe = CraftingManager.findMatchingRecipe(inventoryCrafting, world);
 
             if (recipe != null &&
-                    (recipe.func_192399_d() ||
+                    (recipe.isDynamic() ||
                      world.getGameRules().getBoolean("doLimitedCrafting") == false ||
-                     ((EntityPlayerSP) player).func_192035_E().func_193830_f(recipe))
+                     ((EntityPlayerSP) player).getRecipeBook().isUnlocked(recipe))
             )
             {
-                inventoryCraftResult.func_193056_a(recipe);
+                inventoryCraftResult.setRecipeUsed(recipe);
                 stack = recipe.getCraftingResult(inventoryCrafting);
             }
 

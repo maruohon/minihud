@@ -16,7 +16,7 @@ public class MixinContainer
 {
     //private static final String SCCG_SIG = "(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/inventory/InventoryCrafting;Lnet/minecraft/inventory/InventoryCraftResult;)V";
 
-    @Inject(method = "func_192389_a", at = @At("RETURN"))
+    @Inject(method = "slotChangedCraftingGrid", at = @At("RETURN"))
     public void onSlotChangedCraftingGrid(
             World world,
             EntityPlayer player,
