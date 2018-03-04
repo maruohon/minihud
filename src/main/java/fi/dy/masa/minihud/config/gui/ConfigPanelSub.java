@@ -64,7 +64,8 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
         {
             if (config.getType() == ConfigType.STRING ||
                 config.getType() == ConfigType.HEX_STRING ||
-                config.getType() == ConfigType.INTEGER)
+                config.getType() == ConfigType.INTEGER ||
+                config.getType() == ConfigType.DOUBLE)
             {
                 ConfigTextField field = this.getTextFieldFor(config);
 
@@ -118,7 +119,8 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
             }
             else if (config.getType() == ConfigType.STRING ||
                      config.getType() == ConfigType.HEX_STRING ||
-                     config.getType() == ConfigType.INTEGER)
+                     config.getType() == ConfigType.INTEGER ||
+                     config.getType() == ConfigType.DOUBLE)
             {
                 ConfigTextField field = this.addTextField(0, x + labelWidth, y + 1, 200, configHeight - 3);
                 field.setText(config.getStringValue());

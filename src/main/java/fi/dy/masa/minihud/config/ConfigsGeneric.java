@@ -7,9 +7,10 @@ import com.google.gson.JsonPrimitive;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs.ConfigType;
 import fi.dy.masa.minihud.config.interfaces.IConfigBoolean;
+import fi.dy.masa.minihud.config.interfaces.IConfigDouble;
 import fi.dy.masa.minihud.config.interfaces.IConfigGeneric;
 
-public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean
+public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean, IConfigDouble
 {
     COORDINATE_FORMAT_STRING        ("coordinateFormat", "x: %.1f y: %.1f z: %.1f",
                                     "The format string for the coordinate line.\n" +
@@ -25,6 +26,11 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean
     ENABLE_BY_DEFAULT               ("enableByDefault", true, "If true, the HUD will be enabled by default on game launch"),
     FIX_VANILLA_DEBUG_RENDERERS     ("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed."),
     FONT_COLOR                      ("fontColor", "0xE0E0E0", true, "Font color (RGB, default: 0xE0E0E0 = 14737632)"),
+    FONT_SCALE                      ("fontScale", 1.0d, "Font scale factor. Valid range: 0.0 - 10.0. Default: 1.0\n" +
+                                                        "Note that the 'useScaledFont' option will override\n" +
+                                                        "this option (with 0.5) if it's enabled!"),
+    HUD_ALIGNMENT                   ("hudAlignment", "top_left",
+                                    "The alignment of the HUD. Valid values: top_left, rop_right, bottom_left, bottom_right, center."),
     REGION_OVERLAY_COLOR            ("regionOverlayColor", "0xFFFF8019", true, "Color for the region file overlay (ARGB, default: 0xFFFF8019)"),
     REQUIRE_SNEAK                   ("requireSneak", false, "Require the player to be sneaking to render the HUD"),
     REQUIRE_HOLDING_KEY             ("requireHoldingKey", "none", "Require holding a key to render the HUD. Valid keys are 'alt', 'ctrl' and 'shift'."),
@@ -43,6 +49,7 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean
     private String comment;
     private boolean valueBoolean;
     private int valueInteger;
+    private double valueDouble;
     private String valueString;
 
     private ConfigsGeneric(String name, boolean defaultValue, String comment)
@@ -58,6 +65,14 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean
         this.type = ConfigType.INTEGER;
         this.name = name;
         this.valueInteger = defaultValue;
+        this.comment = comment;
+    }
+
+    private ConfigsGeneric(String name, double defaultValue, String comment)
+    {
+        this.type = ConfigType.DOUBLE;
+        this.name = name;
+        this.valueDouble = defaultValue;
         this.comment = comment;
     }
 
@@ -124,12 +139,25 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean
         this.valueInteger = value;
     }
 
+    @Override
+    public double getDoubleValue()
+    {
+        return this.valueDouble;
+    }
+
+    @Override
+    public void setDoubleValue(double value)
+    {
+        this.valueDouble = value;
+    }
+
     public String getStringValue()
     {
         switch (this.type)
         {
             case BOOLEAN:       return String.valueOf(this.valueBoolean);
             case INTEGER:       return String.valueOf(this.valueInteger);
+            case DOUBLE:        return String.valueOf(this.valueDouble);
             case HEX_STRING:    return String.format("0x%08X", this.valueInteger);
             case STRING:
             default:            return this.valueString;
@@ -159,6 +187,9 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean
                 case INTEGER:
                     this.valueInteger = Integer.parseInt(value);
                     break;
+                case DOUBLE:
+                    this.valueDouble = Double.parseDouble(value);
+                    break;
                 case STRING:
                     this.valueString = value;
                     break;
@@ -186,6 +217,9 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean
                 case INTEGER:
                     this.valueInteger = value.getAsInt();
                     break;
+                case DOUBLE:
+                    this.valueDouble = value.getAsDouble();
+                    break;
                 case STRING:
                     this.valueString = value.getAsString();
                     break;
@@ -207,6 +241,7 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean
         {
             case BOOLEAN:       return new JsonPrimitive(this.getBooleanValue());
             case INTEGER:       return new JsonPrimitive(this.getIntegerValue());
+            case DOUBLE:        return new JsonPrimitive(this.getDoubleValue());
             case STRING:        return new JsonPrimitive(this.getStringValue());
             case HEX_STRING:    return new JsonPrimitive(String.format("0x%08X", this.getIntegerValue()));
             default:

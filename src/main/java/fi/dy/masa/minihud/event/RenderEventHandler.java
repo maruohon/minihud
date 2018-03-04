@@ -18,6 +18,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.entity.Entity;
@@ -55,6 +56,7 @@ public class RenderEventHandler
     private long serverSeed;
     private boolean serverSeedValid;
     private int addedTypes;
+    private double fontScale = 0.5d;
     private final List<StringHolder> lines = new ArrayList<StringHolder>();
 
     public RenderEventHandler()
@@ -118,6 +120,11 @@ public class RenderEventHandler
     public void onWorldLoad()
     {
         this.serverSeedValid = false;
+    }
+
+    public void setFontScale(double scale)
+    {
+        this.fontScale = scale;
     }
 
     public void onChatMessage(ITextComponent message)
@@ -683,38 +690,65 @@ public class RenderEventHandler
 
     private void renderText(Minecraft mc, int xOff, int yOff, List<StringHolder> lines)
     {
-        boolean scale = ConfigsGeneric.USE_SCALED_FONT.getBooleanValue();
+        final double scale = this.fontScale;
 
-        if (scale)
+        if (scale != 1d)
         {
             GlStateManager.pushMatrix();
-            GlStateManager.scale(0.5, 0.5, 0.5);
+            GlStateManager.scale(scale, scale, scale);
         }
 
         FontRenderer fontRenderer = mc.fontRenderer;
+        ScaledResolution res = new ScaledResolution(mc);
+        int x = xOff;
+        int y = yOff;
+
+        switch (Configs.hudAlignment)
+        {
+            case BOTTOM_LEFT:
+            case BOTTOM_RIGHT:
+                y = (int) ((res.getScaledHeight() + 4) / scale) - yOff - lines.size() * (fontRenderer.FONT_HEIGHT + 2);
+                break;
+            case CENTER:
+                y = (int) ((res.getScaledHeight() / 2 + 4) / scale) - yOff - (lines.size() * (fontRenderer.FONT_HEIGHT + 2) / 2);
+                break;
+            default:
+        }
 
         for (StringHolder holder : lines)
         {
             String line = holder.str;
 
+            switch (Configs.hudAlignment)
+            {
+                case TOP_RIGHT:
+                case BOTTOM_RIGHT:
+                    x = (int) (res.getScaledWidth() / scale) - fontRenderer.getStringWidth(line) - xOff;
+                    break;
+                case CENTER:
+                    x = (int) (res.getScaledWidth() / 2 / scale) - (fontRenderer.getStringWidth(line) / 2) - xOff;
+                    break;
+                default:
+            }
+
             if (ConfigsGeneric.USE_TEXT_BACKGROUND.getBooleanValue())
             {
-                Gui.drawRect(xOff - 2, yOff - 2, xOff + fontRenderer.getStringWidth(line) + 2, yOff + fontRenderer.FONT_HEIGHT, ConfigsGeneric.TEXT_BACKGROUND_COLOR.getIntegerValue());
+                Gui.drawRect(x - 2, y - 2, x + fontRenderer.getStringWidth(line) + 2, y + fontRenderer.FONT_HEIGHT, ConfigsGeneric.TEXT_BACKGROUND_COLOR.getIntegerValue());
             }
 
             if (ConfigsGeneric.USE_FONT_SHADOW.getBooleanValue())
             {
-                fontRenderer.drawStringWithShadow(line, xOff, yOff, ConfigsGeneric.FONT_COLOR.getIntegerValue());
+                fontRenderer.drawStringWithShadow(line, x, y, ConfigsGeneric.FONT_COLOR.getIntegerValue());
             }
             else
             {
-                fontRenderer.drawString(line, xOff, yOff, ConfigsGeneric.FONT_COLOR.getIntegerValue());
+                fontRenderer.drawString(line, x, y, ConfigsGeneric.FONT_COLOR.getIntegerValue());
             }
 
-            yOff += fontRenderer.FONT_HEIGHT + 2;
+            y += fontRenderer.FONT_HEIGHT + 2;
         }
 
-        if (scale)
+        if (scale != 1d)
         {
             GlStateManager.popMatrix();
         }
@@ -782,6 +816,28 @@ public class RenderEventHandler
             }
 
             return this.position < other.position ? -1 : (this.position > other.position ? 1 : 0);
+        }
+    }
+
+    public enum HudAlignment
+    {
+        TOP_LEFT,
+        TOP_RIGHT,
+        BOTTOM_LEFT,
+        BOTTOM_RIGHT,
+        CENTER;
+
+        public static HudAlignment fromString(String name)
+        {
+            for (HudAlignment al : HudAlignment.values())
+            {
+                if (al.name().equalsIgnoreCase(name))
+                {
+                    return al;
+                }
+            }
+
+            return HudAlignment.TOP_LEFT;
         }
     }
 }

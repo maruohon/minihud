@@ -18,11 +18,15 @@ import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.interfaces.IConfigHotkey;
 import fi.dy.masa.minihud.event.InputEventHandler.KeyModifier;
 import fi.dy.masa.minihud.event.RenderEventHandler;
+import fi.dy.masa.minihud.event.RenderEventHandler.HudAlignment;
 import fi.dy.masa.minihud.util.JsonUtils;
+import net.minecraft.util.math.MathHelper;
 
 public class Configs
 {
     private static final String CONFIG_FILE_NAME = Reference.MOD_ID + ".json";
+
+    public static HudAlignment hudAlignment = HudAlignment.TOP_LEFT;
 
     public static KeyModifier requiredKey;
     private static final Multimap<Integer, Integer> HOTKEY_DEBUG_MAP = HashMultimap.create();
@@ -34,6 +38,7 @@ public class Configs
     {
         BOOLEAN,
         INTEGER,
+        DOUBLE,
         STRING,
         HEX_STRING,
         HOTKEY;
@@ -107,6 +112,7 @@ public class Configs
             }
         }
 
+        hudAlignment = HudAlignment.fromString(ConfigsGeneric.HUD_ALIGNMENT.getStringValue());
         requiredKey = getKeyModifier(ConfigsGeneric.REQUIRE_HOLDING_KEY.getStringValue());
         int enabledInfoTypes = 0;
         HOTKEY_INFO_MAP.clear();
@@ -133,6 +139,14 @@ public class Configs
         }
 
         RenderEventHandler.getInstance().setEnabledMask(enabledInfoTypes);
+        double scale = 0.5d;
+
+        if (ConfigsGeneric.USE_SCALED_FONT.getBooleanValue() == false)
+        {
+            scale = MathHelper.clamp(ConfigsGeneric.FONT_SCALE.getDoubleValue(), 0d, 10d);
+        }
+
+        RenderEventHandler.getInstance().setFontScale(scale);
     }
 
     public static void save()
