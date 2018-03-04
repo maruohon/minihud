@@ -11,6 +11,7 @@ import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.ConfigsGeneric;
 import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.interfaces.IConfigOptionListEntry;
 import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
@@ -702,8 +703,9 @@ public class RenderEventHandler
         ScaledResolution res = new ScaledResolution(mc);
         int x = xOff;
         int y = yOff;
+        HudAlignment align = (HudAlignment) ConfigsGeneric.HUD_ALIGNMENT.getOptionListValue();
 
-        switch (Configs.hudAlignment)
+        switch (align)
         {
             case BOTTOM_LEFT:
             case BOTTOM_RIGHT:
@@ -719,7 +721,7 @@ public class RenderEventHandler
         {
             String line = holder.str;
 
-            switch (Configs.hudAlignment)
+            switch (align)
             {
                 case TOP_RIGHT:
                 case BOTTOM_RIGHT:
@@ -819,15 +821,69 @@ public class RenderEventHandler
         }
     }
 
-    public enum HudAlignment
+    public enum HudAlignment implements IConfigOptionListEntry
     {
-        TOP_LEFT,
-        TOP_RIGHT,
-        BOTTOM_LEFT,
-        BOTTOM_RIGHT,
-        CENTER;
+        TOP_LEFT        ("Top Left"),
+        TOP_RIGHT       ("Top Right"),
+        BOTTOM_LEFT     ("Bottom Left"),
+        BOTTOM_RIGHT    ("Bottom Right"),
+        CENTER          ("Center");
 
-        public static HudAlignment fromString(String name)
+        private final String displayName;
+
+        private HudAlignment(String displayName)
+        {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String getStringValue()
+        {
+            return this.name().toLowerCase();
+        }
+
+        @Override
+        public String getDisplayName()
+        {
+            return this.displayName;
+        }
+
+        @Override
+        public int getOrdinalValue()
+        {
+            return this.ordinal();
+        }
+
+        @Override
+        public IConfigOptionListEntry cycle(boolean forward)
+        {
+            int id = this.ordinal();
+
+            if (forward)
+            {
+                if (++id >= values().length)
+                {
+                    id = 0;
+                }
+            }
+            else
+            {
+                if (--id < 0)
+                {
+                    id = values().length - 1;
+                }
+            }
+
+            return values()[id % values().length];
+        }
+
+        @Override
+        public HudAlignment fromString(String name)
+        {
+            return fromStringStatic(name);
+        }
+
+        public static HudAlignment fromStringStatic(String name)
         {
             for (HudAlignment al : HudAlignment.values())
             {

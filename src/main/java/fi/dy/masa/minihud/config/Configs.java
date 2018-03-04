@@ -26,23 +26,11 @@ public class Configs
 {
     private static final String CONFIG_FILE_NAME = Reference.MOD_ID + ".json";
 
-    public static HudAlignment hudAlignment = HudAlignment.TOP_LEFT;
-
     public static KeyModifier requiredKey;
     private static final Multimap<Integer, Integer> HOTKEY_DEBUG_MAP = HashMultimap.create();
     private static final Multimap<Integer, Integer> HOTKEY_INFO_MAP = HashMultimap.create();
     private static final Multimap<Integer, Integer> HOTKEY_OVERLAY_MAP = HashMultimap.create();
     private static final Map<Integer, Integer> LINE_ORDER_MAP = new HashMap<Integer, Integer>();
-
-    public enum ConfigType
-    {
-        BOOLEAN,
-        INTEGER,
-        DOUBLE,
-        STRING,
-        HEX_STRING,
-        HOTKEY;
-    }
 
     public static void load()
     {
@@ -112,7 +100,7 @@ public class Configs
             }
         }
 
-        hudAlignment = HudAlignment.fromString(ConfigsGeneric.HUD_ALIGNMENT.getStringValue());
+        ConfigsGeneric.HUD_ALIGNMENT.setOptionListValue(HudAlignment.fromStringStatic(ConfigsGeneric.HUD_ALIGNMENT.getStringValue()));
         requiredKey = getKeyModifier(ConfigsGeneric.REQUIRE_HOLDING_KEY.getStringValue());
         int enabledInfoTypes = 0;
         HOTKEY_INFO_MAP.clear();

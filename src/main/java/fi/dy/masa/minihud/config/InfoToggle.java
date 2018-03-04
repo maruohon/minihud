@@ -1,6 +1,6 @@
 package fi.dy.masa.minihud.config;
 
-import fi.dy.masa.minihud.config.Configs.ConfigType;
+import fi.dy.masa.minihud.config.interfaces.ConfigType;
 import fi.dy.masa.minihud.config.interfaces.IConfigBoolean;
 import fi.dy.masa.minihud.config.interfaces.IConfigHotkey;
 

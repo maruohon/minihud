@@ -56,6 +56,12 @@ public abstract class ConfigPanelHotkeysBase extends ConfigPanelSub
         }
 
         @Override
+        public void onMouseButtonClicked(int mouseButton)
+        {
+            this.onMouseClicked();
+        }
+
+        @Override
         public void onMouseClicked()
         {
             this.selected = true;

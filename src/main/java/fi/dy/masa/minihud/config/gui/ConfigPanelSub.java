@@ -8,10 +8,12 @@ import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.modconfig.AbstractConfigPanel;
 import com.mumfrey.liteloader.modconfig.ConfigPanelHost;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.Configs.ConfigType;
+import fi.dy.masa.minihud.config.interfaces.ConfigType;
 import fi.dy.masa.minihud.config.interfaces.IConfig;
 import fi.dy.masa.minihud.config.interfaces.IConfigBoolean;
 import fi.dy.masa.minihud.config.interfaces.IConfigGeneric;
+import fi.dy.masa.minihud.config.interfaces.IConfigOptionList;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
@@ -21,6 +23,7 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
     private final MiniHudConfigPanel parent;
     private final Map<IConfig, ConfigTextField> textFields = new HashMap<>();
     private final ConfigOptionListenerGeneric<ConfigButtonBase> listener = new ConfigOptionListenerGeneric<>();
+    private final List<ConfigButtonBase> buttons = new ArrayList<>();
     private final List<HoverInfo> configComments = new ArrayList<>();
     private final String title;
 
@@ -56,16 +59,41 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
         }
     }
 
+    @Override
+    public void mousePressed(ConfigPanelHost host, int mouseX, int mouseY, int mouseButton)
+    {
+        for (ConfigButtonBase button : this.buttons)
+        {
+            if (button.mousePressed(this.mc, mouseX, mouseY))
+            {
+                button.onMouseButtonClicked(mouseButton);
+                this.listener.actionPerformed(button);
+                // Don't call super if the button got handled
+                return;
+            }
+        }
+
+        super.mousePressed(host, mouseX, mouseY, mouseButton);
+    }
+
+    private <T extends ConfigButtonBase> void addButton(T button, ConfigOptionListener<T> listener)
+    {
+        this.buttons.add(button);
+        this.addControl(button, listener);
+    }
+
     protected boolean handleTextFields()
     {
         boolean dirty = false;
 
         for (IConfig config : this.getConfigs())
         {
-            if (config.getType() == ConfigType.STRING ||
-                config.getType() == ConfigType.HEX_STRING ||
-                config.getType() == ConfigType.INTEGER ||
-                config.getType() == ConfigType.DOUBLE)
+            ConfigType type = config.getType();
+
+            if (type == ConfigType.STRING ||
+                type == ConfigType.HEX_STRING ||
+                type == ConfigType.INTEGER ||
+                type == ConfigType.DOUBLE)
             {
                 ConfigTextField field = this.getTextFieldFor(config);
 
@@ -107,20 +135,25 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
             this.addLabel(0, x, y + 7, labelWidth, 8, 0xFFFFFFFF, config.getName());
 
             String comment = config.getComment();
+            ConfigType type = config.getType();
 
             if (comment != null)
             {
                 this.addConfigComment(x, y + 2, labelWidth, 10, comment);
             }
 
-            if (config.getType() == ConfigType.BOOLEAN)
+            if (type == ConfigType.BOOLEAN)
             {
-                this.addControl(new ConfigButtonBoolean(0, x + labelWidth, y, 204, configHeight, (IConfigBoolean) config), this.listener);
+                this.addButton(new ConfigButtonBoolean(0, x + labelWidth, y, 204, configHeight, (IConfigBoolean) config), this.listener);
             }
-            else if (config.getType() == ConfigType.STRING ||
-                     config.getType() == ConfigType.HEX_STRING ||
-                     config.getType() == ConfigType.INTEGER ||
-                     config.getType() == ConfigType.DOUBLE)
+            else if (type == ConfigType.OPTION_LIST)
+            {
+                this.addButton(new ConfigButtonOptionList(0, x + labelWidth, y, 204, configHeight, (IConfigOptionList) config), this.listener);
+            }
+            else if (type == ConfigType.STRING ||
+                     type == ConfigType.HEX_STRING ||
+                     type == ConfigType.INTEGER ||
+                     type == ConfigType.DOUBLE)
             {
                 ConfigTextField field = this.addTextField(0, x + labelWidth, y + 1, 200, configHeight - 3);
                 field.setText(config.getStringValue());
@@ -136,6 +169,7 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
     public void clearOptions()
     {
         super.clearOptions();
+        this.buttons.clear();
     }
 
     @Override
@@ -210,7 +244,6 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
         @Override
         public void actionPerformed(T control)
         {
-            control.onMouseClicked();
             this.dirty = true;
         }
 
@@ -233,6 +266,8 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
         }
 
         public abstract void onMouseClicked();
+
+        public abstract void onMouseButtonClicked(int mouseButton);
     }
 
     public static class ConfigButtonBoolean extends ConfigButtonBase
@@ -250,8 +285,14 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
         @Override
         public void onMouseClicked()
         {
+        }
+
+        @Override
+        public void onMouseButtonClicked(int mouseButton)
+        {
             this.config.setBooleanValue(! this.config.getBooleanValue());
             this.updateDisplayString();
+            this.playPressSound(Minecraft.getMinecraft().getSoundHandler());
         }
 
         private void updateDisplayString()
@@ -266,6 +307,37 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
             {
                 this.displayString = TextFormatting.DARK_RED + valueStr + TextFormatting.RESET;
             }
+        }
+    }
+
+    public static class ConfigButtonOptionList extends ConfigButtonBase
+    {
+        private final IConfigOptionList config;
+
+        public ConfigButtonOptionList(int id, int x, int y, int width, int height, IConfigOptionList config)
+        {
+            super(id, x, y, width, height);
+            this.config = config;
+
+            this.updateDisplayString();
+        }
+
+        @Override
+        public void onMouseClicked()
+        {
+        }
+
+        @Override
+        public void onMouseButtonClicked(int mouseButton)
+        {
+            this.config.setOptionListValue(this.config.getOptionListValue().cycle(mouseButton == 0));
+            this.updateDisplayString();
+            this.playPressSound(Minecraft.getMinecraft().getSoundHandler());
+        }
+
+        private void updateDisplayString()
+        {
+            this.displayString = String.valueOf(this.config.getOptionListValue().getDisplayName());
         }
     }
 
