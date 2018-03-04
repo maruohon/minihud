@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import org.lwjgl.input.Keyboard;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.event.InputEventHandler;
 import fi.dy.masa.minihud.event.RenderEventHandler;
+import fi.dy.masa.minihud.event.RenderEventHandler.HudAlignment;
 
 public class Configs
 {
@@ -33,6 +35,9 @@ public class Configs
 
     public static boolean debugRendererPathfindingEnablePointWidth;
 
+    private static double fontScale;
+    public static double activeFontScale;
+
     public static int enabledInfoTypes;
     public static int fontColor;
     public static int regionOverlayColor;
@@ -43,6 +48,8 @@ public class Configs
     public static String coordinateFormat;
     public static String dateFormatMinecraft;
     public static String dateFormatReal;
+
+    public static HudAlignment hudAlignment = HudAlignment.TOP_LEFT;
 
     public static KeyModifier requiredKey;
     private static final Multimap<Integer, Long> HOTKEY_DEBUG_MAP = HashMultimap.create();
@@ -107,6 +114,15 @@ public class Configs
         prop.setComment("Font color (RGB, default: 0xE0E0E0 = 14737632)");
         fontColor = getColor(prop.getString(), 0xE0E0E0);
 
+        prop = conf.get(CATEGORY_GENERIC, "fontScale", 1.0d);
+        prop.setComment("Font scale factor. Valid range: 0.0 - 10.0. Default: 1.0\n" +
+                        "Note that the 'useScaledFont' option will override this option (with 0.5) if it's enabled!");
+        fontScale = MathHelper.clamp(prop.getDouble(), 0d, 10d);
+
+        prop = conf.get(CATEGORY_GENERIC, "hudAlignment", "top_left");
+        prop.setComment("The alignment of the HUD. Valid values: top_left, rop_right, bottom_left, bottom_right, center.");
+        hudAlignment = HudAlignment.fromString(prop.getString());
+
         prop = conf.get(CATEGORY_GENERIC, "regionOverlayColor", "0xFFFF8019");
         prop.setComment("Color for the region file overlay rendering (RGB, default: 0xFFFF8019)");
         regionOverlayColor = getColor(prop.getString(), 0xFFFF8019);
@@ -148,7 +164,7 @@ public class Configs
         useFontShadow = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "useScaledFont", true);
-        prop.setComment("Use 0.5x scale font size");
+        prop.setComment("Use 0.5x scale font size. Note that this overrides the 'fontScale' option!");
         useScaledFont = prop.getBoolean();
 
         prop = conf.get(CATEGORY_GENERIC, "useTextBackground", true);
@@ -384,6 +400,8 @@ public class Configs
         setLinePosition(conf, "infoBlockProperties",        RenderEventHandler.MASK_BLOCK_PROPERTIES);
 
         RenderEventHandler.getInstance().setEnabledMask(enabledInfoTypes);
+
+        activeFontScale = useScaledFont ? 0.5d : fontScale;
 
         if (conf.hasChanged())
         {

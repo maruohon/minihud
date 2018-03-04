@@ -14,6 +14,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.chunk.RenderChunk;
@@ -731,38 +732,65 @@ public class RenderEventHandler
 
     private void renderText(int xOff, int yOff, List<StringHolder> lines)
     {
-        boolean scale = Configs.useScaledFont;
+        final double scale = Configs.activeFontScale;
 
-        if (scale)
+        if (scale != 1f)
         {
             GlStateManager.pushMatrix();
-            GlStateManager.scale(0.5, 0.5, 0.5);
+            GlStateManager.scale(scale, scale, scale);
         }
 
         FontRenderer fontRenderer = this.mc.fontRenderer;
+        ScaledResolution res = new ScaledResolution(this.mc);
+        int x = xOff;
+        int y = yOff;
+
+        switch (Configs.hudAlignment)
+        {
+            case BOTTOM_LEFT:
+            case BOTTOM_RIGHT:
+                y = (int) ((res.getScaledHeight() + 4) / scale) - yOff - lines.size() * (fontRenderer.FONT_HEIGHT + 2);
+                break;
+            case CENTER:
+                y = (int) ((res.getScaledHeight() / 2 + 4) / scale) - yOff - (lines.size() * (fontRenderer.FONT_HEIGHT + 2) / 2);
+                break;
+            default:
+        }
 
         for (StringHolder holder : lines)
         {
             String line = holder.str;
 
+            switch (Configs.hudAlignment)
+            {
+                case TOP_RIGHT:
+                case BOTTOM_RIGHT:
+                    x = (int) (res.getScaledWidth() / scale) - fontRenderer.getStringWidth(line) - xOff;
+                    break;
+                case CENTER:
+                    x = (int) (res.getScaledWidth() / 2 / scale) - (fontRenderer.getStringWidth(line) / 2) - xOff;
+                    break;
+                default:
+            }
+
             if (Configs.useTextBackground)
             {
-                Gui.drawRect(xOff - 2, yOff - 2, xOff + fontRenderer.getStringWidth(line) + 2, yOff + fontRenderer.FONT_HEIGHT, Configs.textBackgroundColor);
+                Gui.drawRect(x - 2, y - 2, x + fontRenderer.getStringWidth(line) + 2, y + fontRenderer.FONT_HEIGHT, Configs.textBackgroundColor);
             }
 
             if (Configs.useFontShadow)
             {
-                fontRenderer.drawStringWithShadow(line, xOff, yOff, Configs.fontColor);
+                fontRenderer.drawStringWithShadow(line, x, y, Configs.fontColor);
             }
             else
             {
-                fontRenderer.drawString(line, xOff, yOff, Configs.fontColor);
+                fontRenderer.drawString(line, x, y, Configs.fontColor);
             }
 
-            yOff += fontRenderer.FONT_HEIGHT + 2;
+            y += fontRenderer.FONT_HEIGHT + 2;
         }
 
-        if (scale)
+        if (scale != 1f)
         {
             GlStateManager.popMatrix();
         }
@@ -843,6 +871,28 @@ public class RenderEventHandler
             }
 
             return this.position < other.position ? -1 : (this.position > other.position ? 1 : 0);
+        }
+    }
+
+    public enum HudAlignment
+    {
+        TOP_LEFT,
+        TOP_RIGHT,
+        BOTTOM_LEFT,
+        BOTTOM_RIGHT,
+        CENTER;
+
+        public static HudAlignment fromString(String name)
+        {
+            for (HudAlignment al : HudAlignment.values())
+            {
+                if (al.name().equalsIgnoreCase(name))
+                {
+                    return al;
+                }
+            }
+
+            return HudAlignment.TOP_LEFT;
         }
     }
 }
