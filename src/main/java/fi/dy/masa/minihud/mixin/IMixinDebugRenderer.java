@@ -12,22 +12,14 @@ public interface IMixinDebugRenderer
     @Accessor public boolean getWaterEnabled();
     @Accessor public boolean getHeightMapEnabled();
     @Accessor public boolean getCollisionBoxEnabled();
-
-    // DebugRendererNeighborsUpdate
-    @Accessor public boolean getField_191558_l();
-
-    // DebugRendererSolidFace
-    @Accessor public boolean getField_193853_n();
+    @Accessor public boolean getNeighborsUpdateEnabled();
+    @Accessor public boolean getSolidFaceEnabled();
 
     @Accessor public void setChunkBorderEnabled(boolean value);
     @Accessor public void setPathfindingEnabled(boolean value);
     @Accessor public void setWaterEnabled(boolean value);
     @Accessor public void setHeightMapEnabled(boolean value);
     @Accessor public void setCollisionBoxEnabled(boolean value);
-
-    // DebugRendererNeighborsUpdate
-    @Accessor public void setField_191558_l(boolean value);
-
-    // DebugRendererSolidFace
-    @Accessor public void setField_193853_n(boolean value);
+    @Accessor public void setNeighborsUpdateEnabled(boolean value);
+    @Accessor public void setSolidFaceEnabled(boolean value);
 }

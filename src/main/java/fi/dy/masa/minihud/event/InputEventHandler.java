@@ -109,11 +109,9 @@ public class InputEventHandler
             {
                 public void run()
                 {
-                    // field_191557_f = neighborsUpdate
-                    // func_191553_a() = addUpdate()
                     for (EnumFacing side : notifiedSides)
                     {
-                        ((DebugRendererNeighborsUpdate) Minecraft.getMinecraft().debugRenderer.field_191557_f).func_191553_a(time, pos.offset(side));
+                        ((DebugRendererNeighborsUpdate) Minecraft.getMinecraft().debugRenderer.neighborsUpdate).addUpdate(time, pos.offset(side));
                     }
                 }
             });
@@ -210,8 +208,8 @@ public class InputEventHandler
             }
             else if (bit == DebugHotkeys.NEIGHBOR_UPDATES.getBitMask())
             {
-                status = ! ((IMixinDebugRenderer) mc.debugRenderer).getField_191558_l();
-                ((IMixinDebugRenderer) mc.debugRenderer).setField_191558_l(status);
+                status = ! ((IMixinDebugRenderer) mc.debugRenderer).getNeighborsUpdateEnabled();
+                ((IMixinDebugRenderer) mc.debugRenderer).setNeighborsUpdateEnabled(status);
                 this.neighborUpdateEnabled = status;
                 this.printMessage(mc, "neighbor_updates", status ? "ON" : "OFF");
             }
@@ -224,8 +222,8 @@ public class InputEventHandler
             }
             else if (bit == DebugHotkeys.SOLID_FACES.getBitMask())
             {
-                status = ! ((IMixinDebugRenderer) mc.debugRenderer).getField_193853_n();
-                ((IMixinDebugRenderer) mc.debugRenderer).setField_193853_n(status);
+                status = ! ((IMixinDebugRenderer) mc.debugRenderer).getSolidFaceEnabled();
+                ((IMixinDebugRenderer) mc.debugRenderer).setSolidFaceEnabled(status);
                 this.printMessage(mc, "solid_faces", status ? "ON" : "OFF");
             }
             else if (bit == DebugHotkeys.WATER.getBitMask())
@@ -239,8 +237,7 @@ public class InputEventHandler
 
     private void printMessage(Minecraft mc, String key, Object... args)
     {
-        // func_191742_a() = addChatMessage()
-        mc.ingameGUI.func_191742_a(ChatType.GAME_INFO, new TextComponentTranslation("minihud.message.toggled_debug_mode." + key, args));
+        mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation("minihud.message.toggled_debug_mode." + key, args));
     }
 
     public static boolean isRequiredKeyActive()
