@@ -36,7 +36,7 @@ public class ConfigPanelOverlayHotkeys extends ConfigPanelHotkeysBase
             this.addConfigComment(x, y + 2, labelWidth, 10, "Hotkey to toggle the " + hotkey.getName() + " renderer");
 
             this.addLabel(i, x + labelWidth + 10, y + 7, 20, 8, 0xFFFFFFFF, toggleKey + " +");
-            this.addControl(new ConfigButtonHotkey(i + 1, x + labelWidth + 30, y, 50, 20, hotkey, this), this.getConfigListener());
+            this.addButton(new ConfigButtonHotkey(i + 1, x + labelWidth + 30, y, 50, 20, hotkey, this), this.getConfigListener());
 
             i += 2;
             y += 21;

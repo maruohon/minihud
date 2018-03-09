@@ -33,7 +33,7 @@ public class ConfigPanelDebugHotkeys extends ConfigPanelHotkeysBase
             this.addConfigComment(x, y + 2, labelWidth, 10, "Hotkey to toggle the " + hotkey.getName() + " debug renderer");
 
             this.addLabel(i, x + labelWidth + 10, y + 7, 24, 8, 0xFFFFFFFF, "F3 +");
-            this.addControl(new ConfigButtonHotkey(i + 1, x + labelWidth + 34, y, 50, 20, hotkey, this), this.getConfigListener());
+            this.addButton(new ConfigButtonHotkey(i + 1, x + labelWidth + 34, y, 50, 20, hotkey, this), this.getConfigListener());
 
             i += 2;
             y += 21;

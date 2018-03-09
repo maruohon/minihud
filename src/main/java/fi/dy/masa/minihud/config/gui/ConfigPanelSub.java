@@ -76,7 +76,7 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
         super.mousePressed(host, mouseX, mouseY, mouseButton);
     }
 
-    private <T extends ConfigButtonBase> void addButton(T button, ConfigOptionListener<T> listener)
+    protected <T extends ConfigButtonBase> void addButton(T button, ConfigOptionListener<T> listener)
     {
         this.buttons.add(button);
         this.addControl(button, listener);
