@@ -15,6 +15,7 @@ public enum InfoToggle implements IConfigBoolean, IConfigHotkey
     CHUNK_POS               ("infoChunkPosition",           false, 0x00000080, "C", "Show the Chunk the player is currently within"),
     CHUNK_SECTIONS          ("infoChunkSections",           false, 0x00002000, "C", "Show the currently rendered number of Chunk sections (the C value from F3)"),
     CHUNK_SECTIONS_FULL     ("infoChunkSectionsLine",       false, 0x00004000, "",  "Show the entire line of the C value from the F3 screen"),
+    CHUNK_UNLOAD_ORDER      ("infoChunkUnloadOrder",        false, 0x20000000, "U", "Show the \"unload order\" (HashSet bucket)\nof the current chunk (for vanilla Perma-Loaders)"),
     CHUNK_UPDATES           ("infoChunkUpdates",            false, 0x00008000, "U", "Show the current number of chunk updates per second"),
     COORDINATES             ("infoCoordinates",             true,  0x00000010, "O", "Show the player's coordinates"),
     DIFFICULTY              ("infoDifficulty",              false, 0x00020000, "D", "Show the local difficulty"),

@@ -30,6 +30,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
@@ -469,6 +470,11 @@ public class RenderEventHandler
         {
             this.addLine(String.format("Chunk updates: %d", RenderChunk.renderChunksUpdated));
         }
+        else if (type == InfoToggle.CHUNK_UNLOAD_ORDER.getBitMask())
+        {
+            int bucket = getChunkUnloadBucket(pos.getX() >> 4, pos.getZ() >> 4);
+            this.addLine(String.format("Chunk unload bucket: %d", bucket));
+        }
         else if (type == InfoToggle.PARTICLE_COUNT.getBitMask())
         {
             this.addLine(String.format("P: %s", mc.effectRenderer.getStatistics()));
@@ -646,6 +652,12 @@ public class RenderEventHandler
         {
             this.getBlockProperties(mc);
         }
+    }
+
+    public static int getChunkUnloadBucket(int chunkX, int chunkZ)
+    {
+        int longHash = Long.valueOf(ChunkPos.asLong(chunkX, chunkZ)).hashCode();
+        return (longHash ^ (longHash >>> 16)) & 0xFFFF;
     }
 
     @SuppressWarnings("unchecked")
