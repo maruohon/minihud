@@ -4,8 +4,10 @@ import org.lwjgl.opengl.GL11;
 import fi.dy.masa.minihud.config.ConfigsGeneric;
 import fi.dy.masa.minihud.config.OverlayHotkeys;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -15,14 +17,17 @@ import net.minecraft.util.math.MathHelper;
 
 public class OverlayRenderer
 {
-    public static void renderOverlays(int mask, Entity entity, float partialTicks)
+    public static void renderOverlays(int mask, Minecraft mc, Entity entity, float partialTicks)
     {
         GlStateManager.depthMask(false);
         GlStateManager.disableLighting();
         GlStateManager.disableCull();
         GlStateManager.enableBlend();
-        GlStateManager.pushMatrix();
+        //GlStateManager.pushMatrix();
         GlStateManager.disableTexture2D();
+        double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
+        double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
+        double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
 
         if ((mask & OverlayHotkeys.REGION_FILE.getBitMask()) != 0)
         {
@@ -30,7 +35,6 @@ public class OverlayRenderer
             int rz = MathHelper.floor(entity.posZ) & ~0x1FF;
             BlockPos pos1 = new BlockPos(rx,         0, rz      );
             BlockPos pos2 = new BlockPos(rx + 511, 256, rz + 511);
-            Minecraft mc = Minecraft.getMinecraft();
             int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
             int color = ConfigsGeneric.REGION_OVERLAY_COLOR.getIntegerValue();
             float a = ((color >>> 24) & 0xFF) / 255f;
@@ -40,11 +44,32 @@ public class OverlayRenderer
 
             GlStateManager.glLineWidth(1.6f);
 
-            renderVerticalWallsOfLinesWithinRange(pos1, pos2, rangeH, 256, 16, 16, entity, r, g, b, a, partialTicks);
+            renderVerticalWallsOfLinesWithinRange(pos1, pos2, rangeH, 256, 16, 16, entity, dx, dy, dz, r, g, b, a, partialTicks);
         }
 
-        GlStateManager.popMatrix();
+        if ((mask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0)
+        {
+            final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
+            final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
+            final int r = MathHelper.clamp(ConfigsGeneric.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue(), 0, 10);
+            final float y = (float) dy + 6F;
+            final float scale = MathHelper.clamp((float) ConfigsGeneric.CHUNK_UNLOAD_BUCKET_FONT_SCALE.getDoubleValue(), 0.01f, 1f);
+
+            for (int xOff = -r; xOff <= r; xOff++)
+            {
+                for (int zOff = -r; zOff <= r; zOff++)
+                {
+                    int cx = centerX + xOff;
+                    int cz = centerZ + zOff;
+                    int bucket = RenderEventHandler.getChunkUnloadBucket(cx, cz);
+                    String str = String.valueOf(bucket);
+                    drawTextPlate(str, (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale, mc);
+                }
+            }
+        }
+
         GlStateManager.enableTexture2D();
+        //GlStateManager.popMatrix();
         GlStateManager.disableBlend();
         GlStateManager.enableCull();
         GlStateManager.depthMask(true);
@@ -58,6 +83,7 @@ public class OverlayRenderer
             float lineIntervalH,
             float lineIntervalV,
             Entity entity,
+            double dx, double dy, double dz,
             float r, float g, float b, float a,
             float partialTicks)
     {
@@ -67,9 +93,6 @@ public class OverlayRenderer
         int zMax = Math.max(posStart.getZ(), posEnd.getZ()) + 1;
         double posX = entity.posX;
         double posZ = entity.posZ;
-        double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
-        double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
-        double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
 
         //double yMin = Math.max(Math.ceil((posY - rangeV) / lineIntervalV) * lineIntervalV,   0);
         //double yMax = Math.min(Math.ceil((posY + rangeV) / lineIntervalV) * lineIntervalV, 256);
@@ -162,6 +185,82 @@ public class OverlayRenderer
                 default:
             }
         }
+    }
+
+    protected static void setLightmapDisabled(boolean disabled)
+    {
+        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+
+        if (disabled)
+        {
+            GlStateManager.disableTexture2D();
+        }
+        else
+        {
+            GlStateManager.enableTexture2D();
+        }
+
+        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+    }
+
+    protected static void drawTextPlate(String text, double x, double y, double z, float scale, Minecraft mc)
+    {
+        /*
+        setLightmapDisabled(true);
+        EntityRenderer.drawNameplate(mc.fontRenderer, text,
+                (float) x, (float) y, (float) z,
+                0, mc.player.rotationYaw, mc.player.rotationPitch, false, false);
+        setLightmapDisabled(false);
+        */
+        renderLabel(text, x, y, z, mc.player.rotationYaw, mc.player.rotationPitch, scale, mc);
+    }
+
+    protected static void renderLabel(String text, double x, double y, double z, float viewerYaw, float viewerPitch, float scale, Minecraft mc)
+    {
+        boolean flag = false; // sneaking
+        boolean isThirdPersonFrontal = false;
+        FontRenderer fontrenderer = mc.fontRenderer;
+
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, z);
+        GlStateManager.glNormal3f(0.0F, 1.0F, 0.0F);
+
+        GlStateManager.rotate(-viewerYaw, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate((isThirdPersonFrontal ? -1 : 1) * viewerPitch, 1.0F, 0.0F, 0.0F);
+
+        GlStateManager.scale(-scale, -scale, scale);
+        GlStateManager.disableLighting();
+        GlStateManager.depthMask(false);
+        GlStateManager.disableDepth();
+
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+                GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.disableTexture2D();
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
+        int strLenHalved = fontrenderer.getStringWidth(text) / 2;
+
+        vertexbuffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        vertexbuffer.pos(-strLenHalved - 1, -1, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        vertexbuffer.pos(-strLenHalved - 1,  8, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        vertexbuffer.pos( strLenHalved + 1,  8, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        vertexbuffer.pos( strLenHalved + 1, -1, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        tessellator.draw();
+
+        GlStateManager.enableTexture2D();
+
+        fontrenderer.drawString(text, -strLenHalved, 0, 0x20FFFFFF);
+        GlStateManager.enableDepth();
+
+        GlStateManager.depthMask(true);
+        fontrenderer.drawString(text, -strLenHalved, 0, flag ? 0x20FFFFFF : 0xFFFFFFFF);
+
+        GlStateManager.disableBlend();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.popMatrix();
     }
 
     /*

@@ -115,7 +115,7 @@ public class RenderEventHandler
 
         if (this.enabled && mc.player != null)
         {
-            OverlayRenderer.renderOverlays(this.overlayMask, mc.player, partialTicks);
+            OverlayRenderer.renderOverlays(this.overlayMask, mc, mc.player, partialTicks);
         }
     }
 

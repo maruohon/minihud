@@ -15,6 +15,10 @@ import fi.dy.masa.minihud.event.RenderEventHandler.HudAlignment;
 
 public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean, IConfigDouble, IConfigOptionList
 {
+    CHUNK_UNLOAD_BUCKET_FONT_SCALE      ("chunkUnloadBucketOverlayFontScale", 0.15F, "The font scale for the Chunk unload order bucket overlay.\n" +
+                                                                                     "Valid range: 0.01 - 1.0"),
+    CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS  ("chunkUnloadBucketOverlayChunkRadius", 4, "The radius of chunks to render the text for in the overlay.\n" +
+                                                                                   "Valid range: 0 - 10"),
     COORDINATE_FORMAT_STRING        ("coordinateFormat", "x: %.1f y: %.1f z: %.1f",
                                     "The format string for the coordinate line.\n" +
                                     "Needs to have three %f format strings! Default: x: %.1f y: %.1f z: %.1f"),
