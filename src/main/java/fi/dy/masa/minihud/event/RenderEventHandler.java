@@ -11,6 +11,7 @@ import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.ConfigsGeneric;
 import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.OverlayHotkeys;
 import fi.dy.masa.minihud.config.interfaces.IConfigOptionListEntry;
 import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
 import net.minecraft.block.Block;
@@ -59,6 +60,7 @@ public class RenderEventHandler
     private boolean serverSeedValid;
     private int addedTypes;
     private double fontScale = 0.5d;
+    private double chunkUnloadOverlayY;
     private final List<StringHolder> lines = new ArrayList<StringHolder>();
 
     public RenderEventHandler()
@@ -115,7 +117,7 @@ public class RenderEventHandler
 
         if (this.enabled && mc.player != null)
         {
-            OverlayRenderer.renderOverlays(this.overlayMask, mc, mc.player, partialTicks);
+            OverlayRenderer.renderOverlays(this.overlayMask, mc, this.chunkUnloadOverlayY, partialTicks);
         }
     }
 
@@ -179,6 +181,18 @@ public class RenderEventHandler
     public void xorOverlayRendererEnabledMask(int mask)
     {
         this.overlayMask ^= mask;
+
+        // Flipped on the Chunk unload bucket rendering, store the player's current y-position
+        if ((mask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0 &&
+            (this.overlayMask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0)
+        {
+            Minecraft mc = Minecraft.getMinecraft();
+
+            if (mc != null && mc.player != null)
+            {
+                this.chunkUnloadOverlayY = mc.player.posY;
+            }
+        }
     }
 
     public void setEnabled(boolean enabled)

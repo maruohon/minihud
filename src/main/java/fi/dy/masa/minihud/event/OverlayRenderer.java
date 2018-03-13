@@ -17,8 +17,9 @@ import net.minecraft.util.math.MathHelper;
 
 public class OverlayRenderer
 {
-    public static void renderOverlays(int mask, Minecraft mc, Entity entity, float partialTicks)
+    public static void renderOverlays(int mask, Minecraft mc, double chunkOverlayY, float partialTicks)
     {
+        Entity entity = mc.player;
         GlStateManager.depthMask(false);
         GlStateManager.disableLighting();
         GlStateManager.disableCull();
@@ -52,7 +53,7 @@ public class OverlayRenderer
             final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
             final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
             final int r = MathHelper.clamp(ConfigsGeneric.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue(), 0, 10);
-            final float y = (float) dy + 6F;
+            final float y = (float) chunkOverlayY;
             final float scale = MathHelper.clamp((float) ConfigsGeneric.CHUNK_UNLOAD_BUCKET_FONT_SCALE.getDoubleValue(), 0.01f, 1f);
 
             for (int xOff = -r; xOff <= r; xOff++)

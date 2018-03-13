@@ -123,7 +123,7 @@ public class Configs
 
         for (DebugHotkeys dbg : DebugHotkeys.values())
         {
-            assignHotkey(HOTKEY_DEBUG_MAP, dbg.getHotkey(), dbg.getBitMask());
+            assignHotkey(HOTKEY_DEBUG_MAP, dbg);
         }
 
         RenderEventHandler.getInstance().setEnabledMask(enabledInfoTypes);
