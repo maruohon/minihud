@@ -9,19 +9,21 @@ import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.InitCompleteListener;
 import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
+import com.mumfrey.liteloader.Tickable;
 import com.mumfrey.liteloader.core.LiteLoader;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.ConfigsGeneric;
 import fi.dy.masa.minihud.config.gui.MiniHudConfigPanel;
 import fi.dy.masa.minihud.event.RenderEventHandler;
+import fi.dy.masa.minihud.util.Tweaks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.play.server.SPacketJoinGame;
 
-public class LiteModMiniHud implements LiteMod, Configurable, InitCompleteListener, JoinGameListener
+public class LiteModMiniHud implements LiteMod, Configurable, InitCompleteListener, JoinGameListener, Tickable
 {
     public static final KeyBinding KEY_TOGGLE_MODE = new KeyBinding("minihud.key.togglemode", Keyboard.KEY_H, "category.minihud");
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
@@ -70,5 +72,18 @@ public class LiteModMiniHud implements LiteMod, Configurable, InitCompleteListen
     public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
     {
         RenderEventHandler.getInstance().onWorldLoad();
+    }
+
+    @Override
+    public void onTick(Minecraft minecraft, float partialTicks, boolean inGame, boolean clock)
+    {
+        if (minecraft.currentScreen == null && minecraft.gameSettings.keyBindUseItem.isKeyDown())
+        {
+            Tweaks.onUsingTick();
+        }
+        else
+        {
+            Tweaks.clearClickedBlockInfo();
+        }
     }
 }

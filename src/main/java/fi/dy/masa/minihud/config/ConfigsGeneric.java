@@ -45,6 +45,7 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean, IConfigDou
     TEXT_BACKGROUND_COLOR           ("textBackgroundColor", "0xA0505050", true, "Text background color (ARGB, default: 0xA0505050)"),
     TEXT_POS_X                      ("textPosX", 4, "Text X position from the screen edge (default: 4)"),
     TEXT_POS_Y                      ("textPosY", 4, "Text Y position from the screen edge (default: 4)"),
+    TWEAK_FAST_BLOCK_PLACEMENT      ("tweakFastBlockPlacement", false, "Enables fast/convenient block placement when moving the cursor over new blocks"),
     TWEAK_FLEXIBLE_BLOCK_PLACEMENT  ("tweakFlexibleBlockPlacement", false, "if true, then it will be possible to place blocks\nin different orientations while holding the keybind for it."),
     TWEAK_NO_FALLING_BLOCK_RENDER   ("tweakNoFallingBlockEntityRendering", false, "If enabled, then falling block entities won't be rendered at all"),
     TWEAK_NO_ITEM_SWITCH_COOLDOWN   ("tweakNoItemSwitchRenderCooldown", false, "If true, then there won't be any cooldown/equip\nanimation when switching the held item or using the item."),

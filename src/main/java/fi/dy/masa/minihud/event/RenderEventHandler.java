@@ -202,6 +202,14 @@ public class RenderEventHandler
             String str = value ? "OFF" : "ON";
             mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation("Toggled EntityFallingBlock rendering "  + str));
         }
+        else if ((mask & OverlayHotkeys.TOGGLE_FAST_BLOCK_PLACEMENT.getBitMask()) != 0)
+        {
+            Minecraft mc = Minecraft.getMinecraft();
+            boolean value = (this.overlayMask & OverlayHotkeys.TOGGLE_FAST_BLOCK_PLACEMENT.getBitMask()) != 0;
+            ConfigsGeneric.TWEAK_FAST_BLOCK_PLACEMENT.setBooleanValue(value);
+            String str = value ? "ON" : "OFF";
+            mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation("Toggled Fast Block Placement "  + str));
+        }
     }
 
     public void setEnabled(boolean enabled)

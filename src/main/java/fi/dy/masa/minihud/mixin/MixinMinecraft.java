@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import fi.dy.masa.minihud.config.ConfigsGeneric;
 import fi.dy.masa.minihud.event.InputEventHandler;
 import fi.dy.masa.minihud.util.IMinecraftAccessor;
 import fi.dy.masa.minihud.util.Tweaks;
@@ -25,6 +24,8 @@ public class MixinMinecraft implements IMinecraftAccessor
 {
     @Shadow
     private boolean actionKeyF3;
+    @Shadow
+    private int rightClickDelayTimer;
 
     //@Inject(method = "runTickKeyboard", at = @At(value = "JUMP", opcode = Opcodes.GOTO, ordinal = ??))
     @Inject(method = "dispatchKeypresses", at = @At(value = "HEAD"))
@@ -37,6 +38,12 @@ public class MixinMinecraft implements IMinecraftAccessor
     public void setActionKeyF3(boolean value)
     {
         this.actionKeyF3 = value;
+    }
+
+    @Override
+    public void setRightClickDelayTimer(int value)
+    {
+        this.rightClickDelayTimer = value;
     }
 
     @Redirect(method = "rightClickMouse()V", at = @At(
@@ -58,13 +65,6 @@ public class MixinMinecraft implements IMinecraftAccessor
             Vec3d hitVec,
             EnumHand hand)
     {
-        if (ConfigsGeneric.TWEAK_FLEXIBLE_BLOCK_PLACEMENT.getBooleanValue())
-        {
-            return Tweaks.onProcessRightClickBlock(controller, player, world, pos, side, hitVec, hand);
-        }
-        else
-        {
-            return controller.processRightClickBlock(player, world, pos, side, hitVec, hand);
-        }
+        return Tweaks.onProcessRightClickBlock(controller, player, world, pos, side, hitVec, hand);
     }
 }
