@@ -34,6 +34,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -192,6 +193,14 @@ public class RenderEventHandler
             {
                 this.chunkUnloadOverlayY = mc.player.posY;
             }
+        }
+        else if ((mask & OverlayHotkeys.TOGGLE_FALLING_BLOCK_RENDER.getBitMask()) != 0)
+        {
+            Minecraft mc = Minecraft.getMinecraft();
+            boolean value = (this.overlayMask & OverlayHotkeys.TOGGLE_FALLING_BLOCK_RENDER.getBitMask()) != 0;
+            ConfigsGeneric.TWEAK_NO_FALLING_BLOCK_RENDER.setBooleanValue(value);
+            String str = value ? "OFF" : "ON";
+            mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation("Toggled EntityFallingBlock rendering "  + str));
         }
     }
 
