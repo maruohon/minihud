@@ -22,7 +22,7 @@ public class RenderUtils
             float lineIntervalV,
             Entity entity,
             double dx, double dy, double dz,
-            float r, float g, float b, float a,
+            int color,
             float partialTicks)
     {
         int xMin = Math.min(posStart.getX(), posEnd.getX());
@@ -31,6 +31,10 @@ public class RenderUtils
         int zMax = Math.max(posStart.getZ(), posEnd.getZ()) + 1;
         double posX = entity.posX;
         double posZ = entity.posZ;
+        float a = ((color >>> 24) & 0xFF) / 255f;
+        float r = ((color >>> 16) & 0xFF) / 255f;
+        float g = ((color >>>  8) & 0xFF) / 255f;
+        float b = ((color       ) & 0xFF) / 255f;
 
         //double yMin = Math.max(Math.ceil((posY - rangeV) / lineIntervalV) * lineIntervalV,   0);
         //double yMax = Math.min(Math.ceil((posY + rangeV) / lineIntervalV) * lineIntervalV, 256);

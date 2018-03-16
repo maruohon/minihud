@@ -42,6 +42,8 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean, IConfigDou
     REQUIRE_HOLDING_KEY             ("requireHoldingKey", "none", "Require holding a key to render the HUD. Valid keys are 'alt', 'ctrl' and 'shift'."),
     SORT_LINES_BY_LENGTH            ("sortLinesByLength", false, "Sort the lines by their text's length"),
     SORT_LINES_REVERSED             ("sortLinesReversed", false, "Reverse the line sorting order"),
+    SPAWN_OVERLAY_COLOR_ENTITY      ("spawnOverlayColorEntity", "0xFF30FF20", true, "Color for the entity-processing spawn chunks overlay (ARGB, default: 0xFF30FF20)"),
+    SPAWN_OVERLAY_COLOR_LAZY        ("spawnOverlayColorLazy", "0xFFFF3020", true, "Color for the lazy spawn chunks overlay (ARGB, default: 0xFFFF3020)"),
     TEXT_BACKGROUND_COLOR           ("textBackgroundColor", "0xA0505050", true, "Text background color (ARGB, default: 0xA0505050)"),
     TEXT_POS_X                      ("textPosX", 4, "Text X position from the screen edge (default: 4)"),
     TEXT_POS_Y                      ("textPosY", 4, "Text Y position from the screen edge (default: 4)"),

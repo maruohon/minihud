@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.event;
 
+import org.apache.commons.lang3.tuple.Pair;
 import fi.dy.masa.minihud.config.ConfigsGeneric;
 import fi.dy.masa.minihud.config.OverlayHotkeys;
 import fi.dy.masa.minihud.renderer.RenderUtils;
@@ -11,7 +12,9 @@ import net.minecraft.util.math.MathHelper;
 
 public class OverlayRenderer
 {
+    public static BlockPos worldSpawn = BlockPos.ORIGIN;
     public static double chunkUnloadBucketOverlayY;
+    public static boolean worldSpawnValid;
 
     public static void renderOverlays(int mask, Minecraft mc, float partialTicks)
     {
@@ -36,6 +39,15 @@ public class OverlayRenderer
             renderChunkUnloadBuckets(mc, entity, dx, dy, dz, chunkUnloadBucketOverlayY, partialTicks);
         }
 
+        if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_PLAYER.getBitMask()) != 0)
+        {
+            renderSpawnChunksOverlay(mc, entity, dx, dy, dz, new BlockPos(entity.posX, 0, entity.posZ), partialTicks);
+        }
+        else if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0 && worldSpawnValid)
+        {
+            renderSpawnChunksOverlay(mc, entity, dx, dy, dz, worldSpawn, partialTicks);
+        }
+
         GlStateManager.enableTexture2D();
         //GlStateManager.popMatrix();
         GlStateManager.disableBlend();
@@ -51,14 +63,10 @@ public class OverlayRenderer
         BlockPos pos2 = new BlockPos(rx + 511, 256, rz + 511);
         int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
         int color = ConfigsGeneric.REGION_OVERLAY_COLOR.getIntegerValue();
-        float a = ((color >>> 24) & 0xFF) / 255f;
-        float r = ((color >>> 16) & 0xFF) / 255f;
-        float g = ((color >>>  8) & 0xFF) / 255f;
-        float b = ((color       ) & 0xFF) / 255f;
 
         GlStateManager.glLineWidth(1.6f);
 
-        RenderUtils.renderVerticalWallsOfLinesWithinRange(pos1, pos2, rangeH, 256, 16, 16, entity, dx, dy, dz, r, g, b, a, partialTicks);
+        RenderUtils.renderVerticalWallsOfLinesWithinRange(pos1, pos2, rangeH, 256, 16, 16, entity, dx, dy, dz, color, partialTicks);
     }
 
     private static void renderChunkUnloadBuckets(Minecraft mc, Entity entity, double dx, double dy, double dz, double chunkOverlayY, float partialTicks)
@@ -81,4 +89,44 @@ public class OverlayRenderer
             }
         }
     }
+
+    private static void renderSpawnChunksOverlay(Minecraft mc, Entity entity, double dx, double dy, double dz, BlockPos worldSpawn, float partialTicks)
+    {
+        GlStateManager.glLineWidth(1.6f);
+
+        int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
+        Pair<BlockPos, BlockPos> corners = getSpawnChunkCorners(worldSpawn, 128);
+        int color = ConfigsGeneric.SPAWN_OVERLAY_COLOR_LAZY.getIntegerValue();
+        RenderUtils.renderVerticalWallsOfLinesWithinRange(corners.getLeft(), corners.getRight(), rangeH, 256, 16, 16, entity, dx, dy, dz, color, partialTicks);
+
+        corners = getSpawnChunkCorners(worldSpawn, 128 - 32);
+        color = ConfigsGeneric.SPAWN_OVERLAY_COLOR_ENTITY.getIntegerValue();
+        RenderUtils.renderVerticalWallsOfLinesWithinRange(corners.getLeft(), corners.getRight(), rangeH, 256, 16, 16, entity, dx, dy, dz, color, partialTicks);
+    }
+
+    private static Pair<BlockPos, BlockPos> getSpawnChunkCorners(BlockPos worldSpawn, int spawnChunkRange)
+    {
+        int x;
+        int z;
+        x = (worldSpawn.getX() - (spawnChunkRange - 8)) & ~0xF;
+        z = (worldSpawn.getZ() - (spawnChunkRange - 8)) & ~0xF;
+        BlockPos pos1 = new BlockPos(x, 0, z);
+
+        x = ((worldSpawn.getX() + (spawnChunkRange - 8)) & ~0xF) + 16 - 1;
+        z = ((worldSpawn.getZ() + (spawnChunkRange - 8)) & ~0xF) + 16 - 1;
+        BlockPos pos2 = new BlockPos(x, 0, z);
+
+        return Pair.of(pos1, pos2);
+    }
+
+    /*
+    public boolean isSpawnChunk(int x, int z)
+    {
+        BlockPos blockpos = this.getSpawnPoint();
+        int i = x * 16 + 8 - blockpos.getX();
+        int j = z * 16 + 8 - blockpos.getZ();
+        int k = 128;
+        return i >= -128 && i <= 128 && j >= -128 && j <= 128;
+    }
+    */
 }

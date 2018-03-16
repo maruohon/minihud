@@ -123,6 +123,7 @@ public class RenderEventHandler
     public void onWorldLoad()
     {
         this.serverSeedValid = false;
+        OverlayRenderer.worldSpawnValid = false;
     }
 
     public void setFontScale(double scale)
@@ -164,6 +165,25 @@ public class RenderEventHandler
                     LiteModMiniHud.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[1], e);
                 }
             }
+            else if ("commands.setworldspawn.success".equals(text.getKey()) && text.getFormatArgs().length == 3)
+            {
+                try
+                {
+                    Object[] o = text.getFormatArgs();
+                    int x = Integer.parseInt(o[0].toString());
+                    int y = Integer.parseInt(o[1].toString());
+                    int z = Integer.parseInt(o[2].toString());
+
+                    OverlayRenderer.worldSpawn = new BlockPos(x, y, z);
+                    OverlayRenderer.worldSpawnValid = true;
+
+                    LiteModMiniHud.logger.info("Received world spawn from the vanilla /setworlspawn command: {}", OverlayRenderer.worldSpawn);
+                }
+                catch (Exception e)
+                {
+                    LiteModMiniHud.logger.warn("Failed to read the world spawn point from '{}'", text.getFormatArgs(), e);
+                }
+            }
         }
     }
 
@@ -180,16 +200,22 @@ public class RenderEventHandler
     public void xorOverlayRendererEnabledMask(int mask)
     {
         this.overlayMask ^= mask;
+        Minecraft mc = Minecraft.getMinecraft();
 
-        // Flipped on the Chunk unload bucket rendering, store the player's current y-position
-        if ((mask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0 &&
-            (this.overlayMask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0)
+        if (mc != null && mc.player != null)
         {
-            Minecraft mc = Minecraft.getMinecraft();
-
-            if (mc != null && mc.player != null)
+            // Flipped on the Chunk unload bucket rendering, store the player's current y-position
+            if ((mask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0 &&
+                (this.overlayMask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0)
             {
                 OverlayRenderer.chunkUnloadBucketOverlayY = mc.player.posY;
+            }
+            // Flipped on the real spawn point rendering, store the player's current position
+            else if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0 &&
+                     (this.overlayMask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0)
+            {
+                OverlayRenderer.worldSpawn = new BlockPos(mc.player.posX, 0, mc.player.posZ);
+                OverlayRenderer.worldSpawnValid = true;
             }
         }
     }

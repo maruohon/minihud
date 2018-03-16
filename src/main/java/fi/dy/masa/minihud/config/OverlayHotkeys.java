@@ -7,8 +7,10 @@ import fi.dy.masa.minihud.config.interfaces.IConfigHotkey;
 
 public enum OverlayHotkeys implements IConfig, IConfigHotkey
 {
-    REGION_FILE         ("regionFileOverlay",           0x01, "J"),
-    CHUNK_UNLOAD_BUCKET ("chunkUnloadBucketOverlay",    0x02, "X");
+    REGION_FILE                 ("regionFileOverlay",           0x01, "J"),
+    CHUNK_UNLOAD_BUCKET         ("chunkUnloadBucketOverlay",    0x02, "X"),
+    SPAWN_CHUNK_OVERLAY_REAL    ("spawnChunkOverlayReal",       0x04, "V"),
+    SPAWN_CHUNK_OVERLAY_PLAYER  ("spawnChunkOverlayPlayer",     0x08, "Q");
 
     private final String name;
     private final int bitMask;
