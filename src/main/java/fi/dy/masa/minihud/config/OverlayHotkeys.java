@@ -9,6 +9,8 @@ public enum OverlayHotkeys implements IConfig, IConfigHotkey
 {
     REGION_FILE                     ("regionFileOverlay",           0x0001, "J"),
     CHUNK_UNLOAD_BUCKET             ("chunkUnloadBucketOverlay",    0x0002, "X"),
+    SPAWN_CHUNK_OVERLAY_REAL        ("spawnChunkOverlayReal",       0x0004, "V"),
+    SPAWN_CHUNK_OVERLAY_PLAYER      ("spawnChunkOverlayPlayer",     0x0008, "Q"),
     TOGGLE_FALLING_BLOCK_RENDER     ("toggleFallingBlockRendering", 0x1000, "N"),
     TOGGLE_FAST_BLOCK_PLACEMENT     ("toggleFastBlockPlacement",    0x2000, "Z");
 

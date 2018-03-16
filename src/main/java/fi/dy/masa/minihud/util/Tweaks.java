@@ -46,7 +46,6 @@ public class Tweaks
 
                     if (hand != null)
                     {
-                        int count = 0;
                         while (true)
                         {
                             EnumActionResult result = tryPlaceBlock(mc.playerController, player, mc.world, pos, sideFirst, hitVecFirst, hand);
@@ -54,7 +53,6 @@ public class Tweaks
                             if (result == EnumActionResult.SUCCESS)
                             {
                                 posLast = pos;
-                                count++;
                             }
                             else
                             {

@@ -61,7 +61,6 @@ public class RenderEventHandler
     private boolean serverSeedValid;
     private int addedTypes;
     private double fontScale = 0.5d;
-    private double chunkUnloadOverlayY;
     private final List<StringHolder> lines = new ArrayList<StringHolder>();
 
     public RenderEventHandler()
@@ -118,13 +117,14 @@ public class RenderEventHandler
 
         if (this.enabled && mc.player != null)
         {
-            OverlayRenderer.renderOverlays(this.overlayMask, mc, this.chunkUnloadOverlayY, partialTicks);
+            OverlayRenderer.renderOverlays(this.overlayMask, mc, partialTicks);
         }
     }
 
     public void onWorldLoad()
     {
         this.serverSeedValid = false;
+        OverlayRenderer.worldSpawnValid = false;
     }
 
     public void setFontScale(double scale)
@@ -166,6 +166,25 @@ public class RenderEventHandler
                     LiteModMiniHud.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[1], e);
                 }
             }
+            else if ("commands.setworldspawn.success".equals(text.getKey()) && text.getFormatArgs().length == 3)
+            {
+                try
+                {
+                    Object[] o = text.getFormatArgs();
+                    int x = Integer.parseInt(o[0].toString());
+                    int y = Integer.parseInt(o[1].toString());
+                    int z = Integer.parseInt(o[2].toString());
+
+                    OverlayRenderer.worldSpawn = new BlockPos(x, y, z);
+                    OverlayRenderer.worldSpawnValid = true;
+
+                    LiteModMiniHud.logger.info("Received world spawn from the vanilla /setworlspawn command: {}", OverlayRenderer.worldSpawn);
+                }
+                catch (Exception e)
+                {
+                    LiteModMiniHud.logger.warn("Failed to read the world spawn point from '{}'", text.getFormatArgs(), e);
+                }
+            }
         }
     }
 
@@ -182,33 +201,37 @@ public class RenderEventHandler
     public void xorOverlayRendererEnabledMask(int mask)
     {
         this.overlayMask ^= mask;
+        Minecraft mc = Minecraft.getMinecraft();
 
-        // Flipped on the Chunk unload bucket rendering, store the player's current y-position
-        if ((mask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0 &&
-            (this.overlayMask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0)
+        if (mc != null && mc.player != null)
         {
-            Minecraft mc = Minecraft.getMinecraft();
-
-            if (mc != null && mc.player != null)
+            // Flipped on the Chunk unload bucket rendering, store the player's current y-position
+            if ((mask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0 &&
+                (this.overlayMask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0)
             {
-                this.chunkUnloadOverlayY = mc.player.posY;
+                OverlayRenderer.chunkUnloadBucketOverlayY = mc.player.posY;
             }
-        }
-        else if ((mask & OverlayHotkeys.TOGGLE_FALLING_BLOCK_RENDER.getBitMask()) != 0)
-        {
-            Minecraft mc = Minecraft.getMinecraft();
-            boolean value = (this.overlayMask & OverlayHotkeys.TOGGLE_FALLING_BLOCK_RENDER.getBitMask()) != 0;
-            ConfigsGeneric.TWEAK_NO_FALLING_BLOCK_RENDER.setBooleanValue(value);
-            String str = value ? "OFF" : "ON";
-            mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation("Toggled EntityFallingBlock rendering "  + str));
-        }
-        else if ((mask & OverlayHotkeys.TOGGLE_FAST_BLOCK_PLACEMENT.getBitMask()) != 0)
-        {
-            Minecraft mc = Minecraft.getMinecraft();
-            boolean value = (this.overlayMask & OverlayHotkeys.TOGGLE_FAST_BLOCK_PLACEMENT.getBitMask()) != 0;
-            ConfigsGeneric.TWEAK_FAST_BLOCK_PLACEMENT.setBooleanValue(value);
-            String str = value ? "ON" : "OFF";
-            mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation("Toggled Fast Block Placement "  + str));
+            // Flipped on the real spawn point rendering, store the player's current position
+            else if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0 &&
+                     (this.overlayMask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0)
+            {
+                OverlayRenderer.worldSpawn = new BlockPos(mc.player.posX, 0, mc.player.posZ);
+                OverlayRenderer.worldSpawnValid = true;
+            }
+            else if ((mask & OverlayHotkeys.TOGGLE_FALLING_BLOCK_RENDER.getBitMask()) != 0)
+            {
+                boolean value = (this.overlayMask & OverlayHotkeys.TOGGLE_FALLING_BLOCK_RENDER.getBitMask()) != 0;
+                ConfigsGeneric.TWEAK_NO_FALLING_BLOCK_RENDER.setBooleanValue(value);
+                String str = value ? "OFF" : "ON";
+                mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation("Toggled EntityFallingBlock rendering "  + str));
+            }
+            else if ((mask & OverlayHotkeys.TOGGLE_FAST_BLOCK_PLACEMENT.getBitMask()) != 0)
+            {
+                boolean value = (this.overlayMask & OverlayHotkeys.TOGGLE_FAST_BLOCK_PLACEMENT.getBitMask()) != 0;
+                ConfigsGeneric.TWEAK_FAST_BLOCK_PLACEMENT.setBooleanValue(value);
+                String str = value ? "ON" : "OFF";
+                mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation("Toggled Fast Block Placement "  + str));
+            }
         }
     }
 
