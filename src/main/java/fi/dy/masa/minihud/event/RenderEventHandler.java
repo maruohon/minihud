@@ -60,7 +60,6 @@ public class RenderEventHandler
     private boolean serverSeedValid;
     private int addedTypes;
     private double fontScale = 0.5d;
-    private double chunkUnloadOverlayY;
     private final List<StringHolder> lines = new ArrayList<StringHolder>();
 
     public RenderEventHandler()
@@ -117,7 +116,7 @@ public class RenderEventHandler
 
         if (this.enabled && mc.player != null)
         {
-            OverlayRenderer.renderOverlays(this.overlayMask, mc, this.chunkUnloadOverlayY, partialTicks);
+            OverlayRenderer.renderOverlays(this.overlayMask, mc, partialTicks);
         }
     }
 
@@ -190,7 +189,7 @@ public class RenderEventHandler
 
             if (mc != null && mc.player != null)
             {
-                this.chunkUnloadOverlayY = mc.player.posY;
+                OverlayRenderer.chunkUnloadBucketOverlayY = mc.player.posY;
             }
         }
     }
