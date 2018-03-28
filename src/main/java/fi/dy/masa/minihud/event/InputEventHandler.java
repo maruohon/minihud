@@ -47,6 +47,13 @@ public class InputEventHandler
     public void onKeyInput()
     {
         Minecraft mc = Minecraft.getMinecraft();
+
+        // Keybinds shouldn't work inside GUIs
+        if (mc.currentScreen != null)
+        {
+            return;
+        }
+
         int eventKey = Keyboard.getEventKey();
         boolean eventKeyState = Keyboard.getEventKeyState();
         int bitMaskForEventKey = Configs.getBitmaskForDebugKey(eventKey);
