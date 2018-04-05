@@ -108,8 +108,8 @@ public class OverlayRenderer
     {
         int x;
         int z;
-        x = (worldSpawn.getX() - (spawnChunkRange - 8)) & ~0xF;
-        z = (worldSpawn.getZ() - (spawnChunkRange - 8)) & ~0xF;
+        x = (worldSpawn.getX() - (spawnChunkRange - 7)) & ~0xF;
+        z = (worldSpawn.getZ() - (spawnChunkRange - 7)) & ~0xF;
         BlockPos pos1 = new BlockPos(x, 0, z);
 
         x = ((worldSpawn.getX() + (spawnChunkRange - 8)) & ~0xF) + 16 - 1;
@@ -120,13 +120,12 @@ public class OverlayRenderer
     }
 
     /*
-    public boolean isSpawnChunk(int x, int z)
+    public boolean isSpawnChunk(int chunkX, int chunkZ)
     {
-        BlockPos blockpos = this.getSpawnPoint();
-        int i = x * 16 + 8 - blockpos.getX();
-        int j = z * 16 + 8 - blockpos.getZ();
-        int k = 128;
-        return i >= -128 && i <= 128 && j >= -128 && j <= 128;
+        BlockPos spawn = this.getSpawnPoint();
+        int dx = chunkX * 16 + 8 - spawn.getX();
+        int dz = chunkZ * 16 + 8 - spawn.getZ();
+        return dx >= -128 && dx <= 128 && dz >= -128 && dz <= 128;
     }
     */
 }
