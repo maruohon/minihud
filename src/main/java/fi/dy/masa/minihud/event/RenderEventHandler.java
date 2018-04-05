@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.event;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -129,6 +132,21 @@ public class RenderEventHandler
     public void setFontScale(double scale)
     {
         this.fontScale = scale;
+    }
+
+    public int getSubtitleOffset()
+    {
+        HudAlignment align = (HudAlignment) ConfigsGeneric.HUD_ALIGNMENT.getOptionListValue();
+
+        if (align == HudAlignment.BOTTOM_RIGHT)
+        {
+            Minecraft mc = Minecraft.getMinecraft();
+            int offset = (int) (this.lines.size() * (mc.fontRenderer.FONT_HEIGHT + 2) * this.fontScale);
+
+            return -(offset - 16);
+        }
+
+        return 0;
     }
 
     public void onChatMessage(ITextComponent message)
@@ -601,7 +619,7 @@ public class RenderEventHandler
 
             if (valid)
             {
-                if (this.canSlimeSpawnAt(entity.posX, entity.posZ, seed))
+                if (this.canSlimeSpawnAt(pos.getX(), pos.getZ(), seed))
                 {
                     result = TextFormatting.GREEN.toString() + "YES" + TextFormatting.RESET.toString() + TextFormatting.WHITE.toString();
                 }
@@ -742,51 +760,92 @@ public class RenderEventHandler
 
     private void renderText(Minecraft mc, int xOff, int yOff, List<StringHolder> lines)
     {
-        final double scale = this.fontScale;
-
-        if (scale != 1d)
-        {
-            GlStateManager.pushMatrix();
-            GlStateManager.scale(scale, scale, scale);
-        }
-
         FontRenderer fontRenderer = mc.fontRenderer;
         ScaledResolution res = new ScaledResolution(mc);
-        int x = xOff;
-        int y = yOff;
+        final int lineHeight = fontRenderer.FONT_HEIGHT + 2;
+        final double scale = this.fontScale;
+        final int bgMargin = 2;
+        final int bgColor = ConfigsGeneric.TEXT_BACKGROUND_COLOR.getIntegerValue();
         HudAlignment align = (HudAlignment) ConfigsGeneric.HUD_ALIGNMENT.getOptionListValue();
+        double posX = xOff + bgMargin;
+        double posY = yOff + bgMargin;
+
+        // Only Chuck Norris can divide by zero
+        if (scale == 0d)
+        {
+            return;
+        }
+
+        if (align == HudAlignment.TOP_RIGHT)
+        {
+            Collection<PotionEffect> effects = mc.player.getActivePotionEffects();
+
+            if (effects.isEmpty() == false)
+            {
+                int y1 = 0;
+                int y2 = 0;
+
+                for (PotionEffect effect : effects)
+                {
+                    Potion potion = effect.getPotion();
+
+                    if (potion.isBeneficial())
+                    {
+                        y1 = 26;
+                    }
+                    else
+                    {
+                        y2 = 52;
+                        break;
+                    }
+                }
+
+                posY += Math.max(y1, y2) / scale;
+            }
+        }
 
         switch (align)
         {
             case BOTTOM_LEFT:
             case BOTTOM_RIGHT:
-                y = (int) ((res.getScaledHeight() + 4) / scale) - yOff - lines.size() * (fontRenderer.FONT_HEIGHT + 2);
+                posY = res.getScaledHeight() / scale - (lines.size() * lineHeight) - yOff + 2;
                 break;
             case CENTER:
-                y = (int) ((res.getScaledHeight() / 2 + 4) / scale) - yOff - (lines.size() * (fontRenderer.FONT_HEIGHT + 2) / 2);
+                posY = (res.getScaledHeight() / scale / 2.0d) - (lines.size() * lineHeight / 2.0d) + yOff;
                 break;
             default:
+        }
+
+        if (scale != 1d)
+        {
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(scale, scale, 0);
         }
 
         for (StringHolder holder : lines)
         {
             String line = holder.str;
+            final int width = fontRenderer.getStringWidth(line);
 
             switch (align)
             {
                 case TOP_RIGHT:
                 case BOTTOM_RIGHT:
-                    x = (int) (res.getScaledWidth() / scale) - fontRenderer.getStringWidth(line) - xOff;
+                    posX = (res.getScaledWidth() / scale) - width - xOff - bgMargin;
                     break;
                 case CENTER:
-                    x = (int) (res.getScaledWidth() / 2 / scale) - (fontRenderer.getStringWidth(line) / 2) - xOff;
+                    posX = (res.getScaledWidth() / scale / 2) - (width / 2) - xOff;
                     break;
                 default:
             }
 
+            final int x = (int) posX;
+            final int y = (int) posY;
+            posY += (double) lineHeight;
+
             if (ConfigsGeneric.USE_TEXT_BACKGROUND.getBooleanValue())
             {
-                Gui.drawRect(x - 2, y - 2, x + fontRenderer.getStringWidth(line) + 2, y + fontRenderer.FONT_HEIGHT, ConfigsGeneric.TEXT_BACKGROUND_COLOR.getIntegerValue());
+                Gui.drawRect(x - bgMargin, y - bgMargin, x + width + bgMargin, y + fontRenderer.FONT_HEIGHT, bgColor);
             }
 
             if (ConfigsGeneric.USE_FONT_SHADOW.getBooleanValue())
@@ -797,8 +856,6 @@ public class RenderEventHandler
             {
                 fontRenderer.drawString(line, x, y, ConfigsGeneric.FONT_COLOR.getIntegerValue());
             }
-
-            y += fontRenderer.FONT_HEIGHT + 2;
         }
 
         if (scale != 1d)
@@ -807,10 +864,10 @@ public class RenderEventHandler
         }
     }
 
-    private boolean canSlimeSpawnAt(double posX, double posZ, long worldSeed)
+    private boolean canSlimeSpawnAt(int posX, int posZ, long worldSeed)
     {
-        int chunkX = (int) Math.floor(posX / 16d);
-        int chunkZ = (int) Math.floor(posZ / 16d);
+        int chunkX = posX >> 4;
+        int chunkZ = posZ >> 4;
         long slimeSeed = 987234911L;
         long rngSeed = worldSeed +
                        (long) (chunkX * chunkX *  4987142) + (long) (chunkX * 5947611) +

@@ -12,6 +12,7 @@
         "MixinDebugRendererNeighborsUpdate",
         "MixinDebugRendererSolidFace",
         "MixinEntityRenderer",
+        "MixinGuiSubtitleOverlay",
         "MixinMinecraft",
         "MixinMinecraftServer",
         "MixinNetHandlerPlayClient",
