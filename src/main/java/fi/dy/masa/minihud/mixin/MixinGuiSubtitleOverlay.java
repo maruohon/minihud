@@ -14,7 +14,11 @@ public class MixinGuiSubtitleOverlay
 {
     @Inject(method = "renderSubtitles", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/GlStateManager;tryBlendFuncSeparate",
+            target = "Lnet/minecraft/client/renderer/GlStateManager;tryBlendFuncSeparate(" +
+            "Lnet/minecraft/client/renderer/GlStateManager$SourceFactor;" +
+            "Lnet/minecraft/client/renderer/GlStateManager$DestFactor;" +
+            "Lnet/minecraft/client/renderer/GlStateManager$SourceFactor;" +
+            "Lnet/minecraft/client/renderer/GlStateManager$DestFactor;)V",
             shift = Shift.AFTER))
     private void nudgeSubtitleOverlay(CallbackInfo ci)
     {
