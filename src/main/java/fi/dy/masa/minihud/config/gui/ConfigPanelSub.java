@@ -181,7 +181,7 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
         {
             if (label.isMouseOver(mouseX, mouseY))
             {
-                this.drawHoveringText(label.getLines(), label.x, label.y + 30);
+                this.drawHoveringText(label.getLines(), mouseX + 6, mouseY + 10);
                 break;
             }
         }

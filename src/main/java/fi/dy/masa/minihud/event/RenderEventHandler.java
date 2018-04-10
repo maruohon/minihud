@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.ConfigsGeneric;
@@ -31,6 +33,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -38,6 +41,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DifficultyInstance;
@@ -49,6 +53,7 @@ import net.minecraft.world.chunk.Chunk;
 
 public class RenderEventHandler
 {
+    private static final Pattern PATTERN_CARPET_TPS = Pattern.compile("TPS: (?<tps>[0-9]+\\.[0-9]) MSPT: (?<mspt>[0-9]+\\.[0-9])");
     private static final RenderEventHandler INSTANCE = new RenderEventHandler();
     private final Date date;
     private final Random rand = new Random();
@@ -63,6 +68,12 @@ public class RenderEventHandler
     private boolean serverSeedValid;
     private int addedTypes;
     private double fontScale = 0.5d;
+    private boolean isCarpetServer;
+    private long lastServerTick;
+    private long lastServerTimeUpdate;
+    private double serverTPS;
+    private double serverMSPT;
+    private boolean serverTPSValid = false;
     private final List<StringHolder> lines = new ArrayList<StringHolder>();
 
     public RenderEventHandler()
@@ -126,6 +137,8 @@ public class RenderEventHandler
     public void onWorldLoad()
     {
         this.serverSeedValid = false;
+        this.serverTPSValid = false;
+        this.isCarpetServer = false;
         OverlayRenderer.worldSpawnValid = false;
     }
 
@@ -205,6 +218,57 @@ public class RenderEventHandler
         }
     }
 
+    public void onServerTimeUpdate(long totalWorldTime)
+    {
+        // Carpet server sends the TPS and MSPT values via the player list footer data
+        if (this.isCarpetServer == false)
+        {
+            long currentTime = System.nanoTime();
+
+            if (this.serverTPSValid)
+            {
+                long elapsedTicks = totalWorldTime - this.lastServerTick;
+
+                if (elapsedTicks > 0)
+                {
+                    this.serverMSPT = ((double) (currentTime - this.lastServerTimeUpdate) / (double) elapsedTicks) / 1000000D;
+                    this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
+                }
+            }
+
+            this.lastServerTick = totalWorldTime;
+            this.lastServerTimeUpdate = currentTime;
+            this.serverTPSValid = true;
+        }
+    }
+
+    public void handleCarpetServerTPSData(ITextComponent textComponent)
+    {
+        if (textComponent.getFormattedText().isEmpty() == false)
+        {
+            String text = TextFormatting.getTextWithoutFormattingCodes(textComponent.getUnformattedText());
+            Matcher matcher = PATTERN_CARPET_TPS.matcher(text);
+
+            if (matcher.matches())
+            {
+                try
+                {
+                    this.serverTPS = Double.parseDouble(matcher.group("tps"));
+                    this.serverMSPT = Double.parseDouble(matcher.group("mspt"));
+                    this.serverTPSValid = true;
+                    this.isCarpetServer = true;
+                    return;
+                }
+                catch (NumberFormatException e)
+                {
+                }
+            }
+        }
+
+        this.serverTPSValid = false;
+
+    }
+
     public void setEnabledMask(int mask)
     {
         this.infoLineMask = mask;
@@ -232,7 +296,18 @@ public class RenderEventHandler
             else if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0 &&
                      (this.overlayMask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0)
             {
-                OverlayRenderer.worldSpawn = new BlockPos(mc.player.posX, 0, mc.player.posZ);
+                if (Minecraft.getMinecraft().isSingleplayer())
+                {
+                    IntegratedServer server = Minecraft.getMinecraft().getIntegratedServer();
+                    OverlayRenderer.worldSpawn = server.getWorld(mc.player.dimension).getSpawnPoint();
+                    mc.player.sendStatusMessage(new TextComponentString("Using single player world spawn"), true);
+                }
+                else
+                {
+                    OverlayRenderer.worldSpawn = new BlockPos(mc.player.posX, 0, mc.player.posZ);
+                    mc.player.sendStatusMessage(new TextComponentString("Using player's current position"), true);
+                }
+
                 OverlayRenderer.worldSpawnValid = true;
             }
         }
@@ -352,6 +427,34 @@ public class RenderEventHandler
             catch (Exception e)
             {
                 this.addLine("Date formatting failed - Invalid date format string?");
+            }
+        }
+        else if (type == InfoToggle.SERVER_TPS.getBitMask())
+        {
+            if (this.serverTPSValid)
+            {
+                String rst = TextFormatting.RESET.toString();
+                String preTps = this.serverTPS >= 20.0D ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+                String preMspt;
+
+                if (this.isCarpetServer)
+                {
+                    if      (this.serverMSPT <= 40) { preMspt = TextFormatting.GREEN.toString(); }
+                    else if (this.serverMSPT <= 45) { preMspt = TextFormatting.YELLOW.toString(); }
+                    else if (this.serverMSPT <= 50) { preMspt = TextFormatting.GOLD.toString(); }
+                    else                            { preMspt = TextFormatting.RED.toString(); }
+                }
+                else
+                {
+                    if (this.serverMSPT <= 51) { preMspt = TextFormatting.GREEN.toString(); }
+                    else                       { preMspt = TextFormatting.RED.toString(); }
+                }
+
+                this.addLine(String.format("Server TPS: %s%.1f%s MSPT: %s%.1f%s", preTps, this.serverTPS, rst, preMspt, this.serverMSPT, rst));
+            }
+            else
+            {
+                this.addLine("Server TPS: <no valid data>");
             }
         }
         else if (type == InfoToggle.COORDINATES.getBitMask() ||
