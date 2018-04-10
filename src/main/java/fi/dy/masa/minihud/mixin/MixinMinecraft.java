@@ -15,11 +15,14 @@ public class MixinMinecraft implements IMinecraftAccessor
     @Shadow
     private boolean actionKeyF3;
 
-    //@Inject(method = "runTickKeyboard", at = @At(value = "JUMP", opcode = Opcodes.GOTO, ordinal = ??))
-    @Inject(method = "dispatchKeypresses", at = @At(value = "HEAD"))
+    @Inject(method = "runTickKeyboard", cancellable = true,
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;dispatchKeypresses()V"))
     public void onKeyboardInput(CallbackInfo ci)
     {
-        InputEventHandler.getInstance().onKeyInput();
+        if (InputEventHandler.getInstance().onKeyInput())
+        {
+            ci.cancel();
+        }
     }
 
     @Override

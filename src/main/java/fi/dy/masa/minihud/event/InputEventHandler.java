@@ -44,19 +44,20 @@ public class InputEventHandler
         return INSTANCE;
     }
 
-    public void onKeyInput()
+    public boolean onKeyInput()
     {
         Minecraft mc = Minecraft.getMinecraft();
 
         // Keybinds shouldn't work inside GUIs
         if (mc.currentScreen != null)
         {
-            return;
+            return false;
         }
 
         int eventKey = Keyboard.getEventKey();
         boolean eventKeyState = Keyboard.getEventKeyState();
         int bitMaskForEventKey = Configs.getBitmaskForDebugKey(eventKey);
+        boolean cancel = false;
 
         if (eventKeyState && Keyboard.isKeyDown(Keyboard.KEY_F3) && bitMaskForEventKey != 0)
         {
@@ -65,12 +66,12 @@ public class InputEventHandler
 
             // This prevent the F3 screen from opening after releasing the F3 key
             ((IMinecraftAccessor) mc).setActionKeyF3(true);
-            KeyBinding.unPressAllKeys();
+            cancel = true;
         }
 
         int toggleKey = LiteModMiniHud.KEY_TOGGLE_MODE.getKeyCode();
 
-        // Toggle the HUD when releasing the toggle key, if no infos were toggled while it was down
+        // Toggle the HUD when releasing the toggle key, if no info types were toggled while it was down
         if (eventKeyState == false && eventKey == toggleKey)
         {
             if (this.toggledInfo == false)
@@ -79,6 +80,7 @@ public class InputEventHandler
             }
 
             this.toggledInfo = false;
+            cancel = true;
         }
         else if (eventKeyState && Keyboard.isKeyDown(toggleKey))
         {
@@ -88,8 +90,7 @@ public class InputEventHandler
             {
                 RenderEventHandler.getInstance().xorInfoLineEnabledMask(bitMaskForEventKey);
                 this.toggledInfo = true;
-                KeyBinding.unPressAllKeys();
-                return;
+                cancel = true;
             }
 
             bitMaskForEventKey = Configs.getBitmaskForOverlayKey(eventKey);
@@ -98,10 +99,11 @@ public class InputEventHandler
             {
                 RenderEventHandler.getInstance().xorOverlayRendererEnabledMask(bitMaskForEventKey);
                 this.toggledInfo = true;
-                KeyBinding.unPressAllKeys();
-                return;
+                cancel = true;
             }
         }
+
+        return cancel;
     }
 
     public void onNeighborNotify(World world, BlockPos pos, EnumSet<EnumFacing> notifiedSides)
