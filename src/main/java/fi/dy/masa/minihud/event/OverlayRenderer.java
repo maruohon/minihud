@@ -23,7 +23,6 @@ public class OverlayRenderer
         GlStateManager.disableLighting();
         GlStateManager.disableCull();
         GlStateManager.enableBlend();
-        //GlStateManager.pushMatrix();
         GlStateManager.disableTexture2D();
         double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
         double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
@@ -41,15 +40,20 @@ public class OverlayRenderer
 
         if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_PLAYER.getBitMask()) != 0)
         {
-            renderSpawnChunksOverlay(mc, entity, dx, dy, dz, new BlockPos(entity.posX, 0, entity.posZ), partialTicks);
+            int colorLazy = ConfigsGeneric.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
+            int colorProcessing = ConfigsGeneric.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getIntegerValue();
+            BlockPos pos = new BlockPos(entity.posX, 0, entity.posZ);
+            renderSpawnChunksOverlay(mc, entity, dx, dy, dz, pos, colorLazy, colorProcessing, partialTicks);
         }
-        else if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0 && worldSpawnValid)
+
+        if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0 && worldSpawnValid)
         {
-            renderSpawnChunksOverlay(mc, entity, dx, dy, dz, worldSpawn, partialTicks);
+            int colorLazy = ConfigsGeneric.SPAWN_REAL_LAZY_OVERLAY_COLOR.getIntegerValue();
+            int colorProcessing = ConfigsGeneric.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getIntegerValue();
+            renderSpawnChunksOverlay(mc, entity, dx, dy, dz, worldSpawn, colorLazy, colorProcessing, partialTicks);
         }
 
         GlStateManager.enableTexture2D();
-        //GlStateManager.popMatrix();
         GlStateManager.disableBlend();
         GlStateManager.enableCull();
         GlStateManager.depthMask(true);
@@ -90,18 +94,17 @@ public class OverlayRenderer
         }
     }
 
-    private static void renderSpawnChunksOverlay(Minecraft mc, Entity entity, double dx, double dy, double dz, BlockPos worldSpawn, float partialTicks)
+    private static void renderSpawnChunksOverlay(Minecraft mc, Entity entity, double dx, double dy, double dz,
+            BlockPos worldSpawn, int colorLazy, int colorProcessing, float partialTicks)
     {
         GlStateManager.glLineWidth(1.6f);
 
         int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
         Pair<BlockPos, BlockPos> corners = getSpawnChunkCorners(worldSpawn, 128);
-        int color = ConfigsGeneric.SPAWN_OVERLAY_COLOR_LAZY.getIntegerValue();
-        RenderUtils.renderVerticalWallsOfLinesWithinRange(corners.getLeft(), corners.getRight(), rangeH, 256, 16, 16, entity, dx, dy, dz, color, partialTicks);
+        RenderUtils.renderVerticalWallsOfLinesWithinRange(corners.getLeft(), corners.getRight(), rangeH, 256, 16, 16, entity, dx, dy, dz, colorLazy, partialTicks);
 
         corners = getSpawnChunkCorners(worldSpawn, 128 - 32);
-        color = ConfigsGeneric.SPAWN_OVERLAY_COLOR_ENTITY.getIntegerValue();
-        RenderUtils.renderVerticalWallsOfLinesWithinRange(corners.getLeft(), corners.getRight(), rangeH, 256, 16, 16, entity, dx, dy, dz, color, partialTicks);
+        RenderUtils.renderVerticalWallsOfLinesWithinRange(corners.getLeft(), corners.getRight(), rangeH, 256, 16, 16, entity, dx, dy, dz, colorProcessing, partialTicks);
     }
 
     private static Pair<BlockPos, BlockPos> getSpawnChunkCorners(BlockPos worldSpawn, int spawnChunkRange)
