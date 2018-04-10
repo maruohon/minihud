@@ -33,7 +33,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -296,17 +295,10 @@ public class RenderEventHandler
             else if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0 &&
                      (this.overlayMask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0)
             {
-                if (Minecraft.getMinecraft().isSingleplayer())
-                {
-                    IntegratedServer server = Minecraft.getMinecraft().getIntegratedServer();
-                    OverlayRenderer.worldSpawn = server.getWorld(mc.player.dimension).getSpawnPoint();
-                    mc.player.sendStatusMessage(new TextComponentString("Using single player world spawn"), true);
-                }
-                else
-                {
-                    OverlayRenderer.worldSpawn = new BlockPos(mc.player.posX, 0, mc.player.posZ);
-                    mc.player.sendStatusMessage(new TextComponentString("Using player's current position"), true);
-                }
+                BlockPos spawn = mc.world.getSpawnPoint();
+                OverlayRenderer.worldSpawn = spawn;
+                String str = String.format("Using the world spawn x = %d, y = %d, z = %d", spawn.getX(), spawn.getY(), spawn.getZ());
+                mc.player.sendStatusMessage(new TextComponentString(str), true);
 
                 OverlayRenderer.worldSpawnValid = true;
             }
