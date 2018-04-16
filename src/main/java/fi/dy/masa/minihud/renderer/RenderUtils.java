@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -127,6 +128,25 @@ public class RenderUtils
                 default:
             }
         }
+    }
+
+    public static void renderBoxWithEdges(BlockPos posMin, BlockPos posMax, double dx, double dy, double dz, int color, float partialTicks)
+    {
+        final double x1 = posMin.getX() - dx;
+        final double y1 = posMin.getY() - dy;
+        final double z1 = posMin.getZ() - dz;
+        final double x2 = posMax.getX() - dx;
+        final double y2 = posMax.getY() - dy;
+        final double z2 = posMax.getZ() - dz;
+
+        final float a = ((color >>> 24) & 0xFF) / 255f;
+        final float r = ((color >>> 16) & 0xFF) / 255f;
+        final float g = ((color >>>  8) & 0xFF) / 255f;
+        final float b = ((color       ) & 0xFF) / 255f;
+        final float quadAlpha = a / 6f;
+
+        RenderGlobal.renderFilledBox(x1, y1, z1, x2, y2, z2, r, g, b, quadAlpha);
+        RenderGlobal.drawBoundingBox(x1, y1, z1, x2, y2, z2, r, g, b, a);
     }
 
     public static void drawTextPlate(String text, double x, double y, double z, float scale, Minecraft mc)

@@ -4,16 +4,19 @@ import org.apache.commons.lang3.tuple.Pair;
 import fi.dy.masa.minihud.config.ConfigsGeneric;
 import fi.dy.masa.minihud.config.OverlayHotkeys;
 import fi.dy.masa.minihud.event.RenderEventHandler;
+import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.PooledMutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 
 public class OverlayRenderer
 {
     public static BlockPos worldSpawn = BlockPos.ORIGIN;
     public static double chunkUnloadBucketOverlayY;
+    public static double slimeChunkOverlayTopY;
     public static boolean worldSpawnValid;
 
     public static void renderOverlays(int mask, Minecraft mc, float partialTicks)
@@ -38,12 +41,19 @@ public class OverlayRenderer
             renderChunkUnloadBuckets(mc, entity, dx, dy, dz, chunkUnloadBucketOverlayY, partialTicks);
         }
 
+        if ((mask & OverlayHotkeys.SLIME_CHUNKS_OVERLAY.getBitMask()) != 0)
+        {
+            renderSlimeChunkOverlay(mc, entity, dx, dy, dz, slimeChunkOverlayTopY, partialTicks);
+        }
+
         if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_PLAYER.getBitMask()) != 0)
         {
+            PooledMutableBlockPos pos = PooledMutableBlockPos.retain();
             int colorLazy = ConfigsGeneric.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
             int colorProcessing = ConfigsGeneric.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getIntegerValue();
-            BlockPos pos = new BlockPos(entity.posX, 0, entity.posZ);
+            pos.setPos(entity.posX, 0, entity.posZ);
             renderSpawnChunksOverlay(mc, entity, dx, dy, dz, pos, colorLazy, colorProcessing, partialTicks);
+            pos.release();
         }
 
         if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0 && worldSpawnValid)
@@ -63,21 +73,25 @@ public class OverlayRenderer
     {
         int rx = MathHelper.floor(entity.posX) & ~0x1FF;
         int rz = MathHelper.floor(entity.posZ) & ~0x1FF;
-        BlockPos pos1 = new BlockPos(rx,         0, rz      );
-        BlockPos pos2 = new BlockPos(rx + 511, 256, rz + 511);
+        PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();
+        PooledMutableBlockPos pos2 = PooledMutableBlockPos.retain();
+        pos1.setPos(rx,         0, rz      );
+        pos2.setPos(rx + 511, 256, rz + 511);
         int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
         int color = ConfigsGeneric.REGION_OVERLAY_COLOR.getIntegerValue();
 
         GlStateManager.glLineWidth(1.6f);
 
         RenderUtils.renderVerticalWallsOfLinesWithinRange(pos1, pos2, rangeH, 256, 16, 16, entity, dx, dy, dz, color, partialTicks);
+        pos1.release();
+        pos2.release();
     }
 
     private static void renderChunkUnloadBuckets(Minecraft mc, Entity entity, double dx, double dy, double dz, double chunkOverlayY, float partialTicks)
     {
         final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
         final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
-        final int r = MathHelper.clamp(ConfigsGeneric.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue(), 0, 10);
+        final int r = MathHelper.clamp(ConfigsGeneric.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue(), 0, 40);
         final float y = (float) chunkOverlayY;
         final float scale = MathHelper.clamp((float) ConfigsGeneric.CHUNK_UNLOAD_BUCKET_FONT_SCALE.getDoubleValue(), 0.01f, 1f);
 
@@ -91,6 +105,39 @@ public class OverlayRenderer
                 String str = String.valueOf(bucket);
                 RenderUtils.drawTextPlate(str, (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale, mc);
             }
+        }
+    }
+
+    private static void renderSlimeChunkOverlay(Minecraft mc, Entity entity, double dx, double dy, double dz, double overlayTopY, float partialTicks)
+    {
+        if (RenderEventHandler.getInstance().isServerSeedKnown(entity))
+        {
+            final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
+            final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
+            final int r = mc.gameSettings.renderDistanceChunks + 2;
+            final long worldSeed = RenderEventHandler.getInstance().getServerSeed(entity);
+            final int color = ConfigsGeneric.SLIME_CHUNKS_OVERLAY_COLOR.getIntegerValue();
+            PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();
+            PooledMutableBlockPos pos2 = PooledMutableBlockPos.retain();
+
+            for (int xOff = -r; xOff <= r; xOff++)
+            {
+                for (int zOff = -r; zOff <= r; zOff++)
+                {
+                    int cx = centerX + xOff;
+                    int cz = centerZ + zOff;
+
+                    if (MiscUtils.canSlimeSpawnInChunk(cx, cz, worldSeed))
+                    {
+                        pos1.setPos( cx << 4,                 0,  cz << 4);
+                        pos2.setPos((cx << 4) + 16, overlayTopY, (cz << 4) + 16);
+                        RenderUtils.renderBoxWithEdges(pos1, pos2, dx, dy, dz, color, partialTicks);
+                    }
+                }
+            }
+
+            pos1.release();
+            pos2.release();
         }
     }
 

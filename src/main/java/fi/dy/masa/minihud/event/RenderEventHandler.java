@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import fi.dy.masa.minihud.LiteModMiniHud;
@@ -18,6 +17,7 @@ import fi.dy.masa.minihud.config.OverlayHotkeys;
 import fi.dy.masa.minihud.config.interfaces.IConfigOptionListEntry;
 import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
+import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -56,7 +56,6 @@ public class RenderEventHandler
     private static final Pattern PATTERN_CARPET_TPS = Pattern.compile("TPS: (?<tps>[0-9]+\\.[0-9]) MSPT: (?<mspt>[0-9]+\\.[0-9])");
     private static final RenderEventHandler INSTANCE = new RenderEventHandler();
     private final Date date;
-    private final Random rand = new Random();
     private boolean enabled;
     private int infoLineMask;
     private int overlayMask;
@@ -145,6 +144,38 @@ public class RenderEventHandler
     public void setFontScale(double scale)
     {
         this.fontScale = scale;
+    }
+
+    public boolean isServerSeedKnown(Entity entity)
+    {
+        if (this.serverSeedValid)
+        {
+            return true;
+        }
+        else if (Minecraft.getMinecraft().isSingleplayer())
+        {
+            MinecraftServer server = Minecraft.getMinecraft().getIntegratedServer();
+            World worldTmp = server.getWorld(entity.dimension);
+            return worldTmp != null;
+        }
+
+        return false;
+    }
+
+    public long getServerSeed(Entity entity)
+    {
+        if (this.serverSeedValid)
+        {
+            return this.serverSeed;
+        }
+        else if (Minecraft.getMinecraft().isSingleplayer())
+        {
+            MinecraftServer server = Minecraft.getMinecraft().getIntegratedServer();
+            World worldTmp = server.getWorld(entity.dimension);
+            return worldTmp != null ? worldTmp.getSeed() : 0;
+        }
+
+        return 0;
     }
 
     public int getSubtitleOffset()
@@ -305,6 +336,12 @@ public class RenderEventHandler
                 (this.overlayMask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0)
             {
                 OverlayRenderer.chunkUnloadBucketOverlayY = mc.player.posY;
+            }
+            // Flipped on the slime chunk overlay rendering, store the player's current y-position
+            else if ((mask & OverlayHotkeys.SLIME_CHUNKS_OVERLAY.getBitMask()) != 0 &&
+                (this.overlayMask & OverlayHotkeys.SLIME_CHUNKS_OVERLAY.getBitMask()) != 0)
+            {
+                OverlayRenderer.slimeChunkOverlayTopY = mc.player.posY;
             }
             // Flipped on the real spawn point rendering, store the player's current position
             else if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0 &&
@@ -719,26 +756,13 @@ public class RenderEventHandler
         }
         else if (type == InfoToggle.SLIME_CHUNK.getBitMask())
         {
-            boolean valid = false;
-            long seed = 0;
             String result;
-            MinecraftServer server = entity.getServer();
 
-            if (server != null && server.isSinglePlayer())
+            if (this.isServerSeedKnown(entity))
             {
-                World worldTmp = server.getWorld(entity.dimension);
-                seed = worldTmp != null ? worldTmp.getSeed() : 0;
-                valid = worldTmp != null;
-            }
-            else if (this.serverSeedValid)
-            {
-                seed = this.serverSeed;
-                valid = true;
-            }
+                long seed = this.getServerSeed(entity);
 
-            if (valid)
-            {
-                if (this.canSlimeSpawnAt(pos.getX(), pos.getZ(), seed))
+                if (MiscUtils.canSlimeSpawnAt(pos.getX(), pos.getZ(), seed))
                 {
                     result = TextFormatting.GREEN.toString() + "YES" + TextFormatting.RESET.toString() + TextFormatting.WHITE.toString();
                 }
@@ -981,20 +1005,6 @@ public class RenderEventHandler
         {
             GlStateManager.popMatrix();
         }
-    }
-
-    private boolean canSlimeSpawnAt(int posX, int posZ, long worldSeed)
-    {
-        int chunkX = posX >> 4;
-        int chunkZ = posZ >> 4;
-        long slimeSeed = 987234911L;
-        long rngSeed = worldSeed +
-                       (long) (chunkX * chunkX *  4987142) + (long) (chunkX * 5947611) +
-                       (long) (chunkZ * chunkZ) * 4392871L + (long) (chunkZ * 389711) ^ slimeSeed;
-
-        this.rand.setSeed(rngSeed);
-
-        return this.rand.nextInt(10) == 0;
     }
 
     private class StringHolder implements Comparable<StringHolder>

@@ -42,6 +42,7 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean, IConfigDou
     REQUIRE_HOLDING_KEY             ("requireHoldingKey", "none", "Require holding a key to render the HUD. Valid keys are 'alt', 'ctrl' and 'shift'."),
     SORT_LINES_BY_LENGTH            ("sortLinesByLength", false, "Sort the lines by their text's length"),
     SORT_LINES_REVERSED             ("sortLinesReversed", false, "Reverse the line sorting order"),
+    SLIME_CHUNKS_OVERLAY_COLOR      ("slimeChunksOverlayColor", "0xFF20F020", true, "Color for the slime chunks overlay (ARGB, default: 0xFF2050D0)"),
     SPAWN_PLAYER_ENTITY_OVERLAY_COLOR ("spawnPlayerEntityOverlayColor", "0xFF2050D0", true, "Color for the entity-processing spawn chunks overlay of\nhow the spawn chunks would be if the spawn were to be at the player's\ncurrent position (ARGB, default: 0xFF2050D0)"),
     SPAWN_PLAYER_LAZY_OVERLAY_COLOR ("spawnPlayerLazyOverlayColor", "0xFFD030D0", true, "Color for the \"lazy-loaded\" spawn chunks overlay of\nhow the spawn chunks would be if the spawn were to be at the player's\ncurrent position(ARGB, default: 0xFFD030D0)"),
     SPAWN_REAL_ENTITY_OVERLAY_COLOR ("spawnRealEntityOverlayColor", "0xFF30FF20", true, "Color for the entity-processing real spawn chunks overlay (ARGB, default: 0xFF30FF20)"),
