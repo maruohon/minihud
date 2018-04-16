@@ -91,7 +91,11 @@ public class OverlayRenderer
     {
         final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
         final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
-        final int r = MathHelper.clamp(ConfigsGeneric.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue(), 0, 40);
+        int r = MathHelper.clamp(ConfigsGeneric.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
+        if (r == -1)
+        {
+            r = mc.gameSettings.renderDistanceChunks;
+        }
         final float y = (float) chunkOverlayY;
         final float scale = MathHelper.clamp((float) ConfigsGeneric.CHUNK_UNLOAD_BUCKET_FONT_SCALE.getDoubleValue(), 0.01f, 1f);
 
@@ -114,7 +118,11 @@ public class OverlayRenderer
         {
             final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
             final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
-            final int r = mc.gameSettings.renderDistanceChunks + 2;
+            int r = MathHelper.clamp(ConfigsGeneric.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
+            if (r == -1)
+            {
+                r = mc.gameSettings.renderDistanceChunks;
+            }
             final long worldSeed = RenderEventHandler.getInstance().getServerSeed(entity);
             final int color = ConfigsGeneric.SLIME_CHUNKS_OVERLAY_COLOR.getIntegerValue();
             PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();

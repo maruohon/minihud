@@ -17,8 +17,8 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean, IConfigDou
 {
     CHUNK_UNLOAD_BUCKET_FONT_SCALE      ("chunkUnloadBucketOverlayFontScale", 0.15F, "The font scale for the Chunk unload order bucket overlay.\n" +
                                                                                      "Valid range: 0.01 - 1.0"),
-    CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS  ("chunkUnloadBucketOverlayChunkRadius", 4, "The radius of chunks to render the text for in the overlay.\n" +
-                                                                                   "Valid range: 0 - 10"),
+    CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS  ("chunkUnloadBucketOverlayChunkRadius", -1, "The radius of chunks to render the text for in the overlay.\n" +
+                                                                                   "Valid range: -1 - 40, where -1 = render distance"),
     COORDINATE_FORMAT_STRING        ("coordinateFormat", "x: %.1f y: %.1f z: %.1f",
                                     "The format string for the coordinate line.\n" +
                                     "Needs to have three %f format strings! Default: x: %.1f y: %.1f z: %.1f"),
@@ -43,6 +43,8 @@ public enum ConfigsGeneric implements IConfigGeneric, IConfigBoolean, IConfigDou
     SORT_LINES_BY_LENGTH            ("sortLinesByLength", false, "Sort the lines by their text's length"),
     SORT_LINES_REVERSED             ("sortLinesReversed", false, "Reverse the line sorting order"),
     SLIME_CHUNKS_OVERLAY_COLOR      ("slimeChunksOverlayColor", "0xFF20F020", true, "Color for the slime chunks overlay (ARGB, default: 0xFF2050D0)"),
+    SLIME_CHUNK_OVERLAY_RADIUS      ("slimeChunkOverlayRadius", -1, "The radius of chunks to render the slime chunk overlay in.\n" +
+                                                                    "Valid range: 0 - 40, where -1 = render distance"),
     SPAWN_PLAYER_ENTITY_OVERLAY_COLOR ("spawnPlayerEntityOverlayColor", "0xFF2050D0", true, "Color for the entity-processing spawn chunks overlay of\nhow the spawn chunks would be if the spawn were to be at the player's\ncurrent position (ARGB, default: 0xFF2050D0)"),
     SPAWN_PLAYER_LAZY_OVERLAY_COLOR ("spawnPlayerLazyOverlayColor", "0xFFD030D0", true, "Color for the \"lazy-loaded\" spawn chunks overlay of\nhow the spawn chunks would be if the spawn were to be at the player's\ncurrent position(ARGB, default: 0xFFD030D0)"),
     SPAWN_REAL_ENTITY_OVERLAY_COLOR ("spawnRealEntityOverlayColor", "0xFF30FF20", true, "Color for the entity-processing real spawn chunks overlay (ARGB, default: 0xFF30FF20)"),
