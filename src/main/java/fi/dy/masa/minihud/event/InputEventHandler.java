@@ -1,7 +1,9 @@
 package fi.dy.masa.minihud.event;
 
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.lwjgl.input.Keyboard;
 import com.google.common.collect.MapMaker;
 import fi.dy.masa.minihud.LiteModMiniHud;
@@ -33,11 +35,22 @@ public class InputEventHandler
 {
     private static final InputEventHandler INSTANCE = new InputEventHandler();
 
+    private final Set<Integer> modifierKeys = new HashSet<>();
     private boolean neighborUpdateEnabled;
     private boolean pathfindingEnabled;
     private boolean toggledInfo;
     private int tickCounter;
     private final Map<Entity, Path> oldPaths = new MapMaker().weakKeys().weakValues().<Entity, Path>makeMap();
+
+    private InputEventHandler()
+    {
+        this.modifierKeys.add(Keyboard.KEY_LSHIFT);
+        this.modifierKeys.add(Keyboard.KEY_RSHIFT);
+        this.modifierKeys.add(Keyboard.KEY_LCONTROL);
+        this.modifierKeys.add(Keyboard.KEY_RCONTROL);
+        this.modifierKeys.add(Keyboard.KEY_LMENU);
+        this.modifierKeys.add(Keyboard.KEY_RMENU);
+    }
 
     public static InputEventHandler getInstance()
     {
@@ -103,7 +116,7 @@ public class InputEventHandler
             }
         }
 
-        return cancel;
+        return cancel && this.modifierKeys.contains(eventKey) == false;
     }
 
     public void onNeighborNotify(World world, BlockPos pos, EnumSet<EnumFacing> notifiedSides)
