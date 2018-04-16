@@ -72,7 +72,7 @@ public class RenderEventHandler
     private long lastServerTimeUpdate;
     private double serverTPS;
     private double serverMSPT;
-    private boolean serverTPSValid = false;
+    private boolean serverTPSValid;
     private final List<StringHolder> lines = new ArrayList<StringHolder>();
 
     public RenderEventHandler()
@@ -219,8 +219,9 @@ public class RenderEventHandler
 
     public void onServerTimeUpdate(long totalWorldTime)
     {
-        // Carpet server sends the TPS and MSPT values via the player list footer data
-        if (this.isCarpetServer == false)
+        // Carpet server sends the TPS and MSPT values via the player list footer data,
+        // and for single player the data is grabbed directly from the integrated server.
+        if (this.isCarpetServer == false && Minecraft.getMinecraft().isSingleplayer() == false)
         {
             long currentTime = System.nanoTime();
 
@@ -237,6 +238,20 @@ public class RenderEventHandler
 
             this.lastServerTick = totalWorldTime;
             this.lastServerTimeUpdate = currentTime;
+            this.serverTPSValid = true;
+        }
+    }
+
+    private void updateIntegratedServerTPS()
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (mc != null && mc.player != null && mc.getIntegratedServer() != null)
+        {
+            final int dim = mc.player.getEntityWorld().provider.getDimensionType().getId();
+            final int dimIndex = dim == 0 ? 0 : (dim == -1 ? 1 : 2);
+            this.serverMSPT = (double) MathHelper.average(mc.getIntegratedServer().timeOfLastDimensionTick[dimIndex]) / 1000000D;
+            this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
             this.serverTPSValid = true;
         }
     }
@@ -265,7 +280,6 @@ public class RenderEventHandler
         }
 
         this.serverTPSValid = false;
-
     }
 
     public void setEnabledMask(int mask)
@@ -372,6 +386,7 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
         Entity entity = mc.getRenderViewEntity();
+        World world = entity.getEntityWorld();
         BlockPos pos = new BlockPos(entity.posX, entity.getEntityBoundingBox().minY, entity.posZ);
 
         if (type == InfoToggle.FPS.getBitMask())
@@ -393,15 +408,15 @@ public class RenderEventHandler
         }
         else if (type == InfoToggle.TIME_WORLD.getBitMask())
         {
-            long current = entity.getEntityWorld().getWorldTime();
-            long total = entity.getEntityWorld().getTotalWorldTime();
+            long current = world.getWorldTime();
+            long total = world.getTotalWorldTime();
             this.addLine(String.format("World time: %5d - total: %d", current, total));
         }
         else if (type == InfoToggle.TIME_WORLD_FORMATTED.getBitMask())
         {
             try
             {
-                long timeDay = (int) entity.getEntityWorld().getWorldTime();
+                long timeDay = (int) world.getWorldTime();
                 int day = (int) (timeDay / 24000) + 1;
                 // 1 tick = 3.6 seconds in MC (0.2777... seconds IRL)
                 int hour = (int) ((timeDay / 1000) + 6) % 24;
@@ -423,26 +438,34 @@ public class RenderEventHandler
         }
         else if (type == InfoToggle.SERVER_TPS.getBitMask())
         {
+            if (mc.isSingleplayer() && (mc.getIntegratedServer().getTickCounter() % 10) == 0)
+            {
+                this.updateIntegratedServerTPS();
+            }
+
             if (this.serverTPSValid)
             {
                 String rst = TextFormatting.RESET.toString();
                 String preTps = this.serverTPS >= 20.0D ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
                 String preMspt;
 
-                if (this.isCarpetServer)
+                // Carpet server and integrated server have actual meaningful MSPT data available
+                if (this.isCarpetServer || mc.isSingleplayer())
                 {
                     if      (this.serverMSPT <= 40) { preMspt = TextFormatting.GREEN.toString(); }
                     else if (this.serverMSPT <= 45) { preMspt = TextFormatting.YELLOW.toString(); }
                     else if (this.serverMSPT <= 50) { preMspt = TextFormatting.GOLD.toString(); }
                     else                            { preMspt = TextFormatting.RED.toString(); }
+
+                    this.addLine(String.format("Server TPS: %s%.1f%s MSPT: %s%.1f%s", preTps, this.serverTPS, rst, preMspt, this.serverMSPT, rst));
                 }
                 else
                 {
                     if (this.serverMSPT <= 51) { preMspt = TextFormatting.GREEN.toString(); }
                     else                       { preMspt = TextFormatting.RED.toString(); }
-                }
 
-                this.addLine(String.format("Server TPS: %s%.1f%s MSPT: %s%.1f%s", preTps, this.serverTPS, rst, preMspt, this.serverMSPT, rst));
+                    this.addLine(String.format("Server TPS: %s%.1f%s (MSPT*: %s%.1f%s)", preTps, this.serverTPS, rst, preMspt, this.serverMSPT, rst));
+                }
             }
             else
             {
@@ -487,7 +510,7 @@ public class RenderEventHandler
 
             if ((enabledMask & InfoToggle.DIMENSION.getBitMask()) != 0)
             {
-                int dimension = entity.getEntityWorld().provider.getDimensionType().getId();
+                int dimension = world.provider.getDimensionType().getId();
                 str.append(String.format(String.format("%sDimensionType ID: %d", pre, dimension)));
             }
 
@@ -702,9 +725,9 @@ public class RenderEventHandler
 
             if (server != null && server.isSinglePlayer())
             {
-                World world = server.getWorld(entity.dimension);
-                seed = world != null ? world.getSeed() : 0;
-                valid = world != null;
+                World worldTmp = server.getWorld(entity.dimension);
+                seed = worldTmp != null ? worldTmp.getSeed() : 0;
+                valid = worldTmp != null;
             }
             else if (this.serverSeedValid)
             {
