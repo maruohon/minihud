@@ -17,6 +17,7 @@ import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.OverlayHotkeys;
 import fi.dy.masa.minihud.config.interfaces.IConfigOptionListEntry;
 import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
+import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;

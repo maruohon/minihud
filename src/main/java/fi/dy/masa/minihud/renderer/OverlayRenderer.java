@@ -1,9 +1,9 @@
-package fi.dy.masa.minihud.event;
+package fi.dy.masa.minihud.renderer;
 
 import org.apache.commons.lang3.tuple.Pair;
 import fi.dy.masa.minihud.config.ConfigsGeneric;
 import fi.dy.masa.minihud.config.OverlayHotkeys;
-import fi.dy.masa.minihud.renderer.RenderUtils;
+import fi.dy.masa.minihud.event.RenderEventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;

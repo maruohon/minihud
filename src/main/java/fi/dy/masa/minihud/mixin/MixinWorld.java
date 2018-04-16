@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import fi.dy.masa.minihud.event.InputEventHandler;
+import fi.dy.masa.minihud.util.DebugInfoUtils;
 import net.minecraft.block.Block;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -18,7 +18,7 @@ public class MixinWorld
     public void onNotifyNeighborsOfStateChange(BlockPos pos, Block blockType, boolean updateObservers, CallbackInfo ci)
     {
         EnumSet<EnumFacing> set = EnumSet.allOf(EnumFacing.class);
-        InputEventHandler.getInstance().onNeighborNotify((World) (Object) this, pos, set);
+        DebugInfoUtils.onNeighborNotify((World) (Object) this, pos, set);
     }
 
     @Inject(method = "notifyNeighborsOfStateExcept", at = @At("HEAD"))
@@ -26,6 +26,6 @@ public class MixinWorld
     {
         EnumSet<EnumFacing> set = EnumSet.allOf(EnumFacing.class);
         set.remove(skipSide);
-        InputEventHandler.getInstance().onNeighborNotify((World) (Object) this, pos, set);
+        DebugInfoUtils.onNeighborNotify((World) (Object) this, pos, set);
     }
 }

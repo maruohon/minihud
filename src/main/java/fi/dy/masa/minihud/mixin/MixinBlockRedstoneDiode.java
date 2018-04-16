@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import fi.dy.masa.minihud.event.InputEventHandler;
+import fi.dy.masa.minihud.util.DebugInfoUtils;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.BlockRedstoneDiode;
 import net.minecraft.block.material.Material;
@@ -26,6 +26,6 @@ public class MixinBlockRedstoneDiode extends BlockHorizontal
     public void onNotifyNeighbors(World world, BlockPos pos, IBlockState state, CallbackInfo ci)
     {
         EnumSet<EnumFacing> set = EnumSet.of(state.getValue(BlockHorizontal.FACING).getOpposite());
-        InputEventHandler.getInstance().onNeighborNotify(world, pos, set);
+        DebugInfoUtils.onNeighborNotify(world, pos, set);
     }
 }
