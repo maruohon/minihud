@@ -755,14 +755,17 @@ public class RenderEventHandler
                 {
                     Potion potion = effect.getPotion();
 
-                    if (potion.isBeneficial())
+                    if (effect.doesShowParticles() && potion.hasStatusIcon())
                     {
-                        y1 = 26;
-                    }
-                    else
-                    {
-                        y2 = 52;
-                        break;
+                        if (potion.isBeneficial())
+                        {
+                            y1 = 26;
+                        }
+                        else
+                        {
+                            y2 = 52;
+                            break;
+                        }
                     }
                 }
 
