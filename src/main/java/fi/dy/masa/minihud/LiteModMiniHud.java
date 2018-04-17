@@ -15,6 +15,7 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.ConfigsGeneric;
 import fi.dy.masa.minihud.config.gui.MiniHudConfigPanel;
 import fi.dy.masa.minihud.event.RenderEventHandler;
+import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.settings.KeyBinding;
@@ -69,6 +70,6 @@ public class LiteModMiniHud implements LiteMod, Configurable, InitCompleteListen
     @Override
     public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
     {
-        RenderEventHandler.getInstance().onWorldLoad();
+        DataStorage.getInstance().onWorldLoad();
     }
 }

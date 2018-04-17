@@ -1,6 +1,10 @@
 package fi.dy.masa.minihud.util;
 
 import java.util.Random;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.text.ChatType;
+import net.minecraft.util.text.TextComponentTranslation;
 
 public class MiscUtils
 {
@@ -21,5 +25,16 @@ public class MiscUtils
         RAND.setSeed(rngSeed);
 
         return RAND.nextInt(10) == 0;
+    }
+
+    public static int getChunkUnloadBucket(int chunkX, int chunkZ)
+    {
+        int longHash = Long.valueOf(ChunkPos.asLong(chunkX, chunkZ)).hashCode();
+        return (longHash ^ (longHash >>> 16)) & 0xFFFF;
+    }
+
+    public static void printInfoMessage(String key, Object... args)
+    {
+        Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation(key, args));
     }
 }

@@ -23,8 +23,6 @@ import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 public class DebugInfoUtils
@@ -221,45 +219,40 @@ public class DebugInfoUtils
             {
                 status = ! ((IMixinDebugRenderer) mc.debugRenderer).getCollisionBoxEnabled();
                 ((IMixinDebugRenderer) mc.debugRenderer).setCollisionBoxEnabled(status);
-                printMessage(mc, "collisions", status ? "ON" : "OFF");
+                MiscUtils.printInfoMessage("minihud.message.toggled_debug_mode.collisions", status ? "ON" : "OFF");
             }
             else if (bit == DebugHotkeys.HEIGHT_MAP.getBitMask())
             {
                 status = ! ((IMixinDebugRenderer) mc.debugRenderer).getHeightMapEnabled();
                 ((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(status);
-                printMessage(mc, "height_map", status ? "ON" : "OFF");
+                MiscUtils.printInfoMessage("minihud.message.toggled_debug_mode.height_map", status ? "ON" : "OFF");
             }
             else if (bit == DebugHotkeys.NEIGHBOR_UPDATES.getBitMask())
             {
                 status = ! ((IMixinDebugRenderer) mc.debugRenderer).getNeighborsUpdateEnabled();
                 ((IMixinDebugRenderer) mc.debugRenderer).setNeighborsUpdateEnabled(status);
                 neighborUpdateEnabled = status;
-                printMessage(mc, "neighbor_updates", status ? "ON" : "OFF");
+                MiscUtils.printInfoMessage("minihud.message.toggled_debug_mode.neighbor_updates", status ? "ON" : "OFF");
             }
             else if (bit == DebugHotkeys.PATH_FINDING.getBitMask())
             {
                 status = ! ((IMixinDebugRenderer) mc.debugRenderer).getPathfindingEnabled();
                 ((IMixinDebugRenderer) mc.debugRenderer).setPathfindingEnabled(status);
                 pathfindingEnabled = status;
-                printMessage(mc, "pathfinding", status ? "ON" : "OFF");
+                MiscUtils.printInfoMessage("minihud.message.toggled_debug_mode.pathfinding", status ? "ON" : "OFF");
             }
             else if (bit == DebugHotkeys.SOLID_FACES.getBitMask())
             {
                 status = ! ((IMixinDebugRenderer) mc.debugRenderer).getSolidFaceEnabled();
                 ((IMixinDebugRenderer) mc.debugRenderer).setSolidFaceEnabled(status);
-                printMessage(mc, "solid_faces", status ? "ON" : "OFF");
+                MiscUtils.printInfoMessage("minihud.message.toggled_debug_mode.solid_faces", status ? "ON" : "OFF");
             }
             else if (bit == DebugHotkeys.WATER.getBitMask())
             {
                 status = ! ((IMixinDebugRenderer) mc.debugRenderer).getWaterEnabled();
                 ((IMixinDebugRenderer) mc.debugRenderer).setWaterEnabled(status);
-                printMessage(mc, "water", status ? "ON" : "OFF");
+                MiscUtils.printInfoMessage("minihud.message.toggled_debug_mode.water", status ? "ON" : "OFF");
             }
         }
-    }
-
-    private static void printMessage(Minecraft mc, String key, Object... args)
-    {
-        mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation("minihud.message.toggled_debug_mode." + key, args));
     }
 }

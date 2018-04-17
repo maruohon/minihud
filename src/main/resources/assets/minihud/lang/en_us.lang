@@ -11,3 +11,8 @@ minihud.message.toggled_debug_mode.neighbor_updates=Toggled Neighbor Update debu
 minihud.message.toggled_debug_mode.pathfinding=Toggled Pathfinding debug rendering to %s
 minihud.message.toggled_debug_mode.solid_faces=Toggled Solid Faces debug rendering to %s
 minihud.message.toggled_debug_mode.water=Toggled Water debug rendering to %s
+
+minihud.message.error.invalid_seed=Failed to parse the world seed from chat
+
+minihud.message.seed_set=MiniHUD: Set the world seed to '%s'
+minihud.message.spawn_set=MiniHUD: Set the world spawn to %s

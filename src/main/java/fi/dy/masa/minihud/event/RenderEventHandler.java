@@ -7,9 +7,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.ConfigsGeneric;
 import fi.dy.masa.minihud.config.InfoToggle;
@@ -17,6 +14,7 @@ import fi.dy.masa.minihud.config.OverlayHotkeys;
 import fi.dy.masa.minihud.config.interfaces.IConfigOptionListEntry;
 import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
+import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
@@ -33,16 +31,12 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumSkyBlock;
@@ -53,8 +47,8 @@ import net.minecraft.world.chunk.Chunk;
 
 public class RenderEventHandler
 {
-    private static final Pattern PATTERN_CARPET_TPS = Pattern.compile("TPS: (?<tps>[0-9]+\\.[0-9]) MSPT: (?<mspt>[0-9]+\\.[0-9])");
     private static final RenderEventHandler INSTANCE = new RenderEventHandler();
+    private final DataStorage data;
     private final Date date;
     private boolean enabled;
     private int infoLineMask;
@@ -63,20 +57,14 @@ public class RenderEventHandler
     private int fpsCounter;
     private long fpsUpdateTime = Minecraft.getSystemTime();
     private long infoUpdateTime;
-    private long serverSeed;
-    private boolean serverSeedValid;
     private int addedTypes;
     private double fontScale = 0.5d;
-    private boolean isCarpetServer;
-    private long lastServerTick;
-    private long lastServerTimeUpdate;
-    private double serverTPS;
-    private double serverMSPT;
-    private boolean serverTPSValid;
+
     private final List<StringHolder> lines = new ArrayList<StringHolder>();
 
     public RenderEventHandler()
     {
+        this.data = DataStorage.getInstance();
         this.date = new Date();
     }
 
@@ -133,50 +121,11 @@ public class RenderEventHandler
         }
     }
 
-    public void onWorldLoad()
-    {
-        this.serverSeedValid = false;
-        this.serverTPSValid = false;
-        this.isCarpetServer = false;
-        OverlayRenderer.worldSpawnValid = false;
-    }
-
     public void setFontScale(double scale)
     {
         this.fontScale = scale;
     }
 
-    public boolean isServerSeedKnown(Entity entity)
-    {
-        if (this.serverSeedValid)
-        {
-            return true;
-        }
-        else if (Minecraft.getMinecraft().isSingleplayer())
-        {
-            MinecraftServer server = Minecraft.getMinecraft().getIntegratedServer();
-            World worldTmp = server.getWorld(entity.dimension);
-            return worldTmp != null;
-        }
-
-        return false;
-    }
-
-    public long getServerSeed(Entity entity)
-    {
-        if (this.serverSeedValid)
-        {
-            return this.serverSeed;
-        }
-        else if (Minecraft.getMinecraft().isSingleplayer())
-        {
-            MinecraftServer server = Minecraft.getMinecraft().getIntegratedServer();
-            World worldTmp = server.getWorld(entity.dimension);
-            return worldTmp != null ? worldTmp.getSeed() : 0;
-        }
-
-        return 0;
-    }
 
     public int getSubtitleOffset()
     {
@@ -191,127 +140,6 @@ public class RenderEventHandler
         }
 
         return 0;
-    }
-
-    public void onChatMessage(ITextComponent message)
-    {
-        if (message instanceof TextComponentTranslation)
-        {
-            TextComponentTranslation text = (TextComponentTranslation) message;
-
-            // The vanilla "/seed" command
-            if ("commands.seed.success".equals(text.getKey()))
-            {
-                try
-                {
-                    this.serverSeed = Long.parseLong(text.getFormatArgs()[0].toString());
-                    this.serverSeedValid = true;
-                    LiteModMiniHud.logger.info("Received world seed from the vanilla /seed command: {}", this.serverSeed);
-                }
-                catch (Exception e)
-                {
-                    LiteModMiniHud.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[0], e);
-                }
-            }
-            // The "/jed seed" command
-            else if ("jed.commands.seed.success".equals(text.getKey()))
-            {
-                try
-                {
-                    this.serverSeed = Long.parseLong(text.getFormatArgs()[1].toString());
-                    this.serverSeedValid = true;
-                    LiteModMiniHud.logger.info("Received world seed from the JED '/jed seed' command: {}", this.serverSeed);
-                }
-                catch (Exception e)
-                {
-                    LiteModMiniHud.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[1], e);
-                }
-            }
-            else if ("commands.setworldspawn.success".equals(text.getKey()) && text.getFormatArgs().length == 3)
-            {
-                try
-                {
-                    Object[] o = text.getFormatArgs();
-                    int x = Integer.parseInt(o[0].toString());
-                    int y = Integer.parseInt(o[1].toString());
-                    int z = Integer.parseInt(o[2].toString());
-
-                    OverlayRenderer.worldSpawn = new BlockPos(x, y, z);
-                    OverlayRenderer.worldSpawnValid = true;
-
-                    LiteModMiniHud.logger.info("Received world spawn from the vanilla /setworlspawn command: {}", OverlayRenderer.worldSpawn);
-                }
-                catch (Exception e)
-                {
-                    LiteModMiniHud.logger.warn("Failed to read the world spawn point from '{}'", text.getFormatArgs(), e);
-                }
-            }
-        }
-    }
-
-    public void onServerTimeUpdate(long totalWorldTime)
-    {
-        // Carpet server sends the TPS and MSPT values via the player list footer data,
-        // and for single player the data is grabbed directly from the integrated server.
-        if (this.isCarpetServer == false && Minecraft.getMinecraft().isSingleplayer() == false)
-        {
-            long currentTime = System.nanoTime();
-
-            if (this.serverTPSValid)
-            {
-                long elapsedTicks = totalWorldTime - this.lastServerTick;
-
-                if (elapsedTicks > 0)
-                {
-                    this.serverMSPT = ((double) (currentTime - this.lastServerTimeUpdate) / (double) elapsedTicks) / 1000000D;
-                    this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
-                }
-            }
-
-            this.lastServerTick = totalWorldTime;
-            this.lastServerTimeUpdate = currentTime;
-            this.serverTPSValid = true;
-        }
-    }
-
-    private void updateIntegratedServerTPS()
-    {
-        Minecraft mc = Minecraft.getMinecraft();
-
-        if (mc != null && mc.player != null && mc.getIntegratedServer() != null)
-        {
-            final int dim = mc.player.getEntityWorld().provider.getDimensionType().getId();
-            final int dimIndex = dim == 0 ? 0 : (dim == -1 ? 1 : 2);
-            this.serverMSPT = (double) MathHelper.average(mc.getIntegratedServer().timeOfLastDimensionTick[dimIndex]) / 1000000D;
-            this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
-            this.serverTPSValid = true;
-        }
-    }
-
-    public void handleCarpetServerTPSData(ITextComponent textComponent)
-    {
-        if (textComponent.getFormattedText().isEmpty() == false)
-        {
-            String text = TextFormatting.getTextWithoutFormattingCodes(textComponent.getUnformattedText());
-            Matcher matcher = PATTERN_CARPET_TPS.matcher(text);
-
-            if (matcher.matches())
-            {
-                try
-                {
-                    this.serverTPS = Double.parseDouble(matcher.group("tps"));
-                    this.serverMSPT = Double.parseDouble(matcher.group("mspt"));
-                    this.serverTPSValid = true;
-                    this.isCarpetServer = true;
-                    return;
-                }
-                catch (NumberFormatException e)
-                {
-                }
-            }
-        }
-
-        this.serverTPSValid = false;
     }
 
     public void setEnabledMask(int mask)
@@ -348,11 +176,9 @@ public class RenderEventHandler
                      (this.overlayMask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0)
             {
                 BlockPos spawn = mc.world.getSpawnPoint();
-                OverlayRenderer.worldSpawn = spawn;
+                this.data.setWorldSpawn(spawn);
                 String str = String.format("Using the world spawn x = %d, y = %d, z = %d", spawn.getX(), spawn.getY(), spawn.getZ());
                 mc.player.sendStatusMessage(new TextComponentString(str), true);
-
-                OverlayRenderer.worldSpawnValid = true;
             }
         }
     }
@@ -478,31 +304,33 @@ public class RenderEventHandler
         {
             if (mc.isSingleplayer() && (mc.getIntegratedServer().getTickCounter() % 10) == 0)
             {
-                this.updateIntegratedServerTPS();
+                this.data.updateIntegratedServerTPS();
             }
 
-            if (this.serverTPSValid)
+            if (this.data.isServerTPSValid())
             {
+                double tps = this.data.getServerTPS();
+                double mspt = this.data.getServerMSPT();
                 String rst = TextFormatting.RESET.toString();
-                String preTps = this.serverTPS >= 20.0D ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+                String preTps = tps >= 20.0D ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
                 String preMspt;
 
                 // Carpet server and integrated server have actual meaningful MSPT data available
-                if (this.isCarpetServer || mc.isSingleplayer())
+                if (this.data.isCarpetServer() || mc.isSingleplayer())
                 {
-                    if      (this.serverMSPT <= 40) { preMspt = TextFormatting.GREEN.toString(); }
-                    else if (this.serverMSPT <= 45) { preMspt = TextFormatting.YELLOW.toString(); }
-                    else if (this.serverMSPT <= 50) { preMspt = TextFormatting.GOLD.toString(); }
-                    else                            { preMspt = TextFormatting.RED.toString(); }
+                    if      (mspt <= 40) { preMspt = TextFormatting.GREEN.toString(); }
+                    else if (mspt <= 45) { preMspt = TextFormatting.YELLOW.toString(); }
+                    else if (mspt <= 50) { preMspt = TextFormatting.GOLD.toString(); }
+                    else                 { preMspt = TextFormatting.RED.toString(); }
 
-                    this.addLine(String.format("Server TPS: %s%.1f%s MSPT: %s%.1f%s", preTps, this.serverTPS, rst, preMspt, this.serverMSPT, rst));
+                    this.addLine(String.format("Server TPS: %s%.1f%s MSPT: %s%.1f%s", preTps, tps, rst, preMspt, mspt, rst));
                 }
                 else
                 {
-                    if (this.serverMSPT <= 51) { preMspt = TextFormatting.GREEN.toString(); }
-                    else                       { preMspt = TextFormatting.RED.toString(); }
+                    if (mspt <= 51) { preMspt = TextFormatting.GREEN.toString(); }
+                    else            { preMspt = TextFormatting.RED.toString(); }
 
-                    this.addLine(String.format("Server TPS: %s%.1f%s (MSPT*: %s%.1f%s)", preTps, this.serverTPS, rst, preMspt, this.serverMSPT, rst));
+                    this.addLine(String.format("Server TPS: %s%.1f%s (MSPT*: %s%.1f%s)", preTps, tps, rst, preMspt, mspt, rst));
                 }
             }
             else
@@ -685,7 +513,7 @@ public class RenderEventHandler
         }
         else if (type == InfoToggle.CHUNK_UNLOAD_ORDER.getBitMask())
         {
-            int bucket = getChunkUnloadBucket(pos.getX() >> 4, pos.getZ() >> 4);
+            int bucket = MiscUtils.getChunkUnloadBucket(pos.getX() >> 4, pos.getZ() >> 4);
             this.addLine(String.format("Chunk unload bucket: %d", bucket));
         }
         else if (type == InfoToggle.PARTICLE_COUNT.getBitMask())
@@ -757,10 +585,11 @@ public class RenderEventHandler
         else if (type == InfoToggle.SLIME_CHUNK.getBitMask())
         {
             String result;
+            int dimension = entity.dimension;
 
-            if (this.isServerSeedKnown(entity))
+            if (this.data.isWorldSeedKnown(dimension))
             {
-                long seed = this.getServerSeed(entity);
+                long seed = this.data.getWorldSeed(dimension);
 
                 if (MiscUtils.canSlimeSpawnAt(pos.getX(), pos.getZ(), seed))
                 {
@@ -852,12 +681,6 @@ public class RenderEventHandler
         {
             this.getBlockProperties(mc);
         }
-    }
-
-    public static int getChunkUnloadBucket(int chunkX, int chunkZ)
-    {
-        int longHash = Long.valueOf(ChunkPos.asLong(chunkX, chunkZ)).hashCode();
-        return (longHash ^ (longHash >>> 16)) & 0xFFFF;
     }
 
     @SuppressWarnings("unchecked")
