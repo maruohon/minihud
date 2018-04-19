@@ -228,9 +228,7 @@ public class DataStorage
     {
         if (this.mc != null && this.mc.player != null && this.mc.getIntegratedServer() != null)
         {
-            final int dim = this.mc.player.getEntityWorld().provider.getDimensionType().getId();
-            final int dimIndex = dim == 0 ? 0 : (dim == -1 ? 1 : 2);
-            this.serverMSPT = (double) MathHelper.average(this.mc.getIntegratedServer().timeOfLastDimensionTick[dimIndex]) / 1000000D;
+            this.serverMSPT = (double) MathHelper.average(this.mc.getIntegratedServer().tickTimeArray) / 1000000D;
             this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
             this.serverTPSValid = true;
         }
