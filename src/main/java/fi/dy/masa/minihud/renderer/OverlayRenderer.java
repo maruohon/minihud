@@ -40,19 +40,17 @@ public class OverlayRenderer
             renderChunkUnloadBuckets(mc, entity, dx, dy, dz, chunkUnloadBucketOverlayY, partialTicks);
         }
 
-        if ((mask & OverlayHotkeys.SLIME_CHUNKS_OVERLAY.getBitMask()) != 0)
+        if ((mask & OverlayHotkeys.SLIME_CHUNKS_OVERLAY.getBitMask()) != 0 && mc.world.provider.isSurfaceWorld())
         {
             renderSlimeChunkOverlay(mc, entity, dx, dy, dz, slimeChunkOverlayTopY, partialTicks);
         }
 
         if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_PLAYER.getBitMask()) != 0)
         {
-            PooledMutableBlockPos pos = PooledMutableBlockPos.retain();
             int colorLazy = ConfigsGeneric.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
             int colorProcessing = ConfigsGeneric.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getIntegerValue();
-            pos.setPos(entity.posX, 0, entity.posZ);
+            BlockPos pos = new BlockPos(entity.posX, 0, entity.posZ);
             renderSpawnChunksOverlay(mc, entity, dx, dy, dz, pos, colorLazy, colorProcessing, partialTicks);
-            pos.release();
         }
 
         if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0 && data.isWorldSpawnKnown())

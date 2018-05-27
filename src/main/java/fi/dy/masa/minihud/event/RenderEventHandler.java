@@ -584,6 +584,11 @@ public class RenderEventHandler
         }
         else if (type == InfoToggle.SLIME_CHUNK.getBitMask())
         {
+            if (world.provider.isSurfaceWorld() == false)
+            {
+                return;
+            }
+
             String result;
             int dimension = entity.dimension;
 
