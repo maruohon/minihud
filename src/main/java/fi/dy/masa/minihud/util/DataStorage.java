@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 
 public class DataStorage
 {
-    private static final Pattern PATTERN_CARPET_TPS = Pattern.compile("TPS: (?<tps>[0-9]+\\.[0-9]) MSPT: (?<mspt>[0-9]+\\.[0-9])");
+    private static final Pattern PATTERN_CARPET_TPS = Pattern.compile("TPS: (?<tps>[0-9]+[\\.,][0-9]) MSPT: (?<mspt>[0-9]+[\\.,][0-9])");
     private static final DataStorage INSTANCE = new DataStorage();
 
     private boolean worldSeedValid;
