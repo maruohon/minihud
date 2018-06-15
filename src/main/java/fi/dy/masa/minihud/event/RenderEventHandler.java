@@ -478,6 +478,10 @@ public class RenderEventHandler
             int bucket = MiscUtils.getChunkUnloadBucket(pos.getX() >> 4, pos.getZ() >> 4);
             this.addLine(String.format("Chunk unload bucket: %d", bucket));
         }
+        else if (type == InfoToggle.MP_CHUNK_CACHE)
+        {
+            this.addLine(mc.world.getProviderName());
+        }
         else if (type == InfoToggle.PARTICLE_COUNT)
         {
             this.addLine(String.format("P: %s", mc.effectRenderer.getStatistics()));

@@ -34,6 +34,7 @@ public enum InfoToggle implements IConfigBoolean, IConfigInteger, IHotkey
     LOOKING_AT_BLOCK        ("infoLookingAtBlock",          false, 25, "H,A", "Show which block the player is currently looking at"),
     LOOKING_AT_BLOCK_CHUNK  ("infoLookingAtBlockInChunk",   false, 26, "",    "Show which block within its containing chunk the player is currently looking at"),
     LOOKING_AT_ENTITY       ("infoLookingAtEntity",         false, 23, "H,A", "Show the entity name and health when looked at"),
+    MP_CHUNK_CACHE          ("infoMultiplayerChunkCache",   false, 31, "",    "Show the Multiplayer Chunk Cache size"),
     PARTICLE_COUNT          ("infoParticleCount",           false, 17, "",    "Show the currently renderer particle count (P from F3)"),
     SERVER_TPS              ("infoServerTPS",               false,  9, "",    "Show the server TPS and ms/tick (MSPT) values\nNote: This is only accurate when running a Carpet server\nand the TPSdisplay carpet rule is enabled.\nOtherwise it is estimated on the client side, based on the world time update packet,\nand it can only detect TPS values lower than 20 that way."),
     TIME_REAL               ("infoTimeIRL",                 true,   1, "H,T", "Show the current real time formatted according to dateFormatReal"),
