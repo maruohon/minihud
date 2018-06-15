@@ -17,6 +17,8 @@ public class ConfigPanelSubMinihud extends ConfigPanelSub
     @Override
     protected void onSettingsChanged()
     {
+        super.onSettingsChanged();
+
         Configs.save();
         Configs.load();
     }

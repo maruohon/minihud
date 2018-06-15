@@ -22,6 +22,8 @@ public class ConfigPanelInfoHotkeys extends ConfigPanelHotkeysBase
     @Override
     protected void onSettingsChanged()
     {
+        super.onSettingsChanged();
+
         Configs.save();
         Configs.load();
     }
