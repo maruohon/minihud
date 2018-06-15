@@ -1,8 +1,8 @@
 package fi.dy.masa.minihud.renderer;
 
 import org.apache.commons.lang3.tuple.Pair;
-import fi.dy.masa.minihud.config.ConfigsGeneric;
-import fi.dy.masa.minihud.config.OverlayHotkeys;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.client.Minecraft;
@@ -17,7 +17,7 @@ public class OverlayRenderer
     public static double chunkUnloadBucketOverlayY;
     public static double slimeChunkOverlayTopY;
 
-    public static void renderOverlays(int mask, Minecraft mc, float partialTicks)
+    public static void renderOverlays(Minecraft mc, float partialTicks)
     {
         Entity entity = mc.player;
         DataStorage data = DataStorage.getInstance();
@@ -30,33 +30,33 @@ public class OverlayRenderer
         double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
         double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
 
-        if ((mask & OverlayHotkeys.REGION_FILE.getBitMask()) != 0)
+        if (RendererToggle.OVERLAY_REGION_FILE.getBooleanValue())
         {
             renderRegionOverlay(mc, entity, dx, dy, dz, partialTicks);
         }
 
-        if ((mask & OverlayHotkeys.CHUNK_UNLOAD_BUCKET.getBitMask()) != 0)
+        if (RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getBooleanValue())
         {
             renderChunkUnloadBuckets(mc, entity, dx, dy, dz, chunkUnloadBucketOverlayY, partialTicks);
         }
 
-        if ((mask & OverlayHotkeys.SLIME_CHUNKS_OVERLAY.getBitMask()) != 0 && mc.world.provider.isSurfaceWorld())
+        if (RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() && mc.world.provider.isSurfaceWorld())
         {
             renderSlimeChunkOverlay(mc, entity, dx, dy, dz, slimeChunkOverlayTopY, partialTicks);
         }
 
-        if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_PLAYER.getBitMask()) != 0)
+        if (RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER.getBooleanValue())
         {
-            int colorLazy = ConfigsGeneric.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
-            int colorProcessing = ConfigsGeneric.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getIntegerValue();
+            int colorLazy = Configs.Generic.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
+            int colorProcessing = Configs.Generic.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getIntegerValue();
             BlockPos pos = new BlockPos(entity.posX, 0, entity.posZ);
             renderSpawnChunksOverlay(mc, entity, dx, dy, dz, pos, colorLazy, colorProcessing, partialTicks);
         }
 
-        if ((mask & OverlayHotkeys.SPAWN_CHUNK_OVERLAY_REAL.getBitMask()) != 0 && data.isWorldSpawnKnown())
+        if (RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getBooleanValue() && data.isWorldSpawnKnown())
         {
-            int colorLazy = ConfigsGeneric.SPAWN_REAL_LAZY_OVERLAY_COLOR.getIntegerValue();
-            int colorProcessing = ConfigsGeneric.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getIntegerValue();
+            int colorLazy = Configs.Generic.SPAWN_REAL_LAZY_OVERLAY_COLOR.getIntegerValue();
+            int colorProcessing = Configs.Generic.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getIntegerValue();
             renderSpawnChunksOverlay(mc, entity, dx, dy, dz, data.getWorldSpawn(), colorLazy, colorProcessing, partialTicks);
         }
 
@@ -75,7 +75,7 @@ public class OverlayRenderer
         pos1.setPos(rx,         0, rz      );
         pos2.setPos(rx + 511, 256, rz + 511);
         int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
-        int color = ConfigsGeneric.REGION_OVERLAY_COLOR.getIntegerValue();
+        int color = Configs.Generic.REGION_OVERLAY_COLOR.getIntegerValue();
 
         GlStateManager.glLineWidth(1.6f);
 
@@ -88,13 +88,13 @@ public class OverlayRenderer
     {
         final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
         final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
-        int r = MathHelper.clamp(ConfigsGeneric.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
+        int r = MathHelper.clamp(Configs.Generic.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
         if (r == -1)
         {
             r = mc.gameSettings.renderDistanceChunks;
         }
         final float y = (float) chunkOverlayY;
-        final float scale = MathHelper.clamp((float) ConfigsGeneric.CHUNK_UNLOAD_BUCKET_FONT_SCALE.getDoubleValue(), 0.01f, 1f);
+        final float scale = MathHelper.clamp((float) Configs.Generic.CHUNK_UNLOAD_BUCKET_FONT_SCALE.getDoubleValue(), 0.01f, 1f);
 
         for (int xOff = -r; xOff <= r; xOff++)
         {
@@ -117,13 +117,13 @@ public class OverlayRenderer
         {
             final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
             final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
-            int r = MathHelper.clamp(ConfigsGeneric.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
+            int r = MathHelper.clamp(Configs.Generic.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
             if (r == -1)
             {
                 r = mc.gameSettings.renderDistanceChunks;
             }
             final long worldSeed = data.getWorldSeed(entity.dimension);
-            final int color = ConfigsGeneric.SLIME_CHUNKS_OVERLAY_COLOR.getIntegerValue();
+            final int color = Configs.Generic.SLIME_CHUNKS_OVERLAY_COLOR.getIntegerValue();
             PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();
             PooledMutableBlockPos pos2 = PooledMutableBlockPos.retain();
 

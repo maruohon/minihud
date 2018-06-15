@@ -18,6 +18,12 @@ buildscript {
     }
 }
 
+repositories {
+    maven {
+        url 'https://masa.dy.fi/maven'
+    }
+}
+
 apply plugin: 'net.minecraftforge.gradle.liteloader'
 apply plugin: 'org.spongepowered.mixin'
 
@@ -43,6 +49,10 @@ minecraft {
 
     replaceIn "Reference.java"
     replace "@MOD_VERSION@", mod_version
+}
+
+dependencies {
+    deobfCompile "fi.dy.masa.malilib:malilib-" + config.minecraft_version_out + ":" + config.malilib_version + ":deobf"
 }
 
 sourceSets {

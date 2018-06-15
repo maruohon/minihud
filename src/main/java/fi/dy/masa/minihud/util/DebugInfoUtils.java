@@ -5,8 +5,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import com.google.common.collect.MapMaker;
-import fi.dy.masa.minihud.config.ConfigsGeneric;
-import fi.dy.masa.minihud.config.DebugHotkeys;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.mixin.IMixinDebugRenderer;
 import fi.dy.masa.minihud.mixin.IMixinPathNavigate;
 import io.netty.buffer.Unpooled;
@@ -170,7 +170,7 @@ public class DebugInfoUtils
                         if (old == null || isSamepath == false || old.getCurrentPathIndex() != path.getCurrentPathIndex())
                         {
                             final int id = entity.getEntityId();
-                            final float maxDistance = ConfigsGeneric.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? ((IMixinPathNavigate) navigator).getMaxDistanceToWaypoint() : 0F;
+                            final float maxDistance = Configs.Generic.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? ((IMixinPathNavigate) navigator).getMaxDistanceToWaypoint() : 0F;
 
                             DebugInfoUtils.sendPacketDebugPath(server, id, path, maxDistance);
 
@@ -208,51 +208,42 @@ public class DebugInfoUtils
         return false;
     }
 
-    public static void toggleDebugRenderers(Minecraft mc, int mask)
+    public static void toggleDebugRenderer(RendererToggle config)
     {
-        for (int i = 0; i < 6; i++)
-        {
-            int bit = mask & (1 << i);
-            boolean status;
+        Minecraft mc = Minecraft.getMinecraft();
+        boolean status;
 
-            if (bit == DebugHotkeys.COLLISION_BOXES.getBitMask())
-            {
-                status = ! ((IMixinDebugRenderer) mc.debugRenderer).getCollisionBoxEnabled();
-                ((IMixinDebugRenderer) mc.debugRenderer).setCollisionBoxEnabled(status);
-                MiscUtils.printInfoMessage("minihud.message.toggled_debug_mode.collisions", status ? "ON" : "OFF");
-            }
-            else if (bit == DebugHotkeys.HEIGHT_MAP.getBitMask())
-            {
-                status = ! ((IMixinDebugRenderer) mc.debugRenderer).getHeightMapEnabled();
-                ((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(status);
-                MiscUtils.printInfoMessage("minihud.message.toggled_debug_mode.height_map", status ? "ON" : "OFF");
-            }
-            else if (bit == DebugHotkeys.NEIGHBOR_UPDATES.getBitMask())
-            {
-                status = ! ((IMixinDebugRenderer) mc.debugRenderer).getNeighborsUpdateEnabled();
-                ((IMixinDebugRenderer) mc.debugRenderer).setNeighborsUpdateEnabled(status);
-                neighborUpdateEnabled = status;
-                MiscUtils.printInfoMessage("minihud.message.toggled_debug_mode.neighbor_updates", status ? "ON" : "OFF");
-            }
-            else if (bit == DebugHotkeys.PATH_FINDING.getBitMask())
-            {
-                status = ! ((IMixinDebugRenderer) mc.debugRenderer).getPathfindingEnabled();
-                ((IMixinDebugRenderer) mc.debugRenderer).setPathfindingEnabled(status);
-                pathfindingEnabled = status;
-                MiscUtils.printInfoMessage("minihud.message.toggled_debug_mode.pathfinding", status ? "ON" : "OFF");
-            }
-            else if (bit == DebugHotkeys.SOLID_FACES.getBitMask())
-            {
-                status = ! ((IMixinDebugRenderer) mc.debugRenderer).getSolidFaceEnabled();
-                ((IMixinDebugRenderer) mc.debugRenderer).setSolidFaceEnabled(status);
-                MiscUtils.printInfoMessage("minihud.message.toggled_debug_mode.solid_faces", status ? "ON" : "OFF");
-            }
-            else if (bit == DebugHotkeys.WATER.getBitMask())
-            {
-                status = ! ((IMixinDebugRenderer) mc.debugRenderer).getWaterEnabled();
-                ((IMixinDebugRenderer) mc.debugRenderer).setWaterEnabled(status);
-                MiscUtils.printInfoMessage("minihud.message.toggled_debug_mode.water", status ? "ON" : "OFF");
-            }
+        if (config == RendererToggle.DEBUG_COLLISION_BOXES)
+        {
+            status = ! ((IMixinDebugRenderer) mc.debugRenderer).getCollisionBoxEnabled();
+            ((IMixinDebugRenderer) mc.debugRenderer).setCollisionBoxEnabled(status);
+        }
+        else if (config == RendererToggle.DEBUG_HEIGHT_MAP)
+        {
+            status = ! ((IMixinDebugRenderer) mc.debugRenderer).getHeightMapEnabled();
+            ((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(status);
+        }
+        else if (config == RendererToggle.DEBUG_NEIGHBOR_UPDATES)
+        {
+            status = ! ((IMixinDebugRenderer) mc.debugRenderer).getNeighborsUpdateEnabled();
+            ((IMixinDebugRenderer) mc.debugRenderer).setNeighborsUpdateEnabled(status);
+            neighborUpdateEnabled = status;
+        }
+        else if (config == RendererToggle.DEBUG_PATH_FINDING)
+        {
+            status = ! ((IMixinDebugRenderer) mc.debugRenderer).getPathfindingEnabled();
+            ((IMixinDebugRenderer) mc.debugRenderer).setPathfindingEnabled(status);
+            pathfindingEnabled = status;
+        }
+        else if (config == RendererToggle.DEBUG_SOLID_FACES)
+        {
+            status = ! ((IMixinDebugRenderer) mc.debugRenderer).getSolidFaceEnabled();
+            ((IMixinDebugRenderer) mc.debugRenderer).setSolidFaceEnabled(status);
+        }
+        else if (config == RendererToggle.DEBUG_WATER)
+        {
+            status = ! ((IMixinDebugRenderer) mc.debugRenderer).getWaterEnabled();
+            ((IMixinDebugRenderer) mc.debugRenderer).setWaterEnabled(status);
         }
     }
 }
