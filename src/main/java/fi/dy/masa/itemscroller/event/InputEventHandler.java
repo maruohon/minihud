@@ -145,6 +145,7 @@ public class InputEventHandler
                              InventoryUtils.isCraftingSlot(gui, slot))
                     {
                         this.recipes.storeCraftingRecipeToCurrentSelection(slot, gui, true);
+                        cancel = true;
                     }
                 }
 
@@ -160,11 +161,11 @@ public class InputEventHandler
                 }
                 else if (Configs.Toggles.SHIFT_PLACE_ITEMS.getValue() && InventoryUtils.canShiftPlaceItems(gui))
                 {
-                    cancel = this.shiftPlaceItems(slot, gui);
+                    cancel |= this.shiftPlaceItems(slot, gui);
                 }
                 else if (Configs.Toggles.SHIFT_DROP_ITEMS.getValue() && this.canShiftDropItems(gui, mc))
                 {
-                    cancel = this.shiftDropItems(gui);
+                    cancel |= this.shiftDropItems(gui);
                 }
                 else if (Configs.Toggles.ALT_SHIFT_CLICK_EVERYTHING.getValue() &&
                          isLeftClick &&
@@ -189,7 +190,7 @@ public class InputEventHandler
                          Configs.Toggles.DRAG_MOVE_SHIFT_RIGHT.getValue() ||
                          Configs.Toggles.DRAG_MOVE_CONTROL_LEFT.getValue())
                 {
-                    cancel = this.dragMoveItems(gui, mc);
+                    cancel |= this.dragMoveItems(gui, mc);
                 }
             }
 
