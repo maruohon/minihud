@@ -5,6 +5,10 @@ language.code=en_US
 category.minihud=Mini HUD
 minihud.key.togglemode=Toggle Mode
 
+minihud.hotkeys.category.generic_hotkeys=Generic hotkeys
+minihud.hotkeys.category.info_toggle_hotkeys=Info Toggle hotkeys
+minihud.hotkeys.category.renderer_toggle_hotkeys=Renderer Toggle hotkeys
+
 minihud.message.toggled_debug_mode.collisions=Toggled Collison Boxes debug rendering to %s
 minihud.message.toggled_debug_mode.height_map=Toggled Height Map debug rendering to %s
 minihud.message.toggled_debug_mode.neighbor_updates=Toggled Neighbor Update debug rendering to %s
