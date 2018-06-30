@@ -8,10 +8,11 @@ import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
-import fi.dy.masa.malilib.hotkeys.KeybindEventHandler;
+import fi.dy.masa.malilib.config.ConfigManager;
+import fi.dy.masa.malilib.event.InputEventHandler;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.gui.MiniHudConfigPanel;
-import fi.dy.masa.minihud.event.InputEventHandler;
+import fi.dy.masa.minihud.event.InputHandler;
 import fi.dy.masa.minihud.event.RenderEventHandler;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleHud;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -48,10 +49,13 @@ public class LiteModMiniHud implements LiteMod, Configurable, JoinGameListener
     @Override
     public void init(File configPath)
     {
-        Configs.load();
-        Configs.Generic.TOGGLE_KEY.getKeybind().setCallback(new KeyCallbackToggleHud());
-        KeybindEventHandler.getInstance().registerKeyEventHandler(InputEventHandler.getInstance());
+        Configs.loadFromFile();
+
+        ConfigManager.getInstance().registerConfigHandler(Reference.MOD_ID, new Configs());
+        InputEventHandler.getInstance().registerKeybindProvider(InputHandler.getInstance());
+
         RenderEventHandler.getInstance().setEnabled(Configs.Generic.ENABLE_BY_DEFAULT.getBooleanValue());
+        Configs.Generic.TOGGLE_KEY.getKeybind().setCallback(new KeyCallbackToggleHud());
     }
 
     @Override
