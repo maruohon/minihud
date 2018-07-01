@@ -12,6 +12,7 @@ import java.util.Set;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -162,6 +163,18 @@ public class RenderEventHandler
             this.fpsUpdateTime = Minecraft.getSystemTime();
             this.fps = this.fpsCounter;
             this.fpsCounter = 0;
+        }
+    }
+
+    public void updateData(Minecraft mc)
+    {
+        if (mc.world != null)
+        {
+            if ((InfoToggle.SPAWNABLE_SUB_CHUNKS.getBooleanValue() || RendererToggle.OVERLAY_SPAWNABLE_SUB_CHUNKS.getBooleanValue()) &&
+                mc.world.getTotalWorldTime() % Configs.Generic.SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL.getIntegerValue() == 0)
+            {
+                DataStorage.getInstance().checkQueuedDirtyChunkHightmaps();
+            }
         }
     }
 
@@ -652,6 +665,19 @@ public class RenderEventHandler
         else if (type == InfoToggle.BLOCK_PROPS)
         {
             this.getBlockProperties(mc);
+        }
+        else if (type == InfoToggle.SPAWNABLE_SUB_CHUNKS)
+        {
+            int value = DataStorage.getInstance().getSpawnableSubChunkCountFor(pos.getX() >> 4, pos.getZ() >> 4);
+
+            if (value >= 0)
+            {
+                this.addLine(String.format("Spawnable sub-chunks: %d (y: 0 - %d)", value, value * 16 - 1));
+            }
+            else
+            {
+                this.addLine(String.format("Spawnable sub-chunks: <no data>"));
+            }
         }
     }
 

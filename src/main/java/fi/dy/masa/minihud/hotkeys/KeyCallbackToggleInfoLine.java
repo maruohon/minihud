@@ -20,7 +20,7 @@ public class KeyCallbackToggleInfoLine implements IHotkeyCallback
         if (action == KeyAction.PRESS)
         {
             this.toggle.setBooleanValue(! this.toggle.getBooleanValue());
-            KeyCallbackToggleHud.toggledSomething = true;
+            KeyCallbackToggleHud.setToggledSomething();
             return true;
         }
 

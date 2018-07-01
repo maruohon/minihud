@@ -37,6 +37,7 @@ public enum InfoToggle implements IConfigBoolean, IConfigInteger, IHotkey
     MP_CHUNK_CACHE          ("infoMultiplayerChunkCache",   false, 31, "",    "Show the Multiplayer Chunk Cache size"),
     PARTICLE_COUNT          ("infoParticleCount",           false, 17, "",    "Show the currently renderer particle count (P from F3)"),
     SERVER_TPS              ("infoServerTPS",               false,  9, "",    "Show the server TPS and ms/tick (MSPT) values\nNote: This is only accurate when running a Carpet server\nand the TPSdisplay carpet rule is enabled.\nOtherwise it is estimated on the client side, based on the world time update packet,\nand it can only detect TPS values lower than 20 that way."),
+    SPAWNABLE_SUB_CHUNKS    ("infoSpawnableSubChunks",      false, 32, "",    "Show the spawnable sub chunk count for the current chunk"),
     TIME_REAL               ("infoTimeIRL",                 true,   1, "H,T", "Show the current real time formatted according to dateFormatReal"),
     TIME_WORLD              ("infoTimeWorld",               false,  2, "",    "Show the current world time in ticks"),
     TIME_WORLD_FORMATTED    ("infoWorldTimeFormatted",      false,  3, "",    "Show the current world time formatted to days, hours, minutes"),

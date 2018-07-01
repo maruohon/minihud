@@ -23,7 +23,7 @@ public class KeyCallbackToggleDebugRenderer extends KeyCallbackToggleBooleanConf
         if (super.onKeyAction(action, key))
         {
             DebugInfoUtils.toggleDebugRenderer(this.rendererConfig);
-            KeyCallbackToggleHud.toggledSomething = true;
+            KeyCallbackToggleHud.setToggledSomething();
             return true;
         }
 

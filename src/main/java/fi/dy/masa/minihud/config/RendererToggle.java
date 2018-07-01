@@ -23,6 +23,8 @@ public enum RendererToggle implements IConfigBoolean, IHotkey
     OVERLAY_REGION_FILE                 ("overlayRegionFile",           "H,J", "Toggle the region file border overlay renderer", "Region file border overlay"),
     OVERLAY_CHUNK_UNLOAD_BUCKET         ("overlayChunkUnloadBucket",    "H,X", "Toggle the Chunk unload bucket/priority renderer", "Chunk unload priority overlay"),
     OVERLAY_SLIME_CHUNKS_OVERLAY        ("overlaySlimeChunks",          "H,M", "Toggle the Slime Chunk overlay renderer", "Slime chunk overlay"),
+    OVERLAY_SPAWNABLE_COLUMN_HEIGHTS    ("overlaySpawnableColumnHeights","",   "Toggle the spawnable column heights overlay renderer", "Spawnable column heights overlay"),
+    OVERLAY_SPAWNABLE_SUB_CHUNKS        ("overlaySpawnableSubChunks",   "",    "Toggle the spawnable sub-chunks overlay renderer", "Spawnable sub-Chunks overlay"),
     OVERLAY_SPAWN_CHUNK_OVERLAY_REAL    ("overlaySpawnChunkReal",       "H,V", "Toggle the spawn chunks overlay renderer", "Spawn chunks overlay"),
     OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER  ("overlaySpawnChunkPlayer",     "H,Q", "Toggle the pseudo (player-following) spawn chunks overlay renderer", "Would-be (player-following) spawn chunks overlay");
 

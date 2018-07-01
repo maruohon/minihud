@@ -7,6 +7,7 @@ import com.mojang.realmsclient.dto.RealmsServer;
 import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
+import com.mumfrey.liteloader.Tickable;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InputEventHandler;
@@ -16,11 +17,12 @@ import fi.dy.masa.minihud.event.InputHandler;
 import fi.dy.masa.minihud.event.RenderEventHandler;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleHud;
 import fi.dy.masa.minihud.util.DataStorage;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.play.server.SPacketJoinGame;
 
-public class LiteModMiniHud implements LiteMod, Configurable, JoinGameListener
+public class LiteModMiniHud implements LiteMod, Configurable, JoinGameListener, Tickable
 {
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
@@ -67,5 +69,11 @@ public class LiteModMiniHud implements LiteMod, Configurable, JoinGameListener
     public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
     {
         DataStorage.getInstance().onWorldLoad();
+    }
+
+    @Override
+    public void onTick(Minecraft mc, float partialTicks, boolean inGame, boolean clock)
+    {
+        RenderEventHandler.getInstance().updateData(mc);
     }
 }

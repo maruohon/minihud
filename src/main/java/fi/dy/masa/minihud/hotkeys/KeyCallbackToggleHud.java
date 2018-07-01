@@ -7,7 +7,12 @@ import fi.dy.masa.minihud.event.RenderEventHandler;
 
 public class KeyCallbackToggleHud implements IHotkeyCallback
 {
-    static boolean toggledSomething;
+    private static boolean toggledSomething;
+
+    public static void setToggledSomething()
+    {
+        toggledSomething = true;
+    }
 
     @Override
     public boolean onKeyAction(KeyAction action, IKeybind key)

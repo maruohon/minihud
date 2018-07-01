@@ -1,17 +1,24 @@
 package fi.dy.masa.minihud.util;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 public class DataStorage
 {
@@ -28,6 +35,8 @@ public class DataStorage
     private double serverTPS;
     private double serverMSPT;
     private BlockPos worldSpawn = BlockPos.ORIGIN;
+    private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
+    private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
     private final Minecraft mc = Minecraft.getMinecraft();
 
     public static DataStorage getInstance()
@@ -115,6 +124,72 @@ public class DataStorage
     public double getServerMSPT()
     {
         return this.serverMSPT;
+    }
+
+    public void markChunkForHightmapCheck(int chunkX, int chunkZ)
+    {
+        this.chunkHeightmapsToCheck.add(new ChunkPos(chunkX, chunkZ));
+    }
+
+    public void checkQueuedDirtyChunkHightmaps()
+    {
+        WorldClient world = this.mc.world;
+
+        if (world != null)
+        {
+            if (this.chunkHeightmapsToCheck.isEmpty() == false)
+            {
+                for (ChunkPos pos : this.chunkHeightmapsToCheck)
+                {
+                    Chunk chunk = world.getChunkFromChunkCoords(pos.x, pos.z);
+                    int[] heightMap = chunk.getHeightMap();
+                    int maxHeight = -1;
+
+                    for (int i = 0; i < heightMap.length; ++i)
+                    {
+                        if (heightMap[i] > maxHeight)
+                        {
+                            maxHeight = heightMap[i];
+                        }
+                    }
+
+                    int subChunks;
+
+                    if (maxHeight >= 0)
+                    {
+                        subChunks = MathHelper.clamp((maxHeight / 16) + 1, 1, 16);
+                    }
+                    // Void world? Use the topFilledSegment, see WorldEntitySpawner.getRandomChunkPosition()
+                    else
+                    {
+                        subChunks = MathHelper.clamp((chunk.getTopFilledSegment() + 16) / 16, 1, 16);
+                    }
+
+                    //System.out.printf("@ %d, %d - subChunks: %d, maxHeight: %d\n", pos.x, pos.z, subChunks, maxHeight);
+
+                    this.spawnableSubChunks.put(pos, subChunks);
+                }
+            }
+        }
+        else
+        {
+            this.spawnableSubChunks.clear();
+        }
+
+        this.chunkHeightmapsToCheck.clear();
+    }
+
+    public void onChunkUnload(int chunkX, int chunkZ)
+    {
+        ChunkPos pos = new ChunkPos(chunkX, chunkZ);
+        this.chunkHeightmapsToCheck.remove(pos);
+        this.spawnableSubChunks.remove(pos);
+    }
+
+    public int getSpawnableSubChunkCountFor(int chunkX, int chunkZ)
+    {
+        Integer count = this.spawnableSubChunks.get(new ChunkPos(chunkX, chunkZ));
+        return count != null ? count.intValue() : -1;
     }
 
     public boolean onSendChatMessage(EntityPlayer player, String message)

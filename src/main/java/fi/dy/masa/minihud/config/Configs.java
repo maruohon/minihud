@@ -50,6 +50,11 @@ public class Configs implements IConfigHandler
         public static final ConfigColor         SPAWN_PLAYER_LAZY_OVERLAY_COLOR     = new ConfigColor("spawnPlayerLazyOverlayColor", "0xFFD030D0", "Color for the \"lazy-loaded\" spawn chunks overlay of\nhow the spawn chunks would be if the spawn were to be at the;player's\ncurrent position(ARGB, default: 0xFFD030D0)");
         public static final ConfigColor         SPAWN_REAL_ENTITY_OVERLAY_COLOR     = new ConfigColor("spawnRealEntityOverlayColor", "0xFF30FF20", "Color for the entity-processing real spawn chunks overlay (ARGB, default: 0xFF30FF20)");
         public static final ConfigColor         SPAWN_REAL_LAZY_OVERLAY_COLOR       = new ConfigColor("spawnRealLazyOverlayColor", "0xFFFF3020", "Color for the \"lazy-loaded\" real spawn chunks overlay (ARGB, default: 0xFFFF3020)");
+        public static final ConfigInteger       SPAWNABLE_COLUMNS_OVERLAY_RADIUS    = new ConfigInteger("spawnableColumnHeightsOverlayRadius", 40, 0, 128, "The radius (in blocks) to render the spawnable column heights overlay in.\nValid range: 0 - 128");
+        public static final ConfigColor         SPAWNABLE_COLUMNS_OVERLAY_COLOR     = new ConfigColor("spawnableColumnHeightsOverlayColor", "0xA0FF00FF", "Color for the spawnable sub-chunks overlay");
+        public static final ConfigInteger       SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL  = new ConfigInteger("spawnableSubChunkCheckInterval", 20, 1, 10000, "The interval in game ticks for the spawnable sub-chunk heightmap checks");
+        public static final ConfigColor         SPAWNABLE_SUB_CHUNKS_OVERLAY_COLOR  = new ConfigColor("spawnableSubChunksOverlayColor", "0xFF2050D0", "Color for the spawnable sub-chunks overlay");
+        public static final ConfigInteger       SPAWNABLE_SUB_CHUNKS_OVERLAY_RADIUS = new ConfigInteger("spawnableSubChunksOverlayRadius", -1, "The radius of chunks to render the spawnable sub-chunks overlay in.\nValid range: 0 - 40, where -1 = render distance");
         public static final ConfigColor         TEXT_BACKGROUND_COLOR               = new ConfigColor("textBackgroundColor", "0xA0505050", "Text background color (ARGB, default: 0xA0505050)");
         public static final ConfigInteger       TEXT_POS_X                          = new ConfigInteger("textPosX", 4, "Text X position from the screen edge (default: 4)");
         public static final ConfigInteger       TEXT_POS_Y                          = new ConfigInteger("textPosY", 4, "Text Y position from the screen edge (default: 4)");
@@ -82,6 +87,11 @@ public class Configs implements IConfigHandler
                 SPAWN_PLAYER_LAZY_OVERLAY_COLOR,
                 SPAWN_REAL_ENTITY_OVERLAY_COLOR,
                 SPAWN_REAL_LAZY_OVERLAY_COLOR,
+                SPAWNABLE_COLUMNS_OVERLAY_COLOR,
+                SPAWNABLE_COLUMNS_OVERLAY_RADIUS,
+                SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL,
+                SPAWNABLE_SUB_CHUNKS_OVERLAY_COLOR,
+                SPAWNABLE_SUB_CHUNKS_OVERLAY_RADIUS,
                 TEXT_BACKGROUND_COLOR,
                 TEXT_POS_X,
                 TEXT_POS_Y,
