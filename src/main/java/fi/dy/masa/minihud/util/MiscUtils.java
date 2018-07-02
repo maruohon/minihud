@@ -10,6 +10,11 @@ public class MiscUtils
 {
     private static final Random RAND = new Random();
 
+    public static long bytesToMb(long bytes)
+    {
+        return bytes / 1024L / 1024L;
+    }
+
     public static boolean canSlimeSpawnAt(int posX, int posZ, long worldSeed)
     {
         return canSlimeSpawnInChunk(posX >> 4, posZ >> 4, worldSeed);

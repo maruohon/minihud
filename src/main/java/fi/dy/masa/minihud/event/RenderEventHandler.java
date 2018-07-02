@@ -228,6 +228,20 @@ public class RenderEventHandler
         {
             this.addLine(String.format("%d fps", this.fps));
         }
+        else if (type == InfoToggle.MEMORY_USAGE)
+        {
+            long memMax = Runtime.getRuntime().maxMemory();
+            long memTotal = Runtime.getRuntime().totalMemory();
+            long memFree = Runtime.getRuntime().freeMemory();
+            long memUsed = memTotal - memFree;
+
+            this.addLine(String.format("Mem: % 2d%% %03d/%03dMB | Allocated: % 2d%% %03dMB",
+                    memUsed * 100L / memMax,
+                    MiscUtils.bytesToMb(memUsed),
+                    MiscUtils.bytesToMb(memMax),
+                    memTotal * 100L / memMax,
+                    MiscUtils.bytesToMb(memTotal)));
+        }
         else if (type == InfoToggle.TIME_REAL)
         {
             try
