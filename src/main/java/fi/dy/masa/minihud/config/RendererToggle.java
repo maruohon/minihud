@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.IConfigBoolean;
+import fi.dy.masa.malilib.config.IConfigValueChangeCallback;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
@@ -105,6 +106,16 @@ public enum RendererToggle implements IConfigBoolean, IHotkey
     public void setBooleanValue(boolean value)
     {
         this.valueBoolean = value;
+    }
+
+    @Override
+    public void onValueChanged()
+    {
+    }
+
+    @Override
+    public void setValueChangeCallback(IConfigValueChangeCallback callback)
+    {
     }
 
     @Override
