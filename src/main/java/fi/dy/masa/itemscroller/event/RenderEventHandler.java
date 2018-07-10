@@ -30,7 +30,6 @@ public class RenderEventHandler
     private static final Vec3d LIGHT0_POS = (new Vec3d( 0.2D, 1.0D, -0.7D)).normalize();
     private static final Vec3d LIGHT1_POS = (new Vec3d(-0.2D, 1.0D,  0.7D)).normalize();
     private ScaledResolution scaledResolution;
-    private boolean renderRecipes;
 
     public static RenderEventHandler instance()
     {
@@ -41,10 +40,10 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (this.renderRecipes && mc.currentScreen instanceof GuiContainer)
+        if (InputEventHandler.getInstance().isRecipeViewOpen() && mc.currentScreen instanceof GuiContainer)
         {
             GuiContainer gui = (GuiContainer) mc.currentScreen;
-            RecipeStorage recipes = InputEventHandler.instance().getRecipes();
+            RecipeStorage recipes = InputEventHandler.getInstance().getRecipes();
             final int count = recipes.getRecipeCount();
 
             for (int recipeId = 0; recipeId < count; recipeId++)
@@ -59,10 +58,10 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (this.renderRecipes && mc.currentScreen instanceof GuiContainer)
+        if (InputEventHandler.getInstance().isRecipeViewOpen() && mc.currentScreen instanceof GuiContainer)
         {
             GuiContainer gui = (GuiContainer) mc.currentScreen;
-            RecipeStorage recipes = InputEventHandler.instance().getRecipes();
+            RecipeStorage recipes = InputEventHandler.getInstance().getRecipes();
 
             final int mouseX = this.getMouseX();
             final int mouseY = this.getMouseY();
@@ -118,16 +117,6 @@ public class RenderEventHandler
         return h - Mouse.getY() * h / Minecraft.getMinecraft().displayHeight - 1;
     }
 
-    public void setRenderStoredRecipes(boolean render)
-    {
-        this.renderRecipes = render;
-    }
-
-    public boolean getRenderRecipes()
-    {
-        return this.renderRecipes;
-    }
-
     private void renderHoverTooltip(int mouseX, int mouseY, CraftingRecipe recipe, GuiContainer gui, Minecraft mc)
     {
         ItemStack stack = recipe.getResult();
@@ -140,7 +129,7 @@ public class RenderEventHandler
 
     public int getHoveredRecipeId(int mouseX, int mouseY, RecipeStorage recipes, GuiContainer gui, Minecraft mc)
     {
-        if (this.renderRecipes)
+        if (InputEventHandler.getInstance().isRecipeViewOpen())
         {
             ScaledResolution scaledResolution = new ScaledResolution(mc);
             final int gap = 40;

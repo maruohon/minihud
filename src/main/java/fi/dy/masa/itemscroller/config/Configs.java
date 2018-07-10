@@ -13,7 +13,12 @@ import com.google.gson.JsonPrimitive;
 import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.Reference;
+import fi.dy.masa.itemscroller.recipes.CraftingHandler;
+import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
 import fi.dy.masa.itemscroller.util.JsonUtils;
+import net.minecraft.client.gui.inventory.GuiCrafting;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.inventory.SlotCrafting;
 
 public class Configs
 {
@@ -26,6 +31,8 @@ public class Configs
         CLIENT_CRAFTING_FIX                     ("enableClientCraftingFixOn1.12",       true),
         CONTROL_SHIFT_DROP                      ("enableControlShiftDropkeyDropItems",  true),
         CRAFTING_RENDER_RECIPE_ITEMS            ("craftingRenderRecipeItems",           true),
+        DRAG_DROP_SINGLE                        ("enableDragDropSingle",                true),
+        DRAG_DROP_STACKS                        ("enableDragDropStacks",                true),
         DRAG_MOVE_SHIFT_LEFT                    ("enableDragMovingShiftLeft",           true),
         DRAG_MOVE_SHIFT_RIGHT                   ("enableDragMovingShiftRight",          true),
         DRAG_MOVE_CONTROL_LEFT                  ("enableDragMovingControlLeft",         true),
@@ -33,7 +40,6 @@ public class Configs
         REVERSE_SCROLL_DIRECTION_STACKS         ("reverseScrollDirectionStacks",        false),
         RIGHT_CLICK_CRAFT_STACK                 ("enableRightClickCraftingOneStack",    true),
         SCROLL_CRAFT                            ("enableScrollingCrafting",             true),
-        //SCROLL_CRAFT_STORE_RECIPE_ON_FILL       ("craftingScrollingStoreRecipeOnFill", true),
         SCROLL_CRAFT_STORE_RECIPES_TO_FILE      ("craftingScrollingSaveToFile",         true),
         SCROLL_CRAFT_RECIPE_FILE_GLOBAL         ("craftingScrollingSaveFileIsGlobal",   false),
         SCROLL_EVERYTHING                       ("enableScrollingEverything",           true),
@@ -44,6 +50,7 @@ public class Configs
         SCROLL_VILLAGER                         ("enableScrollingVillager",             true),
         SHIFT_DROP_ITEMS                        ("enableShiftDropItems",                true),
         SHIFT_PLACE_ITEMS                       ("enableShiftPlaceItems",               true),
+        WS_CLICKING                             ("enableWSClicking",                    true),
         SLOT_POSITION_AWARE_SCROLL_DIRECTION    ("useSlotPositionAwareScrollDirection", false);
 
         private final String name;
@@ -97,6 +104,8 @@ public class Configs
                                                "crafting function and the right-click-to-craft-a-stack function.");
         Toggles.CONTROL_SHIFT_DROP.setComment("Enable dropping all matching items from the same inventory\n" +
                                               "when pressing Ctrl + Shift + the drop item key.");
+        Toggles.DRAG_DROP_SINGLE.setComment("Enables dropping single items when holding down Ctrl + Drop key\nand then click + dragging over slots");
+        Toggles.DRAG_DROP_STACKS.setComment("Enables dropping full stacks when holding down Shift + Drop key\nand then click + dragging over slots");
         Toggles.DRAG_MOVE_SHIFT_LEFT.setComment("Enable moving full stacks of items by holding down\n" +
                                                 "Shift and dragging over slots with the left mouse button held down.");
         Toggles.DRAG_MOVE_SHIFT_RIGHT.setComment("Enable moving everything but the last item from all stacks by holding\n" +
@@ -135,6 +144,7 @@ public class Configs
         Toggles.SLOT_POSITION_AWARE_SCROLL_DIRECTION.setComment("When enabled, the item movement direction depends\n" +
                                                                 "on the slots' y-position on screen. Might be derpy with more\n" +
                                                                 "complex inventories, use with caution!");
+        Toggles.WS_CLICKING.setComment("Enables moving items up or down in the inventory while holding down W or S\nand then clicking (+ dragging)");
     }
 
     public static void load()
@@ -161,6 +171,13 @@ public class Configs
                 getStrings(root, SLOT_BLACKLIST, "slotBlacklist");
             }
         }
+
+        CraftingHandler.clearDefinitions();
+
+        // "net.minecraft.client.gui.inventory.GuiCrafting,net.minecraft.inventory.SlotCrafting,0,1-9", // vanilla Crafting Table
+        CraftingHandler.addCraftingGridDefinition(GuiCrafting.class.getName(), SlotCrafting.class.getName(), 0, new SlotRange(1, 9));
+        //"net.minecraft.client.gui.inventory.GuiInventory,net.minecraft.inventory.SlotCrafting,0,1-4", // vanilla player inventory crafting grid
+        CraftingHandler.addCraftingGridDefinition(GuiInventory.class.getName(), SlotCrafting.class.getName(), 0, new SlotRange(1, 4));
     }
 
     public static void save()

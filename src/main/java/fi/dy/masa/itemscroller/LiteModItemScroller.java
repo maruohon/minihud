@@ -70,6 +70,6 @@ public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteL
     @Override
     public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
     {
-        InputEventHandler.instance().onWorldChanged();
+        InputEventHandler.getInstance().onWorldChanged();
     }
 }

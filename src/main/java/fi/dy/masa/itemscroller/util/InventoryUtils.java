@@ -1,10 +1,14 @@
 package fi.dy.masa.itemscroller.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.lwjgl.input.Mouse;
+import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
+import fi.dy.masa.itemscroller.config.Configs.Toggles;
+import fi.dy.masa.itemscroller.event.InputEventHandler.MoveAmount;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
 import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
@@ -1552,34 +1556,246 @@ public class InventoryUtils
         return slot.getHasStack() == false || getStackSize(slot.getStack()) != sizeOrig;
     }
 
-    public static void leftClickSlot(GuiContainer gui, int slot)
+    public static boolean tryMoveItemsVertically(GuiContainer gui, Slot slot, RecipeStorage recipes, boolean moveUp, MoveAmount amount)
     {
         Minecraft mc = Minecraft.getMinecraft();
-        mc.playerController.windowClick(gui.inventorySlots.windowId, slot, 0, ClickType.PICKUP, mc.player);
+
+        // We require an empty cursor
+        if (slot == null || isStackEmpty(mc.player.inventory.getItemStack()) == false)
+        {
+            return false;
+        }
+
+        // Villager handling only happens when scrolling over the trade output slot
+        boolean villagerHandling = Toggles.SCROLL_VILLAGER.getValue() && gui instanceof GuiMerchant && slot instanceof SlotMerchantResult;
+        boolean craftingHandling = Toggles.SCROLL_CRAFT.getValue() && isCraftingSlot(gui, slot);
+        boolean isCtrlDown = GuiContainer.isCtrlKeyDown();
+
+        if (craftingHandling)
+        {
+            return tryMoveItemsCrafting(recipes, slot, gui, moveUp == false, amount == MoveAmount.MOVE_ALL, isCtrlDown);
+        }
+
+        if (villagerHandling)
+        {
+            return tryMoveItemsVillager((GuiMerchant) gui, slot, moveUp == false, amount == MoveAmount.MOVE_ALL);
+        }
+
+        List<Integer> slots = getVerticallyFurthestSuitableSlotsForStackInSlot(gui.inventorySlots, slot, moveUp);
+
+        if (slots.isEmpty())
+        {
+            return false;
+        }
+
+        if (amount == MoveAmount.MOVE_ALL)
+        {
+            moveStackToSlots(gui, slot, slots, false);
+        }
+        else if (amount == MoveAmount.MOVE_ONE)
+        {
+            moveOneItemToFirstValidSlot(gui, slot, slots);
+        }
+        else if (amount == MoveAmount.LEAVE_ONE)
+        {
+            moveStackToSlots(gui, slot, slots, true);
+        }
+
+        return true;
     }
 
-    private static void rightClickSlot(GuiContainer gui, int slot)
+    private static void moveStackToSlots(GuiContainer gui, Slot slotFrom, List<Integer> slotsTo, boolean leaveOne)
     {
         Minecraft mc = Minecraft.getMinecraft();
-        mc.playerController.windowClick(gui.inventorySlots.windowId, slot, 1, ClickType.PICKUP, mc.player);
+        InventoryPlayer inv = mc.player.inventory;
+
+        // Pick up the stack
+        leftClickSlot(gui, slotFrom.slotNumber);
+
+        if (leaveOne)
+        {
+            rightClickSlot(gui, slotFrom.slotNumber);
+        }
+
+        for (int slotNum : slotsTo)
+        {
+            if (isStackEmpty(inv.getItemStack()))
+            {
+                break;
+            }
+
+            leftClickSlot(gui, slotNum);
+            //System.out.printf("suitable slot: %3d\n", slotNum);
+        }
+
+        // Return the rest of the items, if any
+        if (isStackEmpty(inv.getItemStack()) == false)
+        {
+            leftClickSlot(gui, slotFrom.slotNumber);
+        }
     }
 
-    public static void shiftClickSlot(GuiContainer gui, int slot)
+    private static void moveOneItemToFirstValidSlot(GuiContainer gui, Slot slotFrom, List<Integer> slotsTo)
     {
         Minecraft mc = Minecraft.getMinecraft();
-        mc.playerController.windowClick(gui.inventorySlots.windowId, slot, 0, ClickType.QUICK_MOVE, mc.player);
+        InventoryPlayer inv = mc.player.inventory;
+
+        // Pick up half of the the stack
+        rightClickSlot(gui, slotFrom.slotNumber);
+
+        if (isStackEmpty(inv.getItemStack()))
+        {
+            return;
+        }
+
+        int sizeOrig = getStackSize(inv.getItemStack());
+
+        for (int slotNum : slotsTo)
+        {
+            rightClickSlot(gui, slotNum);
+            ItemStack stackCursor = inv.getItemStack();
+
+            if (isStackEmpty(stackCursor) || getStackSize(stackCursor) != sizeOrig)
+            {
+                break;
+            }
+        }
+
+        // Return the rest of the items, if any
+        if (isStackEmpty(inv.getItemStack()) == false)
+        {
+            leftClickSlot(gui, slotFrom.slotNumber);
+        }
+    }
+
+    private static List<Integer> getVerticallyFurthestSuitableSlotsForStackInSlot(Container container, Slot slot, boolean above)
+    {
+        if (slot == null || slot.getHasStack() == false)
+        {
+            return Collections.emptyList();
+        }
+
+        List<SlotVerticalSorter> slotSorters = new ArrayList<SlotVerticalSorter>();
+        ItemStack stackSlot = slot.getStack();
+
+        for (Slot slotTmp : container.inventorySlots)
+        {
+            if (slotTmp.slotNumber != slot.slotNumber && slotTmp.yPos != slot.yPos)
+            {
+                if (above == slotTmp.yPos < slot.yPos)
+                {
+                    ItemStack stackTmp = slotTmp.getStack();
+
+                    if ((isStackEmpty(stackTmp) && slotTmp.isItemValid(stackSlot)) ||
+                        (areStacksEqual(stackTmp, stackSlot)) && slotTmp.getItemStackLimit(stackTmp) > getStackSize(stackTmp))
+                    {
+                        slotSorters.add(new SlotVerticalSorter(slotTmp));
+                    }
+                }
+            }
+        }
+
+        Collections.sort(slotSorters);
+
+        if (above == false)
+        {
+            Collections.reverse(slotSorters);
+        }
+
+        List<Integer> slots = new ArrayList<Integer>();
+
+        for (SlotVerticalSorter entry : slotSorters)
+        {
+            slots.add(entry.getSlot().slotNumber);
+        }
+
+        return slots;
+    }
+
+    private static class SlotVerticalSorter implements Comparable<SlotVerticalSorter>
+    {
+        private final Slot slot;
+
+        public SlotVerticalSorter(Slot slot)
+        {
+            this.slot = slot;
+        }
+
+        public Slot getSlot()
+        {
+            return this.slot;
+        }
+
+        @Override
+        public int compareTo(SlotVerticalSorter other)
+        {
+            if (this.getSlot().yPos == other.getSlot().yPos)
+            {
+                return this.getSlot().slotNumber < other.getSlot().slotNumber ? -1 : 1;
+            }
+
+            return (this.getSlot().yPos < other.getSlot().yPos) ? -1 : 1;
+        }
+    }
+
+    public static void clickSlot(GuiContainer gui, int slotNum, int mouseButton, ClickType type)
+    {
+        if (slotNum >= 0 && slotNum < gui.inventorySlots.inventorySlots.size())
+        {
+            Slot slot = gui.inventorySlots.getSlot(slotNum);
+            clickSlot(gui, slot, slotNum, mouseButton, type);
+        }
+        else
+        {
+            try
+            {
+                Minecraft mc = Minecraft.getMinecraft();
+                mc.playerController.windowClick(gui.inventorySlots.windowId, slotNum, mouseButton, type, mc.player);
+            }
+            catch (Exception e)
+            {
+                LiteModItemScroller.logger.warn("Exception while emulating a slot click: gui: '{}', slotNum: {}, mouseButton; {}, ClickType: {}",
+                        gui.getClass().getName(), slotNum, mouseButton, type, e);
+            }
+        }
+    }
+
+    public static void clickSlot(GuiContainer gui, Slot slot, int slotNum, int mouseButton, ClickType type)
+    {
+        try
+        {
+            AccessorUtils.handleMouseClick(gui, slot, slotNum, mouseButton, type);
+        }
+        catch (Exception e)
+        {
+            LiteModItemScroller.logger.warn("Exception while emulating a slot click: gui: '{}', slotNum: {}, mouseButton; {}, ClickType: {}",
+                    gui.getClass().getName(), slotNum, mouseButton, type, e);
+        }
+    }
+
+    public static void leftClickSlot(GuiContainer gui, int slotNum)
+    {
+        clickSlot(gui, slotNum, 0, ClickType.PICKUP);
+    }
+
+    public static void rightClickSlot(GuiContainer gui, int slotNum)
+    {
+        clickSlot(gui, slotNum, 1, ClickType.PICKUP);
+    }
+
+    public static void shiftClickSlot(GuiContainer gui, int slotNum)
+    {
+        clickSlot(gui, slotNum, 0, ClickType.QUICK_MOVE);
     }
 
     public static void dropItemsFromCursor(GuiContainer gui)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-        mc.playerController.windowClick(gui.inventorySlots.windowId, -999, 0, ClickType.PICKUP, mc.player);
+        clickSlot(gui, -999, 0, ClickType.PICKUP);
     }
 
-    private static void dropStack(GuiContainer gui, int slot)
+    public static void dropStack(GuiContainer gui, int slotNum)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-        mc.playerController.windowClick(gui.inventorySlots.windowId, slot, 1, ClickType.THROW, mc.player);
+        clickSlot(gui, slotNum, 1, ClickType.THROW);
     }
 
     private static void dragSplitItemsIntoSlots(GuiContainer gui, List<Integer> targetSlots)
@@ -1602,7 +1818,7 @@ public class InventoryUtils
         int loops = targetSlots.size();
 
         // Start the drag
-        mc.playerController.windowClick(gui.inventorySlots.windowId, -999, 0, ClickType.QUICK_CRAFT, mc.player);
+        clickSlot(gui, -999, 0, ClickType.QUICK_CRAFT);
 
         for (int i = 0; i < loops; i++)
         {
@@ -1613,11 +1829,11 @@ public class InventoryUtils
                 break;
             }
 
-            mc.playerController.windowClick(gui.inventorySlots.windowId, targetSlots.get(i), 1, ClickType.QUICK_CRAFT, mc.player);
+            clickSlot(gui, targetSlots.get(i), 1, ClickType.QUICK_CRAFT);
         }
 
         // End the drag
-        mc.playerController.windowClick(gui.inventorySlots.windowId, -999, 2, ClickType.QUICK_CRAFT, mc.player);
+        clickSlot(gui, -999, 2, ClickType.QUICK_CRAFT);
     }
 
     /**************************************************************

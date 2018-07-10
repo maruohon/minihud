@@ -31,7 +31,7 @@ public abstract class MixinGuiScreen extends Gui
         {
             while (Mouse.next())
             {
-                if (InputEventHandler.instance().onMouseInput() == false)
+                if (InputEventHandler.getInstance().onMouseInput() == false)
                 {
                     this.handleMouseInput();
                 }
@@ -42,7 +42,7 @@ public abstract class MixinGuiScreen extends Gui
         {
             while (Keyboard.next())
             {
-                if (InputEventHandler.instance().onKeyInput() == false)
+                if (InputEventHandler.getInstance().onKeyInput() == false)
                 {
                     this.handleKeyboardInput();
                 }

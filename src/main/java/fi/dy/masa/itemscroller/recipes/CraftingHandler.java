@@ -1,24 +1,45 @@
 package fi.dy.masa.itemscroller.recipes;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
+import fi.dy.masa.itemscroller.LiteModItemScroller;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiCrafting;
-import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.inventory.Slot;
-import net.minecraft.inventory.SlotCrafting;
 
 public class CraftingHandler
 {
     private static final Map<CraftingOutputSlot, SlotRange> CRAFTING_GRID_SLOTS = new HashMap<CraftingOutputSlot, SlotRange>();
+    private static final Set<Class<? extends GuiContainer>> CRAFTING_GUIS = new HashSet<>();
 
-    static
+    public static void clearDefinitions()
     {
-        //"net.minecraft.client.gui.inventory.GuiCrafting,net.minecraft.inventory.SlotCrafting,0,1-9", // vanilla Crafting Table
-        CRAFTING_GRID_SLOTS.put(new CraftingOutputSlot(GuiCrafting.class, SlotCrafting.class, 0), new SlotRange(1, 9));
-        //"net.minecraft.client.gui.inventory.GuiInventory,net.minecraft.inventory.SlotCrafting,0,1-4", // vanilla player inventory crafting grid
-        CRAFTING_GRID_SLOTS.put(new CraftingOutputSlot(GuiInventory.class, SlotCrafting.class, 0), new SlotRange(1, 4));
+        CRAFTING_GRID_SLOTS.clear();
+        CRAFTING_GUIS.clear();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static boolean addCraftingGridDefinition(String guiClassName, String slotClassName, int outputSlot, SlotRange range)
+    {
+        try
+        {
+            Class<? extends GuiContainer> guiClass = (Class<? extends GuiContainer>) Class.forName(guiClassName);
+            Class<? extends Slot> slotClass = (Class<? extends Slot>) Class.forName(slotClassName);
+
+            CRAFTING_GRID_SLOTS.put(new CraftingOutputSlot(guiClass, slotClass, outputSlot), range);
+            CRAFTING_GUIS.add(guiClass);
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            LiteModItemScroller.logger.warn("addCraftingGridDefinition(): Failed to find classes for grid definition: gui: '{}', slot: '{}', outputSlot: {}",
+                    guiClassName, slotClassName, outputSlot);
+        }
+
+        return false;
     }
 
     /**
@@ -30,25 +51,20 @@ public class CraftingHandler
     @Nullable
     public static SlotRange getCraftingGridSlots(GuiContainer gui, Slot slot)
     {
-        for (Map.Entry<CraftingOutputSlot, SlotRange> entry : CRAFTING_GRID_SLOTS.entrySet())
-        {
-            if (entry.getKey().matches(gui.getClass(), slot.getClass(), slot.slotNumber))
-            {
-                return entry.getValue();
-            }
-        }
-
-        return null;
+        return CRAFTING_GRID_SLOTS.get(CraftingOutputSlot.from(gui, slot));
     }
 
     @Nullable
     public static Slot getFirstCraftingOutputSlotForGui(GuiContainer gui)
     {
-        for (Slot slot : gui.inventorySlots.inventorySlots)
+        if (CRAFTING_GUIS.contains(gui.getClass()))
         {
-            if (getCraftingGridSlots(gui, slot) != null)
+            for (Slot slot : gui.inventorySlots.inventorySlots)
             {
-                return slot;
+                if (getCraftingGridSlots(gui, slot) != null)
+                {
+                    return slot;
+                }
             }
         }
 
@@ -68,6 +84,11 @@ public class CraftingHandler
             this.outputSlot = outputSlot;
         }
 
+        public static CraftingOutputSlot from(GuiContainer gui, Slot slot)
+        {
+            return new CraftingOutputSlot(gui.getClass(), slot.getClass(), slot.slotNumber);
+        }
+
         public Class<? extends GuiContainer> getGuiClass()
         {
             return this.guiClass;
@@ -83,9 +104,9 @@ public class CraftingHandler
             return this.outputSlot;
         }
 
-        public boolean matches(Class<? extends GuiContainer> guiClass, Class<? extends Slot> slotClass, int outputSlot)
+        public boolean matches(GuiContainer gui, Slot slot, int outputSlot)
         {
-            return outputSlot == this.outputSlot && this.guiClass == guiClass && this.slotClass == slotClass;
+            return outputSlot == this.outputSlot && gui.getClass() == this.guiClass && slot.getClass() == this.slotClass;
         }
 
         @Override
