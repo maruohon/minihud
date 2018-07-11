@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.ClickType;
@@ -240,7 +241,7 @@ public class InputEventHandler
         Minecraft mc = Minecraft.getMinecraft();
         GuiScreen guiScreen = mc.currentScreen;
 
-        if (mc == null || mc.player == null || (guiScreen instanceof GuiContainer) == false)
+        if (mc == null || mc.player == null || (guiScreen instanceof GuiContainer) == false || Keyboard.getEventKeyState() == false)
         {
             return false;
         }
@@ -249,8 +250,14 @@ public class InputEventHandler
         GuiContainer gui = (GuiContainer) guiScreen;
         Slot slot = AccessorUtils.getSlotUnderMouse(gui);
 
-        if (Keyboard.getEventKeyState() &&
-            GuiScreen.isAltKeyDown() &&
+        // Swap the hovered stack to the Offhand
+        if (Configs.Toggles.OFFHAND_SWAP.getValue() &&
+            eventKey == mc.gameSettings.keyBindSwapHands.getKeyCode() &&
+            (gui instanceof GuiInventory) && slot != null)
+        {
+            InventoryUtils.swapSlots(gui, slot.slotNumber, 45);
+        }
+        else if (GuiScreen.isAltKeyDown() &&
             GuiScreen.isShiftKeyDown() &&
             GuiScreen.isCtrlKeyDown())
         {
@@ -280,7 +287,7 @@ public class InputEventHandler
         }
 
         // Drop all matching stacks from the same inventory when pressing Ctrl + Shift + Drop key
-        if (Configs.Toggles.CONTROL_SHIFT_DROP.getValue() && Keyboard.getEventKeyState() &&
+        if (Configs.Toggles.CONTROL_SHIFT_DROP.getValue() &&
             Configs.GUI_BLACKLIST.contains(gui.getClass().getName()) == false &&
             GuiScreen.isCtrlKeyDown() && GuiScreen.isShiftKeyDown() &&
             eventKey == mc.gameSettings.keyBindDrop.getKeyCode())
@@ -291,7 +298,7 @@ public class InputEventHandler
             }
         }
         // Toggle mouse functionality on/off
-        else if (Keyboard.getEventKeyState() && eventKey == LiteModItemScroller.KEY_DISABLE.getKeyCode())
+        else if (eventKey == LiteModItemScroller.KEY_DISABLE.getKeyCode())
         {
             this.disabled = ! this.disabled;
 
@@ -305,8 +312,7 @@ public class InputEventHandler
             }
         }
         // Store or load a recipe
-        else if (Keyboard.getEventKeyState() && this.isRecipeViewOpen() &&
-                 eventKey >= Keyboard.KEY_1 && eventKey <= Keyboard.KEY_9)
+        else if (this.isRecipeViewOpen() && eventKey >= Keyboard.KEY_1 && eventKey <= Keyboard.KEY_9)
         {
             int index = MathHelper.clamp(eventKey - Keyboard.KEY_1, 0, 8);
             this.recipes.changeSelectedRecipe(index);

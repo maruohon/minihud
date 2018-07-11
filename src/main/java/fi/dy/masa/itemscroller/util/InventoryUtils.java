@@ -1836,6 +1836,13 @@ public class InventoryUtils
         clickSlot(gui, slotNum, 1, ClickType.THROW);
     }
 
+    public static void swapSlots(GuiContainer gui, int slotNum, int otherSlot)
+    {
+        clickSlot(gui, slotNum, 0, ClickType.SWAP);
+        clickSlot(gui, otherSlot, 0, ClickType.SWAP);
+        clickSlot(gui, slotNum, 0, ClickType.SWAP);
+    }
+
     private static void dragSplitItemsIntoSlots(GuiContainer gui, List<Integer> targetSlots)
     {
         Minecraft mc = Minecraft.getMinecraft();

@@ -37,6 +37,7 @@ public class Configs
         DRAG_MOVE_SHIFT_LEFT                    ("enableDragMovingShiftLeft",           true),
         DRAG_MOVE_SHIFT_RIGHT                   ("enableDragMovingShiftRight",          true),
         DRAG_MOVE_CONTROL_LEFT                  ("enableDragMovingControlLeft",         true),
+        OFFHAND_SWAP                            ("offHandSwap",                         true),
         REVERSE_SCROLL_DIRECTION_SINGLE         ("reverseScrollDirectionSingle",        false),
         REVERSE_SCROLL_DIRECTION_STACKS         ("reverseScrollDirectionStacks",        false),
         RIGHT_CLICK_CRAFT_STACK                 ("enableRightClickCraftingOneStack",    true),
@@ -115,6 +116,7 @@ public class Configs
                                                  "down Shift and dragging over slots with the right mouse button held down.");
         Toggles.DRAG_MOVE_CONTROL_LEFT.setComment("Enable moving one item from all stacks by holding down Control and\n" +
                                                   "dragging over slots with the left mouse button held down.");
+        Toggles.OFFHAND_SWAP.setComment("If enabled, allows using the vanilla swap hands keybind while\nhovering over a stack in the regular player inventory");
         Toggles.REVERSE_SCROLL_DIRECTION_SINGLE.setComment("Reverse the scrolling direction for single item mode.");
         Toggles.REVERSE_SCROLL_DIRECTION_STACKS.setComment("Reverse the scrolling direction for full stacks mode.");
         Toggles.RIGHT_CLICK_CRAFT_STACK.setComment("Enable crafting up to one full stack when right clicking on\n" +
