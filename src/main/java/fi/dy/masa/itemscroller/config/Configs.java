@@ -28,6 +28,7 @@ public class Configs
     {
         ALT_CLICK_MATCHING                      ("enableAltClickMoveMatchingStacks",    true),
         ALT_SHIFT_CLICK_EVERYTHING              ("enableAltShiftClickMoveEverything",   true),
+        CARPET_CTRL_Q_CRAFTING                  ("carpetCtrlQCraftingEnabledOnServer",  false),
         CLIENT_CRAFTING_FIX                     ("enableClientCraftingFixOn1.12",       true),
         CONTROL_SHIFT_DROP                      ("enableControlShiftDropkeyDropItems",  true),
         CRAFTING_RENDER_RECIPE_ITEMS            ("craftingRenderRecipeItems",           true),
@@ -99,6 +100,8 @@ public class Configs
                                               "(same as the Ctrl + scroll functionality).");
         Toggles.ALT_SHIFT_CLICK_EVERYTHING.setComment("Enable Alt + Shift + click to move everything\n" +
                                                       "(same as the Ctrl + Shift + scroll functionality).");
+        Toggles.CARPET_CTRL_Q_CRAFTING.setComment("Set to true if the server is running the Carpet mod,\nand has the ctrlQCrafting option enabled.\n" +
+                                                  "This just changes which method Item Scroller uses\nfor the Drop key + Shift + Right click crafting.");
         Toggles.CLIENT_CRAFTING_FIX.setComment("Enable setting/updating the crafting recipe output also directly\n" +
                                                "on the client side. This fixes the previously-broken-in-1.12 mass\n" +
                                                "crafting function and the right-click-to-craft-a-stack function.");

@@ -267,7 +267,7 @@ public class InventoryUtils
             // Scrolling items from this slot/inventory into the other inventory
             else if (slot.getHasStack())
             {
-                moveOneSetOfItemsFromSlotToOtherInventory(gui, slot);
+                moveOneSetOfItemsFromSlotToPlayerInventory(gui, slot);
             }
         }
 
@@ -668,7 +668,7 @@ public class InventoryUtils
             // Scrolling items from this crafting slot into the other inventory
             else if (slot.getHasStack())
             {
-                moveOneSetOfItemsFromSlotToOtherInventory(gui, slot);
+                moveOneSetOfItemsFromSlotToPlayerInventory(gui, slot);
             }
             // Scrolling over an empty crafting output slot, clear the crafting grid
             else
@@ -1044,7 +1044,7 @@ public class InventoryUtils
         return count;
     }
 
-    public static void moveOneSetOfItemsFromSlotToOtherInventory(GuiContainer gui, Slot slot)
+    public static void moveOneSetOfItemsFromSlotToPlayerInventory(GuiContainer gui, Slot slot)
     {
         leftClickSlot(gui, slot.slotNumber);
 
@@ -1057,7 +1057,7 @@ public class InventoryUtils
 
             if (moveItemFromCursorToSlots(gui, slots) == false)
             {
-                slots = getSlotNumbersOfEmptySlots(gui.inventorySlots, slot, false, true, false);
+                slots = getSlotNumbersOfEmptySlotsInPlayerInventory(gui.inventorySlots, false);
                 moveItemFromCursorToSlots(gui, slots);
             }
         }
@@ -1289,6 +1289,25 @@ public class InventoryUtils
 
             if (slot != null && slot.getHasStack() == false &&
                 areSlotsInSameInventory(slot, slotReference, treatHotbarAsDifferent) == sameInventory)
+            {
+                slots.add(slot.slotNumber);
+            }
+        }
+
+        return slots;
+    }
+
+    private static List<Integer> getSlotNumbersOfEmptySlotsInPlayerInventory(Container container, boolean reverse)
+    {
+        List<Integer> slots = new ArrayList<Integer>(64);
+        final int maxSlot = container.inventorySlots.size() - 1;
+        final int increment = reverse ? -1 : 1;
+
+        for (int i = reverse ? maxSlot : 0; i >= 0 && i <= maxSlot; i += increment)
+        {
+            Slot slot = container.getSlot(i);
+
+            if (slot != null && (slot.inventory instanceof InventoryPlayer) && slot.getHasStack() == false)
             {
                 slots.add(slot.slotNumber);
             }
@@ -1541,6 +1560,20 @@ public class InventoryUtils
         return ret;
     }
 
+    public static void dropStacksUntilEmpty(GuiContainer gui, int slotNum)
+    {
+        if (slotNum >= 0 && slotNum < gui.inventorySlots.inventorySlots.size())
+        {
+            Slot slot = gui.inventorySlots.getSlot(slotNum);
+            int failsafe = 64;
+
+            while (failsafe-- > 0 && slot.getHasStack())
+            {
+                dropStack(gui, slotNum);
+            }
+        }
+    }
+
     private static boolean shiftClickSlotWithCheck(GuiContainer gui, int slotNum)
     {
         Slot slot = gui.inventorySlots.getSlot(slotNum);
@@ -1791,6 +1824,11 @@ public class InventoryUtils
     public static void dropItemsFromCursor(GuiContainer gui)
     {
         clickSlot(gui, -999, 0, ClickType.PICKUP);
+    }
+
+    public static void dropItem(GuiContainer gui, int slotNum)
+    {
+        clickSlot(gui, slotNum, 0, ClickType.THROW);
     }
 
     public static void dropStack(GuiContainer gui, int slotNum)

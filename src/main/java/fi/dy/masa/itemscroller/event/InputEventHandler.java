@@ -8,6 +8,7 @@ import org.lwjgl.input.Mouse;
 import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Configs.Toggles;
+import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
@@ -106,20 +107,54 @@ public class InputEventHandler
                         if (isLeftClick || isRightClick)
                         {
                             boolean changed = this.recipes.getSelection() != hoveredRecipeId;
+                            this.recipes.changeSelectedRecipe(hoveredRecipeId);
 
-                            // Left click on a recipe: Select the recipe and load items to the crafting grid
-                            if (isLeftClick)
+                            if (changed)
                             {
-                                this.recipes.changeSelectedRecipe(hoveredRecipeId);
-
-                                if (changed)
-                                {
-                                    InventoryUtils.clearFirstCraftingGridOfItems(this.recipes.getSelectedRecipe(), gui, false);
-                                }
+                                InventoryUtils.clearFirstCraftingGridOfItems(this.recipes.getSelectedRecipe(), gui, false);
                             }
-                            // Right click on a recipe: Only load items to the grid
 
                             InventoryUtils.tryMoveItemsToFirstCraftingGrid(this.recipes.getRecipe(hoveredRecipeId), gui, GuiScreen.isShiftKeyDown());
+
+                            // Right click: Also craft the items
+                            if (isRightClick)
+                            {
+                                Slot outputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
+                                boolean dropKeyDown = isKeybindHeld(mc.gameSettings.keyBindDrop.getKeyCode());
+
+                                if (outputSlot != null)
+                                {
+                                    if (dropKeyDown)
+                                    {
+                                        if (GuiScreen.isShiftKeyDown())
+                                        {
+                                            if (Toggles.CARPET_CTRL_Q_CRAFTING.getValue())
+                                            {
+                                                InventoryUtils.dropStack(gui, outputSlot.slotNumber);
+                                            }
+                                            else
+                                            {
+                                                InventoryUtils.dropStacksUntilEmpty(gui, outputSlot.slotNumber);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            InventoryUtils.dropItem(gui, outputSlot.slotNumber);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (GuiScreen.isShiftKeyDown())
+                                        {
+                                            InventoryUtils.shiftClickSlot(gui, outputSlot.slotNumber);
+                                        }
+                                        else
+                                        {
+                                            InventoryUtils.moveOneSetOfItemsFromSlotToPlayerInventory(gui, outputSlot);
+                                        }
+                                    }
+                                }
+                            }
                         }
                         else if (isPickBlock)
                         {
@@ -289,11 +324,23 @@ public class InputEventHandler
         }
     }
 
+    public static boolean isKeybindHeld(int keyCode)
+    {
+        if (keyCode > 0)
+        {
+            return Keyboard.isKeyDown(keyCode);
+        }
+        else
+        {
+            keyCode += 100;
+            return keyCode >= 0 && keyCode < Mouse.getButtonCount() && Mouse.isButtonDown(keyCode);
+        }
+    }
+
     public boolean isRecipeViewOpen()
     {
         int keyCode = LiteModItemScroller.KEY_RECIPE.getKeyCode();
-        return keyCode > 0 && keyCode < 256 && Keyboard.isKeyDown(keyCode) &&
-                GuiScreen.isCtrlKeyDown() == false && GuiScreen.isAltKeyDown() == false;
+        return isKeybindHeld(keyCode) && GuiScreen.isCtrlKeyDown() == false && GuiScreen.isAltKeyDown() == false;
     }
 
     public void initializeRecipeStorage()
