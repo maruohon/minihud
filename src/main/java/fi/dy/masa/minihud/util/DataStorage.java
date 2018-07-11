@@ -314,20 +314,25 @@ public class DataStorage
         if (textComponent.getFormattedText().isEmpty() == false)
         {
             String text = TextFormatting.getTextWithoutFormattingCodes(textComponent.getUnformattedText());
-            Matcher matcher = PATTERN_CARPET_TPS.matcher(text);
+            String[] lines = text.split("\n");
 
-            if (matcher.matches())
+            for (String line : lines)
             {
-                try
+                Matcher matcher = PATTERN_CARPET_TPS.matcher(line);
+
+                if (matcher.matches())
                 {
-                    this.serverTPS = Double.parseDouble(matcher.group("tps"));
-                    this.serverMSPT = Double.parseDouble(matcher.group("mspt"));
-                    this.serverTPSValid = true;
-                    this.carpetServer = true;
-                    return;
-                }
-                catch (NumberFormatException e)
-                {
+                    try
+                    {
+                        this.serverTPS = Double.parseDouble(matcher.group("tps"));
+                        this.serverMSPT = Double.parseDouble(matcher.group("mspt"));
+                        this.serverTPSValid = true;
+                        this.carpetServer = true;
+                        return;
+                    }
+                    catch (NumberFormatException e)
+                    {
+                    }
                 }
             }
         }
