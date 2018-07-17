@@ -30,6 +30,7 @@ public class Configs implements IConfigHandler
         public static final ConfigHotkey        TOGGLE_KEY                          = new ConfigHotkey("toggleKey", "H", "The main toggle key");
         public static final ConfigDouble        CHUNK_UNLOAD_BUCKET_FONT_SCALE      = new ConfigDouble("chunkUnloadBucketOverlayFontScale", 0.1625, "The font scale for the Chunk unload order bucket overlay.\nValid range: 0.01 - 1.0");
         public static final ConfigInteger       CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS  = new ConfigInteger("chunkUnloadBucketOverlayChunkRadius", -1, "The radius of chunks to render the text for in the overlay.\nValid range: -1 - 40, where -1 = render distance");
+        public static final ConfigBoolean       CHUNK_UNLOAD_BUCKET_WITH_SIZE       = new ConfigBoolean("chunkUnloadBucketWithSize", false, "If enabled, uses the more accurate (but still experimental)\nchunk unload bucket calculations, taken from the Carpet mod");
         public static final ConfigString        COORDINATE_FORMAT_STRING            = new ConfigString("coordinateFormat", "x: %.1f y: %.1f z: %.1f", "The format string for the coordinate line.\nNeeds to have three %f format strings! Default: x: %.1f y: %.1f z: %.1f");
         public static final ConfigString        DATE_FORMAT_REAL                    = new ConfigString("dateFormatReal", "yyyy-MM-dd HH:mm:ss", "The format string for real time, see the Java SimpleDateFormat\nclass for the format patterns, if needed.");
         public static final ConfigString        DATE_FORMAT_MINECRAFT               = new ConfigString("dateFormatMinecraft", "MC time: (day {DAY}) {HOUR}:{MIN}:xx", "The format string for the Minecraft time.\nThe supported placeholders are: {DAY}, {HOUR}, {MIN},;{SEC}");
@@ -68,6 +69,7 @@ public class Configs implements IConfigHandler
 
                 CHUNK_UNLOAD_BUCKET_FONT_SCALE,
                 CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS,
+                CHUNK_UNLOAD_BUCKET_WITH_SIZE,
                 COORDINATE_FORMAT_STRING,
                 DATE_FORMAT_REAL,
                 DATE_FORMAT_MINECRAFT,
