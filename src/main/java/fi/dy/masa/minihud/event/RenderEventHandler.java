@@ -450,7 +450,7 @@ public class RenderEventHandler
                 // Prevent a crash when outside of world
                 if (pos.getY() >= 0 && pos.getY() < 256 && this.mc.world.isBlockLoaded(pos))
                 {
-                    Chunk chunk = this.mc.world.getChunkFromBlockCoords(pos);
+                    Chunk chunk = this.mc.world.getChunk(pos);
 
                     if (chunk.isEmpty() == false)
                     {
@@ -542,7 +542,7 @@ public class RenderEventHandler
                 // Prevent a crash when outside of world
                 if (pos.getY() >= 0 && pos.getY() < 256 && this.mc.world.isBlockLoaded(pos))
                 {
-                    Chunk chunk = this.mc.world.getChunkFromBlockCoords(pos);
+                    Chunk chunk = this.mc.world.getChunk(pos);
 
                     if (chunk.isEmpty() == false)
                     {
@@ -555,7 +555,7 @@ public class RenderEventHandler
                 // Prevent a crash when outside of world
                 if (pos.getY() >= 0 && pos.getY() < 256 && this.mc.world.isBlockLoaded(pos))
                 {
-                    Chunk chunk = this.mc.world.getChunkFromBlockCoords(pos);
+                    Chunk chunk = this.mc.world.getChunk(pos);
 
                     if (chunk.isEmpty() == false)
                     {
