@@ -332,7 +332,7 @@ public class InputEventHandler
 
     public static boolean isKeybindHeld(int keyCode)
     {
-        if (keyCode > 0)
+        if (keyCode > 0 && keyCode < Keyboard.getKeyCount())
         {
             return Keyboard.isKeyDown(keyCode);
         }
@@ -592,8 +592,7 @@ public class InputEventHandler
             }
             else if (isShiftDown ^ isControlDown)
             {
-                int dropKey = mc.gameSettings.keyBindDrop.getKeyCode();
-                boolean dropKeyDown = dropKey > 0 ? Keyboard.isKeyDown(dropKey) : dropKey + 100 < Mouse.getButtonCount() && Mouse.isButtonDown(dropKey + 100);
+                boolean dropKeyDown = isKeybindHeld(mc.gameSettings.keyBindDrop.getKeyCode());
 
                 if (dropKeyDown &&
                     ((isShiftDown && Toggles.DRAG_DROP_STACKS.getValue()) ||
