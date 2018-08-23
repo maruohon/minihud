@@ -9,6 +9,7 @@ import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.InitCompleteListener;
 import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
+import com.mumfrey.liteloader.Tickable;
 import com.mumfrey.liteloader.core.LiteLoader;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.itemscroller.config.Configs;
@@ -20,7 +21,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.play.server.SPacketJoinGame;
 
-public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteListener, JoinGameListener
+public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteListener, JoinGameListener, Tickable
 {
     public static final KeyBinding KEY_DISABLE = new KeyBinding("itemscroller.desc.toggledisable", Keyboard.KEY_N, "itemscroller.category");
     public static final KeyBinding KEY_RECIPE = new KeyBinding("itemscroller.desc.recipe", Keyboard.KEY_S, "itemscroller.category");
@@ -71,5 +72,11 @@ public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteL
     public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
     {
         InputEventHandler.getInstance().onWorldChanged();
+    }
+
+    @Override
+    public void onTick(Minecraft mc, float partialTicks, boolean inGame, boolean clock)
+    {
+        InputEventHandler.getInstance().onTick(mc);
     }
 }

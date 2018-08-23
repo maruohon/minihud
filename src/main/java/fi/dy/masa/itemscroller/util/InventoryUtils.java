@@ -1276,6 +1276,31 @@ public class InventoryUtils
         return slots;
     }
 
+    private static List<Integer> getSlotNumbersOfMatchingStacks(Container container, ItemStack stackReference, boolean preferPartial)
+    {
+        List<Integer> slots = new ArrayList<Integer>(64);
+        final int maxSlot = container.inventorySlots.size() - 1;
+
+        for (int i = 0; i <= maxSlot; ++i)
+        {
+            Slot slot = container.getSlot(i);
+
+            if (slot != null && slot.getHasStack() && areStacksEqual(slot.getStack(), stackReference))
+            {
+                if ((getStackSize(slot.getStack()) < stackReference.getMaxStackSize()) == preferPartial)
+                {
+                    slots.add(0, slot.slotNumber);
+                }
+                else
+                {
+                    slots.add(slot.slotNumber);
+                }
+            }
+        }
+
+        return slots;
+    }
+
     private static List<Integer> getSlotNumbersOfEmptySlots(
             Container container, Slot slotReference, boolean sameInventory, boolean treatHotbarAsDifferent, boolean reverse)
     {
@@ -1297,7 +1322,7 @@ public class InventoryUtils
         return slots;
     }
 
-    private static List<Integer> getSlotNumbersOfEmptySlotsInPlayerInventory(Container container, boolean reverse)
+    public static List<Integer> getSlotNumbersOfEmptySlotsInPlayerInventory(Container container, boolean reverse)
     {
         List<Integer> slots = new ArrayList<Integer>(64);
         final int maxSlot = container.inventorySlots.size() - 1;
@@ -1574,6 +1599,20 @@ public class InventoryUtils
         }
     }
 
+    public static void dropStacksWhileHasItem(GuiContainer gui, int slotNum, ItemStack stackReference)
+    {
+        if (slotNum >= 0 && slotNum < gui.inventorySlots.inventorySlots.size())
+        {
+            Slot slot = gui.inventorySlots.getSlot(slotNum);
+            int failsafe = 256;
+
+            while (failsafe-- > 0 && areStacksEqual(slot.getStack(), stackReference))
+            {
+                dropStack(gui, slotNum);
+            }
+        }
+    }
+
     private static boolean shiftClickSlotWithCheck(GuiContainer gui, int slotNum)
     {
         Slot slot = gui.inventorySlots.getSlot(slotNum);
@@ -1743,6 +1782,46 @@ public class InventoryUtils
         }
 
         return slots;
+    }
+
+    public static void tryClearCursor(GuiContainer gui, Minecraft mc)
+    {
+        if (mc.player.inventory.getCurrentItem().isEmpty() == false)
+        {
+            List<Integer> emptySlots = getSlotNumbersOfEmptySlotsInPlayerInventory(gui.inventorySlots, false);
+
+            if (emptySlots.isEmpty() == false)
+            {
+                leftClickSlot(gui, emptySlots.get(0));
+            }
+            else
+            {
+                List<Integer> matchingSlots = getSlotNumbersOfMatchingStacks(gui.inventorySlots, mc.player.inventory.getCurrentItem(), true);
+
+                if (matchingSlots.isEmpty() == false)
+                {
+                    for (int slotNum : matchingSlots)
+                    {
+                        Slot slot = gui.inventorySlots.getSlot(slotNum);
+                        ItemStack stackSlot = slot.getStack();
+                        ItemStack stackCursor = mc.player.inventory.getCurrentItem();
+
+                        if (slot == null || areStacksEqual(stackSlot, stackCursor) == false ||
+                            stackSlot.getCount() >= stackCursor.getMaxStackSize())
+                        {
+                            break;
+                        }
+
+                        leftClickSlot(gui, slotNum);
+                    }
+                }
+            }
+        }
+
+        if (mc.player.inventory.getCurrentItem().isEmpty() == false)
+        {
+            InventoryUtils.dropItemsFromCursor(gui);
+        }
     }
 
     private static class SlotVerticalSorter implements Comparable<SlotVerticalSorter>

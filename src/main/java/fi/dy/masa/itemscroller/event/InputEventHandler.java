@@ -9,6 +9,7 @@ import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Configs.Toggles;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
+import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
@@ -320,6 +321,49 @@ public class InputEventHandler
         }
 
         return false;
+    }
+
+    public void onTick(Minecraft mc)
+    {
+        if (this.disabled == false &&
+            mc != null &&
+            mc.player != null &&
+            GuiScreen.isCtrlKeyDown() && GuiScreen.isAltKeyDown() && GuiScreen.isShiftKeyDown() && Keyboard.isKeyDown(Keyboard.KEY_V) &&
+            mc.currentScreen instanceof GuiContainer &&
+            (mc.currentScreen instanceof GuiContainerCreative) == false &&
+            Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
+        {
+            GuiScreen guiScreen = mc.currentScreen;
+            GuiContainer gui = (GuiContainer) guiScreen;
+            Slot outputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
+
+            if (outputSlot != null)
+            {
+                CraftingRecipe recipe = this.recipes.getSelectedRecipe();
+
+                InventoryUtils.tryClearCursor(gui, mc);
+                InventoryUtils.throwAllCraftingResultsToGround(recipe, gui);
+                InventoryUtils.tryMoveItemsToFirstCraftingGrid(recipe, gui, true);
+
+                int failsafe = 0;
+
+                while (++failsafe < 40 && InventoryUtils.areStacksEqual(outputSlot.getStack(), recipe.getResult()))
+                {
+                    if (Toggles.CARPET_CTRL_Q_CRAFTING.getValue())
+                    {
+                        InventoryUtils.dropStack(gui, outputSlot.slotNumber);
+                    }
+                    else
+                    {
+                        InventoryUtils.dropStacksWhileHasItem(gui, outputSlot.slotNumber, recipe.getResult());
+                    }
+
+                    InventoryUtils.tryClearCursor(gui, mc);
+                    InventoryUtils.throwAllCraftingResultsToGround(recipe, gui);
+                    InventoryUtils.tryMoveItemsToFirstCraftingGrid(recipe, gui, true);
+                }
+            }
+        }
     }
 
     public void onWorldChanged()
