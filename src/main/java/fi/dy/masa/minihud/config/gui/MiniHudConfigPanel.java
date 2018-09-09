@@ -1,13 +1,17 @@
 package fi.dy.masa.minihud.config.gui;
 
+import java.util.List;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.config.gui.ConfigPanelBase;
-import fi.dy.masa.malilib.config.gui.ConfigPanelSub;
+import fi.dy.masa.malilib.config.gui.GuiModConfigs;
+import fi.dy.masa.malilib.gui.ConfigInfoProviderSimple;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.RendererToggle;
 
 public class MiniHudConfigPanel extends ConfigPanelBase
 {
@@ -21,10 +25,23 @@ public class MiniHudConfigPanel extends ConfigPanelBase
     protected void createSubPanels()
     {
         String modId = Reference.MOD_ID;
-        this.addSubPanel(new ConfigPanelSub(modId, "Generic", Configs.Generic.OPTIONS.toArray(new IConfigValue[Configs.Generic.OPTIONS.size()]), this));
-        this.addSubPanel(new ConfigPanelSub(modId, "Info Line Order", ConfigUtils.createConfigWrapperForType(ConfigType.INTEGER, InfoToggle.values()), this));
-        this.addSubPanel((new ConfigPanelSub(modId, "Info Toggles", InfoToggle.values(), this)).setElementWidth(120));
-        this.addSubPanel(new ConfigPanelInfoHotkeys(modId, this));
-        this.addSubPanel(new ConfigPanelRendererHotkeys(modId, this));
+        List<? extends IConfigValue> configs;
+        ConfigInfoProviderSimple provider;
+
+        this.addSubPanel(new GuiModConfigs(modId, "Generic", Configs.Generic.OPTIONS));
+
+        configs = ConfigUtils.createConfigWrapperForType(ConfigType.BOOLEAN, ImmutableList.copyOf(InfoToggle.values()));
+        this.addSubPanel((new GuiModConfigs(modId, "Info Toggles", configs)).setConfigWidth(100));
+
+        configs = ConfigUtils.createConfigWrapperForType(ConfigType.INTEGER, ImmutableList.copyOf(InfoToggle.values()));
+        this.addSubPanel((new GuiModConfigs(modId, "Info Line Order", configs)).setConfigWidth(60));
+
+        configs = ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(InfoToggle.values()));
+        provider = new ConfigInfoProviderSimple("Hotkey to toggle the '", "' info line");
+        this.addSubPanel((new GuiModConfigs(modId, "Info Hotkeys", configs)).setHoverInfoProvider(provider));
+
+        configs = ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(RendererToggle.values()));
+        provider = new ConfigInfoProviderSimple("Hotkey to toggle the '", "' renderer");
+        this.addSubPanel((new GuiModConfigs(modId, "Renderer Hotkeys", configs)).setHoverInfoProvider(provider));
     }
 }

@@ -3,16 +3,16 @@ package fi.dy.masa.minihud.config;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.config.ConfigType;
-import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.IConfigValueChangeCallback;
-import fi.dy.masa.malilib.hotkeys.IHotkey;
+import fi.dy.masa.malilib.config.IHotkeyTogglable;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
+import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
 
-public enum RendererToggle implements IConfigBoolean, IHotkey
+public enum RendererToggle implements IHotkeyTogglable
 {
     DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled",    "H,1", "Toggles the vanilla Block Collision Boxes debug renderer", "Block Collision Boxes"),
     DEBUG_HEIGHT_MAP                    ("debugHeightMapEnabled",       "H,2", "Toggles the vanilla Height Map debug renderer", "Height Map"),
@@ -42,7 +42,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey
         this.prettyName = prettyName;
         this.comment = comment;
         this.defaultValueBoolean = false;
-        this.keybind = KeybindMulti.fromStorageString(defaultHotkey);
+        this.keybind = KeybindMulti.fromStorageString(defaultHotkey, KeybindSettings.DEFAULT);
 
         if (name.startsWith("debug"))
         {

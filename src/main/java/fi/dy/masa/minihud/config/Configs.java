@@ -18,6 +18,7 @@ import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.options.ConfigString;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.event.RenderEventHandler;
 
@@ -27,7 +28,7 @@ public class Configs implements IConfigHandler
 
     public static class Generic
     {
-        public static final ConfigHotkey        TOGGLE_KEY                          = new ConfigHotkey("toggleKey", "H", "The main toggle key");
+        public static final ConfigHotkey        TOGGLE_KEY                          = new ConfigHotkey("toggleKey", "H", LiteModMiniHud.TOGGLE_SETTINGS, "The main toggle key");
         public static final ConfigDouble        CHUNK_UNLOAD_BUCKET_FONT_SCALE      = new ConfigDouble("chunkUnloadBucketOverlayFontScale", 0.1625, "The font scale for the Chunk unload order bucket overlay.\nValid range: 0.01 - 1.0");
         public static final ConfigInteger       CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS  = new ConfigInteger("chunkUnloadBucketOverlayChunkRadius", -1, "The radius of chunks to render the text for in the overlay.\nValid range: -1 - 40, where -1 = render distance");
         public static final ConfigBoolean       CHUNK_UNLOAD_BUCKET_WITH_SIZE       = new ConfigBoolean("chunkUnloadBucketWithSize", false, "If enabled, uses the more accurate (but still experimental)\nchunk unload bucket calculations, taken from the Carpet mod");
@@ -35,7 +36,7 @@ public class Configs implements IConfigHandler
         public static final ConfigString        DATE_FORMAT_REAL                    = new ConfigString("dateFormatReal", "yyyy-MM-dd HH:mm:ss", "The format string for real time, see the Java SimpleDateFormat\nclass for the format patterns, if needed.");
         public static final ConfigString        DATE_FORMAT_MINECRAFT               = new ConfigString("dateFormatMinecraft", "MC time: (day {DAY}) {HOUR}:{MIN}:xx", "The format string for the Minecraft time.\nThe supported placeholders are: {DAY}, {HOUR}, {MIN},;{SEC}");
         public static final ConfigBoolean       DEBUG_RENDERER_PATH_MAX_DIST        = new ConfigBoolean("debugRendererPathFindingEnablePointWidth", true, "If true, then the vanilla pathfinding debug renderer will render the path point width boxes.");
-        public static final ConfigBoolean       ENABLE_BY_DEFAULT                   = new ConfigBoolean("enableByDefault", true, "If true, the HUD will be enabled by default on game launch");
+        public static final ConfigBoolean       ENABLED                             = new ConfigBoolean("enables", true, "If true, the HUD will be rendered");
         public static final ConfigBoolean       FIX_VANILLA_DEBUG_RENDERERS         = new ConfigBoolean("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed.");
         public static final ConfigColor         FONT_COLOR                          = new ConfigColor("fontColor", "0xE0E0E0", "Font color (RGB, default: 0xE0E0E0 = 14737632)");
         public static final ConfigDouble        FONT_SCALE                          = new ConfigDouble("fontScale", 0.5, "Font scale factor. Valid range: 0.0 - 10.0. Default: 0.5\n");
@@ -74,7 +75,7 @@ public class Configs implements IConfigHandler
                 DATE_FORMAT_REAL,
                 DATE_FORMAT_MINECRAFT,
                 DEBUG_RENDERER_PATH_MAX_DIST,
-                ENABLE_BY_DEFAULT,
+                ENABLED,
                 FIX_VANILLA_DEBUG_RENDERERS,
                 FONT_COLOR,
                 FONT_SCALE,
@@ -114,42 +115,17 @@ public class Configs implements IConfigHandler
             if (element != null && element.isJsonObject())
             {
                 JsonObject root = element.getAsJsonObject();
-                JsonObject objToggles           = JsonUtils.getNestedObject(root, "InfoTypeToggles", false);
-                JsonObject objInfoHotkeys       = JsonUtils.getNestedObject(root, "InfoTypeHotkeys", false);
                 JsonObject objInfoLineOrders    = JsonUtils.getNestedObject(root, "InfoLineOrders", false);
-                JsonObject objRendererHotkeys   = JsonUtils.getNestedObject(root, "RendererHotkeys", false);
-                JsonObject objRendererToggles   = JsonUtils.getNestedObject(root, "RendererToggles", false);
 
-                ConfigUtils.readConfigValues(root, "Generic", Configs.Generic.OPTIONS);
+                ConfigUtils.readConfigBase(root, "Generic", Configs.Generic.OPTIONS);
+                ConfigUtils.readHotkeyToggleOptions(root, "RendererHotkeys", "RendererToggles", ImmutableList.copyOf(RendererToggle.values()));
+                ConfigUtils.readHotkeyToggleOptions(root, "InfoTypeHotkeys", "InfoTypeToggles", ImmutableList.copyOf(InfoToggle.values()));
 
                 for (InfoToggle toggle : InfoToggle.values())
                 {
-                    if (objToggles != null && JsonUtils.hasBoolean(objToggles, toggle.getName()))
-                    {
-                        toggle.setBooleanValue(JsonUtils.getBoolean(objToggles, toggle.getName()));
-                    }
-
-                    if (objInfoHotkeys != null && JsonUtils.hasString(objInfoHotkeys, toggle.getName()))
-                    {
-                        toggle.getKeybind().setValueFromString(JsonUtils.getString(objInfoHotkeys, toggle.getName()));
-                    }
-
                     if (objInfoLineOrders != null && JsonUtils.hasInteger(objInfoLineOrders, toggle.getName()))
                     {
                         toggle.setIntegerValue(JsonUtils.getInteger(objInfoLineOrders, toggle.getName()));
-                    }
-                }
-
-                for (RendererToggle hotkey : RendererToggle.values())
-                {
-                    if (objRendererToggles != null && JsonUtils.hasBoolean(objRendererToggles, hotkey.getName()))
-                    {
-                        hotkey.setBooleanValue(JsonUtils.getBoolean(objRendererToggles, hotkey.getName()));
-                    }
-
-                    if (objRendererHotkeys != null && JsonUtils.hasString(objRendererHotkeys, hotkey.getName()))
-                    {
-                        hotkey.getKeybind().setValueFromString(JsonUtils.getString(objRendererHotkeys, hotkey.getName()));
                     }
                 }
             }
@@ -165,26 +141,15 @@ public class Configs implements IConfigHandler
         if (dir.exists() && dir.isDirectory())
         {
             JsonObject root = new JsonObject();
-
-            JsonObject objToggles           = JsonUtils.getNestedObject(root, "InfoTypeToggles", true);
-            JsonObject objInfoHotkeys       = JsonUtils.getNestedObject(root, "InfoTypeHotkeys", true);
             JsonObject objInfoLineOrders    = JsonUtils.getNestedObject(root, "InfoLineOrders", true);
-            JsonObject objRendererHotkeys   = JsonUtils.getNestedObject(root, "RendererHotkeys", true);
-            JsonObject objRendererToggles   = JsonUtils.getNestedObject(root, "RendererToggles", true);
 
-            ConfigUtils.writeConfigValues(root, "Generic", Configs.Generic.OPTIONS);
+            ConfigUtils.writeConfigBase(root, "Generic", Configs.Generic.OPTIONS);
+            ConfigUtils.writeHotkeyToggleOptions(root, "RendererHotkeys", "RendererToggles", ImmutableList.copyOf(RendererToggle.values()));
+            ConfigUtils.writeHotkeyToggleOptions(root, "InfoTypeHotkeys", "InfoTypeToggles", ImmutableList.copyOf(InfoToggle.values()));
 
             for (InfoToggle toggle : InfoToggle.values())
             {
-                objToggles.add(toggle.getName(), new JsonPrimitive(toggle.getBooleanValue()));
-                objInfoHotkeys.add(toggle.getName(), new JsonPrimitive(toggle.getKeybind().getStringValue()));
                 objInfoLineOrders.add(toggle.getName(), new JsonPrimitive(toggle.getIntegerValue()));
-            }
-
-            for (RendererToggle hotkey : RendererToggle.values())
-            {
-                objRendererToggles.add(hotkey.getName(), new JsonPrimitive(hotkey.getBooleanValue()));
-                objRendererHotkeys.add(hotkey.getName(), new JsonPrimitive(hotkey.getKeybind().getStringValue()));
             }
 
             JsonUtils.writeJsonToFile(root, new File(dir, CONFIG_FILE_NAME));

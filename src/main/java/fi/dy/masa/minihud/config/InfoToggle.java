@@ -3,16 +3,16 @@ package fi.dy.masa.minihud.config;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.config.ConfigType;
-import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.IConfigInteger;
 import fi.dy.masa.malilib.config.IConfigValueChangeCallback;
-import fi.dy.masa.malilib.hotkeys.IHotkey;
+import fi.dy.masa.malilib.config.IHotkeyTogglable;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
+import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBoolean;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
+import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.minihud.LiteModMiniHud;
-import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleInfoLine;
 
-public enum InfoToggle implements IConfigBoolean, IConfigInteger, IHotkey
+public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
 {
     BIOME                   ("infoBiome",                   false, 19, "H,I", "Show the name of the current biome"),
     BIOME_REG_NAME          ("infoBiomeRegistryName",       false, 20, "H,I", "Show the registry name of the current biome"),
@@ -64,8 +64,8 @@ public enum InfoToggle implements IConfigBoolean, IConfigInteger, IHotkey
         this.prettyName = name;
         this.valueBoolean = defaultValue;
         this.defaultValueBoolean = defaultValue;
-        this.keybind = KeybindMulti.fromStorageString(defaultHotkey);
-        this.keybind.setCallback(new KeyCallbackToggleInfoLine(this));
+        this.keybind = KeybindMulti.fromStorageString(defaultHotkey, KeybindSettings.DEFAULT);
+        this.keybind.setCallback(new KeyCallbackToggleBoolean(this));
         this.linePosition = linePosition;
         this.defaultLinePosition = linePosition;
         this.comment = comment;

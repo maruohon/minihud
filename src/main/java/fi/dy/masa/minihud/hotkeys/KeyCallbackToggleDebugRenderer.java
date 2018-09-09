@@ -20,13 +20,7 @@ public class KeyCallbackToggleDebugRenderer extends KeyCallbackToggleBooleanConf
     @Override
     public boolean onKeyAction(KeyAction action, IKeybind key)
     {
-        if (super.onKeyAction(action, key))
-        {
-            DebugInfoUtils.toggleDebugRenderer(this.rendererConfig);
-            KeyCallbackToggleHud.setToggledSomething();
-            return true;
-        }
-
-        return false;
+        DebugInfoUtils.toggleDebugRenderer(this.rendererConfig);
+        return true;
     }
 }

@@ -52,8 +52,6 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
                 StringUtils.printActionbarMessage(message + str);
             }
 
-            KeyCallbackToggleHud.setToggledSomething();
-
             return true;
         }
 

@@ -50,7 +50,6 @@ public class RenderEventHandler
     private static final RenderEventHandler INSTANCE = new RenderEventHandler();
     private final DataStorage data;
     private final Date date;
-    private boolean enabled;
     private int fps;
     private int fpsCounter;
     private long fpsUpdateTime = Minecraft.getSystemTime();
@@ -90,7 +89,7 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (this.enabled &&
+        if (Configs.Generic.ENABLED.getBooleanValue() &&
             mc.gameSettings.showDebugInfo == false &&
             mc.player != null &&
             (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
@@ -118,7 +117,7 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (this.enabled && mc.player != null)
+        if (Configs.Generic.ENABLED.getBooleanValue() && mc.player != null)
         {
             OverlayRenderer.renderOverlays(mc, partialTicks);
         }
@@ -142,16 +141,6 @@ public class RenderEventHandler
         }
 
         return 0;
-    }
-
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
-    }
-
-    public void toggleEnabled()
-    {
-        this.enabled = ! this.enabled;
     }
 
     private void updateFps()
