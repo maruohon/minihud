@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.IConfigInteger;
-import fi.dy.masa.malilib.config.IConfigValueChangeCallback;
 import fi.dy.masa.malilib.config.IHotkeyTogglable;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBoolean;
@@ -141,16 +140,6 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     public void setIntegerValue(int value)
     {
         this.linePosition = value;
-    }
-
-    @Override
-    public void onValueChanged()
-    {
-    }
-
-    @Override
-    public void setValueChangeCallback(IConfigValueChangeCallback callback)
-    {
     }
 
     @Override
