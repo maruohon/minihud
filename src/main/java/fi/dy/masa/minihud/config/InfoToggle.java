@@ -73,7 +73,7 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     @Override
     public ConfigType getType()
     {
-        return ConfigType.BOOLEAN;
+        return ConfigType.HOTKEY;
     }
 
     @Override

@@ -56,7 +56,7 @@ public enum RendererToggle implements IHotkeyTogglable
     @Override
     public ConfigType getType()
     {
-        return ConfigType.BOOLEAN;
+        return ConfigType.HOTKEY;
     }
 
     @Override
