@@ -29,6 +29,7 @@ public class MiniHudConfigPanel extends ConfigPanelBase
         ConfigInfoProviderSimple provider;
 
         this.addSubPanel(new GuiModConfigs(modId, "Generic", Configs.Generic.OPTIONS));
+        this.addSubPanel((new GuiModConfigs(modId, "Colors", Configs.Colors.OPTIONS)).setConfigWidth(100));
 
         configs = ConfigUtils.createConfigWrapperForType(ConfigType.BOOLEAN, ImmutableList.copyOf(InfoToggle.values()));
         this.addSubPanel((new GuiModConfigs(modId, "Info Toggles", configs)).setConfigWidth(100));

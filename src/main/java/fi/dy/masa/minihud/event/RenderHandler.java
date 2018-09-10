@@ -735,7 +735,7 @@ public class RenderHandler implements IRenderer
         final int lineHeight = fontRenderer.FONT_HEIGHT + 2;
         final double scale = this.fontScale;
         final int bgMargin = 2;
-        final int bgColor = Configs.Generic.TEXT_BACKGROUND_COLOR.getIntegerValue();
+        final int bgColor = Configs.Colors.TEXT_BACKGROUND_COLOR.getIntegerValue();
         HudAlignment align = (HudAlignment) Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
         double posX = xOff + bgMargin;
         double posY = yOff + bgMargin;
@@ -823,11 +823,11 @@ public class RenderHandler implements IRenderer
 
             if (Configs.Generic.USE_FONT_SHADOW.getBooleanValue())
             {
-                fontRenderer.drawStringWithShadow(line, x, y, Configs.Generic.FONT_COLOR.getIntegerValue());
+                fontRenderer.drawStringWithShadow(line, x, y, Configs.Colors.TEXT_COLOR.getIntegerValue());
             }
             else
             {
-                fontRenderer.drawString(line, x, y, Configs.Generic.FONT_COLOR.getIntegerValue());
+                fontRenderer.drawString(line, x, y, Configs.Colors.TEXT_COLOR.getIntegerValue());
             }
         }
 

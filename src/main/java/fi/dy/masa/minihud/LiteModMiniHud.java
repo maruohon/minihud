@@ -12,10 +12,7 @@ import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InputEventHandler;
 import fi.dy.masa.malilib.event.RenderEventHandler;
-import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBoolean;
-import fi.dy.masa.malilib.hotkeys.KeybindSettings;
-import fi.dy.masa.malilib.hotkeys.KeybindSettings.Context;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.gui.MiniHudConfigPanel;
 import fi.dy.masa.minihud.event.InputHandler;
@@ -29,8 +26,6 @@ import net.minecraft.network.play.server.SPacketJoinGame;
 public class LiteModMiniHud implements LiteMod, Configurable, JoinGameListener, Tickable
 {
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
-
-    public static final KeybindSettings TOGGLE_SETTINGS = KeybindSettings.create(Context.INGAME, KeyAction.RELEASE, false, true, true, true);
 
     public LiteModMiniHud()
     {

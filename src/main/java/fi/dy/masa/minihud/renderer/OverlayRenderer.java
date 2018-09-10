@@ -62,16 +62,16 @@ public class OverlayRenderer
 
         if (RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER.getBooleanValue())
         {
-            int colorLazy = Configs.Generic.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
-            int colorProcessing = Configs.Generic.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getIntegerValue();
+            int colorLazy = Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
+            int colorProcessing = Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getIntegerValue();
             BlockPos pos = new BlockPos(entity.posX, 0, entity.posZ);
             renderSpawnChunksOverlay(mc, entity, dx, dy, dz, pos, colorLazy, colorProcessing);
         }
 
         if (RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getBooleanValue() && data.isWorldSpawnKnown())
         {
-            int colorLazy = Configs.Generic.SPAWN_REAL_LAZY_OVERLAY_COLOR.getIntegerValue();
-            int colorProcessing = Configs.Generic.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getIntegerValue();
+            int colorLazy = Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getIntegerValue();
+            int colorProcessing = Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getIntegerValue();
             renderSpawnChunksOverlay(mc, entity, dx, dy, dz, data.getWorldSpawn(), colorLazy, colorProcessing);
         }
 
@@ -90,7 +90,7 @@ public class OverlayRenderer
         pos1.setPos(rx,         0, rz      );
         pos2.setPos(rx + 511, 256, rz + 511);
         int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
-        int color = Configs.Generic.REGION_OVERLAY_COLOR.getIntegerValue();
+        int color = Configs.Colors.REGION_OVERLAY_COLOR.getIntegerValue();
 
         GlStateManager.glLineWidth(1.6f);
 
@@ -138,7 +138,7 @@ public class OverlayRenderer
                 r = mc.gameSettings.renderDistanceChunks;
             }
             final long worldSeed = data.getWorldSeed(entity.dimension);
-            final int color = Configs.Generic.SLIME_CHUNKS_OVERLAY_COLOR.getIntegerValue();
+            final int color = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getIntegerValue();
             PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();
             PooledMutableBlockPos pos2 = PooledMutableBlockPos.retain();
 
@@ -180,7 +180,7 @@ public class OverlayRenderer
     {
         final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
         final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
-        final int color = Configs.Generic.SPAWNABLE_SUB_CHUNKS_OVERLAY_COLOR.getIntegerValue();
+        final int color = Configs.Colors.SPAWNABLE_SUB_CHUNKS_OVERLAY_COLOR.getIntegerValue();
         int r = MathHelper.clamp(Configs.Generic.SPAWNABLE_SUB_CHUNKS_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
 
         if (r == -1)
@@ -217,7 +217,7 @@ public class OverlayRenderer
 
     private static void renderSpawnableColumnHeightsOverlay(Minecraft mc, Entity entity, double dx, double dy, double dz)
     {
-        final int color = Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_COLOR.getIntegerValue();
+        final int color = Configs.Colors.SPAWNABLE_COLUMNS_OVERLAY_COLOR.getIntegerValue();
         final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
 
         GlStateManager.pushMatrix();
