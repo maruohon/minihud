@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import fi.dy.masa.malilib.config.HudAlignment;
+import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -45,9 +46,9 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 
-public class RenderEventHandler
+public class RenderHandler implements IRenderer
 {
-    private static final RenderEventHandler INSTANCE = new RenderEventHandler();
+    private static final RenderHandler INSTANCE = new RenderHandler();
     private final DataStorage data;
     private final Date date;
     private int fps;
@@ -59,13 +60,13 @@ public class RenderEventHandler
 
     private final List<StringHolder> lines = new ArrayList<StringHolder>();
 
-    public RenderEventHandler()
+    public RenderHandler()
     {
         this.data = DataStorage.getInstance();
         this.date = new Date();
     }
 
-    public static RenderEventHandler getInstance()
+    public static RenderHandler getInstance()
     {
         return INSTANCE;
     }
@@ -85,6 +86,7 @@ public class RenderEventHandler
         }
     }
 
+    @Override
     public void onRenderGameOverlayPost(float partialTicks)
     {
         Minecraft mc = Minecraft.getMinecraft();
@@ -113,6 +115,7 @@ public class RenderEventHandler
         }
     }
 
+    @Override
     public void onRenderWorldLast(float partialTicks)
     {
         Minecraft mc = Minecraft.getMinecraft();

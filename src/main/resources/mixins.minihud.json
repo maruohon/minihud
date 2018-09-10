@@ -13,7 +13,6 @@
         "MixinDebugRendererHeightMap",
         "MixinDebugRendererNeighborsUpdate",
         "MixinDebugRendererSolidFace",
-        "MixinEntityRenderer",
         "MixinGuiScreen",
         "MixinGuiSubtitleOverlay",
         "MixinMinecraftServer",

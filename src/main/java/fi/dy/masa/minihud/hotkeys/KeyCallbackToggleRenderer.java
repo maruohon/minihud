@@ -5,7 +5,7 @@ import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.event.RenderEventHandler;
+import fi.dy.masa.minihud.event.RenderHandler;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -46,7 +46,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
                 String message = I18n.format("malilib.message.toggled", this.config.getPrettyName(), pre + status + TextFormatting.RESET);
 
                 BlockPos spawn = mc.world.getSpawnPoint();
-                RenderEventHandler.getInstance().getDataStorage().setWorldSpawn(spawn);
+                RenderHandler.getInstance().getDataStorage().setWorldSpawn(spawn);
                 String str = String.format(", using the world spawn x: %d, y: %d, z: %d", spawn.getX(), spawn.getY(), spawn.getZ());
 
                 StringUtils.printActionbarMessage(message + str);

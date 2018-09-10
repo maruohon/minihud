@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import fi.dy.masa.minihud.event.RenderEventHandler;
+import fi.dy.masa.minihud.event.RenderHandler;
 import net.minecraft.client.gui.GuiSubtitleOverlay;
 import net.minecraft.client.renderer.GlStateManager;
 
@@ -22,7 +22,7 @@ public class MixinGuiSubtitleOverlay
             shift = Shift.AFTER))
     private void nudgeSubtitleOverlay(CallbackInfo ci)
     {
-        int offset = RenderEventHandler.getInstance().getSubtitleOffset();
+        int offset = RenderHandler.getInstance().getSubtitleOffset();
 
         if (offset != 0)
         {

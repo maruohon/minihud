@@ -20,7 +20,7 @@ import fi.dy.masa.malilib.config.options.ConfigString;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
-import fi.dy.masa.minihud.event.RenderEventHandler;
+import fi.dy.masa.minihud.event.RenderHandler;
 
 public class Configs implements IConfigHandler
 {
@@ -131,7 +131,7 @@ public class Configs implements IConfigHandler
             }
         }
 
-        RenderEventHandler.getInstance().setFontScale(Configs.Generic.FONT_SCALE.getDoubleValue());
+        RenderHandler.getInstance().setFontScale(Configs.Generic.FONT_SCALE.getDoubleValue());
     }
 
     public static void saveToFile()
