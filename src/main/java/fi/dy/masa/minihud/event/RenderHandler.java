@@ -2,7 +2,6 @@ package fi.dy.masa.minihud.event;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -10,6 +9,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import fi.dy.masa.malilib.config.HudAlignment;
+import fi.dy.masa.malilib.gui.RenderUtils;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
@@ -22,17 +22,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -58,7 +53,8 @@ public class RenderHandler implements IRenderer
     private double fontScale = 0.5d;
     private Set<InfoToggle> addedTypes = new HashSet<>();
 
-    private final List<StringHolder> lines = new ArrayList<StringHolder>();
+    private final List<StringHolder> lineWrappers = new ArrayList<>();
+    private final List<String> lines = new ArrayList<>();
 
     public RenderHandler()
     {
@@ -111,7 +107,15 @@ public class RenderHandler implements IRenderer
                 this.infoUpdateTime = currentTime;
             }
 
-            this.renderText(mc, Configs.Generic.TEXT_POS_X.getIntegerValue(), Configs.Generic.TEXT_POS_Y.getIntegerValue(), this.lines);
+            int x = Configs.Generic.TEXT_POS_X.getIntegerValue();
+            int y = Configs.Generic.TEXT_POS_Y.getIntegerValue();
+            int textColor = Configs.Colors.TEXT_COLOR.getIntegerValue();
+            int bgColor = Configs.Colors.TEXT_BACKGROUND_COLOR.getIntegerValue();
+            HudAlignment alignment = (HudAlignment) Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
+            boolean useBackground = Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue();
+            boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
+
+            RenderUtils.renderText(mc, x, y, this.fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.lines);
         }
     }
 
@@ -138,7 +142,7 @@ public class RenderHandler implements IRenderer
         if (align == HudAlignment.BOTTOM_RIGHT)
         {
             Minecraft mc = Minecraft.getMinecraft();
-            int offset = (int) (this.lines.size() * (mc.fontRenderer.FONT_HEIGHT + 2) * this.fontScale);
+            int offset = (int) (this.lineWrappers.size() * (mc.fontRenderer.FONT_HEIGHT + 2) * this.fontScale);
 
             return -(offset - 16);
         }
@@ -172,7 +176,7 @@ public class RenderHandler implements IRenderer
 
     private void updateLines()
     {
-        this.lines.clear();
+        this.lineWrappers.clear();
         this.addedTypes.clear();
 
         // Get the info line order based on the configs
@@ -195,18 +199,25 @@ public class RenderHandler implements IRenderer
 
         if (Configs.Generic.SORT_LINES_BY_LENGTH.getBooleanValue())
         {
-            Collections.sort(this.lines);
+            Collections.sort(this.lineWrappers);
 
             if (Configs.Generic.SORT_LINES_REVERSED.getBooleanValue())
             {
-                Collections.reverse(this.lines);
+                Collections.reverse(this.lineWrappers);
             }
+        }
+
+        this.lines.clear();
+
+        for (StringHolder holder : this.lineWrappers)
+        {
+            this.lines.add(holder.str);
         }
     }
 
     private void addLine(String text)
     {
-        this.lines.add(new StringHolder(text));
+        this.lineWrappers.add(new StringHolder(text));
     }
 
     private void addLine(InfoToggle type)
@@ -702,7 +713,7 @@ public class RenderHandler implements IRenderer
                 state = state.getActualState(mc.world, posLooking);
             }
 
-            this.lines.add(new StringHolder(String.valueOf(Block.REGISTRY.getNameForObject(state.getBlock()))));
+            this.addLine(String.valueOf(Block.REGISTRY.getNameForObject(state.getBlock())));
 
             for (Entry <IProperty<?>, Comparable<?>> entry : state.getProperties().entrySet())
             {
@@ -723,117 +734,8 @@ public class RenderHandler implements IRenderer
                     valueName = TextFormatting.AQUA + valueName;
                 }
 
-                this.lines.add(new StringHolder(property.getName() + ": " + valueName));
+                this.addLine(property.getName() + ": " + valueName);
             }
-        }
-    }
-
-    private void renderText(Minecraft mc, int xOff, int yOff, List<StringHolder> lines)
-    {
-        FontRenderer fontRenderer = mc.fontRenderer;
-        ScaledResolution res = new ScaledResolution(mc);
-        final int lineHeight = fontRenderer.FONT_HEIGHT + 2;
-        final double scale = this.fontScale;
-        final int bgMargin = 2;
-        final int bgColor = Configs.Colors.TEXT_BACKGROUND_COLOR.getIntegerValue();
-        HudAlignment align = (HudAlignment) Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
-        double posX = xOff + bgMargin;
-        double posY = yOff + bgMargin;
-
-        // Only Chuck Norris can divide by zero
-        if (scale == 0d)
-        {
-            return;
-        }
-
-        if (align == HudAlignment.TOP_RIGHT)
-        {
-            Collection<PotionEffect> effects = mc.player.getActivePotionEffects();
-
-            if (effects.isEmpty() == false)
-            {
-                int y1 = 0;
-                int y2 = 0;
-
-                for (PotionEffect effect : effects)
-                {
-                    Potion potion = effect.getPotion();
-
-                    if (effect.doesShowParticles() && potion.hasStatusIcon())
-                    {
-                        if (potion.isBeneficial())
-                        {
-                            y1 = 26;
-                        }
-                        else
-                        {
-                            y2 = 52;
-                            break;
-                        }
-                    }
-                }
-
-                posY += Math.max(y1, y2) / scale;
-            }
-        }
-
-        switch (align)
-        {
-            case BOTTOM_LEFT:
-            case BOTTOM_RIGHT:
-                posY = res.getScaledHeight() / scale - (lines.size() * lineHeight) - yOff + 2;
-                break;
-            case CENTER:
-                posY = (res.getScaledHeight() / scale / 2.0d) - (lines.size() * lineHeight / 2.0d) + yOff;
-                break;
-            default:
-        }
-
-        if (scale != 1d)
-        {
-            GlStateManager.pushMatrix();
-            GlStateManager.scale(scale, scale, 0);
-        }
-
-        for (StringHolder holder : lines)
-        {
-            String line = holder.str;
-            final int width = fontRenderer.getStringWidth(line);
-
-            switch (align)
-            {
-                case TOP_RIGHT:
-                case BOTTOM_RIGHT:
-                    posX = (res.getScaledWidth() / scale) - width - xOff - bgMargin;
-                    break;
-                case CENTER:
-                    posX = (res.getScaledWidth() / scale / 2) - (width / 2) - xOff;
-                    break;
-                default:
-            }
-
-            final int x = (int) posX;
-            final int y = (int) posY;
-            posY += (double) lineHeight;
-
-            if (Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue())
-            {
-                Gui.drawRect(x - bgMargin, y - bgMargin, x + width + bgMargin, y + fontRenderer.FONT_HEIGHT, bgColor);
-            }
-
-            if (Configs.Generic.USE_FONT_SHADOW.getBooleanValue())
-            {
-                fontRenderer.drawStringWithShadow(line, x, y, Configs.Colors.TEXT_COLOR.getIntegerValue());
-            }
-            else
-            {
-                fontRenderer.drawString(line, x, y, Configs.Colors.TEXT_COLOR.getIntegerValue());
-            }
-        }
-
-        if (scale != 1d)
-        {
-            GlStateManager.popMatrix();
         }
     }
 
