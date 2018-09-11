@@ -29,7 +29,6 @@ public class RenderEventHandler
     private static final RenderEventHandler INSTANCE = new RenderEventHandler();
     private static final Vec3d LIGHT0_POS = (new Vec3d( 0.2D, 1.0D, -0.7D)).normalize();
     private static final Vec3d LIGHT1_POS = (new Vec3d(-0.2D, 1.0D,  0.7D)).normalize();
-    private ScaledResolution scaledResolution;
 
     public static RenderEventHandler instance()
     {
@@ -95,12 +94,7 @@ public class RenderEventHandler
 
     public ScaledResolution getScaledResolution()
     {
-        if (this.scaledResolution == null)
-        {
-            this.scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-        }
-
-        return this.scaledResolution;
+        return new ScaledResolution(Minecraft.getMinecraft());
     }
 
     public int getMouseX()
