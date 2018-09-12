@@ -3,11 +3,11 @@ package fi.dy.masa.itemscroller.event;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.lwjgl.input.Mouse;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
+import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -39,10 +39,10 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (InputEventHandler.getInstance().isRecipeViewOpen() && mc.currentScreen instanceof GuiContainer)
+        if (InputUtils.isRecipeViewOpen() && mc.currentScreen instanceof GuiContainer)
         {
             GuiContainer gui = (GuiContainer) mc.currentScreen;
-            RecipeStorage recipes = InputEventHandler.getInstance().getRecipes();
+            RecipeStorage recipes = KeybindCallbacks.getInstance().getRecipes();
             final int count = recipes.getRecipeCount();
 
             for (int recipeId = 0; recipeId < count; recipeId++)
@@ -57,27 +57,27 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (InputEventHandler.getInstance().isRecipeViewOpen() && mc.currentScreen instanceof GuiContainer)
+        if (InputUtils.isRecipeViewOpen() && mc.currentScreen instanceof GuiContainer)
         {
             GuiContainer gui = (GuiContainer) mc.currentScreen;
-            RecipeStorage recipes = InputEventHandler.getInstance().getRecipes();
+            RecipeStorage recipes = KeybindCallbacks.getInstance().getRecipes();
 
-            final int mouseX = this.getMouseX();
-            final int mouseY = this.getMouseY();
+            final int mouseX = InputUtils.getMouseX();
+            final int mouseY = InputUtils.getMouseY();
             final int recipeId = this.getHoveredRecipeId(mouseX, mouseY, recipes, gui, mc);
 
             if (recipeId >= 0)
             {
                 CraftingRecipe recipe = recipes.getRecipe(recipeId);
 
-                if (Configs.Toggles.CRAFTING_RENDER_RECIPE_ITEMS.getValue())
+                if (Configs.Generic.CRAFTING_RENDER_RECIPE_ITEMS.getBooleanValue())
                 {
                     this.renderRecipeItems(recipe, recipes.getRecipeCount(), gui, mc);
                 }
 
                 this.renderHoverTooltip(mouseX, mouseY, recipe, gui, mc);
             }
-            else if (Configs.Toggles.CRAFTING_RENDER_RECIPE_ITEMS.getValue())
+            else if (Configs.Generic.CRAFTING_RENDER_RECIPE_ITEMS.getBooleanValue())
             {
                 CraftingRecipe recipe = recipes.getSelectedRecipe();
                 this.renderRecipeItems(recipe, recipes.getRecipeCount(), gui, mc);
@@ -92,25 +92,6 @@ public class RenderEventHandler
         }
     }
 
-    public ScaledResolution getScaledResolution()
-    {
-        return new ScaledResolution(Minecraft.getMinecraft());
-    }
-
-    public int getMouseX()
-    {
-        final ScaledResolution scaledresolution = this.getScaledResolution();
-        final int w = scaledresolution.getScaledWidth();
-        return Mouse.getX() * w / Minecraft.getMinecraft().displayWidth;
-    }
-
-    public int getMouseY()
-    {
-        final ScaledResolution scaledresolution = this.getScaledResolution();
-        final int h = scaledresolution.getScaledHeight();
-        return h - Mouse.getY() * h / Minecraft.getMinecraft().displayHeight - 1;
-    }
-
     private void renderHoverTooltip(int mouseX, int mouseY, CraftingRecipe recipe, GuiContainer gui, Minecraft mc)
     {
         ItemStack stack = recipe.getResult();
@@ -123,7 +104,7 @@ public class RenderEventHandler
 
     public int getHoveredRecipeId(int mouseX, int mouseY, RecipeStorage recipes, GuiContainer gui, Minecraft mc)
     {
-        if (InputEventHandler.getInstance().isRecipeViewOpen())
+        if (InputUtils.isRecipeViewOpen())
         {
             ScaledResolution scaledResolution = new ScaledResolution(mc);
             final int gap = 40;

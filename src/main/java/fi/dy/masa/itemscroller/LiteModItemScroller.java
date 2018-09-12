@@ -3,29 +3,25 @@ package fi.dy.masa.itemscroller;
 import java.io.File;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.input.Keyboard;
 import com.mojang.realmsclient.dto.RealmsServer;
 import com.mumfrey.liteloader.Configurable;
-import com.mumfrey.liteloader.InitCompleteListener;
 import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.Tickable;
-import com.mumfrey.liteloader.core.LiteLoader;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.ItemScrollerConfigPanel;
-import fi.dy.masa.itemscroller.event.InputEventHandler;
+import fi.dy.masa.itemscroller.event.InputHandler;
+import fi.dy.masa.itemscroller.event.KeybindCallbacks;
+import fi.dy.masa.malilib.config.ConfigManager;
+import fi.dy.masa.malilib.event.InputEventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.play.server.SPacketJoinGame;
 
-public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteListener, JoinGameListener, Tickable
+public class LiteModItemScroller implements LiteMod, Configurable, JoinGameListener, Tickable
 {
-    public static final KeyBinding KEY_DISABLE = new KeyBinding("itemscroller.desc.toggledisable", Keyboard.KEY_N, "itemscroller.category");
-    public static final KeyBinding KEY_RECIPE = new KeyBinding("itemscroller.desc.recipe", Keyboard.KEY_S, "itemscroller.category");
-
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
     public LiteModItemScroller()
@@ -53,7 +49,13 @@ public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteL
     @Override
     public void init(File configPath)
     {
-        Configs.load();
+        Configs.loadFromFile();
+        ConfigManager.getInstance().registerConfigHandler(Reference.MOD_ID, new Configs());
+
+        InputHandler handler = new InputHandler();
+        InputEventHandler.getInstance().registerKeybindProvider(handler);
+        InputEventHandler.getInstance().registerKeyboardInputHandler(handler);
+        InputEventHandler.getInstance().registerMouseInputHandler(handler);
     }
 
     @Override
@@ -62,21 +64,14 @@ public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteL
     }
 
     @Override
-    public void onInitCompleted(Minecraft minecraft, LiteLoader loader)
-    {
-        LiteLoader.getInput().registerKeyBinding(KEY_DISABLE);
-        LiteLoader.getInput().registerKeyBinding(KEY_RECIPE);
-    }
-
-    @Override
     public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
     {
-        InputEventHandler.getInstance().onWorldChanged();
+        KeybindCallbacks.getInstance().onWorldChanged();
     }
 
     @Override
     public void onTick(Minecraft mc, float partialTicks, boolean inGame, boolean clock)
     {
-        InputEventHandler.getInstance().onTick(mc);
+        KeybindCallbacks.getInstance().onTick(mc);
     }
 }
