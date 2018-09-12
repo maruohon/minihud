@@ -5,9 +5,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.mojang.realmsclient.dto.RealmsServer;
 import com.mumfrey.liteloader.Configurable;
+import com.mumfrey.liteloader.InitCompleteListener;
 import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.Tickable;
+import com.mumfrey.liteloader.core.LiteLoader;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.ItemScrollerConfigPanel;
@@ -20,7 +22,7 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.play.server.SPacketJoinGame;
 
-public class LiteModItemScroller implements LiteMod, Configurable, JoinGameListener, Tickable
+public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteListener, JoinGameListener, Tickable
 {
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
@@ -61,6 +63,12 @@ public class LiteModItemScroller implements LiteMod, Configurable, JoinGameListe
     @Override
     public void upgradeSettings(String version, File configPath, File oldConfigPath)
     {
+    }
+
+    @Override
+    public void onInitCompleted(Minecraft mc, LiteLoader loader)
+    {
+        KeybindCallbacks.getInstance().setCallbacks();
     }
 
     @Override

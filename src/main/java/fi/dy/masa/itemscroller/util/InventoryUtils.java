@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Configs.Toggles;
@@ -45,12 +44,13 @@ import net.minecraft.world.World;
 
 public class InventoryUtils
 {
+    private static boolean dragging;
     private static int lastPosX;
     private static int lastPosY;
     private static int slotNumberLast;
     private static final Set<Integer> DRAGGED_SLOTS = new HashSet<Integer>();
-    private static WeakReference<Slot> sourceSlotCandidate = new WeakReference<Slot>(null);
-    private static WeakReference<Slot> sourceSlot = new WeakReference<Slot>(null);
+    private static WeakReference<Slot> sourceSlotCandidate = null;
+    private static WeakReference<Slot> sourceSlot = null;
     private static ItemStack stackInCursorLast = InventoryUtils.EMPTY_STACK;
 
     public static void onSlotChangedCraftingGrid(World world, EntityPlayer player, InventoryCrafting inventoryCrafting, InventoryCraftResult inventoryCraftResult)
@@ -253,21 +253,25 @@ public class InventoryUtils
             // Updating these here is part of the fix to preventing a drag after shift + place
             lastPosX = mouseX;
             lastPosY = mouseY;
+            stopDragging();
+
             return false;
         }
 
         MoveType type = InputUtils.getDragMoveType(mc);
         MoveAmount amount = InputUtils.getDragMoveAmount(type, mc);
         boolean cancel = false;
+        System.out.printf("dragMoveItems() type: %s, amount: %s\n", type, amount);
 
         if (isClick)
         {
             // Reset this or the method call won't do anything...
             slotNumberLast = -1;
+            dragging = true;
             cancel = dragMoveFromSlotAtPosition(gui, mouseX, mouseY, type, amount);
         }
 
-        if (cancel == false)
+        if (dragging && cancel == false)
         {
             int distX = mouseX - lastPosX;
             int distY = mouseY - lastPosY;
@@ -333,15 +337,13 @@ public class InventoryUtils
             slotNumberLast = -1;
         }
 
-        boolean leftButtonDown = Mouse.isButtonDown(0);
-        boolean rightButtonDown = Mouse.isButtonDown(1);
-
-        if (leftButtonDown == false && rightButtonDown == false)
-        {
-            DRAGGED_SLOTS.clear();
-        }
-
         return cancel;
+    }
+
+    public static void stopDragging()
+    {
+        DRAGGED_SLOTS.clear();
+        dragging = false;
     }
 
     private static boolean dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y, MoveType type, MoveAmount amount)
@@ -508,7 +510,7 @@ public class InventoryUtils
     {
         ItemStack stackReference = Minecraft.getMinecraft().player.inventory.getItemStack();
 
-        if (isStackEmpty(stackReference) == false)
+        if (isStackEmpty(stackReference) == false && sourceSlot != null)
         {
             stackReference = stackReference.copy();
 
@@ -554,8 +556,11 @@ public class InventoryUtils
                 stack = new ItemStack(stackCursor.getItem(), getStackSize(stackCursor), stackCursor.getMetadata());
             }
 
+            // Store the candidate
+            // NOTE: This method is called BEFORE the stack has been picked up to the cursor!
+            // Thus we can't check that there is an item already in the cursor, and that's why this is just a "candidate"
+            sourceSlotCandidate = new WeakReference<>(slot);
             stackInCursorLast = stack;
-            sourceSlotCandidate = new WeakReference<Slot>(slot);
         }
     }
 
@@ -568,9 +573,9 @@ public class InventoryUtils
 
         // Picked up or swapped items to the cursor, grab a reference to the slot that the items came from
         // Note that we are only checking the item and metadata here!
-        if (isStackEmpty(stackCursor) == false && stackCursor.isItemEqual(stackInCursorLast) == false)
+        if (isStackEmpty(stackCursor) == false && stackCursor.isItemEqual(stackInCursorLast) == false && sourceSlotCandidate != null)
         {
-            sourceSlot = new WeakReference<Slot>(sourceSlotCandidate.get());
+            sourceSlot = new WeakReference<>(sourceSlotCandidate.get());
         }
     }
 

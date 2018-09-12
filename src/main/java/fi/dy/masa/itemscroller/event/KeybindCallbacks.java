@@ -1,6 +1,5 @@
 package fi.dy.masa.itemscroller.event;
 
-import org.lwjgl.input.Keyboard;
 import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Hotkeys;
@@ -9,6 +8,7 @@ import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
+import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
@@ -34,6 +34,14 @@ public class KeybindCallbacks implements IHotkeyCallback
 
     private KeybindCallbacks()
     {
+    }
+
+    public void setCallbacks()
+    {
+        for (ConfigHotkey hotkey : Hotkeys.HOTKEY_LIST)
+        {
+            hotkey.getKeybind().setCallback(this);
+        }
     }
 
     public boolean functionalityEnabled()
@@ -64,8 +72,10 @@ public class KeybindCallbacks implements IHotkeyCallback
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (mc == null || mc.player == null || (mc.currentScreen instanceof GuiContainer) == false || Keyboard.getEventKeyState() == false)
+        System.out.printf("callbacks start\n");
+        if (mc == null || mc.player == null || (mc.currentScreen instanceof GuiContainer) == false)
         {
+            System.out.printf("callbacks abort\n");
             return false;
         }
 
@@ -79,17 +89,20 @@ public class KeybindCallbacks implements IHotkeyCallback
             if (Configs.Toggles.OFFHAND_SWAP.getBooleanValue() &&
                 (gui instanceof GuiInventory) && slot != null)
             {
+                System.out.printf("callbacks KEY_MOVE_STACK_TO_OFFHAND\n");
                 InventoryUtils.swapSlots(gui, slot.slotNumber, 45);
                 return true;
             }
         }
         else if (key == Hotkeys.KEY_CRAFT_EVERYTHING.getKeybind())
         {
+            System.out.printf("callbacks KEY_CRAFT_EVERYTHING\n");
             InventoryUtils.craftEverythingPossibleWithCurrentRecipe(recipes.getSelectedRecipe(), gui);
             return true;
         }
         else if (key == Hotkeys.KEY_THROW_CRAFT_RESULTS.getKeybind())
         {
+            System.out.printf("callbacks KEY_THROW_CRAFT_RESULTS\n");
             InventoryUtils.throwAllCraftingResultsToGround(recipes.getSelectedRecipe(), gui);
             return true;
         }
@@ -100,16 +113,19 @@ public class KeybindCallbacks implements IHotkeyCallback
         }
         else if (key == Hotkeys.KEY_DROP_ALL_MATCHING.getKeybind())
         {
+            System.out.printf("callbacks KEY_DROP_ALL_MATCHING 1, slot: %s\n", slot);
             if (Configs.Toggles.DROP_MATCHING.getBooleanValue() &&
-                Configs.GUI_BLACKLIST.contains(gui.getClass().getName()) &&
+                Configs.GUI_BLACKLIST.contains(gui.getClass().getName()) == false &&
                 slot != null && slot.getHasStack())
             {
+                System.out.printf("callbacks KEY_DROP_ALL_MATCHING 2\n");
                 InventoryUtils.dropStacks(gui, slot.getStack(), slot, true);
                 return true;
             }
         }
         else if (key == Hotkeys.KEY_MAIN_TOGGLE.getKeybind())
         {
+            System.out.printf("callbacks KEY_MAIN_TOGGLE\n");
             this.disabled = ! this.disabled;
 
             if (this.disabled)
@@ -125,6 +141,7 @@ public class KeybindCallbacks implements IHotkeyCallback
         }
         else if (key == Hotkeys.KEY_SLOT_DEBUG.getKeybind())
         {
+            System.out.printf("callbacks KEY_SLOT_DEBUG\n");
             if (slot != null)
             {
                 InventoryUtils.debugPrintSlotInfo(gui, slot);
@@ -142,9 +159,11 @@ public class KeybindCallbacks implements IHotkeyCallback
                  (key == Hotkeys.KEY_DRAG_LEAVE_ONE.getKeybind() && Configs.Toggles.DRAG_MOVE_LEAVE_ONE.getBooleanValue()) ||
                  (key == Hotkeys.KEY_DRAG_MOVE_ONE.getKeybind() && Configs.Toggles.DRAG_MOVE_ONE.getBooleanValue()))
         {
+            System.out.printf("callbacks dragMoveItems\n");
             return InventoryUtils.dragMoveItems(gui, mc, true);
         }
 
+        System.out.printf("callbacks end\n");
         return false;
     }
 

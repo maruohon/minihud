@@ -57,6 +57,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         Minecraft mc = Minecraft.getMinecraft();
         boolean cancel = false;
 
+        System.out.printf("onMouseInput()\n");
         if (KeybindCallbacks.getInstance().functionalityEnabled() &&
             mc != null &&
             mc.player != null &&
@@ -111,6 +112,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
                 if (eventButtonState && (isLeftClick || isRightClick))
                 {
+                    System.out.printf("storeSourceSlotCandidate\n");
                     InventoryUtils.storeSourceSlotCandidate(slot, mc);
                 }
 
@@ -118,18 +120,21 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                     isRightClick && eventButtonState &&
                     InventoryUtils.isCraftingSlot(gui, slot))
                 {
+                    System.out.printf("RIGHT_CLICK_CRAFT_STACK\n");
                     InventoryUtils.rightClickCraftOneStack(gui);
                 }
                 else if (Configs.Toggles.SHIFT_PLACE_ITEMS.getBooleanValue() &&
                          isLeftClick && isShiftDown &&
                          InventoryUtils.canShiftPlaceItems(gui))
                 {
+                    System.out.printf("SHIFT_PLACE_ITEMS\n");
                     cancel |= InventoryUtils.shiftPlaceItems(slot, gui);
                 }
                 else if (Configs.Toggles.SHIFT_DROP_ITEMS.getBooleanValue() &&
                          isLeftClick && isShiftDown &&
                          InputUtils.canShiftDropItems(gui, mc))
                 {
+                    System.out.printf("SHIFT_DROP_ITEMS\n");
                     cancel |= InventoryUtils.shiftDropItems(gui);
                 }
                 else if (Configs.Toggles.CLICK_MOVE_EVERYTHING.getBooleanValue() &&
@@ -137,6 +142,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                          isLeftClick && eventButtonState &&
                          slot != null && InventoryUtils.isStackEmpty(slot.getStack()) == false)
                 {
+                    System.out.printf("CLICK_MOVE_EVERYTHING\n");
                     InventoryUtils.tryMoveStacks(slot, gui, false, true, false);
                     cancel = true;
                 }
@@ -145,20 +151,27 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                          isLeftClick && eventButtonState &&
                          slot != null && InventoryUtils.isStackEmpty(slot.getStack()) == false)
                 {
+                    System.out.printf("CLICK_MOVE_MATCHING\n");
                     InventoryUtils.tryMoveStacks(slot, gui, true, true, false);
                     cancel = true;
                 }
                 else if (isLeftClick && eventButtonState && InputUtils.shouldMoveVertically())
                 {
+                    System.out.printf("tryMoveItemsVertically\n");
                     MoveType type = InputUtils.getDragMoveType(mc);
                     MoveAmount amount = InputUtils.getDragMoveAmount(type, mc);
                     InventoryUtils.tryMoveItemsVertically(gui, slot, Keyboard.isKeyDown(Keyboard.KEY_W), amount);
                     InventoryUtils.resetLastSlotNumber();
                     cancel = true;
                 }
-                else
+                else if (Hotkeys.KEY_DRAG_DROP_SINGLE.getKeybind().isKeybindHeld() == false &&
+                         Hotkeys.KEY_DRAG_DROP_STACKS.getKeybind().isKeybindHeld() == false &&
+                         Hotkeys.KEY_DRAG_FULL_STACKS.getKeybind().isKeybindHeld() == false &&
+                         Hotkeys.KEY_DRAG_LEAVE_ONE.getKeybind().isKeybindHeld() == false &&
+                         Hotkeys.KEY_DRAG_MOVE_ONE.getKeybind().isKeybindHeld() == false)
                 {
-                    cancel |= this.handleDragging(gui, mc, true);
+                    System.out.printf("onMouseInput() stopDragging\n");
+                    InventoryUtils.stopDragging();
                 }
             }
 
@@ -194,7 +207,13 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             (Hotkeys.KEY_DRAG_DROP_SINGLE.getKeybind().isKeybindHeld() && Configs.Toggles.DRAG_DROP_SINGLE.getBooleanValue()) ||
             (Hotkeys.KEY_DRAG_DROP_STACKS.getKeybind().isKeybindHeld() && Configs.Toggles.DRAG_DROP_STACKS.getBooleanValue()))
         {
+            System.out.printf("handleDragging()\n");
             return InventoryUtils.dragMoveItems(gui, mc, false);
+        }
+        else
+        {
+            System.out.printf("handleDragging() stopDragging\n");
+            InventoryUtils.stopDragging();
         }
 
         return false;
