@@ -49,7 +49,7 @@ public class InventoryUtils
     private static final Set<Integer> DRAGGED_SLOTS = new HashSet<Integer>();
     private static WeakReference<Slot> sourceSlotCandidate = null;
     private static WeakReference<Slot> sourceSlot = null;
-    private static ItemStack stackInCursorLast = InventoryUtils.EMPTY_STACK;
+    private static ItemStack stackInCursorLast = ItemStack.EMPTY;
 
     public static void onSlotChangedCraftingGrid(World world, EntityPlayer player, InventoryCrafting inventoryCrafting, InventoryCraftResult inventoryCraftResult)
     {
