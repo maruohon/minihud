@@ -49,16 +49,8 @@ public class Configs implements IConfigHandler
 
     public static class Toggles
     {
-        public static final ConfigBoolean CLICK_MOVE_MATCHING       = new ConfigBoolean("enableClickMovingMatchingStacks",  true, "Enables moving all matching stacks while clicking\nwith the modifier key active.");
-        public static final ConfigBoolean CLICK_MOVE_EVERYTHING     = new ConfigBoolean("enableClickMovingEverything",      true, "Enables moving all items while clicking\nwith the modifier key active.");
         public static final ConfigBoolean CRAFTING_FEATURES         = new ConfigBoolean("enableCraftingFeatures",           true, "Enables scrolling items to and from crafting grids,\nwith a built-in 18 recipe memory.\nHold down the Recipe key to see the stored recipes and\nto change the selection. While holding the Recipe key,\nyou can either scroll or press a number key to change the selection.\nA recipe is stored to the currently selected \"recipe slot\"\n by clicking pick block over a configured crafting output slot.\nThe supported crafting grids must be added to the scrollableCraftingGrids list.");
         public static final ConfigBoolean DROP_MATCHING             = new ConfigBoolean("enableDropkeyDropMatching",        true, "Enables dropping all matching items from the same\ninventory with the hotkey");
-        public static final ConfigBoolean DRAG_DROP_SINGLE          = new ConfigBoolean("enableDragDropSingle",             true, "Enables dropping single items when holding down the\nkeyDragDropSingle key and then dragging over slots");
-        public static final ConfigBoolean DRAG_DROP_STACKS          = new ConfigBoolean("enableDragDropStacks",             true, "Enables dropping entire stacks when holding down the\nkeyDragDropStacks key and then dragging over slots");
-        public static final ConfigBoolean DRAG_MOVE_STACKS          = new ConfigBoolean("enableDragMovingFullStacks",       true, "Enables moving entire stacks of items by holding down the\nkeyDragMoveStacks key and dragging over slots");
-        public static final ConfigBoolean DRAG_MOVE_LEAVE_ONE       = new ConfigBoolean("enableDragMovingLeaveOne",         true, "Enables moving everything but the last item\nfrom all stacks by holding down the keyDragMoveLeaveOne\nkey and dragging over slots");
-        public static final ConfigBoolean DRAG_MOVE_ONE             = new ConfigBoolean("enableDragMovingMoveOne",          true, "Enables moving one item from all stacks by holding down the\nkeyDragMoveOne key and dragging over slots");
-        public static final ConfigBoolean OFFHAND_SWAP              = new ConfigBoolean("enableOffHandSwap",                true, "Enables using the moveStackToOffhand key to swap\nthe hovered stack to the offhand while\nin the regular player inventory");
         public static final ConfigBoolean RIGHT_CLICK_CRAFT_STACK   = new ConfigBoolean("enableRightClickCraftingOneStack", true, "Enables crafting up to one full stack when right clicking on\na slot that has been configured as a crafting output slot.");
         public static final ConfigBoolean SCROLL_EVERYTHING         = new ConfigBoolean("enableScrollingEverything",        true, "Enables scroll moving all items at once while\nholding the modifierMoveEverything keybind");
         public static final ConfigBoolean SCROLL_MATCHING           = new ConfigBoolean("enableScrollingMatchingStacks",    true, "Enables scroll moving all matching stacks at once\nwhile holding the modifierMoveMatching keybind");
@@ -68,19 +60,10 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean SCROLL_VILLAGER           = new ConfigBoolean("enableScrollingVillager",          true, "Enables special handling for the Villager GUIs.\n(Normally you can't shift click items in them.)\nHold shift and scroll up/down over the trade output slot.");
         public static final ConfigBoolean SHIFT_DROP_ITEMS          = new ConfigBoolean("enableShiftDropItems",             true, "Enables dropping all matching items at once by holding\nshift while clicking to drop a stack");
         public static final ConfigBoolean SHIFT_PLACE_ITEMS         = new ConfigBoolean("enableShiftPlaceItems",            true, "Enables moving all matching stacks at once by holding\nshift while placing items to an empty slot");
-        public static final ConfigBoolean WS_CLICKING               = new ConfigBoolean("enableWSClicking",                 true, "Enables moving items up or down in the inventory while\nholding down W or S and then clicking (+ dragging)");
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
-                CLICK_MOVE_MATCHING,
-                CLICK_MOVE_EVERYTHING,
                 CRAFTING_FEATURES,
                 DROP_MATCHING,
-                DRAG_DROP_SINGLE,
-                DRAG_DROP_STACKS,
-                DRAG_MOVE_STACKS,
-                DRAG_MOVE_LEAVE_ONE,
-                DRAG_MOVE_ONE,
-                OFFHAND_SWAP,
                 RIGHT_CLICK_CRAFT_STACK,
                 SCROLL_EVERYTHING,
                 SCROLL_MATCHING,
@@ -89,8 +72,7 @@ public class Configs implements IConfigHandler
                 SCROLL_STACKS_FALLBACK,
                 SCROLL_VILLAGER,
                 SHIFT_DROP_ITEMS,
-                SHIFT_PLACE_ITEMS,
-                WS_CLICKING
+                SHIFT_PLACE_ITEMS
         );
     }
 

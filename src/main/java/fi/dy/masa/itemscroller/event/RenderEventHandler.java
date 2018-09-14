@@ -39,7 +39,7 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (InputUtils.isRecipeViewOpen() && mc.currentScreen instanceof GuiContainer)
+        if (mc.currentScreen instanceof GuiContainer && InputUtils.isRecipeViewOpen())
         {
             GuiContainer gui = (GuiContainer) mc.currentScreen;
             RecipeStorage recipes = KeybindCallbacks.getInstance().getRecipes();
@@ -57,7 +57,7 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (InputUtils.isRecipeViewOpen() && mc.currentScreen instanceof GuiContainer)
+        if (mc.currentScreen instanceof GuiContainer && InputUtils.isRecipeViewOpen())
         {
             GuiContainer gui = (GuiContainer) mc.currentScreen;
             RecipeStorage recipes = KeybindCallbacks.getInstance().getRecipes();

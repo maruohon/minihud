@@ -2,10 +2,10 @@ package fi.dy.masa.itemscroller.util;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import fi.dy.masa.itemscroller.config.Configs.Toggles;
 import fi.dy.masa.itemscroller.config.Hotkeys;
+import fi.dy.masa.itemscroller.event.KeybindCallbacks;
+import fi.dy.masa.malilib.hotkeys.IKeybind;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 
@@ -29,7 +29,7 @@ public class InputUtils
 
     public static boolean isRecipeViewOpen()
     {
-        return Hotkeys.KEY_RECIPE_VIEW.getKeybind().isKeybindHeld();
+        return Hotkeys.KEY_RECIPE_VIEW.getKeybind().isKeybindHeld() && KeybindCallbacks.getInstance().functionalityEnabled();
     }
 
     public static boolean canShiftDropItems(GuiContainer gui, Minecraft mc)
@@ -50,93 +50,94 @@ public class InputUtils
         return false;
     }
 
-    public static MoveType getDragMoveType(Minecraft mc)
+    public static MoveAction getDragMoveAction(IKeybind key)
     {
-        boolean leftButtonDown = Mouse.isButtonDown(0);
-        boolean rightButtonDown = Mouse.isButtonDown(1);
-        boolean isShiftDown = GuiScreen.isShiftKeyDown();
-        boolean isControlDown = GuiScreen.isCtrlKeyDown();
-        boolean eitherMouseButtonDown = leftButtonDown || rightButtonDown;
+             if (key == Hotkeys.KEY_DRAG_FULL_STACKS.getKeybind())      { return MoveAction.MOVE_TO_OTHER_STACKS;       }
+        else if (key == Hotkeys.KEY_DRAG_LEAVE_ONE.getKeybind())        { return MoveAction.MOVE_TO_OTHER_LEAVE_ONE;    }
+        else if (key == Hotkeys.KEY_DRAG_MOVE_ONE.getKeybind())         { return MoveAction.MOVE_TO_OTHER_MOVE_ONE;     }
+        else if (key == Hotkeys.KEY_DRAG_MATCHING.getKeybind())         { return MoveAction.MOVE_TO_OTHER_MATCHING;     }
 
-        // Only one of the mouse buttons is down, and only one of shift or control is down
-        if (leftButtonDown ^ rightButtonDown)
-        {
-            if (shouldMoveVertically())
-            {
-                if (Keyboard.isKeyDown(Keyboard.KEY_W))
-                {
-                    return MoveType.MOVE_UP;
-                }
-                else if (Keyboard.isKeyDown(Keyboard.KEY_S))
-                {
-                    return MoveType.MOVE_DOWN;
-                }
-            }
-            else if (isShiftDown ^ isControlDown)
-            {
-                boolean dropKeyDown = isKeybindHeld(mc.gameSettings.keyBindDrop.getKeyCode());
+        else if (key == Hotkeys.KEY_DRAG_DROP_STACKS.getKeybind())      { return MoveAction.DROP_STACKS;                }
+        else if (key == Hotkeys.KEY_DRAG_DROP_LEAVE_ONE.getKeybind())   { return MoveAction.DROP_LEAVE_ONE;             }
+        else if (key == Hotkeys.KEY_DRAG_DROP_SINGLE.getKeybind())      { return MoveAction.DROP_ONE;                   }
 
-                if (dropKeyDown &&
-                    ((isShiftDown && Toggles.DRAG_DROP_STACKS.getBooleanValue()) ||
-                     (isControlDown && Toggles.DRAG_DROP_SINGLE.getBooleanValue())))
-                {
-                    return MoveType.DROP;
-                }
-                else if ((isShiftDown && leftButtonDown && Toggles.DRAG_MOVE_STACKS.getBooleanValue()) ||
-                    (isShiftDown && rightButtonDown && Toggles.DRAG_MOVE_LEAVE_ONE.getBooleanValue()) ||
-                    (isControlDown && eitherMouseButtonDown && Toggles.DRAG_MOVE_ONE.getBooleanValue()))
-                {
-                    return MoveType.MOVE_TO_OTHER;
-                }
-            }
-        }
+        else if (key == Hotkeys.KEY_WS_MOVE_UP_STACKS.getKeybind())     { return MoveAction.MOVE_UP_STACKS;             }
+        else if (key == Hotkeys.KEY_WS_MOVE_UP_MATCHING.getKeybind())   { return MoveAction.MOVE_UP_MATCHING;           }
+        else if (key == Hotkeys.KEY_WS_MOVE_UP_LEAVE_ONE.getKeybind())  { return MoveAction.MOVE_UP_LEAVE_ONE;          }
+        else if (key == Hotkeys.KEY_WS_MOVE_UP_SINGLE.getKeybind())     { return MoveAction.MOVE_UP_MOVE_ONE;           }
+        else if (key == Hotkeys.KEY_WS_MOVE_DOWN_STACKS.getKeybind())   { return MoveAction.MOVE_DOWN_STACKS;           }
+        else if (key == Hotkeys.KEY_WS_MOVE_DOWN_MATCHING.getKeybind()) { return MoveAction.MOVE_DOWN_MATCHING;         }
+        else if (key == Hotkeys.KEY_WS_MOVE_DOWN_LEAVE_ONE.getKeybind()){ return MoveAction.MOVE_DOWN_LEAVE_ONE;        }
+        else if (key == Hotkeys.KEY_WS_MOVE_DOWN_SINGLE.getKeybind())   { return MoveAction.MOVE_DOWN_MOVE_ONE;         }
 
-        return MoveType.INVALID;
+        return MoveAction.NONE;
     }
 
-    public static MoveAmount getDragMoveAmount(MoveType type, Minecraft mc)
+    public static boolean isActionKeyActive(MoveAction action)
     {
-        boolean leftButtonDown = Mouse.isButtonDown(0);
-        boolean rightButtonDown = Mouse.isButtonDown(1);
-        boolean isShiftDown = GuiScreen.isShiftKeyDown();
-        boolean isControlDown = GuiScreen.isCtrlKeyDown();
-
-        // Only one of the mouse buttons is down, and only one of shift or control is down
-        if (leftButtonDown ^ rightButtonDown)
+        switch (action)
         {
-            if (isShiftDown ^ isControlDown)
-            {
-                if (isControlDown && isShiftDown == false)
-                {
-                    return MoveAmount.MOVE_ONE;
-                }
-                else if (rightButtonDown && isShiftDown)
-                {
-                    return MoveAmount.LEAVE_ONE;
-                }
-                else if (leftButtonDown && isShiftDown)
-                {
-                    return MoveAmount.MOVE_ALL;
-                }
-            }
-            // Allow moving entire stacks with just W or S down, (without Shift),
-            // but only when first clicking the left button down, and when not holding Control
-            else if (leftButtonDown &&
-                     isShiftDown == false &&
-                     isControlDown == false &&
-                     (type == MoveType.MOVE_UP || type == MoveType.MOVE_DOWN) &&
-                     Mouse.getEventButtonState())
-            {
-                return MoveAmount.MOVE_ALL;
-            }
+            case MOVE_TO_OTHER_STACKS:          return Hotkeys.KEY_DRAG_FULL_STACKS.getKeybind().isKeybindHeld();
+            case MOVE_TO_OTHER_LEAVE_ONE:       return Hotkeys.KEY_DRAG_LEAVE_ONE.getKeybind().isKeybindHeld();
+            case MOVE_TO_OTHER_MOVE_ONE:        return Hotkeys.KEY_DRAG_MOVE_ONE.getKeybind().isKeybindHeld();
+            case MOVE_TO_OTHER_MATCHING:        return Hotkeys.KEY_DRAG_MATCHING.getKeybind().isKeybindHeld();
+            case MOVE_TO_OTHER_EVERYTHING:      return Hotkeys.KEY_MOVE_EVERYTHING.getKeybind().isKeybindHeld();
+            case DROP_STACKS:                   return Hotkeys.KEY_DRAG_DROP_STACKS.getKeybind().isKeybindHeld();
+            case DROP_LEAVE_ONE:                return Hotkeys.KEY_DRAG_DROP_LEAVE_ONE.getKeybind().isKeybindHeld();
+            case DROP_ONE:                      return Hotkeys.KEY_DRAG_DROP_SINGLE.getKeybind().isKeybindHeld();
+            case MOVE_UP_STACKS:                return Hotkeys.KEY_WS_MOVE_UP_STACKS.getKeybind().isKeybindHeld();
+            case MOVE_UP_MATCHING:              return Hotkeys.KEY_WS_MOVE_UP_MATCHING.getKeybind().isKeybindHeld();
+            case MOVE_UP_LEAVE_ONE:             return Hotkeys.KEY_WS_MOVE_UP_LEAVE_ONE.getKeybind().isKeybindHeld();
+            case MOVE_UP_MOVE_ONE:              return Hotkeys.KEY_WS_MOVE_UP_SINGLE.getKeybind().isKeybindHeld();
+            case MOVE_DOWN_STACKS:              return Hotkeys.KEY_WS_MOVE_DOWN_STACKS.getKeybind().isKeybindHeld();
+            case MOVE_DOWN_MATCHING:            return Hotkeys.KEY_WS_MOVE_DOWN_MATCHING.getKeybind().isKeybindHeld();
+            case MOVE_DOWN_LEAVE_ONE:           return Hotkeys.KEY_WS_MOVE_DOWN_LEAVE_ONE.getKeybind().isKeybindHeld();
+            case MOVE_DOWN_MOVE_ONE:            return Hotkeys.KEY_WS_MOVE_DOWN_SINGLE.getKeybind().isKeybindHeld();
+            default:
         }
 
-        return MoveAmount.INVALID;
+        return false;
     }
 
-    public static boolean shouldMoveVertically()
+    public static MoveAmount getMoveAmount(MoveAction action)
     {
-        return Toggles.WS_CLICKING.getBooleanValue() && (Keyboard.isKeyDown(Keyboard.KEY_W) || Keyboard.isKeyDown(Keyboard.KEY_S));
+        switch (action)
+        {
+            case SCROLL_TO_OTHER_MOVE_ONE:
+            case MOVE_TO_OTHER_MOVE_ONE:
+            case DROP_ONE:
+            case MOVE_DOWN_MOVE_ONE:
+            case MOVE_UP_MOVE_ONE:
+                return MoveAmount.MOVE_ONE;
+
+            case MOVE_TO_OTHER_LEAVE_ONE:
+            case DROP_LEAVE_ONE:
+            case MOVE_DOWN_LEAVE_ONE:
+            case MOVE_UP_LEAVE_ONE:
+                return MoveAmount.LEAVE_ONE;
+
+            case SCROLL_TO_OTHER_STACKS:
+            case MOVE_TO_OTHER_STACKS:
+            case DROP_STACKS:
+            case MOVE_DOWN_STACKS:
+            case MOVE_UP_STACKS:
+                return MoveAmount.FULL_STACKS;
+
+            case SCROLL_TO_OTHER_MATCHING:
+            case MOVE_TO_OTHER_MATCHING:
+            case DROP_ALL_MATCHING:
+            case MOVE_UP_MATCHING:
+            case MOVE_DOWN_MATCHING:
+                return MoveAmount.ALL_MATCHING;
+
+            case MOVE_TO_OTHER_EVERYTHING:
+            case SCROLL_TO_OTHER_EVERYTHING:
+                return MoveAmount.EVERYTHING;
+
+            default:
+        }
+
+        return MoveAmount.NONE;
     }
 
     public static boolean isKeybindHeld(int keyCode)

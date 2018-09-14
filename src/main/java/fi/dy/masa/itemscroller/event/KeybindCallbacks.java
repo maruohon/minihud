@@ -7,7 +7,9 @@ import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
+import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
+import fi.dy.masa.itemscroller.util.MoveAction;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
@@ -72,60 +74,8 @@ public class KeybindCallbacks implements IHotkeyCallback
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        System.out.printf("callbacks start\n");
-        if (mc == null || mc.player == null || (mc.currentScreen instanceof GuiContainer) == false)
+        if (key == Hotkeys.KEY_MAIN_TOGGLE.getKeybind())
         {
-            System.out.printf("callbacks abort\n");
-            return false;
-        }
-
-        GuiContainer gui = (GuiContainer) mc.currentScreen;
-        Slot slot = AccessorUtils.getSlotUnderMouse(gui);
-        RecipeStorage recipes = this.getRecipes();
-
-        if (key == Hotkeys.KEY_MOVE_STACK_TO_OFFHAND.getKeybind())
-        {
-            // Swap the hovered stack to the Offhand
-            if (Configs.Toggles.OFFHAND_SWAP.getBooleanValue() &&
-                (gui instanceof GuiInventory) && slot != null)
-            {
-                System.out.printf("callbacks KEY_MOVE_STACK_TO_OFFHAND\n");
-                InventoryUtils.swapSlots(gui, slot.slotNumber, 45);
-                return true;
-            }
-        }
-        else if (key == Hotkeys.KEY_CRAFT_EVERYTHING.getKeybind())
-        {
-            System.out.printf("callbacks KEY_CRAFT_EVERYTHING\n");
-            InventoryUtils.craftEverythingPossibleWithCurrentRecipe(recipes.getSelectedRecipe(), gui);
-            return true;
-        }
-        else if (key == Hotkeys.KEY_THROW_CRAFT_RESULTS.getKeybind())
-        {
-            System.out.printf("callbacks KEY_THROW_CRAFT_RESULTS\n");
-            InventoryUtils.throwAllCraftingResultsToGround(recipes.getSelectedRecipe(), gui);
-            return true;
-        }
-        else if (key == Hotkeys.KEY_MOVE_CRAFT_RESULTS.getKeybind())
-        {
-            InventoryUtils.moveAllCraftingResultsToOtherInventory(recipes.getSelectedRecipe(), gui);
-            return true;
-        }
-        else if (key == Hotkeys.KEY_DROP_ALL_MATCHING.getKeybind())
-        {
-            System.out.printf("callbacks KEY_DROP_ALL_MATCHING 1, slot: %s\n", slot);
-            if (Configs.Toggles.DROP_MATCHING.getBooleanValue() &&
-                Configs.GUI_BLACKLIST.contains(gui.getClass().getName()) == false &&
-                slot != null && slot.getHasStack())
-            {
-                System.out.printf("callbacks KEY_DROP_ALL_MATCHING 2\n");
-                InventoryUtils.dropStacks(gui, slot.getStack(), slot, true);
-                return true;
-            }
-        }
-        else if (key == Hotkeys.KEY_MAIN_TOGGLE.getKeybind())
-        {
-            System.out.printf("callbacks KEY_MAIN_TOGGLE\n");
             this.disabled = ! this.disabled;
 
             if (this.disabled)
@@ -139,9 +89,62 @@ public class KeybindCallbacks implements IHotkeyCallback
 
             return true;
         }
+
+        if (this.disabled || mc == null || mc.player == null || (mc.currentScreen instanceof GuiContainer) == false)
+        {
+            return false;
+        }
+
+        GuiContainer gui = (GuiContainer) mc.currentScreen;
+        Slot slot = AccessorUtils.getSlotUnderMouse(gui);
+        RecipeStorage recipes = this.getRecipes();
+        MoveAction moveAction = InputUtils.getDragMoveAction(key);
+
+        if (moveAction != MoveAction.NONE)
+        {
+            return InventoryUtils.dragMoveItems(gui, mc, moveAction, true);
+        }
+        else if (key == Hotkeys.KEY_MOVE_EVERYTHING.getKeybind())
+        {
+            InventoryUtils.tryMoveStacks(slot, gui, false, true, false);
+            return true;
+        }
+        else if (key == Hotkeys.KEY_CRAFT_EVERYTHING.getKeybind())
+        {
+            InventoryUtils.craftEverythingPossibleWithCurrentRecipe(recipes.getSelectedRecipe(), gui);
+            return true;
+        }
+        else if (key == Hotkeys.KEY_THROW_CRAFT_RESULTS.getKeybind())
+        {
+            InventoryUtils.throwAllCraftingResultsToGround(recipes.getSelectedRecipe(), gui);
+            return true;
+        }
+        else if (key == Hotkeys.KEY_MOVE_CRAFT_RESULTS.getKeybind())
+        {
+            InventoryUtils.moveAllCraftingResultsToOtherInventory(recipes.getSelectedRecipe(), gui);
+            return true;
+        }
+        else if (key == Hotkeys.KEY_DROP_ALL_MATCHING.getKeybind())
+        {
+            if (Configs.Toggles.DROP_MATCHING.getBooleanValue() &&
+                Configs.GUI_BLACKLIST.contains(gui.getClass().getName()) == false &&
+                slot != null && slot.getHasStack())
+            {
+                InventoryUtils.dropStacks(gui, slot.getStack(), slot, true);
+                return true;
+            }
+        }
+        else if (key == Hotkeys.KEY_MOVE_STACK_TO_OFFHAND.getKeybind())
+        {
+            // Swap the hovered stack to the Offhand
+            if ((gui instanceof GuiInventory) && slot != null)
+            {
+                InventoryUtils.swapSlots(gui, slot.slotNumber, 45);
+                return true;
+            }
+        }
         else if (key == Hotkeys.KEY_SLOT_DEBUG.getKeybind())
         {
-            System.out.printf("callbacks KEY_SLOT_DEBUG\n");
             if (slot != null)
             {
                 InventoryUtils.debugPrintSlotInfo(gui, slot);
@@ -153,17 +156,7 @@ public class KeybindCallbacks implements IHotkeyCallback
 
             return true;
         }
-        else if ((key == Hotkeys.KEY_DRAG_DROP_SINGLE.getKeybind() && Configs.Toggles.DRAG_DROP_SINGLE.getBooleanValue()) ||
-                 (key == Hotkeys.KEY_DRAG_DROP_STACKS.getKeybind() && Configs.Toggles.DRAG_DROP_STACKS.getBooleanValue()) ||
-                 (key == Hotkeys.KEY_DRAG_FULL_STACKS.getKeybind() && Configs.Toggles.DRAG_MOVE_STACKS.getBooleanValue()) ||
-                 (key == Hotkeys.KEY_DRAG_LEAVE_ONE.getKeybind() && Configs.Toggles.DRAG_MOVE_LEAVE_ONE.getBooleanValue()) ||
-                 (key == Hotkeys.KEY_DRAG_MOVE_ONE.getKeybind() && Configs.Toggles.DRAG_MOVE_ONE.getBooleanValue()))
-        {
-            System.out.printf("callbacks dragMoveItems\n");
-            return InventoryUtils.dragMoveItems(gui, mc, true);
-        }
 
-        System.out.printf("callbacks end\n");
         return false;
     }
 

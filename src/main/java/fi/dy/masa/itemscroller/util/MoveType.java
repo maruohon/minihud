@@ -2,7 +2,7 @@ package fi.dy.masa.itemscroller.util;
 
 public enum MoveType
 {
-    INVALID,
+    NONE,
     MOVE_TO_OTHER,
     MOVE_TO_THIS,
     MOVE_UP,

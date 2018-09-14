@@ -3,16 +3,14 @@ package fi.dy.masa.itemscroller.util;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.lwjgl.input.Keyboard;
 import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
-import fi.dy.masa.itemscroller.config.Configs.Toggles;
 import fi.dy.masa.itemscroller.config.Hotkeys;
-import fi.dy.masa.itemscroller.event.KeybindCallbacks;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
 import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
@@ -44,7 +42,7 @@ import net.minecraft.world.World;
 
 public class InventoryUtils
 {
-    private static boolean dragging;
+    private static MoveAction activeMoveAction = MoveAction.NONE;
     private static int lastPosX;
     private static int lastPosY;
     private static int slotNumberLast;
@@ -163,8 +161,6 @@ public class InventoryUtils
         // Villager handling only happens when scrolling over the trade output slot
         boolean villagerHandling = Configs.Toggles.SCROLL_VILLAGER.getBooleanValue() && gui instanceof GuiMerchant && slot instanceof SlotMerchantResult;
         boolean craftingHandling = Configs.Toggles.CRAFTING_FEATURES.getBooleanValue() && isCraftingSlot(gui, slot);
-        boolean isCtrlDown = GuiContainer.isCtrlKeyDown();
-        boolean isShiftDown = GuiContainer.isShiftKeyDown();
         boolean keyActiveMoveEverything = Hotkeys.MODIFIER_MOVE_EVERYTHING.getKeybind().isKeybindHeld();
         boolean keyActiveMoveMatching = Hotkeys.MODIFIER_MOVE_MATCHING.getKeybind().isKeybindHeld();
         boolean keyActiveMoveStacks = Hotkeys.MODIFIER_MOVE_STACK.getKeybind().isKeybindHeld();
@@ -192,7 +188,7 @@ public class InventoryUtils
 
         if (craftingHandling)
         {
-            return tryMoveItemsCrafting(recipes, slot, gui, moveToOtherInventory, isShiftDown, isCtrlDown);
+            return tryMoveItemsCrafting(recipes, slot, gui, moveToOtherInventory, keyActiveMoveStacks, keyActiveMoveEverything);
         }
 
         if (villagerHandling)
@@ -231,19 +227,19 @@ public class InventoryUtils
             // Scrolling items from this slot/inventory into the other inventory
             if (moveToOtherInventory)
             {
-                return tryMoveSingleItemToOtherInventory(slot, gui);
+                tryMoveSingleItemToOtherInventory(slot, gui);
             }
             // Scrolling items from the other inventory into this slot/inventory
             else if (getStackSize(stack) < slot.getItemStackLimit(stack))
             {
-                return tryMoveSingleItemToThisInventory(slot, gui);
+                tryMoveSingleItemToThisInventory(slot, gui);
             }
         }
 
         return false;
     }
 
-    public static boolean dragMoveItems(GuiContainer gui, Minecraft mc, boolean isClick)
+    public static boolean dragMoveItems(GuiContainer gui, Minecraft mc, MoveAction action, boolean isClick)
     {
         int mouseX = InputUtils.getMouseX();
         int mouseY = InputUtils.getMouseY();
@@ -258,20 +254,23 @@ public class InventoryUtils
             return false;
         }
 
-        MoveType type = InputUtils.getDragMoveType(mc);
-        MoveAmount amount = InputUtils.getDragMoveAmount(type, mc);
         boolean cancel = false;
-        System.out.printf("dragMoveItems() type: %s, amount: %s\n", type, amount);
 
-        if (isClick)
+        if (isClick && action != MoveAction.NONE)
         {
             // Reset this or the method call won't do anything...
             slotNumberLast = -1;
-            dragging = true;
-            cancel = dragMoveFromSlotAtPosition(gui, mouseX, mouseY, type, amount);
+            lastPosX = mouseX;
+            lastPosY = mouseY;
+            activeMoveAction = action;
+            cancel = dragMoveFromSlotAtPosition(gui, mouseX, mouseY, action);
+        }
+        else
+        {
+            action = activeMoveAction;
         }
 
-        if (dragging && cancel == false)
+        if (activeMoveAction != MoveAction.NONE && cancel == false)
         {
             int distX = mouseX - lastPosX;
             int distY = mouseY - lastPosY;
@@ -285,7 +284,7 @@ public class InventoryUtils
                 for (int x = lastPosX; ; x += inc)
                 {
                     int y = absX != 0 ? lastPosY + ((x - lastPosX) * distY / absX) : mouseY;
-                    dragMoveFromSlotAtPosition(gui, x, y, type, amount);
+                    dragMoveFromSlotAtPosition(gui, x, y, action);
 
                     if (x == mouseX)
                     {
@@ -300,7 +299,7 @@ public class InventoryUtils
                 for (int y = lastPosY; ; y += inc)
                 {
                     int x = absY != 0 ? lastPosX + ((y - lastPosY) * distX / absY) : mouseX;
-                    dragMoveFromSlotAtPosition(gui, x, y, type, amount);
+                    dragMoveFromSlotAtPosition(gui, x, y, action);
 
                     if (y == mouseY)
                     {
@@ -342,72 +341,82 @@ public class InventoryUtils
 
     public static void stopDragging()
     {
+        activeMoveAction = MoveAction.NONE;
         DRAGGED_SLOTS.clear();
-        dragging = false;
     }
 
-    private static boolean dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y, MoveType type, MoveAmount amount)
+    private static boolean dragMoveFromSlotAtPosition(GuiContainer gui, int x, int y, MoveAction action)
     {
         if (gui instanceof GuiContainerCreative)
         {
-            return dragMoveFromSlotAtPositionCreative(gui, x, y, type, amount);
+            return dragMoveFromSlotAtPositionCreative(gui, x, y, action);
         }
 
         Slot slot = AccessorUtils.getSlotAtPosition(gui, x, y);
         Minecraft mc = Minecraft.getMinecraft();
+        MoveAmount amount = InputUtils.getMoveAmount(action);
         boolean flag = slot != null && isValidSlot(slot, gui, true) && slot.canTakeStack(mc.player);
-        boolean cancel = flag && (amount == MoveAmount.LEAVE_ONE || amount == MoveAmount.MOVE_ONE);
+        //boolean cancel = flag && (amount == MoveAmount.LEAVE_ONE || amount == MoveAmount.MOVE_ONE);
 
         if (flag && slot.slotNumber != slotNumberLast &&
             (amount != MoveAmount.MOVE_ONE || DRAGGED_SLOTS.contains(slot.slotNumber) == false))
         {
-            if (type == MoveType.MOVE_TO_OTHER)
+            switch (action)
             {
-                if (amount == MoveAmount.MOVE_ONE)
-                {
+                case MOVE_TO_OTHER_MOVE_ONE:
                     tryMoveSingleItemToOtherInventory(slot, gui);
-                }
-                else if (amount == MoveAmount.LEAVE_ONE)
-                {
+                    break;
+
+                case MOVE_TO_OTHER_LEAVE_ONE:
                     tryMoveAllButOneItemToOtherInventory(slot, gui);
-                }
-                else
-                {
+                    break;
+
+                case MOVE_TO_OTHER_STACKS:
                     shiftClickSlot(gui, slot.slotNumber);
-                    cancel = true;
-                }
-            }
-            else if (type == MoveType.MOVE_UP || type == MoveType.MOVE_DOWN)
-            {
-                tryMoveItemsVertically(gui, slot, Keyboard.isKeyDown(Keyboard.KEY_W), amount);
-                cancel = true;
-            }
-            else if (type == MoveType.DROP)
-            {
-                if (amount == MoveAmount.MOVE_ONE)
-                {
+                    break;
+
+                case MOVE_TO_OTHER_MATCHING:
+                    tryMoveStacks(slot, gui, true, true, false);
+                    break;
+
+                case DROP_ONE:
                     clickSlot(gui, slot.slotNumber, 0, ClickType.THROW);
-                }
-                else if (amount == MoveAmount.LEAVE_ONE)
-                {
+                    break;
+
+                case DROP_LEAVE_ONE:
                     leftClickSlot(gui, slot.slotNumber);
                     rightClickSlot(gui, slot.slotNumber);
                     dropItemsFromCursor(gui);
-                }
-                else
-                {
+                    break;
+
+                case DROP_STACKS:
                     clickSlot(gui, slot.slotNumber, 1, ClickType.THROW);
-                    cancel = true;
-                }
+                    break;
+
+                case MOVE_DOWN_MOVE_ONE:
+                case MOVE_DOWN_LEAVE_ONE:
+                case MOVE_DOWN_STACKS:
+                case MOVE_DOWN_MATCHING:
+                    tryMoveItemsVertically(gui, slot, false, amount);
+                    break;
+
+                case MOVE_UP_MOVE_ONE:
+                case MOVE_UP_LEAVE_ONE:
+                case MOVE_UP_STACKS:
+                case MOVE_UP_MATCHING:
+                    tryMoveItemsVertically(gui, slot, true, amount);
+                    break;
+
+                default:
             }
 
             DRAGGED_SLOTS.add(slot.slotNumber);
         }
 
-        return cancel;
+        return true;
     }
 
-    private static boolean dragMoveFromSlotAtPositionCreative(GuiContainer gui, int x, int y, MoveType type, MoveAmount amount)
+    private static boolean dragMoveFromSlotAtPositionCreative(GuiContainer gui, int x, int y, MoveAction action)
     {
         GuiContainerCreative guiCreative = (GuiContainerCreative) gui;
         Slot slot = AccessorUtils.getSlotAtPosition(gui, x, y);
@@ -420,6 +429,7 @@ public class InventoryUtils
         }
 
         Minecraft mc = Minecraft.getMinecraft();
+        MoveAmount amount = InputUtils.getMoveAmount(action);
         boolean flag = slot != null && isValidSlot(slot, gui, true) && slot.canTakeStack(mc.player);
         boolean cancel = flag && (amount == MoveAmount.LEAVE_ONE || amount == MoveAmount.MOVE_ONE);
         // The player inventory tab of the creative inventory uses stupid wrapped
@@ -429,19 +439,19 @@ public class InventoryUtils
 
         if (flag && slotNumber != slotNumberLast && DRAGGED_SLOTS.contains(slotNumber) == false)
         {
-            if (type == MoveType.MOVE_TO_OTHER)
+            switch (action)
             {
-                if (amount == MoveAmount.MOVE_ONE)
-                {
+                case SCROLL_TO_OTHER_MOVE_ONE:
+                case MOVE_TO_OTHER_MOVE_ONE:
                     leftClickSlot(guiCreative, slot, slotNumber);
                     rightClickSlot(guiCreative, slot, slotNumber);
                     shiftClickSlot(guiCreative, slot, slotNumber);
                     leftClickSlot(guiCreative, slot, slotNumber);
 
                     cancel = true;
-                }
-                else if (amount == MoveAmount.LEAVE_ONE)
-                {
+                    break;
+
+                case MOVE_TO_OTHER_LEAVE_ONE:
                     // Too lazy to try to duplicate the proper code for the weird creative inventory...
                     if (isPlayerInv == false)
                     {
@@ -454,30 +464,44 @@ public class InventoryUtils
                     }
 
                     cancel = true;
-                }
-                else
-                {
+                    break;
+
+                case SCROLL_TO_OTHER_STACKS:
+                case MOVE_TO_OTHER_STACKS:
                     shiftClickSlot(gui, slot, slotNumber);
                     cancel = true;
-                }
-            }
-            else if (type == MoveType.DROP)
-            {
-                if (amount == MoveAmount.MOVE_ONE)
-                {
+                    break;
+
+                case DROP_ONE:
                     clickSlot(gui, slot.slotNumber, 0, ClickType.THROW);
-                }
-                else if (amount == MoveAmount.LEAVE_ONE)
-                {
+                    break;
+
+                case DROP_LEAVE_ONE:
                     leftClickSlot(gui, slot.slotNumber);
                     rightClickSlot(gui, slot.slotNumber);
                     dropItemsFromCursor(gui);
-                }
-                else
-                {
+                    break;
+
+                case DROP_STACKS:
                     clickSlot(gui, slot.slotNumber, 1, ClickType.THROW);
                     cancel = true;
-                }
+                    break;
+
+                case MOVE_DOWN_MOVE_ONE:
+                case MOVE_DOWN_LEAVE_ONE:
+                case MOVE_DOWN_STACKS:
+                    tryMoveItemsVertically(gui, slot, false, amount);
+                    cancel = true;
+                    break;
+
+                case MOVE_UP_MOVE_ONE:
+                case MOVE_UP_LEAVE_ONE:
+                case MOVE_UP_STACKS:
+                    tryMoveItemsVertically(gui, slot, true, amount);
+                    cancel = true;
+                    break;
+
+                default:
             }
 
             DRAGGED_SLOTS.add(slotNumber);
@@ -1018,74 +1042,44 @@ public class InventoryUtils
     }
 
     private static boolean tryMoveItemsCrafting(RecipeStorage recipes, Slot slot, GuiContainer gui,
-            boolean moveToOtherInventory, boolean isShiftDown, boolean isCtrlDown)
+            boolean moveToOtherInventory, boolean moveStacks, boolean moveEverything)
     {
         CraftingRecipe recipe = recipes.getSelectedRecipe();
+        ItemStack stackRecipeOutput = recipe.getResult();
 
-        if (isShiftDown)
+        // Try to craft items
+        if (moveToOtherInventory)
         {
-            // Try to fill the crafting grid
-            if (moveToOtherInventory == false)
+            // Items in the output slot
+            if (slot.getHasStack())
             {
-                if (isStackEmpty(recipes.getSelectedRecipe().getResult()) == false)
+                // The output item matches the current recipe
+                if (areStacksEqual(slot.getStack(), stackRecipeOutput))
                 {
-                    tryMoveItemsToCraftingGridSlots(recipe, slot, gui, true);
-                }
-            }
-            // Move items from the crafting output slot
-            else if (slot.getHasStack())
-            {
-                if (isCtrlDown)
-                {
-                    craftAsManyItemsAsPossible(recipe, slot, gui);
-                }
-                else
-                {
-                    shiftClickSlot(gui, slot.slotNumber);
-                }
-            }
-            // Scrolling over an empty crafting output slot, clear the crafting grid
-            else
-            {
-                SlotRange range = CraftingHandler.getCraftingGridSlots(gui, slot);
-
-                if (range != null)
-                {
-                    for (int i = 0, s = range.getFirst(); i < range.getSlotCount(); i++, s++)
+                    if (moveEverything)
                     {
-                        shiftClickSlot(gui, s);
+                        craftAsManyItemsAsPossible(recipe, slot, gui);
+                    }
+                    else if (moveStacks)
+                    {
+                        shiftClickSlot(gui, slot.slotNumber);
+                    }
+                    else
+                    {
+                        moveOneSetOfItemsFromSlotToPlayerInventory(gui, slot);
                     }
                 }
+            }
+            // Scrolling over an empty output slot, clear the grid
+            else
+            {
+                clearCraftingGridOfAllItems(gui, CraftingHandler.getCraftingGridSlots(gui, slot));
             }
         }
-        else
+        // Try to move items to the grid
+        else if (moveToOtherInventory == false && isStackEmpty(stackRecipeOutput) == false)
         {
-            // Scrolling items from player inventory into crafting grid slots
-            if (moveToOtherInventory == false)
-            {
-                if (isStackEmpty(recipes.getSelectedRecipe().getResult()) == false)
-                {
-                    tryMoveItemsToCraftingGridSlots(recipe, slot, gui, false);
-                }
-            }
-            // Scrolling items from this crafting slot into the other inventory
-            else if (slot.getHasStack())
-            {
-                moveOneSetOfItemsFromSlotToPlayerInventory(gui, slot);
-            }
-            // Scrolling over an empty crafting output slot, clear the crafting grid
-            else
-            {
-                SlotRange range = CraftingHandler.getCraftingGridSlots(gui, slot);
-
-                if (range != null)
-                {
-                    for (int i = 0, s = range.getFirst(); i < range.getSlotCount(); i++, s++)
-                    {
-                        shiftClickSlot(gui, s);
-                    }
-                }
-            }
+            tryMoveItemsToCraftingGridSlots(recipe, slot, gui, moveStacks);
         }
 
         return false;
@@ -1637,8 +1631,8 @@ public class InventoryUtils
     }
 
     /**
-     * Return the slot numbers of slots that have items identical to stackReference, that are NOT in the same
-     * inventory as slotReference. If preferPartial is true, then stacks with a stackSize less that getMaxStackSize() are
+     * Return the slot numbers of slots that have items identical to stackReference.
+     * If preferPartial is true, then stacks with a stackSize less that getMaxStackSize() are
      * at the beginning of the list (not ordered though) and full stacks are at the end, otherwise the reverse is true.
      * @param container
      * @param slotReference
@@ -2041,22 +2035,6 @@ public class InventoryUtils
             return false;
         }
 
-        // Villager handling only happens when scrolling over the trade output slot
-        boolean villagerHandling = Toggles.SCROLL_VILLAGER.getBooleanValue() && gui instanceof GuiMerchant && slot instanceof SlotMerchantResult;
-        boolean craftingHandling = Toggles.CRAFTING_FEATURES.getBooleanValue() && isCraftingSlot(gui, slot);
-        boolean isCtrlDown = GuiContainer.isCtrlKeyDown();
-
-        if (craftingHandling)
-        {
-            RecipeStorage recipes = KeybindCallbacks.getInstance().getRecipes();
-            return tryMoveItemsCrafting(recipes, slot, gui, moveUp == false, amount == MoveAmount.MOVE_ALL, isCtrlDown);
-        }
-
-        if (villagerHandling)
-        {
-            return tryMoveItemsVillager((GuiMerchant) gui, slot, moveUp == false, amount == MoveAmount.MOVE_ALL);
-        }
-
         List<Integer> slots = getVerticallyFurthestSuitableSlotsForStackInSlot(gui.inventorySlots, slot, moveUp);
 
         if (slots.isEmpty())
@@ -2064,7 +2042,7 @@ public class InventoryUtils
             return false;
         }
 
-        if (amount == MoveAmount.MOVE_ALL)
+        if (amount == MoveAmount.FULL_STACKS)
         {
             moveStackToSlots(gui, slot, slots, false);
         }
@@ -2076,14 +2054,48 @@ public class InventoryUtils
         {
             moveStackToSlots(gui, slot, slots, true);
         }
+        else if (amount == MoveAmount.ALL_MATCHING)
+        {
+            moveMatchingStacksToSlots(gui, slot, moveUp);
+        }
 
         return true;
     }
 
-    private static void moveStackToSlots(GuiContainer gui, Slot slotFrom, List<Integer> slotsTo, boolean leaveOne)
+    private static void moveMatchingStacksToSlots(GuiContainer gui, Slot slot, boolean moveUp)
+    {
+        List<Integer> matchingSlots = getSlotNumbersOfMatchingStacks(gui.inventorySlots, slot, true, slot.getStack(), true, true, false);
+        List<Integer> targetSlots = getSlotNumbersOfEmptySlots(gui.inventorySlots, slot, false, true, false);
+        targetSlots.addAll(getSlotNumbersOfEmptySlots(gui.inventorySlots, slot, true, true, false));
+        targetSlots.addAll(matchingSlots);
+
+        Collections.sort(matchingSlots, new SlotVerticalSorterSlotNumbers(gui.inventorySlots, ! moveUp));
+        Collections.sort(targetSlots, new SlotVerticalSorterSlotNumbers(gui.inventorySlots, moveUp));
+
+        for (int i = 0; i < matchingSlots.size(); ++i)
+        {
+            int srcSlotNum = matchingSlots.get(i).intValue();
+            Slot srcSlot = gui.inventorySlots.getSlot(srcSlotNum);
+            Slot lastSlot = moveStackToSlots(gui, srcSlot, targetSlots, false);
+
+            if (lastSlot == null || (lastSlot.slotNumber == srcSlot.slotNumber || (lastSlot.yPos > srcSlot.yPos) == moveUp))
+            {
+                return;
+            }
+        }
+    }
+
+    private static Slot moveStackToSlots(GuiContainer gui, Slot slotFrom, List<Integer> slotsTo, boolean leaveOne)
     {
         Minecraft mc = Minecraft.getMinecraft();
         InventoryPlayer inv = mc.player.inventory;
+        Slot lastSlot = null;
+
+        // Empty slot, nothing to do
+        if (slotFrom.getHasStack() == false)
+        {
+            return null;
+        }
 
         // Pick up the stack
         leftClickSlot(gui, slotFrom.slotNumber);
@@ -2095,13 +2107,20 @@ public class InventoryUtils
 
         for (int slotNum : slotsTo)
         {
+            // Empty cursor, all done here
             if (isStackEmpty(inv.getItemStack()))
             {
                 break;
             }
 
-            leftClickSlot(gui, slotNum);
-            //System.out.printf("suitable slot: %3d\n", slotNum);
+            Slot dstSlot = gui.inventorySlots.getSlot(slotNum);
+
+            if (dstSlot.isItemValid(inv.getItemStack()) &&
+                (dstSlot.getHasStack() == false || areStacksEqual(dstSlot.getStack(), inv.getItemStack())))
+            {
+                leftClickSlot(gui, slotNum);
+                lastSlot = dstSlot;
+            }
         }
 
         // Return the rest of the items, if any
@@ -2109,6 +2128,8 @@ public class InventoryUtils
         {
             leftClickSlot(gui, slotFrom.slotNumber);
         }
+
+        return lastSlot;
     }
 
     private static void moveOneItemToFirstValidSlot(GuiContainer gui, Slot slotFrom, List<Integer> slotsTo)
@@ -2144,48 +2165,36 @@ public class InventoryUtils
         }
     }
 
-    private static List<Integer> getVerticallyFurthestSuitableSlotsForStackInSlot(Container container, Slot slot, boolean above)
+    private static List<Integer> getVerticallyFurthestSuitableSlotsForStackInSlot(Container container, final Slot slotIn, boolean above)
     {
-        if (slot == null || slot.getHasStack() == false)
+        if (slotIn == null || slotIn.getHasStack() == false)
         {
             return Collections.emptyList();
         }
 
-        List<SlotVerticalSorter> slotSorters = new ArrayList<SlotVerticalSorter>();
-        ItemStack stackSlot = slot.getStack();
+        List<Integer> slotNumbers = new ArrayList<>();
+        ItemStack stackSlot = slotIn.getStack();
 
         for (Slot slotTmp : container.inventorySlots)
         {
-            if (slotTmp.slotNumber != slot.slotNumber && slotTmp.yPos != slot.yPos)
+            if (slotTmp.slotNumber != slotIn.slotNumber && slotTmp.yPos != slotIn.yPos)
             {
-                if (above == slotTmp.yPos < slot.yPos)
+                if (above == slotTmp.yPos < slotIn.yPos)
                 {
                     ItemStack stackTmp = slotTmp.getStack();
 
                     if ((isStackEmpty(stackTmp) && slotTmp.isItemValid(stackSlot)) ||
                         (areStacksEqual(stackTmp, stackSlot)) && slotTmp.getItemStackLimit(stackTmp) > getStackSize(stackTmp))
                     {
-                        slotSorters.add(new SlotVerticalSorter(slotTmp));
+                        slotNumbers.add(slotTmp.slotNumber);
                     }
                 }
             }
         }
 
-        Collections.sort(slotSorters);
+        Collections.sort(slotNumbers, new SlotVerticalSorterSlotNumbers(container, above));
 
-        if (above == false)
-        {
-            Collections.reverse(slotSorters);
-        }
-
-        List<Integer> slots = new ArrayList<Integer>();
-
-        for (SlotVerticalSorter entry : slotSorters)
-        {
-            slots.add(entry.getSlot().slotNumber);
-        }
-
-        return slots;
+        return slotNumbers;
     }
 
     public static void tryClearCursor(GuiContainer gui, Minecraft mc)
@@ -2233,29 +2242,57 @@ public class InventoryUtils
         slotNumberLast = -1;
     }
 
-    private static class SlotVerticalSorter implements Comparable<SlotVerticalSorter>
+    public static MoveAction getActiveMoveAction()
     {
-        private final Slot slot;
+        return activeMoveAction;
+    }
 
-        public SlotVerticalSorter(Slot slot)
-        {
-            this.slot = slot;
-        }
+    /*
+    private static class SlotVerticalSorterSlots implements Comparator<Slot>
+    {
+        private final boolean topToBottom;
 
-        public Slot getSlot()
+        public SlotVerticalSorterSlots(boolean topToBottom)
         {
-            return this.slot;
+            this.topToBottom = topToBottom;
         }
 
         @Override
-        public int compareTo(SlotVerticalSorter other)
+        public int compare(Slot slot1, Slot slot2)
         {
-            if (this.getSlot().yPos == other.getSlot().yPos)
+            if (slot1.yPos == slot2.yPos)
             {
-                return this.getSlot().slotNumber < other.getSlot().slotNumber ? -1 : 1;
+                return (slot1.slotNumber < slot2.slotNumber) == this.topToBottom ? -1 : 1;
             }
 
-            return (this.getSlot().yPos < other.getSlot().yPos) ? -1 : 1;
+            return (slot1.yPos < slot2.yPos) == this.topToBottom ? -1 : 1;
+        }
+    }
+    */
+
+    private static class SlotVerticalSorterSlotNumbers implements Comparator<Integer>
+    {
+        private final Container container;
+        private final boolean topToBottom;
+
+        public SlotVerticalSorterSlotNumbers(Container container, boolean topToBottom)
+        {
+            this.container = container;
+            this.topToBottom = topToBottom;
+        }
+
+        @Override
+        public int compare(Integer slotNum1, Integer slotNum2)
+        {
+            Slot slot1 = this.container.getSlot(slotNum1.intValue());
+            Slot slot2 = this.container.getSlot(slotNum2.intValue());
+
+            if (slot1.yPos == slot2.yPos)
+            {
+                return (slot1.slotNumber < slot2.slotNumber) == this.topToBottom ? -1 : 1;
+            }
+
+            return (slot1.yPos < slot2.yPos) == this.topToBottom ? -1 : 1;
         }
     }
 

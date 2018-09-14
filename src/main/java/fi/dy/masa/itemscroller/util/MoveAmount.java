@@ -2,8 +2,10 @@ package fi.dy.masa.itemscroller.util;
 
 public enum MoveAmount
 {
-    INVALID,
+    NONE,
     MOVE_ONE,
-    MOVE_ALL,
-    LEAVE_ONE
+    LEAVE_ONE,
+    FULL_STACKS,
+    ALL_MATCHING,
+    EVERYTHING
 }

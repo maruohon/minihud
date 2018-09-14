@@ -8,8 +8,7 @@ import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
 import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
-import fi.dy.masa.itemscroller.util.MoveAmount;
-import fi.dy.masa.itemscroller.util.MoveType;
+import fi.dy.masa.itemscroller.util.MoveAction;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
@@ -23,6 +22,13 @@ import net.minecraft.util.math.MathHelper;
 
 public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IMouseInputHandler
 {
+    private final KeybindCallbacks callbacks;
+
+    public InputHandler()
+    {
+        this.callbacks = KeybindCallbacks.getInstance();
+    }
+
     @Override
     public void addKeysToMap(IKeybindManager manager)
     {
@@ -44,8 +50,15 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         if (InputUtils.isRecipeViewOpen() && eventKey >= Keyboard.KEY_1 && eventKey <= Keyboard.KEY_9)
         {
             int index = MathHelper.clamp(eventKey - Keyboard.KEY_1, 0, 8);
-            KeybindCallbacks.getInstance().getRecipes().changeSelectedRecipe(index);
+            this.callbacks.getRecipes().changeSelectedRecipe(index);
             return true;
+        }
+
+        MoveAction action = InventoryUtils.getActiveMoveAction();
+
+        if (action != MoveAction.NONE && InputUtils.isActionKeyActive(action) == false)
+        {
+            InventoryUtils.stopDragging();
         }
 
         return false;
@@ -57,15 +70,14 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         Minecraft mc = Minecraft.getMinecraft();
         boolean cancel = false;
 
-        System.out.printf("onMouseInput()\n");
-        if (KeybindCallbacks.getInstance().functionalityEnabled() &&
+        if (this.callbacks.functionalityEnabled() &&
             mc != null &&
             mc.player != null &&
             mc.currentScreen instanceof GuiContainer &&
             Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
         {
             GuiContainer gui = (GuiContainer) mc.currentScreen;
-            RecipeStorage recipes = KeybindCallbacks.getInstance().getRecipes();
+            RecipeStorage recipes = this.callbacks.getRecipes();
 
             if (dWheel != 0)
             {
@@ -112,66 +124,33 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
                 if (eventButtonState && (isLeftClick || isRightClick))
                 {
-                    System.out.printf("storeSourceSlotCandidate\n");
                     InventoryUtils.storeSourceSlotCandidate(slot, mc);
+                }
+
+                MoveAction action = InventoryUtils.getActiveMoveAction();
+
+                if (action != MoveAction.NONE && InputUtils.isActionKeyActive(action) == false)
+                {
+                    InventoryUtils.stopDragging();
                 }
 
                 if (Configs.Toggles.RIGHT_CLICK_CRAFT_STACK.getBooleanValue() &&
                     isRightClick && eventButtonState &&
                     InventoryUtils.isCraftingSlot(gui, slot))
                 {
-                    System.out.printf("RIGHT_CLICK_CRAFT_STACK\n");
                     InventoryUtils.rightClickCraftOneStack(gui);
                 }
                 else if (Configs.Toggles.SHIFT_PLACE_ITEMS.getBooleanValue() &&
                          isLeftClick && isShiftDown &&
                          InventoryUtils.canShiftPlaceItems(gui))
                 {
-                    System.out.printf("SHIFT_PLACE_ITEMS\n");
                     cancel |= InventoryUtils.shiftPlaceItems(slot, gui);
                 }
                 else if (Configs.Toggles.SHIFT_DROP_ITEMS.getBooleanValue() &&
                          isLeftClick && isShiftDown &&
                          InputUtils.canShiftDropItems(gui, mc))
                 {
-                    System.out.printf("SHIFT_DROP_ITEMS\n");
                     cancel |= InventoryUtils.shiftDropItems(gui);
-                }
-                else if (Configs.Toggles.CLICK_MOVE_EVERYTHING.getBooleanValue() &&
-                         Hotkeys.MODIFIER_MOVE_EVERYTHING.getKeybind().isKeybindHeld() &&
-                         isLeftClick && eventButtonState &&
-                         slot != null && InventoryUtils.isStackEmpty(slot.getStack()) == false)
-                {
-                    System.out.printf("CLICK_MOVE_EVERYTHING\n");
-                    InventoryUtils.tryMoveStacks(slot, gui, false, true, false);
-                    cancel = true;
-                }
-                else if (Configs.Toggles.CLICK_MOVE_MATCHING.getBooleanValue() &&
-                         Hotkeys.MODIFIER_MOVE_MATCHING.getKeybind().isKeybindHeld() &&
-                         isLeftClick && eventButtonState &&
-                         slot != null && InventoryUtils.isStackEmpty(slot.getStack()) == false)
-                {
-                    System.out.printf("CLICK_MOVE_MATCHING\n");
-                    InventoryUtils.tryMoveStacks(slot, gui, true, true, false);
-                    cancel = true;
-                }
-                else if (isLeftClick && eventButtonState && InputUtils.shouldMoveVertically())
-                {
-                    System.out.printf("tryMoveItemsVertically\n");
-                    MoveType type = InputUtils.getDragMoveType(mc);
-                    MoveAmount amount = InputUtils.getDragMoveAmount(type, mc);
-                    InventoryUtils.tryMoveItemsVertically(gui, slot, Keyboard.isKeyDown(Keyboard.KEY_W), amount);
-                    InventoryUtils.resetLastSlotNumber();
-                    cancel = true;
-                }
-                else if (Hotkeys.KEY_DRAG_DROP_SINGLE.getKeybind().isKeybindHeld() == false &&
-                         Hotkeys.KEY_DRAG_DROP_STACKS.getKeybind().isKeybindHeld() == false &&
-                         Hotkeys.KEY_DRAG_FULL_STACKS.getKeybind().isKeybindHeld() == false &&
-                         Hotkeys.KEY_DRAG_LEAVE_ONE.getKeybind().isKeybindHeld() == false &&
-                         Hotkeys.KEY_DRAG_MOVE_ONE.getKeybind().isKeybindHeld() == false)
-                {
-                    System.out.printf("onMouseInput() stopDragging\n");
-                    InventoryUtils.stopDragging();
                 }
             }
 
@@ -189,7 +168,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (KeybindCallbacks.getInstance().functionalityEnabled() &&
+        if (this.callbacks.functionalityEnabled() &&
             mc != null &&
             mc.player != null &&
             mc.currentScreen instanceof GuiContainer &&
@@ -201,18 +180,14 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
     private boolean handleDragging(GuiContainer gui, Minecraft mc, boolean isClick)
     {
-        if ((Hotkeys.KEY_DRAG_FULL_STACKS.getKeybind().isKeybindHeld() && Configs.Toggles.DRAG_MOVE_STACKS.getBooleanValue()) ||
-            (Hotkeys.KEY_DRAG_LEAVE_ONE.getKeybind().isKeybindHeld() && Configs.Toggles.DRAG_MOVE_LEAVE_ONE.getBooleanValue()) ||
-            (Hotkeys.KEY_DRAG_MOVE_ONE.getKeybind().isKeybindHeld() && Configs.Toggles.DRAG_MOVE_ONE.getBooleanValue()) ||
-            (Hotkeys.KEY_DRAG_DROP_SINGLE.getKeybind().isKeybindHeld() && Configs.Toggles.DRAG_DROP_SINGLE.getBooleanValue()) ||
-            (Hotkeys.KEY_DRAG_DROP_STACKS.getKeybind().isKeybindHeld() && Configs.Toggles.DRAG_DROP_STACKS.getBooleanValue()))
+        MoveAction action = InventoryUtils.getActiveMoveAction();
+
+        if (InputUtils.isActionKeyActive(action))
         {
-            System.out.printf("handleDragging()\n");
-            return InventoryUtils.dragMoveItems(gui, mc, false);
+            return InventoryUtils.dragMoveItems(gui, mc, action, false);
         }
-        else
+        else if (action != MoveAction.NONE)
         {
-            System.out.printf("handleDragging() stopDragging\n");
             InventoryUtils.stopDragging();
         }
 
