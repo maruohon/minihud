@@ -17,6 +17,7 @@ import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.inventory.Slot;
 import net.minecraft.util.math.MathHelper;
 
@@ -67,6 +68,13 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     @Override
     public boolean onMouseInput(int eventButton, int dWheel, boolean eventButtonState)
     {
+        MoveAction action = InventoryUtils.getActiveMoveAction();
+
+        if (action != MoveAction.NONE && InputUtils.isActionKeyActive(action) == false)
+        {
+            InventoryUtils.stopDragging();
+        }
+
         Minecraft mc = Minecraft.getMinecraft();
         boolean cancel = false;
 
@@ -74,6 +82,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             mc != null &&
             mc.player != null &&
             mc.currentScreen instanceof GuiContainer &&
+            (mc.currentScreen instanceof GuiContainerCreative) == false &&
             Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
         {
             GuiContainer gui = (GuiContainer) mc.currentScreen;
@@ -125,13 +134,6 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 if (eventButtonState && (isLeftClick || isRightClick))
                 {
                     InventoryUtils.storeSourceSlotCandidate(slot, mc);
-                }
-
-                MoveAction action = InventoryUtils.getActiveMoveAction();
-
-                if (action != MoveAction.NONE && InputUtils.isActionKeyActive(action) == false)
-                {
-                    InventoryUtils.stopDragging();
                 }
 
                 if (Configs.Toggles.RIGHT_CLICK_CRAFT_STACK.getBooleanValue() &&
