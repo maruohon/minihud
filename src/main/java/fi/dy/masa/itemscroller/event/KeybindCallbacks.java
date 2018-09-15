@@ -100,16 +100,39 @@ public class KeybindCallbacks implements IHotkeyCallback
         RecipeStorage recipes = this.getRecipes();
         MoveAction moveAction = InputUtils.getDragMoveAction(key);
 
-        if (moveAction != MoveAction.NONE)
+        if (slot != null)
         {
-            return InventoryUtils.dragMoveItems(gui, mc, moveAction, true);
+            if (moveAction != MoveAction.NONE)
+            {
+                return InventoryUtils.dragMoveItems(gui, mc, moveAction, true);
+            }
+            else if (key == Hotkeys.KEY_MOVE_EVERYTHING.getKeybind())
+            {
+                InventoryUtils.tryMoveStacks(slot, gui, false, true, false);
+                return true;
+            }
+            else if (key == Hotkeys.KEY_DROP_ALL_MATCHING.getKeybind())
+            {
+                if (Configs.Toggles.DROP_MATCHING.getBooleanValue() &&
+                    Configs.GUI_BLACKLIST.contains(gui.getClass().getName()) == false &&
+                    slot.getHasStack())
+                {
+                    InventoryUtils.dropStacks(gui, slot.getStack(), slot, true);
+                    return true;
+                }
+            }
+            else if (key == Hotkeys.KEY_MOVE_STACK_TO_OFFHAND.getKeybind())
+            {
+                // Swap the hovered stack to the Offhand
+                if ((gui instanceof GuiInventory) && slot != null)
+                {
+                    InventoryUtils.swapSlots(gui, slot.slotNumber, 45);
+                    return true;
+                }
+            }
         }
-        else if (key == Hotkeys.KEY_MOVE_EVERYTHING.getKeybind())
-        {
-            InventoryUtils.tryMoveStacks(slot, gui, false, true, false);
-            return true;
-        }
-        else if (key == Hotkeys.KEY_CRAFT_EVERYTHING.getKeybind())
+
+        if (key == Hotkeys.KEY_CRAFT_EVERYTHING.getKeybind())
         {
             InventoryUtils.craftEverythingPossibleWithCurrentRecipe(recipes.getSelectedRecipe(), gui);
             return true;
@@ -123,25 +146,6 @@ public class KeybindCallbacks implements IHotkeyCallback
         {
             InventoryUtils.moveAllCraftingResultsToOtherInventory(recipes.getSelectedRecipe(), gui);
             return true;
-        }
-        else if (key == Hotkeys.KEY_DROP_ALL_MATCHING.getKeybind())
-        {
-            if (Configs.Toggles.DROP_MATCHING.getBooleanValue() &&
-                Configs.GUI_BLACKLIST.contains(gui.getClass().getName()) == false &&
-                slot != null && slot.getHasStack())
-            {
-                InventoryUtils.dropStacks(gui, slot.getStack(), slot, true);
-                return true;
-            }
-        }
-        else if (key == Hotkeys.KEY_MOVE_STACK_TO_OFFHAND.getKeybind())
-        {
-            // Swap the hovered stack to the Offhand
-            if ((gui instanceof GuiInventory) && slot != null)
-            {
-                InventoryUtils.swapSlots(gui, slot.slotNumber, 45);
-                return true;
-            }
         }
         else if (key == Hotkeys.KEY_SLOT_DEBUG.getKeybind())
         {
