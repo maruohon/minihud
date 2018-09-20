@@ -87,8 +87,8 @@ public class Configs implements IConfigHandler
 
     public static class Colors
     {
-        public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR    = new ConfigColor("randomTicksFixedOverlayColor", "0xFF2050D0", "Color for the fixed-point random ticked chunks overlay");
-        public static final ConfigColor RANDOM_TICKS_PLAYER_OVERLAY_COLOR   = new ConfigColor("randomTicksPlayerOverlayColor", "0xFF2050D0", "Color for the player-following random ticked chunks overlay");
+        public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR    = new ConfigColor("randomTicksFixedOverlayColor", "0xFFF9F225", "Color for the fixed-point random ticked chunks overlay");
+        public static final ConfigColor RANDOM_TICKS_PLAYER_OVERLAY_COLOR   = new ConfigColor("randomTicksPlayerOverlayColor", "0xFF30FE73", "Color for the player-following random ticked chunks overlay");
         public static final ConfigColor REGION_OVERLAY_COLOR                = new ConfigColor("regionOverlayColor", "0xFFFF8019", "Color for the region file overlay");
         public static final ConfigColor SLIME_CHUNKS_OVERLAY_COLOR          = new ConfigColor("slimeChunksOverlayColor", "0xFF20F020", "Color for the slime chunks overlay");
         public static final ConfigColor SPAWN_PLAYER_ENTITY_OVERLAY_COLOR   = new ConfigColor("spawnPlayerEntityOverlayColor", "0xFF2050D0", "Color for the entity-processing spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");

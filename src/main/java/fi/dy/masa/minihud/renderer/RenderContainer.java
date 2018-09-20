@@ -25,6 +25,8 @@ public class RenderContainer
 
     public void init()
     {
+        this.renderers.add(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_FIXED));
+        this.renderers.add(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER));
         this.renderers.add(new OverlayRendererRegion());
         this.renderers.add(new OverlayRendererSlimeChunks());
         this.renderers.add(new OverlayRendererSpawnableColumnHeights());
@@ -56,6 +58,7 @@ public class RenderContainer
 
             if (renderer.shouldRender(mc) && renderer.needsUpdate(entity, mc))
             {
+                //System.out.printf("plop update\n");
                 renderer.update(entity, mc);
             }
         }
@@ -127,7 +130,9 @@ public class RenderContainer
             GlStateManager.color(1f, 1f, 1f, 1f);
             GlStateManager.disableBlend();
             GlStateManager.enableDepth();
+            GlStateManager.enableLighting();
             GlStateManager.enableCull();
+            GlStateManager.depthMask(true);
             GlStateManager.doPolygonOffset(0f, 0f);
             GlStateManager.disablePolygonOffset();
             GlStateManager.enableTexture2D();

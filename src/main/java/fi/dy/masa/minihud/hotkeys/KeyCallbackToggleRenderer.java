@@ -7,10 +7,12 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.event.RenderHandler;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
+import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 
 public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWithMessage
@@ -49,6 +51,19 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
                 BlockPos spawn = mc.world.getSpawnPoint();
                 RenderHandler.getInstance().getDataStorage().setWorldSpawn(spawn);
                 String str = String.format(", using the world spawn x: %d, y: %d, z: %d", spawn.getX(), spawn.getY(), spawn.getZ());
+
+                StringUtils.printActionbarMessage(message + str);
+            }
+            else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getKeybind() && this.rendererConfig.getBooleanValue())
+            {
+                final boolean enabled = this.config.getBooleanValue();
+                String pre = enabled ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+                String status = I18n.format("malilib.message.value." + (enabled ? "on" : "off"));
+                String message = I18n.format("malilib.message.toggled", this.config.getPrettyName(), pre + status + TextFormatting.RESET);
+
+                Vec3d pos = mc.player.getPositionVector();
+                OverlayRendererRandomTickableChunks.newPos = pos;
+                String str = String.format(", using the position x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
 
                 StringUtils.printActionbarMessage(message + str);
             }

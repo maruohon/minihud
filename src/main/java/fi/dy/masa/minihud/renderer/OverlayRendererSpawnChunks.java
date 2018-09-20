@@ -14,7 +14,6 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     protected final RendererToggle toggle;
     protected final int colorEntityProcessing;
     protected final int colorLazy;
-    protected final BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
     protected boolean rendered;
 
     public OverlayRendererSpawnChunks(RendererToggle toggle, int colorEntityProcessing, int colorLazy)

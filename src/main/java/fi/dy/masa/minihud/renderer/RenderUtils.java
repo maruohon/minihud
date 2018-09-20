@@ -52,6 +52,46 @@ public class RenderUtils
                 lineIntervalH, lineIntervalV, zMin, zMax, r, g, b, a);
     }
 
+    public static void renderVerticalWallsOfLinesWithinRange(
+            BufferBuilder bufferQuads, BufferBuilder bufferLines,
+            EnumFacing.Axis axis,
+            BlockPos posStart,
+            BlockPos posEnd,
+            float rangeH,
+            float rangeV,
+            float lineIntervalH,
+            float lineIntervalV,
+            Entity entity,
+            int color)
+    {
+        int xMin = Math.min(posStart.getX(), posEnd.getX());
+        int zMin = Math.min(posStart.getZ(), posEnd.getZ());
+        int xMax = Math.max(posStart.getX(), posEnd.getX());
+        int zMax = Math.max(posStart.getZ(), posEnd.getZ());
+        double posX = entity.posX;
+        double posZ = entity.posZ;
+        float a = ((color >>> 24) & 0xFF) / 255f;
+        float r = ((color >>> 16) & 0xFF) / 255f;
+        float g = ((color >>>  8) & 0xFF) / 255f;
+        float b = ((color       ) & 0xFF) / 255f;
+
+        //double yMin = Math.max(Math.ceil((posY - rangeV) / lineIntervalV) * lineIntervalV,   0);
+        //double yMax = Math.min(Math.ceil((posY + rangeV) / lineIntervalV) * lineIntervalV, 256);
+        double yMin = posStart.getY();
+        double yMax = posEnd.getY();
+
+        if (axis == EnumFacing.Axis.Z)
+        {
+            renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, EnumFacing.Axis.X, zMin, posZ, posX, yMin, yMax, rangeH,
+                    lineIntervalH, lineIntervalV, xMin, xMax, r, g, b, a);
+        }
+        else if (axis == EnumFacing.Axis.X)
+        {
+            renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, EnumFacing.Axis.Z, xMin, posX, posZ, yMin, yMax, rangeH,
+                    lineIntervalH, lineIntervalV, zMin, zMax, r, g, b, a);
+        }
+    }
+
     public static void renderVerticalWallsOfLinesIfWithinRange(
             BufferBuilder bufferQuads, BufferBuilder bufferLines,
             EnumFacing.Axis axis,
