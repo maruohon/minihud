@@ -7,6 +7,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.event.RenderHandler;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
+import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
@@ -36,7 +37,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             }
             else if (key == RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind())
             {
-                OverlayRenderer.slimeChunkOverlayTopY = mc.player.posY;
+                OverlayRendererSlimeChunks.overlayTopY = mc.player.posY;
             }
             else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind() && this.rendererConfig.getBooleanValue())
             {

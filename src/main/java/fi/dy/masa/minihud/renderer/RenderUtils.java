@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 public class RenderUtils
 {
     public static void renderVerticalWallsOfLinesWithinRange(
+            BufferBuilder bufferQuads, BufferBuilder bufferLines,
             BlockPos posStart,
             BlockPos posEnd,
             float rangeH,
@@ -22,7 +23,6 @@ public class RenderUtils
             float lineIntervalH,
             float lineIntervalV,
             Entity entity,
-            double dx, double dy, double dz,
             int color)
     {
         int xMin = Math.min(posStart.getX(), posEnd.getX());
@@ -41,33 +41,28 @@ public class RenderUtils
         double yMin = posStart.getY();
         double yMax = posEnd.getY();
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, EnumFacing.Axis.X, zMin, posZ, posX, yMin, yMax, rangeH,
+                lineIntervalH, lineIntervalV, xMin, xMax, r, g, b, a);
+        renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, EnumFacing.Axis.X, zMax, posZ, posX, yMin, yMax, rangeH,
+                lineIntervalH, lineIntervalV, xMin, xMax, r, g, b, a);
 
-        renderVerticalWallsOfLinesIfWithinRange(buffer, EnumFacing.Axis.X, zMin, posZ, posX, yMin, yMax, rangeH,
-                lineIntervalH, lineIntervalV, xMin, xMax, dx, dy, dz, r, g, b, a);
-        renderVerticalWallsOfLinesIfWithinRange(buffer, EnumFacing.Axis.X, zMax, posZ, posX, yMin, yMax, rangeH,
-                lineIntervalH, lineIntervalV, xMin, xMax, dx, dy, dz, r, g, b, a);
-
-        renderVerticalWallsOfLinesIfWithinRange(buffer, EnumFacing.Axis.Z, xMin, posX, posZ, yMin, yMax, rangeH,
-                lineIntervalH, lineIntervalV, zMin, zMax, dx, dy, dz, r, g, b, a);
-        renderVerticalWallsOfLinesIfWithinRange(buffer, EnumFacing.Axis.Z, xMax, posX, posZ, yMin, yMax, rangeH,
-                lineIntervalH, lineIntervalV, zMin, zMax, dx, dy, dz, r, g, b, a);
+        renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, EnumFacing.Axis.Z, xMin, posX, posZ, yMin, yMax, rangeH,
+                lineIntervalH, lineIntervalV, zMin, zMax, r, g, b, a);
+        renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, EnumFacing.Axis.Z, xMax, posX, posZ, yMin, yMax, rangeH,
+                lineIntervalH, lineIntervalV, zMin, zMax, r, g, b, a);
     }
 
     public static void renderVerticalWallsOfLinesIfWithinRange(
-            BufferBuilder buffer,
+            BufferBuilder bufferQuads, BufferBuilder bufferLines,
             EnumFacing.Axis axis,
             double edge, double posOnEdgeAxis, double posOnPerpAxis,
             double yMin, double yMax, float rangeH,
             float lineIntervalH, float lineIntervalV,
             int perpendicularMin, int perpendicularMax,
-            double dx, double dy, double dz,
             float r, float g, float b, float a)
     {
         if (Math.abs(posOnEdgeAxis - edge) <= rangeH)
         {
-            Tessellator tessellator = Tessellator.getInstance();
             double hMin = Math.max(Math.ceil((posOnPerpAxis - rangeH) / lineIntervalH) * lineIntervalV, perpendicularMin);
             double hMax = Math.min(Math.ceil((posOnPerpAxis + rangeH) / lineIntervalH) * lineIntervalV, perpendicularMax);
             float quadAlpha = a / 6f;
@@ -75,53 +70,41 @@ public class RenderUtils
             switch (axis)
             {
                 case X:
-                    buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-
                     for (double y = yMin; y <= yMax; y += lineIntervalV)
                     {
-                        buffer.pos(hMin - dx, y - dy, edge - dz).color(r, g, b, a).endVertex();
-                        buffer.pos(hMax - dx, y - dy, edge - dz).color(r, g, b, a).endVertex();
+                        bufferLines.pos(hMin, y, edge).color(r, g, b, a).endVertex();
+                        bufferLines.pos(hMax, y, edge).color(r, g, b, a).endVertex();
                     }
 
                     for (double h = hMin; h <= hMax; h += lineIntervalH)
                     {
-                        buffer.pos(h - dx, yMin - dy, edge - dz).color(r, g, b, a).endVertex();
-                        buffer.pos(h - dx, yMax - dy, edge - dz).color(r, g, b, a).endVertex();
+                        bufferLines.pos(h, yMin, edge).color(r, g, b, a).endVertex();
+                        bufferLines.pos(h, yMax, edge).color(r, g, b, a).endVertex();
                     }
 
-                    tessellator.draw();
-
-                    buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-                    buffer.pos(hMin - dx, yMin - dy, edge - dz).color(r, g, b, quadAlpha).endVertex();
-                    buffer.pos(hMin - dx, yMax - dy, edge - dz).color(r, g, b, quadAlpha).endVertex();
-                    buffer.pos(hMax - dx, yMax - dy, edge - dz).color(r, g, b, quadAlpha).endVertex();
-                    buffer.pos(hMax - dx, yMin - dy, edge - dz).color(r, g, b, quadAlpha).endVertex();
-                    tessellator.draw();
+                    bufferQuads.pos(hMin, yMin, edge).color(r, g, b, quadAlpha).endVertex();
+                    bufferQuads.pos(hMin, yMax, edge).color(r, g, b, quadAlpha).endVertex();
+                    bufferQuads.pos(hMax, yMax, edge).color(r, g, b, quadAlpha).endVertex();
+                    bufferQuads.pos(hMax, yMin, edge).color(r, g, b, quadAlpha).endVertex();
 
                     break;
                 case Z:
-                    buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-
                     for (double y = yMin; y <= yMax; y += lineIntervalV)
                     {
-                        buffer.pos(edge - dx, y - dy, hMin - dz).color(r, g, b, a).endVertex();
-                        buffer.pos(edge - dx, y - dy, hMax - dz).color(r, g, b, a).endVertex();
+                        bufferLines.pos(edge, y, hMin).color(r, g, b, a).endVertex();
+                        bufferLines.pos(edge, y, hMax).color(r, g, b, a).endVertex();
                     }
 
                     for (double h = hMin; h <= hMax; h += lineIntervalH)
                     {
-                        buffer.pos(edge - dx, yMin - dy, h - dz).color(r, g, b, a).endVertex();
-                        buffer.pos(edge - dx, yMax - dy, h - dz).color(r, g, b, a).endVertex();
+                        bufferLines.pos(edge, yMin, h).color(r, g, b, a).endVertex();
+                        bufferLines.pos(edge, yMax, h).color(r, g, b, a).endVertex();
                     }
 
-                    tessellator.draw();
-
-                    buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-                    buffer.pos(edge - dx, yMin - dy, hMin - dz).color(r, g, b, quadAlpha).endVertex();
-                    buffer.pos(edge - dx, yMax - dy, hMin - dz).color(r, g, b, quadAlpha).endVertex();
-                    buffer.pos(edge - dx, yMax - dy, hMax - dz).color(r, g, b, quadAlpha).endVertex();
-                    buffer.pos(edge - dx, yMin - dy, hMax - dz).color(r, g, b, quadAlpha).endVertex();
-                    tessellator.draw();
+                    bufferQuads.pos(edge, yMin, hMin).color(r, g, b, quadAlpha).endVertex();
+                    bufferQuads.pos(edge, yMax, hMin).color(r, g, b, quadAlpha).endVertex();
+                    bufferQuads.pos(edge, yMax, hMax).color(r, g, b, quadAlpha).endVertex();
+                    bufferQuads.pos(edge, yMin, hMax).color(r, g, b, quadAlpha).endVertex();
                     break;
                 default:
             }
@@ -145,6 +128,25 @@ public class RenderUtils
 
         RenderGlobal.renderFilledBox(x1, y1, z1, x2, y2, z2, r, g, b, quadAlpha);
         RenderGlobal.drawBoundingBox(x1, y1, z1, x2, y2, z2, r, g, b, a);
+    }
+
+    public static void renderBoxWithEdgesBatched(BufferBuilder bufferQuads, BufferBuilder bufferLines, BlockPos posMin, BlockPos posMax, int color)
+    {
+        final double x1 = posMin.getX();
+        final double y1 = posMin.getY();
+        final double z1 = posMin.getZ();
+        final double x2 = posMax.getX();
+        final double y2 = posMax.getY();
+        final double z2 = posMax.getZ();
+
+        final float a = ((color >>> 24) & 0xFF) / 255f;
+        final float r = ((color >>> 16) & 0xFF) / 255f;
+        final float g = ((color >>>  8) & 0xFF) / 255f;
+        final float b = ((color       ) & 0xFF) / 255f;
+        final float quadAlpha = a / 6f;
+
+        RenderGlobal.addChainedFilledBoxVertices(bufferQuads, x1, y1, z1, x2, y2, z2, r, g, b, quadAlpha);
+        RenderGlobal.drawBoundingBox(bufferLines, x1, y1, z1, x2, y2, z2, r, g, b, a);
     }
 
     public static void renderChunkOverlayTopQuad(int chunkX, int chunkZ, double y, double dx, double dz, int color)
@@ -171,29 +173,29 @@ public class RenderUtils
         tessellator.draw();
     }
 
-    public static void addChainedSidesAndTopBoxVertices(BufferBuilder buffer, double x1, double y1, double z1, double x2, double y2, double z2, float red, float green, float blue, float alpha)
+    public static void addChainedSidesAndTopBoxVertices(BufferBuilder buffer, float r, float g, float b, float a, double x1, double y1, double z1, double x2, double y2, double z2)
     {
-        buffer.pos(x1, y1, z1).color(red, green, blue, alpha).endVertex(); // (dummy)
+        buffer.pos(x1, y1, z1).color(r, g, b, 0).endVertex(); // (dummy)
 
-        buffer.pos(x1, y1, z1).color(red, green, blue, alpha).endVertex();
-        buffer.pos(x1, y2, z1).color(red, green, blue, alpha).endVertex();
-        buffer.pos(x1, y1, z2).color(red, green, blue, alpha).endVertex(); // west lower left
-        buffer.pos(x1, y2, z2).color(red, green, blue, alpha).endVertex(); // west upper right
-        buffer.pos(x2, y1, z2).color(red, green, blue, alpha).endVertex(); // south lower left
-        buffer.pos(x2, y2, z2).color(red, green, blue, alpha).endVertex(); // south upper right
-        buffer.pos(x2, y1, z1).color(red, green, blue, alpha).endVertex(); // east lower left
-        buffer.pos(x2, y2, z1).color(red, green, blue, alpha).endVertex(); // east upper right
-        buffer.pos(x1, y1, z1).color(red, green, blue, alpha).endVertex(); // north lower left
-        buffer.pos(x1, y2, z1).color(red, green, blue, alpha).endVertex(); // north upper right
+        buffer.pos(x1, y1, z1).color(r, g, b, a).endVertex();
+        buffer.pos(x1, y2, z1).color(r, g, b, a).endVertex();
+        buffer.pos(x1, y1, z2).color(r, g, b, a).endVertex(); // west lower left
+        buffer.pos(x1, y2, z2).color(r, g, b, a).endVertex(); // west upper right
+        buffer.pos(x2, y1, z2).color(r, g, b, a).endVertex(); // south lower left
+        buffer.pos(x2, y2, z2).color(r, g, b, a).endVertex(); // south upper right
+        buffer.pos(x2, y1, z1).color(r, g, b, a).endVertex(); // east lower left
+        buffer.pos(x2, y2, z1).color(r, g, b, a).endVertex(); // east upper right
+        buffer.pos(x1, y1, z1).color(r, g, b, a).endVertex(); // north lower left
+        buffer.pos(x1, y2, z1).color(r, g, b, a).endVertex(); // north upper right
 
-        buffer.pos(x1, y2, z1).color(red, green, blue, alpha).endVertex(); // (dummy)
+        buffer.pos(x1, y2, z1).color(r, g, b, 0).endVertex(); // (dummy)
 
-        buffer.pos(x1, y2, z2).color(red, green, blue, alpha).endVertex();
-        buffer.pos(x1, y2, z1).color(red, green, blue, alpha).endVertex();
-        buffer.pos(x2, y2, z2).color(red, green, blue, alpha).endVertex(); // top south west
-        buffer.pos(x2, y2, z1).color(red, green, blue, alpha).endVertex(); // top north east
+        buffer.pos(x1, y2, z2).color(r, g, b, a).endVertex();
+        buffer.pos(x1, y2, z1).color(r, g, b, a).endVertex();
+        buffer.pos(x2, y2, z2).color(r, g, b, a).endVertex(); // top south west
+        buffer.pos(x2, y2, z1).color(r, g, b, a).endVertex(); // top north east
 
-        buffer.pos(x2, y2, z1).color(red, green, blue, alpha).endVertex(); // (dummy)
+        buffer.pos(x2, y2, z1).color(r, g, b, 0).endVertex(); // (dummy)
     }
 
     public static void drawTextPlate(String text, double x, double y, double z, float scale, Minecraft mc)
