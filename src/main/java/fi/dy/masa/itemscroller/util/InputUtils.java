@@ -4,6 +4,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import fi.dy.masa.itemscroller.config.Hotkeys;
 import fi.dy.masa.itemscroller.event.KeybindCallbacks;
+import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -29,7 +30,12 @@ public class InputUtils
 
     public static boolean isRecipeViewOpen()
     {
-        return Hotkeys.KEY_RECIPE_VIEW.getKeybind().isKeybindHeld() && KeybindCallbacks.getInstance().functionalityEnabled();
+        Minecraft mc = Minecraft.getMinecraft();
+
+        return mc.currentScreen != null &&
+               Hotkeys.KEY_RECIPE_VIEW.getKeybind().isKeybindHeld() &&
+               KeybindCallbacks.getInstance().functionalityEnabled() &&
+               CraftingHandler.isCraftingGui(mc.currentScreen);
     }
 
     public static boolean canShiftDropItems(GuiContainer gui, Minecraft mc)

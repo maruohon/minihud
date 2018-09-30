@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import fi.dy.masa.itemscroller.LiteModItemScroller;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 
@@ -40,6 +41,11 @@ public class CraftingHandler
         }
 
         return false;
+    }
+
+    public static boolean isCraftingGui(GuiScreen gui)
+    {
+        return (gui instanceof GuiContainer) && CRAFTING_GUIS.contains(((GuiContainer) gui).getClass());
     }
 
     /**
