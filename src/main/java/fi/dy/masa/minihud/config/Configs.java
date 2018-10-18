@@ -25,6 +25,7 @@ import fi.dy.masa.minihud.event.RenderHandler;
 public class Configs implements IConfigHandler
 {
     private static final String CONFIG_FILE_NAME = Reference.MOD_ID + ".json";
+    private static final int CONFIG_VERSION = 1;
 
     public static class Generic
     {
@@ -133,12 +134,16 @@ public class Configs implements IConfigHandler
                 ConfigUtils.readConfigBase(root, "Colors", Configs.Colors.OPTIONS);
                 ConfigUtils.readHotkeyToggleOptions(root, "RendererHotkeys", "RendererToggles", ImmutableList.copyOf(RendererToggle.values()));
                 ConfigUtils.readHotkeyToggleOptions(root, "InfoHotkeys", "InfoTypeToggles", ImmutableList.copyOf(InfoToggle.values()));
+                int version = JsonUtils.getIntegerOrDefault(root, "config_version", 0);
 
-                for (InfoToggle toggle : InfoToggle.values())
+                if (objInfoLineOrders != null && version >= 1)
                 {
-                    if (objInfoLineOrders != null && JsonUtils.hasInteger(objInfoLineOrders, toggle.getName()))
+                    for (InfoToggle toggle : InfoToggle.values())
                     {
-                        toggle.setIntegerValue(JsonUtils.getInteger(objInfoLineOrders, toggle.getName()));
+                        if (JsonUtils.hasInteger(objInfoLineOrders, toggle.getName()))
+                        {
+                            toggle.setIntegerValue(JsonUtils.getInteger(objInfoLineOrders, toggle.getName()));
+                        }
                     }
                 }
             }
@@ -165,6 +170,8 @@ public class Configs implements IConfigHandler
             {
                 objInfoLineOrders.add(toggle.getName(), new JsonPrimitive(toggle.getIntegerValue()));
             }
+
+            root.add("config_version", new JsonPrimitive(CONFIG_VERSION));
 
             JsonUtils.writeJsonToFile(root, new File(dir, CONFIG_FILE_NAME));
         }
