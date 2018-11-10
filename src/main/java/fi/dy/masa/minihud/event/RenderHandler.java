@@ -19,6 +19,7 @@ import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -720,7 +721,11 @@ public class RenderHandler implements IRenderer
                 T value = (T) entry.getValue();
                 String valueName = property.getName(value);
 
-                if (Boolean.TRUE.equals(value))
+                if (property instanceof PropertyDirection)
+                {
+                    valueName = TextFormatting.GOLD + valueName;
+                }
+                else if (Boolean.TRUE.equals(value))
                 {
                     valueName = TextFormatting.GREEN + valueName;
                 }
@@ -730,7 +735,7 @@ public class RenderHandler implements IRenderer
                 }
                 else if (Integer.class.equals(property.getValueClass()))
                 {
-                    valueName = TextFormatting.AQUA + valueName;
+                    valueName = TextFormatting.GREEN + valueName;
                 }
 
                 this.addLine(property.getName() + ": " + valueName);
