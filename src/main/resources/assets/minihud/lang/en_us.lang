@@ -2,8 +2,15 @@ language.name=English
 language.region=US
 language.code=en_US
 
-category.minihud=Mini HUD
-minihud.key.togglemode=Toggle Mode
+
+minihud.gui.button.config_gui.colors=Colors
+minihud.gui.button.config_gui.generic=Generic
+minihud.gui.button.config_gui.info_toggles=Info Toggles
+minihud.gui.button.config_gui.info_line_order=Info Line Order
+minihud.gui.button.config_gui.info_hotkeys=Info Hotkeys
+minihud.gui.button.config_gui.renderer_hotkeys=Renderer Hotkeys
+
+minihud.gui.title.configs=MiniHUD Configs
 
 minihud.hotkeys.category.generic_hotkeys=Generic hotkeys
 minihud.hotkeys.category.info_toggle_hotkeys=Info Toggle hotkeys
