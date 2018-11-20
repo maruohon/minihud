@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
@@ -146,12 +147,13 @@ public class DataStorage
         }
     }
 
-    public void markChunkForHightmapCheck(int chunkX, int chunkZ)
+    public void markChunkForHeightmapCheck(int chunkX, int chunkZ)
     {
+        OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
         this.chunkHeightmapsToCheck.add(new ChunkPos(chunkX, chunkZ));
     }
 
-    public void checkQueuedDirtyChunkHightmaps()
+    public void checkQueuedDirtyChunkHeightmaps()
     {
         WorldClient world = this.mc.world;
 

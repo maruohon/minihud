@@ -169,7 +169,7 @@ public class RenderHandler implements IRenderer
             if (InfoToggle.SPAWNABLE_SUB_CHUNKS.getBooleanValue() &&
                 mc.world.getTotalWorldTime() % Configs.Generic.SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL.getIntegerValue() == 0)
             {
-                DataStorage.getInstance().checkQueuedDirtyChunkHightmaps();
+                DataStorage.getInstance().checkQueuedDirtyChunkHeightmaps();
             }
         }
     }

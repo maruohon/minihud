@@ -1,5 +1,7 @@
 package fi.dy.masa.minihud.renderer;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.lwjgl.opengl.GL11;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.Configs;
@@ -9,10 +11,26 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 
 public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
 {
+    private static final Set<Long> DIRTY_CHUNKS = new HashSet<>();
+
+    private long lastCheckTime;
+
+    public static void markChunkChanged(int cx, int cz)
+    {
+        if (RendererToggle.OVERLAY_SPAWNABLE_COLUMN_HEIGHTS.getBooleanValue())
+        {
+            synchronized (DIRTY_CHUNKS)
+            {
+                DIRTY_CHUNKS.add(ChunkPos.asLong(cx, cz));
+            }
+        }
+    }
+
     @Override
     public boolean shouldRender(Minecraft mc)
     {
@@ -26,7 +44,38 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
         int ez = (int) Math.floor(entity.posZ);
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
-        return Math.abs(lx - ex) > 16 || Math.abs(lz - ez) > 16;
+
+        if (Math.abs(lx - ex) > 8 || Math.abs(lz - ez) > 8)
+        {
+            return true;
+        }
+
+        if (System.currentTimeMillis() - this.lastCheckTime > 1000)
+        {
+            final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
+            final int xStart = (((int) entity.posX) >> 4) - radius;
+            final int zStart = (((int) entity.posZ) >> 4) - radius;
+            final int xEnd = (((int) entity.posX) >> 4) + radius;
+            final int zEnd = (((int) entity.posZ) >> 4) + radius;
+
+            synchronized (DIRTY_CHUNKS)
+            {
+                for (int cx = xStart; cx <= xEnd; ++cx)
+                {
+                    for (int cz = zStart; cz <= zEnd; ++cz)
+                    {
+                        if (DIRTY_CHUNKS.contains(ChunkPos.asLong(cx, cz)))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            this.lastCheckTime = System.currentTimeMillis();
+        }
+
+        return false;
     }
 
     @Override
@@ -79,6 +128,12 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
         renderLines.uploadData(BUFFER_2);
 
         this.lastUpdatePos = new BlockPos(entity.posX, 0, entity.posZ);
+        this.lastCheckTime = System.currentTimeMillis();
+
+        synchronized (DIRTY_CHUNKS)
+        {
+            DIRTY_CHUNKS.clear();
+        }
     }
 
     @Override

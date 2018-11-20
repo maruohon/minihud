@@ -38,19 +38,19 @@ public class MixinNetHandlerPlayClient
     @Inject(method = "handleChunkData", at = @At("RETURN"))
     private void markChunkChangedFullChunk(SPacketChunkData packet, CallbackInfo ci)
     {
-        DataStorage.getInstance().markChunkForHightmapCheck(packet.getChunkX(), packet.getChunkZ());
+        DataStorage.getInstance().markChunkForHeightmapCheck(packet.getChunkX(), packet.getChunkZ());
     }
 
     @Inject(method = "handleBlockChange", at = @At("RETURN"))
     private void markChunkChangedBlockChange(SPacketBlockChange packet, CallbackInfo ci)
     {
-        DataStorage.getInstance().markChunkForHightmapCheck(packet.getBlockPosition().getX() >> 4, packet.getBlockPosition().getZ() >> 4);
+        DataStorage.getInstance().markChunkForHeightmapCheck(packet.getBlockPosition().getX() >> 4, packet.getBlockPosition().getZ() >> 4);
     }
 
     @Inject(method = "handleMultiBlockChange", at = @At("RETURN"))
     private void markChunkChangedMultiBlockChange(SPacketMultiBlockChange packet, CallbackInfo ci)
     {
         ChunkPos pos = ((IMixinSPacketMultiBlockChange) packet).getChunkPos();
-        DataStorage.getInstance().markChunkForHightmapCheck(pos.x, pos.z);
+        DataStorage.getInstance().markChunkForHeightmapCheck(pos.x, pos.z);
     }
 }
