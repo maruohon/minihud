@@ -54,7 +54,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         }
         else
         {
-            obj = new RenderObjectDisplayList();
+            obj = new RenderObjectDisplayList(glMode);
         }
 
         this.renderObjects.add(obj);

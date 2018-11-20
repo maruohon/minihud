@@ -37,8 +37,10 @@ public class OverlayRendererRegion extends OverlayRendererBase
     @Override
     public void update(Entity entity, Minecraft mc)
     {
-        BUFFER_1.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+        RenderObjectBase renderQuads = this.renderObjects.get(0);
+        RenderObjectBase renderLines = this.renderObjects.get(1);
+        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
         int rx = MathHelper.floor(entity.posX) & ~0x1FF;
         int rz = MathHelper.floor(entity.posZ) & ~0x1FF;
@@ -52,8 +54,8 @@ public class OverlayRendererRegion extends OverlayRendererBase
         BUFFER_1.finishDrawing();
         BUFFER_2.finishDrawing();
 
-        this.renderObjects.get(0).uploadData(BUFFER_1);
-        this.renderObjects.get(1).uploadData(BUFFER_2);
+        renderQuads.uploadData(BUFFER_1);
+        renderLines.uploadData(BUFFER_2);
 
         this.lastUpdatePos = new BlockPos(entity);
     }

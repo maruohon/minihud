@@ -12,12 +12,12 @@ public class RenderObjectVbo extends RenderObjectBase
     protected static final VertexBufferUploader VERTEX_UPLOADER = new VertexBufferUploader();
 
     protected final VertexBuffer vertexBuffer;
-    protected final int glMode;
 
     public RenderObjectVbo(int glMode)
     {
+        super(glMode);
+
         this.vertexBuffer = new VertexBuffer(DefaultVertexFormats.POSITION_COLOR);
-        this.glMode = glMode;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class RenderObjectVbo extends RenderObjectBase
 
         this.vertexBuffer.bindBuffer();
         this.setupArrayPointers();
-        this.vertexBuffer.drawArrays(this.glMode);
+        this.vertexBuffer.drawArrays(this.getGlMode());
 
         GlStateManager.popMatrix();
     }

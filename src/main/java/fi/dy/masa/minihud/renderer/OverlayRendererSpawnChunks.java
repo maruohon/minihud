@@ -59,8 +59,10 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         DataStorage data = DataStorage.getInstance();
         BlockPos spawn = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ? new BlockPos(entity) : data.getWorldSpawn();
 
-        BUFFER_1.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+        RenderObjectBase renderQuads = this.renderObjects.get(0);
+        RenderObjectBase renderLines = this.renderObjects.get(1);
+        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
         int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
         Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 128);
@@ -74,8 +76,8 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         BUFFER_1.finishDrawing();
         BUFFER_2.finishDrawing();
 
-        this.renderObjects.get(0).uploadData(BUFFER_1);
-        this.renderObjects.get(1).uploadData(BUFFER_2);
+        renderQuads.uploadData(BUFFER_1);
+        renderLines.uploadData(BUFFER_2);
 
         this.lastUpdatePos = new BlockPos(entity);
         this.rendered = true;

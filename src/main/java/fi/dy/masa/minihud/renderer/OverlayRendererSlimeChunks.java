@@ -1,6 +1,7 @@
 package fi.dy.masa.minihud.renderer;
 
 import org.lwjgl.opengl.GL11;
+import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -51,7 +52,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
             final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
             final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
             final long worldSeed = data.getWorldSeed(entity.dimension);
-            final int color = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getIntegerValue();
+            final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
+            final Color4f colorSides = Color4f.fromColor(colorLines, colorLines.a / 6);
             PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();
             PooledMutableBlockPos pos2 = PooledMutableBlockPos.retain();
             int r = MathHelper.clamp(Configs.Generic.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
@@ -61,8 +63,10 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
                 r = mc.gameSettings.renderDistanceChunks;
             }
 
-            BUFFER_1.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-            BUFFER_2.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+            RenderObjectBase renderQuads = this.renderObjects.get(0);
+            RenderObjectBase renderLines = this.renderObjects.get(1);
+            BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+            BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
             for (int xOff = -r; xOff <= r; xOff++)
             {
@@ -75,7 +79,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
                     {
                         pos1.setPos( cx << 4,               0,  cz << 4);
                         pos2.setPos((cx << 4) + 16, this.topY, (cz << 4) + 16);
-                        RenderUtils.renderBoxWithEdgesBatched(BUFFER_1, BUFFER_2, pos1, pos2, color);
+                        RenderUtils.renderBoxWithEdgesBatched(BUFFER_1, BUFFER_2, pos1, pos2, colorLines, colorSides);
                     }
                 }
             }
@@ -86,8 +90,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
             BUFFER_1.finishDrawing();
             BUFFER_2.finishDrawing();
 
-            this.renderObjects.get(0).uploadData(BUFFER_1);
-            this.renderObjects.get(1).uploadData(BUFFER_2);
+            renderQuads.uploadData(BUFFER_1);
+            renderLines.uploadData(BUFFER_2);
 
             this.lastUpdatePos = new BlockPos(entity);
         }
@@ -96,7 +100,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     @Override
     public void allocateGlResources()
     {
-        this.allocateBuffer(GL11.GL_TRIANGLE_STRIP);
-        this.allocateBuffer(GL11.GL_LINE_STRIP);
+        this.allocateBuffer(GL11.GL_QUADS);
+        this.allocateBuffer(GL11.GL_LINES);
     }
 }

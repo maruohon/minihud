@@ -12,8 +12,10 @@ public class RenderObjectDisplayList extends RenderObjectBase
 
     protected final int baseDisplayList;
 
-    public RenderObjectDisplayList()
+    public RenderObjectDisplayList(int glMode)
     {
+        super(glMode);
+
         this.baseDisplayList = GLAllocation.generateDisplayLists(1);
     }
 
