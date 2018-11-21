@@ -15,7 +15,6 @@ public class OverlayRendererRegion extends OverlayRendererBase
 
     public OverlayRendererRegion()
     {
-        this.glLineWidth = 1f;
     }
 
     @Override

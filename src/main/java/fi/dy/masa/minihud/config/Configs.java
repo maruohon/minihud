@@ -98,6 +98,8 @@ public class Configs implements IConfigHandler
         public static final ConfigColor SPAWN_PLAYER_LAZY_OVERLAY_COLOR     = new ConfigColor("spawnPlayerLazyOverlayColor", "0xFFD030D0", "Color for the \"lazy-loaded\" spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
         public static final ConfigColor SPAWN_REAL_ENTITY_OVERLAY_COLOR     = new ConfigColor("spawnRealEntityOverlayColor", "0xFF30FF20", "Color for the entity-processing real spawn chunks overlay");
         public static final ConfigColor SPAWN_REAL_LAZY_OVERLAY_COLOR       = new ConfigColor("spawnRealLazyOverlayColor", "0xFFFF3020", "Color for the \"lazy-loaded\" real spawn chunks overlay");
+        public static final ConfigColor SPAWNABLE_CHUNKS_FIXED_OVERLAY_COLOR    = new ConfigColor("spawnableChunkFixedOverlayColor", "0xFFFF2090", "Color for the location-fixed spawnable chunks overlay");
+        public static final ConfigColor SPAWNABLE_CHUNKS_PLAYER_OVERLAY_COLOR   = new ConfigColor("spawnableChunksPlayerOverlayColor", "0xFFFF3030", "Color for the player-following spawnable chunks overlay");
         public static final ConfigColor SPAWNABLE_COLUMNS_OVERLAY_COLOR     = new ConfigColor("spawnableColumnHeightsOverlayColor", "0xA0FF00FF", "Color for the spawnable sub-chunks overlay");
         public static final ConfigColor SPAWNABLE_SUB_CHUNKS_OVERLAY_COLOR  = new ConfigColor("spawnableSubChunksOverlayColor", "0xFF2050D0", "Color for the spawnable sub-chunks overlay");
         public static final ConfigColor TEXT_BACKGROUND_COLOR               = new ConfigColor("textBackgroundColor", "0xA0505050", "Text background color");
@@ -112,6 +114,8 @@ public class Configs implements IConfigHandler
                 SPAWN_PLAYER_LAZY_OVERLAY_COLOR,
                 SPAWN_REAL_ENTITY_OVERLAY_COLOR,
                 SPAWN_REAL_LAZY_OVERLAY_COLOR,
+                SPAWNABLE_CHUNKS_FIXED_OVERLAY_COLOR,
+                SPAWNABLE_CHUNKS_PLAYER_OVERLAY_COLOR,
                 SPAWNABLE_COLUMNS_OVERLAY_COLOR,
                 SPAWNABLE_SUB_CHUNKS_OVERLAY_COLOR,
                 TEXT_BACKGROUND_COLOR,

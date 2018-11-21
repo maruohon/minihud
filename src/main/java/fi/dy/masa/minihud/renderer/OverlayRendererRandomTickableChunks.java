@@ -36,13 +36,12 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
-        if (newPos != null)
+        if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED)
         {
-            return true;
+            return newPos != null;
         }
-
         // Player-following renderer
-        if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
+        else if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
         {
             return entity.posX != this.pos.x || entity.posZ != this.pos.z;
         }

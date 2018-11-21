@@ -25,6 +25,8 @@ public enum RendererToggle implements IHotkeyTogglable
     OVERLAY_RANDOM_TICKS_FIXED          ("overlayRandomTicksFixed",     "",    "Toggle the fixed-point random ticked chunks overlay renderer", "Random ticked chunks (fixed) overlay"),
     OVERLAY_RANDOM_TICKS_PLAYER         ("overlayRandomTicksPlayer",    "",    "Toggle the player-following random ticked chunks overlay renderer", "Random ticked chunks (player-following) overlay"),
     OVERLAY_SLIME_CHUNKS_OVERLAY        ("overlaySlimeChunks",          "H,M", "Toggle the Slime Chunk overlay renderer", "Slime chunk overlay"),
+    OVERLAY_SPAWNABLE_CHUNKS_FIXED      ("overlaySpawnableChunksFixed",  "",   "Toggle the location-fixed spawnable chunks overlay renderer", "Spawnable chunks (fixed) overlay"),
+    OVERLAY_SPAWNABLE_CHUNKS_PLAYER     ("overlaySpawnableChunksPlayer", "",   "Toggle the player-following spawnable chunks overlay renderer", "Spawnable chunks (player-following) overlay"),
     OVERLAY_SPAWNABLE_COLUMN_HEIGHTS    ("overlaySpawnableColumnHeights","",   "Toggle the spawnable column heights overlay renderer", "Spawnable column heights overlay"),
     OVERLAY_SPAWN_CHUNK_OVERLAY_REAL    ("overlaySpawnChunkReal",       "H,V", "Toggle the spawn chunks overlay renderer", "Spawn chunks overlay"),
     OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER  ("overlaySpawnChunkPlayer",     "H,Q", "Toggle the pseudo (player-following) spawn chunks overlay renderer", "Would-be (player-following) spawn chunks overlay");
