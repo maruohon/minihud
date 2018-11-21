@@ -3,7 +3,6 @@ package fi.dy.masa.minihud.renderer;
 import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
-import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -32,14 +31,8 @@ public class RenderContainer
         this.renderers.add(new OverlayRendererSpawnableColumnHeights());
         this.renderers.add(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED));
         this.renderers.add(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER));
-        this.renderers.add(new OverlayRendererSpawnChunks(
-                RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL,
-                Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getIntegerValue(),
-                Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getIntegerValue()));
-        this.renderers.add(new OverlayRendererSpawnChunks(
-                RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER,
-                Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getIntegerValue(),
-                Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue()));
+        this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL));
+        this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER));
 
         this.allocateGlResources();
     }

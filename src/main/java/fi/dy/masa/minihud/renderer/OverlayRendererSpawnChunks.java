@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.renderer;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
+import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.Minecraft;
@@ -12,20 +13,22 @@ import net.minecraft.util.math.BlockPos;
 public class OverlayRendererSpawnChunks extends OverlayRendererBase
 {
     protected final RendererToggle toggle;
-    protected final int colorEntityProcessing;
-    protected final int colorLazy;
     protected boolean rendered;
 
-    public OverlayRendererSpawnChunks(RendererToggle toggle, int colorEntityProcessing, int colorLazy)
+    public OverlayRendererSpawnChunks(RendererToggle toggle)
     {
         this.toggle = toggle;
-        this.colorEntityProcessing = colorEntityProcessing;
-        this.colorLazy = colorLazy;
     }
 
     @Override
     public boolean shouldRender(Minecraft mc)
     {
+        if (this.toggle.getBooleanValue() == false)
+        {
+            // A cheap hack to get it to re-render after toggling off/on
+            this.rendered = false;
+        }
+
         return this.toggle.getBooleanValue() &&
                 (this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ||
                  DataStorage.getInstance().isWorldSpawnKnown());
@@ -64,14 +67,21 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
+        final int colorEntity = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
+                Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getIntegerValue() :
+                Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getIntegerValue();
+        final int colorLazy = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
+                Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getIntegerValue() :
+                Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
+
         int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
         Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 128);
         RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
-                rangeH, 256, 16, 16, entity, this.colorLazy);
+                rangeH, 256, 16, 16, entity, colorLazy);
 
         corners = this.getSpawnChunkCorners(spawn, 128 - 32);
         RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
-                rangeH, 256, 16, 16, entity, this.colorEntityProcessing);
+                rangeH, 256, 16, 16, entity, colorEntity);
 
         BUFFER_1.finishDrawing();
         BUFFER_2.finishDrawing();
