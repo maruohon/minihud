@@ -184,7 +184,7 @@ public class RecipeStorage
 
     private File getSaveDir()
     {
-        return new File(Minecraft.getMinecraft().mcDataDir, Reference.MOD_ID);
+        return new File(Minecraft.getMinecraft().gameDir, Reference.MOD_ID);
     }
 
     public void readFromDisk()
