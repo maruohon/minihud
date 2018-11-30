@@ -314,8 +314,9 @@ public class DataStorage
                     this.worldSpawn = new BlockPos(x, y, z);
                     this.worldSpawnValid = true;
 
-                    LiteModMiniHud.logger.info("Received world spawn from the vanilla /setworlspawn command: {}", this.worldSpawn);
-                    MiscUtils.printInfoMessage("minihud.message.spawn_set", this.worldSpawn);
+                    String spawnStr = String.format("x: %d, y: %d, z: %d", this.worldSpawn.getX(), this.worldSpawn.getY(), this.worldSpawn.getZ());
+                    LiteModMiniHud.logger.info("Received world spawn from the vanilla /setworldspawn command: {}", spawnStr);
+                    MiscUtils.printInfoMessage("minihud.message.spawn_set", spawnStr);
                 }
                 catch (Exception e)
                 {
