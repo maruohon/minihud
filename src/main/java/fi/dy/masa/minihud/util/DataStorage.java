@@ -163,7 +163,7 @@ public class DataStorage
             {
                 for (ChunkPos pos : this.chunkHeightmapsToCheck)
                 {
-                    Chunk chunk = world.getChunkFromChunkCoords(pos.x, pos.z);
+                    Chunk chunk = world.getChunk(pos.x, pos.z);
                     int[] heightMap = chunk.getHeightMap();
                     int maxHeight = -1;
 

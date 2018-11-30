@@ -104,7 +104,7 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
 
                 if (height == 0)
                 {
-                    height = world.getChunkFromChunkCoords(x << 4, z << 4).getTopFilledSegment() + 15;
+                    height = world.getChunk(x << 4, z << 4).getTopFilledSegment() + 15;
                 }
 
                 final double minY = height;

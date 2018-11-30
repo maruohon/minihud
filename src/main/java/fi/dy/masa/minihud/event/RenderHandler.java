@@ -438,7 +438,7 @@ public class RenderHandler implements IRenderer
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
             {
-                Chunk chunk = mc.world.getChunkFromBlockCoords(pos);
+                Chunk chunk = mc.world.getChunk(pos);
 
                 if (chunk.isEmpty() == false)
                 {
@@ -541,7 +541,7 @@ public class RenderHandler implements IRenderer
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
             {
-                Chunk chunk = mc.world.getChunkFromBlockCoords(pos);
+                Chunk chunk = mc.world.getChunk(pos);
 
                 if (chunk.isEmpty() == false)
                 {
@@ -554,7 +554,7 @@ public class RenderHandler implements IRenderer
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
             {
-                Chunk chunk = mc.world.getChunkFromBlockCoords(pos);
+                Chunk chunk = mc.world.getChunk(pos);
 
                 if (chunk.isEmpty() == false)
                 {

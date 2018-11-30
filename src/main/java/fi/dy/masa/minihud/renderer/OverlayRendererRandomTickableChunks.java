@@ -116,7 +116,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     {
         for (EnumFacing side : HORIZONTALS)
         {
-            ChunkPos posTmp = new ChunkPos(pos.x + side.getFrontOffsetX(), pos.z + side.getFrontOffsetZ());
+            ChunkPos posTmp = new ChunkPos(pos.x + side.getXOffset(), pos.z + side.getZOffset());
 
             if (chunks.contains(posTmp) == false)
             {
