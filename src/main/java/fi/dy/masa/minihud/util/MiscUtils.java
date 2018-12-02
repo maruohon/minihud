@@ -68,7 +68,7 @@ public class MiscUtils
 
         try
         {
-            Set<Long> droppedChunks = provider.getDroppedChunksSet();
+            Set<Long> droppedChunks = provider.getDroppedChunks();
             Field field = droppedChunks.getClass().getDeclaredField("map");
             field.setAccessible(true);
 

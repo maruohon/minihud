@@ -9,5 +9,5 @@ import net.minecraft.world.gen.ChunkProviderServer;
 public interface IMixinChunkProviderServer
 {
     @Accessor
-    Set<Long> getDroppedChunksSet();
+    Set<Long> getDroppedChunks();
 }
