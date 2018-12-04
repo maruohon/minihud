@@ -15,6 +15,7 @@
         "MixinDebugRendererSolidFace",
         "MixinGuiScreen",
         "MixinGuiSubtitleOverlay",
+        "MixinMinecraft",
         "MixinMinecraftServer",
         "MixinNetHandlerPlayClient",
         "MixinWorld"

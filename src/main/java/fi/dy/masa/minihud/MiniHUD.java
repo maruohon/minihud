@@ -34,15 +34,6 @@ public class MiniHUD implements ClientTickable, InitializationListener
         InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
     }
 
-    // TODO
-    /*
-    @Override
-    public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
-    {
-        DataStorage.getInstance().onWorldLoad();
-    }
-    */
-
     @Override
     public void clientTick(Minecraft mc)
     {

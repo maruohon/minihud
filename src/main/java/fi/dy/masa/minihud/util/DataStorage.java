@@ -48,7 +48,7 @@ public class DataStorage
         return INSTANCE;
     }
 
-    public void onWorldLoad()
+    public void reset()
     {
         this.worldSeedValid = false;
         this.serverTPSValid = false;
