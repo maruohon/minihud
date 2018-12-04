@@ -621,11 +621,11 @@ public class RenderHandler implements IRenderer
                 {
                     EntityLivingBase living = (EntityLivingBase) target;
                     this.addLine(String.format("Entity: %s - HP: %.1f / %.1f",
-                            target.getName(), living.getHealth(), living.getMaxHealth()));
+                            target.getName().getString(), living.getHealth(), living.getMaxHealth()));
                 }
                 else
                 {
-                    this.addLine(String.format("Entity: %s", target.getName()));
+                    this.addLine(String.format("Entity: %s", target.getName().getString()));
                 }
             }
         }
