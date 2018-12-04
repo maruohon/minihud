@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.config.IConfigBase;
@@ -19,6 +18,7 @@ import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.options.ConfigString;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.event.RenderHandler;
@@ -41,7 +41,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       FIX_VANILLA_DEBUG_RENDERERS         = new ConfigBoolean("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed.");
         public static final ConfigDouble        FONT_SCALE                          = new ConfigDouble("fontScale", 0.5, "Font scale factor. Valid range: 0.0 - 10.0. Default: 0.5\n");
         public static final ConfigOptionList    HUD_ALIGNMENT                       = new ConfigOptionList("hudAlignment", HudAlignment.TOP_LEFT, "The alignment of the HUD.");
-        public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "", "A hotkey to open the in-game Config GUI");
+        public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "LCONTROL,H,C", "A hotkey to open the in-game Config GUI");
         public static final ConfigBoolean       REQUIRE_SNEAK                       = new ConfigBoolean("requireSneak", false, "Require the player to be sneaking to render the HUD");
         public static final ConfigHotkey        REQUIRED_KEY                        = new ConfigHotkey("requiredKey", "", KeybindSettings.MODIFIER_INGAME, "Require holding this key to render the HUD");
         public static final ConfigBoolean       SORT_LINES_BY_LENGTH                = new ConfigBoolean("sortLinesByLength", false, "Sort the lines by their text's length");
@@ -126,7 +126,7 @@ public class Configs implements IConfigHandler
 
     public static void loadFromFile()
     {
-        File configFile = new File(LiteLoader.getCommonConfigFolder(), CONFIG_FILE_NAME);
+        File configFile = new File(FileUtils.getConfigDirectory(), CONFIG_FILE_NAME);
 
         if (configFile.exists() && configFile.isFile() && configFile.canRead())
         {
@@ -161,9 +161,9 @@ public class Configs implements IConfigHandler
 
     public static void saveToFile()
     {
-        File dir = LiteLoader.getCommonConfigFolder();
+        File dir = FileUtils.getConfigDirectory();
 
-        if (dir.exists() && dir.isDirectory())
+        if ((dir.exists() && dir.isDirectory()) || dir.mkdirs())
         {
             JsonObject root = new JsonObject();
             JsonObject objInfoLineOrders = JsonUtils.getNestedObject(root, "InfoLineOrders", true);
@@ -188,6 +188,12 @@ public class Configs implements IConfigHandler
     public void onConfigsChanged()
     {
         saveToFile();
+        loadFromFile();
+    }
+
+    @Override
+    public void load()
+    {
         loadFromFile();
     }
 

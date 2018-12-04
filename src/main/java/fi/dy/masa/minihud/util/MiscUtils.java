@@ -1,13 +1,10 @@
 package fi.dy.masa.minihud.util;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.Set;
-import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.ChatType;
@@ -56,7 +53,7 @@ public class MiscUtils
 
     public static void printInfoMessage(String key, Object... args)
     {
-        Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation(key, args));
+        Minecraft.getInstance().ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation(key, args));
     }
 
     /**
@@ -64,11 +61,12 @@ public class MiscUtils
      */
     public static int getCurrentHashSize(WorldServer server)
     {
+        /*
         IMixinChunkProviderServer provider = (IMixinChunkProviderServer) (Object) server.getChunkProvider();
 
         try
         {
-            Set<Long> droppedChunks = provider.getDroppedChunksSet();
+            LongSet droppedChunks = provider.getDroppedChunks();
             Field field = droppedChunks.getClass().getDeclaredField("map");
             field.setAccessible(true);
 
@@ -90,8 +88,10 @@ public class MiscUtils
         {
             e.printStackTrace();
         }
+        */
 
-        return -1;
+        // FIXME 1.13
+        return 1;
     }
 
 
@@ -109,7 +109,7 @@ public class MiscUtils
         }
         catch (Exception e)
         {
-            LiteModMiniHud.logger.error("Error while trying to get the chunk unload order");
+            MiniHUD.logger.error("Error while trying to get the chunk unload order");
             return -1;
         }
     }

@@ -30,7 +30,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
     @Override
     public boolean onKeyAction(KeyAction action, IKeybind key)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         if (mc != null && mc.player != null && super.onKeyAction(action, key))
         {

@@ -178,19 +178,19 @@ public class RenderUtils
 
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, z);
-        GlStateManager.glNormal3f(0.0F, 1.0F, 0.0F);
+        GlStateManager.translated(x, y, z);
+        GlStateManager.normal3f(0.0F, 1.0F, 0.0F);
 
-        GlStateManager.rotate(-viewerYaw, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate((isThirdPersonFrontal ? -1 : 1) * viewerPitch, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotatef(-viewerYaw, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotatef((isThirdPersonFrontal ? -1 : 1) * viewerPitch, 1.0F, 0.0F, 0.0F);
 
-        GlStateManager.scale(-scale, -scale, scale);
+        GlStateManager.scaled(-scale, -scale, scale);
         GlStateManager.disableLighting();
         GlStateManager.depthMask(false);
-        GlStateManager.disableDepth();
+        GlStateManager.disableDepthTest();
 
         GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
                 GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.disableTexture2D();
 
@@ -208,13 +208,13 @@ public class RenderUtils
         GlStateManager.enableTexture2D();
 
         fontrenderer.drawString(text, -strLenHalved, 0, 0x20FFFFFF);
-        GlStateManager.enableDepth();
+        GlStateManager.enableDepthTest();
 
         GlStateManager.depthMask(true);
         fontrenderer.drawString(text, -strLenHalved, 0, flag ? 0x20FFFFFF : 0xFFFFFFFF);
 
         GlStateManager.disableBlend();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1f, 1f, 1f, 1f);
         GlStateManager.popMatrix();
     }
 }

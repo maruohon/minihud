@@ -39,7 +39,7 @@ public class DebugInfoUtils
         buffer.writeFloat(maxDistance);
         writePathToBuffer(buffer, path);
 
-        SPacketCustomPayload packet = new SPacketCustomPayload("MC|DebugPath", buffer);
+        SPacketCustomPayload packet = new SPacketCustomPayload(SPacketCustomPayload.DEBUG_PATH, buffer);
         server.getPlayerList().sendPacketToAllPlayers(packet);
     }
 
@@ -124,15 +124,15 @@ public class DebugInfoUtils
         // We are catching updates from the server world, and adding them to the debug renderer directly
         if (neighborUpdateEnabled && world.isRemote == false)
         {
-            final long time = world.getTotalWorldTime();
+            final long time = world.getGameTime();
 
-            Minecraft.getMinecraft().addScheduledTask(new Runnable()
+            Minecraft.getInstance().addScheduledTask(new Runnable()
             {
                 public void run()
                 {
                     for (EnumFacing side : notifiedSides)
                     {
-                        ((DebugRendererNeighborsUpdate) Minecraft.getMinecraft().debugRenderer.neighborsUpdate).addUpdate(time, pos.offset(side));
+                        ((DebugRendererNeighborsUpdate) Minecraft.getInstance().debugRenderer.neighborsUpdate).addUpdate(time, pos.offset(side));
                     }
                 }
             });
@@ -141,13 +141,13 @@ public class DebugInfoUtils
 
     public static void onServerTickEnd(MinecraftServer server)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         // Send the custom packet with the Path data, if that debug renderer is enabled
         if (pathfindingEnabled && mc.world != null && ++tickCounter >= 10)
         {
             tickCounter = 0;
-            World world = server.getWorld(mc.world.provider.getDimensionType().getId());
+            World world = server.getWorld(mc.world.dimension.getType());
 
             if (world != null)
             {
@@ -210,7 +210,7 @@ public class DebugInfoUtils
 
     public static void toggleDebugRenderer(RendererToggle config)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         boolean status;
 
         if (config == RendererToggle.DEBUG_COLLISION_BOXES)

@@ -22,7 +22,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() && mc.world.provider.isSurfaceWorld();
+        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() && mc.world.dimension.isSurfaceWorld();
     }
 
     @Override
@@ -84,8 +84,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
                 }
             }
 
-            pos1.release();
-            pos2.release();
+            pos1.close();
+            pos2.close();
 
             BUFFER_1.finishDrawing();
             BUFFER_2.finishDrawing();

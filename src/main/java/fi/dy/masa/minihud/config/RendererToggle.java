@@ -7,7 +7,7 @@ import fi.dy.masa.malilib.config.IHotkeyTogglable;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
-import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
 
@@ -143,7 +143,7 @@ public enum RendererToggle implements IHotkeyTogglable
         }
         catch (Exception e)
         {
-            LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", this.getName(), e);
+            MiniHUD.logger.warn("Failed to read config value for {} from the JSON config", this.getName(), e);
         }
     }
 
@@ -158,12 +158,12 @@ public enum RendererToggle implements IHotkeyTogglable
             }
             else
             {
-                LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", this.getName());
+                MiniHUD.logger.warn("Failed to read config value for {} from the JSON config", this.getName());
             }
         }
         catch (Exception e)
         {
-            LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", this.getName(), e);
+            MiniHUD.logger.warn("Failed to read config value for {} from the JSON config", this.getName(), e);
         }
     }
 

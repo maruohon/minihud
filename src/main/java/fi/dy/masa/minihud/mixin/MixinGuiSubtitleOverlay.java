@@ -12,9 +12,9 @@ import net.minecraft.client.renderer.GlStateManager;
 @Mixin(GuiSubtitleOverlay.class)
 public class MixinGuiSubtitleOverlay
 {
-    @Inject(method = "renderSubtitles", at = @At(
+    @Inject(method = "render", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/GlStateManager;tryBlendFuncSeparate(" +
+            target = "Lnet/minecraft/client/renderer/GlStateManager;blendFuncSeparate(" +
             "Lnet/minecraft/client/renderer/GlStateManager$SourceFactor;" +
             "Lnet/minecraft/client/renderer/GlStateManager$DestFactor;" +
             "Lnet/minecraft/client/renderer/GlStateManager$SourceFactor;" +
@@ -26,7 +26,7 @@ public class MixinGuiSubtitleOverlay
 
         if (offset != 0)
         {
-            GlStateManager.translate(0, offset, 0);
+            GlStateManager.translatef(0, offset, 0);
         }
     }
 }

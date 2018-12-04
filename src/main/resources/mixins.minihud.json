@@ -7,8 +7,8 @@
         "IMixinChunkProviderServer",
         "IMixinDebugRenderer",
         "IMixinPathNavigate",
-        "IMixinRenderGlobal",
         "IMixinSPacketMultiBlockChange",
+        "IMixinWorldRenderer",
         "MixinDebugRendererCollisionBox",
         "MixinDebugRendererHeightMap",
         "MixinDebugRendererNeighborsUpdate",
@@ -17,8 +17,7 @@
         "MixinGuiSubtitleOverlay",
         "MixinMinecraftServer",
         "MixinNetHandlerPlayClient",
-        "MixinWorld",
-        "MixinWorldClient"
+        "MixinWorld"
     ],
     "injectors": {
         "defaultRequire": 1

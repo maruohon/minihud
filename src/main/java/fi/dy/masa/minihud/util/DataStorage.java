@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -20,6 +20,8 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.Heightmap;
 
 public class DataStorage
 {
@@ -39,7 +41,7 @@ public class DataStorage
     private BlockPos worldSpawn = BlockPos.ORIGIN;
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
-    private final Minecraft mc = Minecraft.getMinecraft();
+    private final Minecraft mc = Minecraft.getInstance();
 
     public static DataStorage getInstance()
     {
@@ -66,7 +68,7 @@ public class DataStorage
         this.worldSpawnValid = true;
     }
 
-    public boolean isWorldSeedKnown(int dimension)
+    public boolean isWorldSeedKnown(DimensionType dimension)
     {
         if (this.worldSeedValid)
         {
@@ -82,7 +84,7 @@ public class DataStorage
         return false;
     }
 
-    public long getWorldSeed(int dimension)
+    public long getWorldSeed(DimensionType dimension)
     {
         if (this.worldSeedValid)
         {
@@ -135,11 +137,11 @@ public class DataStorage
             return this.droppedChunksHashSize;
         }
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         if (mc.isSingleplayer())
         {
-            return MiscUtils.getCurrentHashSize(mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().provider.getDimensionType().getId()));
+            return MiscUtils.getCurrentHashSize(mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().dimension.getType()));
         }
         else
         {
@@ -164,14 +166,19 @@ public class DataStorage
                 for (ChunkPos pos : this.chunkHeightmapsToCheck)
                 {
                     Chunk chunk = world.getChunk(pos.x, pos.z);
-                    int[] heightMap = chunk.getHeightMap();
+                    Heightmap hm = chunk.getHeightmap(Heightmap.Type.LIGHT_BLOCKING);
                     int maxHeight = -1;
 
-                    for (int i = 0; i < heightMap.length; ++i)
+                    for (int x = 0; x < 16; ++x)
                     {
-                        if (heightMap[i] > maxHeight)
+                        for (int z = 0; z < 16; ++z)
                         {
-                            maxHeight = heightMap[i];
+                            int h = hm.getHeight(x, z);
+
+                            if (h > maxHeight)
+                            {
+                                maxHeight = h;
+                            }
                         }
                     }
 
@@ -279,12 +286,12 @@ public class DataStorage
                 {
                     this.worldSeed = Long.parseLong(text.getFormatArgs()[0].toString());
                     this.worldSeedValid = true;
-                    LiteModMiniHud.logger.info("Received world seed from the vanilla /seed command: {}", this.worldSeed);
+                    MiniHUD.logger.info("Received world seed from the vanilla /seed command: {}", this.worldSeed);
                     MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
                 }
                 catch (Exception e)
                 {
-                    LiteModMiniHud.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[0], e);
+                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[0], e);
                 }
             }
             // The "/jed seed" command
@@ -294,12 +301,12 @@ public class DataStorage
                 {
                     this.worldSeed = Long.parseLong(text.getFormatArgs()[1].toString());
                     this.worldSeedValid = true;
-                    LiteModMiniHud.logger.info("Received world seed from the JED '/jed seed' command: {}", this.worldSeed);
+                    MiniHUD.logger.info("Received world seed from the JED '/jed seed' command: {}", this.worldSeed);
                     MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
                 }
                 catch (Exception e)
                 {
-                    LiteModMiniHud.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[1], e);
+                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[1], e);
                 }
             }
             else if ("commands.setworldspawn.success".equals(text.getKey()) && text.getFormatArgs().length == 3)
@@ -315,12 +322,12 @@ public class DataStorage
                     this.worldSpawnValid = true;
 
                     String spawnStr = String.format("x: %d, y: %d, z: %d", this.worldSpawn.getX(), this.worldSpawn.getY(), this.worldSpawn.getZ());
-                    LiteModMiniHud.logger.info("Received world spawn from the vanilla /setworldspawn command: {}", spawnStr);
+                    MiniHUD.logger.info("Received world spawn from the vanilla /setworldspawn command: {}", spawnStr);
                     MiscUtils.printInfoMessage("minihud.message.spawn_set", spawnStr);
                 }
                 catch (Exception e)
                 {
-                    LiteModMiniHud.logger.warn("Failed to read the world spawn point from '{}'", text.getFormatArgs(), e);
+                    MiniHUD.logger.warn("Failed to read the world spawn point from '{}'", text.getFormatArgs(), e);
                 }
             }
         }
@@ -365,7 +372,7 @@ public class DataStorage
     {
         if (textComponent.getFormattedText().isEmpty() == false)
         {
-            String text = TextFormatting.getTextWithoutFormattingCodes(textComponent.getUnformattedText());
+            String text = TextFormatting.getTextWithoutFormattingCodes(textComponent.getString());
             String[] lines = text.split("\n");
 
             for (String line : lines)

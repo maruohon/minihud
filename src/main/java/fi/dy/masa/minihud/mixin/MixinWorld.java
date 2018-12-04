@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 public class MixinWorld
 {
     @Inject(method = "notifyNeighborsOfStateChange", at = @At("HEAD"))
-    public void onNotifyNeighborsOfStateChange(BlockPos pos, Block blockType, boolean updateObservers, CallbackInfo ci)
+    public void onNotifyNeighborsOfStateChange(BlockPos pos, Block blockType, CallbackInfo ci)
     {
         EnumSet<EnumFacing> set = EnumSet.allOf(EnumFacing.class);
         DebugInfoUtils.onNeighborNotify((World) (Object) this, pos, set);

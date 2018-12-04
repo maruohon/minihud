@@ -22,13 +22,13 @@ public class RenderObjectDisplayList extends RenderObjectBase
     @Override
     public void uploadData(BufferBuilder buffer)
     {
-        GlStateManager.glNewList(this.baseDisplayList, GL11.GL_COMPILE);
+        GlStateManager.newList(this.baseDisplayList, GL11.GL_COMPILE);
         GlStateManager.pushMatrix();
 
         VERTEX_UPLOADER.draw(buffer);
 
         GlStateManager.popMatrix();
-        GlStateManager.glEndList();
+        GlStateManager.endList();
     }
 
     @Override

@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.gen.Heightmap;
 
 public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
 {
@@ -100,7 +101,7 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
             for (int z = zStart; z <= zEnd; ++z)
             {
                 // See WorldEntitySpawner.getRandomChunkPosition()
-                int height = MathHelper.roundUp(world.getHeight(x, z) + 1, 16);
+                int height = MathHelper.roundUp(world.getHeight(Heightmap.Type.LIGHT_BLOCKING, x, z) + 1, 16);
 
                 if (height == 0)
                 {

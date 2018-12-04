@@ -20,7 +20,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     @Override
     public void draw()
     {
-        GlStateManager.glLineWidth(this.glLineWidth);
+        GlStateManager.lineWidth(this.glLineWidth);
 
         for (RenderObjectBase obj : this.renderObjects)
         {

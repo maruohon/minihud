@@ -41,8 +41,8 @@ public class RenderObjectVbo extends RenderObjectBase
 
     protected void setupArrayPointers()
     {
-        GlStateManager.glVertexPointer(3, GL11.GL_FLOAT, 16, 0);
-        GlStateManager.glColorPointer(4, GL11.GL_UNSIGNED_BYTE, 16, 12);
+        GlStateManager.vertexPointer(3, GL11.GL_FLOAT, 16, 0);
+        GlStateManager.colorPointer(4, GL11.GL_UNSIGNED_BYTE, 16, 12);
     }
 
     @Override

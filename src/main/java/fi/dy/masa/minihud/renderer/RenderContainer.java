@@ -72,22 +72,22 @@ public class RenderContainer
             GlStateManager.disableLighting();
             GlStateManager.depthMask(false);
             GlStateManager.enablePolygonOffset();
-            GlStateManager.doPolygonOffset(-0.1f, -0.8f);
+            GlStateManager.polygonOffset(-0.1f, -0.8f);
             GlStateManager.enableBlend();
-            GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-            GlStateManager.color(1f, 1f, 1f, 1f);
+            GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+            GlStateManager.color4f(1f, 1f, 1f, 1f);
 
             if (OpenGlHelper.useVbo())
             {
-                GlStateManager.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-                GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
+                GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
+                GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
             }
 
             double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
             double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
             double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
 
-            GlStateManager.translate((float) -dx, (float) -dy, (float) -dz);
+            GlStateManager.translated((float) -dx, (float) -dy, (float) -dz);
 
             for (int i = 0; i < this.renderers.size(); ++i)
             {
@@ -111,10 +111,10 @@ public class RenderContainer
                     switch (usage)
                     {
                         case POSITION:
-                            GlStateManager.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+                            GlStateManager.disableClientState(GL11.GL_VERTEX_ARRAY);
                             break;
                         case COLOR:
-                            GlStateManager.glDisableClientState(GL11.GL_COLOR_ARRAY);
+                            GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
                             GlStateManager.resetColor();
                         default:
                     }
@@ -122,13 +122,13 @@ public class RenderContainer
 
             }
 
-            GlStateManager.color(1f, 1f, 1f, 1f);
+            GlStateManager.color4f(1f, 1f, 1f, 1f);
             GlStateManager.disableBlend();
-            GlStateManager.enableDepth();
+            GlStateManager.enableDepthTest();
             GlStateManager.enableLighting();
             GlStateManager.enableCull();
             GlStateManager.depthMask(true);
-            GlStateManager.doPolygonOffset(0f, 0f);
+            GlStateManager.polygonOffset(0f, 0f);
             GlStateManager.disablePolygonOffset();
             GlStateManager.enableTexture2D();
             GlStateManager.popMatrix();
