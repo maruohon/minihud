@@ -221,7 +221,7 @@ public class DebugInfoUtils
         else if (config == RendererToggle.DEBUG_HEIGHT_MAP)
         {
             status = ! ((IMixinDebugRenderer) mc.debugRenderer).getHeightMapEnabled();
-            ((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(status);
+            //((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(status);
         }
         else if (config == RendererToggle.DEBUG_NEIGHBOR_UPDATES)
         {
