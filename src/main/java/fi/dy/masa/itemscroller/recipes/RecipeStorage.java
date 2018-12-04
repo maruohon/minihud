@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import javax.annotation.Nonnull;
-import fi.dy.masa.itemscroller.LiteModItemScroller;
+import fi.dy.masa.itemscroller.ItemScroller;
 import fi.dy.masa.itemscroller.Reference;
 import fi.dy.masa.itemscroller.util.Constants;
 import net.minecraft.client.Minecraft;
@@ -104,7 +104,7 @@ public class RecipeStorage
 
     private void readFromNBT(NBTTagCompound nbt)
     {
-        if (nbt == null || nbt.hasKey("Recipes", Constants.NBT.TAG_LIST) == false)
+        if (nbt == null || nbt.contains("Recipes", Constants.NBT.TAG_LIST) == false)
         {
             return;
         }
@@ -114,12 +114,12 @@ public class RecipeStorage
             this.recipes[i].clearRecipe();
         }
 
-        NBTTagList tagList = nbt.getTagList("Recipes", Constants.NBT.TAG_COMPOUND);
-        int count = tagList.tagCount();
+        NBTTagList tagList = nbt.getList("Recipes", Constants.NBT.TAG_COMPOUND);
+        int count = tagList.size();
 
         for (int i = 0; i < count; i++)
         {
-            NBTTagCompound tag = tagList.getCompoundTagAt(i);
+            NBTTagCompound tag = tagList.getCompound(i);
 
             int index = tag.getByte("RecipeIndex");
 
@@ -141,14 +141,14 @@ public class RecipeStorage
             if (this.recipes[i].isValid())
             {
                 NBTTagCompound tag = new NBTTagCompound();
-                tag.setByte("RecipeIndex", (byte) i);
+                tag.putByte("RecipeIndex", (byte) i);
                 this.recipes[i].writeToNBT(tag);
-                tagRecipes.appendTag(tag);
+                tagRecipes.add(tag);
             }
         }
 
-        nbt.setTag("Recipes", tagRecipes);
-        nbt.setByte("Selected", (byte) this.selected);
+        nbt.put("Recipes", tagRecipes);
+        nbt.putByte("Selected", (byte) this.selected);
 
         return nbt;
     }
@@ -159,9 +159,11 @@ public class RecipeStorage
 
         if (this.global == false)
         {
-            if (Minecraft.getMinecraft().isSingleplayer())
+            Minecraft mc = Minecraft.getInstance();
+
+            if (mc.isSingleplayer())
             {
-                IntegratedServer server = Minecraft.getMinecraft().getIntegratedServer();
+                IntegratedServer server = mc.getIntegratedServer();
 
                 if (server != null)
                 {
@@ -170,7 +172,7 @@ public class RecipeStorage
             }
             else
             {
-                ServerData server = Minecraft.getMinecraft().getCurrentServerData();
+                ServerData server = mc.getCurrentServerData();
 
                 if (server != null)
                 {
@@ -184,7 +186,7 @@ public class RecipeStorage
 
     private File getSaveDir()
     {
-        return new File(Minecraft.getMinecraft().gameDir, Reference.MOD_ID);
+        return new File(Minecraft.getInstance().gameDir, Reference.MOD_ID);
     }
 
     public void readFromDisk()
@@ -208,7 +210,7 @@ public class RecipeStorage
         }
         catch (Exception e)
         {
-            LiteModItemScroller.logger.warn("Failed to read recipes from file", e);
+            ItemScroller.logger.warn("Failed to read recipes from file", e);
         }
     }
 
@@ -229,7 +231,7 @@ public class RecipeStorage
                 {
                     if (saveDir.mkdirs() == false)
                     {
-                        LiteModItemScroller.logger.warn("Failed to create the recipe storage directory '{}'", saveDir.getPath());
+                        ItemScroller.logger.warn("Failed to create the recipe storage directory '{}'", saveDir.getPath());
                         return;
                     }
                 }
@@ -250,7 +252,7 @@ public class RecipeStorage
             }
             catch (Exception e)
             {
-                LiteModItemScroller.logger.warn("Failed to write recipes to file!", e);
+                ItemScroller.logger.warn("Failed to write recipes to file!", e);
             }
         }
     }

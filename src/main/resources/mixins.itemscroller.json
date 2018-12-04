@@ -6,10 +6,11 @@
     "client": [
         "IMixinGuiContainer",
         "IMixinGuiMerchant",
-        "MixinEntityRenderer",
         "IMixinSlot",
+        "MixinGameRenderer",
         "MixinContainer",
-        "MixinGuiScreen"
+        "MixinGuiScreen",
+        "MixinMinecraft"
     ],
     "injectors": {
         "defaultRequire": 1

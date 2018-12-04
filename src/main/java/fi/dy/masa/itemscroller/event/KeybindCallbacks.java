@@ -1,8 +1,9 @@
 package fi.dy.masa.itemscroller.event;
 
-import fi.dy.masa.itemscroller.LiteModItemScroller;
+import fi.dy.masa.itemscroller.ItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Hotkeys;
+import fi.dy.masa.itemscroller.gui.GuiConfigs;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
@@ -14,6 +15,7 @@ import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
+import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -72,7 +74,7 @@ public class KeybindCallbacks implements IHotkeyCallback
     @Override
     public boolean onKeyAction(KeyAction action, IKeybind key)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         if (key == Hotkeys.KEY_MAIN_TOGGLE.getKeybind())
         {
@@ -80,13 +82,18 @@ public class KeybindCallbacks implements IHotkeyCallback
 
             if (this.disabled)
             {
-                mc.player.playSound(SoundEvents.BLOCK_NOTE_BASS, 0.8f, 0.8f);
+                mc.player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 0.8f, 0.8f);
             }
             else
             {
-                mc.player.playSound(SoundEvents.BLOCK_NOTE_PLING, 0.5f, 1.0f);
+                mc.player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1.0f);
             }
 
+            return true;
+        }
+        else if (key == Hotkeys.KEY_OPEN_CONFIG_GUI.getKeybind())
+        {
+            mc.displayGuiScreen(new GuiConfigs());
             return true;
         }
 
@@ -104,7 +111,10 @@ public class KeybindCallbacks implements IHotkeyCallback
         {
             if (moveAction != MoveAction.NONE)
             {
-                return InventoryUtils.dragMoveItems(gui, mc, moveAction, true);
+                MainWindow window = mc.mainWindow;
+                final int mouseX = (int) (mc.mouseHelper.getMouseX() * (double) window.getScaledWidth() / (double) window.getWidth());
+                final int mouseY = (int) (mc.mouseHelper.getMouseY() * (double) window.getScaledHeight() / (double) window.getHeight());
+                return InventoryUtils.dragMoveItems(gui, mc, moveAction, mouseX, mouseY, true);
             }
             else if (key == Hotkeys.KEY_MOVE_EVERYTHING.getKeybind())
             {
@@ -155,7 +165,7 @@ public class KeybindCallbacks implements IHotkeyCallback
             }
             else
             {
-                LiteModItemScroller.logger.info("GUI class: {}", gui.getClass().getName());
+                ItemScroller.logger.info("GUI class: {}", gui.getClass().getName());
             }
 
             return true;

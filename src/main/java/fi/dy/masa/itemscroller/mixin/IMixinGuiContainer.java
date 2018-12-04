@@ -10,8 +10,8 @@ import net.minecraft.inventory.Slot;
 @Mixin(GuiContainer.class)
 public interface IMixinGuiContainer
 {
-    @Invoker("getSlotAtPosition")
-    Slot getSlotAtPositionInvoker(int x, int y);
+    @Invoker("getSelectedSlot")
+    Slot getSlotAtPositionInvoker(double x, double y);
 
     @Invoker("handleMouseClick")
     void handleMouseClickInvoker(Slot slotIn, int slotId, int mouseButton, ClickType type);

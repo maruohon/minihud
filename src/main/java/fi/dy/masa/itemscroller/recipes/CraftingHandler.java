@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
-import fi.dy.masa.itemscroller.LiteModItemScroller;
+import fi.dy.masa.itemscroller.ItemScroller;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
@@ -36,7 +36,7 @@ public class CraftingHandler
         }
         catch (Exception e)
         {
-            LiteModItemScroller.logger.warn("addCraftingGridDefinition(): Failed to find classes for grid definition: gui: '{}', slot: '{}', outputSlot: {}",
+            ItemScroller.logger.warn("addCraftingGridDefinition(): Failed to find classes for grid definition: gui: '{}', slot: '{}', outputSlot: {}",
                     guiClassName, slotClassName, outputSlot);
         }
 

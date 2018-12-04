@@ -31,9 +31,8 @@ public class ItemType
         final int prime = 31;
         int result = 1;
         //result = prime * result + ((stack == null) ? 0 : stack.hashCode());
-        result = prime * result + this.stack.getMetadata();
         result = prime * result + this.stack.getItem().hashCode();
-        result = prime * result + (this.stack.getTagCompound() != null ? this.stack.getTagCompound().hashCode() : 0);
+        result = prime * result + (this.stack.getTag() != null ? this.stack.getTag().hashCode() : 0);
         return result;
     }
 
@@ -56,11 +55,6 @@ public class ItemType
         }
         else
         {
-            if (this.stack.getMetadata() != other.stack.getMetadata())
-            {
-                return false;
-            }
-
             if (this.stack.getItem() != other.stack.getItem())
             {
                 return false;

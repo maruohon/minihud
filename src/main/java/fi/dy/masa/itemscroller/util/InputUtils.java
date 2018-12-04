@@ -1,36 +1,17 @@
 package fi.dy.masa.itemscroller.util;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import fi.dy.masa.itemscroller.config.Hotkeys;
 import fi.dy.masa.itemscroller.event.KeybindCallbacks;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 
 public class InputUtils
 {
-    public static int getMouseX()
-    {
-        Minecraft mc = Minecraft.getMinecraft();
-        ScaledResolution scaledresolution = new ScaledResolution(mc);
-        int w = scaledresolution.getScaledWidth();
-        return Mouse.getX() * w / mc.displayWidth;
-    }
-
-    public static int getMouseY()
-    {
-        Minecraft mc = Minecraft.getMinecraft();
-        ScaledResolution scaledresolution = new ScaledResolution(mc);
-        int h = scaledresolution.getScaledHeight();
-        return h - Mouse.getY() * h / mc.displayHeight - 1;
-    }
-
     public static boolean isRecipeViewOpen()
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         return mc.currentScreen != null &&
                Hotkeys.KEY_RECIPE_VIEW.getKeybind().isKeybindHeld() &&
@@ -38,7 +19,7 @@ public class InputUtils
                CraftingHandler.isCraftingGui(mc.currentScreen);
     }
 
-    public static boolean canShiftDropItems(GuiContainer gui, Minecraft mc)
+    public static boolean canShiftDropItems(GuiContainer gui, Minecraft mc, int mouseX, int mouseY)
     {
         if (InventoryUtils.isStackEmpty(mc.player.inventory.getItemStack()) == false)
         {
@@ -46,11 +27,9 @@ public class InputUtils
             int top = AccessorUtils.getGuiTop(gui);
             int xSize = AccessorUtils.getGuiXSize(gui);
             int ySize = AccessorUtils.getGuiYSize(gui);
-            int mouseAbsX = Mouse.getEventX() * gui.width / mc.displayWidth;
-            int mouseAbsY = gui.height - Mouse.getEventY() * gui.height / mc.displayHeight - 1;
-            boolean isOutsideGui = mouseAbsX < left || mouseAbsY < top || mouseAbsX >= left + xSize || mouseAbsY >= top + ySize;
+            boolean isOutsideGui = mouseX < left || mouseY < top || mouseX >= left + xSize || mouseY >= top + ySize;
 
-            return isOutsideGui && AccessorUtils.getSlotAtPosition(gui, mouseAbsX - left, mouseAbsY - top) == null;
+            return isOutsideGui && AccessorUtils.getSlotAtPosition(gui, mouseX - left, mouseY - top) == null;
         }
 
         return false;
@@ -144,33 +123,5 @@ public class InputUtils
         }
 
         return MoveAmount.NONE;
-    }
-
-    public static boolean isKeybindHeld(int keyCode)
-    {
-        if (keyCode > 0 && keyCode < Keyboard.getKeyCount())
-        {
-            return Keyboard.isKeyDown(keyCode);
-        }
-        else
-        {
-            keyCode += 100;
-            return keyCode >= 0 && keyCode < Mouse.getButtonCount() && Mouse.isButtonDown(keyCode);
-        }
-    }
-
-    public static boolean mouseEventIsLeftClick()
-    {
-        return Mouse.getEventButton() == Minecraft.getMinecraft().gameSettings.keyBindAttack.getKeyCode() + 100;
-    }
-
-    public static boolean mouseEventIsRightClick()
-    {
-        return Mouse.getEventButton() == Minecraft.getMinecraft().gameSettings.keyBindUseItem.getKeyCode() + 100;
-    }
-
-    public static boolean mouseEventIsPickBlock()
-    {
-        return Mouse.getEventButton() == Minecraft.getMinecraft().gameSettings.keyBindPickBlock.getKeyCode() + 100;
     }
 }

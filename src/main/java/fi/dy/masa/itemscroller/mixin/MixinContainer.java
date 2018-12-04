@@ -7,8 +7,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCraftResult;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.world.World;
 
 @Mixin(Container.class)
@@ -20,11 +20,11 @@ public class MixinContainer
     public void onSlotChangedCraftingGrid(
             World world,
             EntityPlayer player,
-            InventoryCrafting inventoryCrafting,
+            IInventory craftMatrix,
             InventoryCraftResult inventoryCraftResult,
             CallbackInfo ci
     )
     {
-        InventoryUtils.onSlotChangedCraftingGrid(world, player, inventoryCrafting, inventoryCraftResult);
+        InventoryUtils.onSlotChangedCraftingGrid(world, player, craftMatrix, inventoryCraftResult);
     }
 }

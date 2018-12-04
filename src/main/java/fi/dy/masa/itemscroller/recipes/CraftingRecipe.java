@@ -93,11 +93,11 @@ public class CraftingRecipe
 
     public void readFromNBT(@Nonnull NBTTagCompound nbt)
     {
-        if (nbt.hasKey("Result", Constants.NBT.TAG_COMPOUND) && nbt.hasKey("Ingredients", Constants.NBT.TAG_LIST))
+        if (nbt.contains("Result", Constants.NBT.TAG_COMPOUND) && nbt.contains("Ingredients", Constants.NBT.TAG_LIST))
         {
-            NBTTagList tagIngredients = nbt.getTagList("Ingredients", Constants.NBT.TAG_COMPOUND);
-            int count = tagIngredients.tagCount();
-            int length = nbt.getInteger("Length");
+            NBTTagList tagIngredients = nbt.getList("Ingredients", Constants.NBT.TAG_COMPOUND);
+            int count = tagIngredients.size();
+            int length = nbt.getInt("Length");
 
             if (length > 0)
             {
@@ -106,16 +106,16 @@ public class CraftingRecipe
 
             for (int i = 0; i < count; i++)
             {
-                NBTTagCompound tag = tagIngredients.getCompoundTagAt(i);
-                int slot = tag.getInteger("Slot");
+                NBTTagCompound tag = tagIngredients.getCompound(i);
+                int slot = tag.getInt("Slot");
 
                 if (slot >= 0 && slot < this.recipe.length)
                 {
-                    this.recipe[slot] = new ItemStack(tag);
+                    this.recipe[slot] = ItemStack.read(tag);
                 }
             }
 
-            this.result = new ItemStack(nbt.getCompoundTag("Result"));
+            this.result = ItemStack.read(nbt.getCompound("Result"));
         }
     }
 
@@ -125,10 +125,10 @@ public class CraftingRecipe
         if (this.isValid())
         {
             NBTTagCompound tag = new NBTTagCompound();
-            this.result.writeToNBT(tag);
+            this.result.write(tag);
 
-            nbt.setInteger("Length", this.recipe.length);
-            nbt.setTag("Result", tag);
+            nbt.putInt("Length", this.recipe.length);
+            nbt.put("Result", tag);
 
             NBTTagList tagIngredients = new NBTTagList();
 
@@ -137,13 +137,13 @@ public class CraftingRecipe
                 if (InventoryUtils.isStackEmpty(this.recipe[i]) == false)
                 {
                     tag = new NBTTagCompound();
-                    tag.setInteger("Slot", i);
-                    this.recipe[i].writeToNBT(tag);
-                    tagIngredients.appendTag(tag);
+                    tag.putInt("Slot", i);
+                    this.recipe[i].write(tag);
+                    tagIngredients.add(tag);
                 }
             }
 
-            nbt.setTag("Ingredients", tagIngredients);
+            nbt.put("Ingredients", tagIngredients);
         }
 
         return nbt;
