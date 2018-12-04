@@ -101,13 +101,7 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
             for (int z = zStart; z <= zEnd; ++z)
             {
                 // See WorldEntitySpawner.getRandomChunkPosition()
-                int height = MathHelper.roundUp(world.getHeight(Heightmap.Type.LIGHT_BLOCKING, x, z) + 1, 16);
-
-                if (height == 0)
-                {
-                    height = world.getChunk(x << 4, z << 4).getTopFilledSegment() + 15;
-                }
-
+                final int height = world.getHeight(Heightmap.Type.LIGHT_BLOCKING, x, z);
                 final double minY = height;
                 final double maxY = height + 0.09375;
                 final double minX = x + 0.25;
