@@ -492,6 +492,13 @@ public class RenderHandler implements IRenderer
             this.addedTypes.add(InfoToggle.ROTATION_PITCH);
             this.addedTypes.add(InfoToggle.SPEED);
         }
+        else if (type == InfoToggle.SPEED_AXIS)
+        {
+            double dx = entity.posX - entity.lastTickPosX;
+            double dy = entity.posY - entity.lastTickPosY;
+            double dz = entity.posZ - entity.lastTickPosZ;
+            this.addLine(String.format("speed: x: %.3f y: %.3f z: %.3f m/s", dx * 20, dy * 20, dz * 20));
+        }
         else if (type == InfoToggle.CHUNK_SECTIONS)
         {
             this.addLine(String.format("C: %d", ((IMixinWorldRenderer) mc.worldRenderer).getRenderedChunksInvoker()));
