@@ -44,6 +44,7 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     SLIME_CHUNK             ("infoSlimeChunk",              false, 22, "",    "Show whether the player is currently in a slime chunk.\nNOTE: This only works in single player without any user intervention!\nOn a server the player needs to either:\n  1) be admin/OP and run the /seed command manually EVERY TIME\n     they join or change dimensions, or\n  2) input the seed via chat, by sending a \"command\" like: minihud-seed 12345"),
     SPAWNABLE_SUB_CHUNKS    ("infoSpawnableSubChunks",      false, 32, "",    "Show the spawnable sub chunk count for the current chunk"),
     SPEED                   ("infoSpeed",                   false, 13, "",    "Show the player's current moving speed"),
+    SPEED_AXIS              ("infoSpeedAxis",               false, 13, "",    "Show the player's current moving speed per axis"),
     TIME_REAL               ("infoTimeIRL",                 true,   1, "",    "Show the current real time formatted according to dateFormatReal"),
     TIME_WORLD              ("infoTimeWorld",               false,  2, "",    "Show the current world time in ticks"),
     TIME_WORLD_FORMATTED    ("infoWorldTimeFormatted",      false,  3, "",    "Show the current world time formatted to days, hours, minutes");
