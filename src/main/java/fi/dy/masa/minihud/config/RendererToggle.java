@@ -20,10 +20,11 @@ public enum RendererToggle implements IHotkeyTogglable
     DEBUG_SOLID_FACES                   ("debugSolidFaceEnabled",       "H,5", "Toggles the vanilla Block Solid Faces debug renderer", "Block Solid Faces"),
     DEBUG_WATER                         ("debugWaterEnabled",           "H,6", "Toggles the vanilla Water debug renderer", "Water"),
 
-    OVERLAY_REGION_FILE                 ("overlayRegionFile",           "H,J", "Toggle the region file border overlay renderer", "Region file border overlay"),
+    OVERLAY_BLOCK_GRID                  ("overlayBlockGrid",            "",    "Toggle the Block Grid overlay renderer", "Block Grid overlay"),
     OVERLAY_CHUNK_UNLOAD_BUCKET         ("overlayChunkUnloadBucket",    "H,X", "Toggle the Chunk unload bucket/priority renderer", "Chunk unload priority overlay"),
     OVERLAY_RANDOM_TICKS_FIXED          ("overlayRandomTicksFixed",     "",    "Toggle the fixed-point random ticked chunks overlay renderer", "Random ticked chunks (fixed) overlay"),
     OVERLAY_RANDOM_TICKS_PLAYER         ("overlayRandomTicksPlayer",    "",    "Toggle the player-following random ticked chunks overlay renderer", "Random ticked chunks (player-following) overlay"),
+    OVERLAY_REGION_FILE                 ("overlayRegionFile",           "H,J", "Toggle the region file border overlay renderer", "Region file border overlay"),
     OVERLAY_SLIME_CHUNKS_OVERLAY        ("overlaySlimeChunks",          "H,M", "Toggle the Slime Chunk overlay renderer", "Slime chunk overlay"),
     OVERLAY_SPAWNABLE_CHUNKS_FIXED      ("overlaySpawnableChunksFixed",  "",   "Toggle the location-fixed spawnable chunks overlay renderer", "Spawnable chunks (fixed) overlay"),
     OVERLAY_SPAWNABLE_CHUNKS_PLAYER     ("overlaySpawnableChunksPlayer", "",   "Toggle the player-following spawnable chunks overlay renderer", "Spawnable chunks (player-following) overlay"),

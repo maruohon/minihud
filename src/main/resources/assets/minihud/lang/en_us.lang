@@ -12,6 +12,10 @@ minihud.gui.button.config_gui.renderer_hotkeys=Renderer Hotkeys
 
 minihud.gui.title.configs=MiniHUD Configs
 
+minihud.label.blockgridmode.all=All
+minihud.label.blockgridmode.non_air=Non-air
+minihud.label.blockgridmode.adjacent=Adjacent to non-air
+
 minihud.hotkeys.category.generic_hotkeys=Generic hotkeys
 minihud.hotkeys.category.info_toggle_hotkeys=Info Toggle hotkeys
 minihud.hotkeys.category.renderer_toggle_hotkeys=Renderer Toggle hotkeys

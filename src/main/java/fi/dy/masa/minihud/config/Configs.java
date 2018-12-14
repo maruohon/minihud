@@ -22,6 +22,7 @@ import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.event.RenderHandler;
+import fi.dy.masa.minihud.util.BlockGridMode;
 
 public class Configs implements IConfigHandler
 {
@@ -30,6 +31,8 @@ public class Configs implements IConfigHandler
 
     public static class Generic
     {
+        public static final ConfigOptionList    BLOCK_GRID_OVERLAY_MODE             = new ConfigOptionList("blockGridOverlayMode", BlockGridMode.ALL, "The block grid render mode");
+        public static final ConfigInteger       BLOCK_GRID_OVERLAY_RADIUS           = new ConfigInteger("blockGridOverlayRadius", 32, "The radius of the block grid lines to render");
         public static final ConfigDouble        CHUNK_UNLOAD_BUCKET_FONT_SCALE      = new ConfigDouble("chunkUnloadBucketOverlayFontScale", 0.1625, "The font scale for the Chunk unload order bucket overlay.\nValid range: 0.01 - 1.0");
         public static final ConfigInteger       CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS  = new ConfigInteger("chunkUnloadBucketOverlayChunkRadius", -1, "The radius of chunks to render the text for in the overlay.\nValid range: -1 - 40, where -1 = render distance");
         public static final ConfigBoolean       CHUNK_UNLOAD_BUCKET_WITH_SIZE       = new ConfigBoolean("chunkUnloadBucketWithSize", false, "If enabled, uses the more accurate (but still experimental)\nchunk unload bucket calculations, taken from the Carpet mod");
@@ -72,8 +75,10 @@ public class Configs implements IConfigHandler
                 TOGGLE_KEY,
                 REQUIRED_KEY,
                 OPEN_CONFIG_GUI,
+                BLOCK_GRID_OVERLAY_MODE,
                 HUD_ALIGNMENT,
 
+                BLOCK_GRID_OVERLAY_RADIUS,
                 CHUNK_UNLOAD_BUCKET_FONT_SCALE,
                 CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS,
                 COORDINATE_FORMAT_STRING,
@@ -91,6 +96,7 @@ public class Configs implements IConfigHandler
 
     public static class Colors
     {
+        public static final ConfigColor BLOCK_GRID_OVERLAY_COLOR            = new ConfigColor("blockGridOverlayColor", "0x80FFFFFF", "Color for the block grid overlay");
         public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR    = new ConfigColor("randomTicksFixedOverlayColor", "0xFFF9F225", "Color for the fixed-point random ticked chunks overlay");
         public static final ConfigColor RANDOM_TICKS_PLAYER_OVERLAY_COLOR   = new ConfigColor("randomTicksPlayerOverlayColor", "0xFF30FE73", "Color for the player-following random ticked chunks overlay");
         public static final ConfigColor REGION_OVERLAY_COLOR                = new ConfigColor("regionOverlayColor", "0xFFFF8019", "Color for the region file overlay");
@@ -107,6 +113,7 @@ public class Configs implements IConfigHandler
         public static final ConfigColor TEXT_COLOR                          = new ConfigColor("textColor", "0xE0E0E0", "Info line text color");
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
+                BLOCK_GRID_OVERLAY_COLOR,
                 RANDOM_TICKS_FIXED_OVERLAY_COLOR,
                 RANDOM_TICKS_PLAYER_OVERLAY_COLOR,
                 REGION_OVERLAY_COLOR,
