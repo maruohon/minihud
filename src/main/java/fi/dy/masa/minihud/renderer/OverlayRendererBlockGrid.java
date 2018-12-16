@@ -32,7 +32,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         }
 
         return Math.abs(entity.posX - this.lastUpdatePos.getX()) > 8 ||
-               Math.abs(entity.posY - this.lastUpdatePos.getY()) > 2 ||
+               Math.abs(entity.posY - this.lastUpdatePos.getY()) > 8 ||
                Math.abs(entity.posZ - this.lastUpdatePos.getZ()) > 8;
     }
 
