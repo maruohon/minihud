@@ -284,10 +284,17 @@ public class DataStorage
             {
                 try
                 {
-                    this.worldSeed = Long.parseLong(text.getFormatArgs()[0].toString());
-                    this.worldSeedValid = true;
-                    MiniHUD.logger.info("Received world seed from the vanilla /seed command: {}", this.worldSeed);
-                    MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
+                    String str = text.getString();
+                    int i1 = str.indexOf("[");
+                    int i2 = str.indexOf("]");
+
+                    if (i1 != -1 && i2 != -1)
+                    {
+                        this.worldSeed = Long.parseLong(str.substring(i1 + 1, i2));
+                        this.worldSeedValid = true;
+                        MiniHUD.logger.info("Received world seed from the vanilla /seed command: {}", this.worldSeed);
+                        MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
+                    }
                 }
                 catch (Exception e)
                 {
