@@ -34,6 +34,13 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
 
         if (mc != null && mc.player != null && super.onKeyAction(action, key))
         {
+            String green = TextFormatting.GREEN.toString();
+            String red = TextFormatting.RED.toString();
+            String rst = TextFormatting.RESET.toString();
+            String statusOn = green + I18n.format("malilib.message.value.on") + rst;
+            String statusOff = red + I18n.format("malilib.message.value.off") + rst;
+            String strStatus = this.config.getBooleanValue() ? statusOn : statusOff;
+
             if (key == RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind())
             {
                 OverlayRenderer.chunkUnloadBucketOverlayY = mc.player.posY - 2;
@@ -44,29 +51,21 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             }
             else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind() && this.rendererConfig.getBooleanValue())
             {
-                final boolean enabled = this.config.getBooleanValue();
-                String pre = enabled ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-                String status = I18n.format("malilib.message.value." + (enabled ? "on" : "off"));
-                String message = I18n.format("malilib.message.toggled", this.config.getPrettyName(), pre + status + TextFormatting.RESET);
-
                 BlockPos spawn = mc.world.getSpawnPoint();
                 RenderHandler.getInstance().getDataStorage().setWorldSpawn(spawn);
-                String str = String.format(", using the world spawn x: %d, y: %d, z: %d", spawn.getX(), spawn.getY(), spawn.getZ());
+                String strPos = String.format("x: %d, y: %d, z: %d", spawn.getX(), spawn.getY(), spawn.getZ());
+                String message = I18n.format("minihud.message.toggled_using_world_spawn", this.config.getPrettyName(), strStatus, strPos);
 
-                StringUtils.printActionbarMessage(message + str);
+                StringUtils.printActionbarMessage(message);
             }
             else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getKeybind() && this.rendererConfig.getBooleanValue())
             {
-                final boolean enabled = this.config.getBooleanValue();
-                String pre = enabled ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-                String status = I18n.format("malilib.message.value." + (enabled ? "on" : "off"));
-                String message = I18n.format("malilib.message.toggled", this.config.getPrettyName(), pre + status + TextFormatting.RESET);
-
                 Vec3d pos = mc.player.getPositionVector();
                 OverlayRendererRandomTickableChunks.newPos = pos;
-                String str = String.format(", using the position x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
+                String strPos = String.format("x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
+                String message = I18n.format("minihud.message.toggled_using_position", this.config.getPrettyName(), strStatus, strPos);
 
-                StringUtils.printActionbarMessage(message + str);
+                StringUtils.printActionbarMessage(message);
             }
             else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.getKeybind() && this.rendererConfig.getBooleanValue())
             {
@@ -74,17 +73,14 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             }
             else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getKeybind() && this.rendererConfig.getBooleanValue())
             {
-                final boolean enabled = this.config.getBooleanValue();
-                String pre = enabled ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-                String status = I18n.format("malilib.message.value." + (enabled ? "on" : "off"));
-                String message = I18n.format("malilib.message.toggled", this.config.getPrettyName(), pre + status + TextFormatting.RESET);
-
                 BlockPos pos = new BlockPos(mc.player);
                 OverlayRendererSpawnableChunks.newPos = pos;
                 OverlayRendererSpawnableChunks.overlayTopY = mc.player.posY;
-                String str = String.format(", using the position x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                String strPos = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                String message = I18n.format("minihud.message.toggled_using_position", this.config.getPrettyName(), strStatus, strPos);
 
-                StringUtils.printActionbarMessage(message + str);
+                StringUtils.printActionbarMessage(message);
+
             }
 
             return true;
