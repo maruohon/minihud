@@ -16,6 +16,7 @@ public class RenderContainer
     protected final List<IOverlayRenderer> renderers = new ArrayList<>();
     protected boolean resourcesAllocated;
     protected boolean useVbo;
+    protected int countActive;
 
     public RenderContainer()
     {
@@ -47,22 +48,28 @@ public class RenderContainer
     protected void update(Entity entity, Minecraft mc)
     {
         this.checkVideoSettings();
+        this.countActive = 0;
 
         for (int i = 0; i < this.renderers.size(); ++i)
         {
             IOverlayRenderer renderer = this.renderers.get(i);
 
-            if (renderer.shouldRender(mc) && renderer.needsUpdate(entity, mc))
+            if (renderer.shouldRender(mc))
             {
-                //System.out.printf("plop update\n");
-                renderer.update(entity, mc);
+                if (renderer.needsUpdate(entity, mc))
+                {
+                    //System.out.printf("plop update\n");
+                    renderer.update(entity, mc);
+                }
+
+                ++this.countActive;
             }
         }
     }
 
     protected void draw(Entity entity, Minecraft mc, float partialTicks)
     {
-        if (this.resourcesAllocated)
+        if (this.resourcesAllocated && this.countActive > 0)
         {
             GlStateManager.pushMatrix();
 
@@ -120,7 +127,6 @@ public class RenderContainer
                         default:
                     }
                 }
-
             }
 
             GlStateManager.color(1f, 1f, 1f, 1f);
