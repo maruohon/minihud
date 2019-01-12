@@ -91,7 +91,7 @@ public class RenderHandler implements IRenderer
             mc.gameSettings.showDebugInfo == false &&
             mc.player != null &&
             (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
-            (Configs.Generic.REQUIRED_KEY.getKeybind().isValid() == false || Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld()))
+            Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld())
         {
             if (InfoToggle.FPS.getBooleanValue())
             {
