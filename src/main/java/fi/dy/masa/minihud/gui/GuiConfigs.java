@@ -13,7 +13,7 @@ import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.resource.language.I18n;
 
 public class GuiConfigs extends GuiConfigsBase
 {
@@ -24,13 +24,13 @@ public class GuiConfigs extends GuiConfigsBase
     {
         super(10, 50, Reference.MOD_ID, null);
 
-        this.title = I18n.format("minihud.gui.title.configs");
+        this.title = I18n.translate("minihud.gui.title.configs");
     }
 
     @Override
-    public void initGui()
+    public void onInitialized()
     {
-        super.initGui();
+        super.onInitialized();
         this.clearOptions();
 
         this.id = 0;
@@ -51,7 +51,7 @@ public class GuiConfigs extends GuiConfigsBase
 
         if (width < 0)
         {
-            width = this.mc.fontRenderer.getStringWidth(label) + 10;
+            width = this.client.fontRenderer.getStringWidth(label) + 10;
         }
 
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
@@ -141,7 +141,7 @@ public class GuiConfigs extends GuiConfigsBase
 
             this.parent.reCreateListWidget(); // apply the new config width
             this.parent.getListWidget().resetScrollbarPosition();
-            this.parent.initGui();
+            this.parent.onInitialized();
         }
     }
 
@@ -163,7 +163,7 @@ public class GuiConfigs extends GuiConfigsBase
 
         public String getDisplayName()
         {
-            return I18n.format(this.translationKey);
+            return I18n.translate(this.translationKey);
         }
     }
 }

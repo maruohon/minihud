@@ -3,12 +3,13 @@ package fi.dy.masa.minihud.renderer;
 import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
+import com.mojang.blaze3d.platform.GLX;
+import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.minihud.config.RendererToggle;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.GlBuffer;
+import net.minecraft.client.render.VertexFormatElement;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 
 public class RenderContainer
@@ -38,13 +39,13 @@ public class RenderContainer
         this.allocateGlResources();
     }
 
-    public void render(Entity entity, Minecraft mc, float partialTicks)
+    public void render(Entity entity, MinecraftClient mc, float partialTicks)
     {
         this.update(entity, mc);
         this.draw(entity, mc, partialTicks);
     }
 
-    protected void update(Entity entity, Minecraft mc)
+    protected void update(Entity entity, MinecraftClient mc)
     {
         this.checkVideoSettings();
 
@@ -60,13 +61,13 @@ public class RenderContainer
         }
     }
 
-    protected void draw(Entity entity, Minecraft mc, float partialTicks)
+    protected void draw(Entity entity, MinecraftClient mc, float partialTicks)
     {
         if (this.resourcesAllocated)
         {
             GlStateManager.pushMatrix();
 
-            GlStateManager.disableTexture2D();
+            GlStateManager.disableTexture();
             //GlStateManager.matrixMode(GL11.GL_MODELVIEW);
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
             GlStateManager.disableCull();
@@ -75,18 +76,18 @@ public class RenderContainer
             GlStateManager.enablePolygonOffset();
             GlStateManager.polygonOffset(-0.1f, -0.8f);
             GlStateManager.enableBlend();
-            GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             GlStateManager.color4f(1f, 1f, 1f, 1f);
 
-            if (OpenGlHelper.useVbo())
+            if (GLX.useVbo())
             {
                 GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
                 GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
             }
 
-            double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
-            double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
-            double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
+            double dx = entity.prevRenderX + (entity.x - entity.prevRenderX) * partialTicks;
+            double dy = entity.prevRenderY + (entity.y - entity.prevRenderY) * partialTicks;
+            double dz = entity.prevRenderZ + (entity.z - entity.prevRenderZ) * partialTicks;
 
             GlStateManager.translated((float) -dx, (float) -dy, (float) -dz);
 
@@ -100,14 +101,14 @@ public class RenderContainer
                 }
             }
 
-            if (OpenGlHelper.useVbo())
+            if (GLX.useVbo())
             {
-                OpenGlHelper.glBindBuffer(OpenGlHelper.GL_ARRAY_BUFFER, 0);
-                GlStateManager.resetColor();
+                GlBuffer.unbind();
+                GlStateManager.clearCurrentColor();
 
-                for (VertexFormatElement element : DefaultVertexFormats.POSITION_COLOR.getElements())
+                for (VertexFormatElement element : VertexFormats.POSITION_COLOR.getElements())
                 {
-                    VertexFormatElement.EnumUsage usage = element.getUsage();
+                    VertexFormatElement.Type usage = element.getType();
 
                     switch (usage)
                     {
@@ -116,7 +117,7 @@ public class RenderContainer
                             break;
                         case COLOR:
                             GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
-                            GlStateManager.resetColor();
+                            GlStateManager.clearCurrentColor();
                         default:
                     }
                 }
@@ -131,7 +132,7 @@ public class RenderContainer
             GlStateManager.depthMask(true);
             GlStateManager.polygonOffset(0f, 0f);
             GlStateManager.disablePolygonOffset();
-            GlStateManager.enableTexture2D();
+            GlStateManager.enableTexture();
             GlStateManager.popMatrix();
         }
     }
@@ -139,7 +140,7 @@ public class RenderContainer
     protected void checkVideoSettings()
     {
         boolean vboLast = this.useVbo;
-        this.useVbo = OpenGlHelper.useVbo();
+        this.useVbo = GLX.useVbo();
 
         if (vboLast != this.useVbo || this.resourcesAllocated == false)
         {

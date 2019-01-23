@@ -1,6 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
-import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.render.BufferBuilder;
 
 public abstract class RenderObjectBase
 {

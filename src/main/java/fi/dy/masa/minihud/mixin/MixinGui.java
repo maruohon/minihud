@@ -6,22 +6,22 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.minihud.util.DataStorage;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Gui;
 
-@Mixin(GuiScreen.class)
-public class MixinGuiScreen
+@Mixin(Gui.class)
+public abstract class MixinGui
 {
     @Shadow
-    protected Minecraft mc;
+    protected MinecraftClient client;
 
-    @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at = @At(
+    @Inject(method = "method_2213(Ljava/lang/String;Z)V", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/entity/EntityPlayerSP;sendChatMessage(Ljava/lang/String;)V"),
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;)V"),
             cancellable = true)
     private void onSendMessage(String msg, boolean addToChat, CallbackInfo ci)
     {
-        if (DataStorage.getInstance().onSendChatMessage(this.mc.player, msg))
+        if (DataStorage.getInstance().onSendChatMessage(this.client.player, msg))
         {
             ci.cancel();
         }

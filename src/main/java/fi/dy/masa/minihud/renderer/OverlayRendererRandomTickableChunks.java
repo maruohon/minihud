@@ -6,18 +6,18 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.chunk.ChunkPos;
 
 public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 {
     @Nullable public static Vec3d newPos;
-    private static final EnumFacing[] HORIZONTALS = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
+    private static final Direction[] HORIZONTALS = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST };
 
     protected final RendererToggle toggle;
     protected Vec3d pos = Vec3d.ZERO;
@@ -28,13 +28,13 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     }
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender(MinecraftClient mc)
     {
         return this.toggle.getBooleanValue();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity, MinecraftClient mc)
     {
         if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED)
         {
@@ -43,18 +43,18 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
         // Player-following renderer
         else if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
         {
-            return entity.posX != this.pos.x || entity.posZ != this.pos.z;
+            return entity.x != this.pos.x || entity.z != this.pos.z;
         }
 
         return false;
     }
 
     @Override
-    public void update(Entity entity, Minecraft mc)
+    public void update(Entity entity, MinecraftClient mc)
     {
         if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
         {
-            this.pos = entity.getPositionVector();
+            this.pos = entity.getPosVector();
         }
         else if (newPos != null)
         {
@@ -68,8 +68,8 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+        BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
+        BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
 
         Set<ChunkPos> chunks = this.getRandomTickableChunks(this.pos);
 
@@ -78,8 +78,8 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
             this.renderChunkEdgesIfApplicable(pos, chunks, entity, color);
         }
 
-        BUFFER_1.finishDrawing();
-        BUFFER_2.finishDrawing();
+        BUFFER_1.end();
+        BUFFER_2.end();
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
@@ -114,9 +114,9 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 
     protected void renderChunkEdgesIfApplicable(ChunkPos pos, Set<ChunkPos> chunks, Entity entity, int color)
     {
-        for (EnumFacing side : HORIZONTALS)
+        for (Direction side : HORIZONTALS)
         {
-            ChunkPos posTmp = new ChunkPos(pos.x + side.getXOffset(), pos.z + side.getZOffset());
+            ChunkPos posTmp = new ChunkPos(pos.x + side.getOffsetX(), pos.z + side.getOffsetZ());
 
             if (chunks.contains(posTmp) == false)
             {
@@ -127,7 +127,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
         }
     }
 
-    protected BlockPos getStartPos(ChunkPos chunkPos, EnumFacing side)
+    protected BlockPos getStartPos(ChunkPos chunkPos, Direction side)
     {
         switch (side)
         {
@@ -141,7 +141,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
         return BlockPos.ORIGIN;
     }
 
-    protected BlockPos getEndPos(ChunkPos chunkPos, EnumFacing side)
+    protected BlockPos getEndPos(ChunkPos chunkPos, Direction side)
     {
         switch (side)
         {

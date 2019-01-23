@@ -8,21 +8,21 @@ import com.google.common.collect.MapMaker;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.mixin.IMixinDebugRenderer;
-import fi.dy.masa.minihud.mixin.IMixinPathNavigate;
+import fi.dy.masa.minihud.mixin.IMixinEntityNavigation;
 import io.netty.buffer.Unpooled;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.debug.DebugRendererNeighborsUpdate;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.packet.CustomPayloadClientPacket;
+import net.minecraft.client.render.debug.NeighborUpdateDebugRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.server.SPacketCustomPayload;
-import net.minecraft.pathfinding.Path;
-import net.minecraft.pathfinding.PathNavigate;
-import net.minecraft.pathfinding.PathPoint;
+import net.minecraft.entity.ai.pathing.EntityNavigation;
+import net.minecraft.entity.ai.pathing.Path;
+import net.minecraft.entity.ai.pathing.PathNode;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class DebugInfoUtils
@@ -34,105 +34,105 @@ public class DebugInfoUtils
 
     public static void sendPacketDebugPath(MinecraftServer server, int entityId, Path path, float maxDistance)
     {
-        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
         buffer.writeInt(entityId);
         buffer.writeFloat(maxDistance);
         writePathToBuffer(buffer, path);
 
-        SPacketCustomPayload packet = new SPacketCustomPayload(SPacketCustomPayload.DEBUG_PATH, buffer);
-        server.getPlayerList().sendPacketToAllPlayers(packet);
+        CustomPayloadClientPacket packet = new CustomPayloadClientPacket(CustomPayloadClientPacket.DEBUG_PATH, buffer);
+        server.getPlayerManager().sendToAll(packet);
     }
 
-    private static void writePathPointToBuffer(PacketBuffer buf, PathPoint point)
+    private static void writePathPointToBuffer(PacketByteBuf buf, PathNode node)
     {
-        buf.writeInt(point.x);
-        buf.writeInt(point.y);
-        buf.writeInt(point.z);
+        buf.writeInt(node.x);
+        buf.writeInt(node.y);
+        buf.writeInt(node.z);
 
-        buf.writeFloat(point.distanceFromOrigin);
-        buf.writeFloat(point.cost);
-        buf.writeFloat(point.costMalus);
-        buf.writeBoolean(point.visited);
-        buf.writeInt(point.nodeType.ordinal());
-        buf.writeFloat(point.distanceToTarget);
+        buf.writeFloat(node.field_46);
+        buf.writeFloat(node.field_45);
+        buf.writeFloat(node.field_43);
+        buf.writeBoolean(node.field_42);
+        buf.writeInt(node.type.ordinal());
+        buf.writeFloat(node.heapWeight);
     }
 
-    public static PacketBuffer writePathTobuffer(Path path)
+    public static PacketByteBuf writePathTobuffer(Path path)
     {
-        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
         writePathToBuffer(buffer, path);
         return buffer;
     }
 
-    private static void writePathToBuffer(PacketBuffer buf, Path path)
+    private static void writePathToBuffer(PacketByteBuf buf, Path path)
     {
-        PathPoint target = path.getFinalPathPoint(); // FIXME is this the target?
+        PathNode target = path.getEnd(); // FIXME is this the target?
 
         if (target != null)
         {
-            buf.writeInt(path.getCurrentPathIndex());
+            buf.writeInt(path.getCurrentNodeIndex());
 
             writePathPointToBuffer(buf, target);
 
-            int countTotal = path.getCurrentPathLength();
-            List<PathPoint> openSet = new ArrayList<PathPoint>();
-            List<PathPoint> closedSet = new ArrayList<PathPoint>();
-            List<PathPoint> allSet = new ArrayList<PathPoint>();
+            int countTotal = path.getPathLength();
+            List<PathNode> openSet = new ArrayList<>();
+            List<PathNode> closedSet = new ArrayList<>();
+            List<PathNode> allSet = new ArrayList<>();
 
             for (int i = 0; i < countTotal; i++)
             {
-                PathPoint point = path.getPathPointFromIndex(i);
+                PathNode node = path.getNode(i);
 
-                if (point.nodeType.getPriority() < 0F)
+                if (node.type.getWeight() < 0F)
                 {
-                    closedSet.add(point);
+                    closedSet.add(node);
                 }
-                else if (point.nodeType.getPriority() > 0F)
+                else if (node.type.getWeight() > 0F)
                 {
-                    openSet.add(point);
+                    openSet.add(node);
                 }
 
-                allSet.add(point);
+                allSet.add(node);
             }
 
             buf.writeInt(allSet.size());
 
-            for (PathPoint point : allSet)
+            for (PathNode point : allSet)
             {
                 writePathPointToBuffer(buf, point);
             }
 
             buf.writeInt(openSet.size());
 
-            for (PathPoint point : openSet)
+            for (PathNode point : openSet)
             {
                 writePathPointToBuffer(buf, point);
             }
 
             buf.writeInt(closedSet.size());
 
-            for (PathPoint point : closedSet)
+            for (PathNode point : closedSet)
             {
                 writePathPointToBuffer(buf, point);
             }
         }
     }
 
-    public static void onNeighborNotify(World world, BlockPos pos, EnumSet<EnumFacing> notifiedSides)
+    public static void onNeighborNotify(World world, BlockPos pos, EnumSet<Direction> notifiedSides)
     {
         // This will only work in single player...
         // We are catching updates from the server world, and adding them to the debug renderer directly
-        if (neighborUpdateEnabled && world.isRemote == false)
+        if (neighborUpdateEnabled && world.isClient == false)
         {
-            final long time = world.getGameTime();
+            final long time = world.getTime();
 
-            Minecraft.getInstance().addScheduledTask(new Runnable()
+            MinecraftClient.getInstance().execute(new Runnable()
             {
                 public void run()
                 {
-                    for (EnumFacing side : notifiedSides)
+                    for (Direction side : notifiedSides)
                     {
-                        ((DebugRendererNeighborsUpdate) Minecraft.getInstance().debugRenderer.neighborsUpdate).addUpdate(time, pos.offset(side));
+                        ((NeighborUpdateDebugRenderer) MinecraftClient.getInstance().debugRenderer.neighborUpdateDebugRenderer).method_3870(time, pos.offset(side));
                     }
                 }
             });
@@ -141,7 +141,7 @@ public class DebugInfoUtils
 
     public static void onServerTickEnd(MinecraftServer server)
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
         // Send the custom packet with the Path data, if that debug renderer is enabled
         if (pathfindingEnabled && mc.world != null && ++tickCounter >= 10)
@@ -151,13 +151,13 @@ public class DebugInfoUtils
 
             if (world != null)
             {
-                for (Entity entity : world.loadedEntityList)
+                for (Entity entity : world.entities)
                 {
-                    PathNavigate navigator = entity instanceof EntityLiving ? ((EntityLiving) entity).getNavigator() : null;
+                    EntityNavigation navigator = entity instanceof MobEntity ? ((MobEntity) entity).getNavigation() : null;
 
                     if (navigator != null && isAnyPlayerWithinRange(world, entity, 64))
                     {
-                        final Path path = navigator.getPath();
+                        final Path path = navigator.method_6345();
                         Path old = OLD_PATHS.get(entity);
 
                         if (path == null)
@@ -165,24 +165,24 @@ public class DebugInfoUtils
                             continue;
                         }
 
-                        boolean isSamepath = old != null && old.isSamePath(path);
+                        boolean isSamepath = old != null && old.equalsPath(path);
 
-                        if (old == null || isSamepath == false || old.getCurrentPathIndex() != path.getCurrentPathIndex())
+                        if (old == null || isSamepath == false || old.getCurrentNodeIndex() != path.getCurrentNodeIndex())
                         {
                             final int id = entity.getEntityId();
-                            final float maxDistance = Configs.Generic.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? ((IMixinPathNavigate) navigator).getMaxDistanceToWaypoint() : 0F;
+                            final float maxDistance = Configs.Generic.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? ((IMixinEntityNavigation) navigator).getMaxDistanceToWaypoint() : 0F;
 
                             DebugInfoUtils.sendPacketDebugPath(server, id, path, maxDistance);
 
                             if (isSamepath == false)
                             {
                                 // Make a copy via a PacketBuffer... :/
-                                PacketBuffer buf = DebugInfoUtils.writePathTobuffer(path);
-                                OLD_PATHS.put(entity, Path.read(buf));
+                                PacketByteBuf buf = DebugInfoUtils.writePathTobuffer(path);
+                                OLD_PATHS.put(entity, Path.method_34(buf));
                             }
                             else if (old != null)
                             {
-                                old.setCurrentPathIndex(path.getCurrentPathIndex());
+                                old.setCurrentPosition(path.getCurrentNodeIndex());
                             }
                         }
                     }
@@ -193,11 +193,11 @@ public class DebugInfoUtils
 
     private static boolean isAnyPlayerWithinRange(World world, Entity entity, double range)
     {
-        for (int i = 0; i < world.playerEntities.size(); ++i)
+        for (int i = 0; i < world.players.size(); ++i)
         {
-            EntityPlayer player = world.playerEntities.get(i);
+            PlayerEntity player = world.players.get(i);
 
-            double distSq = player.getDistanceSq(entity.posX, entity.posY, entity.posZ);
+            double distSq = player.squaredDistanceTo(entity.x, entity.y, entity.z);
 
             if (range < 0.0D || distSq < range * range)
             {
@@ -210,7 +210,7 @@ public class DebugInfoUtils
 
     public static void toggleDebugRenderer(RendererToggle config)
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
         boolean status;
 
         if (config == RendererToggle.DEBUG_COLLISION_BOXES)

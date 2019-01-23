@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Random;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.Configs;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.world.WorldServer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sortme.ChatMessageType;
+import net.minecraft.text.TranslatableTextComponent;
+import net.minecraft.world.chunk.ChunkPos;
 
 public class MiscUtils
 {
@@ -46,20 +46,20 @@ public class MiscUtils
         // The old simple calculation, without knowledge of the HashSet size
         else
         {
-            int longHash = Long.valueOf(ChunkPos.asLong(chunkX, chunkZ)).hashCode();
+            int longHash = Long.valueOf(ChunkPos.toLong(chunkX, chunkZ)).hashCode();
             return (longHash ^ (longHash >>> 16)) & 0xFFFF;
         }
     }
 
     public static void printInfoMessage(String key, Object... args)
     {
-        Minecraft.getInstance().ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation(key, args));
+        MinecraftClient.getInstance().inGameHud.addChatMessage(ChatMessageType.GAME_INFO, new TranslatableTextComponent(key, args));
     }
 
     /**
      * This method has been taken from the Carpet mod, by gnembon
      */
-    public static int getCurrentHashSize(WorldServer server)
+    public static int getCurrentHashSize(ServerWorld server)
     {
         /*
         IMixinChunkProviderServer provider = (IMixinChunkProviderServer) (Object) server.getChunkProvider();
@@ -105,7 +105,7 @@ public class MiscUtils
             Method method = HashMap.class.getDeclaredMethod("hash", Object.class);
             method.setAccessible(true);
 
-            return (Integer) method.invoke(null, Long.hashCode(ChunkPos.asLong(chunkX, chunkZ))) & (hashSize - 1);
+            return (Integer) method.invoke(null, Long.hashCode(ChunkPos.toLong(chunkX, chunkZ))) & (hashSize - 1);
         }
         catch (Exception e)
         {

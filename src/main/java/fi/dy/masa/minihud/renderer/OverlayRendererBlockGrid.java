@@ -5,12 +5,12 @@ import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.BlockGridMode;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class OverlayRendererBlockGrid extends OverlayRendererBase
@@ -18,33 +18,33 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
     private BlockPos lastUpdatePos;
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender(MinecraftClient mc)
     {
         return RendererToggle.OVERLAY_BLOCK_GRID.getBooleanValue();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity, MinecraftClient mc)
     {
         if (this.lastUpdatePos == null)
         {
             return true;
         }
 
-        return Math.abs(entity.posX - this.lastUpdatePos.getX()) > 8 ||
-               Math.abs(entity.posY - this.lastUpdatePos.getY()) > 8 ||
-               Math.abs(entity.posZ - this.lastUpdatePos.getZ()) > 8;
+        return Math.abs(entity.x - this.lastUpdatePos.getX()) > 8 ||
+               Math.abs(entity.y - this.lastUpdatePos.getY()) > 8 ||
+               Math.abs(entity.z - this.lastUpdatePos.getZ()) > 8;
     }
 
     @Override
-    public void update(Entity entity, Minecraft mc)
+    public void update(Entity entity, MinecraftClient mc)
     {
         this.lastUpdatePos = new BlockPos(entity);
         Color4f color = Configs.Colors.BLOCK_GRID_OVERLAY_COLOR.getColor();
         int radius = Configs.Generic.BLOCK_GRID_OVERLAY_RADIUS.getIntegerValue();
 
         RenderObjectBase renderLines = this.renderObjects.get(0);
-        BUFFER_1.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+        BUFFER_1.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
         BlockGridMode mode = (BlockGridMode) Configs.Generic.BLOCK_GRID_OVERLAY_MODE.getOptionListValue();
 
         switch (mode)
@@ -60,7 +60,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
                 break;
         }
 
-        BUFFER_1.finishDrawing();
+        BUFFER_1.end();
         renderLines.uploadData(BUFFER_1);
     }
 
@@ -83,8 +83,8 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         {
             for (int y = startY; y <= endY; ++y)
             {
-                buffer.pos(x, y, startZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x, y, endZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.vertex(x, y, startZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x, y, endZ).color(color.r, color.g, color.b, color.a).next();
             }
         }
 
@@ -92,8 +92,8 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         {
             for (int z = startZ; z <= endZ; ++z)
             {
-                buffer.pos(x, startY, z).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x, endY, z).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.vertex(x, startY, z).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x, endY, z).color(color.r, color.g, color.b, color.a).next();
             }
         }
 
@@ -101,8 +101,8 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         {
             for (int y = startY; y <= endY; ++y)
             {
-                buffer.pos(startX, y, z).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(endX, y, z).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.vertex(startX, y, z).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(endX, y, z).color(color.r, color.g, color.b, color.a).next();
             }
         }
     }
@@ -115,7 +115,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         int endX = center.getX() + radius;
         int endY = center.getY() + radius;
         int endZ = center.getZ() + radius;
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+        BlockPos.Mutable posMutable = new BlockPos.Mutable();
 
         for (int x = startX; x <= endX; ++x)
         {
@@ -123,9 +123,9 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
             {
                 for (int y = startY; y <= endY; ++y)
                 {
-                    posMutable.setPos(x, y, z);
+                    posMutable.set(x, y, z);
 
-                    if (world.isAirBlock(posMutable) == false)
+                    if (world.isAir(posMutable) == false)
                     {
                         fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(posMutable, color, 0.001, buffer);
                     }
@@ -142,8 +142,8 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         int endX = center.getX() + radius;
         int endY = center.getY() + radius;
         int endZ = center.getZ() + radius;
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
-        BlockPos.MutableBlockPos posMutable2 = new BlockPos.MutableBlockPos();
+        BlockPos.Mutable posMutable = new BlockPos.Mutable();
+        BlockPos.Mutable posMutable2 = new BlockPos.Mutable();
 
         for (int x = startX; x <= endX; ++x)
         {
@@ -151,18 +151,18 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
             {
                 for (int y = startY; y <= endY; ++y)
                 {
-                    posMutable.setPos(x, y, z);
+                    posMutable.set(x, y, z);
 
-                    if (world.isAirBlock(posMutable))
+                    if (world.isAir(posMutable))
                     {
-                        for (EnumFacing side : EnumFacing.values())
+                        for (Direction side : Direction.values())
                         {
-                            posMutable2.setPos(
-                                    posMutable.getX() + side.getXOffset(),
-                                    posMutable.getY() + side.getYOffset(),
-                                    posMutable.getZ() + side.getZOffset());
+                            posMutable2.set(
+                                    posMutable.getX() + side.getOffsetX(),
+                                    posMutable.getY() + side.getOffsetY(),
+                                    posMutable.getZ() + side.getOffsetZ());
 
-                            if (world.isAirBlock(posMutable2) == false)
+                            if (world.isAir(posMutable2) == false)
                             {
                                 fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(posMutable, color, 0.001, buffer);
                                 break;

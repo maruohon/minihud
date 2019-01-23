@@ -6,35 +6,36 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.PooledMutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 
 public class OverlayRendererSlimeChunks extends OverlayRendererBase
 {
     public static double overlayTopY;
 
+    protected final BlockPos.Mutable posMutable1 = new BlockPos.Mutable();
+    protected final BlockPos.Mutable posMutable2 = new BlockPos.Mutable();
     protected double topY;
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender(MinecraftClient mc)
     {
-        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() && mc.world.dimension.isSurfaceWorld();
+        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() && mc.world.dimension.hasVisibleSky();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity, MinecraftClient mc)
     {
         if (this.topY != overlayTopY)
         {
             return true;
         }
 
-        int ex = (int) Math.floor(entity.posX);
-        int ez = (int) Math.floor(entity.posZ);
+        int ex = (int) Math.floor(entity.x);
+        int ez = (int) Math.floor(entity.z);
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -42,31 +43,29 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, Minecraft mc)
+    public void update(Entity entity, MinecraftClient mc)
     {
         DataStorage data = DataStorage.getInstance();
         this.topY = overlayTopY;
 
         if (data.isWorldSeedKnown(entity.dimension))
         {
-            final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
-            final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
+            final int centerX = ((int) MathHelper.floor(entity.x)) >> 4;
+            final int centerZ = ((int) MathHelper.floor(entity.z)) >> 4;
             final long worldSeed = data.getWorldSeed(entity.dimension);
             final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
             final Color4f colorSides = Color4f.fromColor(colorLines, colorLines.a / 6);
-            PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();
-            PooledMutableBlockPos pos2 = PooledMutableBlockPos.retain();
             int r = MathHelper.clamp(Configs.Generic.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
 
             if (r == -1)
             {
-                r = mc.gameSettings.renderDistanceChunks;
+                r = mc.options.viewDistance;
             }
 
             RenderObjectBase renderQuads = this.renderObjects.get(0);
             RenderObjectBase renderLines = this.renderObjects.get(1);
-            BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-            BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+            BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
+            BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
 
             for (int xOff = -r; xOff <= r; xOff++)
             {
@@ -77,18 +76,15 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
 
                     if (MiscUtils.canSlimeSpawnInChunk(cx, cz, worldSeed))
                     {
-                        pos1.setPos( cx << 4,               0,  cz << 4);
-                        pos2.setPos((cx << 4) + 16, this.topY, (cz << 4) + 16);
-                        RenderUtils.renderBoxWithEdgesBatched(BUFFER_1, BUFFER_2, pos1, pos2, colorLines, colorSides);
+                        this.posMutable1.set( cx << 4,               0,  cz << 4);
+                        this.posMutable2.set((cx << 4) + 16, this.topY, (cz << 4) + 16);
+                        RenderUtils.renderBoxWithEdgesBatched(BUFFER_1, BUFFER_2, this.posMutable1, this.posMutable2, colorLines, colorSides);
                     }
                 }
             }
 
-            pos1.close();
-            pos2.close();
-
-            BUFFER_1.finishDrawing();
-            BUFFER_2.finishDrawing();
+            BUFFER_1.end();
+            BUFFER_2.end();
 
             renderQuads.uploadData(BUFFER_1);
             renderLines.uploadData(BUFFER_2);

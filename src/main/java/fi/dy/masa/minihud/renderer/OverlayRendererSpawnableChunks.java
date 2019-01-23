@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 
@@ -23,13 +23,13 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
     }
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender(MinecraftClient mc)
     {
         return this.toggle.getBooleanValue();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity, MinecraftClient mc)
     {
         /*
         if (this.topY != overlayTopY)
@@ -44,8 +44,8 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
         }
         else
         {
-            int ex = ((int) Math.floor(entity.posX)) >> 4;
-            int ez = ((int) Math.floor(entity.posZ)) >> 4;
+            int ex = ((int) Math.floor(entity.x)) >> 4;
+            int ez = ((int) Math.floor(entity.z)) >> 4;
             int lx = this.lastUpdatePos.getX();
             int lz = this.lastUpdatePos.getZ();
 
@@ -54,7 +54,7 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, Minecraft mc)
+    public void update(Entity entity, MinecraftClient mc)
     {
         BlockPos posCenter;
 
@@ -77,8 +77,8 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+        BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
+        BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
 
         int centerX = posCenter.getX() >> 4;
         int centerZ = posCenter.getZ() >> 4;
@@ -95,8 +95,8 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
 
         RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, pos1, pos2, 256, 256, 16, 16, entity, color);
 
-        BUFFER_1.finishDrawing();
-        BUFFER_2.finishDrawing();
+        BUFFER_1.end();
+        BUFFER_2.end();
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);

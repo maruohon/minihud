@@ -1,27 +1,18 @@
 package fi.dy.masa.minihud.util;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import fi.dy.masa.minihud.MiniHUD;
-import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.text.TextComponent;
+import net.minecraft.text.TextFormat;
+import net.minecraft.text.TranslatableTextComponent;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.Heightmap;
 
 public class DataStorage
 {
@@ -39,9 +30,7 @@ public class DataStorage
     private double serverMSPT;
     private int droppedChunksHashSize = -1;
     private BlockPos worldSpawn = BlockPos.ORIGIN;
-    private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
-    private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
-    private final Minecraft mc = Minecraft.getInstance();
+    private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public static DataStorage getInstance()
     {
@@ -74,9 +63,9 @@ public class DataStorage
         {
             return true;
         }
-        else if (this.mc.isSingleplayer())
+        else if (this.mc.isIntegratedServerRunning())
         {
-            MinecraftServer server = this.mc.getIntegratedServer();
+            MinecraftServer server = this.mc.getServer();
             World worldTmp = server.getWorld(dimension);
             return worldTmp != null;
         }
@@ -90,9 +79,9 @@ public class DataStorage
         {
             return this.worldSeed;
         }
-        else if (this.mc.isSingleplayer())
+        else if (this.mc.isIntegratedServerRunning())
         {
-            MinecraftServer server = this.mc.getIntegratedServer();
+            MinecraftServer server = this.mc.getServer();
             World worldTmp = server.getWorld(dimension);
             return worldTmp != null ? worldTmp.getSeed() : 0;
         }
@@ -137,11 +126,11 @@ public class DataStorage
             return this.droppedChunksHashSize;
         }
 
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
-        if (mc.isSingleplayer())
+        if (mc.isIntegratedServerRunning())
         {
-            return MiscUtils.getCurrentHashSize(mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().dimension.getType()));
+            return MiscUtils.getCurrentHashSize(mc.getServer().getWorld(mc.player.getEntityWorld().dimension.getType()));
         }
         else
         {
@@ -149,79 +138,7 @@ public class DataStorage
         }
     }
 
-    public void markChunkForHeightmapCheck(int chunkX, int chunkZ)
-    {
-        OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
-        this.chunkHeightmapsToCheck.add(new ChunkPos(chunkX, chunkZ));
-    }
-
-    public void checkQueuedDirtyChunkHeightmaps()
-    {
-        WorldClient world = this.mc.world;
-
-        if (world != null)
-        {
-            if (this.chunkHeightmapsToCheck.isEmpty() == false)
-            {
-                for (ChunkPos pos : this.chunkHeightmapsToCheck)
-                {
-                    Chunk chunk = world.getChunk(pos.x, pos.z);
-                    Heightmap hm = chunk.getHeightmap(Heightmap.Type.LIGHT_BLOCKING);
-                    int maxHeight = -1;
-
-                    for (int x = 0; x < 16; ++x)
-                    {
-                        for (int z = 0; z < 16; ++z)
-                        {
-                            int h = hm.getHeight(x, z);
-
-                            if (h > maxHeight)
-                            {
-                                maxHeight = h;
-                            }
-                        }
-                    }
-
-                    int subChunks;
-
-                    if (maxHeight >= 0)
-                    {
-                        subChunks = MathHelper.clamp((maxHeight / 16) + 1, 1, 16);
-                    }
-                    // Void world? Use the topFilledSegment, see WorldEntitySpawner.getRandomChunkPosition()
-                    else
-                    {
-                        subChunks = MathHelper.clamp((chunk.getTopFilledSegment() + 16) / 16, 1, 16);
-                    }
-
-                    //System.out.printf("@ %d, %d - subChunks: %d, maxHeight: %d\n", pos.x, pos.z, subChunks, maxHeight);
-
-                    this.spawnableSubChunks.put(pos, subChunks);
-                }
-            }
-        }
-        else
-        {
-            this.spawnableSubChunks.clear();
-        }
-
-        this.chunkHeightmapsToCheck.clear();
-    }
-
-    public void onChunkUnload(int chunkX, int chunkZ)
-    {
-        ChunkPos pos = new ChunkPos(chunkX, chunkZ);
-        this.chunkHeightmapsToCheck.remove(pos);
-        this.spawnableSubChunks.remove(pos);
-    }
-
-    public int getSpawnableSubChunkCountFor(int chunkX, int chunkZ)
-    {
-        Integer count = this.spawnableSubChunks.get(new ChunkPos(chunkX, chunkZ));
-        return count != null ? count.intValue() : -1;
-    }
-
-    public boolean onSendChatMessage(EntityPlayer player, String message)
+    public boolean onSendChatMessage(PlayerEntity player, String message)
     {
         String[] parts = message.split(" ");
 
@@ -273,11 +190,11 @@ public class DataStorage
         return false;
     }
 
-    public void onChatMessage(ITextComponent message)
+    public void onChatMessage(TextComponent message)
     {
-        if (message instanceof TextComponentTranslation)
+        if (message instanceof TranslatableTextComponent)
         {
-            TextComponentTranslation text = (TextComponentTranslation) message;
+            TranslatableTextComponent text = (TranslatableTextComponent) message;
 
             // The vanilla "/seed" command
             if ("commands.seed.success".equals(text.getKey()))
@@ -298,7 +215,7 @@ public class DataStorage
                 }
                 catch (Exception e)
                 {
-                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[0], e);
+                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getParams()[0], e);
                 }
             }
             // The "/jed seed" command
@@ -306,21 +223,21 @@ public class DataStorage
             {
                 try
                 {
-                    this.worldSeed = Long.parseLong(text.getFormatArgs()[1].toString());
+                    this.worldSeed = Long.parseLong(text.getParams()[1].toString());
                     this.worldSeedValid = true;
                     MiniHUD.logger.info("Received world seed from the JED '/jed seed' command: {}", this.worldSeed);
                     MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
                 }
                 catch (Exception e)
                 {
-                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[1], e);
+                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getParams()[1], e);
                 }
             }
-            else if ("commands.setworldspawn.success".equals(text.getKey()) && text.getFormatArgs().length == 3)
+            else if ("commands.setworldspawn.success".equals(text.getKey()) && text.getParams().length == 3)
             {
                 try
                 {
-                    Object[] o = text.getFormatArgs();
+                    Object[] o = text.getParams();
                     int x = Integer.parseInt(o[0].toString());
                     int y = Integer.parseInt(o[1].toString());
                     int z = Integer.parseInt(o[2].toString());
@@ -334,7 +251,7 @@ public class DataStorage
                 }
                 catch (Exception e)
                 {
-                    MiniHUD.logger.warn("Failed to read the world spawn point from '{}'", text.getFormatArgs(), e);
+                    MiniHUD.logger.warn("Failed to read the world spawn point from '{}'", text.getParams(), e);
                 }
             }
         }
@@ -344,7 +261,7 @@ public class DataStorage
     {
         // Carpet server sends the TPS and MSPT values via the player list footer data,
         // and for single player the data is grabbed directly from the integrated server.
-        if (this.carpetServer == false && this.mc.isSingleplayer() == false)
+        if (this.carpetServer == false && this.mc.isInSingleplayer() == false)
         {
             long currentTime = System.nanoTime();
 
@@ -367,19 +284,19 @@ public class DataStorage
 
     public void updateIntegratedServerTPS()
     {
-        if (this.mc != null && this.mc.player != null && this.mc.getIntegratedServer() != null)
+        if (this.mc != null && this.mc.player != null && this.mc.getServer() != null)
         {
-            this.serverMSPT = (double) MathHelper.average(this.mc.getIntegratedServer().tickTimeArray) / 1000000D;
+            this.serverMSPT = (double) MathHelper.average(this.mc.getServer().lastTickLengths) / 1000000D;
             this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
             this.serverTPSValid = true;
         }
     }
 
-    public void handleCarpetServerTPSData(ITextComponent textComponent)
+    public void handleCarpetServerTPSData(TextComponent textComponent)
     {
         if (textComponent.getFormattedText().isEmpty() == false)
         {
-            String text = TextFormatting.getTextWithoutFormattingCodes(textComponent.getString());
+            String text = TextFormat.stripFormatting(textComponent.getString());
             String[] lines = text.split("\n");
 
             for (String line : lines)

@@ -1,0 +1,16 @@
+{
+    "id": "minihud",
+    "name": "MiniHUD",
+    "description": "Configurable mini-F3 info lines, and various overlay renderers",
+    "version": "0.19.0-dev",
+    "side": "client",
+    "initializers": [
+        "fi.dy.masa.minihud.MiniHUD"
+    ],
+    "requires": {
+        "fabric": "*"
+    },
+    "mixins": {
+        "client": "mixins.minihud.json"
+    }
+}

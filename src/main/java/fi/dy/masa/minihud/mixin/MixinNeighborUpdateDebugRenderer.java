@@ -5,10 +5,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.minihud.event.RenderHandler;
-import net.minecraft.client.renderer.debug.DebugRendererHeightMap;
+import net.minecraft.client.render.debug.NeighborUpdateDebugRenderer;
 
-@Mixin(DebugRendererHeightMap.class)
-public class MixinDebugRendererHeightMap
+@Mixin(NeighborUpdateDebugRenderer.class)
+public abstract class MixinNeighborUpdateDebugRenderer
 {
     @Inject(method = "render", at = @At("HEAD"))
     public void fixDebugRendererState(CallbackInfo ci)

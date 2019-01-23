@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.hotkeys;
 
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
@@ -10,11 +11,10 @@ import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableChunks;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextFormatting;
 
 public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWithMessage
 {
@@ -30,26 +30,26 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
     @Override
     public boolean onKeyAction(KeyAction action, IKeybind key)
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
         if (mc != null && mc.player != null && super.onKeyAction(action, key))
         {
             if (key == RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind())
             {
-                OverlayRenderer.chunkUnloadBucketOverlayY = mc.player.posY - 2;
+                OverlayRenderer.chunkUnloadBucketOverlayY = mc.player.y - 2;
             }
             else if (key == RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind())
             {
-                OverlayRendererSlimeChunks.overlayTopY = mc.player.posY;
+                OverlayRendererSlimeChunks.overlayTopY = mc.player.y;
             }
             else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind() && this.rendererConfig.getBooleanValue())
             {
                 final boolean enabled = this.config.getBooleanValue();
-                String pre = enabled ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-                String status = I18n.format("malilib.message.value." + (enabled ? "on" : "off"));
-                String message = I18n.format("malilib.message.toggled", this.config.getPrettyName(), pre + status + TextFormatting.RESET);
+                String pre = enabled ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
+                String status = I18n.translate("malilib.message.value." + (enabled ? "on" : "off"));
+                String message = I18n.translate("malilib.message.toggled", this.config.getPrettyName(), pre + status + GuiBase.TXT_RST);
 
-                BlockPos spawn = mc.world.getSpawnPoint();
+                BlockPos spawn = mc.world.getSpawnPos();
                 RenderHandler.getInstance().getDataStorage().setWorldSpawn(spawn);
                 String str = String.format(", using the world spawn x: %d, y: %d, z: %d", spawn.getX(), spawn.getY(), spawn.getZ());
 
@@ -58,11 +58,11 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getKeybind() && this.rendererConfig.getBooleanValue())
             {
                 final boolean enabled = this.config.getBooleanValue();
-                String pre = enabled ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-                String status = I18n.format("malilib.message.value." + (enabled ? "on" : "off"));
-                String message = I18n.format("malilib.message.toggled", this.config.getPrettyName(), pre + status + TextFormatting.RESET);
+                String pre = enabled ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
+                String status = I18n.translate("malilib.message.value." + (enabled ? "on" : "off"));
+                String message = I18n.translate("malilib.message.toggled", this.config.getPrettyName(), pre + status + GuiBase.TXT_RST);
 
-                Vec3d pos = mc.player.getPositionVector();
+                Vec3d pos = mc.player.getPosVector();
                 OverlayRendererRandomTickableChunks.newPos = pos;
                 String str = String.format(", using the position x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
 
@@ -70,18 +70,18 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             }
             else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.getKeybind() && this.rendererConfig.getBooleanValue())
             {
-                OverlayRendererSpawnableChunks.overlayTopY = mc.player.posY;
+                OverlayRendererSpawnableChunks.overlayTopY = mc.player.y;
             }
             else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getKeybind() && this.rendererConfig.getBooleanValue())
             {
                 final boolean enabled = this.config.getBooleanValue();
-                String pre = enabled ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-                String status = I18n.format("malilib.message.value." + (enabled ? "on" : "off"));
-                String message = I18n.format("malilib.message.toggled", this.config.getPrettyName(), pre + status + TextFormatting.RESET);
+                String pre = enabled ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
+                String status = I18n.translate("malilib.message.value." + (enabled ? "on" : "off"));
+                String message = I18n.translate("malilib.message.toggled", this.config.getPrettyName(), pre + status + GuiBase.TXT_RST);
 
                 BlockPos pos = new BlockPos(mc.player);
                 OverlayRendererSpawnableChunks.newPos = pos;
-                OverlayRendererSpawnableChunks.overlayTopY = mc.player.posY;
+                OverlayRendererSpawnableChunks.overlayTopY = mc.player.y;
                 String str = String.format(", using the position x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
 
                 StringUtils.printActionbarMessage(message + str);

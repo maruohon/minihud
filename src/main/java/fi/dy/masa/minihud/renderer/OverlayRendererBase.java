@@ -2,9 +2,9 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
+import com.mojang.blaze3d.platform.GLX;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.util.math.BlockPos;
 
 public abstract class OverlayRendererBase implements IOverlayRenderer
@@ -48,7 +48,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     {
         RenderObjectBase obj;
 
-        if (OpenGlHelper.useVbo())
+        if (GLX.useVbo())
         {
             obj = new RenderObjectVbo(glMode);
         }

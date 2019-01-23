@@ -7,24 +7,24 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
 import net.minecraft.block.Block;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 @Mixin(World.class)
-public class MixinWorld
+public abstract class MixinWorld
 {
-    @Inject(method = "notifyNeighborsOfStateChange", at = @At("HEAD"))
-    public void onNotifyNeighborsOfStateChange(BlockPos pos, Block blockType, CallbackInfo ci)
+    @Inject(method = "updateNeighborsAlways", at = @At("HEAD"))
+    public void onUpdateNeighborsAlways(BlockPos pos, Block blockType, CallbackInfo ci)
     {
-        EnumSet<EnumFacing> set = EnumSet.allOf(EnumFacing.class);
+        EnumSet<Direction> set = EnumSet.allOf(Direction.class);
         DebugInfoUtils.onNeighborNotify((World) (Object) this, pos, set);
     }
 
-    @Inject(method = "notifyNeighborsOfStateExcept", at = @At("HEAD"))
-    public void onNotifyNeighborsOfStateExcept(BlockPos pos, Block blockType, EnumFacing skipSide, CallbackInfo ci)
+    @Inject(method = "updateNeighborsExcept", at = @At("HEAD"))
+    public void onUpdateNeighborsExcept(BlockPos pos, Block blockType, Direction skipSide, CallbackInfo ci)
     {
-        EnumSet<EnumFacing> set = EnumSet.allOf(EnumFacing.class);
+        EnumSet<Direction> set = EnumSet.allOf(Direction.class);
         set.remove(skipSide);
         DebugInfoUtils.onNeighborNotify((World) (Object) this, pos, set);
     }

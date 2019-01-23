@@ -1,29 +1,29 @@
 package fi.dy.masa.minihud.renderer;
 
 import org.lwjgl.opengl.GL11;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.VertexBufferUploader;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexBuffer;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.class_294;
+import net.minecraft.client.gl.GlBuffer;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexFormats;
 
 public class RenderObjectVbo extends RenderObjectBase
 {
-    protected static final VertexBufferUploader VERTEX_UPLOADER = new VertexBufferUploader();
+    protected static final class_294 VERTEX_UPLOADER = new class_294(); // MCP: VertexBufferUploader
 
-    protected final VertexBuffer vertexBuffer;
+    protected final GlBuffer vertexBuffer;
 
     public RenderObjectVbo(int glMode)
     {
         super(glMode);
 
-        this.vertexBuffer = new VertexBuffer(DefaultVertexFormats.POSITION_COLOR);
+        this.vertexBuffer = new GlBuffer(VertexFormats.POSITION_COLOR);
     }
 
     @Override
     public void uploadData(BufferBuilder buffer)
     {
-        VERTEX_UPLOADER.setVertexBuffer(this.vertexBuffer);
+        VERTEX_UPLOADER.method_1372(this.vertexBuffer); // MCP: setVertexBuffer
         VERTEX_UPLOADER.draw(buffer);
     }
 
@@ -32,9 +32,9 @@ public class RenderObjectVbo extends RenderObjectBase
     {
         GlStateManager.pushMatrix();
 
-        this.vertexBuffer.bindBuffer();
+        this.vertexBuffer.bind();
         this.setupArrayPointers();
-        this.vertexBuffer.drawArrays(this.getGlMode());
+        this.vertexBuffer.draw(this.getGlMode());
 
         GlStateManager.popMatrix();
     }
@@ -48,6 +48,6 @@ public class RenderObjectVbo extends RenderObjectBase
     @Override
     public void deleteGlResources()
     {
-        this.vertexBuffer.deleteGlBuffers();
+        this.vertexBuffer.delete();
     }
 }
