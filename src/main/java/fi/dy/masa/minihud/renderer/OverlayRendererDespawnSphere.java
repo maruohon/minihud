@@ -105,15 +105,26 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
 
         long before = System.nanoTime();
         posMutable.setPos(posCenter);
-        addPositionsOnRing(spherePositions, posMutable, center);
+        addPositionsOnRing(spherePositions, posMutable, center, EnumFacing.EAST);
+
+        posMutable.setPos(posCenter);
+        addPositionsOnRing(spherePositions, posMutable, center, EnumFacing.UP);
 
         for (int i = 1; i < 130; ++i)
         {
+            // Horizontal rings
             posMutable.setPos(posCenter.getX(), posCenter.getY() - i, posCenter.getZ());
-            addPositionsOnRing(spherePositions, posMutable, center);
+            addPositionsOnRing(spherePositions, posMutable, center, EnumFacing.EAST);
 
             posMutable.setPos(posCenter.getX(), posCenter.getY() + i, posCenter.getZ());
-            addPositionsOnRing(spherePositions, posMutable, center);
+            addPositionsOnRing(spherePositions, posMutable, center, EnumFacing.EAST);
+
+            // Vertical rings
+            posMutable.setPos(posCenter.getX() - i, posCenter.getY(), posCenter.getZ());
+            addPositionsOnRing(spherePositions, posMutable, center, EnumFacing.UP);
+
+            posMutable.setPos(posCenter.getX() + i, posCenter.getY(), posCenter.getZ());
+            addPositionsOnRing(spherePositions, posMutable, center, EnumFacing.UP);
         }
         System.out.printf("time: %.6f s\n", (double) (System.nanoTime() - before) / 1000000000D);
 
@@ -123,6 +134,7 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
         for (BlockPos pos : spherePositions)
         {
             //fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxSidesBatchedQuads(pos, colorDebug, -0.25, BUFFER_1);
+
             for (int i = 0; i < 6; ++i)
             {
                 EnumFacing side = FACING_ALL[i];
@@ -144,19 +156,25 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
         renderLines.uploadData(BUFFER_2);
     }
 
-    private static void addPositionsOnRing(HashSet<BlockPos> positions, BlockPos.MutableBlockPos posMutable, Vec3d center)
+    private static void addPositionsOnRing(HashSet<BlockPos> positions, BlockPos.MutableBlockPos posMutable, Vec3d center, EnumFacing direction)
     {
-        EnumFacing direction = EnumFacing.EAST;
-
         if (movePositionToRing(posMutable, center, direction))
         {
             BlockPos posFirst = posMutable.toImmutable();
             positions.add(posFirst);
             int failsafe = 860;
+            EnumFacing.Axis axis = direction.getAxis();
 
             while (--failsafe > 0)
             {
-                direction = getNextPositionOnRing(posMutable, center, direction);
+                if (axis == EnumFacing.Axis.Y)
+                {
+                    direction = getNextPositionOnRingVertical(posMutable, center, direction);
+                }
+                else
+                {
+                    direction = getNextPositionOnRing(posMutable, center, direction);
+                }
 
                 if (direction == null || posMutable.equals(posFirst))
                 {
@@ -182,7 +200,7 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
         int failsafe = 0;
         int failsafeMax = 140;
 
-        while (center.squareDistanceTo(xNext + 0.5, y, zNext + 0.5) < maxDistSq && ++failsafe < failsafeMax)
+        while (center.squareDistanceTo(xNext + 0.5, yNext, zNext + 0.5) < maxDistSq && ++failsafe < failsafeMax)
         {
             x = xNext;
             y = yNext;
@@ -247,6 +265,52 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
         return null;
     }
 
+    @Nullable
+    private static EnumFacing getNextPositionOnRingVertical(BlockPos.MutableBlockPos posMutable, Vec3d center, EnumFacing dir)
+    {
+        EnumFacing dirOut = dir;
+        EnumFacing ccw90 = getNextDirRotatingVertical(dir);
+        final double maxDistSq = 128 * 128;
+
+        for (int i = 0; i < 4; ++i)
+        {
+            int x = posMutable.getX() + dir.getXOffset();
+            int y = posMutable.getY() + dir.getYOffset();
+            int z = posMutable.getZ() + dir.getZOffset();
+
+            // First check the adjacent position
+            double dist = center.squareDistanceTo(x + 0.5, y, z + 0.5);
+            //if (posMutable.getZ() <= 168 && posMutable.getX() >= 343) System.out.printf("1 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist, dirOut);
+
+            if (dist < maxDistSq)
+            {
+                posMutable.setPos(x, y, z);
+                return dirOut;
+            }
+
+            // Then check the diagonal position
+            x = posMutable.getX() + dir.getXOffset() + ccw90.getXOffset();
+            y = posMutable.getY() + dir.getYOffset() + ccw90.getYOffset();
+            z = posMutable.getZ() + dir.getZOffset() + ccw90.getZOffset();
+            dist = center.squareDistanceTo(x + 0.5, y, z + 0.5);
+            //if (posMutable.getZ() <= 168 && posMutable.getX() >= 343) System.out.printf("2 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist, dirOut);
+
+            if (dist < maxDistSq)
+            {
+                posMutable.setPos(x, y, z);
+                return dirOut;
+            }
+
+            // Delay the next direction by one cycle, so that it won't get updated too soon on the diagonals
+            dirOut = dir;
+            dir = getNextDirRotatingVertical(dir);
+            ccw90 = getNextDirRotatingVertical(dir);
+        }
+
+        //System.out.printf("3 null @ x: %d, z: %d\n", posMutable.getX(), posMutable.getZ());
+        return null;
+    }
+
     private static boolean isAdjacentPositionOutside(BlockPos pos, Vec3d center, EnumFacing dir)
     {
         final double maxDistSq = 128 * 128;
@@ -298,7 +362,7 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
 
     /**
      * Returns the next horizontal direction in sequence, rotating counter-clockwise
-     * @param firstDir
+     * @param dirIn
      * @return
      */
     private static EnumFacing getNextDirRotating(EnumFacing dirIn)
@@ -309,6 +373,23 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
             case NORTH: return EnumFacing.WEST;
             case WEST:  return EnumFacing.SOUTH;
             case SOUTH: return EnumFacing.EAST;
+            default:    return EnumFacing.NORTH;
+        }
+    }
+
+    /**
+     * Returns the next direction in sequence, rotating up to north
+     * @param dirIn
+     * @return
+     */
+    private static EnumFacing getNextDirRotatingVertical(EnumFacing dirIn)
+    {
+        switch (dirIn)
+        {
+            case UP:    return EnumFacing.NORTH;
+            case NORTH: return EnumFacing.DOWN;
+            case DOWN:  return EnumFacing.SOUTH;
+            case SOUTH: return EnumFacing.UP;
             default:    return EnumFacing.NORTH;
         }
     }
