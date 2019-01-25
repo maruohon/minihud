@@ -7,6 +7,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.event.RenderHandler;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
+import fi.dy.masa.minihud.renderer.OverlayRendererDespawnSphere;
 import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableChunks;
@@ -80,7 +81,15 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
                 String message = I18n.format("minihud.message.toggled_using_position", this.config.getPrettyName(), strStatus, strPos);
 
                 StringUtils.printActionbarMessage(message);
+            }
+            else if (key == RendererToggle.OVERLAY_DESPAWN_SPHERE.getKeybind() && this.rendererConfig.getBooleanValue())
+            {
+                Vec3d pos = mc.player.getPositionVector();
+                OverlayRendererDespawnSphere.newPos = pos;
+                String strPos = String.format("x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
+                String message = I18n.format("minihud.message.toggled_using_center_position", this.config.getPrettyName(), strStatus, strPos);
 
+                StringUtils.printActionbarMessage(message);
             }
 
             return true;

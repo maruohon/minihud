@@ -26,6 +26,7 @@ public class RenderContainer
     public void init()
     {
         this.renderers.add(new OverlayRendererBlockGrid());
+        this.renderers.add(new OverlayRendererDespawnSphere());
         this.renderers.add(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_FIXED));
         this.renderers.add(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER));
         this.renderers.add(new OverlayRendererRegion());
