@@ -81,7 +81,7 @@ public class RenderContainer
             GlStateManager.disableLighting();
             GlStateManager.depthMask(false);
             GlStateManager.enablePolygonOffset();
-            GlStateManager.doPolygonOffset(-0.1f, -0.8f);
+            GlStateManager.doPolygonOffset(-0.4f, -0.8f);
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             GlStateManager.color(1f, 1f, 1f, 1f);

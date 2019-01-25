@@ -190,7 +190,6 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
 
     private static boolean movePositionToRing(BlockPos.MutableBlockPos posMutable, Vec3d center, EnumFacing dir)
     {
-        final double maxDistSq = 128 * 128;
         int x = posMutable.getX();
         int y = posMutable.getY();
         int z = posMutable.getZ();
@@ -198,9 +197,9 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
         int yNext = y;
         int zNext = z;
         int failsafe = 0;
-        int failsafeMax = 140;
+        final int failsafeMax = 140;
 
-        while (center.squareDistanceTo(xNext + 0.5, yNext, zNext + 0.5) < maxDistSq && ++failsafe < failsafeMax)
+        while (isPositionWithinRange(xNext, yNext, zNext, center) && ++failsafe < failsafeMax)
         {
             x = xNext;
             y = yNext;
@@ -225,7 +224,6 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
     {
         EnumFacing dirOut = dir;
         EnumFacing ccw90 = getNextDirRotating(dir);
-        final double maxDistSq = 128 * 128;
         final int y = posMutable.getY();
 
         for (int i = 0; i < 4; ++i)
@@ -234,10 +232,9 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
             int z = posMutable.getZ() + dir.getZOffset();
 
             // First check the adjacent position
-            double dist = center.squareDistanceTo(x + 0.5, y, z + 0.5);
             //if (posMutable.getZ() <= 168 && posMutable.getX() >= 343) System.out.printf("1 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist, dirOut);
 
-            if (dist < maxDistSq)
+            if (isPositionWithinRange(x, y, z, center))
             {
                 posMutable.setPos(x, y, z);
                 return dirOut;
@@ -246,10 +243,9 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
             // Then check the diagonal position
             x = posMutable.getX() + dir.getXOffset() + ccw90.getXOffset();
             z = posMutable.getZ() + dir.getZOffset() + ccw90.getZOffset();
-            dist = center.squareDistanceTo(x + 0.5, y, z + 0.5);
             //if (posMutable.getZ() <= 168 && posMutable.getX() >= 343) System.out.printf("2 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist, dirOut);
 
-            if (dist < maxDistSq)
+            if (isPositionWithinRange(x, y, z, center))
             {
                 posMutable.setPos(x, y, z);
                 return dirOut;
@@ -270,7 +266,6 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
     {
         EnumFacing dirOut = dir;
         EnumFacing ccw90 = getNextDirRotatingVertical(dir);
-        final double maxDistSq = 128 * 128;
 
         for (int i = 0; i < 4; ++i)
         {
@@ -279,10 +274,9 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
             int z = posMutable.getZ() + dir.getZOffset();
 
             // First check the adjacent position
-            double dist = center.squareDistanceTo(x + 0.5, y, z + 0.5);
             //if (posMutable.getZ() <= 168 && posMutable.getX() >= 343) System.out.printf("1 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist, dirOut);
 
-            if (dist < maxDistSq)
+            if (isPositionWithinRange(x, y, z, center))
             {
                 posMutable.setPos(x, y, z);
                 return dirOut;
@@ -292,10 +286,9 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
             x = posMutable.getX() + dir.getXOffset() + ccw90.getXOffset();
             y = posMutable.getY() + dir.getYOffset() + ccw90.getYOffset();
             z = posMutable.getZ() + dir.getZOffset() + ccw90.getZOffset();
-            dist = center.squareDistanceTo(x + 0.5, y, z + 0.5);
             //if (posMutable.getZ() <= 168 && posMutable.getX() >= 343) System.out.printf("2 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist, dirOut);
 
-            if (dist < maxDistSq)
+            if (isPositionWithinRange(x, y, z, center))
             {
                 posMutable.setPos(x, y, z);
                 return dirOut;
@@ -311,10 +304,16 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
         return null;
     }
 
+    private static boolean isPositionWithinRange(int x, int y, int z, Vec3d center)
+    {
+        final double maxDistSq = 128 * 128;
+        return center.squareDistanceTo(x + 0.5, y + 1, z + 0.5) < maxDistSq;
+    }
+
     private static boolean isAdjacentPositionOutside(BlockPos pos, Vec3d center, EnumFacing dir)
     {
         final double maxDistSq = 128 * 128;
-        return center.squareDistanceTo(pos.getX() + dir.getXOffset() + 0.5, pos.getY() + dir.getYOffset(), pos.getZ() + dir.getZOffset() + 0.5) >= maxDistSq;
+        return center.squareDistanceTo(pos.getX() + dir.getXOffset() + 0.5, pos.getY() + dir.getYOffset() + 1, pos.getZ() + dir.getZOffset() + 0.5) >= maxDistSq;
     }
 
     /*
