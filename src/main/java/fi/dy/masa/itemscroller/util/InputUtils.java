@@ -159,18 +159,18 @@ public class InputUtils
         }
     }
 
-    public static boolean mouseEventIsLeftClick()
+    public static boolean mouseEventIsLeftClick(int keyCode)
     {
-        return Mouse.getEventButton() == Minecraft.getMinecraft().gameSettings.keyBindAttack.getKeyCode() + 100;
+        return keyCode == Minecraft.getMinecraft().gameSettings.keyBindAttack.getKeyCode();
     }
 
-    public static boolean mouseEventIsRightClick()
+    public static boolean mouseEventIsRightClick(int keyCode)
     {
-        return Mouse.getEventButton() == Minecraft.getMinecraft().gameSettings.keyBindUseItem.getKeyCode() + 100;
+        return keyCode == Minecraft.getMinecraft().gameSettings.keyBindUseItem.getKeyCode();
     }
 
-    public static boolean mouseEventIsPickBlock()
+    public static boolean mouseEventIsPickBlock(int keyCode)
     {
-        return Mouse.getEventButton() == Minecraft.getMinecraft().gameSettings.keyBindPickBlock.getKeyCode() + 100;
+        return keyCode == Minecraft.getMinecraft().gameSettings.keyBindPickBlock.getKeyCode();
     }
 }

@@ -48,11 +48,37 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     @Override
     public boolean onKeyInput(int eventKey, boolean eventKeyState)
     {
-        if (InputUtils.isRecipeViewOpen() && eventKey >= Keyboard.KEY_1 && eventKey <= Keyboard.KEY_9)
+        if (InputUtils.isRecipeViewOpen() && eventKeyState)
         {
-            int index = MathHelper.clamp(eventKey - Keyboard.KEY_1, 0, 8);
-            this.callbacks.getRecipes().changeSelectedRecipe(index);
-            return true;
+            int index = -1;
+            int oldIndex = this.callbacks.getRecipes().getSelection();
+
+            if (eventKey >= Keyboard.KEY_1 && eventKey <= Keyboard.KEY_9)
+            {
+                index = MathHelper.clamp(eventKey - Keyboard.KEY_1, 0, 8);
+            }
+            else if (eventKey == Keyboard.KEY_UP && oldIndex > 0)
+            {
+                index = oldIndex - 1;
+            }
+            else if (eventKey == Keyboard.KEY_DOWN && oldIndex < 17)
+            {
+                index = oldIndex + 1;
+            }
+            else if (eventKey == Keyboard.KEY_LEFT && oldIndex >= 9)
+            {
+                index = oldIndex - 9;
+            }
+            else if (eventKey == Keyboard.KEY_RIGHT && oldIndex < 9)
+            {
+                index = oldIndex + 9;
+            }
+
+            if (index >= 0)
+            {
+                this.callbacks.getRecipes().changeSelectedRecipe(index);
+                return true;
+            }
         }
 
         MoveAction action = InventoryUtils.getActiveMoveAction();
@@ -62,7 +88,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             InventoryUtils.stopDragging();
         }
 
-        return false;
+        return this.handleInput(eventKey, eventKeyState, 0);
     }
 
     @Override
@@ -75,6 +101,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             InventoryUtils.stopDragging();
         }
 
+        return this.handleInput(eventButton - 100, eventButtonState, dWheel);
+    }
+
+    private boolean handleInput(int keyCode, boolean keyState, int dWheel)
+    {
         Minecraft mc = Minecraft.getMinecraft();
         boolean cancel = false;
 
@@ -104,12 +135,12 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             else
             {
                 Slot slot = AccessorUtils.getSlotUnderMouse(gui);
-                final boolean isLeftClick = InputUtils.mouseEventIsLeftClick();
-                final boolean isRightClick = InputUtils.mouseEventIsRightClick();
-                final boolean isPickBlock = InputUtils.mouseEventIsPickBlock();
+                final boolean isLeftClick = InputUtils.mouseEventIsLeftClick(keyCode);
+                final boolean isRightClick = InputUtils.mouseEventIsRightClick(keyCode);
+                final boolean isPickBlock = InputUtils.mouseEventIsPickBlock(keyCode);
                 final boolean isShiftDown = GuiScreen.isShiftKeyDown();
 
-                if (eventButtonState && (isLeftClick || isRightClick || isPickBlock))
+                if (keyState && (isLeftClick || isRightClick || isPickBlock))
                 {
                     final int mouseX = InputUtils.getMouseX();
                     final int mouseY = InputUtils.getMouseY();
@@ -131,13 +162,13 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
                 InventoryUtils.checkForItemPickup(gui, mc);
 
-                if (eventButtonState && (isLeftClick || isRightClick))
+                if (keyState && (isLeftClick || isRightClick))
                 {
                     InventoryUtils.storeSourceSlotCandidate(slot, mc);
                 }
 
                 if (Configs.Toggles.RIGHT_CLICK_CRAFT_STACK.getBooleanValue() &&
-                    isRightClick && eventButtonState &&
+                    isRightClick && keyState &&
                     InventoryUtils.isCraftingSlot(gui, slot))
                 {
                     InventoryUtils.rightClickCraftOneStack(gui);
