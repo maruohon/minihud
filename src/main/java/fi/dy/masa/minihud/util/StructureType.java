@@ -22,6 +22,7 @@ public enum StructureType
     private final String structureName;
     private final String componentId;
     private final int dimId;
+    private final boolean isTemple;
 
     private StructureType(int dimId, String structureName, String componentId, StructureToggle toggle)
     {
@@ -29,6 +30,7 @@ public enum StructureType
         this.componentId = componentId;
         this.toggle = toggle;
         this.dimId = dimId;
+        this.isTemple = componentId.isEmpty() == false;
     }
 
     public boolean existsInDimension(int dimension)
@@ -39,6 +41,16 @@ public enum StructureType
     public String getStructureName()
     {
         return this.structureName;
+    }
+
+    public String getComponentId()
+    {
+        return this.componentId;
+    }
+
+    public boolean isTemple()
+    {
+        return this.isTemple;
     }
 
     public StructureToggle getToggle()

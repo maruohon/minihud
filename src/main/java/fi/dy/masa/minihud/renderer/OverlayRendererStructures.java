@@ -1,20 +1,20 @@
 package fi.dy.masa.minihud.renderer;
 
 import java.util.Collection;
-import java.util.List;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
+import fi.dy.masa.minihud.util.StructureData;
 import fi.dy.masa.minihud.util.StructureType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.gen.structure.StructureComponent;
-import net.minecraft.world.gen.structure.StructureStart;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class OverlayRendererStructures extends OverlayRendererBase
 {
@@ -91,14 +91,14 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
     private void updateStructures(int dimId, BlockPos playerPos, Minecraft mc)
     {
-        ArrayListMultimap<StructureType, StructureStart> structures = DataStorage.getInstance().getCopyOfStructureData();
+        ArrayListMultimap<StructureType, StructureData> structures = DataStorage.getInstance().getCopyOfStructureData();
         int maxRange = (mc.gameSettings.renderDistanceChunks + 4) * 16;
 
         for (StructureType type : StructureType.values())
         {
             if (type.isEnabled() && type.existsInDimension(dimId))
             {
-                Collection<StructureStart> structureData = structures.get(type);
+                Collection<StructureData> structureData = structures.get(type);
 
                 if (structureData.isEmpty() == false)
                 {
@@ -108,33 +108,33 @@ public class OverlayRendererStructures extends OverlayRendererBase
         }
     }
 
-    private void renderStructuresWithinRange(StructureType type, Collection<StructureStart> structureData, BlockPos playerPos, int maxRange)
+    private void renderStructuresWithinRange(StructureType type, Collection<StructureData> structureData, BlockPos playerPos, int maxRange)
     {
-        for (StructureStart start : structureData)
+        for (StructureData structure : structureData)
         {
-            if (MiscUtils.isStructureWithinRange(start, playerPos, maxRange))
+            if (MiscUtils.isStructureWithinRange(structure.getBoundingBox(), playerPos, maxRange))
             {
-                this.renderStructure(type, start);
+                this.renderStructure(type, structure);
             }
         }
     }
 
-    private void renderStructure(StructureType type, StructureStart start)
+    private void renderStructure(StructureType type, StructureData structure)
     {
         Color4f color = type.getToggle().getColorMain().getColor();
-        List<StructureComponent> components = start.getComponents();
+        ImmutableList<StructureBoundingBox> components = structure.getComponents();
 
-        fi.dy.masa.malilib.render.RenderUtils.drawBox(start.getBoundingBox(), color, BUFFER_1, BUFFER_2);
+        fi.dy.masa.malilib.render.RenderUtils.drawBox(structure.getBoundingBox(), color, BUFFER_1, BUFFER_2);
 
         if (components.isEmpty() == false)
         {
-            if (components.size() > 1 || MiscUtils.areBoxesEqual(components.get(0).getBoundingBox(), start.getBoundingBox()) == false)
+            if (components.size() > 1 || MiscUtils.areBoxesEqual(components.get(0), structure.getBoundingBox()) == false)
             {
                 color = type.getToggle().getColorComponents().getColor();
 
-                for (StructureComponent component : components)
+                for (StructureBoundingBox bb : components)
                 {
-                    fi.dy.masa.malilib.render.RenderUtils.drawBox(component.getBoundingBox(), color, BUFFER_1, BUFFER_2);
+                    fi.dy.masa.malilib.render.RenderUtils.drawBox(bb, color, BUFFER_1, BUFFER_2);
                 }
             }
         }

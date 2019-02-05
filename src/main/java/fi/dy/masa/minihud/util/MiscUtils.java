@@ -15,7 +15,6 @@ import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
-import net.minecraft.world.gen.structure.StructureStart;
 
 public class MiscUtils
 {
@@ -117,10 +116,8 @@ public class MiscUtils
         }
     }
 
-    public static boolean isStructureWithinRange(StructureStart start, BlockPos playerPos, int maxRange)
+    public static boolean isStructureWithinRange(StructureBoundingBox bb, BlockPos playerPos, int maxRange)
     {
-        StructureBoundingBox bb = start.getBoundingBox();
-
         if (playerPos.getX() < (bb.minX - maxRange) ||
             playerPos.getX() > (bb.maxX + maxRange) ||
             playerPos.getZ() < (bb.minZ - maxRange) ||

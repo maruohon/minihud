@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.util;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,8 +9,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
+import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorEnd;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorFlat;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorHell;
@@ -21,6 +26,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -65,7 +71,7 @@ public class DataStorage
     private BlockPos worldSpawn = BlockPos.ORIGIN;
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
-    private final ArrayListMultimap<StructureType, StructureStart> structures = ArrayListMultimap.create();
+    private final ArrayListMultimap<StructureType, StructureData> structures = ArrayListMultimap.create();
     private final Minecraft mc = Minecraft.getMinecraft();
 
     public static DataStorage getInstance()
@@ -400,15 +406,15 @@ public class DataStorage
      * Gets a copy of the structure data map, and clears the dirty flag
      * @return
      */
-    public ArrayListMultimap<StructureType, StructureStart> getCopyOfStructureData()
+    public ArrayListMultimap<StructureType, StructureData> getCopyOfStructureData()
     {
-        ArrayListMultimap<StructureType, StructureStart> copy = ArrayListMultimap.create();
+        ArrayListMultimap<StructureType, StructureData> copy = ArrayListMultimap.create();
 
         synchronized (this.structures)
         {
             for (StructureType type : StructureType.values())
             {
-                Collection<StructureStart> values = this.structures.get(type);
+                Collection<StructureData> values = this.structures.get(type);
 
                 if (values.isEmpty() == false)
                 {
@@ -424,42 +430,106 @@ public class DataStorage
 
     public void updateStructureData()
     {
-        if (this.mc != null && this.mc.player != null && this.mc.isSingleplayer())
+        if (this.mc != null && this.mc.world != null && this.mc.player != null)
         {
-            final int dimension = this.mc.player.dimension;
             final BlockPos playerPos = new BlockPos(this.mc.player);
-            final WorldServer world = this.mc.getIntegratedServer().getWorld(dimension);
-            int hysteresis = 32;
-            int maxRange = (this.mc.gameSettings.renderDistanceChunks + 4) * 16;
 
-            if (this.lastStructureUpdatePos == null ||
-                Math.abs(playerPos.getX() - this.lastStructureUpdatePos.getX()) >= hysteresis ||
-                Math.abs(playerPos.getY() - this.lastStructureUpdatePos.getY()) >= hysteresis ||
-                Math.abs(playerPos.getZ() - this.lastStructureUpdatePos.getZ()) >= hysteresis)
+            if (this.mc.isSingleplayer())
             {
-                this.structures.clear();
-
-                if (world != null)
+                if (this.structuresNeedUpdating(playerPos, 32))
                 {
-                    final IChunkGenerator chunkGenerator = ((IMixinChunkProviderServer) world.getChunkProvider()).getChunkGenerator();
-                    final DataStorage storage = this;
-
-                    world.addScheduledTask(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            synchronized (storage.structures)
-                            {
-                                storage.addStructureDataFromGenerator(chunkGenerator, playerPos, maxRange);
-                            }
-                        }
-                    });
+                    this.updateStructureDataFromIntegratedServer(playerPos);
                 }
-
-                this.lastStructureUpdatePos = playerPos;
+            }
+            /*else if (this.hasStructureDataFromServer())
+            {
+                
+            }*/
+            // Try to read structure data from local NBT files
+            else
+            {
+                if (this.structuresNeedUpdating(playerPos, 1024))
+                {
+                    this.updateStructureDataFromNBTFiles(playerPos);
+                }
             }
         }
+    }
+
+    private boolean structuresNeedUpdating(BlockPos playerPos, int hysteresis)
+    {
+        return this.lastStructureUpdatePos == null ||
+                Math.abs(playerPos.getX() - this.lastStructureUpdatePos.getX()) >= hysteresis ||
+                Math.abs(playerPos.getY() - this.lastStructureUpdatePos.getY()) >= hysteresis ||
+                Math.abs(playerPos.getZ() - this.lastStructureUpdatePos.getZ()) >= hysteresis;
+    }
+
+    private void updateStructureDataFromIntegratedServer(final BlockPos playerPos)
+    {
+        final int dimension = this.mc.player.dimension;
+        final WorldServer world = this.mc.getIntegratedServer().getWorld(dimension);
+
+        synchronized (this.structures)
+        {
+            this.structures.clear();
+        }
+
+        if (world != null)
+        {
+            final IChunkGenerator chunkGenerator = ((IMixinChunkProviderServer) world.getChunkProvider()).getChunkGenerator();
+            final DataStorage storage = this;
+            final int maxRange = (this.mc.gameSettings.renderDistanceChunks + 4) * 16;
+
+            world.addScheduledTask(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    synchronized (storage.structures)
+                    {
+                        storage.addStructureDataFromGenerator(chunkGenerator, playerPos, maxRange);
+                    }
+                }
+            });
+        }
+
+        this.lastStructureUpdatePos = playerPos;
+    }
+
+    private void updateStructureDataFromNBTFiles(final BlockPos playerPos)
+    {
+        synchronized (this.structures)
+        {
+            this.structures.clear();
+
+            File dir = this.getLocalStructureFileDirectory();
+
+            if (dir != null && dir.exists() && dir.isDirectory())
+            {
+                for (StructureType type : StructureType.values())
+                {
+                    if (type.isTemple() == false)
+                    {
+                        NBTTagCompound nbt = FileUtils.readNBTFile(new File(dir, type.getStructureName() + ".dat"));
+
+                        if (nbt != null)
+                        {
+                            StructureData.readAndAddStructuresToMap(this.structures, nbt, type);
+                        }
+                    }
+                }
+
+                NBTTagCompound nbt = FileUtils.readNBTFile(new File(dir, "Temple.dat"));
+
+                if (nbt != null)
+                {
+                    StructureData.readAndAddTemplesToMap(this.structures, nbt);
+                }
+            }
+        }
+
+        this.lastStructureUpdatePos = playerPos;
+        this.structuresDirty = true;
     }
 
     private void addStructureDataFromGenerator(IChunkGenerator chunkGenerator, BlockPos playerPos, int maxRange)
@@ -527,9 +597,9 @@ public class DataStorage
 
         for (StructureStart start : structureMap.values())
         {
-            if (MiscUtils.isStructureWithinRange(start, playerPos, maxRange))
+            if (MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxRange))
             {
-                this.structures.put(type, start);
+                this.structures.put(type, StructureData.fromStructure(start));
             }
         }
     }
@@ -542,14 +612,14 @@ public class DataStorage
         {
             List<StructureComponent> components = start.getComponents();
 
-            if (components.size() == 1 && MiscUtils.isStructureWithinRange(start, playerPos, maxRange))
+            if (components.size() == 1 && MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxRange))
             {
                 String id = MapGenStructureIO.getStructureComponentName(components.get(0));
                 StructureType type = StructureType.templeTypeFromComponentId(id);
 
                 if (type != null)
                 {
-                    this.structures.put(type, start);
+                    this.structures.put(type, StructureData.fromStructure(start));
                 }
             }
         }
@@ -584,5 +654,19 @@ public class DataStorage
         }
 
         this.serverTPSValid = false;
+    }
+
+    @Nullable
+    private File getLocalStructureFileDirectory()
+    {
+        String dirName = StringUtils.getWorldOrServerName();
+
+        if (dirName != null)
+        {
+            File dir = new File(new File(FileUtils.getConfigDirectory(), Reference.MOD_ID), "structures");
+            return new File(dir, dirName);
+        }
+
+        return null;
     }
 }
