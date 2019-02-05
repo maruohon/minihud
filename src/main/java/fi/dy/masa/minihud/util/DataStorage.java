@@ -1,6 +1,7 @@
 package fi.dy.masa.minihud.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
+import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
@@ -27,6 +29,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -56,10 +60,15 @@ public class DataStorage
     private static final Pattern PATTERN_CARPET_TPS = Pattern.compile("TPS: (?<tps>[0-9]+[\\.,][0-9]) MSPT: (?<mspt>[0-9]+[\\.,][0-9])");
     private static final DataStorage INSTANCE = new DataStorage();
 
+    public static final int CARPET_ID_BOUNDINGBOX_MARKERS = 3;
+    public static final int CARPET_ID_LARGE_BOUNDINGBOX_MARKERS_START = 7;
+    public static final int CARPET_ID_LARGE_BOUNDINGBOX_MARKERS = 8;
+
     private boolean worldSeedValid;
     private boolean serverTPSValid;
     private boolean carpetServer;
     private boolean worldSpawnValid;
+    private boolean hasStructureDataFromServer;
     private boolean structuresDirty;
     private long worldSeed;
     private long lastServerTick;
@@ -87,6 +96,7 @@ public class DataStorage
         this.worldSpawnValid = false;
         this.structures.clear();
         this.lastStructureUpdatePos = null;
+        this.hasStructureDataFromServer = false;
         this.structuresDirty = false;
     }
 
@@ -441,12 +451,7 @@ public class DataStorage
                     this.updateStructureDataFromIntegratedServer(playerPos);
                 }
             }
-            /*else if (this.hasStructureDataFromServer())
-            {
-                
-            }*/
-            // Try to read structure data from local NBT files
-            else
+            else if (this.hasStructureDataFromServer == false)
             {
                 if (this.structuresNeedUpdating(playerPos, 1024))
                 {
@@ -530,6 +535,83 @@ public class DataStorage
 
         this.lastStructureUpdatePos = playerPos;
         this.structuresDirty = true;
+    }
+
+    public void updateStructureDataFromServer(PacketBuffer data)
+    {
+        try
+        {
+            data.readerIndex(0);
+
+            if (data.readerIndex() < data.writerIndex() - 4)
+            {
+                int type = data.readInt();
+
+                if (type == CARPET_ID_BOUNDINGBOX_MARKERS)
+                {
+                    this.readStructureDataCarpetAll(data.readCompoundTag());
+                }
+                else if (type == CARPET_ID_LARGE_BOUNDINGBOX_MARKERS_START)
+                {
+                    NBTTagCompound nbt = data.readCompoundTag();
+                    int boxCount = data.readVarInt();
+                    this.readStructureDataCarpetSplitHeader(nbt, boxCount);
+                }
+                else if (type == CARPET_ID_LARGE_BOUNDINGBOX_MARKERS)
+                {
+                    int boxCount = data.readByte();
+                    this.readStructureDataCarpetSplitBoxes(data, boxCount);
+                }
+            }
+
+            data.readerIndex(0);
+        }
+        catch (Exception e)
+        {
+            LiteModMiniHud.logger.warn("Failed to read structure data from Carpet mod packet", e);
+        }
+    }
+
+    private void readStructureDataCarpetAll(NBTTagCompound nbt)
+    {
+        NBTTagList tagList = nbt.getTagList("Boxes", Constants.NBT.TAG_LIST);
+        this.worldSeed = nbt.getLong("Seed");
+        this.worldSeedValid = true;
+
+        synchronized (this.structures)
+        {
+            this.structures.clear();
+            StructureData.readStructureDataCarpetAllBoxes(this.structures, tagList);
+            this.hasStructureDataFromServer = true;
+            this.structuresDirty = true;
+        }
+    }
+
+    private void readStructureDataCarpetSplitHeader(NBTTagCompound nbt, int boxCount)
+    {
+        this.worldSeed = nbt.getLong("Seed");
+        this.worldSeedValid = true;
+
+        synchronized (this.structures)
+        {
+            this.structures.clear();
+            StructureData.readStructureDataCarpetIndividualBoxesHeader(boxCount);
+        }
+    }
+
+    private void readStructureDataCarpetSplitBoxes(PacketBuffer data, int boxCount) throws IOException
+    {
+        synchronized (this.structures)
+        {
+            for (int i = 0; i < boxCount; ++i)
+            {
+                NBTTagCompound nbt = data.readCompoundTag();
+                StructureData.readStructureDataCarpetIndividualBoxes(this.structures, nbt);
+            }
+
+            this.hasStructureDataFromServer = true;
+            this.structuresDirty = true;
+        }
     }
 
     private void addStructureDataFromGenerator(IChunkGenerator chunkGenerator, BlockPos playerPos, int maxRange)
