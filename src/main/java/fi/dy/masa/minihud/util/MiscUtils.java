@@ -9,10 +9,13 @@ import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
+import net.minecraft.world.gen.structure.StructureStart;
 
 public class MiscUtils
 {
@@ -112,5 +115,26 @@ public class MiscUtils
             LiteModMiniHud.logger.error("Error while trying to get the chunk unload order");
             return -1;
         }
+    }
+
+    public static boolean isStructureWithinRange(StructureStart start, BlockPos playerPos, int maxRange)
+    {
+        StructureBoundingBox bb = start.getBoundingBox();
+
+        if (playerPos.getX() < (bb.minX - maxRange) ||
+            playerPos.getX() > (bb.maxX + maxRange) ||
+            playerPos.getZ() < (bb.minZ - maxRange) ||
+            playerPos.getZ() > (bb.maxZ + maxRange))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean areBoxesEqual(StructureBoundingBox bb1, StructureBoundingBox bb2)
+    {
+        return bb1.minX == bb2.minX && bb1.minY == bb2.minY && bb1.minZ == bb2.minZ &&
+               bb1.maxX == bb2.maxX && bb1.maxY == bb2.maxY && bb1.maxZ == bb2.maxZ;
     }
 }

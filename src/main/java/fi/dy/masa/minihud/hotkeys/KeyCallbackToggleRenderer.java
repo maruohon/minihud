@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.hotkeys;
 
+import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
@@ -19,9 +20,9 @@ import net.minecraft.util.text.TextFormatting;
 
 public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWithMessage
 {
-    protected final RendererToggle rendererConfig;
+    protected final IConfigBoolean rendererConfig;
 
-    public KeyCallbackToggleRenderer(RendererToggle config)
+    public KeyCallbackToggleRenderer(IConfigBoolean config)
     {
         super(config);
 

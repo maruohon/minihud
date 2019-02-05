@@ -36,6 +36,7 @@ public class RenderContainer
         this.renderers.add(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER));
         this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL));
         this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER));
+        this.renderers.add(new OverlayRendererStructures());
 
         this.allocateGlResources();
     }
@@ -81,7 +82,7 @@ public class RenderContainer
             GlStateManager.disableLighting();
             GlStateManager.depthMask(false);
             GlStateManager.enablePolygonOffset();
-            GlStateManager.doPolygonOffset(-0.4f, -0.8f);
+            GlStateManager.doPolygonOffset(-1.9f, -4.2f);
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             GlStateManager.color(1f, 1f, 1f, 1f);

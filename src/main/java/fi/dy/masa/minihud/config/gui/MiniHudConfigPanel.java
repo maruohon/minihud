@@ -1,9 +1,11 @@
 package fi.dy.masa.minihud.config.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.ConfigUtils;
+import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.config.gui.ConfigPanelBase;
 import fi.dy.masa.malilib.config.gui.GuiModConfigs;
@@ -12,6 +14,7 @@ import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.config.StructureToggle;
 
 public class MiniHudConfigPanel extends ConfigPanelBase
 {
@@ -40,6 +43,12 @@ public class MiniHudConfigPanel extends ConfigPanelBase
         configs = ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(InfoToggle.values()));
         provider = new ConfigInfoProviderSimple("Hotkey to toggle the '", "' info line");
         this.addSubPanel((new GuiModConfigs(modId, "Info Hotkeys", configs)).setHoverInfoProvider(provider));
+
+        List<IConfigBase> list = new ArrayList<>();
+        list.addAll(StructureToggle.getToggleConfigs());
+        list.addAll(StructureToggle.getHotkeys());
+        list.addAll(StructureToggle.getColorConfigs());
+        this.addSubPanel((new GuiModConfigs(modId, "Structures", list)).setConfigWidth(200));
 
         configs = ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(RendererToggle.values()));
         provider = new ConfigInfoProviderSimple("Hotkey to toggle the '", "' renderer");

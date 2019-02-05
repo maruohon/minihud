@@ -13,6 +13,7 @@ import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -124,7 +125,7 @@ public class RenderHandler implements IRenderer
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (Configs.Generic.ENABLED.getBooleanValue() && mc.player != null)
+        if (Configs.Generic.ENABLED.getBooleanValue() && mc.world != null && mc.player != null)
         {
             OverlayRenderer.renderOverlays(mc, partialTicks);
         }
@@ -170,6 +171,11 @@ public class RenderHandler implements IRenderer
                 mc.world.getTotalWorldTime() % Configs.Generic.SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL.getIntegerValue() == 0)
             {
                 DataStorage.getInstance().checkQueuedDirtyChunkHeightmaps();
+            }
+
+            if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue() && (mc.world.getTotalWorldTime() % 20) == 0)
+            {
+                DataStorage.getInstance().updateStructureData();
             }
         }
     }

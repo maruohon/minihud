@@ -1,13 +1,23 @@
 package fi.dy.masa.minihud.util;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.google.common.collect.ArrayListMultimap;
 import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorEnd;
+import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorFlat;
+import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorHell;
+import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorOverworld;
+import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
+import fi.dy.masa.minihud.mixin.IMixinMapGenStructure;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,7 +29,21 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.gen.ChunkGeneratorEnd;
+import net.minecraft.world.gen.ChunkGeneratorFlat;
+import net.minecraft.world.gen.ChunkGeneratorHell;
+import net.minecraft.world.gen.ChunkGeneratorOverworld;
+import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraft.world.gen.structure.MapGenScatteredFeature;
+import net.minecraft.world.gen.structure.MapGenStronghold;
+import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.structure.MapGenStructureIO;
+import net.minecraft.world.gen.structure.MapGenVillage;
+import net.minecraft.world.gen.structure.StructureComponent;
+import net.minecraft.world.gen.structure.StructureOceanMonument;
+import net.minecraft.world.gen.structure.StructureStart;
 
 public class DataStorage
 {
@@ -30,15 +54,18 @@ public class DataStorage
     private boolean serverTPSValid;
     private boolean carpetServer;
     private boolean worldSpawnValid;
+    private boolean structuresDirty;
     private long worldSeed;
     private long lastServerTick;
     private long lastServerTimeUpdate;
+    private BlockPos lastStructureUpdatePos;
     private double serverTPS;
     private double serverMSPT;
     private int droppedChunksHashSize = -1;
     private BlockPos worldSpawn = BlockPos.ORIGIN;
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
+    private final ArrayListMultimap<StructureType, StructureStart> structures = ArrayListMultimap.create();
     private final Minecraft mc = Minecraft.getMinecraft();
 
     public static DataStorage getInstance()
@@ -52,6 +79,9 @@ public class DataStorage
         this.serverTPSValid = false;
         this.carpetServer = false;
         this.worldSpawnValid = false;
+        this.structures.clear();
+        this.lastStructureUpdatePos = null;
+        this.structuresDirty = false;
     }
 
     public void setWorldSeed(long seed)
@@ -126,6 +156,11 @@ public class DataStorage
     public double getServerMSPT()
     {
         return this.serverMSPT;
+    }
+
+    public boolean hasStructureDataChanged()
+    {
+        return this.structuresDirty;
     }
 
     public int getDroppedChunksHashSize()
@@ -358,6 +393,165 @@ public class DataStorage
             this.serverMSPT = (double) MathHelper.average(this.mc.getIntegratedServer().tickTimeArray) / 1000000D;
             this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
             this.serverTPSValid = true;
+        }
+    }
+
+    /**
+     * Gets a copy of the structure data map, and clears the dirty flag
+     * @return
+     */
+    public ArrayListMultimap<StructureType, StructureStart> getCopyOfStructureData()
+    {
+        ArrayListMultimap<StructureType, StructureStart> copy = ArrayListMultimap.create();
+
+        synchronized (this.structures)
+        {
+            for (StructureType type : StructureType.values())
+            {
+                Collection<StructureStart> values = this.structures.get(type);
+
+                if (values.isEmpty() == false)
+                {
+                    copy.putAll(type, values);
+                }
+            }
+
+            this.structuresDirty = false;
+        }
+
+        return copy;
+    }
+
+    public void updateStructureData()
+    {
+        if (this.mc != null && this.mc.player != null && this.mc.isSingleplayer())
+        {
+            final int dimension = this.mc.player.dimension;
+            final BlockPos playerPos = new BlockPos(this.mc.player);
+            final WorldServer world = this.mc.getIntegratedServer().getWorld(dimension);
+            int hysteresis = 32;
+            int maxRange = (this.mc.gameSettings.renderDistanceChunks + 4) * 16;
+
+            if (this.lastStructureUpdatePos == null ||
+                Math.abs(playerPos.getX() - this.lastStructureUpdatePos.getX()) >= hysteresis ||
+                Math.abs(playerPos.getY() - this.lastStructureUpdatePos.getY()) >= hysteresis ||
+                Math.abs(playerPos.getZ() - this.lastStructureUpdatePos.getZ()) >= hysteresis)
+            {
+                this.structures.clear();
+
+                if (world != null)
+                {
+                    final IChunkGenerator chunkGenerator = ((IMixinChunkProviderServer) world.getChunkProvider()).getChunkGenerator();
+                    final DataStorage storage = this;
+
+                    world.addScheduledTask(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            synchronized (storage.structures)
+                            {
+                                storage.addStructureDataFromGenerator(chunkGenerator, playerPos, maxRange);
+                            }
+                        }
+                    });
+                }
+
+                this.lastStructureUpdatePos = playerPos;
+            }
+        }
+    }
+
+    private void addStructureDataFromGenerator(IChunkGenerator chunkGenerator, BlockPos playerPos, int maxRange)
+    {
+        if (chunkGenerator instanceof ChunkGeneratorOverworld)
+        {
+            MapGenStructure mapGen;
+
+            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getOceanMonumentGenerator();
+            this.addStructuresWithinRange(StructureType.OCEAN_MONUMENT, mapGen, playerPos, maxRange);
+
+            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getScatteredFeatureGenerator();
+            this.addTempleStructuresWithinRange(mapGen, playerPos, maxRange);
+
+            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getStrongholdGenerator();
+            this.addStructuresWithinRange(StructureType.STRONGHOLD, mapGen, playerPos, maxRange);
+
+            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getVillageGenerator();
+            this.addStructuresWithinRange(StructureType.VILLAGE, mapGen, playerPos, maxRange);
+
+            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getWoodlandMansionGenerator();
+            this.addStructuresWithinRange(StructureType.MANSION, mapGen, playerPos, maxRange);
+        }
+        else if (chunkGenerator instanceof ChunkGeneratorHell)
+        {
+            MapGenStructure mapGen = ((IMixinChunkGeneratorHell) chunkGenerator).getFortressGenerator();
+            this.addStructuresWithinRange(StructureType.NETHER_FORTRESS, mapGen, playerPos, maxRange);
+        }
+        else if (chunkGenerator instanceof ChunkGeneratorEnd)
+        {
+            MapGenStructure mapGen = ((IMixinChunkGeneratorEnd) chunkGenerator).getEndCityGenerator();
+            this.addStructuresWithinRange(StructureType.END_CITY, mapGen, playerPos, maxRange);
+        }
+        else if (chunkGenerator instanceof ChunkGeneratorFlat)
+        {
+            Map<String, MapGenStructure> map = ((IMixinChunkGeneratorFlat) chunkGenerator).getStructureGenerators();
+
+            for (MapGenStructure mapGen : map.values())
+            {
+                if (mapGen instanceof StructureOceanMonument)
+                {
+                    this.addStructuresWithinRange(StructureType.OCEAN_MONUMENT, mapGen, playerPos, maxRange);
+                }
+                else if (mapGen instanceof MapGenScatteredFeature)
+                {
+                    this.addTempleStructuresWithinRange(mapGen, playerPos, maxRange);
+                }
+                else if (mapGen instanceof MapGenStronghold)
+                {
+                    this.addStructuresWithinRange(StructureType.STRONGHOLD, mapGen, playerPos, maxRange);
+                }
+                else if (mapGen instanceof MapGenVillage)
+                {
+                    this.addStructuresWithinRange(StructureType.VILLAGE, mapGen, playerPos, maxRange);
+                }
+            }
+        }
+
+        this.structuresDirty = true;
+    }
+
+    private void addStructuresWithinRange(StructureType type, MapGenStructure mapGen, BlockPos playerPos, int maxRange)
+    {
+        Long2ObjectMap<StructureStart> structureMap = ((IMixinMapGenStructure) mapGen).getStructureMap();
+
+        for (StructureStart start : structureMap.values())
+        {
+            if (MiscUtils.isStructureWithinRange(start, playerPos, maxRange))
+            {
+                this.structures.put(type, start);
+            }
+        }
+    }
+
+    private void addTempleStructuresWithinRange(MapGenStructure mapGen, BlockPos playerPos, int maxRange)
+    {
+        Long2ObjectMap<StructureStart> structureMap = ((IMixinMapGenStructure) mapGen).getStructureMap();
+
+        for (StructureStart start : structureMap.values())
+        {
+            List<StructureComponent> components = start.getComponents();
+
+            if (components.size() == 1 && MiscUtils.isStructureWithinRange(start, playerPos, maxRange))
+            {
+                String id = MapGenStructureIO.getStructureComponentName(components.get(0));
+                StructureType type = StructureType.templeTypeFromComponentId(id);
+
+                if (type != null)
+                {
+                    this.structures.put(type, start);
+                }
+            }
         }
     }
 

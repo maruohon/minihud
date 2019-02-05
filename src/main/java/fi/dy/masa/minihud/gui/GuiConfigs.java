@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.gui;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
@@ -13,6 +14,7 @@ import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.config.StructureToggle;
 import net.minecraft.client.resources.I18n;
 
 public class GuiConfigs extends GuiConfigsBase
@@ -66,7 +68,7 @@ public class GuiConfigs extends GuiConfigsBase
     {
         ConfigGuiTab tab = GuiConfigs.tab;
 
-        if (tab == ConfigGuiTab.GENERIC)
+        if (tab == ConfigGuiTab.GENERIC || tab == ConfigGuiTab.STRUCTURES)
         {
             return 200;
         }
@@ -105,6 +107,14 @@ public class GuiConfigs extends GuiConfigsBase
         else if (tab == ConfigGuiTab.INFO_HOTKEYS)
         {
             configs = ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(InfoToggle.values()));
+        }
+        else if (tab == ConfigGuiTab.STRUCTURES)
+        {
+            List<IConfigBase> list = new ArrayList<>();
+            list.addAll(StructureToggle.getToggleConfigs());
+            list.addAll(StructureToggle.getHotkeys());
+            list.addAll(StructureToggle.getColorConfigs());
+            return ConfigOptionWrapper.createFor(list);
         }
         else if (tab == ConfigGuiTab.RENDERER_HOTKEYS)
         {
@@ -152,6 +162,7 @@ public class GuiConfigs extends GuiConfigsBase
         INFO_TOGGLES        ("minihud.gui.button.config_gui.info_toggles"),
         INFO_LINE_ORDER     ("minihud.gui.button.config_gui.info_line_order"),
         INFO_HOTKEYS        ("minihud.gui.button.config_gui.info_hotkeys"),
+        STRUCTURES          ("minihud.gui.button.config_gui.structures"),
         RENDERER_HOTKEYS    ("minihud.gui.button.config_gui.renderer_hotkeys");
 
         private final String translationKey;
