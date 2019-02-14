@@ -144,6 +144,18 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     }
 
     @Override
+    public int getMinIntegerValue()
+    {
+        return 0;
+    }
+
+    @Override
+    public int getMaxIntegerValue()
+    {
+        return InfoToggle.values().length - 1;
+    }
+
+    @Override
     public IKeybind getKeybind()
     {
         return this.keybind;
