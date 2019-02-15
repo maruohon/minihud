@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.Reference;
 import fi.dy.masa.itemscroller.util.Constants;
-import net.minecraft.client.Minecraft;
+import fi.dy.masa.malilib.util.FileUtils;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.inventory.Slot;
@@ -184,7 +184,7 @@ public class RecipeStorage
 
     private File getSaveDir()
     {
-        return new File(Minecraft.getMinecraft().gameDir, Reference.MOD_ID);
+        return new File(FileUtils.getMinecraftDirectory(), Reference.MOD_ID);
     }
 
     public void readFromDisk()
