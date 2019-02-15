@@ -6,7 +6,7 @@ import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.event.RenderHandler;
@@ -64,7 +64,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
                 String strPos = String.format("x: %d, y: %d, z: %d", spawn.getX(), spawn.getY(), spawn.getZ());
                 String message = I18n.format("minihud.message.toggled_using_world_spawn", this.config.getPrettyName(), strStatus, strPos);
 
-                StringUtils.printActionbarMessage(message);
+                InfoUtils.printActionbarMessage(message);
             }
             else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getKeybind() && this.rendererConfig.getBooleanValue())
             {
@@ -73,7 +73,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
                 String strPos = String.format("x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
                 String message = I18n.format("minihud.message.toggled_using_position", this.config.getPrettyName(), strStatus, strPos);
 
-                StringUtils.printActionbarMessage(message);
+                InfoUtils.printActionbarMessage(message);
             }
             else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.getKeybind() && this.rendererConfig.getBooleanValue())
             {
@@ -87,7 +87,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
                 String strPos = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                 String message = I18n.format("minihud.message.toggled_using_position", this.config.getPrettyName(), strStatus, strPos);
 
-                StringUtils.printActionbarMessage(message);
+                InfoUtils.printActionbarMessage(message);
             }
             else if (key == RendererToggle.OVERLAY_DESPAWN_SPHERE.getKeybind() && this.rendererConfig.getBooleanValue())
             {
@@ -96,7 +96,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
                 String strPos = String.format("x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
                 String message = I18n.format("minihud.message.toggled_using_center_position", this.config.getPrettyName(), strStatus, strPos);
 
-                StringUtils.printActionbarMessage(message);
+                InfoUtils.printActionbarMessage(message);
             }
             else if (key == RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getKeybind())
             {
