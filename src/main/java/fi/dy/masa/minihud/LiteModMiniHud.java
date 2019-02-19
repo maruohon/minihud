@@ -69,8 +69,10 @@ public class LiteModMiniHud implements LiteMod, Configurable, JoinGameListener, 
         ConfigManager.getInstance().registerConfigHandler(Reference.MOD_ID, new Configs());
         InputEventHandler.getInstance().registerKeybindProvider(InputHandler.getInstance());
 
-        RenderEventHandler.getInstance().registerGameOverlayRenderer(RenderHandler.getInstance());
-        RenderEventHandler.getInstance().registerWorldLastRenderer(RenderHandler.getInstance());
+        RenderHandler renderer = RenderHandler.getInstance();
+        RenderEventHandler.getInstance().registerGameOverlayRenderer(renderer);
+        RenderEventHandler.getInstance().registerTooltipLastRenderer(renderer);
+        RenderEventHandler.getInstance().registerWorldLastRenderer(renderer);
 
         Configs.Generic.OPEN_CONFIG_GUI.getKeybind().setCallback(new CallbackOpenConfigGui());
         Configs.Generic.TOGGLE_KEY.getKeybind().setCallback(new KeyCallbackToggleBoolean(Configs.Generic.ENABLED));

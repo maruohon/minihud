@@ -29,6 +29,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemMap;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -117,6 +119,22 @@ public class RenderHandler implements IRenderer
             boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
 
             RenderUtils.renderText(mc, x, y, this.fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.lines);
+        }
+    }
+
+    @Override
+    public void onRenderTooltipLast(ItemStack stack, int x, int y)
+    {
+        if (stack.getItem() instanceof ItemMap)
+        {
+            if (Configs.Generic.MAP_PREVIEW.getBooleanValue())
+            {
+                fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue());
+            }
+        }
+        else if (Configs.Generic.SHULKER_BOX_PREVIEW.getBooleanValue())
+        {
+            fi.dy.masa.malilib.render.RenderUtils.renderShulkerBoxPreview(stack, x, y, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
         }
     }
 
