@@ -70,6 +70,7 @@ public class DataStorage
     private boolean worldSpawnValid;
     private boolean hasStructureDataFromServer;
     private boolean structuresDirty;
+    private boolean structuresNeedUpdating;
     private long worldSeed;
     private long lastServerTick;
     private long lastServerTimeUpdate;
@@ -96,6 +97,7 @@ public class DataStorage
         this.worldSpawnValid = false;
         this.structures.clear();
         this.lastStructureUpdatePos = null;
+        this.structuresNeedUpdating = true;
         this.hasStructureDataFromServer = false;
         this.structuresDirty = false;
     }
@@ -177,6 +179,11 @@ public class DataStorage
     public boolean hasStructureDataChanged()
     {
         return this.structuresDirty;
+    }
+
+    public void setStructuresNeedUpdating()
+    {
+        this.structuresNeedUpdating = true;
     }
 
     public int getDroppedChunksHashSize()
@@ -463,7 +470,7 @@ public class DataStorage
 
     private boolean structuresNeedUpdating(BlockPos playerPos, int hysteresis)
     {
-        return this.lastStructureUpdatePos == null ||
+        return this.structuresNeedUpdating || this.lastStructureUpdatePos == null ||
                 Math.abs(playerPos.getX() - this.lastStructureUpdatePos.getX()) >= hysteresis ||
                 Math.abs(playerPos.getY() - this.lastStructureUpdatePos.getY()) >= hysteresis ||
                 Math.abs(playerPos.getZ() - this.lastStructureUpdatePos.getZ()) >= hysteresis;
@@ -499,6 +506,7 @@ public class DataStorage
         }
 
         this.lastStructureUpdatePos = playerPos;
+        this.structuresNeedUpdating = false;
     }
 
     private void updateStructureDataFromNBTFiles(final BlockPos playerPos)
@@ -530,11 +538,14 @@ public class DataStorage
                 {
                     StructureData.readAndAddTemplesToMap(this.structures, nbt);
                 }
+
+                LiteModMiniHud.logger.info("Structure data updated from local structure files, structures: {}", this.structures.size());
             }
         }
 
         this.lastStructureUpdatePos = playerPos;
         this.structuresDirty = true;
+        this.structuresNeedUpdating = false;
     }
 
     public void updateStructureDataFromServer(PacketBuffer data)
@@ -584,6 +595,7 @@ public class DataStorage
             StructureData.readStructureDataCarpetAllBoxes(this.structures, tagList);
             this.hasStructureDataFromServer = true;
             this.structuresDirty = true;
+            LiteModMiniHud.logger.info("Structure data updated from Carpet server (all), structures: {}", this.structures.size());
         }
     }
 
@@ -671,6 +683,7 @@ public class DataStorage
         }
 
         this.structuresDirty = true;
+        LiteModMiniHud.logger.info("Structure data updated from the integrated server");
     }
 
     private void addStructuresWithinRange(StructureType type, MapGenStructure mapGen, BlockPos playerPos, int maxRange)

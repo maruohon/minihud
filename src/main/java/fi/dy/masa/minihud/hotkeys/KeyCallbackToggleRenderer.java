@@ -26,13 +26,9 @@ import net.minecraft.util.text.TextFormatting;
 
 public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWithMessage
 {
-    protected final IConfigBoolean rendererConfig;
-
     public KeyCallbackToggleRenderer(IConfigBoolean config)
     {
         super(config);
-
-        this.rendererConfig = config;
     }
 
     @Override
@@ -57,7 +53,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             {
                 OverlayRendererSlimeChunks.overlayTopY = mc.player.posY;
             }
-            else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind() && this.rendererConfig.getBooleanValue())
+            else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind() && this.config.getBooleanValue())
             {
                 BlockPos spawn = mc.world.getSpawnPoint();
                 RenderHandler.getInstance().getDataStorage().setWorldSpawn(spawn);
@@ -66,7 +62,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
 
                 InfoUtils.printActionbarMessage(message);
             }
-            else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getKeybind() && this.rendererConfig.getBooleanValue())
+            else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getKeybind() && this.config.getBooleanValue())
             {
                 Vec3d pos = mc.player.getPositionVector();
                 OverlayRendererRandomTickableChunks.newPos = pos;
@@ -75,11 +71,11 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
 
                 InfoUtils.printActionbarMessage(message);
             }
-            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.getKeybind() && this.rendererConfig.getBooleanValue())
+            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.getKeybind() && this.config.getBooleanValue())
             {
                 OverlayRendererSpawnableChunks.overlayTopY = mc.player.posY;
             }
-            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getKeybind() && this.rendererConfig.getBooleanValue())
+            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getKeybind() && this.config.getBooleanValue())
             {
                 BlockPos pos = new BlockPos(mc.player);
                 OverlayRendererSpawnableChunks.newPos = pos;

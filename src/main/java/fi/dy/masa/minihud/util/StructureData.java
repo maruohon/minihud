@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.minihud.LiteModMiniHud;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -283,6 +284,8 @@ public class StructureData
             }
 
             resetCarpetBoxReader();
+
+            LiteModMiniHud.logger.info("Structure data updated from Carpet server (split data), structures: {}", map.size());
         }
     }
 

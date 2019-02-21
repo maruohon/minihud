@@ -6,7 +6,7 @@ import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
+import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleStructures;
 
 public enum StructureToggle
 {
@@ -32,7 +32,7 @@ public enum StructureToggle
         this.colorMain       = new ConfigColor(name +  " Main", colorMain, prettyName + " full box");
         this.colorComponents = new ConfigColor(name + " Components", colorComponents, prettyName + " components");
         this.hotkey          = new ConfigHotkey(name, defaultHotkey, comment);
-        this.hotkey.getKeybind().setCallback(new KeyCallbackToggleRenderer(this.toggleOption));
+        this.hotkey.getKeybind().setCallback(new KeyCallbackToggleStructures(this.toggleOption));
     }
 
     public IConfigBoolean getToggleOption()

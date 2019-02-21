@@ -10,6 +10,7 @@ import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
+import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleStructures;
 
 public enum RendererToggle implements IHotkeyTogglable
 {
@@ -41,7 +42,7 @@ public enum RendererToggle implements IHotkeyTogglable
     private final boolean defaultValueBoolean;
     private boolean valueBoolean;
 
-    private RendererToggle(String name, String defaultHotkey, String comment, String prettyName)
+    RendererToggle(String name, String defaultHotkey, String comment, String prettyName)
     {
         this.name = name;
         this.prettyName = prettyName;
@@ -49,7 +50,11 @@ public enum RendererToggle implements IHotkeyTogglable
         this.defaultValueBoolean = false;
         this.keybind = KeybindMulti.fromStorageString(defaultHotkey, KeybindSettings.DEFAULT);
 
-        if (name.startsWith("debug"))
+        if (name.equals("overlayStructureMainToggle"))
+        {
+            this.keybind.setCallback(new KeyCallbackToggleStructures(this));
+        }
+        else if (name.startsWith("debug"))
         {
             this.keybind.setCallback(new KeyCallbackToggleDebugRenderer(this));
         }
