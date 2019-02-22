@@ -15,6 +15,7 @@ import com.google.common.collect.ArrayListMultimap;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorEnd;
@@ -197,7 +198,7 @@ public class DataStorage
 
         if (mc.isSingleplayer())
         {
-            return MiscUtils.getCurrentHashSize(mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().provider.getDimensionType().getId()));
+            return MiscUtils.getCurrentHashSize(mc.getIntegratedServer().getWorld(WorldUtils.getDimensionId(mc.player.getEntityWorld())));
         }
         else
         {

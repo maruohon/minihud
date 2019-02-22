@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import com.google.common.collect.MapMaker;
+import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.mixin.IMixinDebugRenderer;
@@ -147,7 +148,7 @@ public class DebugInfoUtils
         if (pathfindingEnabled && mc.world != null && ++tickCounter >= 10)
         {
             tickCounter = 0;
-            World world = server.getWorld(mc.world.provider.getDimensionType().getId());
+            World world = server.getWorld(WorldUtils.getDimensionId(mc.world));
 
             if (world != null)
             {

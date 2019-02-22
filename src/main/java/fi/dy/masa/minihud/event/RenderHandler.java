@@ -11,6 +11,7 @@ import java.util.Set;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -388,8 +389,8 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.DIMENSION.getBooleanValue())
             {
-                int dimension = world.provider.getDimensionType().getId();
-                str.append(String.format(String.format("%sDimensionType ID: %d", pre, dimension)));
+                int dimension = WorldUtils.getDimensionId(world);
+                str.append(String.format(String.format("%sDimType ID: %d", pre, dimension)));
             }
 
             this.addLine(str.toString());

@@ -8,6 +8,7 @@ import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
@@ -83,9 +84,7 @@ public class WorldLoadListener implements IWorldLoadListener
             }
             else
             {
-                // TODO How to fix this for Forge custom dimensions compatibility (if the type ID is not unique)?
-                final int dimension = mc.world.provider.getDimensionType().getId();
-                return name + "_dim" + dimension + ".json";
+                return name + "_dim" + WorldUtils.getDimensionId(mc.world) + ".json";
             }
         }
 
