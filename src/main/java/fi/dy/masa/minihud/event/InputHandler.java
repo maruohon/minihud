@@ -40,12 +40,13 @@ public class InputHandler implements IKeybindProvider
         manager.addKeybindToMap(Configs.Generic.TOGGLE_KEY.getKeybind());
         manager.addKeybindToMap(Configs.Generic.REQUIRED_KEY.getKeybind());
         manager.addKeybindToMap(Configs.Generic.OPEN_CONFIG_GUI.getKeybind());
+        manager.addKeybindToMap(Configs.Generic.SHAPE_EDITOR.getKeybind());
     }
 
     @Override
     public void addHotkeys(IKeybindManager manager)
     {
-        List<? extends IHotkey> hotkeys = ImmutableList.of( Configs.Generic.TOGGLE_KEY, Configs.Generic.REQUIRED_KEY, Configs.Generic.OPEN_CONFIG_GUI );
+        List<? extends IHotkey> hotkeys = ImmutableList.of( Configs.Generic.TOGGLE_KEY, Configs.Generic.REQUIRED_KEY, Configs.Generic.OPEN_CONFIG_GUI, Configs.Generic.SHAPE_EDITOR );
         manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", hotkeys);
         manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", ImmutableList.copyOf(InfoToggle.values()));
         manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", ImmutableList.copyOf(RendererToggle.values()));

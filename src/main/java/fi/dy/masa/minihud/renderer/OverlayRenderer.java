@@ -9,7 +9,6 @@ import net.minecraft.util.math.MathHelper;
 
 public class OverlayRenderer
 {
-    private static final RenderContainer RC = new RenderContainer();
     public static double chunkUnloadBucketOverlayY;
 
     public static void renderOverlays(Minecraft mc, float partialTicks)
@@ -24,7 +23,7 @@ public class OverlayRenderer
             renderChunkUnloadBuckets(mc, entity, dx, dy, dz, chunkUnloadBucketOverlayY);
         }
 
-        RC.render(entity, mc, partialTicks);
+        RenderContainer.INSTANCE.render(entity, mc, partialTicks);
     }
 
     private static void renderChunkUnloadBuckets(Minecraft mc, Entity entity, double dx, double dy, double dz, double chunkOverlayY)

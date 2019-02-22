@@ -15,6 +15,7 @@ import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InputEventHandler;
 import fi.dy.masa.malilib.event.RenderEventHandler;
+import fi.dy.masa.malilib.event.WorldLoadHandler;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
@@ -23,7 +24,13 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.gui.MiniHudConfigPanel;
 import fi.dy.masa.minihud.event.InputHandler;
 import fi.dy.masa.minihud.event.RenderHandler;
+import fi.dy.masa.minihud.event.WorldLoadListener;
 import fi.dy.masa.minihud.gui.GuiConfigs;
+import fi.dy.masa.minihud.gui.GuiConfigs.ConfigGuiTab;
+import fi.dy.masa.minihud.gui.GuiShapeEditor;
+import fi.dy.masa.minihud.gui.GuiShapeManager;
+import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
+import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
@@ -74,7 +81,13 @@ public class LiteModMiniHud implements LiteMod, Configurable, JoinGameListener, 
         RenderEventHandler.getInstance().registerTooltipLastRenderer(renderer);
         RenderEventHandler.getInstance().registerWorldLastRenderer(renderer);
 
-        Configs.Generic.OPEN_CONFIG_GUI.getKeybind().setCallback(new CallbackOpenConfigGui());
+        WorldLoadListener listener = new WorldLoadListener();
+        WorldLoadHandler.getInstance().registerWorldLoadPreHandler(listener);
+        WorldLoadHandler.getInstance().registerWorldLoadPostHandler(listener);
+
+        CallbackOpenConfigGui callback = new CallbackOpenConfigGui();
+        Configs.Generic.OPEN_CONFIG_GUI.getKeybind().setCallback(callback);
+        Configs.Generic.SHAPE_EDITOR.getKeybind().setCallback(callback);
         Configs.Generic.TOGGLE_KEY.getKeybind().setCallback(new KeyCallbackToggleBoolean(Configs.Generic.ENABLED));
     }
 
@@ -115,7 +128,27 @@ public class LiteModMiniHud implements LiteMod, Configurable, JoinGameListener, 
         @Override
         public boolean onKeyAction(KeyAction action, IKeybind key)
         {
-            Minecraft.getMinecraft().displayGuiScreen(new GuiConfigs());
+            Minecraft mc = Minecraft.getMinecraft();
+
+            if (key == Configs.Generic.OPEN_CONFIG_GUI.getKeybind())
+            {
+                mc.displayGuiScreen(new GuiConfigs());
+            }
+            else if (key == Configs.Generic.SHAPE_EDITOR.getKeybind())
+            {
+                ShapeBase shape = ShapeManager.INSTANCE.getSelectedShape();
+
+                if (shape != null)
+                {
+                    mc.displayGuiScreen(new GuiShapeEditor(shape));
+                }
+                else
+                {
+                    GuiConfigs.tab = ConfigGuiTab.SHAPES;
+                    mc.displayGuiScreen(new GuiShapeManager());
+                }
+            }
+
             return true;
         }
     }

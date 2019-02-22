@@ -1,68 +1,75 @@
-package fi.dy.masa.minihud.renderer;
+package fi.dy.masa.minihud.renderer.shapes;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.renderer.RenderObjectBase;
+import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
-public class OverlayRendererDespawnSphere extends OverlayRendererBase
+public class ShapeDespawnSphere extends ShapeBase
 {
     private static final EnumFacing[] FACING_ALL = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
     private static final EnumFacing[] HORIZONTALS = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
     //private static final EnumFacing[] HORIZONTALS_ROTATING = new EnumFacing[] { EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.WEST, EnumFacing.SOUTH };
-    public static Vec3d newPos;
 
+    protected Vec3d center = Vec3d.ZERO;
     protected Vec3d lastUpdatePos = Vec3d.ZERO;
     protected long lastUpdateTime;
 
-    @Override
-    public boolean shouldRender(Minecraft mc)
+    public ShapeDespawnSphere()
     {
-        return RendererToggle.OVERLAY_DESPAWN_SPHERE.getBooleanValue();
+        super(ShapeTypes.DESPAWN_SPHERE, Configs.Colors.DESPAWN_SPHERE_OVERLAY_COLOR.getColor());
+
+        EntityPlayer player = Minecraft.getMinecraft().player;
+
+        if (player != null)
+        {
+            this.center = player.getPositionVector();
+        }
     }
 
-    @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public Vec3d getCenter()
     {
-        /*
-        return System.currentTimeMillis() - this.lastUpdateTime >= 1000 &&
-                (this.lastUpdatePos.x != entity.posX ||
-                 this.lastUpdatePos.y != entity.posY ||
-                 this.lastUpdatePos.z != entity.posZ);
-        */
-        return newPos != null;
+        return this.center;
+    }
+
+    public void setCenter(Vec3d center)
+    {
+        this.center = center;
+        this.setNeedsUpdate();
     }
 
     @Override
     public void update(Entity entity, Minecraft mc)
     {
-        Vec3d center = entity.getPositionVector();
-
-        if (newPos != null)
-        {
-            center = newPos;
-            newPos = null;
-        }
         //center = new Vec3d(256.5, 10, 256.5); // FIXME debug
 
         if (Configs.Generic.DESPAWN_SPHERE_ROUND.getBooleanValue())
         {
-            this.renderSphereRound(center, mc);
+            this.renderSphereRound(this.center, mc);
         }
         else
         {
-            this.renderSphereBlock(center, mc);
+            this.renderSphereBlock(this.center, mc);
         }
 
+        this.needsUpdate = false;
         this.lastUpdatePos = entity.getPositionVector();
         this.lastUpdateTime = System.currentTimeMillis();
     }
@@ -75,14 +82,51 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
         this.allocateBuffer(GL11.GL_TRIANGLES);
     }
 
+    @Override
+    public JsonObject toJson()
+    {
+        JsonObject obj = super.toJson();
+
+        obj.add("center", JsonUtils.vec3dToJson(this.center));
+        obj.add("color", new JsonPrimitive(this.color.intValue));
+
+        return obj;
+    }
+
+    @Override
+    public void fromJson(JsonObject obj)
+    {
+        super.fromJson(obj);
+
+        Vec3d center = JsonUtils.vec3dFromJson(obj, "center");
+
+        if (center != null)
+        {
+            this.center = center;
+        }
+
+        if (JsonUtils.hasInteger(obj, "color"))
+        {
+            this.color = Color4f.fromColor(JsonUtils.getInteger(obj, "color"));
+        }
+    }
+
+    @Override
+    public List<String> getWidgetHoverLines()
+    {
+        List<String> lines = new ArrayList<>();
+        Vec3d c = this.center;
+        lines.add(I18n.format("minihud.gui.label.center_value", String.format("x: %.2f, y: %.2f, z: %.2f", c.x, c.y, c.z)));
+
+        return lines;
+    }
+
     protected void renderSphereRound(Vec3d center, Minecraft mc)
     {
         RenderObjectBase renderTriangles = this.renderObjects.get(2);
         BUFFER_1.begin(renderTriangles.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        Color4f color = Configs.Colors.DESPAWN_SPHERE_OVERLAY_COLOR.getColor();
-
-        renderSphere(center, 8, 4, BUFFER_1, color);
+        renderSphere(center, 8, 4, BUFFER_1, this.color);
 
         BUFFER_1.finishDrawing();
 
@@ -96,7 +140,7 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        Color4f colorQuad = Configs.Colors.DESPAWN_SPHERE_OVERLAY_COLOR.getColor();
+        Color4f colorQuad = this.color;
         Color4f colorLine = Color4f.fromColor(colorQuad, 1);
         BlockPos posCenter = new BlockPos(center);
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
@@ -139,7 +183,7 @@ public class OverlayRendererDespawnSphere extends OverlayRendererBase
             {
                 EnumFacing side = FACING_ALL[i];
 
-                if (isAdjacentPositionOutside(pos, center, side))
+                if (this.layerRange.isPositionWithinRange(pos) && isAdjacentPositionOutside(pos, center, side))
                 {
                     renderBlockSideQuads(pos, side, BUFFER_1, colorQuad);
                     renderBlockSideLines(pos, side, BUFFER_2, colorLine);

@@ -15,12 +15,12 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.config.StructureToggle;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
 public class GuiConfigs extends GuiConfigsBase
 {
-    private static ConfigGuiTab tab = ConfigGuiTab.INFO_TOGGLES;
-    private int id;
+    public static ConfigGuiTab tab = ConfigGuiTab.INFO_TOGGLES;
 
     public GuiConfigs()
     {
@@ -32,6 +32,12 @@ public class GuiConfigs extends GuiConfigsBase
     @Override
     public void initGui()
     {
+        if (GuiConfigs.tab == ConfigGuiTab.SHAPES)
+        {
+            Minecraft.getMinecraft().displayGuiScreen(new GuiShapeManager());
+            return;
+        }
+
         super.initGui();
         this.clearOptions();
 
@@ -124,12 +130,12 @@ public class GuiConfigs extends GuiConfigsBase
         return ConfigOptionWrapper.createFor(configs);
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListenerConfigTabs implements IButtonActionListener<ButtonGeneric>
     {
         private final GuiConfigs parent;
         private final ConfigGuiTab tab;
 
-        public ButtonListener(ConfigGuiTab tab, GuiConfigs parent)
+        public ButtonListenerConfigTabs(ConfigGuiTab tab, GuiConfigs parent)
         {
             this.tab = tab;
             this.parent = parent;
@@ -145,9 +151,16 @@ public class GuiConfigs extends GuiConfigsBase
         {
             GuiConfigs.tab = this.tab;
 
-            this.parent.reCreateListWidget(); // apply the new config width
-            this.parent.getListWidget().resetScrollbarPosition();
-            this.parent.initGui();
+            if (this.tab == ConfigGuiTab.SHAPES)
+            {
+                Minecraft.getMinecraft().displayGuiScreen(new GuiShapeManager());
+            }
+            else
+            {
+                this.parent.reCreateListWidget(); // apply the new config width
+                this.parent.getListWidget().resetScrollbarPosition();
+                this.parent.initGui();
+            }
         }
     }
 
@@ -159,7 +172,8 @@ public class GuiConfigs extends GuiConfigsBase
         INFO_LINE_ORDER     ("minihud.gui.button.config_gui.info_line_order"),
         INFO_HOTKEYS        ("minihud.gui.button.config_gui.info_hotkeys"),
         STRUCTURES          ("minihud.gui.button.config_gui.structures"),
-        RENDERER_HOTKEYS    ("minihud.gui.button.config_gui.renderer_hotkeys");
+        RENDERER_HOTKEYS    ("minihud.gui.button.config_gui.renderer_hotkeys"),
+        SHAPES              ("minihud.gui.button.config_gui.shapes");
 
         private final String translationKey;
 

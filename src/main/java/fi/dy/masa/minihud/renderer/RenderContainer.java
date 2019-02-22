@@ -13,6 +13,8 @@ import net.minecraft.entity.Entity;
 
 public class RenderContainer
 {
+    public static final RenderContainer INSTANCE = new RenderContainer();
+
     protected final List<IOverlayRenderer> renderers = new ArrayList<>();
     protected boolean resourcesAllocated;
     protected boolean useVbo;
@@ -20,13 +22,7 @@ public class RenderContainer
 
     public RenderContainer()
     {
-        this.init();
-    }
-
-    public void init()
-    {
         this.renderers.add(new OverlayRendererBlockGrid());
-        this.renderers.add(new OverlayRendererDespawnSphere());
         this.renderers.add(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_FIXED));
         this.renderers.add(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER));
         this.renderers.add(new OverlayRendererRegion());
@@ -39,6 +35,26 @@ public class RenderContainer
         this.renderers.add(new OverlayRendererStructures());
 
         this.allocateGlResources();
+    }
+
+    public void addShapeRenderer(IOverlayRenderer renderer)
+    {
+        if (this.resourcesAllocated)
+        {
+            renderer.allocateGlResources();
+        }
+
+        this.renderers.add(renderer);
+    }
+
+    public void removeShapeRenderer(IOverlayRenderer renderer)
+    {
+        this.renderers.remove(renderer);
+
+        if (this.resourcesAllocated)
+        {
+            renderer.deleteGlResources();
+        }
     }
 
     public void render(Entity entity, Minecraft mc, float partialTicks)
@@ -60,7 +76,6 @@ public class RenderContainer
             {
                 if (renderer.needsUpdate(entity, mc))
                 {
-                    //System.out.printf("plop update\n");
                     renderer.update(entity, mc);
                 }
 
@@ -152,7 +167,7 @@ public class RenderContainer
         if (vboLast != this.useVbo || this.resourcesAllocated == false)
         {
             this.deleteGlResources();
-            this.init();
+            this.allocateGlResources();
         }
     }
 
@@ -162,8 +177,7 @@ public class RenderContainer
         {
             for (int i = 0; i < this.renderers.size(); ++i)
             {
-                IOverlayRenderer renderer = this.renderers.get(i);
-                renderer.allocateGlResources();
+                this.renderers.get(i).allocateGlResources();
             }
 
             this.resourcesAllocated = true;
@@ -176,11 +190,9 @@ public class RenderContainer
         {
             for (int i = 0; i < this.renderers.size(); ++i)
             {
-                IOverlayRenderer renderer = this.renderers.get(i);
-                renderer.deleteGlResources();
+                this.renderers.get(i).deleteGlResources();
             }
 
-            this.renderers.clear();
             this.resourcesAllocated = false;
         }
     }
