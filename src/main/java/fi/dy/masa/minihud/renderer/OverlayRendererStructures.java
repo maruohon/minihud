@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldProvider;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class OverlayRendererStructures extends OverlayRendererBase
@@ -28,9 +29,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
             return false;
         }
 
-        int dimId = mc.world.provider.getDimensionType().getId();
-
-        if (dimId == 0)
+        if (mc.world.provider.isSurfaceWorld())
         {
             return StructureType.DESERT_PYRAMID.isEnabled() ||
                    StructureType.IGLOO.isEnabled() ||
@@ -41,13 +40,13 @@ public class OverlayRendererStructures extends OverlayRendererBase
                    StructureType.VILLAGE.isEnabled() ||
                    StructureType.WITCH_HUT.isEnabled();
         }
-        else if (dimId == -1)
+        else if (mc.world.provider.isNether())
         {
             return StructureType.NETHER_FORTRESS.isEnabled();
         }
         else
         {
-            return dimId == 1 && StructureType.END_CITY.isEnabled();
+            return StructureType.END_CITY.isEnabled();
         }
     }
 
@@ -65,7 +64,6 @@ public class OverlayRendererStructures extends OverlayRendererBase
     @Override
     public void update(Entity entity, Minecraft mc)
     {
-        int dim = mc.world.provider.getDimensionType().getId();
         this.lastUpdatePos = new BlockPos(entity);
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
@@ -73,7 +71,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        this.updateStructures(dim, this.lastUpdatePos, mc);
+        this.updateStructures(mc.world.provider, this.lastUpdatePos, mc);
 
         BUFFER_1.finishDrawing();
         BUFFER_2.finishDrawing();
@@ -89,14 +87,14 @@ public class OverlayRendererStructures extends OverlayRendererBase
         this.allocateBuffer(GL11.GL_LINES);
     }
 
-    private void updateStructures(int dimId, BlockPos playerPos, Minecraft mc)
+    private void updateStructures(WorldProvider provider, BlockPos playerPos, Minecraft mc)
     {
         ArrayListMultimap<StructureType, StructureData> structures = DataStorage.getInstance().getCopyOfStructureData();
         int maxRange = (mc.gameSettings.renderDistanceChunks + 4) * 16;
 
         for (StructureType type : StructureType.values())
         {
-            if (type.isEnabled() && type.existsInDimension(dimId))
+            if (type.isEnabled() && type.existsInDimension(provider))
             {
                 Collection<StructureData> structureData = structures.get(type);
 
