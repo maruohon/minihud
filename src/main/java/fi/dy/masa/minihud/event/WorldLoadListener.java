@@ -33,6 +33,8 @@ public class WorldLoadListener implements IWorldLoadListener
     @Override
     public void onWorldLoadPost(@Nullable WorldClient world, Minecraft mc)
     {
+        ShapeManager.INSTANCE.clear();
+
         if (world != null)
         {
             File file = getCurrentStorageFile(false);
@@ -47,10 +49,6 @@ public class WorldLoadListener implements IWorldLoadListener
                     ShapeManager.INSTANCE.fromJson(JsonUtils.getNestedObject(root, "shapes", false));
                 }
             }
-        }
-        else
-        {
-            ShapeManager.INSTANCE.clear();
         }
     }
 
