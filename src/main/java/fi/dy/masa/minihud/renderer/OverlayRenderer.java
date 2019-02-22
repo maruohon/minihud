@@ -10,10 +10,34 @@ import net.minecraft.util.math.MathHelper;
 public class OverlayRenderer
 {
     public static double chunkUnloadBucketOverlayY;
+    private static long loginTime;
+    private static boolean canRender;
+
+    public static void resetRenderTimeout()
+    {
+        canRender = false;
+        loginTime = System.currentTimeMillis();
+    }
 
     public static void renderOverlays(Minecraft mc, float partialTicks)
     {
         Entity entity = mc.player;
+
+        if (canRender == false)
+        {
+            // Don't render before the player has been placed in the actual proper position,
+            // otherwise some of the renderers mess up.
+            // The magic 8.5, 65, 8.5 comes from the WorldClient constructor
+            if (System.currentTimeMillis() - loginTime >= 5000 || entity.posX != 8.5 || entity.posY != 65 || entity.posZ != 8.5)
+            {
+                canRender = true;
+            }
+            else
+            {
+                return;
+            }
+        }
+
         double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
         double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
         double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;

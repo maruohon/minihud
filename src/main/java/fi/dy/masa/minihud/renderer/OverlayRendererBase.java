@@ -2,6 +2,8 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
+import com.google.gson.JsonObject;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -60,5 +62,20 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         this.renderObjects.add(obj);
 
         return obj;
+    }
+
+    public String getSaveId()
+    {
+        return "";
+    }
+
+    @Nullable
+    public JsonObject toJson()
+    {
+        return null;
+    }
+
+    public void fromJson(JsonObject obj)
+    {
     }
 }

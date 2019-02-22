@@ -12,6 +12,8 @@ import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.renderer.OverlayRenderer;
+import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.Minecraft;
@@ -21,6 +23,7 @@ public class WorldLoadListener implements IWorldLoadListener
 {
     private boolean hasCachedSeed;
     private long cachedSeed;
+    private boolean renderersRead;
 
     @Override
     public void onWorldLoadPre(@Nullable WorldClient world, Minecraft mc)
@@ -30,10 +33,14 @@ public class WorldLoadListener implements IWorldLoadListener
         // Save the settings before the integrated server gets shut down
         if (worldOld != null)
         {
-            File file = getCurrentStorageFile(false);
-            JsonObject root = new JsonObject();
-            root.add("shapes", ShapeManager.INSTANCE.toJson());
-            JsonUtils.writeJsonToFile(root, file);
+            this.writeDataPerDimension();
+
+            // Quitting to main menu
+            if (world == null)
+            {
+                this.writeDataGlobal();
+            }
+
             this.hasCachedSeed = world != null && Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue();
 
             if (this.hasCachedSeed)
@@ -43,6 +50,13 @@ public class WorldLoadListener implements IWorldLoadListener
         }
         else
         {
+            // Logging in to a world, load the global data
+            if (world != null)
+            {
+                this.readStoredDataGlobal();
+                OverlayRenderer.resetRenderTimeout();
+            }
+
             this.hasCachedSeed = false;
         }
     }
@@ -57,23 +71,66 @@ public class WorldLoadListener implements IWorldLoadListener
 
         if (world != null)
         {
-            File file = getCurrentStorageFile(false);
-            JsonElement element = JsonUtils.parseJsonFile(file);
-
-            if (element != null && element.isJsonObject())
-            {
-                JsonObject root = element.getAsJsonObject();
-
-                if (JsonUtils.hasObject(root, "shapes"))
-                {
-                    ShapeManager.INSTANCE.fromJson(JsonUtils.getNestedObject(root, "shapes", false));
-                }
-            }
+            this.readStoredDataPerDimension();
 
             if (this.hasCachedSeed)
             {
                 DataStorage.getInstance().setWorldSeed(this.cachedSeed);
                 this.hasCachedSeed = false;
+            }
+        }
+    }
+
+    private void writeDataPerDimension()
+    {
+        File file = getCurrentStorageFile(false);
+        JsonObject root = new JsonObject();
+
+        root.add("shapes", ShapeManager.INSTANCE.toJson());
+
+        JsonUtils.writeJsonToFile(root, file);
+    }
+
+    private void writeDataGlobal()
+    {
+        File file = getCurrentStorageFile(true);
+        JsonObject root = new JsonObject();
+
+        root.add("renderers", RenderContainer.INSTANCE.toJson());
+
+        JsonUtils.writeJsonToFile(root, file);
+    }
+
+    private void readStoredDataPerDimension()
+    {
+        // Per-dimension file
+        File file = getCurrentStorageFile(false);
+        JsonElement element = JsonUtils.parseJsonFile(file);
+
+        if (element != null && element.isJsonObject())
+        {
+            JsonObject root = element.getAsJsonObject();
+
+            if (JsonUtils.hasObject(root, "shapes"))
+            {
+                ShapeManager.INSTANCE.fromJson(JsonUtils.getNestedObject(root, "shapes", false));
+            }
+        }
+    }
+
+    private void readStoredDataGlobal()
+    {
+        // Global file
+        File file = getCurrentStorageFile(true);
+        JsonElement element = JsonUtils.parseJsonFile(file);
+
+        if (element != null && element.isJsonObject())
+        {
+            JsonObject root = element.getAsJsonObject();
+
+            if (this.renderersRead == false && JsonUtils.hasObject(root, "renderers"))
+            {
+                RenderContainer.INSTANCE.fromJson(JsonUtils.getNestedObject(root, "renderers", false));
             }
         }
     }

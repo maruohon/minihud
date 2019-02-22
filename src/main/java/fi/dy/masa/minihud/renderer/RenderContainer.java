@@ -3,7 +3,10 @@ package fi.dy.masa.minihud.renderer;
 import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
+import com.google.gson.JsonObject;
+import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -15,12 +18,12 @@ public class RenderContainer
 {
     public static final RenderContainer INSTANCE = new RenderContainer();
 
-    protected final List<IOverlayRenderer> renderers = new ArrayList<>();
+    protected final List<OverlayRendererBase> renderers = new ArrayList<>();
     protected boolean resourcesAllocated;
     protected boolean useVbo;
     protected int countActive;
 
-    public RenderContainer()
+    private RenderContainer()
     {
         this.renderers.add(new OverlayRendererBlockGrid());
         this.renderers.add(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_FIXED));
@@ -33,11 +36,9 @@ public class RenderContainer
         this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL));
         this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER));
         this.renderers.add(new OverlayRendererStructures());
-
-        this.allocateGlResources();
     }
 
-    public void addShapeRenderer(IOverlayRenderer renderer)
+    public void addShapeRenderer(ShapeBase renderer)
     {
         if (this.resourcesAllocated)
         {
@@ -47,7 +48,7 @@ public class RenderContainer
         this.renderers.add(renderer);
     }
 
-    public void removeShapeRenderer(IOverlayRenderer renderer)
+    public void removeShapeRenderer(ShapeBase renderer)
     {
         this.renderers.remove(renderer);
 
@@ -194,6 +195,38 @@ public class RenderContainer
             }
 
             this.resourcesAllocated = false;
+        }
+    }
+
+    public JsonObject toJson()
+    {
+        JsonObject obj = new JsonObject();
+
+        for (int i = 0; i < this.renderers.size(); ++i)
+        {
+            OverlayRendererBase renderer = this.renderers.get(i);
+            String id = renderer.getSaveId();
+
+            if (id.isEmpty() == false)
+            {
+                obj.add(id, renderer.toJson());
+            }
+        }
+
+        return obj;
+    }
+
+    public void fromJson(JsonObject obj)
+    {
+        for (int i = 0; i < this.renderers.size(); ++i)
+        {
+            OverlayRendererBase renderer = this.renderers.get(i);
+            String id = renderer.getSaveId();
+
+            if (id.isEmpty() == false && JsonUtils.hasObject(obj, id))
+            {
+                renderer.fromJson(obj.get(id).getAsJsonObject());
+            }
         }
     }
 }
