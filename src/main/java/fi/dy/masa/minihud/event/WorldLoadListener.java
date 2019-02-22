@@ -11,22 +11,39 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
+import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
+import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 
 public class WorldLoadListener implements IWorldLoadListener
 {
+    private boolean hasCachedSeed;
+    private long cachedSeed;
+
     @Override
     public void onWorldLoadPre(@Nullable WorldClient world, Minecraft mc)
     {
+        WorldClient worldOld = Minecraft.getMinecraft().world;
+
         // Save the settings before the integrated server gets shut down
-        if (Minecraft.getMinecraft().world != null)
+        if (worldOld != null)
         {
             File file = getCurrentStorageFile(false);
             JsonObject root = new JsonObject();
             root.add("shapes", ShapeManager.INSTANCE.toJson());
             JsonUtils.writeJsonToFile(root, file);
+            this.hasCachedSeed = world != null && Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue();
+
+            if (this.hasCachedSeed)
+            {
+                this.cachedSeed = world.getSeed();
+            }
+        }
+        else
+        {
+            this.hasCachedSeed = false;
         }
     }
 
@@ -34,6 +51,9 @@ public class WorldLoadListener implements IWorldLoadListener
     public void onWorldLoadPost(@Nullable WorldClient world, Minecraft mc)
     {
         ShapeManager.INSTANCE.clear();
+
+        // Clear the cached data
+        DataStorage.getInstance().onWorldLoad();
 
         if (world != null)
         {
@@ -48,6 +68,12 @@ public class WorldLoadListener implements IWorldLoadListener
                 {
                     ShapeManager.INSTANCE.fromJson(JsonUtils.getNestedObject(root, "shapes", false));
                 }
+            }
+
+            if (this.hasCachedSeed)
+            {
+                DataStorage.getInstance().setWorldSeed(this.cachedSeed);
+                this.hasCachedSeed = false;
             }
         }
     }

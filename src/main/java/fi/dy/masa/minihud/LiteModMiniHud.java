@@ -5,9 +5,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.google.common.collect.ImmutableList;
-import com.mojang.realmsclient.dto.RealmsServer;
 import com.mumfrey.liteloader.Configurable;
-import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.PluginChannelListener;
 import com.mumfrey.liteloader.Tickable;
@@ -33,12 +31,9 @@ import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.server.SPacketJoinGame;
 
-public class LiteModMiniHud implements LiteMod, Configurable, JoinGameListener, PluginChannelListener, Tickable
+public class LiteModMiniHud implements LiteMod, Configurable, PluginChannelListener, Tickable
 {
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
@@ -94,12 +89,6 @@ public class LiteModMiniHud implements LiteMod, Configurable, JoinGameListener, 
     @Override
     public void upgradeSettings(String version, File configPath, File oldConfigPath)
     {
-    }
-
-    @Override
-    public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
-    {
-        DataStorage.getInstance().onWorldLoad();
     }
 
     @Override

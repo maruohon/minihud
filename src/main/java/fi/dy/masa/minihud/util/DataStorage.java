@@ -96,11 +96,13 @@ public class DataStorage
         this.serverTPSValid = false;
         this.carpetServer = false;
         this.worldSpawnValid = false;
-        this.structures.clear();
-        this.lastStructureUpdatePos = null;
         this.structuresNeedUpdating = true;
         this.hasStructureDataFromServer = false;
         this.structuresDirty = false;
+
+        this.lastStructureUpdatePos = null;
+        this.structures.clear();
+        this.worldSeed = 0;
     }
 
     public void setWorldSeed(long seed)
@@ -133,27 +135,38 @@ public class DataStorage
 
     public long getWorldSeed(int dimension)
     {
-        if (this.worldSeedValid)
-        {
-            return this.worldSeed;
-        }
-        else if (this.mc.isSingleplayer())
+        if (this.worldSeedValid == false && this.mc.isSingleplayer())
         {
             MinecraftServer server = this.mc.getIntegratedServer();
             World worldTmp = server.getWorld(dimension);
-            return worldTmp != null ? worldTmp.getSeed() : 0;
+
+            if (worldTmp != null)
+            {
+                this.setWorldSeed(worldTmp.getSeed());
+            }
         }
 
-        return 0;
+        return this.worldSeed;
     }
 
     public boolean isWorldSpawnKnown()
     {
-        return this.worldSpawnValid;
+        return this.worldSpawnValid || Minecraft.getMinecraft().world != null;
     }
 
     public BlockPos getWorldSpawn()
     {
+        if (this.worldSpawnValid == false)
+        {
+            World world = Minecraft.getMinecraft().world;
+
+            if (world != null)
+            {
+                this.worldSpawn = world.getSpawnPoint();
+                this.worldSpawnValid = true;
+            }
+        }
+
         return this.worldSpawn;
     }
 
@@ -283,10 +296,8 @@ public class DataStorage
             {
                 try
                 {
-                    long seed = Long.parseLong(parts[1]);
-                    this.worldSeed = seed;
-                    this.worldSeedValid = true;
-                    MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(seed));
+                    this.setWorldSeed(Long.parseLong(parts[1]));
+                    MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
                 }
                 catch (NumberFormatException e)
                 {
@@ -336,8 +347,7 @@ public class DataStorage
             {
                 try
                 {
-                    this.worldSeed = Long.parseLong(text.getFormatArgs()[0].toString());
-                    this.worldSeedValid = true;
+                    this.setWorldSeed(Long.parseLong(text.getFormatArgs()[0].toString()));
                     LiteModMiniHud.logger.info("Received world seed from the vanilla /seed command: {}", this.worldSeed);
                     MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
                 }
@@ -351,8 +361,7 @@ public class DataStorage
             {
                 try
                 {
-                    this.worldSeed = Long.parseLong(text.getFormatArgs()[1].toString());
-                    this.worldSeedValid = true;
+                    this.setWorldSeed(Long.parseLong(text.getFormatArgs()[1].toString()));
                     LiteModMiniHud.logger.info("Received world seed from the JED '/jed seed' command: {}", this.worldSeed);
                     MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
                 }
@@ -370,8 +379,7 @@ public class DataStorage
                     int y = Integer.parseInt(o[1].toString());
                     int z = Integer.parseInt(o[2].toString());
 
-                    this.worldSpawn = new BlockPos(x, y, z);
-                    this.worldSpawnValid = true;
+                    this.setWorldSpawn(new BlockPos(x, y, z));
 
                     String spawnStr = String.format("x: %d, y: %d, z: %d", this.worldSpawn.getX(), this.worldSpawn.getY(), this.worldSpawn.getZ());
                     LiteModMiniHud.logger.info("Received world spawn from the vanilla /setworldspawn command: {}", spawnStr);
@@ -587,8 +595,7 @@ public class DataStorage
     private void readStructureDataCarpetAll(NBTTagCompound nbt)
     {
         NBTTagList tagList = nbt.getTagList("Boxes", Constants.NBT.TAG_LIST);
-        this.worldSeed = nbt.getLong("Seed");
-        this.worldSeedValid = true;
+        this.setWorldSeed(nbt.getLong("Seed"));
 
         synchronized (this.structures)
         {
@@ -602,8 +609,7 @@ public class DataStorage
 
     private void readStructureDataCarpetSplitHeader(NBTTagCompound nbt, int boxCount)
     {
-        this.worldSeed = nbt.getLong("Seed");
-        this.worldSeedValid = true;
+        this.setWorldSeed(nbt.getLong("Seed"));
 
         synchronized (this.structures)
         {

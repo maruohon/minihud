@@ -9,7 +9,6 @@ import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.event.RenderHandler;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
@@ -55,7 +54,6 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind() && this.config.getBooleanValue())
             {
                 BlockPos spawn = mc.world.getSpawnPoint();
-                RenderHandler.getInstance().getDataStorage().setWorldSpawn(spawn);
                 String strPos = String.format("x: %d, y: %d, z: %d", spawn.getX(), spawn.getY(), spawn.getZ());
                 String message = I18n.format("minihud.message.toggled_using_world_spawn", this.config.getPrettyName(), strStatus, strPos);
 

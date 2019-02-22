@@ -41,6 +41,7 @@ public class Configs implements IConfigHandler
         public static final ConfigString        DATE_FORMAT_MINECRAFT               = new ConfigString("dateFormatMinecraft", "MC time: (day {DAY}) {HOUR}:{MIN}:xx", "The format string for the Minecraft time.\nThe supported placeholders are: {DAY}, {HOUR}, {MIN},;{SEC}");
         public static final ConfigBoolean       DEBUG_RENDERER_PATH_MAX_DIST        = new ConfigBoolean("debugRendererPathFindingEnablePointWidth", true, "If true, then the vanilla pathfinding debug renderer\nwill render the path point width boxes.");
         public static final ConfigBoolean       DESPAWN_SPHERE_ROUND                = new ConfigBoolean("despawnSpehereRound", false, "Use a round despawn sphere instead of a \"block sphere\"");
+        public static final ConfigBoolean       DONT_RESET_SEED_ON_DIMENSION_CHANGE = new ConfigBoolean("dontResetSeedOnDimensionChange", false, "Don't reset the world seed when just changing dimensions.\nSome mods may use per-dimension seeds, so by default the seed\nis reset every time the player changes dimensions.");
         public static final ConfigBoolean       ENABLED                             = new ConfigBoolean("enabled", true, "If true, the HUD will be rendered");
         public static final ConfigBoolean       FIX_VANILLA_DEBUG_RENDERERS         = new ConfigBoolean("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed.");
         public static final ConfigDouble        FONT_SCALE                          = new ConfigDouble("fontScale", 0.5, "Font scale factor. Valid range: 0.0 - 10.0. Default: 0.5\n");
@@ -71,6 +72,7 @@ public class Configs implements IConfigHandler
                 CHUNK_UNLOAD_BUCKET_WITH_SIZE,
                 DEBUG_RENDERER_PATH_MAX_DIST,
                 DESPAWN_SPHERE_ROUND,
+                DONT_RESET_SEED_ON_DIMENSION_CHANGE,
                 FIX_VANILLA_DEBUG_RENDERERS,
                 MAP_PREVIEW,
                 REQUIRE_SNEAK,
