@@ -71,7 +71,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
 
         if (this.enabled)
         {
-            this.updateAll();
+            this.setNeedsUpdate();
         }
     }
 
@@ -95,37 +95,25 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
     @Override
     public void updateAll()
     {
-        if (this.mc.player != null)
-        {
-            this.update(this.mc.player, this.mc);
-        }
+        this.setNeedsUpdate();
     }
 
     @Override
     public void updateBetweenX(int minX, int maxX)
     {
-        if (this.mc.player != null)
-        {
-            this.update(this.mc.player, this.mc);
-        }
+        this.setNeedsUpdate();
     }
 
     @Override
     public void updateBetweenY(int minY, int maxY)
     {
-        if (this.mc.player != null)
-        {
-            this.update(this.mc.player, this.mc);
-        }
+        this.setNeedsUpdate();
     }
 
     @Override
     public void updateBetweenZ(int minZ, int maxZ)
     {
-        if (this.mc.player != null)
-        {
-            this.update(this.mc.player, this.mc);
-        }
+        this.setNeedsUpdate();
     }
 
     public JsonObject toJson()
