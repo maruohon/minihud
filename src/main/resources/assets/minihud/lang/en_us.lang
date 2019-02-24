@@ -17,9 +17,13 @@ minihud.gui.button.configure=Configure
 minihud.gui.button.remove=Remove
 minihud.gui.button.shape_entry.enabled=Enabled: %s
 
+minihud.gui.label.block_snap=Block snap: %s
 minihud.gui.label.center_colon=Center:
 minihud.gui.label.center_value=Center: %s
 minihud.gui.label.color=Color:
+minihud.gui.label.effective_center_value=Effective center: %s
+minihud.gui.label.margin_colon=Margin:
+minihud.gui.label.margin_value=Margin: %s
 
 minihud.gui.title.configs=MiniHUD Configs
 minihud.gui.title.shape_editor=Shape Editor

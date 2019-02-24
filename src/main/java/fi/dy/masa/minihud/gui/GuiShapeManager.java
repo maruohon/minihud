@@ -1,10 +1,13 @@
 package fi.dy.masa.minihud.gui;
 
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetDropDownList;
+import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.minihud.gui.widgets.WidgetListShapes;
 import fi.dy.masa.minihud.gui.widgets.WidgetShapeEntry;
@@ -60,6 +63,8 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         button.x -= button.getButtonWidth();
 
         this.addButton(button, new ButtonListener(ButtonListener.Type.ADD_SHAPE, this));
+        WidgetDropDownList<InfoToggle> dd = new WidgetDropDownList<InfoToggle>(button.x - 160, y, 140, 18, 200, 6, this.zLevel + 1, ImmutableList.copyOf(InfoToggle.values()));
+        this.addWidget(dd);
 
         return button.getButtonWidth();
     }

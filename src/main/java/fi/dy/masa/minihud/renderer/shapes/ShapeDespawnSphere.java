@@ -7,8 +7,10 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import fi.dy.masa.malilib.util.BlockSnap;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.Quadrant;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.RenderObjectBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
@@ -25,11 +27,15 @@ import net.minecraft.util.math.Vec3d;
 public class ShapeDespawnSphere extends ShapeBase
 {
     private static final EnumFacing[] FACING_ALL = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
-    private static final EnumFacing[] HORIZONTALS = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
+    //private static final EnumFacing[] HORIZONTALS = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
     //private static final EnumFacing[] HORIZONTALS_ROTATING = new EnumFacing[] { EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.WEST, EnumFacing.SOUTH };
 
     protected Vec3d center = Vec3d.ZERO;
+    protected Vec3d effectiveCenter = Vec3d.ZERO;
+    protected final Vec3d[] quadrantCenters = new Vec3d[4];
     protected Vec3d lastUpdatePos = Vec3d.ZERO;
+    protected BlockSnap snap = BlockSnap.NONE;
+    protected double margin = 0;
     protected long lastUpdateTime;
 
     public ShapeDespawnSphere()
@@ -40,7 +46,11 @@ public class ShapeDespawnSphere extends ShapeBase
 
         if (player != null)
         {
-            this.center = player.getPositionVector();
+            this.setCenter(player.getPositionVector());
+        }
+        else
+        {
+            this.setCenter(Vec3d.ZERO);
         }
     }
 
@@ -52,22 +62,69 @@ public class ShapeDespawnSphere extends ShapeBase
     public void setCenter(Vec3d center)
     {
         this.center = center;
+        this.updateEffectiveCenter();
+    }
+
+    private void updateQuadrantPoints()
+    {
+        Vec3d center = this.effectiveCenter;
+
+        this.quadrantCenters[Quadrant.NORTH_WEST.ordinal()] = new Vec3d(center.x - this.margin, center.y, center.z - this.margin);
+        this.quadrantCenters[Quadrant.NORTH_EAST.ordinal()] = new Vec3d(center.x + this.margin, center.y, center.z - this.margin);
+        this.quadrantCenters[Quadrant.SOUTH_WEST.ordinal()] = new Vec3d(center.x - this.margin, center.y, center.z + this.margin);
+        this.quadrantCenters[Quadrant.SOUTH_EAST.ordinal()] = new Vec3d(center.x + this.margin, center.y, center.z + this.margin);
+
         this.setNeedsUpdate();
+    }
+
+    private void updateEffectiveCenter()
+    {
+        Vec3d center = this.center;
+
+        if (this.snap == BlockSnap.CENTER)
+        {
+            this.effectiveCenter = new Vec3d(Math.floor(center.x) + 0.5, Math.floor(center.y), Math.floor(center.z) + 0.5);
+        }
+        else if (this.snap == BlockSnap.CORNER)
+        {
+            this.effectiveCenter = new Vec3d(Math.floor(center.x), Math.floor(center.y), Math.floor(center.z));
+        }
+        else
+        {
+            this.effectiveCenter = center;
+        }
+
+        this.updateQuadrantPoints();
+    }
+
+    public double getMargin()
+    {
+        return this.margin;
+    }
+
+    public void setMargin(double margin)
+    {
+        this.margin = margin;
+
+        // Update the quadrant centers
+        this.updateQuadrantPoints();
+    }
+
+    public BlockSnap getBlockSnap()
+    {
+        return this.snap;
+    }
+
+    public void setBlockSnap(BlockSnap snap)
+    {
+        this.snap = snap;
+        this.updateEffectiveCenter();
     }
 
     @Override
     public void update(Entity entity, Minecraft mc)
     {
-        //center = new Vec3d(256.5, 10, 256.5); // FIXME debug
-
-        if (Configs.Generic.DESPAWN_SPHERE_ROUND.getBooleanValue())
-        {
-            this.renderSphereRound(this.center, mc);
-        }
-        else
-        {
-            this.renderSphereBlock(this.center, mc);
-        }
+        this.renderSphereBlock();
 
         this.needsUpdate = false;
         this.lastUpdatePos = entity.getPositionVector();
@@ -88,6 +145,8 @@ public class ShapeDespawnSphere extends ShapeBase
         JsonObject obj = super.toJson();
 
         obj.add("center", JsonUtils.vec3dToJson(this.center));
+        obj.add("snap", new JsonPrimitive(this.snap.getStringValue()));
+        obj.add("margin", new JsonPrimitive(this.margin));
         obj.add("color", new JsonPrimitive(this.color.intValue));
 
         return obj;
@@ -98,11 +157,19 @@ public class ShapeDespawnSphere extends ShapeBase
     {
         super.fromJson(obj);
 
+        this.margin = JsonUtils.getDouble(obj, "margin");
+
+        // The snap value has to be set before the center
+        if (JsonUtils.hasString(obj, "snap"))
+        {
+            this.snap = BlockSnap.fromStringStatic(JsonUtils.getString(obj, "snap"));
+        }
+
         Vec3d center = JsonUtils.vec3dFromJson(obj, "center");
 
         if (center != null)
         {
-            this.center = center;
+            this.setCenter(center);
         }
 
         if (JsonUtils.hasInteger(obj, "color"))
@@ -117,23 +184,19 @@ public class ShapeDespawnSphere extends ShapeBase
         List<String> lines = new ArrayList<>();
         Vec3d c = this.center;
         lines.add(I18n.format("minihud.gui.label.center_value", String.format("x: %.2f, y: %.2f, z: %.2f", c.x, c.y, c.z)));
+        lines.add(I18n.format("minihud.gui.label.block_snap", this.snap.getDisplayName()));
+        lines.add(I18n.format("minihud.gui.label.margin_value", String.format("%.2f", this.margin)));
+
+        if (this.snap != BlockSnap.NONE)
+        {
+            c = this.effectiveCenter;
+            lines.add(I18n.format("minihud.gui.label.effective_center_value", String.format("x: %.2f, y: %.2f, z: %.2f", c.x, c.y, c.z)));
+        }
 
         return lines;
     }
 
-    protected void renderSphereRound(Vec3d center, Minecraft mc)
-    {
-        RenderObjectBase renderTriangles = this.renderObjects.get(2);
-        BUFFER_1.begin(renderTriangles.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-
-        renderSphere(center, 8, 4, BUFFER_1, this.color);
-
-        BUFFER_1.finishDrawing();
-
-        renderTriangles.uploadData(BUFFER_1);
-    }
-
-    protected void renderSphereBlock(Vec3d center, Minecraft mc)
+    protected void renderSphereBlock()
     {
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
@@ -142,38 +205,34 @@ public class ShapeDespawnSphere extends ShapeBase
 
         Color4f colorQuad = this.color;
         Color4f colorLine = Color4f.fromColor(colorQuad, 1);
-        BlockPos posCenter = new BlockPos(center);
+        BlockPos posCenter = new BlockPos(this.effectiveCenter);
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
-        //ArrayList<BlockPos> positionsOnRing = new ArrayList<>();
         HashSet<BlockPos> spherePositions = new HashSet<>();
 
-        long before = System.nanoTime();
+        //long before = System.nanoTime();
         posMutable.setPos(posCenter);
-        addPositionsOnRing(spherePositions, posMutable, center, EnumFacing.EAST);
+        this.addPositionsOnRing(spherePositions, posMutable, EnumFacing.EAST);
 
         posMutable.setPos(posCenter);
-        addPositionsOnRing(spherePositions, posMutable, center, EnumFacing.UP);
+        this.addPositionsOnRing(spherePositions, posMutable, EnumFacing.UP);
 
         for (int i = 1; i < 130; ++i)
         {
             // Horizontal rings
             posMutable.setPos(posCenter.getX(), posCenter.getY() - i, posCenter.getZ());
-            addPositionsOnRing(spherePositions, posMutable, center, EnumFacing.EAST);
+            this.addPositionsOnRing(spherePositions, posMutable, EnumFacing.EAST);
 
             posMutable.setPos(posCenter.getX(), posCenter.getY() + i, posCenter.getZ());
-            addPositionsOnRing(spherePositions, posMutable, center, EnumFacing.EAST);
+            this.addPositionsOnRing(spherePositions, posMutable, EnumFacing.EAST);
 
             // Vertical rings
             posMutable.setPos(posCenter.getX() - i, posCenter.getY(), posCenter.getZ());
-            addPositionsOnRing(spherePositions, posMutable, center, EnumFacing.UP);
+            this.addPositionsOnRing(spherePositions, posMutable, EnumFacing.UP);
 
             posMutable.setPos(posCenter.getX() + i, posCenter.getY(), posCenter.getZ());
-            addPositionsOnRing(spherePositions, posMutable, center, EnumFacing.UP);
+            this.addPositionsOnRing(spherePositions, posMutable, EnumFacing.UP);
         }
-        System.out.printf("time: %.6f s\n", (double) (System.nanoTime() - before) / 1000000000D);
-
-        int r = 0;
-        Color4f colorDebug = new Color4f(0, 0.2f, 0.7f, 0.4f);
+        //System.out.printf("time: %.6f s - margin: %.4f\n", (double) (System.nanoTime() - before) / 1000000000D, this.margin);
 
         for (BlockPos pos : spherePositions)
         {
@@ -182,12 +241,15 @@ public class ShapeDespawnSphere extends ShapeBase
             for (int i = 0; i < 6; ++i)
             {
                 EnumFacing side = FACING_ALL[i];
+                posMutable.setPos(pos).move(side);
 
-                if (this.layerRange.isPositionWithinRange(pos) && isAdjacentPositionOutside(pos, center, side))
+                if (this.layerRange.isPositionWithinRange(pos) &&
+                    spherePositions.contains(posMutable) == false &&
+                    this.isAdjacentPositionOutside(pos, side))
                 {
                     renderBlockSideQuads(pos, side, BUFFER_1, colorQuad);
                     renderBlockSideLines(pos, side, BUFFER_2, colorLine);
-                    r++;
+                    //r++;
                 }
             }
         }
@@ -200,9 +262,9 @@ public class ShapeDespawnSphere extends ShapeBase
         renderLines.uploadData(BUFFER_2);
     }
 
-    private static void addPositionsOnRing(HashSet<BlockPos> positions, BlockPos.MutableBlockPos posMutable, Vec3d center, EnumFacing direction)
+    private void addPositionsOnRing(HashSet<BlockPos> positions, BlockPos.MutableBlockPos posMutable, EnumFacing direction)
     {
-        if (movePositionToRing(posMutable, center, direction))
+        if (this.movePositionToRing(posMutable, direction))
         {
             BlockPos posFirst = posMutable.toImmutable();
             positions.add(posFirst);
@@ -213,11 +275,11 @@ public class ShapeDespawnSphere extends ShapeBase
             {
                 if (axis == EnumFacing.Axis.Y)
                 {
-                    direction = getNextPositionOnRingVertical(posMutable, center, direction);
+                    direction = this.getNextPositionOnRingVertical(posMutable, direction);
                 }
                 else
                 {
-                    direction = getNextPositionOnRing(posMutable, center, direction);
+                    direction = this.getNextPositionOnRing(posMutable, direction);
                 }
 
                 if (direction == null || posMutable.equals(posFirst))
@@ -232,7 +294,7 @@ public class ShapeDespawnSphere extends ShapeBase
         }
     }
 
-    private static boolean movePositionToRing(BlockPos.MutableBlockPos posMutable, Vec3d center, EnumFacing dir)
+    private boolean movePositionToRing(BlockPos.MutableBlockPos posMutable, EnumFacing dir)
     {
         int x = posMutable.getX();
         int y = posMutable.getY();
@@ -243,7 +305,7 @@ public class ShapeDespawnSphere extends ShapeBase
         int failsafe = 0;
         final int failsafeMax = 140;
 
-        while (isPositionWithinRange(xNext, yNext, zNext, center) && ++failsafe < failsafeMax)
+        while (this.isPositionWithinRange(xNext, yNext, zNext) && ++failsafe < failsafeMax)
         {
             x = xNext;
             y = yNext;
@@ -264,7 +326,7 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Nullable
-    private static EnumFacing getNextPositionOnRing(BlockPos.MutableBlockPos posMutable, Vec3d center, EnumFacing dir)
+    private EnumFacing getNextPositionOnRing(BlockPos.MutableBlockPos posMutable, EnumFacing dir)
     {
         EnumFacing dirOut = dir;
         EnumFacing ccw90 = getNextDirRotating(dir);
@@ -276,9 +338,9 @@ public class ShapeDespawnSphere extends ShapeBase
             int z = posMutable.getZ() + dir.getZOffset();
 
             // First check the adjacent position
-            //if (posMutable.getZ() <= 168 && posMutable.getX() >= 343) System.out.printf("1 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist, dirOut);
+            //if (posMutable.getX() <= 140) System.out.printf("1 pos: x: %d, z: %d - check: x: %d, z: %d, distE: %.3f, distC: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist1, dist2, dirOut);
 
-            if (isPositionWithinRange(x, y, z, center))
+            if (this.isPositionWithinRange(x, y, z))
             {
                 posMutable.setPos(x, y, z);
                 return dirOut;
@@ -287,9 +349,9 @@ public class ShapeDespawnSphere extends ShapeBase
             // Then check the diagonal position
             x = posMutable.getX() + dir.getXOffset() + ccw90.getXOffset();
             z = posMutable.getZ() + dir.getZOffset() + ccw90.getZOffset();
-            //if (posMutable.getZ() <= 168 && posMutable.getX() >= 343) System.out.printf("2 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist, dirOut);
+            //if (posMutable.getX() <= 140) System.out.printf("2 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist1, dist2, dirOut);
 
-            if (isPositionWithinRange(x, y, z, center))
+            if (this.isPositionWithinRange(x, y, z))
             {
                 posMutable.setPos(x, y, z);
                 return dirOut;
@@ -306,7 +368,7 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Nullable
-    private static EnumFacing getNextPositionOnRingVertical(BlockPos.MutableBlockPos posMutable, Vec3d center, EnumFacing dir)
+    private EnumFacing getNextPositionOnRingVertical(BlockPos.MutableBlockPos posMutable, EnumFacing dir)
     {
         EnumFacing dirOut = dir;
         EnumFacing ccw90 = getNextDirRotatingVertical(dir);
@@ -320,7 +382,7 @@ public class ShapeDespawnSphere extends ShapeBase
             // First check the adjacent position
             //if (posMutable.getZ() <= 168 && posMutable.getX() >= 343) System.out.printf("1 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist, dirOut);
 
-            if (isPositionWithinRange(x, y, z, center))
+            if (this.isPositionWithinRange(x, y, z))
             {
                 posMutable.setPos(x, y, z);
                 return dirOut;
@@ -332,7 +394,7 @@ public class ShapeDespawnSphere extends ShapeBase
             z = posMutable.getZ() + dir.getZOffset() + ccw90.getZOffset();
             //if (posMutable.getZ() <= 168 && posMutable.getX() >= 343) System.out.printf("2 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist, dirOut);
 
-            if (isPositionWithinRange(x, y, z, center))
+            if (this.isPositionWithinRange(x, y, z))
             {
                 posMutable.setPos(x, y, z);
                 return dirOut;
@@ -348,60 +410,27 @@ public class ShapeDespawnSphere extends ShapeBase
         return null;
     }
 
-    private static boolean isPositionWithinRange(int x, int y, int z, Vec3d center)
+    private boolean isPositionWithinRange(int x, int y, int z)
     {
         final double maxDistSq = 128 * 128;
-        return center.squareDistanceTo(x + 0.5, y + 1, z + 0.5) < maxDistSq;
+        Vec3d quadrantCenter = this.quadrantCenters[Quadrant.getQuadrant(x, z, this.effectiveCenter).ordinal()];
+        double dx = x + 0.5;
+        double dy = y + 1;
+        double dz = z + 0.5;
+
+        return quadrantCenter.squareDistanceTo(dx, dy, dz) < maxDistSq || this.effectiveCenter.squareDistanceTo(dx, dy, dz) < maxDistSq;
     }
 
-    private static boolean isAdjacentPositionOutside(BlockPos pos, Vec3d center, EnumFacing dir)
+    private boolean isAdjacentPositionOutside(BlockPos pos, EnumFacing dir)
     {
         final double maxDistSq = 128 * 128;
-        return center.squareDistanceTo(pos.getX() + dir.getXOffset() + 0.5, pos.getY() + dir.getYOffset() + 1, pos.getZ() + dir.getZOffset() + 0.5) >= maxDistSq;
+        Vec3d quadrantCenter = this.quadrantCenters[Quadrant.getQuadrant(pos.getX(), pos.getZ(), this.effectiveCenter).ordinal()];
+        double x = pos.getX() + dir.getXOffset() + 0.5;
+        double y = pos.getY() + dir.getYOffset() + 1;
+        double z = pos.getZ() + dir.getZOffset() + 0.5;
+
+        return quadrantCenter.squareDistanceTo(x, y, z) >= maxDistSq && this.effectiveCenter.squareDistanceTo(x, y, z) >= maxDistSq;
     }
-
-    /*
-    private static boolean isPositionOnRing(int x, int y, int z, Vec3d center)
-    {
-        final double maxDistSq = 128 * 128;
-
-        if (center.squareDistanceTo(x + 0.5, y, z + 0.5) < maxDistSq)
-        {
-            for (int i = 0; i < 4; ++i)
-            {
-                EnumFacing dir = HORIZONTALS[i];
-                double dist = center.squareDistanceTo(x + dir.getXOffset() + 0.5, y, z + dir.getZOffset() + 0.5);
-
-                // The given position has at least one outside neighbor, while being within the distance itself
-                if (dist > maxDistSq)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-    */
-
-    /**
-     * Returns the next horizontal direction in the EnumFacing sequence
-     * @param firstDir
-     * @return
-     */
-    /*
-    private static EnumFacing getNextDir(EnumFacing firstDir)
-    {
-        int index = firstDir.getIndex();
-
-        if (++index >= 6 || index < 2)
-        {
-            index = 2;
-        }
-
-        return HORIZONTALS[index - 2];
-    }
-    */
 
     /**
      * Returns the next horizontal direction in sequence, rotating counter-clockwise
@@ -434,100 +463,6 @@ public class ShapeDespawnSphere extends ShapeBase
             case DOWN:  return EnumFacing.SOUTH;
             case SOUTH: return EnumFacing.UP;
             default:    return EnumFacing.NORTH;
-        }
-    }
-
-    public static void renderSphere(Vec3d center, final double radius, final int numRings, BufferBuilder buffer, Color4f color)
-    {
-        //final double ringHeight = (Math.PI * radius) / numRings;
-        final double ringAngle = Math.PI / numRings;
-        double[] x = new double[2 * numRings + 1];
-        double[] z = new double[2 * numRings + 1];
-        double yOffPrev = 0;
-        System.out.printf("rendering...\n");
-
-        for (int ring = 0; ring < numRings / 2; ++ring)
-        {
-            double angleRingTop = ( ring      * ringAngle);
-            double angleRingBot = ((ring + 1) * ringAngle);
-
-            double yOff2 = radius * Math.cos(angleRingBot);
-            double y1 = center.y + radius - yOffPrev;
-            double y2 = center.y + radius - yOff2;
-
-            double ry1 = radius * Math.sin(angleRingTop);
-            double ry2 = radius * Math.sin(angleRingBot);
-
-            if (ring == 0)
-            {
-                System.out.printf("ringAngle: %.2f, angleRingTop: %.2f, angleRingBot: %.2f, yOff2: %.2f, y1: %.2f, y2: %.2f, ry1: %.2f, ry2: %.2f\n", ringAngle, angleRingTop, angleRingBot, yOff2, y1, y2, ry1, ry2);
-            }
-
-            if (ring == 0)
-            {
-                for (int tr = 0; tr < (2 * numRings); ++tr)
-                {
-                    if (tr == 0)
-                    {
-                        double a1 = (tr * ringAngle);
-                        double x2 = ry2 * Math.sin(a1) + center.x;
-                        double z2 = ry2 * Math.cos(a1) + center.z;
-                        x[tr] = x2;
-                        z[tr] = z2;
-                    }
-
-                    double a2 = ((tr + 1) * ringAngle);
-                    double x3 = ry2 * Math.sin(a2) + center.x;
-                    double z3 = ry2 * Math.cos(a2) + center.z;
-
-                    x[tr + 1] = x3;
-                    z[tr + 1] = z3;
-
-                    //System.out.printf("2: x: %.2f, y: %.2f, z: %.2f\n", x[tr    ], y2, z[tr    ]);
-                    //System.out.printf("3: x: %.2f, y: %.2f, z: %.2f\n", x[tr + 1], y2, z[tr + 1]);
-
-                    // Top of the sphere
-                    buffer.pos(center.x , y1, center.z ).color(color.r, color.g, color.b, color.a).endVertex();
-                    buffer.pos(x[tr    ], y2, z[tr    ]).color(color.r, color.g, color.b, color.a).endVertex();
-                    buffer.pos(x[tr + 1], y2, z[tr + 1]).color(color.r, color.g, color.b, color.a).endVertex();
-
-                    // Mirrored to the bottom of the sphere
-                    double y1b = center.y - radius + yOffPrev;
-                    double y2b = center.y - radius + yOff2;
-                    buffer.pos(center.x , y1b, center.z ).color(color.r, color.g, color.b, color.a).endVertex();
-                    buffer.pos(x[tr    ], y2b, z[tr    ]).color(color.r, color.g, color.b, color.a).endVertex();
-                    buffer.pos(x[tr + 1], y2b, z[tr + 1]).color(color.r, color.g, color.b, color.a).endVertex();
-                }
-            }
-            else
-            {
-                /*
-                for (int tr = 0; tr < numRings; ++tr)
-                {
-                    double a2 = Math.PI - ((tr + 1) * ringAngle);
-                    double x3 = ry2 * Math.sin(a2) + ry2 * Math.cos(a2);
-                    double z3 = ry2 * Math.cos(a2) + ry2 * Math.sin(a2);
-
-                    if (tr == 0)
-                    {
-                        double a1 = Math.PI - (tr * ringAngle);
-                        double x2 = ry2 * Math.sin(a1) + ry2 * Math.cos(a1);
-                        double z2 = ry2 * Math.cos(a1) + ry2 * Math.sin(a1);
-                        x[tr] = x2;
-                        z[tr] = z2;
-                    }
-
-                    x[tr + 1] = x3;
-                    z[tr + 1] = z3;
-
-                    buffer.pos(center.x , y1, center.z ).color(color.r, color.g, color.b, color.a).endVertex();
-                    buffer.pos(x[tr    ], y2, x[tr    ]).color(color.r, color.g, color.b, color.a).endVertex();
-                    buffer.pos(x[tr + 1], y2, x[tr + 1]).color(color.r, color.g, color.b, color.a).endVertex();
-                }
-                */
-            }
-
-            yOffPrev = yOff2;
         }
     }
 
