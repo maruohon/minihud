@@ -64,6 +64,8 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
             newPos = null;
         }
 
+        this.setPosition(new BlockPos(this.pos));
+
         final int color = this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER ?
                 Configs.Colors.RANDOM_TICKS_PLAYER_OVERLAY_COLOR.getIntegerValue() :
                 Configs.Colors.RANDOM_TICKS_FIXED_OVERLAY_COLOR.getIntegerValue();
@@ -85,8 +87,6 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
-
-        this.lastUpdatePos = new BlockPos(entity);
     }
 
     protected Set<ChunkPos> getRandomTickableChunks(Vec3d posCenter)

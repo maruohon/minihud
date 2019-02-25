@@ -16,6 +16,7 @@ import fi.dy.masa.minihud.renderer.RenderObjectBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -135,8 +136,24 @@ public class ShapeDespawnSphere extends ShapeBase
     public void allocateGlResources()
     {
         this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
-        this.allocateBuffer(GL11.GL_TRIANGLES);
+    }
+
+    @Override
+    public void draw(double x, double y, double z)
+    {
+        GlStateManager.pushMatrix();
+        this.preRender(x, y, z);
+
+        this.renderObjects.get(0).draw();
+
+        // Render the lines as quads with glPolygonMode(GL_LINE)
+        GlStateManager.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+        GlStateManager.disableBlend();
+        this.renderObjects.get(0).draw();
+        GlStateManager.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+        GlStateManager.enableBlend();
+
+        GlStateManager.popMatrix();
     }
 
     @Override
@@ -199,15 +216,14 @@ public class ShapeDespawnSphere extends ShapeBase
     protected void renderSphereBlock()
     {
         RenderObjectBase renderQuads = this.renderObjects.get(0);
-        RenderObjectBase renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
         Color4f colorQuad = this.color;
-        Color4f colorLine = Color4f.fromColor(colorQuad, 1);
         BlockPos posCenter = new BlockPos(this.effectiveCenter);
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
         HashSet<BlockPos> spherePositions = new HashSet<>();
+
+        this.setPosition(posCenter);
 
         //long before = System.nanoTime();
         posMutable.setPos(posCenter);
@@ -236,8 +252,6 @@ public class ShapeDespawnSphere extends ShapeBase
 
         for (BlockPos pos : spherePositions)
         {
-            //fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxSidesBatchedQuads(pos, colorDebug, -0.25, BUFFER_1);
-
             for (int i = 0; i < 6; ++i)
             {
                 EnumFacing side = FACING_ALL[i];
@@ -248,7 +262,7 @@ public class ShapeDespawnSphere extends ShapeBase
                     this.isAdjacentPositionOutside(pos, side))
                 {
                     renderBlockSideQuads(pos, side, BUFFER_1, colorQuad);
-                    renderBlockSideLines(pos, side, BUFFER_2, colorLine);
+                    //renderBlockSideLines(pos, side, BUFFER_2, colorLine);
                     //r++;
                 }
             }
@@ -256,10 +270,8 @@ public class ShapeDespawnSphere extends ShapeBase
         //System.out.printf("rendered: %d\n", r);
 
         BUFFER_1.finishDrawing();
-        BUFFER_2.finishDrawing();
 
         renderQuads.uploadData(BUFFER_1);
-        renderLines.uploadData(BUFFER_2);
     }
 
     private void addPositionsOnRing(HashSet<BlockPos> positions, BlockPos.MutableBlockPos posMutable, EnumFacing direction)
@@ -289,8 +301,6 @@ public class ShapeDespawnSphere extends ShapeBase
 
                 positions.add(posMutable.toImmutable());
             }
-
-            //System.out.printf("y: %d - positions: %d\n", posMutable.getY(), positions.size());
         }
     }
 
@@ -338,8 +348,6 @@ public class ShapeDespawnSphere extends ShapeBase
             int z = posMutable.getZ() + dir.getZOffset();
 
             // First check the adjacent position
-            //if (posMutable.getX() <= 140) System.out.printf("1 pos: x: %d, z: %d - check: x: %d, z: %d, distE: %.3f, distC: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist1, dist2, dirOut);
-
             if (this.isPositionWithinRange(x, y, z))
             {
                 posMutable.setPos(x, y, z);
@@ -349,7 +357,6 @@ public class ShapeDespawnSphere extends ShapeBase
             // Then check the diagonal position
             x = posMutable.getX() + dir.getXOffset() + ccw90.getXOffset();
             z = posMutable.getZ() + dir.getZOffset() + ccw90.getZOffset();
-            //if (posMutable.getX() <= 140) System.out.printf("2 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist1, dist2, dirOut);
 
             if (this.isPositionWithinRange(x, y, z))
             {
@@ -363,7 +370,6 @@ public class ShapeDespawnSphere extends ShapeBase
             ccw90 = getNextDirRotating(dir);
         }
 
-        //System.out.printf("3 null @ x: %d, z: %d\n", posMutable.getX(), posMutable.getZ());
         return null;
     }
 
@@ -380,8 +386,6 @@ public class ShapeDespawnSphere extends ShapeBase
             int z = posMutable.getZ() + dir.getZOffset();
 
             // First check the adjacent position
-            //if (posMutable.getZ() <= 168 && posMutable.getX() >= 343) System.out.printf("1 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist, dirOut);
-
             if (this.isPositionWithinRange(x, y, z))
             {
                 posMutable.setPos(x, y, z);
@@ -392,7 +396,6 @@ public class ShapeDespawnSphere extends ShapeBase
             x = posMutable.getX() + dir.getXOffset() + ccw90.getXOffset();
             y = posMutable.getY() + dir.getYOffset() + ccw90.getYOffset();
             z = posMutable.getZ() + dir.getZOffset() + ccw90.getZOffset();
-            //if (posMutable.getZ() <= 168 && posMutable.getX() >= 343) System.out.printf("2 pos: x: %d, z: %d - check: x: %d, z: %d, dist: %.3f, out: %s\n", posMutable.getX(), posMutable.getZ(), x, z, dist, dirOut);
 
             if (this.isPositionWithinRange(x, y, z))
             {
@@ -406,7 +409,6 @@ public class ShapeDespawnSphere extends ShapeBase
             ccw90 = getNextDirRotatingVertical(dir);
         }
 
-        //System.out.printf("3 null @ x: %d, z: %d\n", posMutable.getX(), posMutable.getZ());
         return null;
     }
 

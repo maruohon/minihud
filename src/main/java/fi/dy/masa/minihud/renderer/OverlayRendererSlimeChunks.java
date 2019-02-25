@@ -12,7 +12,6 @@ import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.PooledMutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 
@@ -95,8 +94,6 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
 
             renderQuads.uploadData(BUFFER_1);
             renderLines.uploadData(BUFFER_2);
-
-            this.lastUpdatePos = new BlockPos(entity);
         }
     }
 

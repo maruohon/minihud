@@ -77,11 +77,6 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
             this.posCenter = new BlockPos(entity);
         }
 
-        RenderObjectBase renderQuads = this.renderObjects.get(0);
-        RenderObjectBase renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-
         int centerX = this.posCenter.getX() >> 4;
         int centerZ = this.posCenter.getZ() >> 4;
         int r = 7;
@@ -89,7 +84,14 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
                 Configs.Colors.SPAWNABLE_CHUNKS_FIXED_OVERLAY_COLOR.getIntegerValue() :
                 Configs.Colors.SPAWNABLE_CHUNKS_PLAYER_OVERLAY_COLOR.getIntegerValue();
 
+        this.lastUpdatePos = new BlockPos(centerX, 0, centerZ);
+        this.setPosition(this.lastUpdatePos);
         //this.topY = overlayTopY;
+
+        RenderObjectBase renderQuads = this.renderObjects.get(0);
+        RenderObjectBase renderLines = this.renderObjects.get(1);
+        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
         BlockPos pos1 = new BlockPos( (centerX - r    ) << 4,              0,  (centerZ - r    ) << 4     );
         BlockPos pos2 = new BlockPos(((centerX + r + 1) << 4) - 1, this.topY, ((centerZ + r + 1) << 4) - 1);
@@ -101,8 +103,6 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
-
-        this.lastUpdatePos = new BlockPos(centerX, 0, centerZ);
     }
 
     @Override

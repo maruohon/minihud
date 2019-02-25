@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
 
 public class RenderContainer
 {
@@ -71,12 +72,15 @@ public class RenderContainer
 
         for (int i = 0; i < this.renderers.size(); ++i)
         {
-            IOverlayRenderer renderer = this.renderers.get(i);
+            OverlayRendererBase renderer = this.renderers.get(i);
 
             if (renderer.shouldRender(mc))
             {
                 if (renderer.needsUpdate(entity, mc))
                 {
+                    renderer.lastUpdatePos = new BlockPos(entity);
+                    renderer.setPosition(renderer.lastUpdatePos);
+
                     renderer.update(entity, mc);
                 }
 
@@ -92,13 +96,12 @@ public class RenderContainer
             GlStateManager.pushMatrix();
 
             GlStateManager.disableTexture2D();
-            //GlStateManager.matrixMode(GL11.GL_MODELVIEW);
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
             GlStateManager.disableCull();
             GlStateManager.disableLighting();
             GlStateManager.depthMask(false);
+            GlStateManager.doPolygonOffset(-3f, -3f);
             GlStateManager.enablePolygonOffset();
-            GlStateManager.doPolygonOffset(-4.0f, -8.0f);
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             GlStateManager.color(1f, 1f, 1f, 1f);
@@ -109,11 +112,9 @@ public class RenderContainer
                 GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
             }
 
-            double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
-            double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
-            double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
-
-            GlStateManager.translate((float) -dx, (float) -dy, (float) -dz);
+            double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
+            double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
+            double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
 
             for (int i = 0; i < this.renderers.size(); ++i)
             {
@@ -121,7 +122,7 @@ public class RenderContainer
 
                 if (renderer.shouldRender(mc))
                 {
-                    renderer.draw();
+                    renderer.draw(x, y, z);
                 }
             }
 

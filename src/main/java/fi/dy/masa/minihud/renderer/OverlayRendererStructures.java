@@ -19,8 +19,6 @@ import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class OverlayRendererStructures extends OverlayRendererBase
 {
-    protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
-
     @Override
     public boolean shouldRender(Minecraft mc)
     {
@@ -64,8 +62,6 @@ public class OverlayRendererStructures extends OverlayRendererBase
     @Override
     public void update(Entity entity, Minecraft mc)
     {
-        this.lastUpdatePos = new BlockPos(entity);
-
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);

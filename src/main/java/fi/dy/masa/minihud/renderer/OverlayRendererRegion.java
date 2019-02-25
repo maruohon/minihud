@@ -54,8 +54,6 @@ public class OverlayRendererRegion extends OverlayRendererBase
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
-
-        this.lastUpdatePos = new BlockPos(entity);
     }
 
     @Override
