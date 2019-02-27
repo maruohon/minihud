@@ -1,6 +1,5 @@
 package fi.dy.masa.minihud.event;
 
-import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybindManager;
@@ -37,17 +36,16 @@ public class InputHandler implements IKeybindProvider
             manager.addKeybindToMap(toggle.getKeybind());
         }
 
-        manager.addKeybindToMap(Configs.Generic.TOGGLE_KEY.getKeybind());
-        manager.addKeybindToMap(Configs.Generic.REQUIRED_KEY.getKeybind());
-        manager.addKeybindToMap(Configs.Generic.OPEN_CONFIG_GUI.getKeybind());
-        manager.addKeybindToMap(Configs.Generic.SHAPE_EDITOR.getKeybind());
+        for (IHotkey hotkey : Configs.Generic.HOTKEY_LIST)
+        {
+            manager.addKeybindToMap(hotkey.getKeybind());
+        }
     }
 
     @Override
     public void addHotkeys(IKeybindManager manager)
     {
-        List<? extends IHotkey> hotkeys = ImmutableList.of( Configs.Generic.TOGGLE_KEY, Configs.Generic.REQUIRED_KEY, Configs.Generic.OPEN_CONFIG_GUI, Configs.Generic.SHAPE_EDITOR );
-        manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", hotkeys);
+        manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST);
         manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", ImmutableList.copyOf(InfoToggle.values()));
         manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", ImmutableList.copyOf(RendererToggle.values()));
     }

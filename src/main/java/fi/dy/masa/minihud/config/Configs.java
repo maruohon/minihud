@@ -1,6 +1,7 @@
 package fi.dy.masa.minihud.config;
 
 import java.io.File;
+import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -103,6 +104,13 @@ public class Configs implements IConfigHandler
                 SPAWNABLE_SUB_CHUNKS_OVERLAY_RADIUS,
                 TEXT_POS_X,
                 TEXT_POS_Y
+        );
+
+        public static final List<ConfigHotkey> HOTKEY_LIST = ImmutableList.of(
+                TOGGLE_KEY,
+                REQUIRED_KEY,
+                OPEN_CONFIG_GUI,
+                SHAPE_EDITOR
         );
     }
 
