@@ -12,8 +12,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.gson.JsonObject;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
@@ -36,6 +39,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -80,6 +84,7 @@ public class DataStorage
     private double serverMSPT;
     private int droppedChunksHashSize = -1;
     private BlockPos worldSpawn = BlockPos.ORIGIN;
+    private Vec3d distanceReferencePoint = Vec3d.ZERO;
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
     private final ArrayListMultimap<StructureType, StructureData> structures = ArrayListMultimap.create();
@@ -217,6 +222,18 @@ public class DataStorage
         {
             return 0xFFFF;
         }
+    }
+
+    public Vec3d getDistanceReferencePoint()
+    {
+        return this.distanceReferencePoint;
+    }
+
+    public void setDistanceReferencePoint(Vec3d pos)
+    {
+        this.distanceReferencePoint = pos;
+        String str = String.format("x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
+        InfoUtils.printActionbarMessage("minihud.message.distance_reference_point_set", str);
     }
 
     public void markChunkForHeightmapCheck(int chunkX, int chunkZ)
@@ -770,5 +787,28 @@ public class DataStorage
         }
 
         return null;
+    }
+
+    public JsonObject toJson()
+    {
+        JsonObject obj = new JsonObject();
+
+        obj.add("distance_pos", JsonUtils.vec3dToJson(this.distanceReferencePoint));
+
+        return obj;
+    }
+
+    public void fromJson(JsonObject obj)
+    {
+        Vec3d pos = JsonUtils.vec3dFromJson(obj, "distance_pos");
+
+        if (pos != null)
+        {
+            this.distanceReferencePoint = pos;
+        }
+        else
+        {
+            this.distanceReferencePoint = Vec3d.ZERO;
+        }
     }
 }

@@ -87,6 +87,7 @@ public class WorldLoadListener implements IWorldLoadListener
         JsonObject root = new JsonObject();
 
         root.add("shapes", ShapeManager.INSTANCE.toJson());
+        root.add("data_storage", DataStorage.getInstance().toJson());
 
         JsonUtils.writeJsonToFile(root, file);
     }
@@ -114,6 +115,11 @@ public class WorldLoadListener implements IWorldLoadListener
             if (JsonUtils.hasObject(root, "shapes"))
             {
                 ShapeManager.INSTANCE.fromJson(JsonUtils.getNestedObject(root, "shapes", false));
+            }
+
+            if (JsonUtils.hasObject(root, "data_storage"))
+            {
+                DataStorage.getInstance().fromJson(JsonUtils.getNestedObject(root, "data_storage", false));
             }
         }
     }

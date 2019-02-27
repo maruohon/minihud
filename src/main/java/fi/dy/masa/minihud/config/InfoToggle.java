@@ -26,6 +26,7 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     COORDINATES             ("infoCoordinates",             true,   4, "", "Show the player's coordinates"),
     DIFFICULTY              ("infoDifficulty",              false, 18, "", "Show the local difficulty"),
     DIMENSION               ("infoDimensionId",             false,  5, "", "Show the current dimension ID\n(might not be accurate in every case,\ndepending on the server (Sponge?)!)"),
+    DISTANCE                ("infoDistance",                false, 33, "", "Show the distance to the current reference point.\nSet the reference point with the setDistanceReferencePoint hotkey"),
     ENTITIES                ("infoEntities",                false, 21, "", "Show the visible/loaded entity count"),
     ENTITY_REG_NAME         ("infoEntityRegistryName",      false, 24, "", "Show the registry name of the entity\nthe player is currently looking at"),
     FACING                  ("infoFacing",                  true,   8, "", "Show the player's current facing"),

@@ -51,6 +51,7 @@ public class Configs implements IConfigHandler
         public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "H,C", "A hotkey to open the in-game Config GUI");
         public static final ConfigBoolean       REQUIRE_SNEAK                       = new ConfigBoolean("requireSneak", false, "Require the player to be sneaking to render the HUD");
         public static final ConfigHotkey        REQUIRED_KEY                        = new ConfigHotkey("requiredKey", "", KeybindSettings.MODIFIER_INGAME_EMPTY, "Require holding this key to render the HUD");
+        public static final ConfigHotkey        SET_DISTANCE_REFERENCE_POINT        = new ConfigHotkey("setDistanceReferencePoint", "", "A htokey to store the player's current position\nas the reference point for the distance info line type");
         public static final ConfigHotkey        SHAPE_EDITOR                        = new ConfigHotkey("shapeEditor", "", "Opens the Shape Editor GUI for the selected shape");
         public static final ConfigBoolean       SHULKER_BOX_PREVIEW                 = new ConfigBoolean("shulkerBoxPreview", false, "Enables rendering a preview of the Shulker Box contents,\nwhen you hold shift while hovering over a Shulker Box item");
         public static final ConfigBoolean       SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean("shulkerDisplayBgColor", true, "Enables tinting/coloring the Shulker Box display\nbackground texture with the dye color of the box");
@@ -85,6 +86,7 @@ public class Configs implements IConfigHandler
 
                 TOGGLE_KEY,
                 REQUIRED_KEY,
+                SET_DISTANCE_REFERENCE_POINT,
                 SHAPE_EDITOR,
                 OPEN_CONFIG_GUI,
                 BLOCK_GRID_OVERLAY_MODE,
@@ -110,6 +112,7 @@ public class Configs implements IConfigHandler
                 TOGGLE_KEY,
                 REQUIRED_KEY,
                 OPEN_CONFIG_GUI,
+                SET_DISTANCE_REFERENCE_POINT,
                 SHAPE_EDITOR
         );
     }
