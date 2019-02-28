@@ -294,12 +294,13 @@ public class RenderHandler implements IRenderer
         {
             try
             {
-                long timeDay = (int) world.getWorldTime();
-                int day = (int) (timeDay / 24000) + 1;
+                long timeDay = world.getWorldTime();
+                long day = (int) (timeDay / 24000) + 1;
                 // 1 tick = 3.6 seconds in MC (0.2777... seconds IRL)
-                int hour = (int) ((timeDay / 1000) + 6) % 24;
-                int min = (int) (timeDay / 16.666666) % 60;
-                int sec = (int) (timeDay / 0.277777) % 60;
+                int dayTicks = (int) (timeDay % 24000);
+                int hour = (int) ((dayTicks / 1000) + 6) % 24;
+                int min = (int) (dayTicks / 16.666666) % 60;
+                int sec = (int) (dayTicks / 0.277777) % 60;
 
                 String str = Configs.Generic.DATE_FORMAT_MINECRAFT.getStringValue();
                 str = str.replace("{DAY}",  String.format("%d", day));
