@@ -1,23 +1,17 @@
 package fi.dy.masa.minihud.hotkeys;
 
-import com.mumfrey.liteloader.core.ClientPluginChannels;
-import com.mumfrey.liteloader.core.PluginChannels.ChannelPolicy;
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableChunks;
-import fi.dy.masa.minihud.util.DataStorage;
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
@@ -81,15 +75,6 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
                 String message = I18n.format("minihud.message.toggled_using_position", this.config.getPrettyName(), strStatus, strPos);
 
                 InfoUtils.printActionbarMessage(message);
-            }
-            else if (key == RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getKeybind())
-            {
-                if (this.config.getBooleanValue() && mc.isSingleplayer() == false)
-                {
-                    PacketBuffer data = new PacketBuffer(Unpooled.buffer());
-                    data.writeInt(DataStorage.CARPET_ID_BOUNDINGBOX_MARKERS);
-                    ClientPluginChannels.sendMessage(LiteModMiniHud.CHANNEL_CARPET_CLIENT, data, ChannelPolicy.DISPATCH_ALWAYS);
-                }
             }
 
             return true;

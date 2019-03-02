@@ -4,6 +4,7 @@ import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
+import fi.dy.masa.minihud.config.StructureToggle;
 import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.Minecraft;
 
@@ -23,8 +24,10 @@ public class KeyCallbackToggleStructures extends KeyCallbackToggleBooleanConfigW
         {
             if (this.config.getBooleanValue())
             {
-                DataStorage.getInstance().setStructuresNeedUpdating();
+                StructureToggle.updateStructureData();
             }
+
+            DataStorage.getInstance().setStructuresDirty();
 
             return true;
         }

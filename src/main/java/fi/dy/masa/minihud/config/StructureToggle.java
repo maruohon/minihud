@@ -1,12 +1,19 @@
 package fi.dy.masa.minihud.config;
 
 import com.google.common.collect.ImmutableList;
+import com.mumfrey.liteloader.core.ClientPluginChannels;
+import com.mumfrey.liteloader.core.PluginChannels.ChannelPolicy;
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleStructures;
+import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
+import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.util.DataStorage;
+import io.netty.buffer.Unpooled;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
 
 public enum StructureToggle
 {
@@ -21,7 +28,7 @@ public enum StructureToggle
     OVERLAY_STRUCTURE_VILLAGE           ("Village",         "", "#3054CB4E", "#3054CB4E", "Toggle Village structure bounding boxes rendering\nNOTE: This is the Village world gen structures!\nThis is not the Village data you use for iron farms etc.!", "Village"),
     OVERLAY_STRUCTURE_WITCH_HUT         ("Witch Hut",       "", "#30BE1DFC", "#300099FF", "Toggle Witch Hut structure bounding boxes rendering", "Witch Hut");
 
-    private final IConfigBoolean toggleOption;
+    private final ConfigBoolean toggleOption;
     private final ConfigColor colorMain;
     private final ConfigColor colorComponents;
     private final IHotkey hotkey;
@@ -32,7 +39,7 @@ public enum StructureToggle
         this.colorMain       = new ConfigColor(name +  " Main", colorMain, prettyName + " full box");
         this.colorComponents = new ConfigColor(name + " Components", colorComponents, prettyName + " components");
         this.hotkey          = new ConfigHotkey(name, defaultHotkey, comment);
-        this.hotkey.getKeybind().setCallback(new KeyCallbackToggleStructures(this.toggleOption));
+        this.toggleOption.setValueChangeCallback(new StructureRefresh());
     }
 
     public IConfigBoolean getToggleOption()
@@ -90,5 +97,32 @@ public enum StructureToggle
         }
 
         return builder.build();
+    }
+
+    public static void updateStructureData()
+    {
+        if (Minecraft.getMinecraft().isSingleplayer() == false)
+        {
+            PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+            data.writeInt(DataStorage.CARPET_ID_BOUNDINGBOX_MARKERS);
+            ClientPluginChannels.sendMessage(LiteModMiniHud.CHANNEL_CARPET_CLIENT, data, ChannelPolicy.DISPATCH_ALWAYS);
+            LiteModMiniHud.logger.info("Requesting structure data from Carpet server");
+        }
+
+        DataStorage.getInstance().setStructuresNeedUpdating();
+    }
+
+    public static class StructureRefresh implements IValueChangeCallback<ConfigBoolean>
+    {
+        @Override
+        public void onValueChanged(ConfigBoolean config)
+        {
+            if (config.getBooleanValue())
+            {
+                StructureToggle.updateStructureData();
+            }
+
+            DataStorage.getInstance().setStructuresDirty();
+        }
     }
 }

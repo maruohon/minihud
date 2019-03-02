@@ -300,6 +300,7 @@ public class StructureData
             case CARPET_STRUCTURE_ID_MONUMENT:      return StructureType.OCEAN_MONUMENT;
             case CARPET_STRUCTURE_ID_STRONGHOLD:    return StructureType.STRONGHOLD;
             case CARPET_STRUCTURE_ID_TEMPLE:        return StructureType.WITCH_HUT;
+            case CARPET_STRUCTURE_ID_VILLAGE:       return StructureType.VILLAGE;
         }
 
         return null;
