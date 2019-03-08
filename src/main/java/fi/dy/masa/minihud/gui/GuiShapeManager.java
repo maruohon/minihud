@@ -22,7 +22,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
 {
     public GuiShapeManager()
     {
-        super(10, 68);
+        super(10, 64);
 
         this.title = I18n.format("minihud.gui.title.shape_manager");
     }
@@ -36,7 +36,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
     @Override
     protected int getBrowserHeight()
     {
-        return this.height - 68;
+        return this.height - this.getListY() - 6;
     }
 
     @Override
@@ -45,12 +45,26 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         super.initGui();
 
         int x = 10;
-        int y = 26;
+        int y = 22;
+
+        int rows = 1;
 
         for (ConfigGuiTab tab : ConfigGuiTab.values())
         {
-            x += this.createTabButton(x, y, -1, tab);
+            int width = this.mc.fontRenderer.getStringWidth(tab.getDisplayName()) + 10;
+
+            if (x >= this.width - width - 10)
+            {
+                x = 10;
+                y += 22;
+                rows++;
+            }
+
+            x += this.createTabButton(x, y, width, tab);
         }
+
+        this.setListPosition(this.getListX(), 64 + (rows - 1) * 22);
+        this.reCreateListWidget();
 
         y += 24;
 

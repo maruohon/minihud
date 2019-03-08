@@ -43,11 +43,24 @@ public class GuiConfigs extends GuiConfigsBase
 
         int x = 10;
         int y = 26;
+        int rows = 1;
 
         for (ConfigGuiTab tab : ConfigGuiTab.values())
         {
-            x += this.createButton(x, y, -1, tab);
+            int width = this.mc.fontRenderer.getStringWidth(tab.getDisplayName()) + 10;
+
+            if (x >= this.width - width - 10)
+            {
+                x = 10;
+                y += 22;
+                rows++;
+            }
+
+            x += this.createButton(x, y, width, tab);
         }
+
+        this.setListPosition(this.getListX(), 50 + (rows - 1) * 22);
+        this.reCreateListWidget();
     }
 
     private int createButton(int x, int y, int width, ConfigGuiTab tab)
