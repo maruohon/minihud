@@ -51,7 +51,10 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         if (InputUtils.isRecipeViewOpen() && eventKeyState)
         {
             int index = -1;
-            int oldIndex = this.callbacks.getRecipes().getSelection();
+            RecipeStorage recipes = RecipeStorage.getInstance();
+            int oldIndex = recipes.getSelection();
+            int recipesPerPage = recipes.getRecipeCountPerPage();
+            int recipeIndexChange = GuiScreen.isShiftKeyDown() ? recipesPerPage : recipesPerPage / 2;
 
             if (eventKey >= Keyboard.KEY_1 && eventKey <= Keyboard.KEY_9)
             {
@@ -61,22 +64,22 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             {
                 index = oldIndex - 1;
             }
-            else if (eventKey == Keyboard.KEY_DOWN && oldIndex < 17)
+            else if (eventKey == Keyboard.KEY_DOWN && oldIndex < (recipes.getTotalRecipeCount() - 1))
             {
                 index = oldIndex + 1;
             }
-            else if (eventKey == Keyboard.KEY_LEFT && oldIndex >= 9)
+            else if (eventKey == Keyboard.KEY_LEFT && oldIndex >= recipeIndexChange)
             {
-                index = oldIndex - 9;
+                index = oldIndex - recipeIndexChange;
             }
-            else if (eventKey == Keyboard.KEY_RIGHT && oldIndex < 9)
+            else if (eventKey == Keyboard.KEY_RIGHT && oldIndex < (recipes.getTotalRecipeCount() - recipeIndexChange))
             {
-                index = oldIndex + 9;
+                index = oldIndex + recipeIndexChange;
             }
 
             if (index >= 0)
             {
-                this.callbacks.getRecipes().changeSelectedRecipe(index);
+                recipes.changeSelectedRecipe(index);
                 return true;
             }
         }
@@ -117,7 +120,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
         {
             GuiContainer gui = (GuiContainer) mc.currentScreen;
-            RecipeStorage recipes = this.callbacks.getRecipes();
+            RecipeStorage recipes = RecipeStorage.getInstance();
 
             if (dWheel != 0)
             {
@@ -144,7 +147,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 {
                     final int mouseX = InputUtils.getMouseX();
                     final int mouseY = InputUtils.getMouseY();
-                    int hoveredRecipeId = RenderEventHandler.instance().getHoveredRecipeId(mouseX, mouseY, recipes, gui, mc);
+                    int hoveredRecipeId = RenderEventHandler.instance().getHoveredRecipeId(mouseX, mouseY, recipes, gui);
 
                     // Hovering over an item in the recipe view
                     if (hoveredRecipeId >= 0)

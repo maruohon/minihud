@@ -27,7 +27,6 @@ public class KeybindCallbacks implements IHotkeyCallback
     private static final KeybindCallbacks INSTANCE = new KeybindCallbacks();
 
     private boolean disabled;
-    private RecipeStorage recipes;
 
     public static KeybindCallbacks getInstance()
     {
@@ -51,21 +50,11 @@ public class KeybindCallbacks implements IHotkeyCallback
         return this.disabled == false;
     }
 
-    public RecipeStorage getRecipes()
-    {
-        if (this.recipes == null)
-        {
-            this.recipes = new RecipeStorage(18, Configs.Generic.SCROLL_CRAFT_RECIPE_FILE_GLOBAL.getBooleanValue());
-        }
-
-        return this.recipes;
-    }
-
     public void onWorldChanged()
     {
         if (Configs.Generic.SCROLL_CRAFT_STORE_RECIPES_TO_FILE.getBooleanValue())
         {
-            this.getRecipes().readFromDisk();
+            RecipeStorage.getInstance().readFromDisk();
         }
     }
 
@@ -97,7 +86,7 @@ public class KeybindCallbacks implements IHotkeyCallback
 
         GuiContainer gui = (GuiContainer) mc.currentScreen;
         Slot slot = AccessorUtils.getSlotUnderMouse(gui);
-        RecipeStorage recipes = this.getRecipes();
+        RecipeStorage recipes = RecipeStorage.getInstance();
         MoveAction moveAction = InputUtils.getDragMoveAction(key);
 
         if (slot != null)
@@ -147,6 +136,14 @@ public class KeybindCallbacks implements IHotkeyCallback
             InventoryUtils.moveAllCraftingResultsToOtherInventory(recipes.getSelectedRecipe(), gui);
             return true;
         }
+        else if (key == Hotkeys.KEY_STORE_RECIPE.getKeybind())
+        {
+            if (InputUtils.isRecipeViewOpen() && InventoryUtils.isCraftingSlot(gui, slot))
+            {
+                recipes.storeCraftingRecipeToCurrentSelection(slot, gui, true);
+                return true;
+            }
+        }
         else if (key == Hotkeys.KEY_SLOT_DEBUG.getKeybind())
         {
             if (slot != null)
@@ -180,7 +177,7 @@ public class KeybindCallbacks implements IHotkeyCallback
 
             if (outputSlot != null)
             {
-                CraftingRecipe recipe = this.getRecipes().getSelectedRecipe();
+                CraftingRecipe recipe = RecipeStorage.getInstance().getSelectedRecipe();
 
                 InventoryUtils.tryClearCursor(gui, mc);
                 InventoryUtils.throwAllCraftingResultsToGround(recipe, gui);
