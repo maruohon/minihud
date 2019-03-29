@@ -28,6 +28,7 @@ import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorHell;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorOverworld;
 import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
 import fi.dy.masa.minihud.mixin.IMixinMapGenStructure;
+import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.Minecraft;
@@ -246,6 +247,7 @@ public class DataStorage
     {
         OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
         this.chunkHeightmapsToCheck.add(new ChunkPos(chunkX, chunkZ));
+        OverlayRendererLightLevel.setNeedsUpdate();
     }
 
     public void checkQueuedDirtyChunkHeightmaps()

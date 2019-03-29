@@ -23,6 +23,7 @@ public enum RendererToggle implements IHotkeyTogglable
 
     OVERLAY_BLOCK_GRID                  ("overlayBlockGrid",            "", "Toggle the Block Grid overlay renderer", "Block Grid overlay"),
     OVERLAY_CHUNK_UNLOAD_BUCKET         ("overlayChunkUnloadBucket",    "", "Toggle the Chunk unload bucket/priority renderer", "Chunk Unload Priority overlay"),
+    OVERLAY_LIGHT_LEVEL                 ("overlayLightLevel",           "", "Toggle the Light Level overlay renderer", "Light Level overlay"),
     OVERLAY_RANDOM_TICKS_FIXED          ("overlayRandomTicksFixed",     "", "Toggle the fixed-point random ticked chunks overlay renderer", "Random Ticked Chunks (fixed) overlay"),
     OVERLAY_RANDOM_TICKS_PLAYER         ("overlayRandomTicksPlayer",    "", "Toggle the player-following random ticked chunks overlay renderer", "Random Ticked Chunks (player-following) overlay"),
     OVERLAY_REGION_FILE                 ("overlayRegionFile",           "", "Toggle the region file border overlay renderer", "Region File Border overlay"),

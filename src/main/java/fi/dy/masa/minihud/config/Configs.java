@@ -46,6 +46,8 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       FIX_VANILLA_DEBUG_RENDERERS         = new ConfigBoolean("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed.");
         public static final ConfigDouble        FONT_SCALE                          = new ConfigDouble("fontScale", 0.5, "Font scale factor. Valid range: 0.0 - 10.0. Default: 0.5\n");
         public static final ConfigOptionList    HUD_ALIGNMENT                       = new ConfigOptionList("hudAlignment", HudAlignment.TOP_LEFT, "The alignment of the HUD.");
+        public static final ConfigBoolean       LIGHT_LEVEL_COLORED_NUMBERS         = new ConfigBoolean("lightLevelColoredNumbers", true, "Whether to use colored or white numbers\nfor the Light Level overlay numbers");
+        public static final ConfigBoolean       LIGHT_LEVEL_NUMBERS                 = new ConfigBoolean("lightLevelNumbers", true, "Whether to render the Light Level overlay\nusing the light level numbers, or just\nthe traditional yellow or red crosses");
         public static final ConfigBoolean       MAP_PREVIEW                         = new ConfigBoolean("mapPreview", false, "Enables rendering a preview of the map,\nwhen you hold shift while hovering over a map item");
         public static final ConfigInteger       MAP_PREVIEW_SIZE                    = new ConfigInteger("mapPreviewSize", 160, 16, 512, "The size of the rendered map previews");
         public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "H,C", "A hotkey to open the in-game Config GUI");
@@ -74,6 +76,8 @@ public class Configs implements IConfigHandler
                 DEBUG_RENDERER_PATH_MAX_DIST,
                 DONT_RESET_SEED_ON_DIMENSION_CHANGE,
                 FIX_VANILLA_DEBUG_RENDERERS,
+                LIGHT_LEVEL_COLORED_NUMBERS,
+                LIGHT_LEVEL_NUMBERS,
                 MAP_PREVIEW,
                 REQUIRE_SNEAK,
                 SHULKER_BOX_PREVIEW,

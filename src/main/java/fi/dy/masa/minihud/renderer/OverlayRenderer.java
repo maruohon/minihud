@@ -38,13 +38,18 @@ public class OverlayRenderer
             }
         }
 
+        double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
+        double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
+        double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
+
         if (RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getBooleanValue())
         {
-            double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
-            double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
-            double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
-
             renderChunkUnloadBuckets(mc, entity, dx, dy, dz, chunkUnloadBucketOverlayY);
+        }
+
+        if (RendererToggle.OVERLAY_LIGHT_LEVEL.getBooleanValue())
+        {
+            OverlayRendererLightLevel.render(dx, dy, dz, entity, mc);
         }
 
         RenderContainer.INSTANCE.render(entity, mc, partialTicks);

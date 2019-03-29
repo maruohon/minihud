@@ -7,6 +7,7 @@ import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
+import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableChunks;
@@ -30,22 +31,28 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
 
         if (mc != null && mc.player != null && super.onKeyAction(action, key))
         {
+            if (this.config.getBooleanValue() == false)
+            {
+                return true;
+            }
+
             String green = TextFormatting.GREEN.toString();
-            String red = TextFormatting.RED.toString();
             String rst = TextFormatting.RESET.toString();
-            String statusOn = green + I18n.format("malilib.message.value.on") + rst;
-            String statusOff = red + I18n.format("malilib.message.value.off") + rst;
-            String strStatus = this.config.getBooleanValue() ? statusOn : statusOff;
+            String strStatus = green + I18n.format("malilib.message.value.on") + rst;
 
             if (key == RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind())
             {
                 OverlayRenderer.chunkUnloadBucketOverlayY = mc.player.posY - 2;
             }
+            else if (key == RendererToggle.OVERLAY_LIGHT_LEVEL.getKeybind())
+            {
+                OverlayRendererLightLevel.setNeedsUpdate();
+            }
             else if (key == RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind())
             {
                 OverlayRendererSlimeChunks.overlayTopY = mc.player.posY;
             }
-            else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind() && this.config.getBooleanValue())
+            else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind())
             {
                 BlockPos spawn = mc.world.getSpawnPoint();
                 String strPos = String.format("x: %d, y: %d, z: %d", spawn.getX(), spawn.getY(), spawn.getZ());
@@ -53,7 +60,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
 
                 InfoUtils.printActionbarMessage(message);
             }
-            else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getKeybind() && this.config.getBooleanValue())
+            else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getKeybind())
             {
                 Vec3d pos = mc.player.getPositionVector();
                 OverlayRendererRandomTickableChunks.newPos = pos;
@@ -62,11 +69,11 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
 
                 InfoUtils.printActionbarMessage(message);
             }
-            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.getKeybind() && this.config.getBooleanValue())
+            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.getKeybind())
             {
                 OverlayRendererSpawnableChunks.overlayTopY = mc.player.posY;
             }
-            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getKeybind() && this.config.getBooleanValue())
+            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getKeybind())
             {
                 BlockPos pos = new BlockPos(mc.player);
                 OverlayRendererSpawnableChunks.newPos = pos;
