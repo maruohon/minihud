@@ -7,6 +7,7 @@ import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.event.RenderHandler;
+import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableChunks;
@@ -37,7 +38,11 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             {
                 OverlayRendererSlimeChunks.overlayTopY = mc.player.y;
             }
-            else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind() && this.rendererConfig.getBooleanValue())
+            else if (key == RendererToggle.OVERLAY_LIGHT_LEVEL.getKeybind())
+            {
+                OverlayRendererLightLevel.setNeedsUpdate();
+            }
+            else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind())
             {
                 final boolean enabled = this.config.getBooleanValue();
                 String pre = enabled ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
@@ -50,7 +55,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
 
                 StringUtils.printActionbarMessage(message + str);
             }
-            else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getKeybind() && this.rendererConfig.getBooleanValue())
+            else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getKeybind())
             {
                 final boolean enabled = this.config.getBooleanValue();
                 String pre = enabled ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
@@ -63,11 +68,11 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
 
                 StringUtils.printActionbarMessage(message + str);
             }
-            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.getKeybind() && this.rendererConfig.getBooleanValue())
+            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.getKeybind())
             {
                 OverlayRendererSpawnableChunks.overlayTopY = mc.player.y;
             }
-            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getKeybind() && this.rendererConfig.getBooleanValue())
+            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getKeybind())
             {
                 final boolean enabled = this.config.getBooleanValue();
                 String pre = enabled ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;

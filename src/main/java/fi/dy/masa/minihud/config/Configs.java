@@ -41,6 +41,8 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       FIX_VANILLA_DEBUG_RENDERERS         = new ConfigBoolean("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed.");
         public static final ConfigDouble        FONT_SCALE                          = new ConfigDouble("fontScale", 0.5, "Font scale factor. Valid range: 0.0 - 10.0. Default: 0.5\n");
         public static final ConfigOptionList    HUD_ALIGNMENT                       = new ConfigOptionList("hudAlignment", HudAlignment.TOP_LEFT, "The alignment of the HUD.");
+        public static final ConfigBoolean       LIGHT_LEVEL_COLORED_NUMBERS         = new ConfigBoolean("lightLevelColoredNumbers", true, "Whether to use colored or white numbers\nfor the Light Level overlay numbers");
+        public static final ConfigBoolean       LIGHT_LEVEL_NUMBERS                 = new ConfigBoolean("lightLevelNumbers", true, "Whether to render the Light Level overlay\nusing the light level numbers, or just\nthe traditional yellow or red crosses");
         public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "H,C", "A hotkey to open the in-game Config GUI");
         public static final ConfigBoolean       REQUIRE_SNEAK                       = new ConfigBoolean("requireSneak", false, "Require the player to be sneaking to render the HUD");
         public static final ConfigHotkey        REQUIRED_KEY                        = new ConfigHotkey("requiredKey", "", KeybindSettings.MODIFIER_INGAME, "Require holding this key to render the HUD");
@@ -61,6 +63,8 @@ public class Configs implements IConfigHandler
                 ENABLED,
                 DEBUG_RENDERER_PATH_MAX_DIST,
                 FIX_VANILLA_DEBUG_RENDERERS,
+                LIGHT_LEVEL_COLORED_NUMBERS,
+                LIGHT_LEVEL_NUMBERS,
                 REQUIRE_SNEAK,
                 SORT_LINES_BY_LENGTH,
                 SORT_LINES_REVERSED,
