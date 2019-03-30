@@ -2,10 +2,14 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
+import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.util.LightLevelMarkerMode;
+import fi.dy.masa.minihud.util.LightLevelNumberMode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -69,39 +73,51 @@ public class OverlayRendererLightLevel
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBufferBuilder();
+            LightLevelNumberMode numberMode = (LightLevelNumberMode) Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getOptionListValue();
+            LightLevelMarkerMode markerMode = (LightLevelMarkerMode) Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
             boolean useColoredNumbers = Configs.Generic.LIGHT_LEVEL_COLORED_NUMBERS.getBooleanValue();
+            int lightThreshold = Configs.Generic.LIGHT_LEVEL_THRESHOLD.getIntegerValue();
 
-            if (Configs.Generic.LIGHT_LEVEL_NUMBERS.getBooleanValue())
+            if (numberMode == LightLevelNumberMode.BLOCK || numberMode == LightLevelNumberMode.BOTH)
             {
+                double tmpX = dx - Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X.getDoubleValue();
+                double tmpZ = dz - Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y.getDoubleValue();
+                Color4f colorLit = null, colorDark = null;
+
                 if (useColoredNumbers)
                 {
-                    buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV_COLOR);
-
-                    for (int i = 0; i < count; ++i)
-                    {
-                        LightLevelInfo info = LIGHT_INFOS.get(i);
-                        BlockPos pos = info.pos;
-                        renderLightLevelTextureColor(info, pos.getX() - dx, pos.getY() - dy, pos.getZ() - dz, buffer);
-                    }
-
-                    tessellator.draw();
+                    colorLit = Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_LIT.getColor();
+                    colorDark = Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_DARK.getColor();
                 }
-                else
-                {
-                    buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV);
 
-                    for (int i = 0; i < count; ++i)
-                    {
-                        LightLevelInfo info = LIGHT_INFOS.get(i);
-                        BlockPos pos = info.pos;
-                        renderLightLevelTexture(info, pos.getX() - dx, pos.getY() - dy, pos.getZ() - dz, buffer);
-                    }
-
-                    tessellator.draw();
-                }
+                renderLightLevelNumbers(tmpX, dy, tmpZ, lightThreshold, LightLevelNumberMode.BLOCK, colorLit, colorDark, buffer);
+                tessellator.draw();
             }
-            else
+
+            if (numberMode == LightLevelNumberMode.SKY || numberMode == LightLevelNumberMode.BOTH)
             {
+                double tmpX = dx - Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_X.getDoubleValue();
+                double tmpZ = dz - Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y.getDoubleValue();
+                Color4f colorLit = null, colorDark = null;
+
+                if (useColoredNumbers)
+                {
+                    colorLit = Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_LIT.getColor();
+                    colorDark = Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_DARK.getColor();
+                }
+
+                renderLightLevelNumbers(tmpX, dy, tmpZ, lightThreshold, LightLevelNumberMode.SKY, colorLit, colorDark, buffer);
+                tessellator.draw();
+            }
+
+            if (markerMode == LightLevelMarkerMode.SQUARE)
+            {
+                double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
+                Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
+                Color4f colorDark = Configs.Colors.LIGHT_LEVEL_MARKER_DARK.getColor();
+                double offset1 = (1.0 - markerSize) / 2.0;
+                double offset2 = (1.0 - offset1);
+
                 GlStateManager.disableTexture();
 
                 buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
@@ -110,10 +126,39 @@ public class OverlayRendererLightLevel
                 {
                     LightLevelInfo info = LIGHT_INFOS.get(i);
 
-                    if (info.block < 8)
+                    if (info.block < lightThreshold)
                     {
                         BlockPos pos = info.pos;
-                        renderLightLevelCross(info, pos.getX() - dx, pos.getY() - dy, pos.getZ() - dz, buffer);
+                        Color4f color = info.sky >= lightThreshold ? colorLit : colorDark;
+                        renderLightLevelSquare(pos.getX() - dx, pos.getY() - dy, pos.getZ() - dz, color, offset1, offset2, buffer);
+                    }
+                }
+
+                tessellator.draw();
+
+                GlStateManager.enableTexture();
+            }
+            else if (markerMode == LightLevelMarkerMode.CROSS)
+            {
+                double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
+                Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
+                Color4f colorDark = Configs.Colors.LIGHT_LEVEL_MARKER_DARK.getColor();
+                double offset1 = (1.0 - markerSize) / 2.0;
+                double offset2 = (1.0 - offset1);
+
+                GlStateManager.disableTexture();
+
+                buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+
+                for (int i = 0; i < count; ++i)
+                {
+                    LightLevelInfo info = LIGHT_INFOS.get(i);
+
+                    if (info.block < lightThreshold)
+                    {
+                        BlockPos pos = info.pos;
+                        Color4f color = info.sky >= lightThreshold ? colorLit : colorDark;
+                        renderLightLevelCross(pos.getX() - dx, pos.getY() - dy, pos.getZ() - dz, color, offset1, offset2, buffer);
                     }
                 }
 
@@ -127,10 +172,48 @@ public class OverlayRendererLightLevel
         }
     }
 
-    private static void renderLightLevelTexture(LightLevelInfo info, double x, double y, double z, BufferBuilder buffer)
+    private static void renderLightLevelNumbers(double dx, double dy, double dz, int lightThreshold, LightLevelNumberMode numberMode,
+            @Nullable Color4f colorLit, @Nullable Color4f colorDark, BufferBuilder buffer)
     {
-        double u = (info.block & 0x3) * 0.25;
-        double v = (info.block >> 2) * 0.25;
+        final int count = LIGHT_INFOS.size();
+
+        if (colorLit != null)
+        {
+            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV_COLOR);
+
+            for (int i = 0; i < count; ++i)
+            {
+                LightLevelInfo info = LIGHT_INFOS.get(i);
+                BlockPos pos = info.pos;
+                double x = pos.getX() - dx;
+                double z = pos.getZ() - dz;
+                int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
+                Color4f color = lightLevel >= lightThreshold ? colorLit : colorDark;
+
+                renderLightLevelTextureColor(x, pos.getY() - dy, z, lightLevel, color, buffer);
+            }
+        }
+        else
+        {
+            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV);
+
+            for (int i = 0; i < count; ++i)
+            {
+                LightLevelInfo info = LIGHT_INFOS.get(i);
+                BlockPos pos = info.pos;
+                double x = pos.getX() - dx;
+                double z = pos.getZ() - dz;
+                int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
+
+                renderLightLevelTexture(x, pos.getY() - dy, z, lightLevel, buffer);
+            }
+        }
+    }
+
+    private static void renderLightLevelTexture(double x, double y, double z, int lightLevel, BufferBuilder buffer)
+    {
+        double u = (lightLevel & 0x3) * 0.25;
+        double v = (lightLevel >> 2) * 0.25;
         y += 0.005;
 
         buffer.vertex(x    , y, z    ).texture(u       , v       ).next();
@@ -139,56 +222,44 @@ public class OverlayRendererLightLevel
         buffer.vertex(x + 1, y, z    ).texture(u + 0.25, v       ).next();
     }
 
-    private static void renderLightLevelTextureColor(LightLevelInfo info, double x, double y, double z, BufferBuilder buffer)
+    private static void renderLightLevelTextureColor(double x, double y, double z, int lightLevel, Color4f color, BufferBuilder buffer)
     {
-        double u = (info.block & 0x3) * 0.25;
-        double v = (info.block >> 2) * 0.25;
-        float r, g, b;
+        double u = (lightLevel & 0x3) * 0.25;
+        double v = (lightLevel >> 2) * 0.25;
         y += 0.005;
 
-        if (info.block >= 8)
-        {
-            r = 0x20 / 255f;
-            g = 0x70 / 255f;
-            b = 0x40 / 255f;
-        }
-        else
-        {
-            r = 0xC0 / 255f;
-            g = 0x30 / 255f;
-            b = 0x30 / 255f;
-        }
-
-        buffer.vertex(x    , y, z    ).texture(u       , v       ).color(r, g, b, 1f).next();
-        buffer.vertex(x    , y, z + 1).texture(u       , v + 0.25).color(r, g, b, 1f).next();
-        buffer.vertex(x + 1, y, z + 1).texture(u + 0.25, v + 0.25).color(r, g, b, 1f).next();
-        buffer.vertex(x + 1, y, z    ).texture(u + 0.25, v       ).color(r, g, b, 1f).next();
+        buffer.vertex(x    , y, z    ).texture(u       , v       ).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x    , y, z + 1).texture(u       , v + 0.25).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + 1, y, z + 1).texture(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + 1, y, z    ).texture(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).next();
     }
 
-    private static void renderLightLevelCross(LightLevelInfo info, double x, double y, double z, BufferBuilder buffer)
+    private static void renderLightLevelCross(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
     {
-        float r, g, b;
-
         y += 0.005;
 
-        if (info.sky >= 8)
-        {
-            r = 1f;
-            g = 1f;
-            b = 0.2f;
-        }
-        else
-        {
-            r = 1f;
-            g = 0.3f;
-            b = 0.3f;
-        }
+        buffer.vertex(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
 
-        buffer.vertex(x    , y, z    ).color(r, g, b, 1f).next();
-        buffer.vertex(x + 1, y, z + 1).color(r, g, b, 1f).next();
+        buffer.vertex(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
+    }
 
-        buffer.vertex(x    , y, z + 1).color(r, g, b, 1f).next();
-        buffer.vertex(x + 1, y, z    ).color(r, g, b, 1f).next();
+    private static void renderLightLevelSquare(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
+    {
+        y += 0.005;
+
+        buffer.vertex(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
+
+        buffer.vertex(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
+
+        buffer.vertex(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
+
+        buffer.vertex(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
     }
 
     private static void updateLightLevels(World world, BlockPos center)

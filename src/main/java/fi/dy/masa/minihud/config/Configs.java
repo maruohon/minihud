@@ -23,6 +23,8 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.event.RenderHandler;
 import fi.dy.masa.minihud.util.BlockGridMode;
+import fi.dy.masa.minihud.util.LightLevelMarkerMode;
+import fi.dy.masa.minihud.util.LightLevelNumberMode;
 
 public class Configs implements IConfigHandler
 {
@@ -39,10 +41,17 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       DEBUG_RENDERER_PATH_MAX_DIST        = new ConfigBoolean("debugRendererPathFindingEnablePointWidth", true, "If true, then the vanilla pathfinding debug renderer\nwill render the path point width boxes.");
         public static final ConfigBoolean       ENABLED                             = new ConfigBoolean("enabled", true, "If true, the HUD will be rendered");
         public static final ConfigBoolean       FIX_VANILLA_DEBUG_RENDERERS         = new ConfigBoolean("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed.");
-        public static final ConfigDouble        FONT_SCALE                          = new ConfigDouble("fontScale", 0.5, "Font scale factor. Valid range: 0.0 - 10.0. Default: 0.5\n");
+        public static final ConfigDouble        FONT_SCALE                          = new ConfigDouble("fontScale", 0.5, 0.0, 100.0, "Font scale factor. Default: 0.5\n");
         public static final ConfigOptionList    HUD_ALIGNMENT                       = new ConfigOptionList("hudAlignment", HudAlignment.TOP_LEFT, "The alignment of the HUD.");
         public static final ConfigBoolean       LIGHT_LEVEL_COLORED_NUMBERS         = new ConfigBoolean("lightLevelColoredNumbers", true, "Whether to use colored or white numbers\nfor the Light Level overlay numbers");
-        public static final ConfigBoolean       LIGHT_LEVEL_NUMBERS                 = new ConfigBoolean("lightLevelNumbers", true, "Whether to render the Light Level overlay\nusing the light level numbers, or just\nthe traditional yellow or red crosses");
+        public static final ConfigOptionList    LIGHT_LEVEL_MARKER_MODE             = new ConfigOptionList("lightLevelMarkers", LightLevelMarkerMode.SQUARE, "Which type of colored marker to use in the\nLight Level overlay, if any");
+        public static final ConfigDouble        LIGHT_LEVEL_MARKER_SIZE             = new ConfigDouble("lightLevelMarkerSize", 0.84, 0.0, 1.0, "The size of the light level colored marker.\nRange: 0.0 - 1.0");
+        public static final ConfigOptionList    LIGHT_LEVEL_NUMBER_MODE             = new ConfigOptionList("lightLevelNumbers", LightLevelNumberMode.BLOCK, "Which light level number(s) to render in the Light Level overlay");
+        public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X   = new ConfigDouble("lightLevelNumberOffsetBlockX", 0.09, 0.0, 1.0, "The relative \"x\" offset for the block light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y   = new ConfigDouble("lightLevelNumberOffsetBlockY", 0.12, 0.0, 1.0, "The relative \"y\" offset for the block light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_SKY_X     = new ConfigDouble("lightLevelNumberOffsetSkyX", 0.42, 0.0, 1.0, "The relative \"x\" offset for the sky light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y     = new ConfigDouble("lightLevelNumberOffsetSkyY", 0.56, 0.0, 1.0, "The relative \"y\" offset for the sky light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigInteger       LIGHT_LEVEL_THRESHOLD               = new ConfigInteger("lightLevelThreshold", 8, 0, 15, "The light level threshold which is considered safe");
         public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "H,C", "A hotkey to open the in-game Config GUI");
         public static final ConfigBoolean       REQUIRE_SNEAK                       = new ConfigBoolean("requireSneak", false, "Require the player to be sneaking to render the HUD");
         public static final ConfigHotkey        REQUIRED_KEY                        = new ConfigHotkey("requiredKey", "", KeybindSettings.MODIFIER_INGAME, "Require holding this key to render the HUD");
@@ -64,7 +73,6 @@ public class Configs implements IConfigHandler
                 DEBUG_RENDERER_PATH_MAX_DIST,
                 FIX_VANILLA_DEBUG_RENDERERS,
                 LIGHT_LEVEL_COLORED_NUMBERS,
-                LIGHT_LEVEL_NUMBERS,
                 REQUIRE_SNEAK,
                 SORT_LINES_BY_LENGTH,
                 SORT_LINES_REVERSED,
@@ -76,6 +84,8 @@ public class Configs implements IConfigHandler
                 REQUIRED_KEY,
                 OPEN_CONFIG_GUI,
                 BLOCK_GRID_OVERLAY_MODE,
+                LIGHT_LEVEL_MARKER_MODE,
+                LIGHT_LEVEL_NUMBER_MODE,
                 HUD_ALIGNMENT,
 
                 BLOCK_GRID_OVERLAY_RADIUS,
@@ -83,6 +93,12 @@ public class Configs implements IConfigHandler
                 DATE_FORMAT_REAL,
                 DATE_FORMAT_MINECRAFT,
                 FONT_SCALE,
+                LIGHT_LEVEL_MARKER_SIZE,
+                LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X,
+                LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y,
+                LIGHT_LEVEL_NUMBER_OFFSET_SKY_X,
+                LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
+                LIGHT_LEVEL_THRESHOLD,
                 SLIME_CHUNK_OVERLAY_RADIUS,
                 SPAWNABLE_COLUMNS_OVERLAY_RADIUS,
                 SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL,
@@ -95,6 +111,12 @@ public class Configs implements IConfigHandler
     public static class Colors
     {
         public static final ConfigColor BLOCK_GRID_OVERLAY_COLOR            = new ConfigColor("blockGridOverlayColor", "0x80FFFFFF", "Color for the block grid overlay");
+        public static final ConfigColor LIGHT_LEVEL_MARKER_DARK             = new ConfigColor("lightLevelMarkerDark", "0xFFFF4848", "The color for the spawnable spots marker");
+        public static final ConfigColor LIGHT_LEVEL_MARKER_LIT              = new ConfigColor("lightLevelMarkerLit", "0xFFFFFF33", "The color for the safe (during day) spots marker");
+        public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_DARK       = new ConfigColor("lightLevelNumberBlockDark", "0xFFC03030", "The color for the spawnable spots number of the block light value");
+        public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_LIT        = new ConfigColor("lightLevelNumberBlockLit", "0xFF209040", "The color for the safe spots number of the block light value");
+        public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_DARK         = new ConfigColor("lightLevelNumberSkyDark", "0xFFFFF030", "The color for the spawnable spots number of the sky light value");
+        public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_LIT          = new ConfigColor("lightLevelNumberSkyLit", "0xFF40E0FF", "The color for the safe spots number of the sky light value");
         public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR    = new ConfigColor("randomTicksFixedOverlayColor", "0xFFF9F225", "Color for the fixed-point random ticked chunks overlay");
         public static final ConfigColor RANDOM_TICKS_PLAYER_OVERLAY_COLOR   = new ConfigColor("randomTicksPlayerOverlayColor", "0xFF30FE73", "Color for the player-following random ticked chunks overlay");
         public static final ConfigColor REGION_OVERLAY_COLOR                = new ConfigColor("regionOverlayColor", "0xFFFF8019", "Color for the region file overlay");
@@ -112,6 +134,12 @@ public class Configs implements IConfigHandler
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
                 BLOCK_GRID_OVERLAY_COLOR,
+                LIGHT_LEVEL_MARKER_DARK,
+                LIGHT_LEVEL_MARKER_LIT,
+                LIGHT_LEVEL_NUMBER_BLOCK_DARK,
+                LIGHT_LEVEL_NUMBER_BLOCK_LIT,
+                LIGHT_LEVEL_NUMBER_SKY_DARK,
+                LIGHT_LEVEL_NUMBER_SKY_LIT,
                 RANDOM_TICKS_FIXED_OVERLAY_COLOR,
                 RANDOM_TICKS_PLAYER_OVERLAY_COLOR,
                 REGION_OVERLAY_COLOR,

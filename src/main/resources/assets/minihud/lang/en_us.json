@@ -16,6 +16,15 @@
     "minihud.hotkeys.category.info_toggle_hotkeys": "Info Toggle hotkeys",
     "minihud.hotkeys.category.renderer_toggle_hotkeys": "Renderer Toggle hotkeys",
 
+    "minihud.label.light_level_marker_mode.cross": "Cross",
+    "minihud.label.light_level_marker_mode.none": "None",
+    "minihud.label.light_level_marker_mode.square": "Square",
+
+    "minihud.label.light_level_number_mode.none": "None",
+    "minihud.label.light_level_number_mode.block": "Block",
+    "minihud.label.light_level_number_mode.both": "Both",
+    "minihud.label.light_level_number_mode.sky": "Sky",
+
     "minihud.message.toggled_debug_mode.collisions": "Toggled Collison Boxes debug rendering to %s",
     "minihud.message.toggled_debug_mode.height_map": "Toggled Height Map debug rendering to %s",
     "minihud.message.toggled_debug_mode.neighbor_updates": "Toggled Neighbor Update debug rendering to %s",
