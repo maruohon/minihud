@@ -33,6 +33,15 @@ minihud.label.blockgridmode.all=All
 minihud.label.blockgridmode.non_air=Non-air
 minihud.label.blockgridmode.adjacent=Adjacent to non-air
 
+minihud.label.light_level_marker_mode.cross=Cross
+minihud.label.light_level_marker_mode.none=None
+minihud.label.light_level_marker_mode.square=Square
+
+minihud.label.light_level_number_mode.none=None
+minihud.label.light_level_number_mode.block=Block
+minihud.label.light_level_number_mode.both=Both
+minihud.label.light_level_number_mode.sky=Sky
+
 minihud.label.shapes.despawn_sphere=Despawn Sphere
 
 minihud.hotkeys.category.generic_hotkeys=Generic hotkeys
