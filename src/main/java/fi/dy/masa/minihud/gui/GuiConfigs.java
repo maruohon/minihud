@@ -59,8 +59,14 @@ public class GuiConfigs extends GuiConfigsBase
             x += this.createButton(x, y, width, tab);
         }
 
-        this.setListPosition(this.getListX(), 50 + (rows - 1) * 22);
-        this.reCreateListWidget();
+        if (rows > 1)
+        {
+            int scrollbarPosition = this.getListWidget().getScrollbar().getValue();
+            this.setListPosition(this.getListX(), 50 + (rows - 1) * 22);
+            this.reCreateListWidget();
+            this.getListWidget().getScrollbar().setValue(scrollbarPosition);
+            this.getListWidget().refreshEntries();
+        }
     }
 
     private int createButton(int x, int y, int width, ConfigGuiTab tab)
