@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
@@ -70,6 +71,7 @@ public class OverlayRendererLightLevel
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();
+            EnumFacing numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? mc.player.getHorizontalFacing() : EnumFacing.NORTH;
             LightLevelNumberMode numberMode = (LightLevelNumberMode) Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getOptionListValue();
             LightLevelMarkerMode markerMode = (LightLevelMarkerMode) Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
             boolean useColoredNumbers = Configs.Generic.LIGHT_LEVEL_COLORED_NUMBERS.getBooleanValue();
@@ -77,9 +79,19 @@ public class OverlayRendererLightLevel
 
             if (numberMode == LightLevelNumberMode.BLOCK || numberMode == LightLevelNumberMode.BOTH)
             {
-                double tmpX = dx - Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X.getDoubleValue();
-                double tmpZ = dz - Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y.getDoubleValue();
+                double ox = Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X.getDoubleValue();
+                double oz = Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y.getDoubleValue();
+                double tmpX, tmpZ;
                 Color4f colorLit = null, colorDark = null;
+
+                switch (numberFacing)
+                {
+                    case NORTH: tmpX = dx - ox; tmpZ = dz - oz; break;
+                    case SOUTH: tmpX = dx + ox; tmpZ = dz + oz; break;
+                    case WEST:  tmpX = dx - oz; tmpZ = dz + ox; break;
+                    case EAST:  tmpX = dx + oz; tmpZ = dz - ox; break;
+                    default:    tmpX = dx - ox; tmpZ = dz - oz; break;
+                }
 
                 if (useColoredNumbers)
                 {
@@ -87,15 +99,25 @@ public class OverlayRendererLightLevel
                     colorDark = Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_DARK.getColor();
                 }
 
-                renderLightLevelNumbers(tmpX, dy, tmpZ, lightThreshold, LightLevelNumberMode.BLOCK, colorLit, colorDark, buffer);
+                renderLightLevelNumbers(tmpX, dy, tmpZ, numberFacing, lightThreshold, LightLevelNumberMode.BLOCK, colorLit, colorDark, buffer);
                 tessellator.draw();
             }
 
             if (numberMode == LightLevelNumberMode.SKY || numberMode == LightLevelNumberMode.BOTH)
             {
-                double tmpX = dx - Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_X.getDoubleValue();
-                double tmpZ = dz - Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y.getDoubleValue();
+                double ox = Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_X.getDoubleValue();
+                double oz = Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y.getDoubleValue();
+                double tmpX, tmpZ;
                 Color4f colorLit = null, colorDark = null;
+
+                switch (numberFacing)
+                {
+                    case NORTH: tmpX = dx - ox; tmpZ = dz - oz; break;
+                    case SOUTH: tmpX = dx + ox; tmpZ = dz + oz; break;
+                    case WEST:  tmpX = dx - oz; tmpZ = dz + ox; break;
+                    case EAST:  tmpX = dx + oz; tmpZ = dz - ox; break;
+                    default:    tmpX = dx - ox; tmpZ = dz - oz; break;
+                }
 
                 if (useColoredNumbers)
                 {
@@ -103,7 +125,7 @@ public class OverlayRendererLightLevel
                     colorDark = Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_DARK.getColor();
                 }
 
-                renderLightLevelNumbers(tmpX, dy, tmpZ, lightThreshold, LightLevelNumberMode.SKY, colorLit, colorDark, buffer);
+                renderLightLevelNumbers(tmpX, dy, tmpZ, numberFacing, lightThreshold, LightLevelNumberMode.SKY, colorLit, colorDark, buffer);
                 tessellator.draw();
             }
 
@@ -169,7 +191,8 @@ public class OverlayRendererLightLevel
         }
     }
 
-    private static void renderLightLevelNumbers(double dx, double dy, double dz, int lightThreshold, LightLevelNumberMode numberMode,
+    private static void renderLightLevelNumbers(double dx, double dy, double dz, EnumFacing facing,
+            int lightThreshold, LightLevelNumberMode numberMode,
             @Nullable Color4f colorLit, @Nullable Color4f colorDark, BufferBuilder buffer)
     {
         final int count = LIGHT_INFOS.size();
@@ -187,7 +210,7 @@ public class OverlayRendererLightLevel
                 int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
                 Color4f color = lightLevel >= lightThreshold ? colorLit : colorDark;
 
-                renderLightLevelTextureColor(x, pos.getY() - dy, z, lightLevel, color, buffer);
+                renderLightLevelTextureColor(x, pos.getY() - dy, z, facing, lightLevel, color, buffer);
             }
         }
         else
@@ -202,33 +225,90 @@ public class OverlayRendererLightLevel
                 double z = pos.getZ() - dz;
                 int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
 
-                renderLightLevelTexture(x, pos.getY() - dy, z, lightLevel, buffer);
+                renderLightLevelTexture(x, pos.getY() - dy, z, facing, lightLevel, buffer);
             }
         }
     }
 
-    private static void renderLightLevelTexture(double x, double y, double z, int lightLevel, BufferBuilder buffer)
+    private static void renderLightLevelTexture(double x, double y, double z, EnumFacing facing, int lightLevel, BufferBuilder buffer)
     {
         double u = (lightLevel & 0x3) * 0.25;
         double v = (lightLevel >> 2) * 0.25;
+
         y += 0.005;
 
-        buffer.pos(x    , y, z    ).tex(u       , v       ).endVertex();
-        buffer.pos(x    , y, z + 1).tex(u       , v + 0.25).endVertex();
-        buffer.pos(x + 1, y, z + 1).tex(u + 0.25, v + 0.25).endVertex();
-        buffer.pos(x + 1, y, z    ).tex(u + 0.25, v       ).endVertex();
+        switch (facing)
+        {
+            case NORTH:
+                buffer.pos(x    , y, z    ).tex(u       , v       ).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u       , v + 0.25).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u + 0.25, v + 0.25).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u + 0.25, v       ).endVertex();
+                break;
+
+            case SOUTH:
+                buffer.pos(x + 1, y, z + 1).tex(u       , v       ).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u       , v + 0.25).endVertex();
+                buffer.pos(x    , y, z    ).tex(u + 0.25, v + 0.25).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u + 0.25, v       ).endVertex();
+                break;
+
+            case EAST:
+                buffer.pos(x + 1, y, z    ).tex(u       , v       ).endVertex();
+                buffer.pos(x    , y, z    ).tex(u       , v + 0.25).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u + 0.25, v + 0.25).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u + 0.25, v       ).endVertex();
+                break;
+
+            case WEST:
+                buffer.pos(x    , y, z + 1).tex(u       , v       ).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u       , v + 0.25).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u + 0.25, v + 0.25).endVertex();
+                buffer.pos(x    , y, z    ).tex(u + 0.25, v       ).endVertex();
+                break;
+
+            default:
+        }
     }
 
-    private static void renderLightLevelTextureColor(double x, double y, double z, int lightLevel, Color4f color, BufferBuilder buffer)
+    private static void renderLightLevelTextureColor(double x, double y, double z, EnumFacing facing, int lightLevel, Color4f color, BufferBuilder buffer)
     {
         double u = (lightLevel & 0x3) * 0.25;
         double v = (lightLevel >> 2) * 0.25;
         y += 0.005;
 
-        buffer.pos(x    , y, z    ).tex(u       , v       ).color(color.r, color.g, color.b, color.a).endVertex();
-        buffer.pos(x    , y, z + 1).tex(u       , v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
-        buffer.pos(x + 1, y, z + 1).tex(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
-        buffer.pos(x + 1, y, z    ).tex(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).endVertex();
+        switch (facing)
+        {
+            case NORTH:
+                buffer.pos(x    , y, z    ).tex(u       , v       ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u       , v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+
+            case SOUTH:
+                buffer.pos(x + 1, y, z + 1).tex(u       , v       ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u       , v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z    ).tex(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+
+            case EAST:
+                buffer.pos(x + 1, y, z    ).tex(u       , v       ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z    ).tex(u       , v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+
+            case WEST:
+                buffer.pos(x    , y, z + 1).tex(u       , v       ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u       , v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z    ).tex(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+
+            default:
+        }
     }
 
     private static void renderLightLevelCross(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
@@ -263,7 +343,7 @@ public class OverlayRendererLightLevel
     {
         LIGHT_INFOS.clear();
 
-        int radius = 24;
+        int radius = Configs.Generic.LIGHT_LEVEL_RANGE.getIntegerValue();
         final int minX = center.getX() - radius;
         final int minY = center.getY() - radius;
         final int minZ = center.getZ() - radius;

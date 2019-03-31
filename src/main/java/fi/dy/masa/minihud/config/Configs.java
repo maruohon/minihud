@@ -56,6 +56,8 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y   = new ConfigDouble("lightLevelNumberOffsetBlockY", 0.12, 0.0, 1.0, "The relative \"y\" offset for the block light level number.\nRange: 0.0 - 1.0");
         public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_SKY_X     = new ConfigDouble("lightLevelNumberOffsetSkyX", 0.42, 0.0, 1.0, "The relative \"x\" offset for the sky light level number.\nRange: 0.0 - 1.0");
         public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y     = new ConfigDouble("lightLevelNumberOffsetSkyY", 0.56, 0.0, 1.0, "The relative \"y\" offset for the sky light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigBoolean       LIGHT_LEVEL_NUMBER_ROTATION         = new ConfigBoolean("lightLevelNumberRotation", true, "If true, then the light level numbers will rotate\naccording to the player's current facing");
+        public static final ConfigInteger       LIGHT_LEVEL_RANGE                   = new ConfigInteger("lightLevelRange", 24, 1, 64, "The block range to render the Light Level overlay in");
         public static final ConfigInteger       LIGHT_LEVEL_THRESHOLD               = new ConfigInteger("lightLevelThreshold", 8, 0, 15, "The light level threshold which is considered safe");
         public static final ConfigBoolean       MAP_PREVIEW                         = new ConfigBoolean("mapPreview", false, "Enables rendering a preview of the map,\nwhen you hold shift while hovering over a map item");
         public static final ConfigInteger       MAP_PREVIEW_SIZE                    = new ConfigInteger("mapPreviewSize", 160, 16, 512, "The size of the rendered map previews");
@@ -86,6 +88,7 @@ public class Configs implements IConfigHandler
                 DONT_RESET_SEED_ON_DIMENSION_CHANGE,
                 FIX_VANILLA_DEBUG_RENDERERS,
                 LIGHT_LEVEL_COLORED_NUMBERS,
+                LIGHT_LEVEL_NUMBER_ROTATION,
                 MAP_PREVIEW,
                 REQUIRE_SNEAK,
                 SHULKER_BOX_PREVIEW,
@@ -118,6 +121,7 @@ public class Configs implements IConfigHandler
                 LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y,
                 LIGHT_LEVEL_NUMBER_OFFSET_SKY_X,
                 LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
+                LIGHT_LEVEL_RANGE,
                 LIGHT_LEVEL_THRESHOLD,
                 MAP_PREVIEW_SIZE,
                 SLIME_CHUNK_OVERLAY_RADIUS,
