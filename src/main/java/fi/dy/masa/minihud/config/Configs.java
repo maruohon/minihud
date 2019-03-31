@@ -51,6 +51,8 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y   = new ConfigDouble("lightLevelNumberOffsetBlockY", 0.12, 0.0, 1.0, "The relative \"y\" offset for the block light level number.\nRange: 0.0 - 1.0");
         public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_SKY_X     = new ConfigDouble("lightLevelNumberOffsetSkyX", 0.42, 0.0, 1.0, "The relative \"x\" offset for the sky light level number.\nRange: 0.0 - 1.0");
         public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y     = new ConfigDouble("lightLevelNumberOffsetSkyY", 0.56, 0.0, 1.0, "The relative \"y\" offset for the sky light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigBoolean       LIGHT_LEVEL_NUMBER_ROTATION         = new ConfigBoolean("lightLevelNumberRotation", true, "If true, then the light level numbers will rotate\naccording to the player's current facing");
+        public static final ConfigInteger       LIGHT_LEVEL_RANGE                   = new ConfigInteger("lightLevelRange", 24, 1, 64, "The block range to render the Light Level overlay in");
         public static final ConfigInteger       LIGHT_LEVEL_THRESHOLD               = new ConfigInteger("lightLevelThreshold", 8, 0, 15, "The light level threshold which is considered safe");
         public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "H,C", "A hotkey to open the in-game Config GUI");
         public static final ConfigBoolean       REQUIRE_SNEAK                       = new ConfigBoolean("requireSneak", false, "Require the player to be sneaking to render the HUD");
@@ -73,6 +75,7 @@ public class Configs implements IConfigHandler
                 DEBUG_RENDERER_PATH_MAX_DIST,
                 FIX_VANILLA_DEBUG_RENDERERS,
                 LIGHT_LEVEL_COLORED_NUMBERS,
+                LIGHT_LEVEL_NUMBER_ROTATION,
                 REQUIRE_SNEAK,
                 SORT_LINES_BY_LENGTH,
                 SORT_LINES_REVERSED,
@@ -98,6 +101,7 @@ public class Configs implements IConfigHandler
                 LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y,
                 LIGHT_LEVEL_NUMBER_OFFSET_SKY_X,
                 LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
+                LIGHT_LEVEL_RANGE,
                 LIGHT_LEVEL_THRESHOLD,
                 SLIME_CHUNK_OVERLAY_RADIUS,
                 SPAWNABLE_COLUMNS_OVERLAY_RADIUS,
