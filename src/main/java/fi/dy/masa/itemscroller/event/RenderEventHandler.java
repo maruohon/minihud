@@ -82,6 +82,7 @@ public class RenderEventHandler
             }
 
             GlStateManager.popMatrix();
+            GlStateManager.enableBlend(); // Fixes the crafting book icon rendering
         }
     }
 
