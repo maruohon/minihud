@@ -9,7 +9,8 @@
         "MixinEntityRenderer",
         "IMixinSlot",
         "MixinContainer",
-        "MixinGuiScreen"
+        "MixinGuiScreen",
+        "MixinInventoryEffectRenderer"
     ],
     "injectors": {
         "defaultRequire": 1
