@@ -3,6 +3,7 @@ package fi.dy.masa.itemscroller.event;
 import fi.dy.masa.itemscroller.LiteModItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Hotkeys;
+import fi.dy.masa.itemscroller.gui.GuiConfigs;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
@@ -76,6 +77,11 @@ public class KeybindCallbacks implements IHotkeyCallback
                 mc.player.playSound(SoundEvents.BLOCK_NOTE_PLING, 0.5f, 1.0f);
             }
 
+            return true;
+        }
+        else if (key == Hotkeys.KEY_OPEN_CONFIG_GUI.getKeybind())
+        {
+            mc.displayGuiScreen(new GuiConfigs());
             return true;
         }
 

@@ -12,6 +12,8 @@ public class Hotkeys
     private static final KeybindSettings GUI_RELAXED_CANCEL = KeybindSettings.create(KeybindSettings.Context.GUI, KeyAction.PRESS, true, false, false, true);
     private static final KeybindSettings GUI_NO_ORDER = KeybindSettings.create(KeybindSettings.Context.GUI, KeyAction.PRESS, false, false, false, true);
 
+    public static final ConfigHotkey KEY_OPEN_CONFIG_GUI        = new ConfigHotkey("openConfigGui",      "I,C", "Open the in-game config GUI");
+
     public static final ConfigHotkey KEY_CRAFT_EVERYTHING       = new ConfigHotkey("craftEverything",    "LCONTROL,C", GUI_NO_ORDER, "Craft everything possible once with the currently selected recipe");
     public static final ConfigHotkey KEY_DROP_ALL_MATCHING      = new ConfigHotkey("dropAllMatching",    "LCONTROL,LSHIFT,Q", GUI_NO_ORDER, "Drop all stacks identical to the hovered stack");
     public static final ConfigHotkey KEY_MAIN_TOGGLE            = new ConfigHotkey("mainToggle",         "LCONTROL,S", KeybindSettings.GUI, "Toggle all functionality ON/OFF");
@@ -48,6 +50,8 @@ public class Hotkeys
     public static final ConfigHotkey MODIFIER_MOVE_STACK        = new ConfigHotkey("modifierMoveStack",      "LSHIFT", GUI_NO_ORDER, "Modifier key to move the entire stack to the other\ninventory when scrolling over it");
 
     public static final List<ConfigHotkey> HOTKEY_LIST = ImmutableList.of(
+            KEY_OPEN_CONFIG_GUI,
+
             MODIFIER_MOVE_EVERYTHING,
             MODIFIER_MOVE_MATCHING,
             MODIFIER_MOVE_STACK,
