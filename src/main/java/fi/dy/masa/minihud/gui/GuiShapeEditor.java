@@ -71,6 +71,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         y += 12;
 
         GuiTextFieldGeneric textField = new GuiTextFieldGeneric(x, y, 70, 17, this.mc.fontRenderer);
+        textField.setMaxStringLength(12);
         textField.setText(String.format("#%08X", this.shape.getColor().intValue));
         this.addTextField(textField, new TextFieldListenerColor(this.shape));
         this.nextY = y + 20;
