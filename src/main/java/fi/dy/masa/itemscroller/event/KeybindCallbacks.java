@@ -150,6 +150,11 @@ public class KeybindCallbacks implements IHotkeyCallback
                 return true;
             }
         }
+        else if (key == Hotkeys.KEY_VILLAGER_TRADE_FAVORITES.getKeybind())
+        {
+            InventoryUtils.villagerTradeEverythingPossibleWithAllFavoritedTrades();
+            return true;
+        }
         else if (key == Hotkeys.KEY_SLOT_DEBUG.getKeybind())
         {
             if (slot != null)

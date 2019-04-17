@@ -24,6 +24,7 @@ public class Hotkeys
     public static final ConfigHotkey KEY_SLOT_DEBUG             = new ConfigHotkey("slotDebug",          "LCONTROL,LMENU,LSHIFT,I", GUI_NO_ORDER, "Print debug info for the hovered slot or GUI");
     public static final ConfigHotkey KEY_STORE_RECIPE           = new ConfigHotkey("storeRecipe",        "BUTTON2", GUI_RELAXED_CANCEL, "Store a recipe while hovering over a crafting output item");
     public static final ConfigHotkey KEY_THROW_CRAFT_RESULTS    = new ConfigHotkey("throwCraftResults",  "LCONTROL,T", GUI_NO_ORDER, "Throw all of the currently selected recipe's\noutput items to the ground from the player inventory");
+    public static final ConfigHotkey KEY_VILLAGER_TRADE_FAVORITES = new ConfigHotkey("villagerTradeFavorites",  "", KeybindSettings.GUI, "Trade everything possible with all the favorited trades\nof the current villager");
 
     public static final ConfigHotkey KEY_DRAG_LEAVE_ONE         = new ConfigHotkey("keyDragMoveLeaveOne", "LSHIFT,BUTTON1", GUI_NO_ORDER, "Key to move all but the last item from\nall the stacks dragged over");
     public static final ConfigHotkey KEY_DRAG_MATCHING          = new ConfigHotkey("keyDragMoveMatching", "LMENU,BUTTON0", GUI_NO_ORDER, "Key to move all matching items dragged over");
@@ -77,6 +78,7 @@ public class Hotkeys
             KEY_SLOT_DEBUG,
             KEY_STORE_RECIPE,
             KEY_THROW_CRAFT_RESULTS,
+            KEY_VILLAGER_TRADE_FAVORITES,
 
             KEY_WS_MOVE_DOWN_LEAVE_ONE,
             KEY_WS_MOVE_DOWN_MATCHING,

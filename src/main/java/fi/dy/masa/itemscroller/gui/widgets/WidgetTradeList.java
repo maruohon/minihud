@@ -15,7 +15,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.inventory.Slot;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 
@@ -93,23 +92,18 @@ public class WidgetTradeList extends WidgetBase
                     boolean samePage = AccessorUtils.getSelectedMerchantRecipe(this.parentGui) == recipeIndex;
                     InputHandler.changeTradePage(this.parentGui, recipeIndex);
 
-                    if (GuiScreen.isShiftKeyDown() || samePage)
+                    if (GuiScreen.isShiftKeyDown() || samePage || mouseButton == 1)
                     {
-                        Slot slot = this.parentGui.inventorySlots.getSlot(0);
+                        InventoryUtils.villagerClearTradeInputSlots();
 
-                        if (slot.getHasStack())
+                        if (mouseButton == 1)
                         {
-                            InventoryUtils.shiftClickSlot(this.parentGui, slot.slotNumber);
+                            InventoryUtils.villagerTradeEverythingPossibleWithCurrentRecipe();
                         }
-
-                        slot = this.parentGui.inventorySlots.getSlot(1);
-
-                        if (slot.getHasStack())
+                        else
                         {
-                            InventoryUtils.shiftClickSlot(this.parentGui, slot.slotNumber);
+                            InventoryUtils.tryMoveItemsToMerchantBuySlots(this.parentGui, true);
                         }
-
-                        InventoryUtils.tryMoveItemsToMerchantBuySlots(this.parentGui, true);
                     }
                 }
             }
