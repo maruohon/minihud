@@ -7,6 +7,9 @@ import net.minecraft.client.gui.GuiMerchant;
 @Mixin(GuiMerchant.class)
 public interface IMixinGuiMerchant
 {
-    @Accessor
+    @Accessor("selectedMerchantRecipe")
     int getSelectedMerchantRecipe();
+
+    @Accessor("selectedMerchantRecipe")
+    void setSelectedMerchantRecipe(int index);
 }

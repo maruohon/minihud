@@ -9,6 +9,7 @@
         "MixinEntityRenderer",
         "IMixinSlot",
         "MixinContainer",
+        "MixinGuiMerchant",
         "MixinGuiScreen",
         "MixinInventoryEffectRenderer"
     ],

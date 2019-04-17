@@ -906,7 +906,7 @@ public class InventoryUtils
         }
     }
 
-    private static void tryMoveItemsToMerchantBuySlots(GuiMerchant gui, boolean fillStacks)
+    public static void tryMoveItemsToMerchantBuySlots(GuiMerchant gui, boolean fillStacks)
     {
         Minecraft mc = Minecraft.getMinecraft();
         MerchantRecipeList list = gui.getMerchant().getRecipes(mc.player);

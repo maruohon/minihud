@@ -1,24 +1,25 @@
 package fi.dy.masa.itemscroller.event;
 
-import java.util.List;
+import javax.annotation.Nullable;
 import fi.dy.masa.itemscroller.config.Configs;
+import fi.dy.masa.itemscroller.gui.widgets.WidgetTradeList;
 import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
 import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
+import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextFormatting;
 
 public class RenderEventHandler
 {
@@ -27,6 +28,7 @@ public class RenderEventHandler
     private static final Vec3d LIGHT1_POS = (new Vec3d(-0.2D, 1.0D,  0.7D)).normalize();
 
     private final Minecraft mc = Minecraft.getMinecraft();
+    @Nullable private WidgetTradeList widgetTradeList;
     private int recipeListX;
     private int recipeListY;
     private int recipesPerColumn;
@@ -40,6 +42,12 @@ public class RenderEventHandler
     public static RenderEventHandler instance()
     {
         return INSTANCE;
+    }
+
+    @Nullable
+    public WidgetTradeList getTradeListWidget()
+    {
+        return this.widgetTradeList;
     }
 
     public void onDrawBackgroundPost()
@@ -109,9 +117,18 @@ public class RenderEventHandler
 
                 if (InventoryUtils.isStackEmpty(stack) == false)
                 {
-                    this.renderStackToolTip(mouseX, mouseY, stack, gui);
+                    InventoryOverlay.renderStackToolTip(mouseX, mouseY, stack, this.mc);
                 }
             }
+        }
+        else if (Configs.Toggles.VILLAGER_TRADE_LIST.getBooleanValue() && this.mc.currentScreen instanceof GuiMerchant)
+        {
+            GuiMerchant gui = (GuiMerchant) this.mc.currentScreen;
+            this.renderVillagerTradeList(gui);
+        }
+        else
+        {
+            this.widgetTradeList = null;
         }
     }
 
@@ -153,7 +170,7 @@ public class RenderEventHandler
 
         if (InventoryUtils.isStackEmpty(stack) == false)
         {
-            this.renderStackToolTip(mouseX, mouseY, stack, gui);
+            InventoryOverlay.renderStackToolTip(mouseX, mouseY, stack, this.mc);
         }
     }
 
@@ -331,22 +348,22 @@ public class RenderEventHandler
         GlStateManager.glLightModel(2899, RenderHelper.setColorBuffer(ambientLightStrength, ambientLightStrength, ambientLightStrength, 1.0F));
     }
 
-    private void renderStackToolTip(int x, int y, ItemStack stack, GuiContainer gui)
+    private void renderVillagerTradeList(GuiMerchant gui)
     {
-        List<String> list = stack.getTooltip(this.mc.player, this.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
-
-        for (int i = 0; i < list.size(); ++i)
+        if (this.widgetTradeList != null)
         {
-            if (i == 0)
-            {
-                list.set(i, stack.getRarity().color + (String)list.get(i));
-            }
-            else
-            {
-                list.set(i, TextFormatting.GRAY + (String)list.get(i));
-            }
-        }
+            int mouseX = InputUtils.getMouseX();
+            int mouseY = InputUtils.getMouseY();
 
-        RenderUtils.drawHoverText(x, y, list);
+            this.widgetTradeList.render(mouseX, mouseY, false);
+        }
+    }
+
+    public void createVillagerTradeListWidget(GuiMerchant gui)
+    {
+        final int x = AccessorUtils.getGuiLeft(gui) - 106 + 4;
+        final int y = AccessorUtils.getGuiTop(gui);
+
+        this.widgetTradeList = new WidgetTradeList(x, y, gui);
     }
 }
