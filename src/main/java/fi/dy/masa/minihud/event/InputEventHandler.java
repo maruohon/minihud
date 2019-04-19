@@ -23,12 +23,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.event.world.BlockEvent.NeighborNotifyEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindFieldException;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import fi.dy.masa.minihud.MiniHud;
@@ -68,16 +67,16 @@ public class InputEventHandler
 
         try
         {
-            this.field_Minecraft_actionKeyF3                = ReflectionHelper.findField(Minecraft.class, "field_184129_aV", "actionKeyF3");
-            this.field_DebugRenderer_collisionBoxEnabled    = ReflectionHelper.findField(DebugRenderer.class, "field_191326_j", "collisionBoxEnabled");
-            this.field_DebugRenderer_heightMapEnabled       = ReflectionHelper.findField(DebugRenderer.class, "field_190082_h", "heightMapEnabled");
-            this.field_DebugRenderer_neighborsUpdateEnabled = ReflectionHelper.findField(DebugRenderer.class, "field_191558_l", "neighborsUpdateEnabled");
-            this.field_DebugRenderer_pathfindingEnabled     = ReflectionHelper.findField(DebugRenderer.class, "field_190080_f", "pathfindingEnabled");
-            this.field_DebugRenderer_solidFaceEnabled       = ReflectionHelper.findField(DebugRenderer.class, "field_193853_n", "solidFaceEnabled");
-            this.field_DebugRenderer_waterEnabled           = ReflectionHelper.findField(DebugRenderer.class, "field_190081_g", "waterEnabled");
-            this.field_PathNavigate_maxDistanceToWaypoint   = ReflectionHelper.findField(PathNavigate.class, "field_188561_o", "maxDistanceToWaypoint");
+            this.field_Minecraft_actionKeyF3                = ObfuscationReflectionHelper.findField(Minecraft.class, "field_184129_aV"); // actionKeyF3
+            this.field_DebugRenderer_collisionBoxEnabled    = ObfuscationReflectionHelper.findField(DebugRenderer.class, "field_191326_j"); // collisionBoxEnabled
+            this.field_DebugRenderer_heightMapEnabled       = ObfuscationReflectionHelper.findField(DebugRenderer.class, "field_190082_h"); // heightMapEnabled
+            this.field_DebugRenderer_neighborsUpdateEnabled = ObfuscationReflectionHelper.findField(DebugRenderer.class, "field_191558_l"); // neighborsUpdateEnabled
+            this.field_DebugRenderer_pathfindingEnabled     = ObfuscationReflectionHelper.findField(DebugRenderer.class, "field_190080_f"); // pathfindingEnabled
+            this.field_DebugRenderer_solidFaceEnabled       = ObfuscationReflectionHelper.findField(DebugRenderer.class, "field_193853_n"); // solidFaceEnabled
+            this.field_DebugRenderer_waterEnabled           = ObfuscationReflectionHelper.findField(DebugRenderer.class, "field_190081_g"); // waterEnabled
+            this.field_PathNavigate_maxDistanceToWaypoint   = ObfuscationReflectionHelper.findField(PathNavigate.class, "field_188561_o"); // maxDistanceToWaypoint
         }
-        catch (UnableToFindFieldException e)
+        catch (Exception e)
         {
             MiniHud.logger.warn("Failed to reflect DebugRenderer fields");
         }

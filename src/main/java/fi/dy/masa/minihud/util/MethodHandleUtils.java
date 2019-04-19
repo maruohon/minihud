@@ -3,7 +3,6 @@ package fi.dy.masa.minihud.util;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindMethodException;
 
 public class MethodHandleUtils
 {
@@ -38,6 +37,7 @@ public class MethodHandleUtils
         throw new UnableToFindMethodHandleException(methodNames, failed);
     }
 
+    @SuppressWarnings("deprecation")
     public static <E> Method reflectMethod(Class<? super E> clazz, String[] methodNames, Class<?>... methodTypes)
     {
         Exception failed = null;
@@ -56,6 +56,6 @@ public class MethodHandleUtils
             }
         }
 
-        throw new UnableToFindMethodException(methodNames, failed);
+        throw new net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindMethodException(failed);
     }
 }
