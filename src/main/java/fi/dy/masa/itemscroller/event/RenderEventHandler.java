@@ -3,28 +3,29 @@ package fi.dy.masa.itemscroller.event;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
+import org.lwjgl.opengl.GL11;
+import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.itemscroller.config.Configs;
-import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
+import fi.dy.masa.itemscroller.recipes.RecipePattern;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
 import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
-import net.minecraft.client.MainWindow;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.ContainerScreen;
+import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GuiLighting;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.Window;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.text.TextFormat;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
 
 public class RenderEventHandler
 {
@@ -39,11 +40,11 @@ public class RenderEventHandler
 
     public void onDrawBackgroundPost()
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
-        if (mc.currentScreen instanceof GuiContainer && InputUtils.isRecipeViewOpen())
+        if (mc.currentScreen instanceof ContainerScreen && InputUtils.isRecipeViewOpen())
         {
-            GuiContainer gui = (GuiContainer) mc.currentScreen;
+            ContainerScreen<?> gui = (ContainerScreen<?>) mc.currentScreen;
             RecipeStorage recipes = KeybindCallbacks.getInstance().getRecipes();
             final int count = recipes.getRecipeCount();
 
@@ -57,21 +58,21 @@ public class RenderEventHandler
 
     public void onDrawScreenPost()
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
-        if (mc.currentScreen instanceof GuiContainer && InputUtils.isRecipeViewOpen())
+        if (mc.currentScreen instanceof ContainerScreen && InputUtils.isRecipeViewOpen())
         {
-            GuiContainer gui = (GuiContainer) mc.currentScreen;
+            ContainerScreen<?> gui = (ContainerScreen<?>) mc.currentScreen;
             RecipeStorage recipes = KeybindCallbacks.getInstance().getRecipes();
 
-            MainWindow window = mc.mainWindow;
-            final int mouseX = (int) (mc.mouseHelper.getMouseX() * (double) window.getScaledWidth() / (double) window.getWidth());
-            final int mouseY = (int) (mc.mouseHelper.getMouseY() * (double) window.getScaledHeight() / (double) window.getHeight());
+            Window window = mc.window;
+            final int mouseX = (int) (mc.mouse.getX() * (double) window.getScaledWidth() / (double) window.getWidth());
+            final int mouseY = (int) (mc.mouse.getY() * (double) window.getScaledHeight() / (double) window.getHeight());
             final int recipeId = this.getHoveredRecipeId(mouseX, mouseY, recipes, gui, mc);
 
             if (recipeId >= 0)
             {
-                CraftingRecipe recipe = recipes.getRecipe(recipeId);
+                RecipePattern recipe = recipes.getRecipe(recipeId);
 
                 if (Configs.Generic.CRAFTING_RENDER_RECIPE_ITEMS.getBooleanValue())
                 {
@@ -82,7 +83,7 @@ public class RenderEventHandler
             }
             else if (Configs.Generic.CRAFTING_RENDER_RECIPE_ITEMS.getBooleanValue())
             {
-                CraftingRecipe recipe = recipes.getSelectedRecipe();
+                RecipePattern recipe = recipes.getSelectedRecipe();
                 this.renderRecipeItems(recipe, recipes.getRecipeCount(), gui, mc);
 
                 ItemStack stack = this.getHoveredRecipeIngredient(mouseX, mouseY, recipe, recipes.getRecipeCount(), gui, mc);
@@ -95,7 +96,7 @@ public class RenderEventHandler
         }
     }
 
-    private void renderHoverTooltip(int mouseX, int mouseY, CraftingRecipe recipe, GuiContainer gui, Minecraft mc)
+    private void renderHoverTooltip(int mouseX, int mouseY, RecipePattern recipe, ContainerScreen<?> gui, MinecraftClient mc)
     {
         ItemStack stack = recipe.getResult();
 
@@ -105,11 +106,11 @@ public class RenderEventHandler
         }
     }
 
-    public int getHoveredRecipeId(int mouseX, int mouseY, RecipeStorage recipes, GuiContainer gui, Minecraft mc)
+    public int getHoveredRecipeId(int mouseX, int mouseY, RecipeStorage recipes, ContainerScreen<?> gui, MinecraftClient mc)
     {
         if (InputUtils.isRecipeViewOpen())
         {
-            MainWindow window = mc.mainWindow;
+            Window window = mc.window;
             final int gap = 40;
             final int recipesPerColumn = 9;
             final int stackBaseHeight = 16;
@@ -138,13 +139,13 @@ public class RenderEventHandler
         return -1;
     }
 
-    private void renderStoredRecipeStack(int recipeId, int recipeCount, ItemStack stack, GuiContainer gui, Minecraft mc, boolean selected)
+    private void renderStoredRecipeStack(int recipeId, int recipeCount, ItemStack stack, ContainerScreen<?> gui, MinecraftClient mc, boolean selected)
     {
-        FontRenderer font = mc.fontRenderer;
+        TextRenderer font = mc.textRenderer;
         final String indexStr = String.valueOf(recipeId + 1);
         final int strWidth = font.getStringWidth(indexStr);
 
-        MainWindow window = mc.mainWindow;
+        Window window = mc.window;
         final int verticalGap = 40;
         final int recipesPerColumn = 9;
         final int stackBaseHeight = 16;
@@ -164,10 +165,10 @@ public class RenderEventHandler
 
         this.renderStackAt(stack, x, y, selected, scale, stackBaseHeight, mc);
 
-        font.drawString(indexStr, (int) (x - scale * strWidth), (int) (y + (entryHeight - font.FONT_HEIGHT) / 2 - 2), 0xC0C0C0);
+        font.draw(indexStr, (int) (x - scale * strWidth), (int) (y + (entryHeight - font.fontHeight) / 2 - 2), 0xC0C0C0);
     }
 
-    private void renderRecipeItems(CraftingRecipe recipe, int recipeCount, GuiContainer gui, Minecraft mc)
+    private void renderRecipeItems(RecipePattern recipe, int recipeCount, ContainerScreen<?> gui, MinecraftClient mc)
     {
         RecipeLocation location = this.getRecipeLocation(recipe, recipeCount, gui, mc);
 
@@ -184,9 +185,9 @@ public class RenderEventHandler
         }
     }
 
-    private RecipeLocation getRecipeLocation(CraftingRecipe recipe, int recipeCount, GuiContainer gui, Minecraft mc)
+    private RecipeLocation getRecipeLocation(RecipePattern recipe, int recipeCount, ContainerScreen<?> gui, MinecraftClient mc)
     {
-        MainWindow window = mc.mainWindow;
+        Window window = mc.window;
         final int verticalGap = 40;
         final int recipesPerColumn = 9;
         final int stackBaseHeight = 16;
@@ -206,7 +207,7 @@ public class RenderEventHandler
         return new RecipeLocation(x, y, scale, stackBaseHeight, recipeDimensions);
     }
 
-    private ItemStack getHoveredRecipeIngredient(int mouseX, int mouseY, CraftingRecipe recipe, int recipeCount, GuiContainer gui, Minecraft mc)
+    private ItemStack getHoveredRecipeIngredient(int mouseX, int mouseY, RecipePattern recipe, int recipeCount, ContainerScreen<?> gui, MinecraftClient mc)
     {
         RecipeLocation location = this.getRecipeLocation(recipe, recipeCount, gui, mc);
         final float stackWidth = location.scale * location.stackBaseHeight;
@@ -248,7 +249,7 @@ public class RenderEventHandler
         }
     }
 
-    private void renderStackAt(ItemStack stack, float x, float y, boolean border, float scale, int stackBaseHeight, Minecraft mc)
+    private void renderStackAt(ItemStack stack, float x, float y, boolean border, float scale, int stackBaseHeight, MinecraftClient mc)
     {
         GlStateManager.pushMatrix();
         GlStateManager.translatef(x, y, 0);
@@ -259,16 +260,16 @@ public class RenderEventHandler
         if (border)
         {
             // Draw a light/white border around the stack
-            Gui.drawRect(    0,     0, w, 1, 0xFFFFFFFF);
-            Gui.drawRect(    0,     0, 1, w, 0xFFFFFFFF);
-            Gui.drawRect(w - 1,     0, w, w, 0xFFFFFFFF);
-            Gui.drawRect(    0, w - 1, w, w, 0xFFFFFFFF);
+            DrawableHelper.fill(    0,     0, w, 1, 0xFFFFFFFF);
+            DrawableHelper.fill(    0,     0, 1, w, 0xFFFFFFFF);
+            DrawableHelper.fill(w - 1,     0, w, w, 0xFFFFFFFF);
+            DrawableHelper.fill(    0, w - 1, w, w, 0xFFFFFFFF);
 
-            Gui.drawRect(1, 1, w - 1, w - 1, 0x20FFFFFF); // light background for the item
+            DrawableHelper.fill(1, 1, w - 1, w - 1, 0x20FFFFFF); // light background for the item
         }
         else
         {
-            Gui.drawRect(0, 0, w, w, 0x20FFFFFF); // light background for the item
+            DrawableHelper.fill(0, 0, w, w, 0x20FFFFFF); // light background for the item
         }
 
         if (InventoryUtils.isStackEmpty(stack) == false)
@@ -277,14 +278,14 @@ public class RenderEventHandler
 
             stack = stack.copy();
             InventoryUtils.setStackSize(stack, 1);
-            mc.getItemRenderer().zLevel += 100;
-            mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, stack, 0, 0);
-            //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, 0, 0, null);
-            mc.getItemRenderer().zLevel -= 100;
+            mc.getItemRenderer().zOffset += 100;
+            mc.getItemRenderer().renderGuiItem(mc.player, stack, 0, 0);
+            //mc.getRenderItem().renderItemOverlayIntoGUI(mc.textRenderer, stack, 0, 0, null);
+            mc.getItemRenderer().zOffset -= 100;
         }
 
         GlStateManager.disableBlend();
-        RenderHelper.disableStandardItemLighting();
+        GuiLighting.disable();
         GlStateManager.popMatrix();
     }
 
@@ -306,56 +307,56 @@ public class RenderEventHandler
         GlStateManager.enableLight(1);
         GlStateManager.enableColorMaterial();
         GlStateManager.colorMaterial(1032, 5634);
-        GlStateManager.lightfv(16384, 4611, RenderHelper.setColorBuffer((float) LIGHT0_POS.x, (float) LIGHT0_POS.y, (float) LIGHT0_POS.z, 0.0f));
+        GlStateManager.light(16384, 4611, GuiLighting.singletonBuffer((float) LIGHT0_POS.x, (float) LIGHT0_POS.y, (float) LIGHT0_POS.z, 0.0f));
 
         float lightStrength = 0.3F * scale;
-        GlStateManager.lightfv(16384, 4609, RenderHelper.setColorBuffer(lightStrength, lightStrength, lightStrength, 1.0F));
-        GlStateManager.lightfv(16384, 4608, RenderHelper.setColorBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-        GlStateManager.lightfv(16384, 4610, RenderHelper.setColorBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-        GlStateManager.lightfv(16385, 4611, RenderHelper.setColorBuffer((float) LIGHT1_POS.x, (float) LIGHT1_POS.y, (float) LIGHT1_POS.z, 0.0f));
-        GlStateManager.lightfv(16385, 4609, RenderHelper.setColorBuffer(lightStrength, lightStrength, lightStrength, 1.0F));
-        GlStateManager.lightfv(16385, 4608, RenderHelper.setColorBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-        GlStateManager.lightfv(16385, 4610, RenderHelper.setColorBuffer(0.0F, 0.0F, 0.0F, 1.0F));
+        GlStateManager.light(16384, 4609, GuiLighting.singletonBuffer(lightStrength, lightStrength, lightStrength, 1.0F));
+        GlStateManager.light(16384, 4608, GuiLighting.singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
+        GlStateManager.light(16384, 4610, GuiLighting.singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
+        GlStateManager.light(16385, 4611, GuiLighting.singletonBuffer((float) LIGHT1_POS.x, (float) LIGHT1_POS.y, (float) LIGHT1_POS.z, 0.0f));
+        GlStateManager.light(16385, 4609, GuiLighting.singletonBuffer(lightStrength, lightStrength, lightStrength, 1.0F));
+        GlStateManager.light(16385, 4608, GuiLighting.singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
+        GlStateManager.light(16385, 4610, GuiLighting.singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
         GlStateManager.shadeModel(7424);
 
         float ambientLightStrength = 0.4F;
-        GlStateManager.lightModelfv(2899, RenderHelper.setColorBuffer(ambientLightStrength, ambientLightStrength, ambientLightStrength, 1.0F));
+        GlStateManager.lightModel(2899, GuiLighting.singletonBuffer(ambientLightStrength, ambientLightStrength, ambientLightStrength, 1.0F));
     }
 
-    private void renderStackToolTip(int x, int y, ItemStack stack, GuiContainer gui, Minecraft mc)
+    private void renderStackToolTip(int x, int y, ItemStack stack, ContainerScreen<?> gui, MinecraftClient mc)
     {
-        List<ITextComponent> list = stack.getTooltip(mc.player, mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
+        List<TextComponent> list = stack.getTooltipText(mc.player, mc.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
 
         for (int i = 0; i < list.size(); ++i)
         {
             if (i == 0)
             {
-                list.set(i, new TextComponentString(stack.getRarity().color + list.get(i).getString()));
+                list.set(i, new StringTextComponent(stack.getRarity().formatting + list.get(i).getString()));
             }
             else
             {
-                list.set(i, new TextComponentString(TextFormatting.GRAY + list.get(i).getString()));
+                list.set(i, new StringTextComponent(TextFormat.GRAY + list.get(i).getString()));
             }
         }
 
-        FontRenderer font = mc.fontRenderer;
+        TextRenderer font = mc.textRenderer;
 
         drawHoveringText(stack, list, x, y, gui.width, gui.height, -1, font);
     }
 
-    private static void drawHoveringText(@Nonnull final ItemStack stack, List<ITextComponent> components, int mouseX, int mouseY, int screenWidth, int screenHeight, int maxTextWidth, FontRenderer font)
+    private static void drawHoveringText(@Nonnull final ItemStack stack, List<TextComponent> components, int mouseX, int mouseY, int screenWidth, int screenHeight, int maxTextWidth, TextRenderer font)
     {
         List<String> textLines = new ArrayList<>();
 
         if (!components.isEmpty())
         {
             GlStateManager.disableRescaleNormal();
-            RenderHelper.disableStandardItemLighting();
+            GuiLighting.disable();
             GlStateManager.disableLighting();
             GlStateManager.disableDepthTest();
             int tooltipTextWidth = 0;
 
-            for (ITextComponent entry : components)
+            for (TextComponent entry : components)
             {
                 String text = entry.getString();
                 int textLineWidth = font.getStringWidth(text);
@@ -404,7 +405,7 @@ public class RenderEventHandler
                 for (int i = 0; i < textLines.size(); i++)
                 {
                     String textLine = textLines.get(i);
-                    List<String> wrappedLine = font.listFormattedStringToWidth(textLine, tooltipTextWidth);
+                    List<String> wrappedLine = font.wrapStringToWidthAsList(textLine, tooltipTextWidth);
 
                     if (i == 0)
                     {
@@ -471,7 +472,7 @@ public class RenderEventHandler
             for (int lineNumber = 0; lineNumber < textLines.size(); ++lineNumber)
             {
                 String line = textLines.get(lineNumber);
-                font.drawStringWithShadow(line, (float)tooltipX, (float)tooltipY, -1);
+                font.drawWithShadow(line, (float)tooltipX, (float)tooltipY, -1);
 
                 if (lineNumber + 1 == titleLinesCount)
                 {
@@ -483,7 +484,7 @@ public class RenderEventHandler
 
             GlStateManager.enableLighting();
             GlStateManager.enableDepthTest();
-            RenderHelper.enableStandardItemLighting();
+            GuiLighting.enable();
             GlStateManager.enableRescaleNormal();
         }
     }
@@ -491,32 +492,32 @@ public class RenderEventHandler
     public static void drawGradientRect(int zLevel, int left, int top, int right, int bottom, int startColor, int endColor)
     {
         float startAlpha = (float)(startColor >> 24 & 255) / 255.0F;
-        float startRed = (float)(startColor >> 16 & 255) / 255.0F;
+        float startRed   = (float)(startColor >> 16 & 255) / 255.0F;
         float startGreen = (float)(startColor >> 8 & 255) / 255.0F;
-        float startBlue = (float)(startColor & 255) / 255.0F;
-        float endAlpha = (float)(endColor >> 24 & 255) / 255.0F;
-        float endRed = (float)(endColor >> 16 & 255) / 255.0F;
-        float endGreen = (float)(endColor >> 8 & 255) / 255.0F;
-        float endBlue = (float)(endColor & 255) / 255.0F;
+        float startBlue  = (float)(startColor & 255) / 255.0F;
+        float endAlpha   = (float)(endColor >> 24 & 255) / 255.0F;
+        float endRed     = (float)(endColor >> 16 & 255) / 255.0F;
+        float endGreen   = (float)(endColor >> 8 & 255) / 255.0F;
+        float endBlue    = (float)(endColor & 255) / 255.0F;
 
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
         GlStateManager.enableBlend();
         GlStateManager.disableAlphaTest();
         GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        GlStateManager.shadeModel(7425);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        buffer.pos(right, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.pos(left, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.pos(left, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-        buffer.pos(right, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        BufferBuilder buffer = tessellator.getBufferBuilder();
+        buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+        buffer.vertex(right, top,    zLevel).color(startRed, startGreen, startBlue, startAlpha).next();
+        buffer.vertex(left,  top,    zLevel).color(startRed, startGreen, startBlue, startAlpha).next();
+        buffer.vertex(left,  bottom, zLevel).color(endRed,   endGreen,   endBlue,   endAlpha).next();
+        buffer.vertex(right, bottom, zLevel).color(endRed,   endGreen,   endBlue,   endAlpha).next();
         tessellator.draw();
 
-        GlStateManager.shadeModel(7424);
+        GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
         GlStateManager.enableAlphaTest();
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
     }
 }

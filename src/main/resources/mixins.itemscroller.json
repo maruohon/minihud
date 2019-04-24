@@ -1,16 +1,16 @@
 {
     "required": true,
     "package": "fi.dy.masa.itemscroller.mixin",
-    "refmap": "mixins.itemscroller.refmap.json",
-    "minVersion": "0.6",
+    "compatibilityLevel": "JAVA_8",
+    "minVersion": "0.7",
     "client": [
-        "IMixinGuiContainer",
-        "IMixinGuiMerchant",
+        "IMixinContainerScreen",
         "IMixinSlot",
+        "IMixinVillagerScreen",
+        "MixinCraftingTableContainer",
         "MixinGameRenderer",
-        "MixinContainer",
-        "MixinGuiScreen",
-        "MixinMinecraft"
+        "MixinMinecraftClient",
+        "MixinScreen"
     ],
     "injectors": {
         "defaultRequire": 1

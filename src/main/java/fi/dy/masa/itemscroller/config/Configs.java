@@ -16,9 +16,9 @@ import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import net.minecraft.client.gui.inventory.GuiCrafting;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.inventory.SlotCrafting;
+import net.minecraft.client.gui.container.CraftingTableScreen;
+import net.minecraft.client.gui.ingame.PlayerInventoryScreen;
+import net.minecraft.container.CraftingResultSlot;
 
 public class Configs implements IConfigHandler
 {
@@ -103,9 +103,9 @@ public class Configs implements IConfigHandler
         CraftingHandler.clearDefinitions();
 
         // "net.minecraft.client.gui.inventory.GuiCrafting,net.minecraft.inventory.SlotCrafting,0,1-9", // vanilla Crafting Table
-        CraftingHandler.addCraftingGridDefinition(GuiCrafting.class.getName(), SlotCrafting.class.getName(), 0, new SlotRange(1, 9));
-        //"net.minecraft.client.gui.inventory.GuiInventory,net.minecraft.inventory.SlotCrafting,0,1-4", // vanilla player inventory crafting grid
-        CraftingHandler.addCraftingGridDefinition(GuiInventory.class.getName(), SlotCrafting.class.getName(), 0, new SlotRange(1, 4));
+        CraftingHandler.addCraftingGridDefinition(CraftingTableScreen.class.getName(), CraftingResultSlot.class.getName(), 0, new SlotRange(1, 9));
+        //"net.minecraft.client.gui.inventory.PlayerInventoryScreen,net.minecraft.inventory.SlotCrafting,0,1-4", // vanilla player inventory crafting grid
+        CraftingHandler.addCraftingGridDefinition(PlayerInventoryScreen.class.getName(), CraftingResultSlot.class.getName(), 0, new SlotRange(1, 4));
     }
 
     public static void saveToFile()

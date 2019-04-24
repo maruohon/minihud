@@ -6,14 +6,15 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import fi.dy.masa.itemscroller.ItemScroller;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.inventory.Slot;
+import net.minecraft.client.gui.ContainerScreen;
+import net.minecraft.client.gui.Screen;
+import net.minecraft.container.Container;
+import net.minecraft.container.Slot;
 
 public class CraftingHandler
 {
     private static final Map<CraftingOutputSlot, SlotRange> CRAFTING_GRID_SLOTS = new HashMap<CraftingOutputSlot, SlotRange>();
-    private static final Set<Class<? extends GuiContainer>> CRAFTING_GUIS = new HashSet<>();
+    private static final Set<Class<? extends ContainerScreen<?>>> CRAFTING_GUIS = new HashSet<>();
 
     public static void clearDefinitions()
     {
@@ -26,7 +27,7 @@ public class CraftingHandler
     {
         try
         {
-            Class<? extends GuiContainer> guiClass = (Class<? extends GuiContainer>) Class.forName(guiClassName);
+            Class<? extends ContainerScreen<?>> guiClass = (Class<? extends ContainerScreen<?>>) Class.forName(guiClassName);
             Class<? extends Slot> slotClass = (Class<? extends Slot>) Class.forName(slotClassName);
 
             CRAFTING_GRID_SLOTS.put(new CraftingOutputSlot(guiClass, slotClass, outputSlot), range);
@@ -43,9 +44,9 @@ public class CraftingHandler
         return false;
     }
 
-    public static boolean isCraftingGui(GuiScreen gui)
+    public static boolean isCraftingGui(Screen gui)
     {
-        return (gui instanceof GuiContainer) && CRAFTING_GUIS.contains(((GuiContainer) gui).getClass());
+        return (gui instanceof ContainerScreen) && CRAFTING_GUIS.contains(((ContainerScreen<?>) gui).getClass());
     }
 
     /**
@@ -55,17 +56,17 @@ public class CraftingHandler
      * @return the SlotRange of the crafting grid, or null, if the given slot is not a crafting output slot
      */
     @Nullable
-    public static SlotRange getCraftingGridSlots(GuiContainer gui, Slot slot)
+    public static SlotRange getCraftingGridSlots(ContainerScreen<?> gui, Slot slot)
     {
         return CRAFTING_GRID_SLOTS.get(CraftingOutputSlot.from(gui, slot));
     }
 
     @Nullable
-    public static Slot getFirstCraftingOutputSlotForGui(GuiContainer gui)
+    public static Slot getFirstCraftingOutputSlotForGui(ContainerScreen<? extends Container> gui)
     {
         if (CRAFTING_GUIS.contains(gui.getClass()))
         {
-            for (Slot slot : gui.inventorySlots.inventorySlots)
+            for (Slot slot : gui.getContainer().slotList)
             {
                 if (getCraftingGridSlots(gui, slot) != null)
                 {
@@ -79,23 +80,24 @@ public class CraftingHandler
 
     public static class CraftingOutputSlot
     {
-        private final Class<? extends GuiContainer> guiClass;
+        private final Class<? extends ContainerScreen<?>> guiClass;
         private final Class<? extends Slot> slotClass;
         private final int outputSlot;
 
-        private CraftingOutputSlot (Class<? extends GuiContainer> guiClass, Class<? extends Slot> slotClass, int outputSlot)
+        private CraftingOutputSlot (Class<? extends ContainerScreen<?>> guiClass, Class<? extends Slot> slotClass, int outputSlot)
         {
             this.guiClass = guiClass;
             this.slotClass = slotClass;
             this.outputSlot = outputSlot;
         }
 
-        public static CraftingOutputSlot from(GuiContainer gui, Slot slot)
+        @SuppressWarnings("unchecked")
+        public static CraftingOutputSlot from(ContainerScreen<?> gui, Slot slot)
         {
-            return new CraftingOutputSlot(gui.getClass(), slot.getClass(), slot.slotNumber);
+            return new CraftingOutputSlot((Class<? extends ContainerScreen<?>>) gui.getClass(), slot.getClass(), slot.id);
         }
 
-        public Class<? extends GuiContainer> getGuiClass()
+        public Class<? extends ContainerScreen<?>> getGuiClass()
         {
             return this.guiClass;
         }
@@ -110,7 +112,7 @@ public class CraftingHandler
             return this.outputSlot;
         }
 
-        public boolean matches(GuiContainer gui, Slot slot, int outputSlot)
+        public boolean matches(ContainerScreen<?> gui, Slot slot, int outputSlot)
         {
             return outputSlot == this.outputSlot && gui.getClass() == this.guiClass && slot.getClass() == this.slotClass;
         }

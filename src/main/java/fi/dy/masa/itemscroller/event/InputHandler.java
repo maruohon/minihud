@@ -14,11 +14,11 @@ import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.inventory.Slot;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.ContainerScreen;
+import net.minecraft.client.gui.Screen;
+import net.minecraft.client.gui.ingame.CreativePlayerInventoryScreen;
+import net.minecraft.container.Slot;
 import net.minecraft.util.math.MathHelper;
 
 public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IMouseInputHandler
@@ -75,18 +75,18 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             InventoryUtils.stopDragging();
         }
 
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
         boolean cancel = false;
 
         if (this.callbacks.functionalityEnabled() &&
             amount != 0 &&
             mc != null &&
             mc.player != null &&
-            mc.currentScreen instanceof GuiContainer &&
-            (mc.currentScreen instanceof GuiContainerCreative) == false &&
+            mc.currentScreen instanceof ContainerScreen &&
+            (mc.currentScreen instanceof CreativePlayerInventoryScreen) == false &&
             Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
         {
-            GuiContainer gui = (GuiContainer) mc.currentScreen;
+            ContainerScreen<?> gui = (ContainerScreen<?>) mc.currentScreen;
             RecipeStorage recipes = this.callbacks.getRecipes();
 
             // When scrolling while the recipe view is open, change the selection instead of moving items
@@ -114,24 +114,24 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             InventoryUtils.stopDragging();
         }
 
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
         boolean cancel = false;
 
         if (this.callbacks.functionalityEnabled() &&
             mc != null &&
             mc.player != null &&
-            mc.currentScreen instanceof GuiContainer &&
-            (mc.currentScreen instanceof GuiContainerCreative) == false &&
+            mc.currentScreen instanceof ContainerScreen &&
+            (mc.currentScreen instanceof CreativePlayerInventoryScreen) == false &&
             Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
         {
-            GuiContainer gui = (GuiContainer) mc.currentScreen;
+            ContainerScreen<?> gui = (ContainerScreen<?>) mc.currentScreen;
             RecipeStorage recipes = this.callbacks.getRecipes();
 
             Slot slot = AccessorUtils.getSlotUnderMouse(gui);
-            final boolean isLeftClick = mc.gameSettings.keyBindAttack.func_197984_a(eventButton);
-            final boolean isRightClick = mc.gameSettings.keyBindUseItem.func_197984_a(eventButton);
-            final boolean isPickBlock = mc.gameSettings.keyBindPickBlock.func_197984_a(eventButton);
-            final boolean isShiftDown = GuiScreen.isShiftKeyDown();
+            final boolean isLeftClick = mc.options.keyAttack.matchesMouse(eventButton);
+            final boolean isRightClick = mc.options.keyUse.matchesMouse(eventButton);
+            final boolean isPickBlock = mc.options.keyPickItem.matchesMouse(eventButton);
+            final boolean isShiftDown = Screen.hasShiftDown();
 
             if (eventButtonState && (isLeftClick || isRightClick || isPickBlock))
             {
@@ -151,7 +151,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 }
             }
 
-            InventoryUtils.checkForItemPickup(gui, mc);
+            InventoryUtils.checkForItemPickup(mc);
 
             if (eventButtonState && (isLeftClick || isRightClick))
             {
@@ -189,19 +189,19 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     @Override
     public void onMouseMove(int mouseX, int mouseY)
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
         if (this.callbacks.functionalityEnabled() &&
             mc != null &&
             mc.player != null &&
-            mc.currentScreen instanceof GuiContainer &&
+            mc.currentScreen instanceof ContainerScreen &&
             Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
         {
-            this.handleDragging((GuiContainer) mc.currentScreen, mc, mouseX, mouseY, false);
+            this.handleDragging((ContainerScreen<?>) mc.currentScreen, mc, mouseX, mouseY, false);
         }
     }
 
-    private boolean handleDragging(GuiContainer gui, Minecraft mc, int mouseX, int mouseY, boolean isClick)
+    private boolean handleDragging(ContainerScreen<?> gui, MinecraftClient mc, int mouseX, int mouseY, boolean isClick)
     {
         MoveAction action = InventoryUtils.getActiveMoveAction();
 

@@ -1,6 +1,0 @@
-{
-    "id": "itemscroller",
-    "name": "Item Scroller",
-    "authors": [ "masa" ],
-    "listeners": [ "fi.dy.masa.itemscroller.ItemScroller" ]
-}

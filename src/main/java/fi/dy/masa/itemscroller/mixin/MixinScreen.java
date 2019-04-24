@@ -5,13 +5,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.itemscroller.event.RenderEventHandler;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.AbstractParentElement;
+import net.minecraft.client.gui.Screen;
 
-@Mixin(GuiScreen.class)
-public abstract class MixinGuiScreen extends Gui
+@Mixin(Screen.class)
+public abstract class MixinScreen extends AbstractParentElement
 {
-    @Inject(method = "drawDefaultBackground()V", at = @At("RETURN"))
+    @Inject(method = "renderBackground()V", at = @At("RETURN"))
     protected void onDrawDefaultBackgroundPost(CallbackInfo ci)
     {
         RenderEventHandler.instance().onDrawBackgroundPost();

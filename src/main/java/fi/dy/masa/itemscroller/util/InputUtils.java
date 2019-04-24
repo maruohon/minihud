@@ -4,14 +4,14 @@ import fi.dy.masa.itemscroller.config.Hotkeys;
 import fi.dy.masa.itemscroller.event.KeybindCallbacks;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.ContainerScreen;
 
 public class InputUtils
 {
     public static boolean isRecipeViewOpen()
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
         return mc.currentScreen != null &&
                Hotkeys.KEY_RECIPE_VIEW.getKeybind().isKeybindHeld() &&
@@ -19,9 +19,9 @@ public class InputUtils
                CraftingHandler.isCraftingGui(mc.currentScreen);
     }
 
-    public static boolean canShiftDropItems(GuiContainer gui, Minecraft mc, int mouseX, int mouseY)
+    public static boolean canShiftDropItems(ContainerScreen<?> gui, MinecraftClient mc, int mouseX, int mouseY)
     {
-        if (InventoryUtils.isStackEmpty(mc.player.inventory.getItemStack()) == false)
+        if (InventoryUtils.isStackEmpty(mc.player.inventory.getCursorStack()) == false)
         {
             int left = AccessorUtils.getGuiLeft(gui);
             int top = AccessorUtils.getGuiTop(gui);

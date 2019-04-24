@@ -60,7 +60,7 @@ public class ItemType
                 return false;
             }
 
-            return ItemStack.areItemStackTagsEqual(this.stack, other.stack);
+            return ItemStack.areTagsEqual(this.stack, other.stack);
         }
 
         return true;

@@ -9,7 +9,7 @@ import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.resource.language.I18n;
 
 public class GuiConfigs extends GuiConfigsBase
 {
@@ -20,13 +20,13 @@ public class GuiConfigs extends GuiConfigsBase
     {
         super(10, 50, Reference.MOD_ID, null);
 
-        this.title = I18n.format("itemscroller.gui.title.configs");
+        this.title = I18n.translate("itemscroller.gui.title.configs");
     }
 
     @Override
-    public void initGui()
+    public void init()
     {
-        super.initGui();
+        super.init();
         this.clearOptions();
 
         this.id = 0;
@@ -47,11 +47,11 @@ public class GuiConfigs extends GuiConfigsBase
 
         if (width < 0)
         {
-            width = this.mc.fontRenderer.getStringWidth(label) + 10;
+            width = this.textRenderer.getStringWidth(label) + 10;
         }
 
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
-        button.enabled = enabled;
+        button.active = enabled;
         this.addButton(button, listener);
 
         return width;
@@ -119,7 +119,7 @@ public class GuiConfigs extends GuiConfigsBase
 
             this.parent.reCreateListWidget(); // apply the new config width
             this.parent.getListWidget().resetScrollbarPosition();
-            this.parent.initGui();
+            this.parent.init();
         }
     }
 
@@ -138,7 +138,7 @@ public class GuiConfigs extends GuiConfigsBase
 
         public String getDisplayName()
         {
-            return I18n.format(this.translationKey);
+            return I18n.translate(this.translationKey);
         }
     }
 }

@@ -5,7 +5,7 @@ import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Hotkeys;
 import fi.dy.masa.itemscroller.gui.GuiConfigs;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
-import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
+import fi.dy.masa.itemscroller.recipes.RecipePattern;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
 import fi.dy.masa.itemscroller.util.InputUtils;
@@ -15,14 +15,14 @@ import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
-import net.minecraft.client.MainWindow;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.Slot;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.ContainerScreen;
+import net.minecraft.client.gui.Screen;
+import net.minecraft.client.gui.ingame.CreativePlayerInventoryScreen;
+import net.minecraft.client.gui.ingame.PlayerInventoryScreen;
+import net.minecraft.client.util.Window;
+import net.minecraft.container.Slot;
+import net.minecraft.sound.SoundEvents;
 
 public class KeybindCallbacks implements IHotkeyCallback
 {
@@ -74,7 +74,7 @@ public class KeybindCallbacks implements IHotkeyCallback
     @Override
     public boolean onKeyAction(KeyAction action, IKeybind key)
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
         if (key == Hotkeys.KEY_MAIN_TOGGLE.getKeybind())
         {
@@ -93,16 +93,16 @@ public class KeybindCallbacks implements IHotkeyCallback
         }
         else if (key == Hotkeys.KEY_OPEN_CONFIG_GUI.getKeybind())
         {
-            mc.displayGuiScreen(new GuiConfigs());
+            mc.openScreen(new GuiConfigs());
             return true;
         }
 
-        if (this.disabled || mc == null || mc.player == null || (mc.currentScreen instanceof GuiContainer) == false)
+        if (this.disabled || mc == null || mc.player == null || (mc.currentScreen instanceof ContainerScreen) == false)
         {
             return false;
         }
 
-        GuiContainer gui = (GuiContainer) mc.currentScreen;
+        ContainerScreen<?> gui = (ContainerScreen<?>) mc.currentScreen;
         Slot slot = AccessorUtils.getSlotUnderMouse(gui);
         RecipeStorage recipes = this.getRecipes();
         MoveAction moveAction = InputUtils.getDragMoveAction(key);
@@ -111,9 +111,9 @@ public class KeybindCallbacks implements IHotkeyCallback
         {
             if (moveAction != MoveAction.NONE)
             {
-                MainWindow window = mc.mainWindow;
-                final int mouseX = (int) (mc.mouseHelper.getMouseX() * (double) window.getScaledWidth() / (double) window.getWidth());
-                final int mouseY = (int) (mc.mouseHelper.getMouseY() * (double) window.getScaledHeight() / (double) window.getHeight());
+                Window window = mc.window;
+                final int mouseX = (int) (mc.mouse.getX() * (double) window.getScaledWidth() / (double) window.getWidth());
+                final int mouseY = (int) (mc.mouse.getY() * (double) window.getScaledHeight() / (double) window.getHeight());
                 return InventoryUtils.dragMoveItems(gui, mc, moveAction, mouseX, mouseY, true);
             }
             else if (key == Hotkeys.KEY_MOVE_EVERYTHING.getKeybind())
@@ -125,7 +125,7 @@ public class KeybindCallbacks implements IHotkeyCallback
             {
                 if (Configs.Toggles.DROP_MATCHING.getBooleanValue() &&
                     Configs.GUI_BLACKLIST.contains(gui.getClass().getName()) == false &&
-                    slot.getHasStack())
+                    slot.hasStack())
                 {
                     InventoryUtils.dropStacks(gui, slot.getStack(), slot, true);
                     return true;
@@ -134,9 +134,9 @@ public class KeybindCallbacks implements IHotkeyCallback
             else if (key == Hotkeys.KEY_MOVE_STACK_TO_OFFHAND.getKeybind())
             {
                 // Swap the hovered stack to the Offhand
-                if ((gui instanceof GuiInventory) && slot != null)
+                if ((gui instanceof PlayerInventoryScreen) && slot != null)
                 {
-                    InventoryUtils.swapSlots(gui, slot.slotNumber, 45);
+                    InventoryUtils.swapSlots(gui, slot.id, 45);
                     return true;
                 }
             }
@@ -174,23 +174,23 @@ public class KeybindCallbacks implements IHotkeyCallback
         return false;
     }
 
-    public void onTick(Minecraft mc)
+    public void onTick(MinecraftClient mc)
     {
         if (this.disabled == false &&
             mc != null &&
             mc.player != null &&
-            mc.currentScreen instanceof GuiContainer &&
-            (mc.currentScreen instanceof GuiContainerCreative) == false &&
+            mc.currentScreen instanceof ContainerScreen &&
+            (mc.currentScreen instanceof CreativePlayerInventoryScreen) == false &&
             Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false &&
             Hotkeys.KEY_MASS_CRAFT.getKeybind().isKeybindHeld())
         {
-            GuiScreen guiScreen = mc.currentScreen;
-            GuiContainer gui = (GuiContainer) guiScreen;
+            Screen guiScreen = mc.currentScreen;
+            ContainerScreen<?> gui = (ContainerScreen<?>) guiScreen;
             Slot outputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
 
             if (outputSlot != null)
             {
-                CraftingRecipe recipe = this.getRecipes().getSelectedRecipe();
+                RecipePattern recipe = this.getRecipes().getSelectedRecipe();
 
                 InventoryUtils.tryClearCursor(gui, mc);
                 InventoryUtils.throwAllCraftingResultsToGround(recipe, gui);
@@ -202,11 +202,11 @@ public class KeybindCallbacks implements IHotkeyCallback
                 {
                     if (Configs.Generic.CARPET_CTRL_Q_CRAFTING.getBooleanValue())
                     {
-                        InventoryUtils.dropStack(gui, outputSlot.slotNumber);
+                        InventoryUtils.dropStack(gui, outputSlot.id);
                     }
                     else
                     {
-                        InventoryUtils.dropStacksWhileHasItem(gui, outputSlot.slotNumber, recipe.getResult());
+                        InventoryUtils.dropStacksWhileHasItem(gui, outputSlot.id, recipe.getResult());
                     }
 
                     InventoryUtils.tryClearCursor(gui, mc);
