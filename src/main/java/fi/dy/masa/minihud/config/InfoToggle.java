@@ -46,6 +46,7 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     SPAWNABLE_SUB_CHUNKS    ("infoSpawnableSubChunks",      false, 32, "", "Show the spawnable sub chunk count for the current chunk"),
     SPEED                   ("infoSpeed",                   false, 13, "", "Show the player's current moving speed"),
     SPEED_AXIS              ("infoSpeedAxis",               false, 13, "", "Show the player's current moving speed per axis"),
+    TILE_ENTITIES           ("infoTileEntities",            false, 32, "",    "Show the number of TileEntities in the client world"),
     TIME_REAL               ("infoTimeIRL",                 true,   1, "", "Show the current real time formatted according to dateFormatReal"),
     TIME_WORLD              ("infoTimeWorld",               false,  2, "", "Show the current world time in ticks"),
     TIME_WORLD_FORMATTED    ("infoWorldTimeFormatted",      false,  3, "", "Show the current world time formatted to days, hours, minutes");

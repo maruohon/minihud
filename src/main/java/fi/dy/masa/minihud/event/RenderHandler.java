@@ -632,6 +632,10 @@ public class RenderHandler implements IRenderer
 
             this.addLine(ent);
         }
+        else if (type == InfoToggle.TILE_ENTITIES)
+        {
+            this.addLine(String.format("Client world TE - L: %d, T: %d", mc.world.loadedTileEntityList.size(), mc.world.tickableTileEntities.size()));
+        }
         else if (type == InfoToggle.SLIME_CHUNK)
         {
             if (world.provider.isSurfaceWorld() == false)
