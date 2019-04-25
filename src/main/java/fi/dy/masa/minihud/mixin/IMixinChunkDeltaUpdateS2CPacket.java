@@ -2,12 +2,12 @@ package fi.dy.masa.minihud.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
-import net.minecraft.client.network.packet.ChunkDeltaUpdateClientPacket;
+import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.world.chunk.ChunkPos;
 
-@Mixin(ChunkDeltaUpdateClientPacket.class)
-public interface IMixinChunkDeltaUpdateClientPacket
+@Mixin(ChunkDeltaUpdateS2CPacket.class)
+public interface IMixinChunkDeltaUpdateS2CPacket
 {
-    @Accessor
+    @Accessor("chunkPos")
     ChunkPos getChunkPos();
 }

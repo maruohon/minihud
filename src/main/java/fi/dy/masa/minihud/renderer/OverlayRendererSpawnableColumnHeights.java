@@ -11,9 +11,9 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPos;
-import net.minecraft.world.gen.Heightmap;
 
 public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
 {

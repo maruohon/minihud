@@ -28,7 +28,6 @@ public class DataStorage
     private long lastServerTimeUpdate;
     private double serverTPS;
     private double serverMSPT;
-    private int droppedChunksHashSize = -1;
     private BlockPos worldSpawn = BlockPos.ORIGIN;
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -119,25 +118,6 @@ public class DataStorage
         return this.serverMSPT;
     }
 
-    public int getDroppedChunksHashSize()
-    {
-        if (this.droppedChunksHashSize > 0)
-        {
-            return this.droppedChunksHashSize;
-        }
-
-        MinecraftClient mc = MinecraftClient.getInstance();
-
-        if (mc.isIntegratedServerRunning())
-        {
-            return MiscUtils.getCurrentHashSize(mc.getServer().getWorld(mc.player.getEntityWorld().dimension.getType()));
-        }
-        else
-        {
-            return 0xFFFF;
-        }
-    }
-
     public boolean onSendChatMessage(PlayerEntity player, String message)
     {
         String[] parts = message.split(" ");
@@ -161,27 +141,6 @@ public class DataStorage
             else if (this.worldSeedValid && parts.length == 1)
             {
                 MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
-            }
-
-            return true;
-        }
-        else if (parts[0].equals("minihud-dropped-chunks-hash-size"))
-        {
-            if (parts.length == 2)
-            {
-                try
-                {
-                    this.droppedChunksHashSize = Integer.parseInt(parts[1]);
-                    MiscUtils.printInfoMessage("minihud.message.dropped_chunks_hash_size_set", Integer.valueOf(this.droppedChunksHashSize));
-                }
-                catch (NumberFormatException e)
-                {
-                    MiscUtils.printInfoMessage("minihud.message.error.invalid_dropped_chunks_hash_size");
-                }
-            }
-            else if (parts.length == 1)
-            {
-                MiscUtils.printInfoMessage("minihud.message.dropped_chunks_hash_size_set", Integer.valueOf(this.getDroppedChunksHashSize()));
             }
 
             return true;

@@ -28,10 +28,10 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Property;
-import net.minecraft.util.BlockHitResult;
-import net.minecraft.util.EntityHitResult;
-import net.minecraft.util.HitResult;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -146,7 +146,7 @@ public class RenderHandler implements IRenderer
         if (align == HudAlignment.BOTTOM_RIGHT)
         {
             MinecraftClient mc = MinecraftClient.getInstance();
-            int offset = (int) (this.lineWrappers.size() * (mc.fontRenderer.fontHeight + 2) * this.fontScale);
+            int offset = (int) (this.lineWrappers.size() * (mc.textRenderer.fontHeight + 2) * this.fontScale);
 
             return -(offset - 16);
         }
@@ -358,8 +358,8 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.DIMENSION.getBooleanValue())
             {
-                int dimension = world.dimension.getType().getRawId();
-                str.append(String.format(String.format("%sDimensionType ID: %d", pre, dimension)));
+                String dim = world.dimension.getType().toString();
+                str.append(String.format(String.format("%sDimension: %s", pre, dim)));
             }
 
             this.addLine(str.toString());
@@ -438,8 +438,8 @@ public class RenderHandler implements IRenderer
                 {
                     this.addLine(String.format("Client Light: %d (block: %d, sky: %d)",
                             chunk.getLightLevel(pos, 0),
-                            mc.world.getLightLevel(LightType.BLOCK_LIGHT, pos),
-                            mc.world.getLightLevel(LightType.SKY_LIGHT, pos)));
+                            mc.world.getLightLevel(LightType.BLOCK, pos),
+                            mc.world.getLightLevel(LightType.SKY, pos)));
 
                     World bestWorld = WorldUtils.getBestWorld(mc);
                     WorldChunk serverChunk = WorldUtils.getBestChunk(chunkPos.x, chunkPos.z, mc);
@@ -447,7 +447,9 @@ public class RenderHandler implements IRenderer
                     if (serverChunk != null)
                     {
                         LightingProvider lightingProvider = bestWorld.getChunkManager().getLightingProvider();
-                        this.addLine(String.format("Server Light: (%d sky, %d block)", lightingProvider.get(LightType.SKY_LIGHT).getLightLevel(pos), lightingProvider.get(LightType.BLOCK_LIGHT).getLightLevel(pos)));
+                        int sky = lightingProvider.get(LightType.SKY).getLightLevel(pos);
+                        int block = lightingProvider.get(LightType.BLOCK).getLightLevel(pos);
+                        this.addLine(String.format("Server Light: (%d sky, %d block)", sky, block));
                     }
                 }
             }
@@ -531,7 +533,7 @@ public class RenderHandler implements IRenderer
 
                 if (serverChunk != null)
                 {
-                    moonPhaseFactor = mc.world.method_8391();
+                    moonPhaseFactor = mc.world.getMoonSize();
                     chunkInhabitedTime = serverChunk.getInhabitedTime();
                 }
 

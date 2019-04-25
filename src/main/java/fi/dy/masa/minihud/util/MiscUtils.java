@@ -4,10 +4,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Random;
 import fi.dy.masa.minihud.MiniHUD;
-import fi.dy.masa.minihud.config.Configs;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sortme.ChatMessageType;
+import net.minecraft.text.ChatMessageType;
 import net.minecraft.text.TranslatableTextComponent;
 import net.minecraft.world.chunk.ChunkPos;
 
@@ -37,63 +35,10 @@ public class MiscUtils
         return RAND.nextInt(10) == 0;
     }
 
-    public static int getChunkUnloadBucket(int chunkX, int chunkZ)
-    {
-        if (Configs.Generic.CHUNK_UNLOAD_BUCKET_WITH_SIZE.getBooleanValue())
-        {
-            return getChunkOrder(chunkX, chunkZ, DataStorage.getInstance().getDroppedChunksHashSize());
-        }
-        // The old simple calculation, without knowledge of the HashSet size
-        else
-        {
-            int longHash = Long.valueOf(ChunkPos.toLong(chunkX, chunkZ)).hashCode();
-            return (longHash ^ (longHash >>> 16)) & 0xFFFF;
-        }
-    }
-
     public static void printInfoMessage(String key, Object... args)
     {
         MinecraftClient.getInstance().inGameHud.addChatMessage(ChatMessageType.GAME_INFO, new TranslatableTextComponent(key, args));
     }
-
-    /**
-     * This method has been taken from the Carpet mod, by gnembon
-     */
-    public static int getCurrentHashSize(ServerWorld server)
-    {
-        /*
-        IMixinChunkProviderServer provider = (IMixinChunkProviderServer) (Object) server.getChunkProvider();
-
-        try
-        {
-            LongSet droppedChunks = provider.getDroppedChunks();
-            Field field = droppedChunks.getClass().getDeclaredField("map");
-            field.setAccessible(true);
-
-            @SuppressWarnings("unchecked")
-            HashMap<Object, Object> map = (HashMap<Object, Object>) field.get(droppedChunks);
-            field = map.getClass().getDeclaredField("table");
-            field.setAccessible(true);
-
-            Object[] table = (Object []) field.get(map);
-
-            if (table == null)
-            {
-                return 2;
-            }
-
-            return table.length;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        */
-
-        // FIXME 1.13
-        return 1;
-    }
-
 
     /**
      * This method has been taken from the Carpet mod, by gnembon

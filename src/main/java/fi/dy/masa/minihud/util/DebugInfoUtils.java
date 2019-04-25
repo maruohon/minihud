@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import com.google.common.collect.MapMaker;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -11,7 +12,7 @@ import fi.dy.masa.minihud.mixin.IMixinDebugRenderer;
 import fi.dy.masa.minihud.mixin.IMixinEntityNavigation;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.packet.CustomPayloadClientPacket;
+import net.minecraft.client.network.packet.CustomPayloadS2CPacket;
 import net.minecraft.client.render.debug.NeighborUpdateDebugRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
@@ -20,6 +21,7 @@ import net.minecraft.entity.ai.pathing.PathNode;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -39,7 +41,7 @@ public class DebugInfoUtils
         buffer.writeFloat(maxDistance);
         writePathToBuffer(buffer, path);
 
-        CustomPayloadClientPacket packet = new CustomPayloadClientPacket(CustomPayloadClientPacket.DEBUG_PATH, buffer);
+        CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(CustomPayloadS2CPacket.DEBUG_PATH, buffer);
         server.getPlayerManager().sendToAll(packet);
     }
 
@@ -74,7 +76,7 @@ public class DebugInfoUtils
 
             writePathPointToBuffer(buf, target);
 
-            int countTotal = path.getPathLength();
+            int countTotal = path.getLength();
             List<PathNode> openSet = new ArrayList<>();
             List<PathNode> closedSet = new ArrayList<>();
             List<PathNode> allSet = new ArrayList<>();
@@ -147,17 +149,19 @@ public class DebugInfoUtils
         if (pathfindingEnabled && mc.world != null && ++tickCounter >= 10)
         {
             tickCounter = 0;
-            World world = server.getWorld(mc.world.dimension.getType());
+            ServerWorld world = server.getWorld(mc.world.dimension.getType());
 
             if (world != null)
             {
-                for (Entity entity : world.entities)
+                Predicate<Entity> predicate = (entity) -> { return (entity instanceof MobEntity) && entity.isAlive(); };
+
+                for (Entity entity : world.getEntities(null, predicate))
                 {
-                    EntityNavigation navigator = entity instanceof MobEntity ? ((MobEntity) entity).getNavigation() : null;
+                    EntityNavigation navigator = ((MobEntity) entity).getNavigation();
 
                     if (navigator != null && isAnyPlayerWithinRange(world, entity, 64))
                     {
-                        final Path path = navigator.method_6345();
+                        final Path path = navigator.getCurrentPath();
                         Path old = OLD_PATHS.get(entity);
 
                         if (path == null)
@@ -178,11 +182,11 @@ public class DebugInfoUtils
                             {
                                 // Make a copy via a PacketBuffer... :/
                                 PacketByteBuf buf = DebugInfoUtils.writePathTobuffer(path);
-                                OLD_PATHS.put(entity, Path.method_34(buf));
+                                OLD_PATHS.put(entity, Path.fromBuffer(buf));
                             }
                             else if (old != null)
                             {
-                                old.setCurrentPosition(path.getCurrentNodeIndex());
+                                old.setCurrentNodeIndex(path.getCurrentNodeIndex());
                             }
                         }
                     }
@@ -191,11 +195,11 @@ public class DebugInfoUtils
         }
     }
 
-    private static boolean isAnyPlayerWithinRange(World world, Entity entity, double range)
+    private static boolean isAnyPlayerWithinRange(ServerWorld world, Entity entity, double range)
     {
-        for (int i = 0; i < world.players.size(); ++i)
+        for (int i = 0; i < world.getPlayers().size(); ++i)
         {
-            PlayerEntity player = world.players.get(i);
+            PlayerEntity player = world.getPlayers().get(i);
 
             double distSq = player.squaredDistanceTo(entity.x, entity.y, entity.z);
 

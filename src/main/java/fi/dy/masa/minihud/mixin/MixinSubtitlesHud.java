@@ -12,7 +12,7 @@ import net.minecraft.client.gui.hud.SubtitlesHud;
 @Mixin(SubtitlesHud.class)
 public abstract class MixinSubtitlesHud
 {
-    @Inject(method = "method_1957", at = @At(
+    @Inject(method = "draw", at = @At(
             value = "INVOKE",
             target = "Ljava/util/List;iterator()Ljava/util/Iterator;",
             shift = Shift.AFTER, remap = false))

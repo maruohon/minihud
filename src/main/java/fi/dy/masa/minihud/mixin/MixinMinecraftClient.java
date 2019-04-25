@@ -7,14 +7,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.world.ClientWorld;
 
 @Mixin(MinecraftClient.class)
 public abstract class MixinMinecraftClient
 {
-    @Inject(method = "method_1550(Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/gui/Gui;)V", at = @At("HEAD"))
-    private void onLoadWorldPre(@Nullable ClientWorld worldClientIn, Gui loadingScreen, CallbackInfo ci)
+    @Inject(method = "joinWorld(Lnet/minecraft/client/world/ClientWorld;)V", at = @At("HEAD"))
+    private void onLoadWorldPre(@Nullable ClientWorld worldClientIn, CallbackInfo ci)
     {
         if (worldClientIn == null || worldClientIn != (((MinecraftClient) (Object) this).world))
         {

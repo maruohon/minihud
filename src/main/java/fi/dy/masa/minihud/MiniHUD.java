@@ -49,7 +49,7 @@ public class MiniHUD implements ModInitializer
         @Override
         public boolean onKeyAction(KeyAction action, IKeybind key)
         {
-            MinecraftClient.getInstance().openGui(new GuiConfigs());
+            MinecraftClient.getInstance().openScreen(new GuiConfigs());
             return true;
         }
     }

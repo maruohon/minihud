@@ -33,9 +33,6 @@ public class Configs implements IConfigHandler
     {
         public static final ConfigOptionList    BLOCK_GRID_OVERLAY_MODE             = new ConfigOptionList("blockGridOverlayMode", BlockGridMode.ALL, "The block grid render mode");
         public static final ConfigInteger       BLOCK_GRID_OVERLAY_RADIUS           = new ConfigInteger("blockGridOverlayRadius", 32, "The radius of the block grid lines to render");
-        public static final ConfigDouble        CHUNK_UNLOAD_BUCKET_FONT_SCALE      = new ConfigDouble("chunkUnloadBucketOverlayFontScale", 0.1625, "The font scale for the Chunk unload order bucket overlay.\nValid range: 0.01 - 1.0");
-        public static final ConfigInteger       CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS  = new ConfigInteger("chunkUnloadBucketOverlayChunkRadius", -1, "The radius of chunks to render the text for in the overlay.\nValid range: -1 - 40, where -1 = render distance");
-        public static final ConfigBoolean       CHUNK_UNLOAD_BUCKET_WITH_SIZE       = new ConfigBoolean("chunkUnloadBucketWithSize", false, "If enabled, uses the more accurate (but still experimental)\nchunk unload bucket calculations, taken from the Carpet mod");
         public static final ConfigString        COORDINATE_FORMAT_STRING            = new ConfigString("coordinateFormat", "x: %.1f y: %.1f z: %.1f", "The format string for the coordinate line.\nNeeds to have three %f format strings!\nDefault: x: %.1f y: %.1f z: %.1f");
         public static final ConfigString        DATE_FORMAT_REAL                    = new ConfigString("dateFormatReal", "yyyy-MM-dd HH:mm:ss", "The format string for real time, see the Java SimpleDateFormat\nclass for the format patterns, if needed.");
         public static final ConfigString        DATE_FORMAT_MINECRAFT               = new ConfigString("dateFormatMinecraft", "MC time: (day {DAY}) {HOUR}:{MIN}:xx", "The format string for the Minecraft time.\nThe supported placeholders are: {DAY}, {HOUR}, {MIN},;{SEC}");
@@ -44,7 +41,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       FIX_VANILLA_DEBUG_RENDERERS         = new ConfigBoolean("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed.");
         public static final ConfigDouble        FONT_SCALE                          = new ConfigDouble("fontScale", 0.5, "Font scale factor. Valid range: 0.0 - 10.0. Default: 0.5\n");
         public static final ConfigOptionList    HUD_ALIGNMENT                       = new ConfigOptionList("hudAlignment", HudAlignment.TOP_LEFT, "The alignment of the HUD.");
-        public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "LEFT_CONTROL,H,C", "A hotkey to open the in-game Config GUI");
+        public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "H,C", "A hotkey to open the in-game Config GUI");
         public static final ConfigBoolean       REQUIRE_SNEAK                       = new ConfigBoolean("requireSneak", false, "Require the player to be sneaking to render the HUD");
         public static final ConfigHotkey        REQUIRED_KEY                        = new ConfigHotkey("requiredKey", "", KeybindSettings.MODIFIER_INGAME, "Require holding this key to render the HUD");
         public static final ConfigBoolean       SORT_LINES_BY_LENGTH                = new ConfigBoolean("sortLinesByLength", false, "Sort the lines by their text's length");
@@ -62,7 +59,6 @@ public class Configs implements IConfigHandler
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ENABLED,
-                CHUNK_UNLOAD_BUCKET_WITH_SIZE,
                 DEBUG_RENDERER_PATH_MAX_DIST,
                 FIX_VANILLA_DEBUG_RENDERERS,
                 REQUIRE_SNEAK,
@@ -79,8 +75,6 @@ public class Configs implements IConfigHandler
                 HUD_ALIGNMENT,
 
                 BLOCK_GRID_OVERLAY_RADIUS,
-                CHUNK_UNLOAD_BUCKET_FONT_SCALE,
-                CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS,
                 COORDINATE_FORMAT_STRING,
                 DATE_FORMAT_REAL,
                 DATE_FORMAT_MINECRAFT,

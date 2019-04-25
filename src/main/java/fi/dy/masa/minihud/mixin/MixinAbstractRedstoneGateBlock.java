@@ -22,7 +22,7 @@ public abstract class MixinAbstractRedstoneGateBlock extends HorizontalFacingBlo
         super(builder);
     }
 
-    @Inject(method = "method_9997", at = @At("HEAD"))
+    @Inject(method = "updateTarget", at = @At("HEAD"))
     public void onNotifyNeighbors(World world, BlockPos pos, BlockState state, CallbackInfo ci)
     {
         EnumSet<Direction> set = EnumSet.of(state.get(HorizontalFacingBlock.FACING).getOpposite());

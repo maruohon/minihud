@@ -28,9 +28,9 @@ public class GuiConfigs extends GuiConfigsBase
     }
 
     @Override
-    public void onInitialized()
+    public void init()
     {
-        super.onInitialized();
+        super.init();
         this.clearOptions();
 
         this.id = 0;
@@ -51,11 +51,11 @@ public class GuiConfigs extends GuiConfigsBase
 
         if (width < 0)
         {
-            width = this.client.fontRenderer.getStringWidth(label) + 10;
+            width = this.minecraft.textRenderer.getStringWidth(label) + 10;
         }
 
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
-        button.enabled = enabled;
+        button.active = enabled;
         this.addButton(button, listener);
 
         return width;
@@ -141,7 +141,7 @@ public class GuiConfigs extends GuiConfigsBase
 
             this.parent.reCreateListWidget(); // apply the new config width
             this.parent.getListWidget().resetScrollbarPosition();
-            this.parent.onInitialized();
+            this.parent.init();
         }
     }
 

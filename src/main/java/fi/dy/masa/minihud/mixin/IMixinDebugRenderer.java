@@ -19,7 +19,7 @@ public interface IMixinDebugRenderer
     public boolean getCollisionBoxEnabled();
     @Accessor("showNeighborUpdates")
     public boolean getNeighborsUpdateEnabled();
-    @Accessor("field_4518")
+    @Accessor("showBlockOutlines")
     public boolean getSolidFaceEnabled();
 
     @Accessor("showChunkBorder")
@@ -34,6 +34,6 @@ public interface IMixinDebugRenderer
     public void setCollisionBoxEnabled(boolean value);
     @Accessor("showNeighborUpdates")
     public void setNeighborsUpdateEnabled(boolean value);
-    @Accessor("field_4518")
+    @Accessor("showBlockOutlines")
     public void setSolidFaceEnabled(boolean value);
 }

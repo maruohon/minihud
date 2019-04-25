@@ -7,7 +7,6 @@ import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.event.RenderHandler;
-import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableChunks;
@@ -34,11 +33,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
 
         if (mc != null && mc.player != null && super.onKeyAction(action, key))
         {
-            if (key == RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind())
-            {
-                OverlayRenderer.chunkUnloadBucketOverlayY = mc.player.y - 2;
-            }
-            else if (key == RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind())
+            if (key == RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind())
             {
                 OverlayRendererSlimeChunks.overlayTopY = mc.player.y;
             }

@@ -21,7 +21,6 @@ public enum RendererToggle implements IHotkeyTogglable
     DEBUG_WATER                         ("debugWaterEnabled",           "H,6", "Toggles the vanilla Water debug renderer", "Water"),
 
     OVERLAY_BLOCK_GRID                  ("overlayBlockGrid",            "",    "Toggle the Block Grid overlay renderer", "Block Grid overlay"),
-    OVERLAY_CHUNK_UNLOAD_BUCKET         ("overlayChunkUnloadBucket",    "H,X", "Toggle the Chunk unload bucket/priority renderer", "Chunk unload priority overlay"),
     OVERLAY_RANDOM_TICKS_FIXED          ("overlayRandomTicksFixed",     "",    "Toggle the fixed-point random ticked chunks overlay renderer", "Random ticked chunks (fixed) overlay"),
     OVERLAY_RANDOM_TICKS_PLAYER         ("overlayRandomTicksPlayer",    "",    "Toggle the player-following random ticked chunks overlay renderer", "Random ticked chunks (player-following) overlay"),
     OVERLAY_REGION_FILE                 ("overlayRegionFile",           "H,J", "Toggle the region file border overlay renderer", "Region file border overlay"),

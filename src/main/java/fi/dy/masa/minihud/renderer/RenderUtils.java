@@ -4,7 +4,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.malilib.util.Color4f;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.FontRenderer;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
@@ -174,7 +174,7 @@ public class RenderUtils
     {
         boolean flag = false; // sneaking
         boolean isThirdPersonFrontal = false;
-        FontRenderer fontrenderer = mc.fontRenderer;
+        TextRenderer fontrenderer = mc.textRenderer;
 
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
         GlStateManager.pushMatrix();
