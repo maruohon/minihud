@@ -26,6 +26,7 @@ import net.minecraft.client.render.chunk.ChunkRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
@@ -187,7 +188,14 @@ public class RenderHandler implements IRenderer
 
         for (LinePos pos : positions)
         {
-            this.addLine(pos.type);
+            try
+            {
+                this.addLine(pos.type);
+            }
+            catch (Exception e)
+            {
+                this.addLine(pos.type.getName() + ": exception");
+            }
         }
 
         if (Configs.Generic.SORT_LINES_BY_LENGTH.getBooleanValue())
@@ -517,7 +525,19 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.MP_CHUNK_CACHE)
         {
-            this.addLine(mc.world.getChunkProviderStatus());
+            String chunksClient = mc.world.getChunkProviderStatus();
+            World worldServer = WorldUtils.getBestWorld(mc);
+
+            if (worldServer != null && worldServer != mc.world)
+            {
+                int chunksServer = ((ServerChunkManager) worldServer.getChunkManager()).getLoadedChunkCount();
+                int chunksServerTot = ((ServerChunkManager) worldServer.getChunkManager()).getTotalChunksLoadedCount();
+                this.addLine(String.format("Server: %d / %d - Client: %s", chunksServer, chunksServerTot, chunksClient));
+            }
+            else
+            {
+                this.addLine(chunksClient);
+            }
         }
         else if (type == InfoToggle.PARTICLE_COUNT)
         {
