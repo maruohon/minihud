@@ -226,7 +226,14 @@ public class RenderHandler implements IRenderer
 
         for (LinePos pos : positions)
         {
-            this.addLine(pos.type);
+            try
+            {
+                this.addLine(pos.type);
+            }
+            catch (Exception e)
+            {
+                this.addLine(pos.type.getName() + ": exception");
+            }
         }
 
         if (Configs.Generic.SORT_LINES_BY_LENGTH.getBooleanValue())
@@ -562,9 +569,20 @@ public class RenderHandler implements IRenderer
 
             this.addLine(str1);
         }
-        else if (type == InfoToggle.MP_CHUNK_CACHE)
+        else if (type == InfoToggle.LOADED_CHUNKS_COUNT)
         {
-            this.addLine(mc.world.getProviderName());
+            String chunksClient = mc.world.getProviderName();
+            World worldServer = WorldUtils.getBestWorld(mc);
+
+            if (worldServer != null && worldServer != mc.world)
+            {
+                String chunksServer = worldServer.getChunkProvider().makeString();
+                this.addLine(String.format("Server: %s - Client: %s", chunksServer, chunksClient));
+            }
+            else
+            {
+                this.addLine(chunksClient);
+            }
         }
         else if (type == InfoToggle.PARTICLE_COUNT)
         {
