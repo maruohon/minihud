@@ -11,6 +11,7 @@ import net.minecraft.client.gl.GlBuffer;
 import net.minecraft.client.render.VertexFormatElement;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Vec3d;
 
 public class RenderContainer
 {
@@ -85,11 +86,8 @@ public class RenderContainer
                 GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
             }
 
-            double dx = entity.prevRenderX + (entity.x - entity.prevRenderX) * partialTicks;
-            double dy = entity.prevRenderY + (entity.y - entity.prevRenderY) * partialTicks;
-            double dz = entity.prevRenderZ + (entity.z - entity.prevRenderZ) * partialTicks;
-
-            GlStateManager.translated((float) -dx, (float) -dy, (float) -dz);
+            Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+            GlStateManager.translatef((float) -cameraPos.x, (float) -cameraPos.y, (float) -cameraPos.z);
 
             for (int i = 0; i < this.renderers.size(); ++i)
             {

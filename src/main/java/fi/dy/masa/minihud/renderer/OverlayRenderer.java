@@ -8,6 +8,6 @@ public class OverlayRenderer
 
     public static void renderOverlays(MinecraftClient mc, float partialTicks)
     {
-        RC.render(mc.player, mc, partialTicks);
+        RC.render(mc.getCameraEntity(), mc, partialTicks);
     }
 }
