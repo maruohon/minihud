@@ -44,7 +44,9 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     SPEED                   ("infoSpeed",                   false, 13, "",    "Show the player's current moving speed"),
     SPEED_AXIS              ("infoSpeedAxis",               false, 13, "",    "Show the player's current moving speed per axis"),
     TILE_ENTITIES           ("infoTileEntities",            false, 32, "",    "Show the number of TileEntities in the client world"),
+    TIME_DAY_MODULO         ("infoTimeDayModulo",           false, 35, "",    "Show a modulo of the current day time.\nSee Generic configs for the divisor."),
     TIME_REAL               ("infoTimeIRL",                 true,   1, "",    "Show the current real time formatted according to dateFormatReal"),
+    TIME_TOTAL_MODULO       ("infoTimeTotalModulo",         false, 34, "",    "Show a modulo of the current total world time.\nSee Generic configs for the divisor."),
     TIME_WORLD              ("infoTimeWorld",               false,  2, "",    "Show the current world time in ticks"),
     TIME_WORLD_FORMATTED    ("infoWorldTimeFormatted",      false,  3, "",    "Show the current world time formatted to days, hours, minutes");
 

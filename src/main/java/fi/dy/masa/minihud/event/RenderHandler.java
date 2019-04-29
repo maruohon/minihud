@@ -290,6 +290,18 @@ public class RenderHandler implements IRenderer
                 this.addLine("Date formatting failed - Invalid date format string?");
             }
         }
+        else if (type == InfoToggle.TIME_DAY_MODULO)
+        {
+            int mod = Configs.Generic.TIME_DAY_DIVISOR.getIntegerValue();
+            long current = world.getTimeOfDay() % mod;
+            this.addLine(String.format("Day time %% %d: %5d", mod, current));
+        }
+        else if (type == InfoToggle.TIME_TOTAL_MODULO)
+        {
+            int mod = Configs.Generic.TIME_TOTAL_DIVISOR.getIntegerValue();
+            long current = world.getTime() % mod;
+            this.addLine(String.format("Total time %% %d: %5d", mod, current));
+        }
         else if (type == InfoToggle.SERVER_TPS)
         {
             if (mc.isIntegratedServerRunning() && (mc.getServer().getTicks() % 10) == 0)
