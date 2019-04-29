@@ -78,6 +78,8 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       SPAWNABLE_SUB_CHUNKS_OVERLAY_RADIUS = new ConfigInteger("spawnableSubChunksOverlayRadius", -1, "The radius of chunks to render the spawnable sub-chunks\noverlay in. Valid range: -1 - 40, where -1 = render distance");
         public static final ConfigInteger       TEXT_POS_X                          = new ConfigInteger("textPosX", 4, "Text X position from the screen edge (default: 4)");
         public static final ConfigInteger       TEXT_POS_Y                          = new ConfigInteger("textPosY", 4, "Text Y position from the screen edge (default: 4)");
+        public static final ConfigInteger       TIME_DAY_DIVISOR                    = new ConfigInteger("timeDayDivisor", 24000, 1, Integer.MAX_VALUE, "The divisor value for the modulo of the day time");
+        public static final ConfigInteger       TIME_TOTAL_DIVISOR                  = new ConfigInteger("timeTotalDivisor", 24000, 1, Integer.MAX_VALUE, "The divisor value for the modulo of the total world time");
         public static final ConfigHotkey        TOGGLE_KEY                          = new ConfigHotkey("toggleKey", "H", KeybindSettings.RELEASE_EXCLUSIVE, "The main toggle key");
         public static final ConfigBoolean       USE_CUSTOMIZED_COORDINATES          = new ConfigBoolean("useCustomizedCoordinateFormat", true, "Use the customized coordinate format string");
         public static final ConfigBoolean       USE_FONT_SHADOW                     = new ConfigBoolean("useFontShadow", false, "Use font shadow");
@@ -133,7 +135,9 @@ public class Configs implements IConfigHandler
                 SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL,
                 SPAWNABLE_SUB_CHUNKS_OVERLAY_RADIUS,
                 TEXT_POS_X,
-                TEXT_POS_Y
+                TEXT_POS_Y,
+                TIME_DAY_DIVISOR,
+                TIME_TOTAL_DIVISOR
         );
 
         public static final List<ConfigHotkey> HOTKEY_LIST = ImmutableList.of(
