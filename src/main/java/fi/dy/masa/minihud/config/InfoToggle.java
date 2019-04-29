@@ -28,6 +28,7 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     DIMENSION               ("infoDimensionId",             false,  5, "", "Show the current dimension ID\n(might not be accurate in every case,\ndepending on the server (Sponge?)!)"),
     DISTANCE                ("infoDistance",                false, 33, "", "Show the distance to the current reference point.\nSet the reference point with the setDistanceReferencePoint hotkey"),
     ENTITIES                ("infoEntities",                false, 21, "", "Show the visible/loaded entity count"),
+    ENTITIES_CLIENT_WORLD   ("infoEntitiesClientWorld",     false, 22, "", "Show the entity count in the world list/map"),
     ENTITY_REG_NAME         ("infoEntityRegistryName",      false, 24, "", "Show the registry name of the entity\nthe player is currently looking at"),
     FACING                  ("infoFacing",                  true,   8, "", "Show the player's current facing"),
     FPS                     ("infoFPS",                     false,  0, "", "Show the current FPS"),
@@ -46,10 +47,10 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     SPAWNABLE_SUB_CHUNKS    ("infoSpawnableSubChunks",      false, 32, "", "Show the spawnable sub chunk count for the current chunk"),
     SPEED                   ("infoSpeed",                   false, 13, "", "Show the player's current moving speed"),
     SPEED_AXIS              ("infoSpeedAxis",               false, 13, "", "Show the player's current moving speed per axis"),
-    TILE_ENTITIES           ("infoTileEntities",            false, 32, "",    "Show the number of TileEntities in the client world"),
-    TIME_DAY_MODULO         ("infoTimeDayModulo",           false, 35, "",    "Show a modulo of the current day time.\nSee Generic configs for the divisor."),
+    TILE_ENTITIES           ("infoTileEntities",            false, 32, "", "Show the number of TileEntities in the client world"),
+    TIME_DAY_MODULO         ("infoTimeDayModulo",           false, 35, "", "Show a modulo of the current day time.\nSee Generic configs for the divisor."),
     TIME_REAL               ("infoTimeIRL",                 true,   1, "", "Show the current real time formatted according to dateFormatReal"),
-    TIME_TOTAL_MODULO       ("infoTimeTotalModulo",         false, 34, "",    "Show a modulo of the current total world time.\nSee Generic configs for the divisor."),
+    TIME_TOTAL_MODULO       ("infoTimeTotalModulo",         false, 34, "", "Show a modulo of the current total world time.\nSee Generic configs for the divisor."),
     TIME_WORLD              ("infoTimeWorld",               false,  2, "", "Show the current world time in ticks"),
     TIME_WORLD_FORMATTED    ("infoWorldTimeFormatted",      false,  3, "", "Show the current world time formatted to days, hours, minutes");
 

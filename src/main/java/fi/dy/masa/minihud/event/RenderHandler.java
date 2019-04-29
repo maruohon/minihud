@@ -43,6 +43,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
@@ -665,6 +666,24 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.TILE_ENTITIES)
         {
             this.addLine(String.format("Client world TE - L: %d, T: %d", mc.world.loadedTileEntityList.size(), mc.world.tickableTileEntities.size()));
+        }
+        else if (type == InfoToggle.ENTITIES_CLIENT_WORLD)
+        {
+            int countClient = mc.world.loadedEntityList.size();
+
+            if (mc.isIntegratedServerRunning())
+            {
+                World serverWorld = WorldUtils.getBestWorld(mc);
+
+                if (serverWorld != null && serverWorld instanceof WorldServer)
+                {
+                    int countServer = serverWorld.loadedEntityList.size();
+                    this.addLine(String.format("Entities - Client: %d, Server: %d", countClient, countServer));
+                    return;
+                }
+            }
+
+            this.addLine(String.format("Entities - Client: %d", countClient));
         }
         else if (type == InfoToggle.SLIME_CHUNK)
         {
