@@ -16,6 +16,7 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.mixin.IMixinServerWorld;
 import fi.dy.masa.minihud.mixin.IMixinWorldRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -27,6 +28,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.world.ServerChunkManager;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
@@ -619,6 +621,24 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.TILE_ENTITIES)
         {
             this.addLine(String.format("Client world TE - L: %d, T: %d", mc.world.blockEntities.size(), mc.world.tickingBlockEntities.size()));
+        }
+        else if (type == InfoToggle.ENTITIES_CLIENT_WORLD)
+        {
+            int countClient = mc.world.getRegularEntityCount();
+
+            if (mc.isIntegratedServerRunning())
+            {
+                ServerWorld serverWorld = mc.getServer().getWorld(mc.world.dimension.getType());
+
+                if (serverWorld != null)
+                {
+                    int countServer = ((IMixinServerWorld) serverWorld).getEntityMap().values().size();
+                    this.addLine(String.format("Entities - Client: %d, Server: %d", countClient, countServer));
+                    return;
+                }
+            }
+
+            this.addLine(String.format("Entities - Client: %d", countClient));
         }
         else if (type == InfoToggle.SLIME_CHUNK)
         {
