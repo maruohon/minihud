@@ -61,6 +61,7 @@ public class LiteModMiniHud implements LiteMod, Configurable, PluginChannelListe
 
         ConfigManager.getInstance().registerConfigHandler(Reference.MOD_ID, new Configs());
         InputEventHandler.getInstance().registerKeybindProvider(InputHandler.getInstance());
+        InputEventHandler.getInstance().registerMouseInputHandler(InputHandler.getInstance());
 
         RenderHandler renderer = RenderHandler.getInstance();
         RenderEventHandler.getInstance().registerGameOverlayRenderer(renderer);

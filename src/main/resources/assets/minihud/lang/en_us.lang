@@ -63,7 +63,7 @@ minihud.message.error.invalid_dropped_chunks_hash_size=Failed to parse the dropp
 minihud.message.error.invalid_seed=Failed to parse the world seed from chat
 
 minihud.message.distance_reference_point_set=Set distance reference point to %s
-minihud.message.dropped_chunks_hash_size_set=MiniHUD: Set the dropped chunks HashSet size to '%s'
+minihud.message.dropped_chunks_hash_size_set_to=Dropped chunks hash size set to %s
 minihud.message.seed_set=MiniHUD: Set the world seed to '%s'
 minihud.message.spawn_set=MiniHUD: Set the world spawn to %s
 

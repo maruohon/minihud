@@ -21,7 +21,7 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     CHUNK_POS               ("infoChunkPosition",           false,  7, "", "Show the Chunk the player is currently within"),
     CHUNK_SECTIONS          ("infoChunkSections",           false, 14, "", "Show the currently rendered number of\nChunk sections (the C value from F3)"),
     CHUNK_SECTIONS_FULL     ("infoChunkSectionsLine",       false, 15, "", "Show the entire line of the C value from the F3 screen"),
-    CHUNK_UNLOAD_ORDER      ("infoChunkUnloadOrder",        false, 30, "", "Show the \"unload order\" (HashSet bucket)\nof the current chunk (for vanilla Perma-Loaders)"),
+    CHUNK_UNLOAD_ORDER      ("infoChunkUnloadOrder",        false, 30, "", "Show the \"unload order\" (HashSet bucket)\nof the current chunk (for vanilla <= 1.12.x Perma-Loaders)", KeybindSettings.INGAME_BOTH),
     CHUNK_UPDATES           ("infoChunkUpdates",            false, 16, "", "Show the current number of chunk updates per second"),
     COORDINATES             ("infoCoordinates",             true,   4, "", "Show the player's coordinates"),
     DIFFICULTY              ("infoDifficulty",              false, 18, "", "Show the local difficulty"),
@@ -61,11 +61,16 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
 
     private InfoToggle(String name, boolean defaultValue, int linePosition, String defaultHotkey, String comment)
     {
+        this(name, defaultValue, linePosition, defaultHotkey, comment, KeybindSettings.DEFAULT);
+    }
+
+    private InfoToggle(String name, boolean defaultValue, int linePosition, String defaultHotkey, String comment, KeybindSettings settings)
+    {
         this.name = name;
         this.prettyName = name;
         this.valueBoolean = defaultValue;
         this.defaultValueBoolean = defaultValue;
-        this.keybind = KeybindMulti.fromStorageString(defaultHotkey, KeybindSettings.DEFAULT);
+        this.keybind = KeybindMulti.fromStorageString(defaultHotkey, settings);
         this.keybind.setCallback(new KeyCallbackToggleBoolean(this));
         this.linePosition = linePosition;
         this.defaultLinePosition = linePosition;

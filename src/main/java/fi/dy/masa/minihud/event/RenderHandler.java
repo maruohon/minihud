@@ -553,7 +553,14 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.CHUNK_UNLOAD_ORDER)
         {
             int bucket = MiscUtils.getChunkUnloadBucket(pos.getX() >> 4, pos.getZ() >> 4);
-            this.addLine(String.format("Chunk unload bucket: %d", bucket));
+            String str1 = String.format("Chunk unload bucket: %d", bucket);
+
+            if (Configs.Generic.CHUNK_UNLOAD_BUCKET_WITH_SIZE.getBooleanValue())
+            {
+                str1 += String.format(" - Hash size: %d", MiscUtils.getDroppedChunksHashSize());
+            }
+
+            this.addLine(str1);
         }
         else if (type == InfoToggle.MP_CHUNK_CACHE)
         {
