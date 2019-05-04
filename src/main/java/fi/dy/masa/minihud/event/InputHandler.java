@@ -12,6 +12,8 @@ import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.renderer.OverlayRenderer;
+import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.client.Minecraft;
 
@@ -89,6 +91,20 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
 
                 return true;
             }
+            else if (RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() &&
+                     RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind().isKeybindHeld())
+            {
+                OverlayRendererSlimeChunks.overlayTopY += (dWheel < 0 ? 1 : -1);
+                KeyCallbackAdjustable.setValueChanged();
+                return true;
+            }
+            else if (RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getBooleanValue() &&
+                     RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind().isKeybindHeld())
+           {
+               OverlayRenderer.chunkUnloadBucketOverlayY += (dWheel < 0 ? 1 : -1);
+               KeyCallbackAdjustable.setValueChanged();
+               return true;
+           }
         }
 
         return false;

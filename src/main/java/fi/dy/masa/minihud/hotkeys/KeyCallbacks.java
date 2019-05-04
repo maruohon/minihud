@@ -9,6 +9,7 @@ import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBoolean;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.gui.GuiConfigs;
 import fi.dy.masa.minihud.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
@@ -30,6 +31,8 @@ public class KeyCallbacks
         Configs.Generic.TOGGLE_KEY.getKeybind().setCallback(new KeyCallbackToggleBoolean(Configs.Generic.ENABLED));
         Configs.Generic.LIGHT_LEVEL_RANGE.setValueChangeCallback(new IValueChangeCallback<ConfigInteger>() { @Override public void onValueChanged(ConfigInteger config) { OverlayRendererLightLevel.setNeedsUpdate(); } });
         InfoToggle.CHUNK_UNLOAD_ORDER.getKeybind().setCallback(new KeyCallbackAdjustable(InfoToggle.CHUNK_UNLOAD_ORDER, null));
+        RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET)));
+        RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY)));
     }
 
     public static class Callbacks implements IHotkeyCallback

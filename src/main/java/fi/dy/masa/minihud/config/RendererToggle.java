@@ -22,12 +22,12 @@ public enum RendererToggle implements IHotkeyTogglable
     DEBUG_WATER                         ("debugWaterEnabled",           "", "Toggles the vanilla Water debug renderer", "Water"),
 
     OVERLAY_BLOCK_GRID                  ("overlayBlockGrid",            "", "Toggle the Block Grid overlay renderer", "Block Grid overlay"),
-    OVERLAY_CHUNK_UNLOAD_BUCKET         ("overlayChunkUnloadBucket",    "", "Toggle the Chunk unload bucket/priority renderer", "Chunk Unload Priority overlay"),
+    OVERLAY_CHUNK_UNLOAD_BUCKET         ("overlayChunkUnloadBucket",    "", KeybindSettings.INGAME_BOTH, "Toggle the Chunk unload bucket/priority renderer", "Chunk Unload Priority overlay"),
     OVERLAY_LIGHT_LEVEL                 ("overlayLightLevel",           "", "Toggle the Light Level overlay renderer", "Light Level overlay"),
     OVERLAY_RANDOM_TICKS_FIXED          ("overlayRandomTicksFixed",     "", "Toggle the fixed-point random ticked chunks overlay renderer", "Random Ticked Chunks (fixed) overlay"),
     OVERLAY_RANDOM_TICKS_PLAYER         ("overlayRandomTicksPlayer",    "", "Toggle the player-following random ticked chunks overlay renderer", "Random Ticked Chunks (player-following) overlay"),
     OVERLAY_REGION_FILE                 ("overlayRegionFile",           "", "Toggle the region file border overlay renderer", "Region File Border overlay"),
-    OVERLAY_SLIME_CHUNKS_OVERLAY        ("overlaySlimeChunks",          "", "Toggle the Slime Chunk overlay renderer", "Slime Chunks overlay"),
+    OVERLAY_SLIME_CHUNKS_OVERLAY        ("overlaySlimeChunks",          "", KeybindSettings.INGAME_BOTH, "Toggle the Slime Chunk overlay renderer", "Slime Chunks overlay"),
     OVERLAY_SPAWNABLE_CHUNKS_FIXED      ("overlaySpawnableChunksFixed", "", "Toggle the location-fixed spawnable chunks overlay renderer", "Spawnable Chunks (fixed) overlay"),
     OVERLAY_SPAWNABLE_CHUNKS_PLAYER     ("overlaySpawnableChunksPlayer","", "Toggle the player-following spawnable chunks overlay renderer", "Spawnable Chunks (player-following) overlay"),
     OVERLAY_SPAWNABLE_COLUMN_HEIGHTS    ("overlaySpawnableColumnHeights","", "Toggle the spawnable column heights overlay renderer", "Spawnable column heights overlay"),
@@ -45,11 +45,16 @@ public enum RendererToggle implements IHotkeyTogglable
 
     RendererToggle(String name, String defaultHotkey, String comment, String prettyName)
     {
+        this(name, defaultHotkey, KeybindSettings.DEFAULT, comment, prettyName);
+    }
+
+    RendererToggle(String name, String defaultHotkey, KeybindSettings settings, String comment, String prettyName)
+    {
         this.name = name;
         this.prettyName = prettyName;
         this.comment = comment;
         this.defaultValueBoolean = false;
-        this.keybind = KeybindMulti.fromStorageString(defaultHotkey, KeybindSettings.DEFAULT);
+        this.keybind = KeybindMulti.fromStorageString(defaultHotkey, settings);
 
         if (name.equals("overlayStructureMainToggle"))
         {
