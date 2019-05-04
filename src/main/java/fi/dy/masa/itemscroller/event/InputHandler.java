@@ -112,7 +112,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
         if (Configs.Toggles.VILLAGER_TRADE_LIST.getBooleanValue())
         {
-            if (mc.currentScreen == null &&
+            if (mc.currentScreen == null && mc.objectMouseOver != null &&
                 mc.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY &&
                 mc.objectMouseOver.entityHit instanceof EntityVillager)
             {
