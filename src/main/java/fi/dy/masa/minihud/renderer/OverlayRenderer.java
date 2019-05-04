@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
+import java.util.Arrays;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -76,7 +77,7 @@ public class OverlayRenderer
                 int cz = centerZ + zOff;
                 int bucket = MiscUtils.getChunkUnloadBucket(cx, cz);
                 String str = String.valueOf(bucket);
-                RenderUtils.drawTextPlate(str, (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale, mc);
+                fi.dy.masa.malilib.render.RenderUtils.drawTextPlate(Arrays.asList(str), (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale, mc);
             }
         }
     }
