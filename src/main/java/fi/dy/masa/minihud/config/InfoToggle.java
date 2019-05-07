@@ -39,6 +39,7 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     MEMORY_USAGE            ("infoMemoryUsage",             false,  0, "", "Show the memory usage and allocation"),
     LOADED_CHUNKS_COUNT     ("infoLoadedChunksCount",       false, 31, "", "Show the number of loaded chunks on the client"),
     PARTICLE_COUNT          ("infoParticleCount",           false, 17, "", "Show the currently renderer particle count (P from F3)"),
+    PING                    ("infoPing",                    false, 36, "", "Show the current ping to the server"),
     REGION_FILE             ("infoRegionFile",              false, 29, "", "Show the region file the player is currently within"),
     ROTATION_PITCH          ("infoRotationPitch",           false, 12, "", "Show the player's pitch rotation"),
     ROTATION_YAW            ("infoRotationYaw",             false, 11, "", "Show the player's yaw rotation"),

@@ -25,6 +25,7 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.entity.Entity;
@@ -377,6 +378,15 @@ public class RenderHandler implements IRenderer
             else
             {
                 this.addLine("Server TPS: <no valid data>");
+            }
+        }
+        else if (type == InfoToggle.PING)
+        {
+            NetworkPlayerInfo info = mc.player.connection.getPlayerInfo(mc.player.getUniqueID());
+
+            if (info != null)
+            {
+                this.addLine("Ping: " + info.getResponseTime() + " ms");
             }
         }
         else if (type == InfoToggle.COORDINATES ||
