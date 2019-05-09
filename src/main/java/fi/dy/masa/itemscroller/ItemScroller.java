@@ -21,6 +21,7 @@ public class ItemScroller implements ModInitializer, ClientTickCallback
     public void onInitialize()
     {
         InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
+        ClientTickCallback.EVENT.register(this);
     }
 
     @Override
