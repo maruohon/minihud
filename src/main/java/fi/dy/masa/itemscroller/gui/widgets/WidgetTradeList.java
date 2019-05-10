@@ -130,9 +130,10 @@ public class WidgetTradeList extends WidgetBase
     {
         this.lazySetRecipeList();
 
-        if (this.data != null)
+        if (this.data != null && this.recipeList != null)
         {
             int currentPage = AccessorUtils.getSelectedMerchantRecipe(this.parentGui);
+            currentPage = Math.min(currentPage, this.recipeList.size() - 1);
             this.updateDataStorage(currentPage);
 
             GlStateManager.color(1f, 1f, 1f, 1f);

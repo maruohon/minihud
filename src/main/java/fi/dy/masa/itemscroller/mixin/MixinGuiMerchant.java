@@ -15,7 +15,7 @@ import net.minecraft.client.gui.GuiMerchant;
 public abstract class MixinGuiMerchant
 {
     @Inject(method = "initGui", at = @At("RETURN"))
-    private void setRestorePreviousPage(CallbackInfo ci)
+    private void initTradeListWidget(CallbackInfo ci)
     {
         if (Configs.Toggles.VILLAGER_TRADE_LIST.getBooleanValue())
         {

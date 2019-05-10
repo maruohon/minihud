@@ -124,7 +124,10 @@ public class RenderEventHandler
         else if (Configs.Toggles.VILLAGER_TRADE_LIST.getBooleanValue() && this.mc.currentScreen instanceof GuiMerchant)
         {
             GuiMerchant gui = (GuiMerchant) this.mc.currentScreen;
-            this.renderVillagerTradeList(gui);
+            final int mouseX = InputUtils.getMouseX();
+            final int mouseY = InputUtils.getMouseY();
+
+            this.renderVillagerTradeList(gui, mouseX, mouseY);
         }
         else
         {
@@ -348,13 +351,10 @@ public class RenderEventHandler
         GlStateManager.glLightModel(2899, RenderHelper.setColorBuffer(ambientLightStrength, ambientLightStrength, ambientLightStrength, 1.0F));
     }
 
-    private void renderVillagerTradeList(GuiMerchant gui)
+    private void renderVillagerTradeList(GuiMerchant gui, int mouseX, int mouseY)
     {
         if (this.widgetTradeList != null)
         {
-            int mouseX = InputUtils.getMouseX();
-            int mouseY = InputUtils.getMouseY();
-
             this.widgetTradeList.render(mouseX, mouseY, false);
         }
     }

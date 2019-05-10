@@ -30,6 +30,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.village.MerchantRecipeList;
 
 public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IMouseInputHandler
 {
@@ -283,10 +284,20 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
     public static void changeTradePage(GuiMerchant gui, int page)
     {
-        ((IMixinGuiMerchant) gui).setSelectedMerchantRecipe(page);
+        Minecraft mc = Minecraft.getMinecraft();
+        MerchantRecipeList trades = gui.getMerchant().getRecipes(mc.player);
+
+        // The trade list is unfortunately synced after the GUI
+        // opens, so the trade list can be null here when we want to
+        // restore the last viewed page when the GUI first opens
+        if (page >= 0 && (trades == null || page < trades.size()))
+        {
+            ((IMixinGuiMerchant) gui).setSelectedMerchantRecipe(page);
+        }
+
         ((ContainerMerchant) gui.inventorySlots).setCurrentRecipeIndex(page);
         PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
         packetbuffer.writeInt(page);
-        Minecraft.getMinecraft().getConnection().sendPacket(new CPacketCustomPayload("MC|TrSel", packetbuffer));
+        mc.getConnection().sendPacket(new CPacketCustomPayload("MC|TrSel", packetbuffer));
     }
 }
