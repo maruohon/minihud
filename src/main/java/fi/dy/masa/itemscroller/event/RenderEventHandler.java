@@ -1,8 +1,6 @@
 package fi.dy.masa.itemscroller.event;
 
-import javax.annotation.Nullable;
 import fi.dy.masa.itemscroller.config.Configs;
-import fi.dy.masa.itemscroller.gui.widgets.WidgetTradeList;
 import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
@@ -12,7 +10,6 @@ import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -28,7 +25,6 @@ public class RenderEventHandler
     private static final Vec3d LIGHT1_POS = (new Vec3d(-0.2D, 1.0D,  0.7D)).normalize();
 
     private final Minecraft mc = Minecraft.getMinecraft();
-    @Nullable private WidgetTradeList widgetTradeList;
     private int recipeListX;
     private int recipeListY;
     private int recipesPerColumn;
@@ -42,12 +38,6 @@ public class RenderEventHandler
     public static RenderEventHandler instance()
     {
         return INSTANCE;
-    }
-
-    @Nullable
-    public WidgetTradeList getTradeListWidget()
-    {
-        return this.widgetTradeList;
     }
 
     public void onDrawBackgroundPost()
@@ -120,18 +110,6 @@ public class RenderEventHandler
                     InventoryOverlay.renderStackToolTip(mouseX, mouseY, stack, this.mc);
                 }
             }
-        }
-        else if (Configs.Toggles.VILLAGER_TRADE_LIST.getBooleanValue() && this.mc.currentScreen instanceof GuiMerchant)
-        {
-            GuiMerchant gui = (GuiMerchant) this.mc.currentScreen;
-            final int mouseX = InputUtils.getMouseX();
-            final int mouseY = InputUtils.getMouseY();
-
-            this.renderVillagerTradeList(gui, mouseX, mouseY);
-        }
-        else
-        {
-            this.widgetTradeList = null;
         }
     }
 
@@ -349,21 +327,5 @@ public class RenderEventHandler
 
         float ambientLightStrength = 0.4F;
         GlStateManager.glLightModel(2899, RenderHelper.setColorBuffer(ambientLightStrength, ambientLightStrength, ambientLightStrength, 1.0F));
-    }
-
-    private void renderVillagerTradeList(GuiMerchant gui, int mouseX, int mouseY)
-    {
-        if (this.widgetTradeList != null)
-        {
-            this.widgetTradeList.render(mouseX, mouseY, false);
-        }
-    }
-
-    public void createVillagerTradeListWidget(GuiMerchant gui)
-    {
-        final int x = AccessorUtils.getGuiLeft(gui) - 106 + 4;
-        final int y = AccessorUtils.getGuiTop(gui);
-
-        this.widgetTradeList = new WidgetTradeList(x, y, gui);
     }
 }

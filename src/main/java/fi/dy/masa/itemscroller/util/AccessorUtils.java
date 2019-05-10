@@ -1,7 +1,6 @@
 package fi.dy.masa.itemscroller.util;
 
 import fi.dy.masa.itemscroller.mixin.IMixinGuiContainer;
-import fi.dy.masa.itemscroller.mixin.IMixinGuiMerchant;
 import fi.dy.masa.itemscroller.mixin.IMixinSlot;
 import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -47,7 +46,7 @@ public class AccessorUtils
 
     public static int getSelectedMerchantRecipe(GuiMerchant gui)
     {
-        return ((IMixinGuiMerchant) gui).getSelectedMerchantRecipe();
+        return ((IGuiMerchant) gui).getSelectedMerchantRecipe();
     }
 
     public static int getSlotIndex(Slot slot)

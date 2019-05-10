@@ -5,9 +5,9 @@ import fi.dy.masa.itemscroller.Reference;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Hotkeys;
 import fi.dy.masa.itemscroller.gui.widgets.WidgetTradeList;
-import fi.dy.masa.itemscroller.mixin.IMixinGuiMerchant;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
+import fi.dy.masa.itemscroller.util.IGuiMerchant;
 import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.itemscroller.util.MoveAction;
@@ -121,12 +121,13 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             }
             else if (mc.currentScreen instanceof GuiMerchant && storage.hasInteractionTarget())
             {
-                WidgetTradeList widget = RenderEventHandler.instance().getTradeListWidget();
-                final int mouseX = InputUtils.getMouseX();
-                final int mouseY = InputUtils.getMouseY();
+                WidgetTradeList widget = ((IGuiMerchant) mc.currentScreen).getTradeListWidget();
 
                 if (widget != null)
                 {
+                    final int mouseX = InputUtils.getMouseX();
+                    final int mouseY = InputUtils.getMouseY();
+
                     if (widget.isMouseOver(mouseX, mouseY))
                     {
                         if (dWheel != 0)
@@ -292,7 +293,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         // restore the last viewed page when the GUI first opens
         if (page >= 0 && (trades == null || page < trades.size()))
         {
-            ((IMixinGuiMerchant) gui).setSelectedMerchantRecipe(page);
+            ((IGuiMerchant) gui).setSelectedMerchantRecipe(page);
         }
 
         ((ContainerMerchant) gui.inventorySlots).setCurrentRecipeIndex(page);

@@ -5,7 +5,6 @@
     "minVersion": "0.6",
     "client": [
         "IMixinGuiContainer",
-        "IMixinGuiMerchant",
         "MixinEntityRenderer",
         "IMixinSlot",
         "MixinContainer",
