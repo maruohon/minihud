@@ -16,7 +16,7 @@ import net.minecraft.network.play.server.SPacketTimeUpdate;
 import net.minecraft.util.math.ChunkPos;
 
 @Mixin(NetHandlerPlayClient.class)
-public class MixinNetHandlerPlayClient
+public abstract class MixinNetHandlerPlayClient
 {
     @Inject(method = "handleChat", at = @At("RETURN"))
     private void onChatMessage(SPacketChat packet, CallbackInfo ci)

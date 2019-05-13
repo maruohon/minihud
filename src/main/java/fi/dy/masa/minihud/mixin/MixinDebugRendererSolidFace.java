@@ -8,7 +8,7 @@ import fi.dy.masa.minihud.event.RenderHandler;
 import net.minecraft.client.renderer.debug.DebugRendererSolidFace;
 
 @Mixin(DebugRendererSolidFace.class)
-public class MixinDebugRendererSolidFace
+public abstract class MixinDebugRendererSolidFace
 {
     @Inject(method = "render", at = @At("HEAD"))
     public void fixDebugRendererState(CallbackInfo ci)
