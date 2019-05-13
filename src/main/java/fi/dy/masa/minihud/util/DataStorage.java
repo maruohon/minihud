@@ -123,6 +123,14 @@ public class DataStorage
         this.worldSpawnValid = true;
     }
 
+    public void setWorldSpawnIfUnknown(BlockPos spawn)
+    {
+        if (this.worldSpawnValid == false)
+        {
+            this.setWorldSpawn(spawn);
+        }
+    }
+
     public boolean isWorldSeedKnown(int dimension)
     {
         if (this.worldSeedValid)
@@ -157,22 +165,11 @@ public class DataStorage
 
     public boolean isWorldSpawnKnown()
     {
-        return this.worldSpawnValid || Minecraft.getMinecraft().world != null;
+        return this.worldSpawnValid;
     }
 
     public BlockPos getWorldSpawn()
     {
-        if (this.worldSpawnValid == false)
-        {
-            World world = Minecraft.getMinecraft().world;
-
-            if (world != null)
-            {
-                this.worldSpawn = world.getSpawnPoint();
-                this.worldSpawnValid = true;
-            }
-        }
-
         return this.worldSpawn;
     }
 

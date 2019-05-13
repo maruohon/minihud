@@ -11,6 +11,7 @@ import net.minecraft.network.play.server.SPacketChat;
 import net.minecraft.network.play.server.SPacketChunkData;
 import net.minecraft.network.play.server.SPacketMultiBlockChange;
 import net.minecraft.network.play.server.SPacketPlayerListHeaderFooter;
+import net.minecraft.network.play.server.SPacketSpawnPosition;
 import net.minecraft.network.play.server.SPacketTimeUpdate;
 import net.minecraft.util.math.ChunkPos;
 
@@ -52,5 +53,11 @@ public class MixinNetHandlerPlayClient
     {
         ChunkPos pos = ((IMixinSPacketMultiBlockChange) packet).getChunkPos();
         DataStorage.getInstance().markChunkForHeightmapCheck(pos.x, pos.z);
+    }
+
+    @Inject(method = "handleSpawnPosition", at = @At("RETURN"))
+    private void onSetSpawn(SPacketSpawnPosition packet, CallbackInfo ci)
+    {
+        DataStorage.getInstance().setWorldSpawnIfUnknown(packet.getSpawnPos());
     }
 }
