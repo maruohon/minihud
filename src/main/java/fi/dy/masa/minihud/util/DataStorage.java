@@ -109,6 +109,7 @@ public class DataStorage
         this.lastStructureUpdatePos = null;
         this.structures.clear();
         this.worldSeed = 0;
+        this.worldSpawn = BlockPos.ORIGIN;
     }
 
     public void setWorldSeed(long seed)
