@@ -96,8 +96,6 @@ public class VillagerDataStorage
 
     private void readFromNBT(NBTTagCompound nbt)
     {
-        this.data.clear();
-
         if (nbt == null || nbt.hasKey("VillagerData", Constants.NBT.TAG_LIST) == false)
         {
             return;
@@ -153,6 +151,8 @@ public class VillagerDataStorage
 
     public void readFromDisk()
     {
+        this.data.clear();
+
         try
         {
             File saveDir = this.getSaveDir();
