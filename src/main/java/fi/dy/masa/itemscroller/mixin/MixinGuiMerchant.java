@@ -37,6 +37,7 @@ public abstract class MixinGuiMerchant extends GuiContainer implements IGuiMerch
         super(inventorySlotsIn);
     }
 
+    @Nullable
     @Override
     public WidgetTradeList getTradeListWidget()
     {
@@ -60,22 +61,22 @@ public abstract class MixinGuiMerchant extends GuiContainer implements IGuiMerch
     {
         if (Configs.Toggles.VILLAGER_TRADE_LIST.getBooleanValue())
         {
-            GuiMerchant gui = (GuiMerchant) (Object) this;
+            VillagerData data = VillagerDataStorage.getInstance().getDataForLastInteractionTarget();
 
-            if (Configs.Generic.VILLAGER_TRADE_LIST_REMEMBER_PAGE.getBooleanValue())
+            if (data != null)
             {
-                VillagerData data = VillagerDataStorage.getInstance().getDataForLastInteractionTarget();
+                GuiMerchant gui = (GuiMerchant) (Object) this;
 
-                if (data != null)
+                if (Configs.Generic.VILLAGER_TRADE_LIST_REMEMBER_PAGE.getBooleanValue())
                 {
                     InputHandler.changeTradePage(gui, data.getLastPage());
                 }
+
+                int x = this.guiLeft - 106 + 4;
+                int y = this.guiTop;
+
+                this.widgetTradeList = new WidgetTradeList(x, y, gui, data);
             }
-
-            int x = this.guiLeft - 106 + 4;
-            int y = this.guiTop;
-
-            this.widgetTradeList = new WidgetTradeList(x, y, gui);
         }
     }
 
