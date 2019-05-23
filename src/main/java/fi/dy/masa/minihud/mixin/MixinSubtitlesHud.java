@@ -14,8 +14,8 @@ public abstract class MixinSubtitlesHud
 {
     @Inject(method = "draw", at = @At(
             value = "INVOKE",
-            target = "Ljava/util/List;iterator()Ljava/util/Iterator;",
-            shift = Shift.AFTER, remap = false))
+            target = "Lcom/mojang/blaze3d/platform/GlStateManager;enableBlend()V",
+            shift = Shift.AFTER, ordinal = 0))
     private void nudgeSubtitleOverlay(CallbackInfo ci)
     {
         int offset = RenderHandler.getInstance().getSubtitleOffset();

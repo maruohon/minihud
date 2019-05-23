@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Random;
 import fi.dy.masa.minihud.MiniHUD;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.ChatMessageType;
-import net.minecraft.text.TranslatableTextComponent;
-import net.minecraft.world.chunk.ChunkPos;
+import net.minecraft.network.chat.ChatMessageType;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.math.ChunkPos;
 
 public class MiscUtils
 {
@@ -37,7 +37,7 @@ public class MiscUtils
 
     public static void printInfoMessage(String key, Object... args)
     {
-        MinecraftClient.getInstance().inGameHud.addChatMessage(ChatMessageType.GAME_INFO, new TranslatableTextComponent(key, args));
+        MinecraftClient.getInstance().inGameHud.addChatMessage(ChatMessageType.GAME_INFO, new TranslatableComponent(key, args));
     }
 
     /**

@@ -10,9 +10,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.chunk.ChunkPos;
 
 public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 {

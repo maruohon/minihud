@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Screen;
+import net.minecraft.client.gui.screen.Screen;
 
 @Mixin(Screen.class)
 public abstract class MixinScreen
