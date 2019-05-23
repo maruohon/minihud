@@ -4,12 +4,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
+import net.minecraft.ChatFormat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.TextComponent;
-import net.minecraft.text.TextFormat;
-import net.minecraft.text.TranslatableTextComponent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -155,11 +155,11 @@ public class DataStorage
         return false;
     }
 
-    public void onChatMessage(TextComponent message)
+    public void onChatMessage(Component message)
     {
-        if (message instanceof TranslatableTextComponent)
+        if (message instanceof TranslatableComponent)
         {
-            TranslatableTextComponent text = (TranslatableTextComponent) message;
+            TranslatableComponent text = (TranslatableComponent) message;
 
             // The vanilla "/seed" command
             if ("commands.seed.success".equals(text.getKey()))
@@ -257,11 +257,11 @@ public class DataStorage
         }
     }
 
-    public void handleCarpetServerTPSData(TextComponent textComponent)
+    public void handleCarpetServerTPSData(Component textComponent)
     {
         if (textComponent.getFormattedText().isEmpty() == false)
         {
-            String text = TextFormat.stripFormatting(textComponent.getString());
+            String text = ChatFormat.stripFormatting(textComponent.getString());
             String[] lines = text.split("\n");
 
             for (String line : lines)

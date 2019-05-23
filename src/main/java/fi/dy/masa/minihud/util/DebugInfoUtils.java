@@ -52,7 +52,6 @@ public class DebugInfoUtils
         buf.writeInt(node.z);
 
         buf.writeFloat(node.field_46);
-        buf.writeFloat(node.field_45);
         buf.writeFloat(node.field_43);
         buf.writeBoolean(node.field_42);
         buf.writeInt(node.type.ordinal());

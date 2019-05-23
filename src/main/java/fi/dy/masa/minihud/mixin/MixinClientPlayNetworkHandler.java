@@ -12,7 +12,8 @@ import net.minecraft.client.network.packet.ChunkDataS2CPacket;
 import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.client.network.packet.PlayerListHeaderS2CPacket;
 import net.minecraft.client.network.packet.WorldTimeUpdateS2CPacket;
-import net.minecraft.world.chunk.ChunkPos;
+import net.minecraft.util.math.ChunkPos;
+
 
 @Mixin(ClientPlayNetworkHandler.class)
 public abstract class MixinClientPlayNetworkHandler
@@ -42,15 +43,15 @@ public abstract class MixinClientPlayNetworkHandler
         DataStorage.getInstance().onChatMessage(packet.getMessage());
     }
 
-    @Inject(method = "onWorldTimeUpdate", at = @At("RETURN"))
-    private void onTimeUpdate(WorldTimeUpdateS2CPacket packetIn, CallbackInfo ci)
-    {
-        DataStorage.getInstance().onServerTimeUpdate(packetIn.getTime());
-    }
-
     @Inject(method = "onPlayerListHeader", at = @At("RETURN"))
     private void onHandlePlayerListHeaderFooter(PlayerListHeaderS2CPacket packetIn, CallbackInfo ci)
     {
         DataStorage.getInstance().handleCarpetServerTPSData(packetIn.getFooter());
+    }
+
+    @Inject(method = "onWorldTimeUpdate", at = @At("RETURN"))
+    private void onTimeUpdate(WorldTimeUpdateS2CPacket packetIn, CallbackInfo ci)
+    {
+        DataStorage.getInstance().onServerTimeUpdate(packetIn.getTime());
     }
 }
