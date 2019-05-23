@@ -1,53 +1,53 @@
 package fi.dy.masa.itemscroller.util;
 
-import fi.dy.masa.itemscroller.mixin.IMixinContainerScreen;
-import fi.dy.masa.itemscroller.mixin.IMixinVillagerScreen;
+import fi.dy.masa.itemscroller.mixin.IMixinAbstractContainerScreen;
 import fi.dy.masa.itemscroller.mixin.IMixinSlot;
-import net.minecraft.client.gui.ContainerScreen;
-import net.minecraft.client.gui.container.VillagerScreen;
+import fi.dy.masa.itemscroller.mixin.IMixinMerchantScreen;
+import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
+import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 import net.minecraft.container.Slot;
 import net.minecraft.container.SlotActionType;
 
 public class AccessorUtils
 {
-    public static Slot getSlotUnderMouse(ContainerScreen<?> gui)
+    public static Slot getSlotUnderMouse(AbstractContainerScreen<?> gui)
     {
-        return ((IMixinContainerScreen) gui).getHoveredSlot();
+        return ((IMixinAbstractContainerScreen) gui).getHoveredSlot();
     }
 
-    public static Slot getSlotAtPosition(ContainerScreen<?> gui, int x, int y)
+    public static Slot getSlotAtPosition(AbstractContainerScreen<?> gui, int x, int y)
     {
-        return ((IMixinContainerScreen) gui).getSlotAtPositionInvoker(x, y);
+        return ((IMixinAbstractContainerScreen) gui).getSlotAtPositionInvoker(x, y);
     }
 
-    public static void handleMouseClick(ContainerScreen<?> gui, Slot slotIn, int slotId, int mouseButton, SlotActionType type)
+    public static void handleMouseClick(AbstractContainerScreen<?> gui, Slot slotIn, int slotId, int mouseButton, SlotActionType type)
     {
-        ((IMixinContainerScreen) gui).handleMouseClickInvoker(slotIn, slotId, mouseButton, type);
+        ((IMixinAbstractContainerScreen) gui).handleMouseClickInvoker(slotIn, slotId, mouseButton, type);
     }
 
-    public static int getGuiLeft(ContainerScreen<?> gui)
+    public static int getGuiLeft(AbstractContainerScreen<?> gui)
     {
-        return ((IMixinContainerScreen) gui).getGuiLeft();
+        return ((IMixinAbstractContainerScreen) gui).getGuiLeft();
     }
 
-    public static int getGuiTop(ContainerScreen<?> gui)
+    public static int getGuiTop(AbstractContainerScreen<?> gui)
     {
-        return ((IMixinContainerScreen) gui).getGuiTop();
+        return ((IMixinAbstractContainerScreen) gui).getGuiTop();
     }
 
-    public static int getGuiXSize(ContainerScreen<?> gui)
+    public static int getGuiXSize(AbstractContainerScreen<?> gui)
     {
-        return ((IMixinContainerScreen) gui).getGuiSizeX();
+        return ((IMixinAbstractContainerScreen) gui).getGuiSizeX();
     }
 
-    public static int getGuiYSize(ContainerScreen<?> gui)
+    public static int getGuiYSize(AbstractContainerScreen<?> gui)
     {
-        return ((IMixinContainerScreen) gui).getGuiSizeY();
+        return ((IMixinAbstractContainerScreen) gui).getGuiSizeY();
     }
 
-    public static int getSelectedMerchantRecipe(VillagerScreen gui)
+    public static int getSelectedMerchantRecipe(MerchantScreen gui)
     {
-        return ((IMixinVillagerScreen) gui).getSelectedMerchantRecipe();
+        return ((IMixinMerchantScreen) gui).getSelectedMerchantRecipe();
     }
 
     public static int getSlotIndex(Slot slot)

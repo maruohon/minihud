@@ -17,10 +17,10 @@ import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
 import fi.dy.masa.itemscroller.recipes.RecipePattern;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.ContainerScreen;
-import net.minecraft.client.gui.container.VillagerScreen;
-import net.minecraft.client.gui.ingame.CreativePlayerInventoryScreen;
-import net.minecraft.client.gui.ingame.PlayerInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.container.Container;
@@ -34,8 +34,8 @@ import net.minecraft.inventory.CraftingResultInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.crafting.CraftingRecipe;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.village.TradeOffer;
@@ -97,7 +97,7 @@ public class InventoryUtils
         return "<empty>";
     }
 
-    public static void debugPrintSlotInfo(ContainerScreen<? extends Container> gui, Slot slot)
+    public static void debugPrintSlotInfo(AbstractContainerScreen<? extends Container> gui, Slot slot)
     {
         if (slot == null)
         {
@@ -116,7 +116,7 @@ public class InventoryUtils
                 gui.getContainer().slotList.size()));
     }
 
-    private static boolean isValidSlot(Slot slot, ContainerScreen<? extends Container> gui, boolean requireItems)
+    private static boolean isValidSlot(Slot slot, AbstractContainerScreen<? extends Container> gui, boolean requireItems)
     {
         Container container = gui.getContainer();
 
@@ -126,7 +126,7 @@ public class InventoryUtils
                 Configs.SLOT_BLACKLIST.contains(slot.getClass().getName()) == false;
     }
 
-    public static boolean isCraftingSlot(ContainerScreen<? extends Container> gui, Slot slot)
+    public static boolean isCraftingSlot(AbstractContainerScreen<? extends Container> gui, Slot slot)
     {
         return slot != null && CraftingHandler.getCraftingGridSlots(gui, slot) != null;
     }
@@ -147,7 +147,7 @@ public class InventoryUtils
         return false;
     }
 
-    public static boolean canShiftPlaceItems(ContainerScreen<? extends Container> gui)
+    public static boolean canShiftPlaceItems(AbstractContainerScreen<? extends Container> gui)
     {
         Slot slot = AccessorUtils.getSlotUnderMouse(gui);
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -158,7 +158,7 @@ public class InventoryUtils
                slot.hasStack() == false && slot.canInsert(stackCursor);
     }
 
-    public static boolean tryMoveItems(ContainerScreen<? extends Container> gui, RecipeStorage recipes, boolean scrollingUp)
+    public static boolean tryMoveItems(AbstractContainerScreen<? extends Container> gui, RecipeStorage recipes, boolean scrollingUp)
     {
         Slot slot = AccessorUtils.getSlotUnderMouse(gui);
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -170,7 +170,7 @@ public class InventoryUtils
         }
 
         // Villager handling only happens when scrolling over the trade output slot
-        boolean villagerHandling = Configs.Toggles.SCROLL_VILLAGER.getBooleanValue() && gui instanceof VillagerScreen && slot instanceof TradeOutputSlot;
+        boolean villagerHandling = Configs.Toggles.SCROLL_VILLAGER.getBooleanValue() && gui instanceof MerchantScreen && slot instanceof TradeOutputSlot;
         boolean craftingHandling = Configs.Toggles.CRAFTING_FEATURES.getBooleanValue() && isCraftingSlot(gui, slot);
         boolean keyActiveMoveEverything = Hotkeys.MODIFIER_MOVE_EVERYTHING.getKeybind().isKeybindHeld();
         boolean keyActiveMoveMatching = Hotkeys.MODIFIER_MOVE_MATCHING.getKeybind().isKeybindHeld();
@@ -204,7 +204,7 @@ public class InventoryUtils
 
         if (villagerHandling)
         {
-            return tryMoveItemsVillager((VillagerScreen) gui, slot, moveToOtherInventory, keyActiveMoveStacks);
+            return tryMoveItemsVillager((MerchantScreen) gui, slot, moveToOtherInventory, keyActiveMoveStacks);
         }
 
         if ((Configs.Toggles.SCROLL_SINGLE.getBooleanValue() == false && nonSingleMove == false) ||
@@ -250,7 +250,7 @@ public class InventoryUtils
         return false;
     }
 
-    public static boolean dragMoveItems(ContainerScreen<? extends Container> gui, MinecraftClient mc, MoveAction action, int mouseX, int mouseY, boolean isClick)
+    public static boolean dragMoveItems(AbstractContainerScreen<? extends Container> gui, MinecraftClient mc, MoveAction action, int mouseX, int mouseY, boolean isClick)
     {
         if (isStackEmpty(mc.player.inventory.getCursorStack()) == false)
         {
@@ -328,9 +328,9 @@ public class InventoryUtils
 
         if (slot != null)
         {
-            if (gui instanceof CreativePlayerInventoryScreen)
+            if (gui instanceof CreativeInventoryScreen)
             {
-                boolean isPlayerInv = ((CreativePlayerInventoryScreen) gui).method_2469() == ItemGroup.INVENTORY.getIndex();
+                boolean isPlayerInv = ((CreativeInventoryScreen) gui).method_2469() == ItemGroup.INVENTORY.getIndex();
                 int slotNumber = isPlayerInv ? AccessorUtils.getSlotIndex(slot) : slot.id;
                 slotNumberLast = slotNumber;
             }
@@ -353,9 +353,9 @@ public class InventoryUtils
         DRAGGED_SLOTS.clear();
     }
 
-    private static boolean dragMoveFromSlotAtPosition(ContainerScreen<? extends Container> gui, int x, int y, MoveAction action)
+    private static boolean dragMoveFromSlotAtPosition(AbstractContainerScreen<? extends Container> gui, int x, int y, MoveAction action)
     {
-        if (gui instanceof CreativePlayerInventoryScreen)
+        if (gui instanceof CreativeInventoryScreen)
         {
             return dragMoveFromSlotAtPositionCreative(gui, x, y, action);
         }
@@ -424,9 +424,9 @@ public class InventoryUtils
         return true;
     }
 
-    private static boolean dragMoveFromSlotAtPositionCreative(ContainerScreen<? extends Container> gui, int x, int y, MoveAction action)
+    private static boolean dragMoveFromSlotAtPositionCreative(AbstractContainerScreen<? extends Container> gui, int x, int y, MoveAction action)
     {
-        CreativePlayerInventoryScreen guiCreative = (CreativePlayerInventoryScreen) gui;
+        CreativeInventoryScreen guiCreative = (CreativeInventoryScreen) gui;
         Slot slot = AccessorUtils.getSlotAtPosition(gui, x, y);
         boolean isPlayerInv = guiCreative.method_2469() == ItemGroup.INVENTORY.getIndex();
 
@@ -518,7 +518,7 @@ public class InventoryUtils
         return cancel;
     }
 
-    public static void dropStacks(ContainerScreen<? extends Container> gui, ItemStack stackReference, Slot slotReference, boolean sameInventory)
+    public static void dropStacks(AbstractContainerScreen<? extends Container> gui, ItemStack stackReference, Slot slotReference, boolean sameInventory)
     {
         if (slotReference != null && isStackEmpty(stackReference) == false)
         {
@@ -538,7 +538,7 @@ public class InventoryUtils
         }
     }
 
-    public static boolean shiftDropItems(ContainerScreen<? extends Container> gui)
+    public static boolean shiftDropItems(AbstractContainerScreen<? extends Container> gui)
     {
         ItemStack stackReference = MinecraftClient.getInstance().player.inventory.getCursorStack();
 
@@ -556,7 +556,7 @@ public class InventoryUtils
         return false;
     }
 
-    public static boolean shiftPlaceItems(Slot slot, ContainerScreen<? extends Container> gui)
+    public static boolean shiftPlaceItems(Slot slot, AbstractContainerScreen<? extends Container> gui)
     {
         // Left click to place the items from the cursor to the slot
         leftClickSlot(gui, slot.id);
@@ -611,7 +611,7 @@ public class InventoryUtils
         }
     }
 
-    private static boolean tryMoveItemsVillager(VillagerScreen gui, Slot slot, boolean moveToOtherInventory, boolean fullStacks)
+    private static boolean tryMoveItemsVillager(MerchantScreen gui, Slot slot, boolean moveToOtherInventory, boolean fullStacks)
     {
         if (fullStacks)
         {
@@ -648,7 +648,7 @@ public class InventoryUtils
         return false;
     }
 
-    private static boolean tryMoveSingleItemToOtherInventory(Slot slot, ContainerScreen<? extends Container> gui)
+    private static boolean tryMoveSingleItemToOtherInventory(Slot slot, AbstractContainerScreen<? extends Container> gui)
     {
         ItemStack stackOrig = slot.getStack();
         Container container = gui.getContainer();
@@ -700,7 +700,7 @@ public class InventoryUtils
         return false;
     }
 
-    private static boolean tryMoveAllButOneItemToOtherInventory(Slot slot, ContainerScreen<? extends Container> gui)
+    private static boolean tryMoveAllButOneItemToOtherInventory(Slot slot, AbstractContainerScreen<? extends Container> gui)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         PlayerEntity player = mc.player;
@@ -780,7 +780,7 @@ public class InventoryUtils
         // No temporary slot found, try to move the stack manually
         else
         {
-            boolean treatHotbarAsDifferent = gui.getClass() == PlayerInventoryScreen.class;
+            boolean treatHotbarAsDifferent = gui.getClass() == InventoryScreen.class;
             List<Integer> slots = getSlotNumbersOfEmptySlots(gui.getContainer(), slot, false, treatHotbarAsDifferent, false);
 
             if (slots.isEmpty())
@@ -824,7 +824,7 @@ public class InventoryUtils
         return false;
     }
 
-    private static boolean tryMoveSingleItemToThisInventory(Slot slot, ContainerScreen<? extends Container> gui)
+    private static boolean tryMoveSingleItemToThisInventory(Slot slot, AbstractContainerScreen<? extends Container> gui)
     {
         Container container = gui.getContainer();
         ItemStack stackOrig = slot.getStack();
@@ -873,12 +873,12 @@ public class InventoryUtils
         return false;
     }
 
-    public static void tryMoveStacks(Slot slot, ContainerScreen<? extends Container> gui, boolean matchingOnly, boolean toOtherInventory, boolean firstOnly)
+    public static void tryMoveStacks(Slot slot, AbstractContainerScreen<? extends Container> gui, boolean matchingOnly, boolean toOtherInventory, boolean firstOnly)
     {
         tryMoveStacks(slot.getStack(), slot, gui, matchingOnly, toOtherInventory, firstOnly);
     }
 
-    private static void tryMoveStacks(ItemStack stackReference, Slot slot, ContainerScreen<? extends Container> gui, boolean matchingOnly, boolean toOtherInventory, boolean firstOnly)
+    private static void tryMoveStacks(ItemStack stackReference, Slot slot, AbstractContainerScreen<? extends Container> gui, boolean matchingOnly, boolean toOtherInventory, boolean firstOnly)
     {
         Container container = gui.getContainer();
         final int maxSlot = container.slotList.size() - 1;
@@ -913,7 +913,7 @@ public class InventoryUtils
         }
     }
 
-    private static void tryMoveItemsToMerchantBuySlots(VillagerScreen gui, boolean fillStacks)
+    private static void tryMoveItemsToMerchantBuySlots(MerchantScreen gui, boolean fillStacks)
     {
         TraderOfferList list = gui.getContainer().getRecipes();
         int index = AccessorUtils.getSelectedMerchantRecipe(gui);
@@ -944,7 +944,7 @@ public class InventoryUtils
         }
     }
 
-    private static void fillBuySlot(ContainerScreen<? extends Container> gui, int slotNum, ItemStack buyStack, boolean fillStacks)
+    private static void fillBuySlot(AbstractContainerScreen<? extends Container> gui, int slotNum, ItemStack buyStack, boolean fillStacks)
     {
         Slot slot = gui.getContainer().getSlot(slotNum);
         ItemStack existingStack = slot.getStack();
@@ -964,7 +964,7 @@ public class InventoryUtils
         }
     }
 
-    public static void handleRecipeClick(ContainerScreen<? extends Container> gui, MinecraftClient mc, RecipeStorage recipes, int hoveredRecipeId,
+    public static void handleRecipeClick(AbstractContainerScreen<? extends Container> gui, MinecraftClient mc, RecipeStorage recipes, int hoveredRecipeId,
             boolean isLeftClick, boolean isRightClick, boolean isPickBlock, boolean isShiftDown)
     {
         if (isLeftClick || isRightClick)
@@ -1025,7 +1025,7 @@ public class InventoryUtils
         }
     }
 
-    public static void tryMoveItemsToFirstCraftingGrid(RecipePattern recipe, ContainerScreen<? extends Container> gui, boolean fillStacks)
+    public static void tryMoveItemsToFirstCraftingGrid(RecipePattern recipe, AbstractContainerScreen<? extends Container> gui, boolean fillStacks)
     {
         Slot craftingOutputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
 
@@ -1035,13 +1035,13 @@ public class InventoryUtils
         }
     }
 
-    public static void loadRecipeItemsToGridForOutputSlotUnderMouse(RecipePattern recipe, ContainerScreen<? extends Container> gui)
+    public static void loadRecipeItemsToGridForOutputSlotUnderMouse(RecipePattern recipe, AbstractContainerScreen<? extends Container> gui)
     {
         Slot slot = AccessorUtils.getSlotUnderMouse(gui);
         loadRecipeItemsToGridForOutputSlot(recipe, gui, slot);
     }
 
-    private static void loadRecipeItemsToGridForOutputSlot(RecipePattern recipe, ContainerScreen<? extends Container> gui, Slot outputSlot)
+    private static void loadRecipeItemsToGridForOutputSlot(RecipePattern recipe, AbstractContainerScreen<? extends Container> gui, Slot outputSlot)
     {
         if (outputSlot != null && isCraftingSlot(gui, outputSlot) && isStackEmpty(recipe.getResult()) == false)
         {
@@ -1049,7 +1049,7 @@ public class InventoryUtils
         }
     }
 
-    private static boolean tryMoveItemsCrafting(RecipeStorage recipes, Slot slot, ContainerScreen<? extends Container> gui,
+    private static boolean tryMoveItemsCrafting(RecipeStorage recipes, Slot slot, AbstractContainerScreen<? extends Container> gui,
             boolean moveToOtherInventory, boolean moveStacks, boolean moveEverything)
     {
         RecipePattern recipe = recipes.getSelectedRecipe();
@@ -1093,7 +1093,7 @@ public class InventoryUtils
         return false;
     }
 
-    private static void craftAsManyItemsAsPossible(RecipePattern recipe, Slot slot, ContainerScreen<? extends Container> gui)
+    private static void craftAsManyItemsAsPossible(RecipePattern recipe, Slot slot, AbstractContainerScreen<? extends Container> gui)
     {
         ItemStack result = recipe.getResult();
         int failSafe = 1024;
@@ -1117,7 +1117,7 @@ public class InventoryUtils
         }
     }
 
-    public static void clearFirstCraftingGridOfItems(RecipePattern recipe, ContainerScreen<? extends Container> gui, boolean clearNonMatchingOnly)
+    public static void clearFirstCraftingGridOfItems(RecipePattern recipe, AbstractContainerScreen<? extends Container> gui, boolean clearNonMatchingOnly)
     {
         Slot craftingOutputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
 
@@ -1128,7 +1128,7 @@ public class InventoryUtils
         }
     }
 
-    public static void clearFirstCraftingGridOfAllItems(ContainerScreen<? extends Container> gui)
+    public static void clearFirstCraftingGridOfAllItems(AbstractContainerScreen<? extends Container> gui)
     {
         Slot craftingOutputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
 
@@ -1139,7 +1139,7 @@ public class InventoryUtils
         }
     }
 
-    private static boolean clearCraftingGridOfItems(RecipePattern recipe, ContainerScreen<? extends Container> gui, SlotRange range, boolean clearNonMatchingOnly)
+    private static boolean clearCraftingGridOfItems(RecipePattern recipe, AbstractContainerScreen<? extends Container> gui, SlotRange range, boolean clearNonMatchingOnly)
     {
         final int invSlots = gui.getContainer().slotList.size();
         final int rangeSlots = range.getSlotCount();
@@ -1166,7 +1166,7 @@ public class InventoryUtils
         return true;
     }
 
-    private static boolean clearCraftingGridOfAllItems(ContainerScreen<? extends Container> gui, SlotRange range)
+    private static boolean clearCraftingGridOfAllItems(AbstractContainerScreen<? extends Container> gui, SlotRange range)
     {
         final int invSlots = gui.getContainer().slotList.size();
         final int rangeSlots = range.getSlotCount();
@@ -1191,7 +1191,7 @@ public class InventoryUtils
         return clearedAll;
     }
 
-    private static boolean tryMoveItemsToCraftingGridSlots(RecipePattern recipe, Slot slot, ContainerScreen<? extends Container> gui, boolean fillStacks)
+    private static boolean tryMoveItemsToCraftingGridSlots(RecipePattern recipe, Slot slot, AbstractContainerScreen<? extends Container> gui, boolean fillStacks)
     {
         Container container = gui.getContainer();
         int numSlots = container.slotList.size();
@@ -1236,7 +1236,7 @@ public class InventoryUtils
         return false;
     }
 
-    private static void fillCraftingGrid(ContainerScreen<? extends Container> gui, Slot slotGridFirst, ItemStack ingredientReference, List<Integer> targetSlots)
+    private static void fillCraftingGrid(AbstractContainerScreen<? extends Container> gui, Slot slotGridFirst, ItemStack ingredientReference, List<Integer> targetSlots)
     {
         Container container = gui.getContainer();
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -1318,7 +1318,7 @@ public class InventoryUtils
         }
     }
 
-    public static void rightClickCraftOneStack(ContainerScreen<? extends Container> gui)
+    public static void rightClickCraftOneStack(AbstractContainerScreen<? extends Container> gui)
     {
         Slot slot = AccessorUtils.getSlotUnderMouse(gui);
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -1350,7 +1350,7 @@ public class InventoryUtils
         }
     }
 
-    public static void craftEverythingPossibleWithCurrentRecipe(RecipePattern recipe, ContainerScreen<? extends Container> gui)
+    public static void craftEverythingPossibleWithCurrentRecipe(RecipePattern recipe, AbstractContainerScreen<? extends Container> gui)
     {
         Slot slot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
 
@@ -1376,7 +1376,7 @@ public class InventoryUtils
         }
     }
 
-    public static void moveAllCraftingResultsToOtherInventory(RecipePattern recipe, ContainerScreen<? extends Container> gui)
+    public static void moveAllCraftingResultsToOtherInventory(RecipePattern recipe, AbstractContainerScreen<? extends Container> gui)
     {
         if (isStackEmpty(recipe.getResult()) == false)
         {
@@ -1408,7 +1408,7 @@ public class InventoryUtils
         }
     }
 
-    public static void throwAllCraftingResultsToGround(RecipePattern recipe, ContainerScreen<? extends Container> gui)
+    public static void throwAllCraftingResultsToGround(RecipePattern recipe, AbstractContainerScreen<? extends Container> gui)
     {
         Slot slot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
 
@@ -1418,7 +1418,7 @@ public class InventoryUtils
         }
     }
 
-    private static int putSingleItemIntoSlots(ContainerScreen<? extends Container> gui, List<Integer> targetSlots, int startIndex)
+    private static int putSingleItemIntoSlots(AbstractContainerScreen<? extends Container> gui, List<Integer> targetSlots, int startIndex)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         ItemStack stackInCursor = mc.player.inventory.getCursorStack();
@@ -1449,7 +1449,7 @@ public class InventoryUtils
         return count;
     }
 
-    public static void moveOneSetOfItemsFromSlotToPlayerInventory(ContainerScreen<? extends Container> gui, Slot slot)
+    public static void moveOneSetOfItemsFromSlotToPlayerInventory(AbstractContainerScreen<? extends Container> gui, Slot slot)
     {
         leftClickSlot(gui, slot.id);
 
@@ -1468,7 +1468,7 @@ public class InventoryUtils
         }
     }
 
-    private static void moveOneRecipeItemIntoCraftingGrid(ContainerScreen<? extends Container> gui, Slot slotGridFirst, ItemStack ingredientReference, List<Integer> targetSlots)
+    private static void moveOneRecipeItemIntoCraftingGrid(AbstractContainerScreen<? extends Container> gui, Slot slotGridFirst, ItemStack ingredientReference, List<Integer> targetSlots)
     {
         Container container = gui.getContainer();
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -1515,7 +1515,7 @@ public class InventoryUtils
         }
     }
 
-    private static boolean moveItemFromCursorToSlots(ContainerScreen<? extends Container> gui, List<Integer> slotNumbers)
+    private static boolean moveItemFromCursorToSlots(AbstractContainerScreen<? extends Container> gui, List<Integer> slotNumbers)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         PlayerInventory inv = mc.player.inventory;
@@ -1533,7 +1533,7 @@ public class InventoryUtils
         return false;
     }
 
-    private static void moveItemsFromInventory(ContainerScreen<? extends Container> gui, int slotTo, Inventory invSrc, ItemStack stackTemplate, boolean fillStacks)
+    private static void moveItemsFromInventory(AbstractContainerScreen<? extends Container> gui, int slotTo, Inventory invSrc, ItemStack stackTemplate, boolean fillStacks)
     {
         Container container = gui.getContainer();
 
@@ -1821,7 +1821,7 @@ public class InventoryUtils
     }
 
     /*
-    private void clickSlotsToMoveItems(Slot slot, ContainerScreen<? extends Container> gui, boolean matchingOnly, boolean toOtherInventory)
+    private void clickSlotsToMoveItems(Slot slot, AbstractContainerScreen<? extends Container> gui, boolean matchingOnly, boolean toOtherInventory)
     {
         for (Slot slotTmp : gui.getContainer().slotList)
         {
@@ -1841,7 +1841,7 @@ public class InventoryUtils
     }
     */
 
-    private static void clickSlotsToMoveItemsFromSlot(Slot slotFrom, ContainerScreen<? extends Container> gui, boolean toOtherInventory)
+    private static void clickSlotsToMoveItemsFromSlot(Slot slotFrom, AbstractContainerScreen<? extends Container> gui, boolean toOtherInventory)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         PlayerEntity player = mc.player;
@@ -1877,7 +1877,7 @@ public class InventoryUtils
         }
     }
 
-    private static boolean clickSlotsToMoveSingleItem(ContainerScreen<? extends Container> gui, int slotFrom, int slotTo)
+    private static boolean clickSlotsToMoveSingleItem(AbstractContainerScreen<? extends Container> gui, int slotFrom, int slotTo)
     {
         //System.out.println("clickSlotsToMoveSingleItem(from: " + slotFrom + ", to: " + slotTo + ")");
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -1912,7 +1912,7 @@ public class InventoryUtils
         return true;
     }
 
-    private static boolean clickSlotsToMoveSingleItemByShiftClick(ContainerScreen<? extends Container> gui, int slotFrom)
+    private static boolean clickSlotsToMoveSingleItemByShiftClick(AbstractContainerScreen<? extends Container> gui, int slotFrom)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         Slot slot = gui.getContainer().slotList.get(slotFrom);
@@ -1957,7 +1957,7 @@ public class InventoryUtils
      * Try move items from slotFrom to slotTo
      * @return true if at least some items were moved
      */
-    private static boolean clickSlotsToMoveItems(ContainerScreen<? extends Container> gui, int slotFrom, int slotTo)
+    private static boolean clickSlotsToMoveItems(AbstractContainerScreen<? extends Container> gui, int slotFrom, int slotTo)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         PlayerEntity player = mc.player;
@@ -1990,7 +1990,7 @@ public class InventoryUtils
         return ret;
     }
 
-    public static void dropStacksUntilEmpty(ContainerScreen<? extends Container> gui, int slotNum)
+    public static void dropStacksUntilEmpty(AbstractContainerScreen<? extends Container> gui, int slotNum)
     {
         if (slotNum >= 0 && slotNum < gui.getContainer().slotList.size())
         {
@@ -2004,7 +2004,7 @@ public class InventoryUtils
         }
     }
 
-    public static void dropStacksWhileHasItem(ContainerScreen<? extends Container> gui, int slotNum, ItemStack stackReference)
+    public static void dropStacksWhileHasItem(AbstractContainerScreen<? extends Container> gui, int slotNum, ItemStack stackReference)
     {
         if (slotNum >= 0 && slotNum < gui.getContainer().slotList.size())
         {
@@ -2018,7 +2018,7 @@ public class InventoryUtils
         }
     }
 
-    private static boolean shiftClickSlotWithCheck(ContainerScreen<? extends Container> gui, int slotNum)
+    private static boolean shiftClickSlotWithCheck(AbstractContainerScreen<? extends Container> gui, int slotNum)
     {
         Slot slot = gui.getContainer().getSlot(slotNum);
 
@@ -2033,7 +2033,7 @@ public class InventoryUtils
         return slot.hasStack() == false || getStackSize(slot.getStack()) != sizeOrig;
     }
 
-    public static boolean tryMoveItemsVertically(ContainerScreen<? extends Container> gui, Slot slot, boolean moveUp, MoveAmount amount)
+    public static boolean tryMoveItemsVertically(AbstractContainerScreen<? extends Container> gui, Slot slot, boolean moveUp, MoveAmount amount)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -2070,7 +2070,7 @@ public class InventoryUtils
         return true;
     }
 
-    private static void moveMatchingStacksToSlots(ContainerScreen<? extends Container> gui, Slot slot, boolean moveUp)
+    private static void moveMatchingStacksToSlots(AbstractContainerScreen<? extends Container> gui, Slot slot, boolean moveUp)
     {
         List<Integer> matchingSlots = getSlotNumbersOfMatchingStacks(gui.getContainer(), slot, true, slot.getStack(), true, true, false);
         List<Integer> targetSlots = getSlotNumbersOfEmptySlots(gui.getContainer(), slot, false, true, false);
@@ -2093,7 +2093,7 @@ public class InventoryUtils
         }
     }
 
-    private static Slot moveStackToSlots(ContainerScreen<? extends Container> gui, Slot slotFrom, List<Integer> slotsTo, boolean leaveOne)
+    private static Slot moveStackToSlots(AbstractContainerScreen<? extends Container> gui, Slot slotFrom, List<Integer> slotsTo, boolean leaveOne)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         PlayerInventory inv = mc.player.inventory;
@@ -2140,7 +2140,7 @@ public class InventoryUtils
         return lastSlot;
     }
 
-    private static void moveOneItemToFirstValidSlot(ContainerScreen<? extends Container> gui, Slot slotFrom, List<Integer> slotsTo)
+    private static void moveOneItemToFirstValidSlot(AbstractContainerScreen<? extends Container> gui, Slot slotFrom, List<Integer> slotsTo)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         PlayerInventory inv = mc.player.inventory;
@@ -2205,7 +2205,7 @@ public class InventoryUtils
         return slotNumbers;
     }
 
-    public static void tryClearCursor(ContainerScreen<? extends Container> gui, MinecraftClient mc)
+    public static void tryClearCursor(AbstractContainerScreen<? extends Container> gui, MinecraftClient mc)
     {
         ItemStack stackCursor = mc.player.inventory.getCursorStack();
 
@@ -2306,7 +2306,7 @@ public class InventoryUtils
         }
     }
 
-    public static void clickSlot(ContainerScreen<? extends Container> gui, int slotNum, int mouseButton, SlotActionType type)
+    public static void clickSlot(AbstractContainerScreen<? extends Container> gui, int slotNum, int mouseButton, SlotActionType type)
     {
         if (slotNum >= 0 && slotNum < gui.getContainer().slotList.size())
         {
@@ -2328,7 +2328,7 @@ public class InventoryUtils
         }
     }
 
-    public static void clickSlot(ContainerScreen<? extends Container> gui, Slot slot, int slotNum, int mouseButton, SlotActionType type)
+    public static void clickSlot(AbstractContainerScreen<? extends Container> gui, Slot slot, int slotNum, int mouseButton, SlotActionType type)
     {
         try
         {
@@ -2341,59 +2341,59 @@ public class InventoryUtils
         }
     }
 
-    public static void leftClickSlot(ContainerScreen<? extends Container> gui, Slot slot, int slotNumber)
+    public static void leftClickSlot(AbstractContainerScreen<? extends Container> gui, Slot slot, int slotNumber)
     {
         clickSlot(gui, slot, slotNumber, 0, SlotActionType.PICKUP);
     }
 
-    public static void rightClickSlot(ContainerScreen<? extends Container> gui, Slot slot, int slotNumber)
+    public static void rightClickSlot(AbstractContainerScreen<? extends Container> gui, Slot slot, int slotNumber)
     {
         clickSlot(gui, slot, slotNumber, 1, SlotActionType.PICKUP);
     }
 
-    public static void shiftClickSlot(ContainerScreen<? extends Container> gui, Slot slot, int slotNumber)
+    public static void shiftClickSlot(AbstractContainerScreen<? extends Container> gui, Slot slot, int slotNumber)
     {
         clickSlot(gui, slot, slotNumber, 0, SlotActionType.QUICK_MOVE);
     }
 
-    public static void leftClickSlot(ContainerScreen<? extends Container> gui, int slotNum)
+    public static void leftClickSlot(AbstractContainerScreen<? extends Container> gui, int slotNum)
     {
         clickSlot(gui, slotNum, 0, SlotActionType.PICKUP);
     }
 
-    public static void rightClickSlot(ContainerScreen<? extends Container> gui, int slotNum)
+    public static void rightClickSlot(AbstractContainerScreen<? extends Container> gui, int slotNum)
     {
         clickSlot(gui, slotNum, 1, SlotActionType.PICKUP);
     }
 
-    public static void shiftClickSlot(ContainerScreen<? extends Container> gui, int slotNum)
+    public static void shiftClickSlot(AbstractContainerScreen<? extends Container> gui, int slotNum)
     {
         clickSlot(gui, slotNum, 0, SlotActionType.QUICK_MOVE);
     }
 
-    public static void dropItemsFromCursor(ContainerScreen<? extends Container> gui)
+    public static void dropItemsFromCursor(AbstractContainerScreen<? extends Container> gui)
     {
         clickSlot(gui, -999, 0, SlotActionType.PICKUP);
     }
 
-    public static void dropItem(ContainerScreen<? extends Container> gui, int slotNum)
+    public static void dropItem(AbstractContainerScreen<? extends Container> gui, int slotNum)
     {
         clickSlot(gui, slotNum, 0, SlotActionType.THROW);
     }
 
-    public static void dropStack(ContainerScreen<? extends Container> gui, int slotNum)
+    public static void dropStack(AbstractContainerScreen<? extends Container> gui, int slotNum)
     {
         clickSlot(gui, slotNum, 1, SlotActionType.THROW);
     }
 
-    public static void swapSlots(ContainerScreen<? extends Container> gui, int slotNum, int otherSlot)
+    public static void swapSlots(AbstractContainerScreen<? extends Container> gui, int slotNum, int otherSlot)
     {
         clickSlot(gui, slotNum, 0, SlotActionType.SWAP);
         clickSlot(gui, otherSlot, 0, SlotActionType.SWAP);
         clickSlot(gui, slotNum, 0, SlotActionType.SWAP);
     }
 
-    private static void dragSplitItemsIntoSlots(ContainerScreen<? extends Container> gui, List<Integer> targetSlots)
+    private static void dragSplitItemsIntoSlots(AbstractContainerScreen<? extends Container> gui, List<Integer> targetSlots)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         ItemStack stackInCursor = mc.player.inventory.getCursorStack();

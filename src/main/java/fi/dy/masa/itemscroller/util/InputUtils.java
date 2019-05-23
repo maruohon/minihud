@@ -5,7 +5,7 @@ import fi.dy.masa.itemscroller.event.KeybindCallbacks;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.ContainerScreen;
+import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 
 public class InputUtils
 {
@@ -19,7 +19,7 @@ public class InputUtils
                CraftingHandler.isCraftingGui(mc.currentScreen);
     }
 
-    public static boolean canShiftDropItems(ContainerScreen<?> gui, MinecraftClient mc, int mouseX, int mouseY)
+    public static boolean canShiftDropItems(AbstractContainerScreen<?> gui, MinecraftClient mc, int mouseX, int mouseY)
     {
         if (InventoryUtils.isStackEmpty(mc.player.inventory.getCursorStack()) == false)
         {

@@ -11,10 +11,11 @@ import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
 import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
+import net.minecraft.ChatFormat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.ContainerScreen;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GuiLighting;
@@ -22,9 +23,8 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.Window;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.StringTextComponent;
-import net.minecraft.text.TextComponent;
-import net.minecraft.text.TextFormat;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.math.Vec3d;
 
 public class RenderEventHandler
@@ -42,9 +42,9 @@ public class RenderEventHandler
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
-        if (mc.currentScreen instanceof ContainerScreen && InputUtils.isRecipeViewOpen())
+        if (mc.currentScreen instanceof AbstractContainerScreen && InputUtils.isRecipeViewOpen())
         {
-            ContainerScreen<?> gui = (ContainerScreen<?>) mc.currentScreen;
+            AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) mc.currentScreen;
             RecipeStorage recipes = KeybindCallbacks.getInstance().getRecipes();
             final int count = recipes.getRecipeCount();
 
@@ -60,9 +60,9 @@ public class RenderEventHandler
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
-        if (mc.currentScreen instanceof ContainerScreen && InputUtils.isRecipeViewOpen())
+        if (mc.currentScreen instanceof AbstractContainerScreen && InputUtils.isRecipeViewOpen())
         {
-            ContainerScreen<?> gui = (ContainerScreen<?>) mc.currentScreen;
+            AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) mc.currentScreen;
             RecipeStorage recipes = KeybindCallbacks.getInstance().getRecipes();
 
             Window window = mc.window;
@@ -96,7 +96,7 @@ public class RenderEventHandler
         }
     }
 
-    private void renderHoverTooltip(int mouseX, int mouseY, RecipePattern recipe, ContainerScreen<?> gui, MinecraftClient mc)
+    private void renderHoverTooltip(int mouseX, int mouseY, RecipePattern recipe, AbstractContainerScreen<?> gui, MinecraftClient mc)
     {
         ItemStack stack = recipe.getResult();
 
@@ -106,7 +106,7 @@ public class RenderEventHandler
         }
     }
 
-    public int getHoveredRecipeId(int mouseX, int mouseY, RecipeStorage recipes, ContainerScreen<?> gui, MinecraftClient mc)
+    public int getHoveredRecipeId(int mouseX, int mouseY, RecipeStorage recipes, AbstractContainerScreen<?> gui, MinecraftClient mc)
     {
         if (InputUtils.isRecipeViewOpen())
         {
@@ -139,7 +139,7 @@ public class RenderEventHandler
         return -1;
     }
 
-    private void renderStoredRecipeStack(int recipeId, int recipeCount, ItemStack stack, ContainerScreen<?> gui, MinecraftClient mc, boolean selected)
+    private void renderStoredRecipeStack(int recipeId, int recipeCount, ItemStack stack, AbstractContainerScreen<?> gui, MinecraftClient mc, boolean selected)
     {
         TextRenderer font = mc.textRenderer;
         final String indexStr = String.valueOf(recipeId + 1);
@@ -168,7 +168,7 @@ public class RenderEventHandler
         font.draw(indexStr, (int) (x - scale * strWidth), (int) (y + (entryHeight - font.fontHeight) / 2 - 2), 0xC0C0C0);
     }
 
-    private void renderRecipeItems(RecipePattern recipe, int recipeCount, ContainerScreen<?> gui, MinecraftClient mc)
+    private void renderRecipeItems(RecipePattern recipe, int recipeCount, AbstractContainerScreen<?> gui, MinecraftClient mc)
     {
         RecipeLocation location = this.getRecipeLocation(recipe, recipeCount, gui, mc);
 
@@ -185,7 +185,7 @@ public class RenderEventHandler
         }
     }
 
-    private RecipeLocation getRecipeLocation(RecipePattern recipe, int recipeCount, ContainerScreen<?> gui, MinecraftClient mc)
+    private RecipeLocation getRecipeLocation(RecipePattern recipe, int recipeCount, AbstractContainerScreen<?> gui, MinecraftClient mc)
     {
         Window window = mc.window;
         final int verticalGap = 40;
@@ -207,7 +207,7 @@ public class RenderEventHandler
         return new RecipeLocation(x, y, scale, stackBaseHeight, recipeDimensions);
     }
 
-    private ItemStack getHoveredRecipeIngredient(int mouseX, int mouseY, RecipePattern recipe, int recipeCount, ContainerScreen<?> gui, MinecraftClient mc)
+    private ItemStack getHoveredRecipeIngredient(int mouseX, int mouseY, RecipePattern recipe, int recipeCount, AbstractContainerScreen<?> gui, MinecraftClient mc)
     {
         RecipeLocation location = this.getRecipeLocation(recipe, recipeCount, gui, mc);
         final float stackWidth = location.scale * location.stackBaseHeight;
@@ -323,19 +323,19 @@ public class RenderEventHandler
         GlStateManager.lightModel(2899, GuiLighting.singletonBuffer(ambientLightStrength, ambientLightStrength, ambientLightStrength, 1.0F));
     }
 
-    private void renderStackToolTip(int x, int y, ItemStack stack, ContainerScreen<?> gui, MinecraftClient mc)
+    private void renderStackToolTip(int x, int y, ItemStack stack, AbstractContainerScreen<?> gui, MinecraftClient mc)
     {
-        List<TextComponent> list = stack.getTooltipText(mc.player, mc.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
+        List<Component> list = stack.getTooltipText(mc.player, mc.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
 
         for (int i = 0; i < list.size(); ++i)
         {
             if (i == 0)
             {
-                list.set(i, new StringTextComponent(stack.getRarity().formatting + list.get(i).getString()));
+                list.set(i, new TextComponent(stack.getRarity().formatting + list.get(i).getString()));
             }
             else
             {
-                list.set(i, new StringTextComponent(TextFormat.GRAY + list.get(i).getString()));
+                list.set(i, new TextComponent(ChatFormat.GRAY + list.get(i).getString()));
             }
         }
 
@@ -344,7 +344,7 @@ public class RenderEventHandler
         drawHoveringText(stack, list, x, y, gui.width, gui.height, -1, font);
     }
 
-    private static void drawHoveringText(@Nonnull final ItemStack stack, List<TextComponent> components, int mouseX, int mouseY, int screenWidth, int screenHeight, int maxTextWidth, TextRenderer font)
+    private static void drawHoveringText(@Nonnull final ItemStack stack, List<Component> components, int mouseX, int mouseY, int screenWidth, int screenHeight, int maxTextWidth, TextRenderer font)
     {
         List<String> textLines = new ArrayList<>();
 
@@ -356,7 +356,7 @@ public class RenderEventHandler
             GlStateManager.disableDepthTest();
             int tooltipTextWidth = 0;
 
-            for (TextComponent entry : components)
+            for (Component entry : components)
             {
                 String text = entry.getString();
                 int textLineWidth = font.getStringWidth(text);

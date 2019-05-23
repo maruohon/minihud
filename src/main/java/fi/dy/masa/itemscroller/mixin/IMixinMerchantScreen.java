@@ -2,10 +2,10 @@ package fi.dy.masa.itemscroller.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
-import net.minecraft.client.gui.container.VillagerScreen;
+import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 
-@Mixin(VillagerScreen.class)
-public interface IMixinVillagerScreen
+@Mixin(MerchantScreen.class)
+public interface IMixinMerchantScreen
 {
     @Accessor("field_19161")
     int getSelectedMerchantRecipe();

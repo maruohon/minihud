@@ -4,9 +4,9 @@
     "compatibilityLevel": "JAVA_8",
     "minVersion": "0.7",
     "client": [
-        "IMixinContainerScreen",
+        "IMixinAbstractContainerScreen",
+        "IMixinMerchantScreen",
         "IMixinSlot",
-        "IMixinVillagerScreen",
         "MixinCraftingTableContainer",
         "MixinGameRenderer",
         "MixinMinecraftClient",

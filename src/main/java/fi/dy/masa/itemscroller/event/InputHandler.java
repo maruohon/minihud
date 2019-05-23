@@ -15,9 +15,9 @@ import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.ContainerScreen;
-import net.minecraft.client.gui.Screen;
-import net.minecraft.client.gui.ingame.CreativePlayerInventoryScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.container.Slot;
 import net.minecraft.util.math.MathHelper;
 
@@ -82,11 +82,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             amount != 0 &&
             mc != null &&
             mc.player != null &&
-            mc.currentScreen instanceof ContainerScreen &&
-            (mc.currentScreen instanceof CreativePlayerInventoryScreen) == false &&
+            mc.currentScreen instanceof AbstractContainerScreen &&
+            (mc.currentScreen instanceof CreativeInventoryScreen) == false &&
             Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
         {
-            ContainerScreen<?> gui = (ContainerScreen<?>) mc.currentScreen;
+            AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) mc.currentScreen;
             RecipeStorage recipes = this.callbacks.getRecipes();
 
             // When scrolling while the recipe view is open, change the selection instead of moving items
@@ -120,11 +120,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         if (this.callbacks.functionalityEnabled() &&
             mc != null &&
             mc.player != null &&
-            mc.currentScreen instanceof ContainerScreen &&
-            (mc.currentScreen instanceof CreativePlayerInventoryScreen) == false &&
+            mc.currentScreen instanceof AbstractContainerScreen &&
+            (mc.currentScreen instanceof CreativeInventoryScreen) == false &&
             Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
         {
-            ContainerScreen<?> gui = (ContainerScreen<?>) mc.currentScreen;
+            AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) mc.currentScreen;
             RecipeStorage recipes = this.callbacks.getRecipes();
 
             Slot slot = AccessorUtils.getSlotUnderMouse(gui);
@@ -194,14 +194,14 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         if (this.callbacks.functionalityEnabled() &&
             mc != null &&
             mc.player != null &&
-            mc.currentScreen instanceof ContainerScreen &&
+            mc.currentScreen instanceof AbstractContainerScreen &&
             Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
         {
-            this.handleDragging((ContainerScreen<?>) mc.currentScreen, mc, mouseX, mouseY, false);
+            this.handleDragging((AbstractContainerScreen<?>) mc.currentScreen, mc, mouseX, mouseY, false);
         }
     }
 
-    private boolean handleDragging(ContainerScreen<?> gui, MinecraftClient mc, int mouseX, int mouseY, boolean isClick)
+    private boolean handleDragging(AbstractContainerScreen<?> gui, MinecraftClient mc, int mouseX, int mouseY, boolean isClick)
     {
         MoveAction action = InventoryUtils.getActiveMoveAction();
 

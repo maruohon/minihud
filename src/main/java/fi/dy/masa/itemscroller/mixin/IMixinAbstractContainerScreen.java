@@ -3,12 +3,12 @@ package fi.dy.masa.itemscroller.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
-import net.minecraft.client.gui.ContainerScreen;
+import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.container.Slot;
 import net.minecraft.container.SlotActionType;
 
-@Mixin(ContainerScreen.class)
-public interface IMixinContainerScreen
+@Mixin(AbstractContainerScreen.class)
+public interface IMixinAbstractContainerScreen
 {
     @Invoker("getSlotAt")
     Slot getSlotAtPositionInvoker(double x, double y);

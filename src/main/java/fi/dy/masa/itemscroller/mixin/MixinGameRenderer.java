@@ -13,7 +13,7 @@ public abstract class MixinGameRenderer
 {
     @Inject(method = "render(FJZ)V",
             at = @At(value = "INVOKE", shift = Shift.AFTER,
-                     target = "Lnet/minecraft/client/gui/Screen;render(IIF)V"))
+                     target = "Lnet/minecraft/client/gui/screen/Screen;render(IIF)V"))
     private void onDrawScreenPost(float partialTicks, long nanoTime, boolean renderWorldIn, CallbackInfo ci)
     {
         RenderEventHandler.instance().onDrawScreenPost();
