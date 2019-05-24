@@ -5,6 +5,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldDouble;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ConfigButtonOptionList;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -167,7 +168,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static class ButtonListenerDespawnSphere implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListenerDespawnSphere implements IButtonActionListener
     {
         private final GuiShapeEditor gui;
         private final ShapeDespawnSphere shape;
@@ -179,12 +180,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
-        {
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             EntityPlayer player = Minecraft.getMinecraft().player;
 
@@ -196,7 +192,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static class ButtonListenerDespawnSphereBlockSnap implements IButtonActionListener<ConfigButtonOptionList>
+    private static class ButtonListenerDespawnSphereBlockSnap implements IButtonActionListener
     {
         private final GuiShapeEditor gui;
         private final ShapeDespawnSphere shape;
@@ -208,12 +204,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
 
         @Override
-        public void actionPerformed(ConfigButtonOptionList control)
-        {
-        }
-
-        @Override
-        public void actionPerformedWithButton(ConfigButtonOptionList control, int mouseButton)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             this.shape.setBlockSnap((BlockSnap) this.gui.configBlockSnap.getOptionListValue());
         }

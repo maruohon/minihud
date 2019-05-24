@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.gui.widgets;
 
 import java.util.List;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -47,21 +48,18 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
 
     protected int addButton(int x, int y, ButtonListener.Type type)
     {
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, 20, type.getDisplayName());
-        button.x -= button.getButtonWidth();
-
+        ButtonGeneric button = ButtonGeneric.createGeneric(x, y, -1, true, type.getDisplayName());
         this.addButton(button, new ButtonListener(type, this));
 
-        return button.getButtonWidth() + 1;
+        return button.getWidth() + 1;
     }
 
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.Type type)
     {
         ButtonOnOff button = ButtonOnOff.createOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
-        xRight -= button.getButtonWidth();
         this.addButton(button, new ButtonListener(type, this));
 
-        return button.getButtonWidth() + 2;
+        return button.getWidth() + 2;
     }
 
     @Override
@@ -114,7 +112,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final Type type;
         private final WidgetShapeEntry widget;
@@ -126,7 +124,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == Type.CONFIGURE)
             {
@@ -145,12 +143,6 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
                 ShapeManager.INSTANCE.removeShape(this.widget.shape);
                 this.widget.parent.refreshEntries();
             }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
 
         public enum Type

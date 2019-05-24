@@ -3,6 +3,7 @@ package fi.dy.masa.minihud.gui;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.gui.GuiListBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
@@ -15,6 +16,7 @@ import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeDespawnSphere;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 
 public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, WidgetListShapes>
@@ -45,7 +47,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         super.initGui();
 
         int x = 10;
-        int y = 22;
+        int y = 26;
 
         int rows = 1;
 
@@ -73,23 +75,22 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
 
     protected int addButton(int x, int y, ButtonListener.Type type)
     {
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, 20, type.getDisplayName());
-        button.x -= button.getButtonWidth();
-
+        ButtonGeneric button = ButtonGeneric.createGeneric(x, y, -1, true, type.getDisplayName());
         this.addButton(button, new ButtonListener(ButtonListener.Type.ADD_SHAPE, this));
-        WidgetDropDownList<InfoToggle> dd = new WidgetDropDownList<InfoToggle>(button.x - 160, y, 140, 18, 200, 6, this.zLevel + 1, ImmutableList.copyOf(InfoToggle.values()));
+
+        WidgetDropDownList<InfoToggle> dd = new WidgetDropDownList<InfoToggle>(button.getX() - 160, y, 140, 18, 200, 6, this.zLevel + 1, ImmutableList.copyOf(InfoToggle.values()));
         this.addWidget(dd);
 
-        return button.getButtonWidth();
+        return button.getWidth();
     }
 
     private int createTabButton(int x, int y, int width, ConfigGuiTab tab)
     {
         ButtonGeneric button = new ButtonGeneric(x, y, width, 20, tab.getDisplayName());
-        button.enabled = GuiConfigs.tab != tab;
+        button.setEnabled(GuiConfigs.tab != tab);
         this.addButton(button, new ButtonListenerTab(tab));
 
-        return button.getButtonWidth() + 2;
+        return button.getWidth() + 2;
     }
 
     @Override
@@ -105,7 +106,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         return new WidgetListShapes(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this.zLevel, this);
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final Type type;
         private final GuiShapeManager gui;
@@ -117,7 +118,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == Type.ADD_SHAPE)
             {
@@ -125,12 +126,6 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
                 ShapeManager.INSTANCE.addShape(new ShapeDespawnSphere());
                 this.gui.getListWidget().refreshEntries();
             }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
 
         public enum Type
@@ -151,7 +146,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         }
     }
 
-    private static class ButtonListenerTab implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListenerTab implements IButtonActionListener
     {
         private final ConfigGuiTab tab;
 
@@ -161,12 +156,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
-        {
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             GuiConfigs.tab = this.tab;
             Minecraft.getMinecraft().displayGuiScreen(new GuiConfigs());
