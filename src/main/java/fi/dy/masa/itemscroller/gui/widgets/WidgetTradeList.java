@@ -119,7 +119,7 @@ public class WidgetTradeList extends WidgetBase
     }
 
     @Override
-    public boolean onMouseScrolledImpl(int mouseX, int mouseY, int mouseWheelDelta)
+    public boolean onMouseScrolledImpl(int mouseX, int mouseY, double mouseWheelDelta)
     {
         this.scrollBar.offsetValue(mouseWheelDelta < 0 ? 1 : -1);
         return true;
