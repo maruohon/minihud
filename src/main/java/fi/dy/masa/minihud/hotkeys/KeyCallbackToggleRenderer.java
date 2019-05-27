@@ -9,7 +9,6 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.event.RenderHandler;
 import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
-import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableChunks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.math.BlockPos;
@@ -60,24 +59,6 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
                 Vec3d pos = mc.player.getPosVector();
                 OverlayRendererRandomTickableChunks.newPos = pos;
                 String str = String.format(", using the position x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
-
-                StringUtils.printActionbarMessage(message + str);
-            }
-            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.getKeybind() && this.rendererConfig.getBooleanValue())
-            {
-                OverlayRendererSpawnableChunks.overlayTopY = mc.player.y;
-            }
-            else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getKeybind() && this.rendererConfig.getBooleanValue())
-            {
-                final boolean enabled = this.config.getBooleanValue();
-                String pre = enabled ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
-                String status = I18n.translate("malilib.message.value." + (enabled ? "on" : "off"));
-                String message = I18n.translate("malilib.message.toggled", this.config.getPrettyName(), pre + status + GuiBase.TXT_RST);
-
-                BlockPos pos = new BlockPos(mc.player);
-                OverlayRendererSpawnableChunks.newPos = pos;
-                OverlayRendererSpawnableChunks.overlayTopY = mc.player.y;
-                String str = String.format(", using the position x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
 
                 StringUtils.printActionbarMessage(message + str);
             }
