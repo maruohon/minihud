@@ -3,6 +3,7 @@ package fi.dy.masa.minihud.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import fi.dy.masa.minihud.MiniHUD;
+import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
@@ -116,6 +117,11 @@ public class DataStorage
     public double getServerMSPT()
     {
         return this.serverMSPT;
+    }
+
+    public void markChunkForHeightmapCheck(int chunkX, int chunkZ)
+    {
+        OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
     }
 
     public boolean onSendChatMessage(PlayerEntity player, String message)
