@@ -32,8 +32,6 @@ public class RenderContainer
         this.renderers.add(new OverlayRendererRegion());
         this.renderers.add(new OverlayRendererSlimeChunks());
         this.renderers.add(new OverlayRendererSpawnableColumnHeights());
-        this.renderers.add(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED));
-        this.renderers.add(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER));
         this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL));
         this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER));
 
