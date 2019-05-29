@@ -19,10 +19,10 @@ public class WidgetTradeEntry extends WidgetListEntryBase<MerchantRecipe>
 
     private final VillagerData data;
 
-    public WidgetTradeEntry(int x, int y, int width, int height, float zLevel,
+    public WidgetTradeEntry(int x, int y, int width, int height,
             MerchantRecipe entry, int listIndex, VillagerData data)
     {
-        super(x, y, width, height, zLevel, entry, listIndex);
+        super(x, y, width, height, entry, listIndex);
 
         this.data = data;
     }
@@ -32,7 +32,7 @@ public class WidgetTradeEntry extends WidgetListEntryBase<MerchantRecipe>
     {
         GlStateManager.color(1f, 1f, 1f, 1f);
 
-        this.mc.getTextureManager().bindTexture(BUTTON_TEXTURE);
+        this.bindTexture(BUTTON_TEXTURE);
 
         int v = 66;
 
@@ -50,7 +50,7 @@ public class WidgetTradeEntry extends WidgetListEntryBase<MerchantRecipe>
             RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFFFB000, 1f);
         }
 
-        this.mc.getTextureManager().bindTexture(Icons.TEXTURE);
+        this.bindTexture(Icons.TEXTURE);
 
         IGuiIcon icon = this.entry.isRecipeDisabled() ? Icons.TRADE_ARROW_LOCKED : Icons.TRADE_ARROW_AVAILABLE;
 

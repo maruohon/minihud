@@ -30,7 +30,7 @@ public class WidgetTradeList extends WidgetBase
 
     public WidgetTradeList(int x, int y, GuiMerchant parentGui, VillagerData data)
     {
-        super(x, y, 106, 166, 0);
+        super(x, y, 106, 166);
 
         this.scrollBar = (new GuiScrollBar(Icons.SCROLL_BAR_6)).setRenderBarBackground(false);
         this.parentGui = parentGui;
@@ -138,14 +138,14 @@ public class WidgetTradeList extends WidgetBase
 
             GlStateManager.color(1f, 1f, 1f, 1f);
             RenderHelper.disableStandardItemLighting();
-            this.mc.getTextureManager().bindTexture(Icons.TEXTURE);
+            this.bindTexture(Icons.TEXTURE);
 
             // Background
             RenderUtils.drawTexturedRect(this.x, this.y, 0, 0, this.width, 166);
 
             String str = I18n.format("itemscroller.gui.label.trades");
-            int w = this.mc.fontRenderer.getStringWidth(str);
-            this.mc.fontRenderer.drawString(str, this.x + this.width / 2 - w / 2, this.y + 6, 0xFF404040);
+            int w = this.textRenderer.getStringWidth(str);
+            this.drawString(str, this.x + this.width / 2 - w / 2, this.y + 6, 0xFF404040);
 
             this.scrollBar.render(mouseX, mouseY, 0, this.x + 93, this.y + 17, 8, 142, this.scrollBarTotalHeight);
 
@@ -209,7 +209,7 @@ public class WidgetTradeList extends WidgetBase
                 int y = this.y + (index - scrollBarPos) * 20 + 18;
                 MerchantRecipe recipe = list.get(index);
 
-                this.entryList.add(new WidgetTradeEntry(x, y, 88, 20, 0, recipe, this.recipeList.indexOf(recipe), this.data));
+                this.entryList.add(new WidgetTradeEntry(x, y, 88, 20, recipe, this.recipeList.indexOf(recipe), this.data));
             }
         }
     }
