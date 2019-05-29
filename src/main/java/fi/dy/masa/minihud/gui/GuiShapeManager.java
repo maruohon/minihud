@@ -2,6 +2,8 @@ package fi.dy.masa.minihud.gui;
 
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.options.ConfigColor;
+import fi.dy.masa.malilib.gui.GuiColorEditorHSV;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -53,7 +55,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
 
         for (ConfigGuiTab tab : ConfigGuiTab.values())
         {
-            int width = this.mc.fontRenderer.getStringWidth(tab.getDisplayName()) + 10;
+            int width = this.getStringWidth(tab.getDisplayName()) + 10;
 
             if (x >= this.width - width - 10)
             {
@@ -75,10 +77,11 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
 
     protected int addButton(int x, int y, ButtonListener.Type type)
     {
-        ButtonGeneric button = ButtonGeneric.createGeneric(x, y, -1, true, type.getDisplayName());
+        ButtonGeneric button = new ButtonGeneric(x, y, -1, true, type.getDisplayName());
         this.addButton(button, new ButtonListener(ButtonListener.Type.ADD_SHAPE, this));
 
-        WidgetDropDownList<InfoToggle> dd = new WidgetDropDownList<InfoToggle>(button.getX() - 160, y, 140, 18, 200, 6, this.zLevel + 1, ImmutableList.copyOf(InfoToggle.values()));
+        WidgetDropDownList<InfoToggle> dd = new WidgetDropDownList<InfoToggle>(button.getX() - 160, y, 140, 18, 200, 6, ImmutableList.copyOf(InfoToggle.values()));
+        dd.setZLevel(this.zLevel + 1);
         this.addWidget(dd);
 
         return button.getWidth();

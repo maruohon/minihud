@@ -26,7 +26,7 @@ public class WidgetListShapes extends WidgetListBase<ShapeBase, WidgetShapeEntry
     @Override
     protected WidgetShapeEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, ShapeBase entry)
     {
-        return new WidgetShapeEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                this.zLevel, isOdd, entry, listIndex, this, this.mc);
+        return new WidgetShapeEntry(x, y, this.browserEntryWidth,
+                this.getBrowserEntryHeightFor(entry), isOdd, entry, listIndex, this);
     }
 }

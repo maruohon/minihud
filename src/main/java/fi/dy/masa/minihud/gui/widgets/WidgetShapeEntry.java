@@ -21,18 +21,16 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
     private final WidgetListShapes parent;
     private final ShapeBase shape;
     private final List<String> hoverLines;
-    private final Minecraft mc;
     private final boolean isOdd;
     private final int buttonsStartX;
 
-    public WidgetShapeEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            ShapeBase shape, int listIndex, WidgetListShapes parent, Minecraft mc)
+    public WidgetShapeEntry(int x, int y, int width, int height, boolean isOdd,
+            ShapeBase shape, int listIndex, WidgetListShapes parent)
     {
-        super(x, y, width, height, zLevel, shape, listIndex);
+        super(x, y, width, height, shape, listIndex);
 
         this.shape = shape;
         this.hoverLines = shape.getWidgetHoverLines();
-        this.mc = mc;
         this.isOdd = isOdd;
         this.parent = parent;
         y += 1;
@@ -48,7 +46,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
 
     protected int addButton(int x, int y, ButtonListener.Type type)
     {
-        ButtonGeneric button = ButtonGeneric.createGeneric(x, y, -1, true, type.getDisplayName());
+        ButtonGeneric button = new ButtonGeneric(x, y, -1, true, type.getDisplayName());
         this.addButton(button, new ButtonListener(type, this));
 
         return button.getWidth() + 1;
@@ -56,7 +54,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
 
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = ButtonOnOff.createOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
+        ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this));
 
         return button.getWidth() + 2;
@@ -90,7 +88,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         }
 
         String name = this.shape.getType().getDisplayName();
-        this.mc.fontRenderer.drawString(name, this.x + 4, this.y + 7, 0xFFFFFFFF);
+        this.drawString(name, this.x + 4, this.y + 7, 0xFFFFFFFF);
 
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.disableBlend();

@@ -67,11 +67,11 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     private void createColorInput(int x, int y)
     {
         String label = I18n.format("minihud.gui.label.color");
-        int w = this.mc.fontRenderer.getStringWidth(label);
+        int w = this.getStringWidth(label);
         this.addLabel(x, y, w, 14, 0xFFFFFFFF, label);
         y += 12;
 
-        GuiTextFieldGeneric textField = new GuiTextFieldGeneric(x, y, 70, 17, this.mc.fontRenderer);
+        GuiTextFieldGeneric textField = new GuiTextFieldGeneric(x, y, 70, 17, this.textRenderer);
         textField.setMaxStringLength(12);
         textField.setText(String.format("#%08X", this.shape.getColor().intValue));
         this.addTextField(textField, new TextFieldListenerColor(this.shape));
@@ -97,16 +97,16 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         GuiUtils.createVec3dInputsVertical(x, y, 120, shape.getCenter(), new DespawnSphereEditor(shape, this), true, this);
         y += 54;
 
-        ButtonGeneric button = ButtonGeneric.createGeneric(x + 11, y, -1, false, "malilib.gui.button.render_layers_gui.set_here");
+        ButtonGeneric button = new ButtonGeneric(x + 11, y, -1, false, "malilib.gui.button.render_layers_gui.set_here");
         this.addButton(button, new ButtonListenerDespawnSphere(shape, this));
         y += 30;
 
         String label = I18n.format("minihud.gui.label.margin_colon");
-        int w = this.mc.fontRenderer.getStringWidth(label);
+        int w = this.getStringWidth(label);
         this.addLabel(x + 12, y, w, 12, 0xFFFFFFFF, label);
         y += 12;
 
-        GuiTextFieldDouble txtField = new GuiTextFieldDouble(x + 12, y, 60, 16, this.mc.fontRenderer);
+        GuiTextFieldDouble txtField = new GuiTextFieldDouble(x + 12, y, 60, 16, this.textRenderer);
         txtField.setText(String.valueOf(shape.getMargin()));
         this.addTextField(txtField, new TextFieldListenerMargin(shape));
         y += 20;
@@ -129,7 +129,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
         for (BlockSnap val : BlockSnap.values())
         {
-            width = Math.max(width, this.mc.fontRenderer.getStringWidth(I18n.format("minihud.gui.label.block_snap", val.getDisplayName())) + 10);
+            width = Math.max(width, this.getStringWidth(I18n.format("minihud.gui.label.block_snap", val.getDisplayName())) + 10);
         }
 
         return width;

@@ -48,7 +48,7 @@ public class GuiConfigs extends GuiConfigsBase
 
         for (ConfigGuiTab tab : ConfigGuiTab.values())
         {
-            int width = this.mc.fontRenderer.getStringWidth(tab.getDisplayName()) + 10;
+            int width = this.getStringWidth(tab.getDisplayName()) + 10;
 
             if (x >= this.width - width - 10)
             {
