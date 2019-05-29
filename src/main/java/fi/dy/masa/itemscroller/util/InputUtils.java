@@ -159,17 +159,17 @@ public class InputUtils
         }
     }
 
-    public static boolean mouseEventIsLeftClick(int keyCode)
+    public static boolean isAttack(int keyCode)
     {
         return keyCode == Minecraft.getMinecraft().gameSettings.keyBindAttack.getKeyCode();
     }
 
-    public static boolean mouseEventIsRightClick(int keyCode)
+    public static boolean isUse(int keyCode)
     {
         return keyCode == Minecraft.getMinecraft().gameSettings.keyBindUseItem.getKeyCode();
     }
 
-    public static boolean mouseEventIsPickBlock(int keyCode)
+    public static boolean isPickBlock(int keyCode)
     {
         return keyCode == Minecraft.getMinecraft().gameSettings.keyBindPickBlock.getKeyCode();
     }

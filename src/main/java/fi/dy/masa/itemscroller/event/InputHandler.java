@@ -95,61 +95,17 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             }
         }
 
-        MoveAction action = InventoryUtils.getActiveMoveAction();
-
-        if (action != MoveAction.NONE && InputUtils.isActionKeyActive(action) == false)
-        {
-            InventoryUtils.stopDragging();
-        }
-
         return this.handleInput(eventKey, eventKeyState, 0);
     }
 
     @Override
     public boolean onMouseInput(int eventButton, int dWheel, boolean eventButtonState)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-        VillagerDataStorage storage = VillagerDataStorage.getInstance();
+        return this.handleInput(eventButton - 100, eventButtonState, dWheel);
+    }
 
-        if (Configs.Toggles.VILLAGER_TRADE_LIST.getBooleanValue())
-        {
-            if (mc.currentScreen == null && mc.objectMouseOver != null &&
-                mc.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY &&
-                mc.objectMouseOver.entityHit instanceof EntityVillager)
-            {
-                storage.setLastInteractedUUID(mc.objectMouseOver.entityHit.getUniqueID());
-            }
-            else if (mc.currentScreen instanceof GuiMerchant && storage.hasInteractionTarget())
-            {
-                WidgetTradeList widget = ((IGuiMerchant) mc.currentScreen).getTradeListWidget();
-
-                if (widget != null)
-                {
-                    final int mouseX = InputUtils.getMouseX();
-                    final int mouseY = InputUtils.getMouseY();
-
-                    if (widget.isMouseOver(mouseX, mouseY))
-                    {
-                        if (dWheel != 0)
-                        {
-                            widget.onMouseScrolled(mouseX, mouseY, dWheel);
-                        }
-                        else if (eventButtonState)
-                        {
-                            widget.onMouseClicked(mouseX, mouseY, eventButton);
-                        }
-
-                        return true;
-                    }
-
-                    if (eventButtonState == false && dWheel == 0)
-                    {
-                        widget.onMouseReleased(mouseX, mouseY, eventButton);
-                    }
-                }
-            }
-        }
-
+    private boolean handleInput(int keyCode, boolean keyState, int dWheel)
+    {
         MoveAction action = InventoryUtils.getActiveMoveAction();
 
         if (action != MoveAction.NONE && InputUtils.isActionKeyActive(action) == false)
@@ -157,95 +113,134 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             InventoryUtils.stopDragging();
         }
 
-        return this.handleInput(eventButton - 100, eventButtonState, dWheel);
-    }
-
-    private boolean handleInput(int keyCode, boolean keyState, int dWheel)
-    {
         Minecraft mc = Minecraft.getMinecraft();
         boolean cancel = false;
 
-        if (this.callbacks.functionalityEnabled() &&
-            mc != null &&
-            mc.player != null &&
-            mc.currentScreen instanceof GuiContainer &&
-            (mc.currentScreen instanceof GuiContainerCreative) == false &&
-            Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
+        if (this.callbacks.functionalityEnabled() && mc.player != null)
         {
-            GuiContainer gui = (GuiContainer) mc.currentScreen;
-            RecipeStorage recipes = RecipeStorage.getInstance();
+            final boolean isAttack = InputUtils.isAttack(keyCode);
+            final boolean isUse = InputUtils.isUse(keyCode);
+            final boolean isPickBlock = InputUtils.isPickBlock(keyCode);
+            final boolean isAttackUseOrPick = isAttack || isUse || isPickBlock;
 
-            if (dWheel != 0)
+            if (Configs.Toggles.VILLAGER_TRADE_LIST.getBooleanValue())
             {
-                // When scrolling while the recipe view is open, change the selection instead of moving items
-                if (InputUtils.isRecipeViewOpen())
+                VillagerDataStorage storage = VillagerDataStorage.getInstance();
+
+                if (mc.currentScreen == null && mc.objectMouseOver != null &&
+                    mc.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY &&
+                    mc.objectMouseOver.entityHit instanceof EntityVillager)
                 {
-                    recipes.scrollSelection(dWheel < 0);
-                    cancel = true;
+                    storage.setLastInteractedUUID(mc.objectMouseOver.entityHit.getUniqueID());
+                }
+                else if (mc.currentScreen instanceof GuiMerchant && storage.hasInteractionTarget())
+                {
+                    WidgetTradeList widget = ((IGuiMerchant) mc.currentScreen).getTradeListWidget();
+
+                    if (widget != null)
+                    {
+                        final int mouseX = InputUtils.getMouseX();
+                        final int mouseY = InputUtils.getMouseY();
+                        int mouseButton = isAttack ? 0 : (isUse ? 1 : 2);
+
+                        if (widget.isMouseOver(mouseX, mouseY))
+                        {
+                            if (dWheel != 0)
+                            {
+                                widget.onMouseScrolled(mouseX, mouseY, dWheel);
+                                return true;
+                            }
+                            else if (keyState && isAttackUseOrPick)
+                            {
+                                widget.onMouseClicked(mouseX, mouseY, mouseButton);
+                                return true;
+                            }
+                        }
+
+                        if (keyState == false && dWheel == 0)
+                        {
+                            widget.onMouseReleased(mouseX, mouseY, mouseButton);
+                        }
+                    }
+                }
+            }
+
+            if (mc.currentScreen instanceof GuiContainer &&
+                (mc.currentScreen instanceof GuiContainerCreative) == false &&
+                Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
+            {
+                GuiContainer gui = (GuiContainer) mc.currentScreen;
+                RecipeStorage recipes = RecipeStorage.getInstance();
+
+                if (dWheel != 0)
+                {
+                    // When scrolling while the recipe view is open, change the selection instead of moving items
+                    if (InputUtils.isRecipeViewOpen())
+                    {
+                        recipes.scrollSelection(dWheel < 0);
+                        cancel = true;
+                    }
+                    else
+                    {
+                        cancel = InventoryUtils.tryMoveItems(gui, recipes, dWheel > 0);
+                    }
                 }
                 else
                 {
-                    cancel = InventoryUtils.tryMoveItems(gui, recipes, dWheel > 0);
-                }
-            }
-            else
-            {
-                Slot slot = AccessorUtils.getSlotUnderMouse(gui);
-                final boolean isLeftClick = InputUtils.mouseEventIsLeftClick(keyCode);
-                final boolean isRightClick = InputUtils.mouseEventIsRightClick(keyCode);
-                final boolean isPickBlock = InputUtils.mouseEventIsPickBlock(keyCode);
-                final boolean isShiftDown = GuiScreen.isShiftKeyDown();
+                    Slot slot = AccessorUtils.getSlotUnderMouse(gui);
+                    final boolean isShiftDown = GuiScreen.isShiftKeyDown();
 
-                if (keyState && (isLeftClick || isRightClick || isPickBlock))
-                {
-                    final int mouseX = InputUtils.getMouseX();
-                    final int mouseY = InputUtils.getMouseY();
-                    int hoveredRecipeId = RenderEventHandler.instance().getHoveredRecipeId(mouseX, mouseY, recipes, gui);
-
-                    // Hovering over an item in the recipe view
-                    if (hoveredRecipeId >= 0)
+                    if (keyState && isAttackUseOrPick)
                     {
-                        InventoryUtils.handleRecipeClick(gui, mc, recipes, hoveredRecipeId, isLeftClick, isRightClick, isPickBlock, isShiftDown);
-                        return true;
+                        final int mouseX = InputUtils.getMouseX();
+                        final int mouseY = InputUtils.getMouseY();
+                        int hoveredRecipeId = RenderEventHandler.instance().getHoveredRecipeId(mouseX, mouseY, recipes, gui);
+
+                        // Hovering over an item in the recipe view
+                        if (hoveredRecipeId >= 0)
+                        {
+                            InventoryUtils.handleRecipeClick(gui, mc, recipes, hoveredRecipeId, isAttack, isUse, isPickBlock, isShiftDown);
+                            return true;
+                        }
+                        // Pick-blocking over a crafting output slot with the recipe view open, store the recipe
+                        else if (isPickBlock && InputUtils.isRecipeViewOpen() && InventoryUtils.isCraftingSlot(gui, slot))
+                        {
+                            recipes.storeCraftingRecipeToCurrentSelection(slot, gui, true);
+                            cancel = true;
+                        }
                     }
-                    // Pick-blocking over a crafting output slot with the recipe view open, store the recipe
-                    else if (isPickBlock && InputUtils.isRecipeViewOpen() && InventoryUtils.isCraftingSlot(gui, slot))
+
+                    InventoryUtils.checkForItemPickup(gui, mc);
+
+                    if (keyState && (isAttack || isUse))
                     {
-                        recipes.storeCraftingRecipeToCurrentSelection(slot, gui, true);
-                        cancel = true;
+                        InventoryUtils.storeSourceSlotCandidate(slot, mc);
+                    }
+
+                    if (Configs.Toggles.RIGHT_CLICK_CRAFT_STACK.getBooleanValue() &&
+                        isUse && keyState &&
+                        InventoryUtils.isCraftingSlot(gui, slot))
+                    {
+                        InventoryUtils.rightClickCraftOneStack(gui);
+                    }
+                    else if (Configs.Toggles.SHIFT_PLACE_ITEMS.getBooleanValue() &&
+                             isAttack && isShiftDown &&
+                             InventoryUtils.canShiftPlaceItems(gui))
+                    {
+                        cancel |= InventoryUtils.shiftPlaceItems(slot, gui);
+                    }
+                    else if (Configs.Toggles.SHIFT_DROP_ITEMS.getBooleanValue() &&
+                             isAttack && isShiftDown &&
+                             InputUtils.canShiftDropItems(gui, mc))
+                    {
+                        cancel |= InventoryUtils.shiftDropItems(gui);
                     }
                 }
 
-                InventoryUtils.checkForItemPickup(gui, mc);
-
-                if (keyState && (isLeftClick || isRightClick))
+                if (Configs.Generic.SCROLL_CRAFT_STORE_RECIPES_TO_FILE.getBooleanValue())
                 {
-                    InventoryUtils.storeSourceSlotCandidate(slot, mc);
+                    recipes.writeToDisk();
                 }
-
-                if (Configs.Toggles.RIGHT_CLICK_CRAFT_STACK.getBooleanValue() &&
-                    isRightClick && keyState &&
-                    InventoryUtils.isCraftingSlot(gui, slot))
-                {
-                    InventoryUtils.rightClickCraftOneStack(gui);
-                }
-                else if (Configs.Toggles.SHIFT_PLACE_ITEMS.getBooleanValue() &&
-                         isLeftClick && isShiftDown &&
-                         InventoryUtils.canShiftPlaceItems(gui))
-                {
-                    cancel |= InventoryUtils.shiftPlaceItems(slot, gui);
-                }
-                else if (Configs.Toggles.SHIFT_DROP_ITEMS.getBooleanValue() &&
-                         isLeftClick && isShiftDown &&
-                         InputUtils.canShiftDropItems(gui, mc))
-                {
-                    cancel |= InventoryUtils.shiftDropItems(gui);
-                }
-            }
-
-            if (Configs.Generic.SCROLL_CRAFT_STORE_RECIPES_TO_FILE.getBooleanValue())
-            {
-                recipes.writeToDisk();
             }
         }
 
@@ -258,7 +253,6 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         Minecraft mc = Minecraft.getMinecraft();
 
         if (this.callbacks.functionalityEnabled() &&
-            mc != null &&
             mc.player != null &&
             mc.currentScreen instanceof GuiContainer &&
             Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
