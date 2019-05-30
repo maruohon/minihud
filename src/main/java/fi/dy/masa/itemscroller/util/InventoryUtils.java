@@ -8,16 +8,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 import fi.dy.masa.itemscroller.ItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Hotkeys;
+import fi.dy.masa.itemscroller.event.InputHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
 import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
+import fi.dy.masa.itemscroller.villager.VillagerData;
+import fi.dy.masa.itemscroller.villager.VillagerDataStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMerchant;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -114,7 +119,7 @@ public class InventoryUtils
                 Configs.SLOT_BLACKLIST.contains(slot.getClass().getName()) == false;
     }
 
-    public static boolean isCraftingSlot(GuiContainer gui, Slot slot)
+    public static boolean isCraftingSlot(GuiContainer gui, @Nullable Slot slot)
     {
         return slot != null && CraftingHandler.getCraftingGridSlots(gui, slot) != null;
     }
@@ -636,6 +641,88 @@ public class InventoryUtils
         return false;
     }
 
+    public static void villagerClearTradeInputSlots()
+    {
+        GuiScreen gui = Minecraft.getInstance().currentScreen;
+
+        if (gui instanceof GuiMerchant)
+        {
+            GuiMerchant merchantGui = (GuiMerchant) gui;
+            Slot slot = merchantGui.inventorySlots.getSlot(0);
+
+            if (slot.getHasStack())
+            {
+                shiftClickSlot(merchantGui, slot.slotNumber);
+            }
+
+            slot = merchantGui.inventorySlots.getSlot(1);
+
+            if (slot.getHasStack())
+            {
+                InventoryUtils.shiftClickSlot(merchantGui, slot.slotNumber);
+            }
+        }
+    }
+
+    public static void villagerTradeEverythingPossibleWithCurrentRecipe()
+    {
+        GuiScreen gui = Minecraft.getInstance().currentScreen;
+
+        if (gui instanceof GuiMerchant)
+        {
+            GuiMerchant merchantGui = (GuiMerchant) gui;
+            Slot slot = merchantGui.inventorySlots.getSlot(2);
+
+            while (true)
+            {
+                InventoryUtils.tryMoveItemsToMerchantBuySlots(merchantGui, true);
+
+                // Not a valid recipe
+                if (slot.getHasStack() == false)
+                {
+                    break;
+                }
+
+                InventoryUtils.shiftClickSlot(merchantGui, slot.slotNumber);
+
+                // No room in player inventory
+                if (slot.getHasStack())
+                {
+                    break;
+                }
+            }
+
+            villagerClearTradeInputSlots();
+        }
+    }
+
+    public static void villagerTradeEverythingPossibleWithAllFavoritedTrades()
+    {
+        
+        GuiScreen gui = Minecraft.getInstance().currentScreen;
+
+        if (gui instanceof GuiMerchant)
+        {
+            GuiMerchant merchantGui = (GuiMerchant) gui;
+            VillagerData data = VillagerDataStorage.getInstance().getDataForLastInteractionTarget();
+
+            villagerClearTradeInputSlots();
+
+            if (data != null && data.getFavorites().isEmpty() == false)
+            {
+                int initialPage = AccessorUtils.getSelectedMerchantRecipe(merchantGui);
+
+                for (int index : data.getFavorites())
+                {
+                    InputHandler.changeTradePage(merchantGui, index);
+                    villagerTradeEverythingPossibleWithCurrentRecipe();
+                }
+
+                InputHandler.changeTradePage(merchantGui, initialPage);
+            }
+        }
+    }
+
     private static boolean tryMoveSingleItemToOtherInventory(Slot slot, GuiContainer gui)
     {
         ItemStack stackOrig = slot.getStack();
@@ -901,7 +988,7 @@ public class InventoryUtils
         }
     }
 
-    private static void tryMoveItemsToMerchantBuySlots(GuiMerchant gui, boolean fillStacks)
+    public static void tryMoveItemsToMerchantBuySlots(GuiMerchant gui, boolean fillStacks)
     {
         Minecraft mc = Minecraft.getInstance();
         MerchantRecipeList list = gui.getMerchant().getRecipes(mc.player);
@@ -964,8 +1051,10 @@ public class InventoryUtils
             {
                 InventoryUtils.clearFirstCraftingGridOfItems(recipes.getSelectedRecipe(), gui, false);
             }
-
-            InventoryUtils.tryMoveItemsToFirstCraftingGrid(recipes.getRecipe(hoveredRecipeId), gui, isShiftDown);
+            else
+            {
+                InventoryUtils.tryMoveItemsToFirstCraftingGrid(recipes.getRecipe(hoveredRecipeId), gui, isShiftDown);
+            }
 
             // Right click: Also craft the items
             if (isRightClick)

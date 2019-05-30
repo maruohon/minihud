@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 
 @Mixin(Minecraft.class)
-public class MixinMinecraft
+public abstract class MixinMinecraft
 {
     @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Lnet/minecraft/client/gui/GuiScreen;)V", at = @At("HEAD"))
     private void onLoadWorldPre(@Nullable WorldClient worldClientIn, GuiScreen loadingScreen, CallbackInfo ci)

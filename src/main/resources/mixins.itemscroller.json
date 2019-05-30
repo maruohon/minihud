@@ -5,11 +5,12 @@
     "minVersion": "0.6",
     "client": [
         "IMixinGuiContainer",
-        "IMixinGuiMerchant",
         "IMixinSlot",
-        "MixinGameRenderer",
         "MixinContainer",
+        "MixinGameRenderer",
+        "MixinGuiMerchant",
         "MixinGuiScreen",
+        "MixinInventoryEffectRenderer",
         "MixinMinecraft"
     ],
     "injectors": {

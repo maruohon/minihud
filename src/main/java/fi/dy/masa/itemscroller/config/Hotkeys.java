@@ -9,6 +9,7 @@ import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 public class Hotkeys
 {
     private static final KeybindSettings GUI_RELAXED = KeybindSettings.create(KeybindSettings.Context.GUI, KeyAction.PRESS, true, false, false, false);
+    private static final KeybindSettings GUI_RELAXED_CANCEL = KeybindSettings.create(KeybindSettings.Context.GUI, KeyAction.PRESS, true, false, false, true);
     private static final KeybindSettings GUI_NO_ORDER = KeybindSettings.create(KeybindSettings.Context.GUI, KeyAction.PRESS, false, false, false, true);
 
     public static final ConfigHotkey KEY_OPEN_CONFIG_GUI        = new ConfigHotkey("openConfigGui",      "I,C", "Open the in-game config GUI");
@@ -21,7 +22,9 @@ public class Hotkeys
     public static final ConfigHotkey KEY_MOVE_STACK_TO_OFFHAND  = new ConfigHotkey("moveStackToOffhand", "F", KeybindSettings.GUI, "Swap the hovered stack with the offhand");
     public static final ConfigHotkey KEY_RECIPE_VIEW            = new ConfigHotkey("recipeView",         "A", GUI_RELAXED, "Show the Item Scroller recipe GUI");
     public static final ConfigHotkey KEY_SLOT_DEBUG             = new ConfigHotkey("slotDebug",          "LEFT_CONTROL,LEFT_ALT,LEFT_SHIFT,I", GUI_NO_ORDER, "Print debug info for the hovered slot or GUI");
+    public static final ConfigHotkey KEY_STORE_RECIPE           = new ConfigHotkey("storeRecipe",        "BUTTON_3", GUI_RELAXED_CANCEL, "Store a recipe while hovering over a crafting output item");
     public static final ConfigHotkey KEY_THROW_CRAFT_RESULTS    = new ConfigHotkey("throwCraftResults",  "LEFT_CONTROL,T", GUI_NO_ORDER, "Throw all of the currently selected recipe's\noutput items to the ground from the player inventory");
+    public static final ConfigHotkey KEY_VILLAGER_TRADE_FAVORITES = new ConfigHotkey("villagerTradeFavorites",  "", KeybindSettings.GUI, "Trade everything possible with all the favorited trades\nof the current villager");
 
     public static final ConfigHotkey KEY_DRAG_LEAVE_ONE         = new ConfigHotkey("keyDragMoveLeaveOne", "LEFT_SHIFT,BUTTON_2", GUI_NO_ORDER, "Key to move all but the last item from\nall the stacks dragged over");
     public static final ConfigHotkey KEY_DRAG_MATCHING          = new ConfigHotkey("keyDragMoveMatching", "LEFT_ALT,BUTTON_1", GUI_NO_ORDER, "Key to move all matching items dragged over");
@@ -73,7 +76,9 @@ public class Hotkeys
             KEY_MOVE_STACK_TO_OFFHAND,
             KEY_RECIPE_VIEW,
             KEY_SLOT_DEBUG,
+            KEY_STORE_RECIPE,
             KEY_THROW_CRAFT_RESULTS,
+            KEY_VILLAGER_TRADE_FAVORITES,
 
             KEY_WS_MOVE_DOWN_LEAVE_ONE,
             KEY_WS_MOVE_DOWN_MATCHING,

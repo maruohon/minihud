@@ -4,6 +4,7 @@ import fi.dy.masa.itemscroller.config.Hotkeys;
 import fi.dy.masa.itemscroller.event.KeybindCallbacks;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
+import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 
@@ -123,5 +124,20 @@ public class InputUtils
         }
 
         return MoveAmount.NONE;
+    }
+
+    public static boolean isAttack(int keyCode)
+    {
+        return keyCode == KeybindMulti.getKeyCode(Minecraft.getInstance().gameSettings.keyBindAttack);
+    }
+
+    public static boolean isUse(int keyCode)
+    {
+        return keyCode == KeybindMulti.getKeyCode(Minecraft.getInstance().gameSettings.keyBindUseItem);
+    }
+
+    public static boolean isPickBlock(int keyCode)
+    {
+        return keyCode == KeybindMulti.getKeyCode(Minecraft.getInstance().gameSettings.keyBindPickBlock);
     }
 }

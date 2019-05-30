@@ -9,9 +9,11 @@ import org.spongepowered.asm.mixin.Mixins;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.event.InputHandler;
 import fi.dy.masa.itemscroller.event.KeybindCallbacks;
+import fi.dy.masa.itemscroller.event.WorldLoadListener;
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InitializationHandler;
 import fi.dy.masa.malilib.event.InputEventHandler;
+import fi.dy.masa.malilib.event.WorldLoadHandler;
 import fi.dy.masa.malilib.interfaces.IInitializationHandler;
 import net.minecraft.client.Minecraft;
 
@@ -45,6 +47,10 @@ public class ItemScroller implements ClientTickable, InitializationListener
             InputEventHandler.getInstance().registerKeybindProvider(handler);
             InputEventHandler.getInstance().registerKeyboardInputHandler(handler);
             InputEventHandler.getInstance().registerMouseInputHandler(handler);
+
+            WorldLoadListener listener = new WorldLoadListener();
+            WorldLoadHandler.getInstance().registerWorldLoadPreHandler(listener);
+            WorldLoadHandler.getInstance().registerWorldLoadPostHandler(listener);
 
             KeybindCallbacks.getInstance().setCallbacks();
         }
