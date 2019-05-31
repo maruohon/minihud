@@ -8,7 +8,6 @@ import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -67,7 +66,7 @@ public class WorldLoadListener implements IWorldLoadListener
         ShapeManager.INSTANCE.clear();
 
         // Clear the cached data
-        DataStorage.getInstance().onWorldLoad();
+        DataStorage.getInstance().reset();
 
         if (world != null)
         {
@@ -155,26 +154,6 @@ public class WorldLoadListener implements IWorldLoadListener
             LiteModMiniHud.logger.warn("Failed to create the config directory '{}'", dir.getAbsolutePath());
         }
 
-        return new File(dir, getStorageFileName(globalData));
-    }
-
-    private static String getStorageFileName(boolean globalData)
-    {
-        Minecraft mc = Minecraft.getMinecraft();
-        String name = StringUtils.getWorldOrServerName();
-
-        if (name != null)
-        {
-            if (globalData)
-            {
-                return name + ".json";
-            }
-            else
-            {
-                return name + "_dim" + WorldUtils.getDimensionId(mc.world) + ".json";
-            }
-        }
-
-        return Reference.MOD_ID + "_default.json";
+        return new File(dir, StringUtils.getStorageFileName(globalData, "", ".json", Reference.MOD_ID + "_default"));
     }
 }
