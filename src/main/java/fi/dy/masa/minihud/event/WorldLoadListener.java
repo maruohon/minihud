@@ -25,32 +25,30 @@ public class WorldLoadListener implements IWorldLoadListener
     private boolean renderersRead;
 
     @Override
-    public void onWorldLoadPre(@Nullable WorldClient world, Minecraft mc)
+    public void onWorldLoadPre(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter, Minecraft mc)
     {
-        WorldClient worldOld = Minecraft.getMinecraft().world;
-
         // Save the settings before the integrated server gets shut down
-        if (worldOld != null)
+        if (worldBefore != null)
         {
             this.writeDataPerDimension();
 
             // Quitting to main menu
-            if (world == null)
+            if (worldAfter == null)
             {
                 this.writeDataGlobal();
             }
 
-            this.hasCachedSeed = world != null && Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue();
+            this.hasCachedSeed = worldAfter != null && Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue();
 
             if (this.hasCachedSeed)
             {
-                this.cachedSeed = world.getSeed();
+                this.cachedSeed = worldAfter.getSeed();
             }
         }
         else
         {
             // Logging in to a world, load the global data
-            if (world != null)
+            if (worldAfter != null)
             {
                 this.readStoredDataGlobal();
                 OverlayRenderer.resetRenderTimeout();
@@ -61,14 +59,14 @@ public class WorldLoadListener implements IWorldLoadListener
     }
 
     @Override
-    public void onWorldLoadPost(@Nullable WorldClient world, Minecraft mc)
+    public void onWorldLoadPost(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter, Minecraft mc)
     {
         ShapeManager.INSTANCE.clear();
 
         // Clear the cached data
         DataStorage.getInstance().reset();
 
-        if (world != null)
+        if (worldAfter != null)
         {
             this.readStoredDataPerDimension();
 
