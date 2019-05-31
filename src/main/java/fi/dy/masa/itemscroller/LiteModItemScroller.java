@@ -3,10 +3,8 @@ package fi.dy.masa.itemscroller;
 import java.io.File;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.mojang.realmsclient.dto.RealmsServer;
 import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.InitCompleteListener;
-import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.Tickable;
 import com.mumfrey.liteloader.core.LiteLoader;
@@ -20,11 +18,8 @@ import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InputEventHandler;
 import fi.dy.masa.malilib.event.WorldLoadHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.play.server.SPacketJoinGame;
 
-public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteListener, JoinGameListener, Tickable
+public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteListener, Tickable
 {
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
@@ -57,9 +52,9 @@ public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteL
         ConfigManager.getInstance().registerConfigHandler(Reference.MOD_ID, new Configs());
 
         InputHandler handler = new InputHandler();
-        InputEventHandler.getInstance().registerKeybindProvider(handler);
-        InputEventHandler.getInstance().registerKeyboardInputHandler(handler);
-        InputEventHandler.getInstance().registerMouseInputHandler(handler);
+        InputEventHandler.getKeybindManager().registerKeybindProvider(handler);
+        InputEventHandler.getInputManager().registerKeyboardInputHandler(handler);
+        InputEventHandler.getInputManager().registerMouseInputHandler(handler);
 
         WorldLoadListener listener = new WorldLoadListener();
         WorldLoadHandler.getInstance().registerWorldLoadPreHandler(listener);
