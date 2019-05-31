@@ -213,13 +213,13 @@ public class Configs implements IConfigHandler
                 JsonObject root = element.getAsJsonObject();
                 JsonObject objInfoLineOrders = JsonUtils.getNestedObject(root, "InfoLineOrders", false);
 
-                ConfigUtils.readConfigBase(root, "Generic", Configs.Generic.OPTIONS);
                 ConfigUtils.readConfigBase(root, "Colors", Configs.Colors.OPTIONS);
-                ConfigUtils.readHotkeyToggleOptions(root, "RendererHotkeys", "RendererToggles", ImmutableList.copyOf(RendererToggle.values()));
+                ConfigUtils.readConfigBase(root, "Generic", Configs.Generic.OPTIONS);
                 ConfigUtils.readHotkeyToggleOptions(root, "InfoHotkeys", "InfoTypeToggles", ImmutableList.copyOf(InfoToggle.values()));
+                ConfigUtils.readHotkeyToggleOptions(root, "RendererHotkeys", "RendererToggles", ImmutableList.copyOf(RendererToggle.values()));
                 ConfigUtils.readConfigBase(root, "StructureColors", StructureToggle.getColorConfigs());
+                ConfigUtils.readConfigBase(root, "StructureHotkeys", StructureToggle.getHotkeys());
                 ConfigUtils.readConfigBase(root, "StructureToggles", StructureToggle.getToggleConfigs());
-                ConfigUtils.readHotkeys(root, "StructureHotkeys", StructureToggle.getHotkeys());
 
                 int version = JsonUtils.getIntegerOrDefault(root, "config_version", 0);
 
@@ -248,13 +248,13 @@ public class Configs implements IConfigHandler
             JsonObject root = new JsonObject();
             JsonObject objInfoLineOrders = JsonUtils.getNestedObject(root, "InfoLineOrders", true);
 
-            ConfigUtils.writeConfigBase(root, "Generic", Configs.Generic.OPTIONS);
             ConfigUtils.writeConfigBase(root, "Colors", Configs.Colors.OPTIONS);
-            ConfigUtils.writeHotkeyToggleOptions(root, "RendererHotkeys", "RendererToggles", ImmutableList.copyOf(RendererToggle.values()));
+            ConfigUtils.writeConfigBase(root, "Generic", Configs.Generic.OPTIONS);
             ConfigUtils.writeHotkeyToggleOptions(root, "InfoHotkeys", "InfoTypeToggles", ImmutableList.copyOf(InfoToggle.values()));
+            ConfigUtils.writeHotkeyToggleOptions(root, "RendererHotkeys", "RendererToggles", ImmutableList.copyOf(RendererToggle.values()));
             ConfigUtils.writeConfigBase(root, "StructureColors", StructureToggle.getColorConfigs());
+            ConfigUtils.writeConfigBase(root, "StructureHotkeys", StructureToggle.getHotkeys());
             ConfigUtils.writeConfigBase(root, "StructureToggles", StructureToggle.getToggleConfigs());
-            ConfigUtils.writeHotkeys(root, "StructureHotkeys", StructureToggle.getHotkeys());
 
             for (InfoToggle toggle : InfoToggle.values())
             {
