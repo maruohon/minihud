@@ -8,7 +8,6 @@ import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -26,32 +25,30 @@ public class WorldLoadListener implements IWorldLoadListener
     private boolean renderersRead;
 
     @Override
-    public void onWorldLoadPre(@Nullable WorldClient world, Minecraft mc)
+    public void onWorldLoadPre(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter, Minecraft mc)
     {
-        WorldClient worldOld = Minecraft.getInstance().world;
-
         // Save the settings before the integrated server gets shut down
-        if (worldOld != null)
+        if (worldBefore != null)
         {
             this.writeDataPerDimension();
 
             // Quitting to main menu
-            if (world == null)
+            if (worldAfter == null)
             {
                 this.writeDataGlobal();
             }
 
-            this.hasCachedSeed = world != null && Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue();
+            this.hasCachedSeed = worldAfter != null && Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue();
 
             if (this.hasCachedSeed)
             {
-                this.cachedSeed = world.getSeed();
+                this.cachedSeed = worldAfter.getSeed();
             }
         }
         else
         {
             // Logging in to a world, load the global data
-            if (world != null)
+            if (worldAfter != null)
             {
                 this.readStoredDataGlobal();
                 OverlayRenderer.resetRenderTimeout();
@@ -62,14 +59,14 @@ public class WorldLoadListener implements IWorldLoadListener
     }
 
     @Override
-    public void onWorldLoadPost(@Nullable WorldClient world, Minecraft mc)
+    public void onWorldLoadPost(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter, Minecraft mc)
     {
         ShapeManager.INSTANCE.clear();
 
         // Clear the cached data
         DataStorage.getInstance().reset();
 
-        if (world != null)
+        if (worldAfter != null)
         {
             this.readStoredDataPerDimension();
 
@@ -155,26 +152,6 @@ public class WorldLoadListener implements IWorldLoadListener
             MiniHUD.logger.warn("Failed to create the config directory '{}'", dir.getAbsolutePath());
         }
 
-        return new File(dir, getStorageFileName(globalData));
-    }
-
-    private static String getStorageFileName(boolean globalData)
-    {
-        Minecraft mc = Minecraft.getInstance();
-        String name = StringUtils.getWorldOrServerName();
-
-        if (name != null)
-        {
-            if (globalData)
-            {
-                return name + ".json";
-            }
-            else
-            {
-                return name + "_dim" + WorldUtils.getDimensionId(mc.world) + ".json";
-            }
-        }
-
-        return Reference.MOD_ID + "_default.json";
+        return new File(dir, StringUtils.getStorageFileName(globalData, "", ".json", Reference.MOD_ID + "_default"));
     }
 }
