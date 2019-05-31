@@ -1,16 +1,19 @@
 package fi.dy.masa.minihud.event;
 
-import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
+import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
+import fi.dy.masa.malilib.hotkeys.KeyCallbackAdjustable;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
+import net.minecraft.client.Minecraft;
 
-public class InputHandler implements IKeybindProvider
+public class InputHandler implements IKeybindProvider, IMouseInputHandler
 {
     private static final InputHandler INSTANCE = new InputHandler();
 
@@ -37,17 +40,37 @@ public class InputHandler implements IKeybindProvider
             manager.addKeybindToMap(toggle.getKeybind());
         }
 
-        manager.addKeybindToMap(Configs.Generic.TOGGLE_KEY.getKeybind());
-        manager.addKeybindToMap(Configs.Generic.REQUIRED_KEY.getKeybind());
-        manager.addKeybindToMap(Configs.Generic.OPEN_CONFIG_GUI.getKeybind());
+        for (IHotkey hotkey : Configs.Generic.HOTKEY_LIST)
+        {
+            manager.addKeybindToMap(hotkey.getKeybind());
+        }
     }
 
     @Override
     public void addHotkeys(IKeybindManager manager)
     {
-        List<? extends IHotkey> hotkeys = ImmutableList.of( Configs.Generic.TOGGLE_KEY, Configs.Generic.REQUIRED_KEY, Configs.Generic.OPEN_CONFIG_GUI );
-        manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", hotkeys);
+        manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST);
         manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", ImmutableList.copyOf(InfoToggle.values()));
         manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", ImmutableList.copyOf(RendererToggle.values()));
+    }
+
+    @Override
+    public boolean onMouseScroll(int mouseX, int mouseY, double amount)
+    {
+        Minecraft mc = Minecraft.getInstance();
+
+        // Not in a GUI
+        if (mc.currentScreen == null && amount != 0)
+        {
+            if (RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() &&
+                RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind().isKeybindHeld())
+            {
+                OverlayRendererSlimeChunks.overlayTopY += (amount < 0 ? 1 : -1);
+                KeyCallbackAdjustable.setValueChanged();
+                return true;
+            }
+        }
+
+        return false;
     }
 }

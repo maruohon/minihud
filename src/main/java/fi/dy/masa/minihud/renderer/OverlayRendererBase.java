@@ -2,6 +2,8 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
+import com.google.gson.JsonObject;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -16,16 +18,26 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     protected final List<RenderObjectBase> renderObjects = new ArrayList<>();
     protected float glLineWidth = 1f;
     protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
+    private BlockPos position = BlockPos.ORIGIN;
 
-    @Override
-    public void draw()
+    protected void preRender(double x, double y, double z)
     {
         GlStateManager.lineWidth(this.glLineWidth);
+        GlStateManager.translated(this.position.getX() - x, this.position.getY() - y, this.position.getZ() - z);
+    }
+
+    @Override
+    public void draw(double x, double y, double z)
+    {
+        GlStateManager.pushMatrix();
+        this.preRender(x, y, z);
 
         for (RenderObjectBase obj : this.renderObjects)
         {
             obj.draw();
         }
+
+        GlStateManager.popMatrix();
     }
 
     @Override
@@ -37,6 +49,15 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         }
 
         this.renderObjects.clear();
+    }
+
+    protected void setPosition(BlockPos pos)
+    {
+        this.position = pos;
+
+        BUFFER_1.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
+        BUFFER_2.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
+        BUFFER_3.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
     }
 
     /**
@@ -60,5 +81,20 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         this.renderObjects.add(obj);
 
         return obj;
+    }
+
+    public String getSaveId()
+    {
+        return "";
+    }
+
+    @Nullable
+    public JsonObject toJson()
+    {
+        return null;
+    }
+
+    public void fromJson(JsonObject obj)
+    {
     }
 }

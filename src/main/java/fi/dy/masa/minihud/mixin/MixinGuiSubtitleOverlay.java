@@ -6,11 +6,12 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.minihud.event.RenderHandler;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiSubtitleOverlay;
 import net.minecraft.client.renderer.GlStateManager;
 
 @Mixin(GuiSubtitleOverlay.class)
-public class MixinGuiSubtitleOverlay
+public abstract class MixinGuiSubtitleOverlay extends Gui
 {
     @Inject(method = "render", at = @At(
             value = "INVOKE",

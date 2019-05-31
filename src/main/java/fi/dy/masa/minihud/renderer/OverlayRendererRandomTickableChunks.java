@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
+import com.google.gson.JsonObject;
+import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import net.minecraft.client.Minecraft;
@@ -62,6 +64,8 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
             newPos = null;
         }
 
+        this.setPosition(new BlockPos(this.pos));
+
         final int color = this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER ?
                 Configs.Colors.RANDOM_TICKS_PLAYER_OVERLAY_COLOR.getIntegerValue() :
                 Configs.Colors.RANDOM_TICKS_FIXED_OVERLAY_COLOR.getIntegerValue();
@@ -83,8 +87,6 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
-
-        this.lastUpdatePos = new BlockPos(entity);
     }
 
     protected Set<ChunkPos> getRandomTickableChunks(Vec3d posCenter)
@@ -160,5 +162,31 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     {
         this.allocateBuffer(GL11.GL_QUADS);
         this.allocateBuffer(GL11.GL_LINES);
+    }
+
+    @Override
+    public String getSaveId()
+    {
+        return this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED ? "random_tickable_chunks" : "";
+    }
+
+    @Nullable
+    @Override
+    public JsonObject toJson()
+    {
+        JsonObject obj = new JsonObject();
+        obj.add("pos", JsonUtils.vec3dToJson(this.pos));
+        return obj;
+    }
+
+    @Override
+    public void fromJson(JsonObject obj)
+    {
+        Vec3d pos = JsonUtils.vec3dFromJson(obj, "pos");
+
+        if (pos != null && this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED)
+        {
+            newPos = pos;
+        }
     }
 }

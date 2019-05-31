@@ -9,7 +9,7 @@ import fi.dy.masa.minihud.util.DebugInfoUtils;
 import net.minecraft.server.MinecraftServer;
 
 @Mixin(MinecraftServer.class)
-public class MixinMinecraftServer
+public abstract class MixinMinecraftServer
 {
     @Inject(method = "tick", at = @At("TAIL"))
     public void onServerTickPost(BooleanSupplier supplier, CallbackInfo ci)

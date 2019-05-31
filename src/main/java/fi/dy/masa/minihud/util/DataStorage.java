@@ -1,46 +1,75 @@
 package fi.dy.masa.minihud.util;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.gson.JsonObject;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.MiniHUD;
+import fi.dy.masa.minihud.Reference;
+import fi.dy.masa.minihud.config.StructureToggle;
+import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.gen.IChunkGenerator;
 
 public class DataStorage
 {
     private static final Pattern PATTERN_CARPET_TPS = Pattern.compile("TPS: (?<tps>[0-9]+[\\.,][0-9]) MSPT: (?<mspt>[0-9]+[\\.,][0-9])");
     private static final DataStorage INSTANCE = new DataStorage();
 
+    public static final int CARPET_ID_BOUNDINGBOX_MARKERS = 3;
+    public static final int CARPET_ID_LARGE_BOUNDINGBOX_MARKERS_START = 7;
+    public static final int CARPET_ID_LARGE_BOUNDINGBOX_MARKERS = 8;
+
     private boolean worldSeedValid;
     private boolean serverTPSValid;
     private boolean carpetServer;
     private boolean worldSpawnValid;
+    private boolean hasStructureDataFromServer;
+    private boolean structuresDirty;
+    private boolean structuresNeedUpdating;
     private long worldSeed;
     private long lastServerTick;
     private long lastServerTimeUpdate;
+    private BlockPos lastStructureUpdatePos;
     private double serverTPS;
     private double serverMSPT;
-    private int droppedChunksHashSize = -1;
     private BlockPos worldSpawn = BlockPos.ORIGIN;
+    private Vec3d distanceReferencePoint = Vec3d.ZERO;
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
+    private final ArrayListMultimap<StructureType, StructureData> structures = ArrayListMultimap.create();
     private final Minecraft mc = Minecraft.getInstance();
 
     public static DataStorage getInstance()
@@ -54,6 +83,14 @@ public class DataStorage
         this.serverTPSValid = false;
         this.carpetServer = false;
         this.worldSpawnValid = false;
+        this.structuresNeedUpdating = true;
+        this.hasStructureDataFromServer = false;
+        this.structuresDirty = false;
+
+        this.lastStructureUpdatePos = null;
+        this.structures.clear();
+        this.worldSeed = 0;
+        this.worldSpawn = BlockPos.ORIGIN;
     }
 
     public void setWorldSeed(long seed)
@@ -66,6 +103,14 @@ public class DataStorage
     {
         this.worldSpawn = spawn;
         this.worldSpawnValid = true;
+    }
+
+    public void setWorldSpawnIfUnknown(BlockPos spawn)
+    {
+        if (this.worldSpawnValid == false)
+        {
+            this.setWorldSpawn(spawn);
+        }
     }
 
     public boolean isWorldSeedKnown(DimensionType dimension)
@@ -86,18 +131,18 @@ public class DataStorage
 
     public long getWorldSeed(DimensionType dimension)
     {
-        if (this.worldSeedValid)
-        {
-            return this.worldSeed;
-        }
-        else if (this.mc.isSingleplayer())
+        if (this.worldSeedValid == false && this.mc.isSingleplayer())
         {
             MinecraftServer server = this.mc.getIntegratedServer();
             World worldTmp = server.getWorld(dimension);
-            return worldTmp != null ? worldTmp.getSeed() : 0;
+
+            if (worldTmp != null)
+            {
+                this.setWorldSeed(worldTmp.getSeed());
+            }
         }
 
-        return 0;
+        return this.worldSeed;
     }
 
     public boolean isWorldSpawnKnown()
@@ -130,29 +175,38 @@ public class DataStorage
         return this.serverMSPT;
     }
 
-    public int getDroppedChunksHashSize()
+    public boolean hasStructureDataChanged()
     {
-        if (this.droppedChunksHashSize > 0)
-        {
-            return this.droppedChunksHashSize;
-        }
+        return this.structuresDirty;
+    }
 
-        Minecraft mc = Minecraft.getInstance();
+    public void setStructuresNeedUpdating()
+    {
+        this.structuresNeedUpdating = true;
+    }
 
-        if (mc.isSingleplayer())
-        {
-            return MiscUtils.getCurrentHashSize(mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().dimension.getType()));
-        }
-        else
-        {
-            return 0xFFFF;
-        }
+    public void setStructuresDirty()
+    {
+        this.structuresDirty = true;
+    }
+
+    public Vec3d getDistanceReferencePoint()
+    {
+        return this.distanceReferencePoint;
+    }
+
+    public void setDistanceReferencePoint(Vec3d pos)
+    {
+        this.distanceReferencePoint = pos;
+        String str = String.format("x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
+        InfoUtils.printActionbarMessage("minihud.message.distance_reference_point_set", str);
     }
 
     public void markChunkForHeightmapCheck(int chunkX, int chunkZ)
     {
         OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
         this.chunkHeightmapsToCheck.add(new ChunkPos(chunkX, chunkZ));
+        OverlayRendererLightLevel.setNeedsUpdate();
     }
 
     public void checkQueuedDirtyChunkHeightmaps()
@@ -231,40 +285,17 @@ public class DataStorage
             {
                 try
                 {
-                    long seed = Long.parseLong(parts[1]);
-                    this.worldSeed = seed;
-                    this.worldSeedValid = true;
-                    MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(seed));
+                    this.setWorldSeed(Long.parseLong(parts[1]));
+                    InfoUtils.printActionbarMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
                 }
                 catch (NumberFormatException e)
                 {
-                    MiscUtils.printInfoMessage("minihud.message.error.invalid_seed");
+                    InfoUtils.printActionbarMessage("minihud.message.error.invalid_seed");
                 }
             }
             else if (this.worldSeedValid && parts.length == 1)
             {
-                MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
-            }
-
-            return true;
-        }
-        else if (parts[0].equals("minihud-dropped-chunks-hash-size"))
-        {
-            if (parts.length == 2)
-            {
-                try
-                {
-                    this.droppedChunksHashSize = Integer.parseInt(parts[1]);
-                    MiscUtils.printInfoMessage("minihud.message.dropped_chunks_hash_size_set", Integer.valueOf(this.droppedChunksHashSize));
-                }
-                catch (NumberFormatException e)
-                {
-                    MiscUtils.printInfoMessage("minihud.message.error.invalid_dropped_chunks_hash_size");
-                }
-            }
-            else if (parts.length == 1)
-            {
-                MiscUtils.printInfoMessage("minihud.message.dropped_chunks_hash_size_set", Integer.valueOf(this.getDroppedChunksHashSize()));
+                InfoUtils.printActionbarMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
             }
 
             return true;
@@ -290,10 +321,9 @@ public class DataStorage
 
                     if (i1 != -1 && i2 != -1)
                     {
-                        this.worldSeed = Long.parseLong(str.substring(i1 + 1, i2));
-                        this.worldSeedValid = true;
+                        this.setWorldSeed(Long.parseLong(str.substring(i1 + 1, i2)));
                         MiniHUD.logger.info("Received world seed from the vanilla /seed command: {}", this.worldSeed);
-                        MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
+                        InfoUtils.printActionbarMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
                     }
                 }
                 catch (Exception e)
@@ -306,10 +336,9 @@ public class DataStorage
             {
                 try
                 {
-                    this.worldSeed = Long.parseLong(text.getFormatArgs()[1].toString());
-                    this.worldSeedValid = true;
+                    this.setWorldSeed(Long.parseLong(text.getFormatArgs()[1].toString()));
                     MiniHUD.logger.info("Received world seed from the JED '/jed seed' command: {}", this.worldSeed);
-                    MiscUtils.printInfoMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
+                    InfoUtils.printActionbarMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
                 }
                 catch (Exception e)
                 {
@@ -325,12 +354,11 @@ public class DataStorage
                     int y = Integer.parseInt(o[1].toString());
                     int z = Integer.parseInt(o[2].toString());
 
-                    this.worldSpawn = new BlockPos(x, y, z);
-                    this.worldSpawnValid = true;
+                    this.setWorldSpawn(new BlockPos(x, y, z));
 
                     String spawnStr = String.format("x: %d, y: %d, z: %d", this.worldSpawn.getX(), this.worldSpawn.getY(), this.worldSpawn.getZ());
                     MiniHUD.logger.info("Received world spawn from the vanilla /setworldspawn command: {}", spawnStr);
-                    MiscUtils.printInfoMessage("minihud.message.spawn_set", spawnStr);
+                    InfoUtils.printActionbarMessage("minihud.message.spawn_set", spawnStr);
                 }
                 catch (Exception e)
                 {
@@ -375,6 +403,334 @@ public class DataStorage
         }
     }
 
+    /**
+     * Gets a copy of the structure data map, and clears the dirty flag
+     * @return
+     */
+    public ArrayListMultimap<StructureType, StructureData> getCopyOfStructureData()
+    {
+        ArrayListMultimap<StructureType, StructureData> copy = ArrayListMultimap.create();
+
+        synchronized (this.structures)
+        {
+            for (StructureType type : StructureType.values())
+            {
+                Collection<StructureData> values = this.structures.get(type);
+
+                if (values.isEmpty() == false)
+                {
+                    copy.putAll(type, values);
+                }
+            }
+
+            this.structuresDirty = false;
+        }
+
+        return copy;
+    }
+
+    public void updateStructureData()
+    {
+        if (this.mc != null && this.mc.world != null && this.mc.player != null)
+        {
+            final BlockPos playerPos = new BlockPos(this.mc.player);
+
+            if (this.mc.isSingleplayer())
+            {
+                if (this.structuresNeedUpdating(playerPos, 32))
+                {
+                    this.updateStructureDataFromIntegratedServer(playerPos);
+                }
+            }
+            else if (this.structuresNeedUpdating(playerPos, 256))
+            {
+                if (this.hasStructureDataFromServer == false)
+                {
+                    this.updateStructureDataFromNBTFiles(playerPos);
+                }
+                else
+                {
+                    StructureToggle.updateStructureData();
+                }
+            }
+        }
+    }
+
+    private boolean structuresNeedUpdating(BlockPos playerPos, int hysteresis)
+    {
+        return this.structuresNeedUpdating || this.lastStructureUpdatePos == null ||
+                Math.abs(playerPos.getX() - this.lastStructureUpdatePos.getX()) >= hysteresis ||
+                Math.abs(playerPos.getY() - this.lastStructureUpdatePos.getY()) >= hysteresis ||
+                Math.abs(playerPos.getZ() - this.lastStructureUpdatePos.getZ()) >= hysteresis;
+    }
+
+    private void updateStructureDataFromIntegratedServer(final BlockPos playerPos)
+    {
+        final DimensionType dimension = this.mc.player.dimension;
+        final WorldServer world = this.mc.getIntegratedServer().getWorld(dimension);
+
+        synchronized (this.structures)
+        {
+            this.structures.clear();
+        }
+
+        if (world != null)
+        {
+            final IChunkGenerator<?> chunkGenerator = world.getChunkProvider().getChunkGenerator();
+            final DataStorage storage = this;
+            final int maxRange = (this.mc.gameSettings.renderDistanceChunks + 4) * 16;
+
+            world.addScheduledTask(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    synchronized (storage.structures)
+                    {
+                        storage.addStructureDataFromGenerator(chunkGenerator, playerPos, maxRange);
+                    }
+                }
+            });
+        }
+
+        this.lastStructureUpdatePos = playerPos;
+        this.structuresNeedUpdating = false;
+    }
+
+    private void updateStructureDataFromNBTFiles(final BlockPos playerPos)
+    {
+        synchronized (this.structures)
+        {
+            this.structures.clear();
+
+            File dir = this.getLocalStructureFileDirectory();
+
+            if (dir != null && dir.exists() && dir.isDirectory())
+            {
+                for (StructureType type : StructureType.values())
+                {
+                    if (type.isTemple() == false)
+                    {
+                        NBTTagCompound nbt = FileUtils.readNBTFile(new File(dir, type.getStructureName() + ".dat"));
+
+                        if (nbt != null)
+                        {
+                            StructureData.readAndAddStructuresToMap(this.structures, nbt, type);
+                        }
+                    }
+                }
+
+                NBTTagCompound nbt = FileUtils.readNBTFile(new File(dir, "Temple.dat"));
+
+                if (nbt != null)
+                {
+                    StructureData.readAndAddTemplesToMap(this.structures, nbt);
+                }
+
+                MiniHUD.logger.info("Structure data updated from local structure files, structures: {}", this.structures.size());
+            }
+        }
+
+        this.lastStructureUpdatePos = playerPos;
+        this.structuresDirty = true;
+        this.structuresNeedUpdating = false;
+    }
+
+    public void updateStructureDataFromServer(PacketBuffer data)
+    {
+        try
+        {
+            data.readerIndex(0);
+
+            if (data.readerIndex() < data.writerIndex() - 4)
+            {
+                int type = data.readInt();
+
+                if (type == CARPET_ID_BOUNDINGBOX_MARKERS)
+                {
+                    this.readStructureDataCarpetAll(data.readCompoundTag());
+                }
+                else if (type == CARPET_ID_LARGE_BOUNDINGBOX_MARKERS_START)
+                {
+                    NBTTagCompound nbt = data.readCompoundTag();
+                    int boxCount = data.readVarInt();
+                    this.readStructureDataCarpetSplitHeader(nbt, boxCount);
+                }
+                else if (type == CARPET_ID_LARGE_BOUNDINGBOX_MARKERS)
+                {
+                    int boxCount = data.readByte();
+                    this.readStructureDataCarpetSplitBoxes(data, boxCount);
+                }
+            }
+
+            data.readerIndex(0);
+        }
+        catch (Exception e)
+        {
+            MiniHUD.logger.warn("Failed to read structure data from Carpet mod packet", e);
+        }
+    }
+
+    private void readStructureDataCarpetAll(NBTTagCompound nbt)
+    {
+        NBTTagList tagList = nbt.getList("Boxes", Constants.NBT.TAG_LIST);
+        this.setWorldSeed(nbt.getLong("Seed"));
+
+        synchronized (this.structures)
+        {
+            this.structures.clear();
+            StructureData.readStructureDataCarpetAllBoxes(this.structures, tagList);
+            this.hasStructureDataFromServer = true;
+            this.structuresDirty = true;
+            this.structuresNeedUpdating = false;
+
+            EntityPlayer player = Minecraft.getInstance().player;
+
+            if (player != null)
+            {
+                this.lastStructureUpdatePos = new BlockPos(player);
+            }
+
+            MiniHUD.logger.info("Structure data updated from Carpet server (all), structures: {}", this.structures.size());
+        }
+    }
+
+    private void readStructureDataCarpetSplitHeader(NBTTagCompound nbt, int boxCount)
+    {
+        this.setWorldSeed(nbt.getLong("Seed"));
+
+        synchronized (this.structures)
+        {
+            this.structures.clear();
+            StructureData.readStructureDataCarpetIndividualBoxesHeader(boxCount);
+        }
+
+        MiniHUD.logger.info("Structure data header received from Carpet server, expecting {} boxes", boxCount);
+    }
+
+    private void readStructureDataCarpetSplitBoxes(PacketBuffer data, int boxCount) throws IOException
+    {
+        synchronized (this.structures)
+        {
+            for (int i = 0; i < boxCount; ++i)
+            {
+                NBTTagCompound nbt = data.readCompoundTag();
+                StructureData.readStructureDataCarpetIndividualBoxes(this.structures, nbt);
+            }
+
+            this.hasStructureDataFromServer = true;
+            this.structuresDirty = true;
+            this.structuresNeedUpdating = false;
+
+            EntityPlayer player = Minecraft.getInstance().player;
+
+            if (player != null)
+            {
+                this.lastStructureUpdatePos = new BlockPos(player);
+            }
+
+            MiniHUD.logger.info("Structure data received from Carpet server (split boxes), received {} boxes", boxCount);
+        }
+    }
+
+    private void addStructureDataFromGenerator(IChunkGenerator<?> chunkGenerator, BlockPos playerPos, int maxRange)
+    {
+        /*
+        if (chunkGenerator instanceof ChunkGeneratorOverworld)
+        {
+            MapGenStructure mapGen;
+
+            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getOceanMonumentGenerator();
+            this.addStructuresWithinRange(StructureType.OCEAN_MONUMENT, mapGen, playerPos, maxRange);
+
+            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getScatteredFeatureGenerator();
+            this.addTempleStructuresWithinRange(mapGen, playerPos, maxRange);
+
+            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getStrongholdGenerator();
+            this.addStructuresWithinRange(StructureType.STRONGHOLD, mapGen, playerPos, maxRange);
+
+            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getVillageGenerator();
+            this.addStructuresWithinRange(StructureType.VILLAGE, mapGen, playerPos, maxRange);
+
+            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getWoodlandMansionGenerator();
+            this.addStructuresWithinRange(StructureType.MANSION, mapGen, playerPos, maxRange);
+        }
+        else if (chunkGenerator instanceof ChunkGeneratorHell)
+        {
+            MapGenStructure mapGen = ((IMixinChunkGeneratorHell) chunkGenerator).getFortressGenerator();
+            this.addStructuresWithinRange(StructureType.NETHER_FORTRESS, mapGen, playerPos, maxRange);
+        }
+        else if (chunkGenerator instanceof ChunkGeneratorEnd)
+        {
+            MapGenStructure mapGen = ((IMixinChunkGeneratorEnd) chunkGenerator).getEndCityGenerator();
+            this.addStructuresWithinRange(StructureType.END_CITY, mapGen, playerPos, maxRange);
+        }
+        else if (chunkGenerator instanceof ChunkGeneratorFlat)
+        {
+            Map<String, MapGenStructure> map = ((IMixinChunkGeneratorFlat) chunkGenerator).getStructureGenerators();
+
+            for (MapGenStructure mapGen : map.values())
+            {
+                if (mapGen instanceof StructureOceanMonument)
+                {
+                    this.addStructuresWithinRange(StructureType.OCEAN_MONUMENT, mapGen, playerPos, maxRange);
+                }
+                else if (mapGen instanceof MapGenScatteredFeature)
+                {
+                    this.addTempleStructuresWithinRange(mapGen, playerPos, maxRange);
+                }
+                else if (mapGen instanceof MapGenStronghold)
+                {
+                    this.addStructuresWithinRange(StructureType.STRONGHOLD, mapGen, playerPos, maxRange);
+                }
+                else if (mapGen instanceof MapGenVillage)
+                {
+                    this.addStructuresWithinRange(StructureType.VILLAGE, mapGen, playerPos, maxRange);
+                }
+            }
+        }
+
+        this.structuresDirty = true;
+        MiniHUD.logger.info("Structure data updated from the integrated server");
+        */
+    }
+
+    /*
+    private void addStructuresWithinRange(StructureType type, MapGenStructure mapGen, BlockPos playerPos, int maxRange)
+    {
+        Long2ObjectMap<StructureStart> structureMap = ((IMixinMapGenStructure) mapGen).getStructureMap();
+
+        for (StructureStart start : structureMap.values())
+        {
+            if (MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxRange))
+            {
+                this.structures.put(type, StructureData.fromStructure(start));
+            }
+        }
+    }
+
+    private void addTempleStructuresWithinRange(MapGenStructure mapGen, BlockPos playerPos, int maxRange)
+    {
+        Long2ObjectMap<StructureStart> structureMap = ((IMixinMapGenStructure) mapGen).getStructureMap();
+
+        for (StructureStart start : structureMap.values())
+        {
+            List<StructurePiece> components = start.getComponents();
+
+            if (components.size() == 1 && MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxRange))
+            {
+                String id = MapGenStructureIO.getStructureComponentName(components.get(0));
+                StructureType type = StructureType.templeTypeFromComponentId(id);
+
+                if (type != null)
+                {
+                    this.structures.put(type, StructureData.fromStructure(start));
+                }
+            }
+        }
+    }
+    */
+
     public void handleCarpetServerTPSData(ITextComponent textComponent)
     {
         if (textComponent.getFormattedText().isEmpty() == false)
@@ -404,5 +760,42 @@ public class DataStorage
         }
 
         this.serverTPSValid = false;
+    }
+
+    @Nullable
+    private File getLocalStructureFileDirectory()
+    {
+        String dirName = StringUtils.getWorldOrServerName();
+
+        if (dirName != null)
+        {
+            File dir = new File(new File(FileUtils.getConfigDirectory(), Reference.MOD_ID), "structures");
+            return new File(dir, dirName);
+        }
+
+        return null;
+    }
+
+    public JsonObject toJson()
+    {
+        JsonObject obj = new JsonObject();
+
+        obj.add("distance_pos", JsonUtils.vec3dToJson(this.distanceReferencePoint));
+
+        return obj;
+    }
+
+    public void fromJson(JsonObject obj)
+    {
+        Vec3d pos = JsonUtils.vec3dFromJson(obj, "distance_pos");
+
+        if (pos != null)
+        {
+            this.distanceReferencePoint = pos;
+        }
+        else
+        {
+            this.distanceReferencePoint = Vec3d.ZERO;
+        }
     }
 }

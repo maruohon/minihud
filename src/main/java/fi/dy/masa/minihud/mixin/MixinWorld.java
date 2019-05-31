@@ -12,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(World.class)
-public class MixinWorld
+public abstract class MixinWorld
 {
     @Inject(method = "notifyNeighborsOfStateChange", at = @At("HEAD"))
     public void onNotifyNeighborsOfStateChange(BlockPos pos, Block blockType, CallbackInfo ci)

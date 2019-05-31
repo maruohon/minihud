@@ -10,7 +10,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.gen.Heightmap;
@@ -122,7 +121,6 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
 
-        this.lastUpdatePos = new BlockPos(entity.posX, 0, entity.posZ);
         this.lastCheckTime = System.currentTimeMillis();
 
         synchronized (DIRTY_CHUNKS)

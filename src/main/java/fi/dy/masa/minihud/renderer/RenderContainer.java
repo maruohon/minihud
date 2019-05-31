@@ -3,26 +3,28 @@ package fi.dy.masa.minihud.renderer;
 import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
+import com.google.gson.JsonObject;
+import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
 
 public class RenderContainer
 {
-    protected final List<IOverlayRenderer> renderers = new ArrayList<>();
+    public static final RenderContainer INSTANCE = new RenderContainer();
+
+    protected final List<OverlayRendererBase> renderers = new ArrayList<>();
     protected boolean resourcesAllocated;
     protected boolean useVbo;
+    protected int countActive;
 
-    public RenderContainer()
-    {
-        this.init();
-    }
-
-    public void init()
+    private RenderContainer()
     {
         this.renderers.add(new OverlayRendererBlockGrid());
         this.renderers.add(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_FIXED));
@@ -34,8 +36,27 @@ public class RenderContainer
         this.renderers.add(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER));
         this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL));
         this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER));
+        this.renderers.add(new OverlayRendererStructures());
+    }
 
-        this.allocateGlResources();
+    public void addShapeRenderer(ShapeBase renderer)
+    {
+        if (this.resourcesAllocated)
+        {
+            renderer.allocateGlResources();
+        }
+
+        this.renderers.add(renderer);
+    }
+
+    public void removeShapeRenderer(ShapeBase renderer)
+    {
+        this.renderers.remove(renderer);
+
+        if (this.resourcesAllocated)
+        {
+            renderer.deleteGlResources();
+        }
     }
 
     public void render(Entity entity, Minecraft mc, float partialTicks)
@@ -47,33 +68,40 @@ public class RenderContainer
     protected void update(Entity entity, Minecraft mc)
     {
         this.checkVideoSettings();
+        this.countActive = 0;
 
         for (int i = 0; i < this.renderers.size(); ++i)
         {
-            IOverlayRenderer renderer = this.renderers.get(i);
+            OverlayRendererBase renderer = this.renderers.get(i);
 
-            if (renderer.shouldRender(mc) && renderer.needsUpdate(entity, mc))
+            if (renderer.shouldRender(mc))
             {
-                //System.out.printf("plop update\n");
-                renderer.update(entity, mc);
+                if (renderer.needsUpdate(entity, mc))
+                {
+                    renderer.lastUpdatePos = new BlockPos(entity);
+                    renderer.setPosition(renderer.lastUpdatePos);
+
+                    renderer.update(entity, mc);
+                }
+
+                ++this.countActive;
             }
         }
     }
 
     protected void draw(Entity entity, Minecraft mc, float partialTicks)
     {
-        if (this.resourcesAllocated)
+        if (this.resourcesAllocated && this.countActive > 0)
         {
             GlStateManager.pushMatrix();
 
             GlStateManager.disableTexture2D();
-            //GlStateManager.matrixMode(GL11.GL_MODELVIEW);
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
             GlStateManager.disableCull();
             GlStateManager.disableLighting();
             GlStateManager.depthMask(false);
+            GlStateManager.polygonOffset(-3f, -3f);
             GlStateManager.enablePolygonOffset();
-            GlStateManager.polygonOffset(-0.1f, -0.8f);
             GlStateManager.enableBlend();
             GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             GlStateManager.color4f(1f, 1f, 1f, 1f);
@@ -84,11 +112,9 @@ public class RenderContainer
                 GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
             }
 
-            double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
-            double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
-            double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
-
-            GlStateManager.translated((float) -dx, (float) -dy, (float) -dz);
+            double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
+            double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
+            double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
 
             for (int i = 0; i < this.renderers.size(); ++i)
             {
@@ -96,7 +122,7 @@ public class RenderContainer
 
                 if (renderer.shouldRender(mc))
                 {
-                    renderer.draw();
+                    renderer.draw(x, y, z);
                 }
             }
 
@@ -120,17 +146,16 @@ public class RenderContainer
                         default:
                     }
                 }
-
             }
 
+            GlStateManager.polygonOffset(0f, 0f);
+            GlStateManager.disablePolygonOffset();
             GlStateManager.color4f(1f, 1f, 1f, 1f);
             GlStateManager.disableBlend();
             GlStateManager.enableDepthTest();
             GlStateManager.enableLighting();
             GlStateManager.enableCull();
             GlStateManager.depthMask(true);
-            GlStateManager.polygonOffset(0f, 0f);
-            GlStateManager.disablePolygonOffset();
             GlStateManager.enableTexture2D();
             GlStateManager.popMatrix();
         }
@@ -144,7 +169,7 @@ public class RenderContainer
         if (vboLast != this.useVbo || this.resourcesAllocated == false)
         {
             this.deleteGlResources();
-            this.init();
+            this.allocateGlResources();
         }
     }
 
@@ -154,8 +179,7 @@ public class RenderContainer
         {
             for (int i = 0; i < this.renderers.size(); ++i)
             {
-                IOverlayRenderer renderer = this.renderers.get(i);
-                renderer.allocateGlResources();
+                this.renderers.get(i).allocateGlResources();
             }
 
             this.resourcesAllocated = true;
@@ -168,12 +192,42 @@ public class RenderContainer
         {
             for (int i = 0; i < this.renderers.size(); ++i)
             {
-                IOverlayRenderer renderer = this.renderers.get(i);
-                renderer.deleteGlResources();
+                this.renderers.get(i).deleteGlResources();
             }
 
-            this.renderers.clear();
             this.resourcesAllocated = false;
+        }
+    }
+
+    public JsonObject toJson()
+    {
+        JsonObject obj = new JsonObject();
+
+        for (int i = 0; i < this.renderers.size(); ++i)
+        {
+            OverlayRendererBase renderer = this.renderers.get(i);
+            String id = renderer.getSaveId();
+
+            if (id.isEmpty() == false)
+            {
+                obj.add(id, renderer.toJson());
+            }
+        }
+
+        return obj;
+    }
+
+    public void fromJson(JsonObject obj)
+    {
+        for (int i = 0; i < this.renderers.size(); ++i)
+        {
+            OverlayRendererBase renderer = this.renderers.get(i);
+            String id = renderer.getSaveId();
+
+            if (id.isEmpty() == false && JsonUtils.hasObject(obj, id))
+            {
+                renderer.fromJson(obj.get(id).getAsJsonObject());
+            }
         }
     }
 }

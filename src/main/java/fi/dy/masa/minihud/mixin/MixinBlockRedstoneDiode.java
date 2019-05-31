@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(BlockRedstoneDiode.class)
-public class MixinBlockRedstoneDiode extends BlockHorizontal
+public abstract class MixinBlockRedstoneDiode extends BlockHorizontal
 {
     protected MixinBlockRedstoneDiode(Block.Properties builder)
     {
