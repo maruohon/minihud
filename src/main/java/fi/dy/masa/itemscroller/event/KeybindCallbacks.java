@@ -52,14 +52,6 @@ public class KeybindCallbacks implements IHotkeyCallback
         return this.disabled == false;
     }
 
-    public void onWorldChanged()
-    {
-        if (Configs.Generic.SCROLL_CRAFT_STORE_RECIPES_TO_FILE.getBooleanValue())
-        {
-            RecipeStorage.getInstance().readFromDisk();
-        }
-    }
-
     @Override
     public boolean onKeyAction(KeyAction action, IKeybind key)
     {

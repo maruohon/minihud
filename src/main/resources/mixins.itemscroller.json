@@ -10,8 +10,7 @@
         "MixinGameRenderer",
         "MixinGuiMerchant",
         "MixinGuiScreen",
-        "MixinInventoryEffectRenderer",
-        "MixinMinecraft"
+        "MixinInventoryEffectRenderer"
     ],
     "injectors": {
         "defaultRequire": 1

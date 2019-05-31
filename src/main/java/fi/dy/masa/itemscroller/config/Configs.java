@@ -96,8 +96,8 @@ public class Configs implements IConfigHandler
                 JsonObject root = element.getAsJsonObject();
 
                 ConfigUtils.readConfigBase(root, "Generic", Generic.OPTIONS);
+                ConfigUtils.readConfigBase(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
                 ConfigUtils.readConfigBase(root, "Toggles", Toggles.OPTIONS);
-                ConfigUtils.readHotkeys(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
 
                 getStrings(root, GUI_BLACKLIST, "guiBlacklist");
                 getStrings(root, SLOT_BLACKLIST, "slotBlacklist");
@@ -121,21 +121,14 @@ public class Configs implements IConfigHandler
             JsonObject root = new JsonObject();
 
             ConfigUtils.writeConfigBase(root, "Generic", Generic.OPTIONS);
+            ConfigUtils.writeConfigBase(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
             ConfigUtils.writeConfigBase(root, "Toggles", Toggles.OPTIONS);
-            ConfigUtils.writeHotkeys(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
 
             writeStrings(root, GUI_BLACKLIST, "guiBlacklist");
             writeStrings(root, SLOT_BLACKLIST, "slotBlacklist");
 
             JsonUtils.writeJsonToFile(root, new File(dir, CONFIG_FILE_NAME));
         }
-    }
-
-    @Override
-    public void onConfigsChanged()
-    {
-        saveToFile();
-        loadFromFile();
     }
 
     @Override
