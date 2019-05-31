@@ -8,23 +8,13 @@ import com.google.common.collect.ImmutableList;
 import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.PluginChannelListener;
-import com.mumfrey.liteloader.Tickable;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
-import fi.dy.masa.malilib.config.ConfigManager;
-import fi.dy.masa.malilib.event.InputEventHandler;
-import fi.dy.masa.malilib.event.RenderEventHandler;
-import fi.dy.masa.malilib.event.WorldLoadHandler;
-import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.malilib.event.InitializationHandler;
 import fi.dy.masa.minihud.config.gui.MiniHudConfigPanel;
-import fi.dy.masa.minihud.event.InputHandler;
-import fi.dy.masa.minihud.event.RenderHandler;
-import fi.dy.masa.minihud.event.WorldLoadListener;
-import fi.dy.masa.minihud.hotkeys.KeyCallbacks;
 import fi.dy.masa.minihud.util.DataStorage;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 
-public class LiteModMiniHud implements LiteMod, Configurable, PluginChannelListener, Tickable
+public class LiteModMiniHud implements LiteMod, Configurable, PluginChannelListener
 {
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
@@ -57,33 +47,12 @@ public class LiteModMiniHud implements LiteMod, Configurable, PluginChannelListe
     @Override
     public void init(File configPath)
     {
-        Configs.loadFromFile();
-
-        ConfigManager.getInstance().registerConfigHandler(Reference.MOD_ID, new Configs());
-        InputEventHandler.getKeybindManager().registerKeybindProvider(InputHandler.getInstance());
-        InputEventHandler.getInputManager().registerMouseInputHandler(InputHandler.getInstance());
-
-        RenderHandler renderer = RenderHandler.getInstance();
-        RenderEventHandler.getInstance().registerGameOverlayRenderer(renderer);
-        RenderEventHandler.getInstance().registerTooltipLastRenderer(renderer);
-        RenderEventHandler.getInstance().registerWorldLastRenderer(renderer);
-
-        WorldLoadListener listener = new WorldLoadListener();
-        WorldLoadHandler.getInstance().registerWorldLoadPreHandler(listener);
-        WorldLoadHandler.getInstance().registerWorldLoadPostHandler(listener);
-
-        KeyCallbacks.init();
+        InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
     }
 
     @Override
     public void upgradeSettings(String version, File configPath, File oldConfigPath)
     {
-    }
-
-    @Override
-    public void onTick(Minecraft mc, float partialTicks, boolean inGame, boolean clock)
-    {
-        RenderHandler.getInstance().updateData(mc);
     }
 
     @Override
