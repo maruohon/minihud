@@ -236,11 +236,6 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                         cancel |= InventoryUtils.shiftDropItems(gui);
                     }
                 }
-
-                if (Configs.Generic.SCROLL_CRAFT_STORE_RECIPES_TO_FILE.getBooleanValue())
-                {
-                    recipes.writeToDisk();
-                }
             }
         }
 
