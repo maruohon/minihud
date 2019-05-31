@@ -78,12 +78,6 @@ public class LiteModItemScroller implements LiteMod, Configurable, InitCompleteL
     }
 
     @Override
-    public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
-    {
-        KeybindCallbacks.getInstance().onWorldChanged();
-    }
-
-    @Override
     public void onTick(Minecraft mc, float partialTicks, boolean inGame, boolean clock)
     {
         KeybindCallbacks.getInstance().onTick(mc);

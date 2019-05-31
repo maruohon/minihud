@@ -1,6 +1,8 @@
 package fi.dy.masa.itemscroller.event;
 
 import javax.annotation.Nullable;
+import fi.dy.masa.itemscroller.config.Configs;
+import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.villager.VillagerDataStorage;
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import net.minecraft.client.Minecraft;
@@ -44,6 +46,11 @@ public class WorldLoadListener implements IWorldLoadListener
 
     private void readStoredDataGlobal()
     {
+        if (Configs.Generic.SCROLL_CRAFT_STORE_RECIPES_TO_FILE.getBooleanValue())
+        {
+            RecipeStorage.getInstance().readFromDisk();
+        }
+
         VillagerDataStorage.getInstance().readFromDisk();
     }
 }
