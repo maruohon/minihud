@@ -1064,7 +1064,7 @@ public class InventoryUtils
             if (isRightClick)
             {
                 Slot outputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
-                boolean dropKeyDown = InputUtils.isKeybindHeld(mc.gameSettings.keyBindDrop.getKeyCode());
+                boolean dropKeyDown = mc.gameSettings.keyBindDrop.isKeyDown();
 
                 if (outputSlot != null)
                 {

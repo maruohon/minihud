@@ -1,6 +1,5 @@
 package fi.dy.masa.itemscroller.util;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import fi.dy.masa.itemscroller.config.Hotkeys;
 import fi.dy.masa.itemscroller.event.KeybindCallbacks;
@@ -144,19 +143,6 @@ public class InputUtils
         }
 
         return MoveAmount.NONE;
-    }
-
-    public static boolean isKeybindHeld(int keyCode)
-    {
-        if (keyCode > 0 && keyCode < Keyboard.getKeyCount())
-        {
-            return Keyboard.isKeyDown(keyCode);
-        }
-        else
-        {
-            keyCode += 100;
-            return keyCode >= 0 && keyCode < Mouse.getButtonCount() && Mouse.isButtonDown(keyCode);
-        }
     }
 
     public static boolean isAttack(int keyCode)
