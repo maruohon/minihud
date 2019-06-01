@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.dimension.DimensionType;
 
 public class OverlayRendererStructures extends OverlayRendererBase
 {
@@ -67,7 +67,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        this.updateStructures(mc.world.dimension, this.lastUpdatePos, mc);
+        this.updateStructures(mc.world.dimension.getType(), this.lastUpdatePos, mc);
 
         BUFFER_1.finishDrawing();
         BUFFER_2.finishDrawing();
@@ -83,14 +83,14 @@ public class OverlayRendererStructures extends OverlayRendererBase
         this.allocateBuffer(GL11.GL_LINES);
     }
 
-    private void updateStructures(Dimension dimension, BlockPos playerPos, Minecraft mc)
+    private void updateStructures(DimensionType dimensionType, BlockPos playerPos, Minecraft mc)
     {
         ArrayListMultimap<StructureType, StructureData> structures = DataStorage.getInstance().getCopyOfStructureData();
         int maxRange = (mc.gameSettings.renderDistanceChunks + 4) * 16;
 
         for (StructureType type : StructureType.values())
         {
-            if (type.isEnabled() && type.existsInDimension(dimension))
+            if (type.isEnabled() && type.existsInDimension(dimensionType))
             {
                 Collection<StructureData> structureData = structures.get(type);
 

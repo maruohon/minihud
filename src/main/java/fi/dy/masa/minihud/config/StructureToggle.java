@@ -8,17 +8,20 @@ import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.minihud.util.DataStorage;
-import net.minecraft.client.Minecraft;
 
 public enum StructureToggle
 {
+    OVERLAY_STRUCTURE_BURIED_TREASURE   ("Buried Treasure", "", "#FF2298E6", "#FF2298E6", "Toggle Buried Treasure structure bounding boxes rendering", "Desert Pyramid"),
     OVERLAY_STRUCTURE_DESERT_PYRAMID    ("Desert Pyramid",  "", "#30FFFF00", "#30FFFF00", "Toggle Desert Pyramid structure bounding boxes rendering", "Desert Pyramid"),
     OVERLAY_STRUCTURE_END_CITY          ("End City",        "", "#30EB07EB", "#30EB07EB", "Toggle End City structure bounding boxes rendering", "End City"),
     OVERLAY_STRUCTURE_IGLOO             ("Igloo",           "", "#300FAFE4", "#300FAFE4", "Toggle Igloo structure bounding boxes rendering", "Igloo structures"),
     OVERLAY_STRUCTURE_JUNGLE_TEMPLE     ("Jungle Temple",   "", "#3099FF00", "#3099FF00", "Toggle Jungle Temple structure bounding boxes rendering", "Jungle Temple"),
     OVERLAY_STRUCTURE_MANSION           ("Mansion",         "", "#30FF6500", "#30FF6500", "Toggle Mansion structure bounding boxes rendering", "Mansion structures"),
+    OVERLAY_STRUCTURE_MINESHAFT         ("Mineshaft",       "", "#FFF8D650", "#FFF8D650", "Toggle Mineshaft structure bounding boxes rendering", "Mansion structures"),
     OVERLAY_STRUCTURE_NETHER_FORTRESS   ("Nether Fortress", "", "#30FC381D", "#30FC381D", "Toggle Nether Fortress structure bounding boxes rendering", "Nether Fortress"),
     OVERLAY_STRUCTURE_OCEAN_MONUMENT    ("Ocean Monument",  "", "#3029E6EF", "#3029E6EF", "Toggle Ocean Monument structure bounding boxes rendering", "Ocean Monument"),
+    OVERLAY_STRUCTURE_OCEAN_RUIN        ("Ocean Ruin",      "", "#FF0FAD83", "#FF0FAD83", "Toggle Ocean Ruin structure bounding boxes rendering", "Ocean Monument"),
+    OVERLAY_STRUCTURE_SHIPWRECK         ("Shipwreck",       "", "#FFEB1995", "#FFEB1995", "Toggle Shipwreck structure bounding boxes rendering", "Stronghold"),
     OVERLAY_STRUCTURE_STRONGHOLD        ("Stronghold",      "", "#30009999", "#30009999", "Toggle Stronghold structure bounding boxes rendering", "Stronghold"),
     OVERLAY_STRUCTURE_VILLAGE           ("Village",         "", "#3054CB4E", "#3054CB4E", "Toggle Village structure bounding boxes rendering\nNOTE: This is the Village world gen structures!\nThis is not the Village data you use for iron farms etc.!", "Village"),
     OVERLAY_STRUCTURE_WITCH_HUT         ("Witch Hut",       "", "#30BE1DFC", "#300099FF", "Toggle Witch Hut structure bounding boxes rendering", "Witch Hut");
@@ -94,22 +97,6 @@ public enum StructureToggle
         return builder.build();
     }
 
-    public static void updateStructureData()
-    {
-        if (Minecraft.getInstance().isSingleplayer() == false)
-        {
-            // 1.13 TODO
-            /*
-            PacketBuffer data = new PacketBuffer(Unpooled.buffer());
-            data.writeInt(DataStorage.CARPET_ID_BOUNDINGBOX_MARKERS);
-            ClientPluginChannels.sendMessage(LiteModMiniHud.CHANNEL_CARPET_CLIENT, data, ChannelPolicy.DISPATCH_ALWAYS);
-            MiniHUD.logger.info("Requesting structure data from Carpet server");
-            */
-        }
-
-        DataStorage.getInstance().setStructuresNeedUpdating();
-    }
-
     public static class StructureRefresh implements IValueChangeCallback<ConfigBoolean>
     {
         @Override
@@ -117,7 +104,7 @@ public enum StructureToggle
         {
             if (config.getBooleanValue())
             {
-                StructureToggle.updateStructureData();
+                DataStorage.getInstance().requestStructureDataFromServer();
             }
 
             DataStorage.getInstance().setStructuresDirty();

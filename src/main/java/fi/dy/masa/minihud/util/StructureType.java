@@ -1,57 +1,46 @@
 package fi.dy.masa.minihud.util;
 
-import javax.annotation.Nullable;
+import java.util.Locale;
 import fi.dy.masa.minihud.config.StructureToggle;
-import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.dimension.EndDimension;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.structure.Structure;
 
 public enum StructureType
 {
-    DESERT_PYRAMID      (DimensionType.OVERWORLD,   "Temple",      "TeDP", StructureToggle.OVERLAY_STRUCTURE_DESERT_PYRAMID),
-    IGLOO               (DimensionType.OVERWORLD,   "Temple",      "Iglu", StructureToggle.OVERLAY_STRUCTURE_IGLOO),
-    JUNGLE_TEMPLE       (DimensionType.OVERWORLD,   "Temple",      "TeJP", StructureToggle.OVERLAY_STRUCTURE_JUNGLE_TEMPLE),
-    MANSION             (DimensionType.OVERWORLD,   "Mansion",     "",     StructureToggle.OVERLAY_STRUCTURE_MANSION),
-    OCEAN_MONUMENT      (DimensionType.OVERWORLD,   "Monument",    "",     StructureToggle.OVERLAY_STRUCTURE_OCEAN_MONUMENT),
-    STRONGHOLD          (DimensionType.OVERWORLD,   "Stronghold",  "",     StructureToggle.OVERLAY_STRUCTURE_STRONGHOLD),
-    VILLAGE             (DimensionType.OVERWORLD,   "Village",     "",     StructureToggle.OVERLAY_STRUCTURE_VILLAGE),
-    WITCH_HUT           (DimensionType.OVERWORLD,   "Temple",      "TeSH", StructureToggle.OVERLAY_STRUCTURE_WITCH_HUT),
+    BURIED_TREASURE     (DimensionType.OVERWORLD,   "Buried_Treasure",  StructureToggle.OVERLAY_STRUCTURE_BURIED_TREASURE),
+    DESERT_PYRAMID      (DimensionType.OVERWORLD,   "Desert_Pyramid",   StructureToggle.OVERLAY_STRUCTURE_DESERT_PYRAMID),
+    IGLOO               (DimensionType.OVERWORLD,   "Igloo",            StructureToggle.OVERLAY_STRUCTURE_IGLOO),
+    JUNGLE_TEMPLE       (DimensionType.OVERWORLD,   "Jungle_Pyramid",   StructureToggle.OVERLAY_STRUCTURE_JUNGLE_TEMPLE),
+    MANSION             (DimensionType.OVERWORLD,   "Mansion",          StructureToggle.OVERLAY_STRUCTURE_MANSION),
+    MINESHAFT           (DimensionType.OVERWORLD,   "Mineshaft",        StructureToggle.OVERLAY_STRUCTURE_MINESHAFT),
+    OCEAN_MONUMENT      (DimensionType.OVERWORLD,   "Monument",         StructureToggle.OVERLAY_STRUCTURE_OCEAN_MONUMENT),
+    OCEAN_RUIN          (DimensionType.OVERWORLD,   "Ocean_Ruin",       StructureToggle.OVERLAY_STRUCTURE_OCEAN_RUIN),
+    SHIPWRECK           (DimensionType.OVERWORLD,   "Shipwreck",        StructureToggle.OVERLAY_STRUCTURE_SHIPWRECK),
+    STRONGHOLD          (DimensionType.OVERWORLD,   "Stronghold",       StructureToggle.OVERLAY_STRUCTURE_STRONGHOLD),
+    VILLAGE             (DimensionType.OVERWORLD,   "Village",          StructureToggle.OVERLAY_STRUCTURE_VILLAGE),
+    WITCH_HUT           (DimensionType.OVERWORLD,   "Swamp_Hut",        StructureToggle.OVERLAY_STRUCTURE_WITCH_HUT),
 
-    NETHER_FORTRESS     (DimensionType.NETHER,      "Fortress",    "",     StructureToggle.OVERLAY_STRUCTURE_NETHER_FORTRESS),
+    NETHER_FORTRESS     (DimensionType.NETHER,      "Fortress",         StructureToggle.OVERLAY_STRUCTURE_NETHER_FORTRESS),
 
-    END_CITY            (DimensionType.THE_END,     "EndCity",     "",     StructureToggle.OVERLAY_STRUCTURE_END_CITY);
+    END_CITY            (DimensionType.THE_END,     "EndCity",          StructureToggle.OVERLAY_STRUCTURE_END_CITY);
 
     private final StructureToggle toggle;
     private final String structureName;
-    private final String componentId;
     private final DimensionType dimType;
-    private final boolean isTemple;
+    private final Structure<?> structure;
 
-    private StructureType(DimensionType dimType, String structureName, String componentId, StructureToggle toggle)
+    private StructureType(DimensionType dimType, String structureName, StructureToggle toggle)
     {
         this.structureName = structureName;
-        this.componentId = componentId;
         this.toggle = toggle;
         this.dimType = dimType;
-        this.isTemple = componentId.isEmpty() == false;
+        this.structure = Feature.STRUCTURES.get(structureName.toLowerCase(Locale.ROOT));
     }
 
-    public boolean existsInDimension(Dimension dimension)
+    public boolean existsInDimension(DimensionType dimensionType)
     {
-        if (dimension.isSurfaceWorld())
-        {
-            return this.dimType == DimensionType.OVERWORLD;
-        }
-        else if (dimension.isNether())
-        {
-            return this.dimType == DimensionType.NETHER;
-        }
-        else if (dimension instanceof EndDimension)
-        {
-            return this.dimType == DimensionType.THE_END;
-        }
-
-        return false;
+        return this.dimType == dimensionType;
     }
 
     public String getStructureName()
@@ -59,37 +48,18 @@ public enum StructureType
         return this.structureName;
     }
 
-    public String getComponentId()
-    {
-        return this.componentId;
-    }
-
-    public boolean isTemple()
-    {
-        return this.isTemple;
-    }
-
     public StructureToggle getToggle()
     {
         return this.toggle;
     }
 
+    public Structure<?> getStructure()
+    {
+        return this.structure;
+    }
+
     public boolean isEnabled()
     {
         return this.toggle.getToggleOption().getBooleanValue();
-    }
-
-    @Nullable
-    public static StructureType templeTypeFromComponentId(String id)
-    {
-        for (StructureType type : values())
-        {
-            if (type.componentId.equals(id))
-            {
-                return type;
-            }
-        }
-
-        return null;
     }
 }
