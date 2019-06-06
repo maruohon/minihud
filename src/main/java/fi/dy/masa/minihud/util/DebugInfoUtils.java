@@ -215,39 +215,34 @@ public class DebugInfoUtils
     public static void toggleDebugRenderer(RendererToggle config)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
-        boolean status;
+        boolean enabled = config.getBooleanValue();
 
         if (config == RendererToggle.DEBUG_COLLISION_BOXES)
         {
-            status = ! ((IMixinDebugRenderer) mc.debugRenderer).getCollisionBoxEnabled();
-            ((IMixinDebugRenderer) mc.debugRenderer).setCollisionBoxEnabled(status);
+            ((IMixinDebugRenderer) mc.debugRenderer).setCollisionBoxEnabled(enabled);
         }
         else if (config == RendererToggle.DEBUG_HEIGHT_MAP)
         {
-            status = ! ((IMixinDebugRenderer) mc.debugRenderer).getHeightMapEnabled();
-            //((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(status);
+            // This crashes in 1.13+, because it uses a world gen heightmap which doesn't exist normally
+            //((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(enabled);
         }
         else if (config == RendererToggle.DEBUG_NEIGHBOR_UPDATES)
         {
-            status = ! ((IMixinDebugRenderer) mc.debugRenderer).getNeighborsUpdateEnabled();
-            ((IMixinDebugRenderer) mc.debugRenderer).setNeighborsUpdateEnabled(status);
-            neighborUpdateEnabled = status;
+            ((IMixinDebugRenderer) mc.debugRenderer).setNeighborsUpdateEnabled(enabled);
+            neighborUpdateEnabled = enabled;
         }
         else if (config == RendererToggle.DEBUG_PATH_FINDING)
         {
-            status = ! ((IMixinDebugRenderer) mc.debugRenderer).getPathfindingEnabled();
-            ((IMixinDebugRenderer) mc.debugRenderer).setPathfindingEnabled(status);
-            pathfindingEnabled = status;
+            ((IMixinDebugRenderer) mc.debugRenderer).setPathfindingEnabled(enabled);
+            pathfindingEnabled = enabled;
         }
         else if (config == RendererToggle.DEBUG_SOLID_FACES)
         {
-            status = ! ((IMixinDebugRenderer) mc.debugRenderer).getSolidFaceEnabled();
-            ((IMixinDebugRenderer) mc.debugRenderer).setSolidFaceEnabled(status);
+            ((IMixinDebugRenderer) mc.debugRenderer).setSolidFaceEnabled(enabled);
         }
         else if (config == RendererToggle.DEBUG_WATER)
         {
-            status = ! ((IMixinDebugRenderer) mc.debugRenderer).getWaterEnabled();
-            ((IMixinDebugRenderer) mc.debugRenderer).setWaterEnabled(status);
+            ((IMixinDebugRenderer) mc.debugRenderer).setWaterEnabled(enabled);
         }
     }
 }

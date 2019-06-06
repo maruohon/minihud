@@ -16,17 +16,24 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.mixin.IMixinServerWorld;
 import fi.dy.masa.minihud.mixin.IMixinWorldRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Screen;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.chunk.ChunkRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.FilledMapItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerChunkManager;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
@@ -36,6 +43,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.LightType;
 import net.minecraft.world.LocalDifficulty;
@@ -96,7 +104,7 @@ public class RenderHandler implements IRenderer
             mc.options.debugEnabled == false &&
             mc.player != null &&
             (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
-            (Configs.Generic.REQUIRED_KEY.getKeybind().isValid() == false || Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld()))
+            Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld())
         {
             if (InfoToggle.FPS.getBooleanValue())
             {
@@ -125,11 +133,32 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
+    public void onRenderTooltipLast(ItemStack stack, int x, int y)
+    {
+        if (stack.getItem() instanceof FilledMapItem)
+        {
+            if (Configs.Generic.MAP_PREVIEW.getBooleanValue())
+            {
+                fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue());
+            }
+        }
+        else if (Configs.Generic.SHULKER_BOX_PREVIEW.getBooleanValue())
+        {
+            boolean render = Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || Screen.hasShiftDown();
+
+            if (render)
+            {
+                fi.dy.masa.malilib.render.RenderUtils.renderShulkerBoxPreview(stack, x, y, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
+            }
+        }
+    }
+
+    @Override
     public void onRenderWorldLast(float partialTicks)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
-        if (Configs.Generic.ENABLED.getBooleanValue() && mc.player != null)
+        if (Configs.Generic.ENABLED.getBooleanValue() && mc.world != null && mc.player != null)
         {
             OverlayRenderer.renderOverlays(mc, partialTicks);
         }
@@ -165,6 +194,17 @@ public class RenderHandler implements IRenderer
             this.fpsUpdateTime = time;
             this.fps = this.fpsCounter;
             this.fpsCounter = 0;
+        }
+    }
+
+    public void updateData(MinecraftClient mc)
+    {
+        if (mc.world != null)
+        {
+            if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue() && (mc.world.getTime() % 20) == 0)
+            {
+                DataStorage.getInstance().updateStructureData();
+            }
         }
     }
 
@@ -270,12 +310,13 @@ public class RenderHandler implements IRenderer
         {
             try
             {
-                long timeDay = (int) world.getTimeOfDay();
-                int day = (int) (timeDay / 24000) + 1;
+                long timeDay = world.getTimeOfDay();
+                long day = (int) (timeDay / 24000) + 1;
                 // 1 tick = 3.6 seconds in MC (0.2777... seconds IRL)
-                int hour = (int) ((timeDay / 1000) + 6) % 24;
-                int min = (int) (timeDay / 16.666666) % 60;
-                int sec = (int) (timeDay / 0.277777) % 60;
+                int dayTicks = (int) (timeDay % 24000);
+                int hour = (int) ((dayTicks / 1000) + 6) % 24;
+                int min = (int) (dayTicks / 16.666666) % 60;
+                int sec = (int) (dayTicks / 0.277777) % 60;
 
                 String str = Configs.Generic.DATE_FORMAT_MINECRAFT.getStringValue();
                 str = str.replace("{DAY}",  String.format("%d", day));
@@ -289,6 +330,18 @@ public class RenderHandler implements IRenderer
             {
                 this.addLine("Date formatting failed - Invalid date format string?");
             }
+        }
+        else if (type == InfoToggle.TIME_DAY_MODULO)
+        {
+            int mod = Configs.Generic.TIME_DAY_DIVISOR.getIntegerValue();
+            long current = world.getTimeOfDay() % mod;
+            this.addLine(String.format("Day time %% %d: %5d", mod, current));
+        }
+        else if (type == InfoToggle.TIME_TOTAL_MODULO)
+        {
+            int mod = Configs.Generic.TIME_TOTAL_DIVISOR.getIntegerValue();
+            long current = world.getTime() % mod;
+            this.addLine(String.format("Total time %% %d: %5d", mod, current));
         }
         else if (type == InfoToggle.SERVER_TPS)
         {
@@ -326,6 +379,15 @@ public class RenderHandler implements IRenderer
             else
             {
                 this.addLine("Server TPS: <no valid data>");
+            }
+        }
+        else if (type == InfoToggle.PING)
+        {
+            PlayerListEntry info = mc.player.networkHandler.getPlayerListEntry(mc.player.getUuid());
+
+            if (info != null)
+            {
+                this.addLine("Ping: " + info.getLatency() + " ms");
             }
         }
         else if (type == InfoToggle.COORDINATES ||
@@ -366,8 +428,8 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.DIMENSION.getBooleanValue())
             {
-                String dim = world.dimension.getType().toString();
-                str.append(String.format(String.format("%sDimension: %s", pre, dim)));
+                int dimension = world.dimension.getType().getRawId();
+                str.append(String.format(String.format("%sDimType ID: %d", pre, dimension)));
             }
 
             this.addLine(str.toString());
@@ -418,6 +480,13 @@ public class RenderHandler implements IRenderer
             this.addLine(String.format("Block: %d, %d, %d within Sub-Chunk: %d, %d, %d",
                         pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF,
                         chunkPos.x, pos.getY() >> 4, chunkPos.z));
+        }
+        else if (type == InfoToggle.DISTANCE)
+        {
+            Vec3d ref = DataStorage.getInstance().getDistanceReferencePoint();
+            double dist = MathHelper.sqrt(ref.squaredDistanceTo(entity.x, entity.y, entity.z));
+            this.addLine(String.format("Distance: %.2f (x: %.2f y: %.2f z: %.2f) [to x: %.2f y: %.2f z: %.2f]",
+                    dist, entity.x - ref.x, entity.y - ref.y, entity.z - ref.z, ref.x, ref.y, ref.z));
         }
         else if (type == InfoToggle.FACING)
         {
@@ -523,7 +592,7 @@ public class RenderHandler implements IRenderer
         {
             this.addLine(String.format("Chunk updates: %d", ChunkRenderer.chunkUpdateCount));
         }
-        else if (type == InfoToggle.MP_CHUNK_CACHE)
+        else if (type == InfoToggle.LOADED_CHUNKS_COUNT)
         {
             String chunksClient = mc.world.getChunkProviderStatus();
             World worldServer = WorldUtils.getBestWorld(mc);
@@ -607,6 +676,24 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.TILE_ENTITIES)
         {
             this.addLine(String.format("Client world TE - L: %d, T: %d", mc.world.blockEntities.size(), mc.world.tickingBlockEntities.size()));
+        }
+        else if (type == InfoToggle.ENTITIES_CLIENT_WORLD)
+        {
+            int countClient = mc.world.getRegularEntityCount();
+
+            if (mc.isIntegratedServerRunning())
+            {
+                World serverWorld = WorldUtils.getBestWorld(mc);
+
+                if (serverWorld != null && serverWorld instanceof ServerWorld)
+                {
+                    int countServer = ((IMixinServerWorld) serverWorld).getEntityList().size();
+                    this.addLine(String.format("Entities - Client: %d, Server: %d", countClient, countServer));
+                    return;
+                }
+            }
+
+            this.addLine(String.format("Entities - Client: %d", countClient));
         }
         else if (type == InfoToggle.SLIME_CHUNK)
         {

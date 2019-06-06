@@ -123,7 +123,6 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
 
-        this.lastUpdatePos = new BlockPos(entity.x, 0, entity.z);
         this.lastCheckTime = System.currentTimeMillis();
 
         synchronized (DIRTY_CHUNKS)

@@ -7,10 +7,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Screen;
 
 @Mixin(Screen.class)
-public abstract class MixinScreen
+public abstract class MixinScreen extends AbstractParentElement
 {
     @Shadow
     protected MinecraftClient minecraft;

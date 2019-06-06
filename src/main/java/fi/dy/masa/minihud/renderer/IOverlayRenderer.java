@@ -28,8 +28,11 @@ public interface IOverlayRenderer
 
     /**
      * Draw the buffer contents to screen
+     * @param x
+     * @param y
+     * @param z
      */
-    void draw();
+    void draw(double x, double y, double z);
 
     /**
      * Allocates the OpenGL resources according to the current Video settings

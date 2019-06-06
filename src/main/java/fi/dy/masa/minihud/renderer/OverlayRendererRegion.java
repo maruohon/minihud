@@ -28,6 +28,7 @@ public class OverlayRendererRegion extends OverlayRendererBase
         int ez = (int) Math.floor(entity.z);
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
+
         return (ex >> 9) != (lx >> 9) || (ez >> 9) != (lz >> 9) || Math.abs(lx - ex) > 16 || Math.abs(lz - ez) > 16;
     }
 
@@ -53,8 +54,6 @@ public class OverlayRendererRegion extends OverlayRendererBase
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
-
-        this.lastUpdatePos = new BlockPos(entity);
     }
 
     @Override

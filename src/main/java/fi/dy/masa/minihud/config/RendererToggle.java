@@ -10,24 +10,28 @@ import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
+import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleStructures;
 
 public enum RendererToggle implements IHotkeyTogglable
 {
-    DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled",    "H,1", "Toggles the vanilla Block Collision Boxes debug renderer", "Block Collision Boxes"),
-    DEBUG_HEIGHT_MAP                    ("debugHeightMapEnabled",       "H,2", "Toggles the vanilla Height Map debug renderer", "Height Map"),
-    DEBUG_NEIGHBOR_UPDATES              ("debugNeighborsUpdateEnabled", "H,3", "Toggles the vanilla Block Neighbor Updates debug renderer", "Block Neighbor Updates"),
-    DEBUG_PATH_FINDING                  ("debugPathfindingEnabled",     "H,4", "Toggles the vanilla Pathfinding debug renderer", "Pathfinding"),
-    DEBUG_SOLID_FACES                   ("debugSolidFaceEnabled",       "H,5", "Toggles the vanilla Block Solid Faces debug renderer", "Block Solid Faces"),
-    DEBUG_WATER                         ("debugWaterEnabled",           "H,6", "Toggles the vanilla Water debug renderer", "Water"),
+    DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled",    "", "Toggles the vanilla Block Collision Boxes debug renderer", "Block Collision Boxes"),
+    DEBUG_HEIGHT_MAP                    ("debugHeightMapEnabled",       "", "Toggles the vanilla Height Map debug renderer", "Height Map"),
+    DEBUG_NEIGHBOR_UPDATES              ("debugNeighborsUpdateEnabled", "", "Toggles the vanilla Block Neighbor Updates debug renderer", "Block Neighbor Updates"),
+    DEBUG_PATH_FINDING                  ("debugPathfindingEnabled",     "", "Toggles the vanilla Pathfinding debug renderer", "Pathfinding"),
+    DEBUG_SOLID_FACES                   ("debugSolidFaceEnabled",       "", "Toggles the vanilla Block Solid Faces debug renderer", "Block Solid Faces"),
+    DEBUG_WATER                         ("debugWaterEnabled",           "", "Toggles the vanilla Water debug renderer", "Water"),
 
-    OVERLAY_BLOCK_GRID                  ("overlayBlockGrid",            "",    "Toggle the Block Grid overlay renderer", "Block Grid overlay"),
-    OVERLAY_RANDOM_TICKS_FIXED          ("overlayRandomTicksFixed",     "",    "Toggle the fixed-point random ticked chunks overlay renderer", "Random ticked chunks (fixed) overlay"),
-    OVERLAY_RANDOM_TICKS_PLAYER         ("overlayRandomTicksPlayer",    "",    "Toggle the player-following random ticked chunks overlay renderer", "Random ticked chunks (player-following) overlay"),
-    OVERLAY_REGION_FILE                 ("overlayRegionFile",           "H,J", "Toggle the region file border overlay renderer", "Region file border overlay"),
-    OVERLAY_SLIME_CHUNKS_OVERLAY        ("overlaySlimeChunks",          "H,M", "Toggle the Slime Chunk overlay renderer", "Slime chunk overlay"),
-    OVERLAY_SPAWNABLE_COLUMN_HEIGHTS    ("overlaySpawnableColumnHeights","",   "Toggle the spawnable column heights overlay renderer", "Spawnable column heights overlay"),
-    OVERLAY_SPAWN_CHUNK_OVERLAY_REAL    ("overlaySpawnChunkReal",       "H,V", "Toggle the spawn chunks overlay renderer", "Spawn chunks overlay"),
-    OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER  ("overlaySpawnChunkPlayer",     "H,Q", "Toggle the pseudo (player-following) spawn chunks overlay renderer", "Would-be (player-following) spawn chunks overlay");
+    OVERLAY_BLOCK_GRID                  ("overlayBlockGrid",            "", "Toggle the Block Grid overlay renderer", "Block Grid overlay"),
+    OVERLAY_LIGHT_LEVEL                 ("overlayLightLevel",           "", "Toggle the Light Level overlay renderer", "Light Level overlay"),
+    OVERLAY_RANDOM_TICKS_FIXED          ("overlayRandomTicksFixed",     "", "Toggle the fixed-point random ticked chunks overlay renderer", "Random Ticked Chunks (fixed) overlay"),
+    OVERLAY_RANDOM_TICKS_PLAYER         ("overlayRandomTicksPlayer",    "", "Toggle the player-following random ticked chunks overlay renderer", "Random Ticked Chunks (player-following) overlay"),
+    OVERLAY_REGION_FILE                 ("overlayRegionFile",           "", "Toggle the region file border overlay renderer", "Region File Border overlay"),
+    OVERLAY_SLIME_CHUNKS_OVERLAY        ("overlaySlimeChunks",          "", KeybindSettings.INGAME_BOTH, "Toggle the Slime Chunk overlay renderer", "Slime Chunks overlay"),
+    OVERLAY_SPAWNABLE_COLUMN_HEIGHTS    ("overlaySpawnableColumnHeights","", "Toggle the spawnable column heights overlay renderer", "Spawnable column heights overlay"),
+    OVERLAY_SPAWN_CHUNK_OVERLAY_REAL    ("overlaySpawnChunkReal",       "", "Toggle the spawn chunks overlay renderer", "Spawn Chunks (real) overlay"),
+    OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER  ("overlaySpawnChunkPlayer",     "", "Toggle the pseudo (player-following) spawn chunks overlay renderer", "Spawn Chunks (player-following, would-be) overlay"),
+    OVERLAY_STRUCTURE_MAIN_TOGGLE       ("overlayStructureMainToggle",  "", "Main toggle for all structure bounding boxes", "Structure Bounding Boxes main"),
+    SHAPE_RENDERER                      ("shapeRenderer",               "", "The main toggle for the shape renderer", "Shape Renderer");
 
     private final String name;
     private final String prettyName;
@@ -36,15 +40,24 @@ public enum RendererToggle implements IHotkeyTogglable
     private final boolean defaultValueBoolean;
     private boolean valueBoolean;
 
-    private RendererToggle(String name, String defaultHotkey, String comment, String prettyName)
+    RendererToggle(String name, String defaultHotkey, String comment, String prettyName)
+    {
+        this(name, defaultHotkey, KeybindSettings.DEFAULT, comment, prettyName);
+    }
+
+    RendererToggle(String name, String defaultHotkey, KeybindSettings settings, String comment, String prettyName)
     {
         this.name = name;
         this.prettyName = prettyName;
         this.comment = comment;
         this.defaultValueBoolean = false;
-        this.keybind = KeybindMulti.fromStorageString(defaultHotkey, KeybindSettings.DEFAULT);
+        this.keybind = KeybindMulti.fromStorageString(defaultHotkey, settings);
 
-        if (name.startsWith("debug"))
+        if (name.equals("overlayStructureMainToggle"))
+        {
+            this.keybind.setCallback(new KeyCallbackToggleStructures(this));
+        }
+        else if (name.startsWith("debug"))
         {
             this.keybind.setCallback(new KeyCallbackToggleDebugRenderer(this));
         }

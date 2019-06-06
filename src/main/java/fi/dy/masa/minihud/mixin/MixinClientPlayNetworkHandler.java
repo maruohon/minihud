@@ -11,6 +11,7 @@ import net.minecraft.client.network.packet.ChatMessageS2CPacket;
 import net.minecraft.client.network.packet.ChunkDataS2CPacket;
 import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.client.network.packet.PlayerListHeaderS2CPacket;
+import net.minecraft.client.network.packet.PlayerSpawnPositionS2CPacket;
 import net.minecraft.client.network.packet.WorldTimeUpdateS2CPacket;
 import net.minecraft.world.chunk.ChunkPos;
 
@@ -52,5 +53,11 @@ public abstract class MixinClientPlayNetworkHandler
     private void onHandlePlayerListHeaderFooter(PlayerListHeaderS2CPacket packetIn, CallbackInfo ci)
     {
         DataStorage.getInstance().handleCarpetServerTPSData(packetIn.getFooter());
+    }
+
+    @Inject(method = "onPlayerSpawnPosition", at = @At("RETURN"))
+    private void onSetSpawn(PlayerSpawnPositionS2CPacket packet, CallbackInfo ci)
+    {
+        DataStorage.getInstance().setWorldSpawnIfUnknown(packet.getPos());
     }
 }

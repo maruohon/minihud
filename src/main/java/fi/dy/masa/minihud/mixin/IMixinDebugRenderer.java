@@ -8,21 +8,6 @@ import net.minecraft.client.render.debug.DebugRenderer;
 public interface IMixinDebugRenderer
 {
     @Accessor("showChunkBorder")
-    public boolean getChunkBorderEnabled();
-    @Accessor("showPathfinding")
-    public boolean getPathfindingEnabled();
-    @Accessor("showWater")
-    public boolean getWaterEnabled();
-    @Accessor("showHeightmap")
-    public boolean getHeightMapEnabled();
-    @Accessor("showVoxels")
-    public boolean getCollisionBoxEnabled();
-    @Accessor("showNeighborUpdates")
-    public boolean getNeighborsUpdateEnabled();
-    @Accessor("showBlockOutlines")
-    public boolean getSolidFaceEnabled();
-
-    @Accessor("showChunkBorder")
     public void setChunkBorderEnabled(boolean value);
     @Accessor("showPathfinding")
     public void setPathfindingEnabled(boolean value);
