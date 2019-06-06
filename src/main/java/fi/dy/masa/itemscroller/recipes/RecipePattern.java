@@ -53,22 +53,18 @@ public class RecipePattern
         {
             if (slot.hasStack())
             {
-                if (InventoryUtils.areStacksEqual(this.getResult(), slot.getStack()) == false ||
-                    this.getRecipeLength() != range.getSlotCount())
+                int gridSize = range.getSlotCount();
+                int numSlots = gui.getContainer().slotList.size();
+
+                this.ensureRecipeSizeAndClearRecipe(gridSize);
+
+                for (int i = 0, s = range.getFirst(); i < gridSize && s < numSlots; i++, s++)
                 {
-                    int gridSize = range.getSlotCount();
-                    int numSlots = gui.getContainer().slotList.size();
-
-                    this.ensureRecipeSizeAndClearRecipe(gridSize);
-
-                    for (int i = 0, s = range.getFirst(); i < gridSize && s < numSlots; i++, s++)
-                    {
-                        Slot slotTmp = gui.getContainer().getSlot(s);
-                        this.recipe[i] = slotTmp.hasStack() ? slotTmp.getStack().copy() : InventoryUtils.EMPTY_STACK;
-                    }
-
-                    this.result = slot.getStack().copy();
+                    Slot slotTmp = gui.getContainer().getSlot(s);
+                    this.recipe[i] = slotTmp.hasStack() ? slotTmp.getStack().copy() : InventoryUtils.EMPTY_STACK;
                 }
+
+                this.result = slot.getStack().copy();
             }
             else if (clearIfEmpty)
             {

@@ -7,6 +7,7 @@ import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Hotkeys;
 import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.resource.language.I18n;
@@ -14,7 +15,6 @@ import net.minecraft.client.resource.language.I18n;
 public class GuiConfigs extends GuiConfigsBase
 {
     private static ConfigGuiTab tab = ConfigGuiTab.HOTKEYS;
-    private int id;
 
     public GuiConfigs()
     {
@@ -29,32 +29,22 @@ public class GuiConfigs extends GuiConfigsBase
         super.init();
         this.clearOptions();
 
-        this.id = 0;
         int x = 10;
         int y = 26;
 
         for (ConfigGuiTab tab : ConfigGuiTab.values())
         {
-            x += this.createButton(x, y, -1, tab) + 4;
+            x += this.createButton(x, y, -1, tab);
         }
     }
 
     private int createButton(int x, int y, int width, ConfigGuiTab tab)
     {
-        ButtonListener listener = new ButtonListener(tab, this);
-        boolean enabled = GuiConfigs.tab != tab;
-        String label = tab.getDisplayName();
+        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, tab.getDisplayName());
+        button.setEnabled(GuiConfigs.tab != tab);
+        this.addButton(button, new ButtonListener(tab, this));
 
-        if (width < 0)
-        {
-            width = this.textRenderer.getStringWidth(label) + 10;
-        }
-
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
-        button.active = enabled;
-        this.addButton(button, listener);
-
-        return width;
+        return button.getWidth() + 2;
     }
 
     @Override
@@ -96,7 +86,7 @@ public class GuiConfigs extends GuiConfigsBase
         return ConfigOptionWrapper.createFor(configs);
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final GuiConfigs parent;
         private final ConfigGuiTab tab;
@@ -108,12 +98,7 @@ public class GuiConfigs extends GuiConfigsBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
-        {
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             GuiConfigs.tab = this.tab;
 
