@@ -31,27 +31,27 @@ public class MiniHudConfigPanel extends ConfigPanelBase
         List<? extends IConfigValue> configs;
         ConfigInfoProviderSimple provider;
 
-        this.addSubPanel(new GuiModConfigs(modId, "Generic", Configs.Generic.OPTIONS));
-        this.addSubPanel((new GuiModConfigs(modId, "Colors", Configs.Colors.OPTIONS)).setConfigWidth(100));
+        this.addSubPanel(new GuiModConfigs(modId, Configs.Generic.OPTIONS, "minihud.gui.button.config_gui.generic"));
+        this.addSubPanel((new GuiModConfigs(modId, Configs.Colors.OPTIONS, "minihud.gui.button.config_gui.colors")).setConfigWidth(100));
 
         configs = ConfigUtils.createConfigWrapperForType(ConfigType.BOOLEAN, ImmutableList.copyOf(InfoToggle.values()));
-        this.addSubPanel((new GuiModConfigs(modId, "Info Toggles", configs)).setConfigWidth(100));
+        this.addSubPanel((new GuiModConfigs(modId, configs, "minihud.gui.button.config_gui.info_toggles")).setConfigWidth(100));
 
         configs = ConfigUtils.createConfigWrapperForType(ConfigType.INTEGER, ImmutableList.copyOf(InfoToggle.values()));
-        this.addSubPanel((new GuiModConfigs(modId, "Info Line Order", configs)).setConfigWidth(60));
+        this.addSubPanel((new GuiModConfigs(modId, configs, "minihud.gui.button.config_gui.info_line_order")).setConfigWidth(60));
 
         configs = ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(InfoToggle.values()));
         provider = new ConfigInfoProviderSimple("Hotkey to toggle the '", "' info line");
-        this.addSubPanel((new GuiModConfigs(modId, "Info Hotkeys", configs)).setHoverInfoProvider(provider));
+        this.addSubPanel((new GuiModConfigs(modId, configs, "minihud.gui.button.config_gui.info_hotkeys")).setHoverInfoProvider(provider));
 
         List<IConfigBase> list = new ArrayList<>();
         list.addAll(StructureToggle.getToggleConfigs());
         list.addAll(StructureToggle.getHotkeys());
         list.addAll(StructureToggle.getColorConfigs());
-        this.addSubPanel((new GuiModConfigs(modId, "Structures", list)).setConfigWidth(200));
+        this.addSubPanel((new GuiModConfigs(modId, list, "minihud.gui.button.config_gui.structures")).setConfigWidth(200));
 
         configs = ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(RendererToggle.values()));
         provider = new ConfigInfoProviderSimple("Hotkey to toggle the '", "' renderer");
-        this.addSubPanel((new GuiModConfigs(modId, "Renderer Hotkeys", configs)).setHoverInfoProvider(provider));
+        this.addSubPanel((new GuiModConfigs(modId, configs, "minihud.gui.button.config_gui.renderer_hotkeys")).setHoverInfoProvider(provider));
     }
 }

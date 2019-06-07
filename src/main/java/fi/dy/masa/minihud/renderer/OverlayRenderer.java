@@ -22,7 +22,7 @@ public class OverlayRenderer
 
     public static void renderOverlays(Minecraft mc, float partialTicks)
     {
-        Entity entity = mc.player;
+        Entity entity = mc.getRenderViewEntity();
 
         if (canRender == false)
         {
@@ -77,7 +77,7 @@ public class OverlayRenderer
                 int cz = centerZ + zOff;
                 int bucket = MiscUtils.getChunkUnloadBucket(cx, cz);
                 String str = String.valueOf(bucket);
-                fi.dy.masa.malilib.render.RenderUtils.drawTextPlate(Arrays.asList(str), (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale, mc);
+                fi.dy.masa.malilib.render.RenderUtils.drawTextPlate(Arrays.asList(str), (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale);
             }
         }
     }

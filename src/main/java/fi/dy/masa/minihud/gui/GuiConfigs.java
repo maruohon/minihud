@@ -7,17 +7,17 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.config.IConfigBase;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.config.StructureToggle;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 
 public class GuiConfigs extends GuiConfigsBase
 {
@@ -25,9 +25,7 @@ public class GuiConfigs extends GuiConfigsBase
 
     public GuiConfigs()
     {
-        super(10, 50, Reference.MOD_ID, null);
-
-        this.title = I18n.format("minihud.gui.title.configs");
+        super(10, 50, Reference.MOD_ID, null, "minihud.gui.title.configs");
     }
 
     @Override
@@ -35,7 +33,7 @@ public class GuiConfigs extends GuiConfigsBase
     {
         if (GuiConfigs.tab == ConfigGuiTab.SHAPES)
         {
-            Minecraft.getMinecraft().displayGuiScreen(new GuiShapeManager());
+            GuiBase.openGui(new GuiShapeManager());
             return;
         }
 
@@ -168,7 +166,7 @@ public class GuiConfigs extends GuiConfigsBase
 
             if (this.tab == ConfigGuiTab.SHAPES)
             {
-                Minecraft.getMinecraft().displayGuiScreen(new GuiShapeManager());
+                GuiBase.openGui(new GuiShapeManager());
             }
             else
             {
@@ -199,7 +197,7 @@ public class GuiConfigs extends GuiConfigsBase
 
         public String getDisplayName()
         {
-            return I18n.format(this.translationKey);
+            return StringUtils.translate(this.translationKey);
         }
     }
 }

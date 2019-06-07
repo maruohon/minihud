@@ -2,14 +2,14 @@ package fi.dy.masa.minihud.gui;
 
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.options.ConfigColor;
-import fi.dy.masa.malilib.gui.GuiColorEditorHSV;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetDropDownList;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.minihud.gui.widgets.WidgetListShapes;
@@ -17,9 +17,6 @@ import fi.dy.masa.minihud.gui.widgets.WidgetShapeEntry;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeDespawnSphere;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
 
 public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, WidgetListShapes>
                              implements ISelectionListener<ShapeBase>
@@ -28,7 +25,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
     {
         super(10, 64);
 
-        this.title = I18n.format("minihud.gui.title.shape_manager");
+        this.title = StringUtils.translate("minihud.gui.title.shape_manager");
     }
 
     @Override
@@ -67,7 +64,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
             x += this.createTabButton(x, y, width, tab);
         }
 
-        this.setListPosition(this.getListX(), 64 + (rows - 1) * 22);
+        this.setListPosition(this.getListX(), 68 + (rows - 1) * 22);
         this.reCreateListWidget();
 
         y += 24;
@@ -125,7 +122,6 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         {
             if (this.type == Type.ADD_SHAPE)
             {
-                // TODO
                 ShapeManager.INSTANCE.addShape(new ShapeDespawnSphere());
                 this.gui.getListWidget().refreshEntries();
             }
@@ -144,7 +140,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
 
             public String getDisplayName()
             {
-                return I18n.format(this.translationKey);
+                return StringUtils.translate(this.translationKey);
             }
         }
     }
@@ -162,7 +158,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             GuiConfigs.tab = this.tab;
-            Minecraft.getMinecraft().displayGuiScreen(new GuiConfigs());
+            GuiBase.openGui(new GuiConfigs());
         }
     }
 }

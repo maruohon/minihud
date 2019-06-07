@@ -8,13 +8,11 @@ import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
 
 public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
 {
@@ -63,23 +61,23 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        GlStateManager.color(1, 1, 1, 1);
+        RenderUtils.color(1f, 1f, 1f, 1f);
 
         boolean shapeSelected = ShapeManager.INSTANCE.getSelectedShape() == this.entry;
 
         // Draw a lighter background for the hovered and the selected entry
         if (selected || shapeSelected || this.isMouseOver(mouseX, mouseY))
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x70FFFFFF);
+            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x70FFFFFF);
         }
         else if (this.isOdd)
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x20FFFFFF);
+            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x20FFFFFF);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x50FFFFFF);
+            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x50FFFFFF);
         }
 
         if (shapeSelected)
@@ -88,14 +86,14 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         }
 
         String name = this.shape.getType().getDisplayName();
-        this.drawString(name, this.x + 4, this.y + 7, 0xFFFFFFFF);
+        this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name);
 
-        GlStateManager.color(1, 1, 1, 1);
+        RenderUtils.color(1f, 1f, 1f, 1f);
         GlStateManager.disableBlend();
 
         super.render(mouseX, mouseY, selected);
 
-        RenderHelper.disableStandardItemLighting();
+        RenderUtils.disableItemLighting();
         GlStateManager.disableLighting();
     }
 
@@ -126,10 +124,9 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         {
             if (this.type == Type.CONFIGURE)
             {
-                Minecraft mc = Minecraft.getMinecraft();
                 GuiShapeEditor gui = new GuiShapeEditor(this.widget.shape);
-                gui.setParent(mc.currentScreen);
-                mc.displayGuiScreen(gui);
+                gui.setParent(this.widget.mc.currentScreen);
+                GuiBase.openGui(gui);
             }
             else if (this.type == Type.ENABLED)
             {
@@ -163,7 +160,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
             
             public String getDisplayName(Object... args)
             {
-                return I18n.format(this.translationKey, args);
+                return StringUtils.translate(this.translationKey, args);
             }
         }
     }
