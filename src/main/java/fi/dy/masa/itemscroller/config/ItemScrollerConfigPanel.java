@@ -17,8 +17,8 @@ public class ItemScrollerConfigPanel extends ConfigPanelBase
     {
         String modId = Reference.MOD_ID;
 
-        this.addSubPanel((new GuiModConfigs(modId, "Toggles", Configs.Toggles.OPTIONS)).setConfigWidth(100));
-        this.addSubPanel((new GuiModConfigs(modId, "Generic", Configs.Generic.OPTIONS)).setConfigWidth(160));
-        this.addSubPanel((new GuiModConfigs(modId, "Hotkeys", Hotkeys.HOTKEY_LIST)).setConfigWidth(210));
+        this.addSubPanel((new GuiModConfigs(modId, Configs.Toggles.OPTIONS, "itemscroller.gui.button.config_gui.toggles")).setConfigWidth(100));
+        this.addSubPanel((new GuiModConfigs(modId, Configs.Generic.OPTIONS, "itemscroller.gui.button.config_gui.generic")).setConfigWidth(160));
+        this.addSubPanel((new GuiModConfigs(modId, Hotkeys.HOTKEY_LIST, "itemscroller.gui.button.config_gui.hotkeys")).setConfigWidth(210));
     }
 }

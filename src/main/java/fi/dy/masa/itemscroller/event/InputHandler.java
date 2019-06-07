@@ -12,6 +12,7 @@ import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.itemscroller.util.MoveAction;
 import fi.dy.masa.itemscroller.villager.VillagerDataStorage;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
@@ -20,7 +21,6 @@ import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMerchant;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.entity.passive.EntityVillager;
@@ -65,7 +65,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             RecipeStorage recipes = RecipeStorage.getInstance();
             int oldIndex = recipes.getSelection();
             int recipesPerPage = recipes.getRecipeCountPerPage();
-            int recipeIndexChange = GuiScreen.isShiftKeyDown() ? recipesPerPage : recipesPerPage / 2;
+            int recipeIndexChange = GuiBase.isShiftDown() ? recipesPerPage : recipesPerPage / 2;
 
             if (eventKey >= Keyboard.KEY_1 && eventKey <= Keyboard.KEY_9)
             {
@@ -188,7 +188,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 else
                 {
                     Slot slot = AccessorUtils.getSlotUnderMouse(gui);
-                    final boolean isShiftDown = GuiScreen.isShiftKeyDown();
+                    final boolean isShiftDown = GuiBase.isShiftDown();
 
                     if (keyState && isAttackUseOrPick)
                     {

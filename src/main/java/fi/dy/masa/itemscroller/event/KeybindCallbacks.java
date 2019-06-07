@@ -12,6 +12,7 @@ import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.itemscroller.util.MoveAction;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
@@ -73,7 +74,7 @@ public class KeybindCallbacks implements IHotkeyCallback
         }
         else if (key == Hotkeys.KEY_OPEN_CONFIG_GUI.getKeybind())
         {
-            mc.displayGuiScreen(new GuiConfigs());
+            GuiBase.openGui(new GuiConfigs());
             return true;
         }
 
