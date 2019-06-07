@@ -612,7 +612,7 @@ public class DataStorage
 
         this.structuresDirty = true;
 
-        MiniHUD.logger.info("Structure data updated from the integrated server");
+        //MiniHUD.logger.info("Structure data updated from the integrated server");
     }
 
     private void addStructuresWithinRange(StructureType type, IChunkGenerator<?> chunkGen, BlockPos playerPos, int maxRange)

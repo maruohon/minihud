@@ -219,7 +219,8 @@ public class DebugInfoUtils
         }
         else if (config == RendererToggle.DEBUG_HEIGHT_MAP)
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(enabled);
+            // This crashes in 1.13+, because it uses a world gen heightmap which doesn't exist normally
+            //((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(enabled);
         }
         else if (config == RendererToggle.DEBUG_NEIGHBOR_UPDATES)
         {
