@@ -8,13 +8,13 @@ import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 
@@ -57,7 +57,7 @@ public class RenderEventHandler
             GlStateManager.translatef(this.recipeListX, this.recipeListY, 0);
             GlStateManager.scaled(this.scale, this.scale, 1);
 
-            String str = I18n.format("itemscroller.gui.label.recipe_page", (first / countPerPage) + 1, recipes.getTotalRecipeCount() / countPerPage);
+            String str = StringUtils.translate("itemscroller.gui.label.recipe_page", (first / countPerPage) + 1, recipes.getTotalRecipeCount() / countPerPage);
             this.mc.fontRenderer.drawString(str, 16, -12, 0xC0C0C0C0);
 
             for (int i = 0, recipeId = first; recipeId <= lastOnPage; ++i, ++recipeId)
@@ -293,8 +293,8 @@ public class RenderEventHandler
             this.mc.getItemRenderer().zLevel -= 100;
         }
 
+        RenderUtils.disableItemLighting();
         GlStateManager.disableBlend();
-        RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
     }
 

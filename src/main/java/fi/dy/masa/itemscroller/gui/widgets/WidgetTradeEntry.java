@@ -2,13 +2,13 @@ package fi.dy.masa.itemscroller.gui.widgets;
 
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.itemscroller.villager.VillagerData;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.client.gui.GuiScreen;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.village.MerchantRecipe;
@@ -30,7 +30,7 @@ public class WidgetTradeEntry extends WidgetListEntryBase<MerchantRecipe>
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        GlStateManager.color4f(1f, 1f, 1f, 1f);
+        RenderUtils.color(1f, 1f, 1f, 1f);
 
         this.bindTexture(BUTTON_TEXTURE);
 
@@ -54,10 +54,9 @@ public class WidgetTradeEntry extends WidgetListEntryBase<MerchantRecipe>
 
         IGuiIcon icon = this.entry.isRecipeDisabled() ? Icons.TRADE_ARROW_LOCKED : Icons.TRADE_ARROW_AVAILABLE;
 
-        GlStateManager.color4f(1f, 1f, 1f, 1f);
-        GlStateManager.enableBlend();
+        RenderUtils.color(1f, 1f, 1f, 1f);
+        RenderUtils.setupBlend();
         GlStateManager.enableAlphaTest();
-        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
         // Trade arrow
         icon.renderAt(this.x + 44, this.y + 5, 1f, false, false);
@@ -123,11 +122,11 @@ public class WidgetTradeEntry extends WidgetListEntryBase<MerchantRecipe>
                 }
             }
 
-            if (GuiScreen.isAltKeyDown())
+            if (GuiBase.isAltDown())
             {
                 int uses = this.entry.getToolUses();
                 int max = this.entry.getMaxTradeUses();
-                RenderUtils.drawHoverText(mouseX + 6, mouseY + 18, ImmutableList.of(I18n.format("itemscroller.gui.label.trade_uses", uses, max)));
+                RenderUtils.drawHoverText(mouseX + 6, mouseY + 18, ImmutableList.of(StringUtils.translate("itemscroller.gui.label.trade_uses", uses, max)));
             }
         }
     }

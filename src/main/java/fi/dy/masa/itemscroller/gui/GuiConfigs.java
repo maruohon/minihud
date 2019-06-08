@@ -10,7 +10,7 @@ import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiConfigs extends GuiConfigsBase
 {
@@ -18,9 +18,7 @@ public class GuiConfigs extends GuiConfigsBase
 
     public GuiConfigs()
     {
-        super(10, 50, Reference.MOD_ID, null);
-
-        this.title = I18n.format("itemscroller.gui.title.configs");
+        super(10, 50, Reference.MOD_ID, null, "itemscroller.gui.title.configs");
     }
 
     @Override
@@ -123,7 +121,7 @@ public class GuiConfigs extends GuiConfigsBase
 
         public String getDisplayName()
         {
-            return I18n.format(this.translationKey);
+            return StringUtils.translate(this.translationKey);
         }
     }
 }

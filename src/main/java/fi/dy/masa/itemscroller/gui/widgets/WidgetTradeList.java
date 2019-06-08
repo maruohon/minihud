@@ -7,14 +7,12 @@ import fi.dy.masa.itemscroller.util.AccessorUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.itemscroller.villager.VillagerData;
 import fi.dy.masa.itemscroller.villager.VillagerDataStorage;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiScrollBar;
 import fi.dy.masa.malilib.gui.widgets.WidgetBase;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.gui.GuiMerchant;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 
@@ -92,7 +90,7 @@ public class WidgetTradeList extends WidgetBase
                     boolean samePage = AccessorUtils.getSelectedMerchantRecipe(this.parentGui) == recipeIndex;
                     InputHandler.changeTradePage(this.parentGui, recipeIndex);
 
-                    if (GuiScreen.isShiftKeyDown() || samePage || mouseButton == 1)
+                    if (GuiBase.isShiftDown() || samePage || mouseButton == 1)
                     {
                         InventoryUtils.villagerClearTradeInputSlots();
 
@@ -136,16 +134,16 @@ public class WidgetTradeList extends WidgetBase
             currentPage = Math.min(currentPage, this.recipeList.size() - 1);
             this.updateDataStorage(currentPage);
 
-            GlStateManager.color4f(1f, 1f, 1f, 1f);
-            RenderHelper.disableStandardItemLighting();
+            RenderUtils.color(1f, 1f, 1f, 1f);
+            RenderUtils.disableItemLighting();
             this.bindTexture(Icons.TEXTURE);
 
             // Background
             RenderUtils.drawTexturedRect(this.x, this.y, 0, 0, this.width, 166);
 
-            String str = I18n.format("itemscroller.gui.label.trades");
-            int w = this.textRenderer.getStringWidth(str);
-            this.drawString(str, this.x + this.width / 2 - w / 2, this.y + 6, 0xFF404040);
+            String str = StringUtils.translate("itemscroller.gui.label.trades");
+            int w = this.getStringWidth(str);
+            this.drawString(this.x + this.width / 2 - w / 2, this.y + 6, 0xFF404040, str);
 
             this.scrollBar.render(mouseX, mouseY, 0, this.x + 93, this.y + 17, 8, 142, this.scrollBarTotalHeight);
 
