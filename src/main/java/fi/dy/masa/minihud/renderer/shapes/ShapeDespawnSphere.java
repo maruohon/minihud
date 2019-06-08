@@ -11,6 +11,7 @@ import fi.dy.masa.malilib.util.BlockSnap;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.Quadrant;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.RenderObjectBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
@@ -18,7 +19,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -27,8 +27,6 @@ import net.minecraft.util.math.Vec3d;
 public class ShapeDespawnSphere extends ShapeBase
 {
     private static final EnumFacing[] FACING_ALL = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
-    //private static final EnumFacing[] HORIZONTALS = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
-    //private static final EnumFacing[] HORIZONTALS_ROTATING = new EnumFacing[] { EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.WEST, EnumFacing.SOUTH };
 
     protected Vec3d center = Vec3d.ZERO;
     protected Vec3d effectiveCenter = Vec3d.ZERO;
@@ -197,14 +195,14 @@ public class ShapeDespawnSphere extends ShapeBase
     {
         List<String> lines = new ArrayList<>();
         Vec3d c = this.center;
-        lines.add(I18n.format("minihud.gui.label.center_value", String.format("x: %.2f, y: %.2f, z: %.2f", c.x, c.y, c.z)));
-        lines.add(I18n.format("minihud.gui.label.block_snap", this.snap.getDisplayName()));
-        lines.add(I18n.format("minihud.gui.label.margin_value", String.format("%.2f", this.margin)));
+        lines.add(StringUtils.translate("minihud.gui.label.center_value", String.format("x: %.2f, y: %.2f, z: %.2f", c.x, c.y, c.z)));
+        lines.add(StringUtils.translate("minihud.gui.label.block_snap", this.snap.getDisplayName()));
+        lines.add(StringUtils.translate("minihud.gui.label.margin_value", String.format("%.2f", this.margin)));
 
         if (this.snap != BlockSnap.NONE)
         {
             c = this.effectiveCenter;
-            lines.add(I18n.format("minihud.gui.label.effective_center_value", String.format("x: %.2f, y: %.2f, z: %.2f", c.x, c.y, c.z)));
+            lines.add(StringUtils.translate("minihud.gui.label.effective_center_value", String.format("x: %.2f, y: %.2f, z: %.2f", c.x, c.y, c.z)));
         }
 
         return lines;

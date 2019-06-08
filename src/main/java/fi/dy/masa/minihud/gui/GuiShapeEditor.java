@@ -1,7 +1,6 @@
 package fi.dy.masa.minihud.gui;
 
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldDouble;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
@@ -11,14 +10,15 @@ import fi.dy.masa.malilib.gui.button.ConfigButtonOptionList;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.interfaces.ICoordinateValueModifier;
+import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.BlockSnap;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeDespawnSphere;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiShapeEditor extends GuiRenderLayerEditBase
@@ -30,7 +30,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     public GuiShapeEditor(ShapeBase shape)
     {
         this.shape = shape;
-        this.title = I18n.format("minihud.gui.title.shape_editor");
+        this.title = StringUtils.translate("minihud.gui.title.shape_editor");
         this.configBlockSnap = new ConfigOptionList("blockSnap", BlockSnap.NONE, "");
     }
 
@@ -58,14 +58,14 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     {
         int x = 96;
         int y = this.colorY;
-        GuiBase.drawRect(x    , y + 0, x + 19, y + 19, 0xFFFFFFFF);
-        GuiBase.drawRect(x + 1, y + 1, x + 18, y + 18, 0xFF000000);
-        GuiBase.drawRect(x + 2, y + 2, x + 17, y + 17, 0xFF000000 | this.shape.getColor().intValue);
+        RenderUtils.drawRect(x    , y + 0, 19, 19, 0xFFFFFFFF);
+        RenderUtils.drawRect(x + 1, y + 1, 17, 17, 0xFF000000);
+        RenderUtils.drawRect(x + 2, y + 2, 15, 15, 0xFF000000 | this.shape.getColor().intValue);
     }
 
     private void createColorInput(int x, int y)
     {
-        String label = I18n.format("minihud.gui.label.color");
+        String label = StringUtils.translate("minihud.gui.label.color");
         int w = this.getStringWidth(label);
         this.addLabel(x, y, w, 14, 0xFFFFFFFF, label);
         y += 12;
@@ -90,7 +90,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
     private void createShapeEditorElementsDespawnSphere(int x, int y)
     {
-        this.addLabel(x, y, 60, 14, 0xFFFFFFFF, I18n.format("minihud.gui.label.center_colon"));
+        this.addLabel(x, y, 60, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.center_colon"));
         y += 12;
         ShapeDespawnSphere shape = (ShapeDespawnSphere) this.shape;
         GuiUtils.createVec3dInputsVertical(x, y, 120, shape.getCenter(), new DespawnSphereEditor(shape, this), true, this);
@@ -100,7 +100,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.addButton(button, new ButtonListenerDespawnSphere(shape, this));
         y += 30;
 
-        String label = I18n.format("minihud.gui.label.margin_colon");
+        String label = StringUtils.translate("minihud.gui.label.margin_colon");
         int w = this.getStringWidth(label);
         this.addLabel(x + 12, y, w, 12, 0xFFFFFFFF, label);
         y += 12;
@@ -128,7 +128,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
         for (BlockSnap val : BlockSnap.values())
         {
-            width = Math.max(width, this.getStringWidth(I18n.format("minihud.gui.label.block_snap", val.getDisplayName())) + 10);
+            width = Math.max(width, this.getStringWidth(StringUtils.translate("minihud.gui.label.block_snap", val.getDisplayName())) + 10);
         }
 
         return width;

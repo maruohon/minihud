@@ -17,7 +17,7 @@ public class OverlayRenderer
 
     public static void renderOverlays(Minecraft mc, float partialTicks)
     {
-        Entity entity = mc.player;
+        Entity entity = mc.getRenderViewEntity();
 
         if (canRender == false)
         {

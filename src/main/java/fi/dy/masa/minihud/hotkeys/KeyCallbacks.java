@@ -1,6 +1,7 @@
 package fi.dy.masa.minihud.hotkeys;
 
 import fi.dy.masa.malilib.config.options.ConfigInteger;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
@@ -46,7 +47,7 @@ public class KeyCallbacks
 
             if (key == Configs.Generic.OPEN_CONFIG_GUI.getKeybind())
             {
-                mc.displayGuiScreen(new GuiConfigs());
+                GuiBase.openGui(new GuiConfigs());
             }
             else if (key == Configs.Generic.SET_DISTANCE_REFERENCE_POINT.getKeybind())
             {
@@ -58,12 +59,12 @@ public class KeyCallbacks
 
                 if (shape != null)
                 {
-                    mc.displayGuiScreen(new GuiShapeEditor(shape));
+                    GuiBase.openGui(new GuiShapeEditor(shape));
                 }
                 else
                 {
                     GuiConfigs.tab = ConfigGuiTab.SHAPES;
-                    mc.displayGuiScreen(new GuiShapeManager());
+                    GuiBase.openGui(new GuiShapeManager());
                 }
             }
 

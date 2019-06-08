@@ -6,11 +6,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import fi.dy.masa.malilib.config.HudAlignment;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
@@ -21,7 +23,6 @@ import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.chunk.RenderChunk;
@@ -31,8 +32,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.IProperty;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -40,7 +39,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.IRegistry;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumLightType;
 import net.minecraft.world.World;
@@ -85,7 +83,7 @@ public class RenderHandler implements IRenderer
         if (Configs.Generic.FIX_VANILLA_DEBUG_RENDERERS.getBooleanValue())
         {
             GlStateManager.disableLighting();
-            //GlStateManager.color(1, 1, 1, 1);
+            //RenderUtils.color(1, 1, 1, 1);
             //OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f);
         }
     }
@@ -123,7 +121,7 @@ public class RenderHandler implements IRenderer
             boolean useBackground = Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue();
             boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
 
-            RenderUtils.renderText(mc, x, y, this.fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.lines);
+            RenderUtils.renderText(x, y, this.fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.lines);
         }
     }
 
@@ -139,7 +137,7 @@ public class RenderHandler implements IRenderer
         }
         else if (Configs.Generic.SHULKER_BOX_PREVIEW.getBooleanValue())
         {
-            boolean render = Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiScreen.isShiftKeyDown();
+            boolean render = Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown();
 
             if (render)
             {
@@ -170,8 +168,7 @@ public class RenderHandler implements IRenderer
 
         if (align == HudAlignment.BOTTOM_RIGHT)
         {
-            Minecraft mc = Minecraft.getInstance();
-            int offset = (int) (this.lineWrappers.size() * (mc.fontRenderer.FONT_HEIGHT + 2) * this.fontScale);
+            int offset = (int) (this.lineWrappers.size() * (StringUtils.getFontHeight() + 2) * this.fontScale);
 
             return -(offset - 16);
         }
@@ -354,24 +351,24 @@ public class RenderHandler implements IRenderer
             {
                 double tps = this.data.getServerTPS();
                 double mspt = this.data.getServerMSPT();
-                String rst = TextFormatting.RESET.toString();
-                String preTps = tps >= 20.0D ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+                String rst = GuiBase.TXT_RST;
+                String preTps = tps >= 20.0D ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
                 String preMspt;
 
                 // Carpet server and integrated server have actual meaningful MSPT data available
                 if (this.data.isCarpetServer() || mc.isSingleplayer())
                 {
-                    if      (mspt <= 40) { preMspt = TextFormatting.GREEN.toString(); }
-                    else if (mspt <= 45) { preMspt = TextFormatting.YELLOW.toString(); }
-                    else if (mspt <= 50) { preMspt = TextFormatting.GOLD.toString(); }
-                    else                 { preMspt = TextFormatting.RED.toString(); }
+                    if      (mspt <= 40) { preMspt = GuiBase.TXT_GREEN; }
+                    else if (mspt <= 45) { preMspt = GuiBase.TXT_YELLOW; }
+                    else if (mspt <= 50) { preMspt = GuiBase.TXT_GOLD; }
+                    else                 { preMspt = GuiBase.TXT_RED; }
 
                     this.addLine(String.format("Server TPS: %s%.1f%s MSPT: %s%.1f%s", preTps, tps, rst, preMspt, mspt, rst));
                 }
                 else
                 {
-                    if (mspt <= 51) { preMspt = TextFormatting.GREEN.toString(); }
-                    else            { preMspt = TextFormatting.RED.toString(); }
+                    if (mspt <= 51) { preMspt = GuiBase.TXT_GREEN; }
+                    else            { preMspt = GuiBase.TXT_RED; }
 
                     this.addLine(String.format("Server TPS: %s%.1f%s (MSPT*: %s%.1f%s)", preTps, tps, rst, preMspt, mspt, rst));
                 }
@@ -700,11 +697,11 @@ public class RenderHandler implements IRenderer
 
                 if (MiscUtils.canSlimeSpawnAt(pos.getX(), pos.getZ(), seed))
                 {
-                    result = TextFormatting.GREEN.toString() + "YES" + TextFormatting.RESET.toString() + TextFormatting.WHITE.toString();
+                    result = GuiBase.TXT_GREEN + "YES" + GuiBase.TXT_RST;
                 }
                 else
                 {
-                    result = TextFormatting.RED.toString() + "NO" + TextFormatting.RESET.toString() + TextFormatting.WHITE.toString();
+                    result = GuiBase.TXT_RED + "NO" + GuiBase.TXT_RST;
                 }
             }
             else
@@ -804,7 +801,6 @@ public class RenderHandler implements IRenderer
         }
     }
 
-    @SuppressWarnings("unchecked")
     private <T extends Comparable<T>> void getBlockProperties(Minecraft mc)
     {
         if (mc.objectMouseOver != null &&
@@ -816,30 +812,9 @@ public class RenderHandler implements IRenderer
 
             this.addLine(String.valueOf(IRegistry.BLOCK.getKey(state.getBlock())));
 
-            for (Entry <IProperty<?>, Comparable<?>> entry : state.getValues().entrySet())
+            for (String line : BlockUtils.getFormattedBlockStateProperties(state))
             {
-                IProperty<T> property = (IProperty<T>) entry.getKey();
-                T value = (T) entry.getValue();
-                String valueName = property.getName(value);
-
-                if (property instanceof DirectionProperty)
-                {
-                    valueName = TextFormatting.GOLD + valueName;
-                }
-                else if (Boolean.TRUE.equals(value))
-                {
-                    valueName = TextFormatting.GREEN + valueName;
-                }
-                else if (Boolean.FALSE.equals(value))
-                {
-                    valueName = TextFormatting.RED + valueName;
-                }
-                else if (Integer.class.equals(property.getValueClass()))
-                {
-                    valueName = TextFormatting.GREEN + valueName;
-                }
-
-                this.addLine(property.getName() + ": " + valueName);
+                this.addLine(line);
             }
         }
     }

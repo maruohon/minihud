@@ -102,9 +102,8 @@ public class RenderContainer
             GlStateManager.depthMask(false);
             GlStateManager.polygonOffset(-3f, -3f);
             GlStateManager.enablePolygonOffset();
-            GlStateManager.enableBlend();
-            GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-            GlStateManager.color4f(1f, 1f, 1f, 1f);
+            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
             if (OpenGlHelper.useVbo())
             {
@@ -150,7 +149,7 @@ public class RenderContainer
 
             GlStateManager.polygonOffset(0f, 0f);
             GlStateManager.disablePolygonOffset();
-            GlStateManager.color4f(1f, 1f, 1f, 1f);
+            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
             GlStateManager.disableBlend();
             GlStateManager.enableDepthTest();
             GlStateManager.enableLighting();
