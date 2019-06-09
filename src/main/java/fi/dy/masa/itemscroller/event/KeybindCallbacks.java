@@ -12,16 +12,17 @@ import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.itemscroller.util.MoveAction;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.interfaces.IClientTickHandler;
+import fi.dy.masa.malilib.util.GuiUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.ContainerScreen;
 import net.minecraft.client.gui.Screen;
 import net.minecraft.client.gui.ingame.CreativePlayerInventoryScreen;
 import net.minecraft.client.gui.ingame.PlayerInventoryScreen;
-import net.minecraft.client.util.Window;
 import net.minecraft.container.Slot;
 import net.minecraft.sound.SoundEvents;
 
@@ -75,16 +76,16 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
         }
         else if (key == Hotkeys.KEY_OPEN_CONFIG_GUI.getKeybind())
         {
-            mc.openScreen(new GuiConfigs());
+            GuiBase.openGui(new GuiConfigs());
             return true;
         }
 
-        if (this.disabled || mc == null || mc.player == null || (mc.currentScreen instanceof ContainerScreen) == false)
+        if (this.disabled || mc == null || mc.player == null || (GuiUtils.getCurrentScreen() instanceof ContainerScreen) == false)
         {
             return false;
         }
 
-        ContainerScreen<?> gui = (ContainerScreen<?>) mc.currentScreen;
+        ContainerScreen<?> gui = (ContainerScreen<?>) GuiUtils.getCurrentScreen();
         Slot slot = AccessorUtils.getSlotUnderMouse(gui);
         RecipeStorage recipes = RecipeStorage.getInstance();
         MoveAction moveAction = InputUtils.getDragMoveAction(key);
@@ -93,9 +94,8 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
         {
             if (moveAction != MoveAction.NONE)
             {
-                Window window = mc.window;
-                final int mouseX = (int) (mc.mouse.getX() * (double) window.getScaledWidth() / (double) window.getWidth());
-                final int mouseY = (int) (mc.mouse.getY() * (double) window.getScaledHeight() / (double) window.getHeight());
+                final int mouseX = fi.dy.masa.malilib.util.InputUtils.getMouseX();
+                final int mouseY = fi.dy.masa.malilib.util.InputUtils.getMouseY();
                 return InventoryUtils.dragMoveItems(gui, mc, moveAction, mouseX, mouseY, true);
             }
             else if (key == Hotkeys.KEY_MOVE_EVERYTHING.getKeybind())
@@ -170,12 +170,12 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
         if (this.disabled == false &&
             mc != null &&
             mc.player != null &&
-            mc.currentScreen instanceof ContainerScreen &&
-            (mc.currentScreen instanceof CreativePlayerInventoryScreen) == false &&
-            Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false &&
+            GuiUtils.getCurrentScreen() instanceof ContainerScreen &&
+            (GuiUtils.getCurrentScreen() instanceof CreativePlayerInventoryScreen) == false &&
+            Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false &&
             Hotkeys.KEY_MASS_CRAFT.getKeybind().isKeybindHeld())
         {
-            Screen guiScreen = mc.currentScreen;
+            Screen guiScreen = GuiUtils.getCurrentScreen();
             ContainerScreen<?> gui = (ContainerScreen<?>) guiScreen;
             Slot outputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
 

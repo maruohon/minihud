@@ -9,12 +9,12 @@ import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.ContainerScreen;
 import net.minecraft.client.render.GuiLighting;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.Window;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 
@@ -42,9 +42,9 @@ public class RenderEventHandler
 
     public void onDrawBackgroundPost()
     {
-        if (this.mc.currentScreen instanceof ContainerScreen && InputUtils.isRecipeViewOpen())
+        if (GuiUtils.getCurrentScreen() instanceof ContainerScreen && InputUtils.isRecipeViewOpen())
         {
-            ContainerScreen<?> gui = (ContainerScreen<?>) this.mc.currentScreen;
+            ContainerScreen<?> gui = (ContainerScreen<?>) GuiUtils.getCurrentScreen();
             RecipeStorage recipes = RecipeStorage.getInstance();
             final int first = recipes.getFirstVisibleRecipeId();
             final int countPerPage = recipes.getRecipeCountPerPage();
@@ -56,7 +56,7 @@ public class RenderEventHandler
             GlStateManager.translatef(this.recipeListX, this.recipeListY, 0);
             GlStateManager.scaled(this.scale, this.scale, 1);
 
-            String str = I18n.translate("itemscroller.gui.label.recipe_page", (first / countPerPage) + 1, recipes.getTotalRecipeCount() / countPerPage);
+            String str = StringUtils.translate("itemscroller.gui.label.recipe_page", (first / countPerPage) + 1, recipes.getTotalRecipeCount() / countPerPage);
             this.mc.textRenderer.draw(str, 16, -12, 0xC0C0C0C0);
 
             for (int i = 0, recipeId = first; recipeId <= lastOnPage; ++i, ++recipeId)
@@ -71,9 +71,8 @@ public class RenderEventHandler
 
             if (Configs.Generic.CRAFTING_RENDER_RECIPE_ITEMS.getBooleanValue())
             {
-                Window window = this.mc.window;
-                final int mouseX = (int) (this.mc.mouse.getX() * (double) window.getScaledWidth() / (double) window.getWidth());
-                final int mouseY = (int) (this.mc.mouse.getY() * (double) window.getScaledHeight() / (double) window.getHeight());
+                final int mouseX = fi.dy.masa.malilib.util.InputUtils.getMouseX();
+                final int mouseY = fi.dy.masa.malilib.util.InputUtils.getMouseY();
                 final int recipeId = this.getHoveredRecipeId(mouseX, mouseY, recipes, gui);
                 RecipePattern recipe = recipeId >= 0 ? recipes.getRecipe(recipeId) : recipes.getSelectedRecipe();
 
@@ -87,14 +86,13 @@ public class RenderEventHandler
 
     public void onDrawScreenPost()
     {
-        if (this.mc.currentScreen instanceof ContainerScreen && InputUtils.isRecipeViewOpen())
+        if (GuiUtils.getCurrentScreen() instanceof ContainerScreen && InputUtils.isRecipeViewOpen())
         {
             ContainerScreen<?> gui = (ContainerScreen<?>) this.mc.currentScreen;
             RecipeStorage recipes = RecipeStorage.getInstance();
 
-            Window window = this.mc.window;
-            final int mouseX = (int) (this.mc.mouse.getX() * (double) window.getScaledWidth() / (double) window.getWidth());
-            final int mouseY = (int) (this.mc.mouse.getY() * (double) window.getScaledHeight() / (double) window.getHeight());
+            final int mouseX = fi.dy.masa.malilib.util.InputUtils.getMouseX();
+            final int mouseY = fi.dy.masa.malilib.util.InputUtils.getMouseY();
             final int recipeId = this.getHoveredRecipeId(mouseX, mouseY, recipes, gui);
 
             if (recipeId >= 0)
@@ -117,7 +115,6 @@ public class RenderEventHandler
 
     private void calculateRecipePositions(ContainerScreen<?> gui)
     {
-        Window window = this.mc.window;
         RecipeStorage recipes = RecipeStorage.getInstance();
         final int gapHorizontal = 2;
         final int gapVertical = 2;
@@ -129,7 +126,7 @@ public class RenderEventHandler
         this.numberTextWidth = 12;
         this.gapColumn = 4;
 
-        int usableHeight = window.getScaledHeight();
+        int usableHeight = GuiUtils.getScaledWindowHeight();
         int usableWidth = guiLeft;
         // Scale the maximum stack size by taking into account the relative gap size
         double gapScaleVertical = (1D - (double) gapVertical / (double) (stackBaseHeight + gapVertical));
@@ -292,8 +289,8 @@ public class RenderEventHandler
             this.mc.getItemRenderer().zOffset -= 100;
         }
 
+        RenderUtils.disableItemLighting();
         GlStateManager.disableBlend();
-        GuiLighting.disable();
         GlStateManager.popMatrix();
     }
 

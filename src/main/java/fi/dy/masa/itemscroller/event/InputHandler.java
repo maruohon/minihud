@@ -9,17 +9,17 @@ import fi.dy.masa.itemscroller.util.AccessorUtils;
 import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.itemscroller.util.MoveAction;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.KeyCodes;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.ContainerScreen;
-import net.minecraft.client.gui.Screen;
 import net.minecraft.client.gui.ingame.CreativePlayerInventoryScreen;
-import net.minecraft.client.util.Window;
 import net.minecraft.container.Slot;
 import net.minecraft.util.math.MathHelper;
 
@@ -56,7 +56,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             RecipeStorage recipes = RecipeStorage.getInstance();
             int oldIndex = recipes.getSelection();
             int recipesPerPage = recipes.getRecipeCountPerPage();
-            int recipeIndexChange = Screen.hasShiftDown() ? recipesPerPage : recipesPerPage / 2;
+            int recipeIndexChange = GuiBase.isShiftDown() ? recipesPerPage : recipesPerPage / 2;
 
             if (keyCode >= KeyCodes.KEY_1 && keyCode <= KeyCodes.KEY_9)
             {
@@ -119,15 +119,14 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             final boolean isUse = InputUtils.isUse(keyCode);
             final boolean isPickBlock = InputUtils.isPickBlock(keyCode);
             final boolean isAttackUseOrPick = isAttack || isUse || isPickBlock;
-            Window window = mc.window;
-            final int mouseX = (int) (mc.mouse.getX() * (double) window.getScaledWidth() / (double) window.getWidth());
-            final int mouseY = (int) (mc.mouse.getY() * (double) window.getScaledHeight() / (double) window.getHeight());
+            final int mouseX = fi.dy.masa.malilib.util.InputUtils.getMouseX();
+            final int mouseY = fi.dy.masa.malilib.util.InputUtils.getMouseY();
 
-            if (mc.currentScreen instanceof ContainerScreen &&
-                (mc.currentScreen instanceof CreativePlayerInventoryScreen) == false &&
-                Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
+            if (GuiUtils.getCurrentScreen() instanceof ContainerScreen &&
+                (GuiUtils.getCurrentScreen() instanceof CreativePlayerInventoryScreen) == false &&
+                Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false)
             {
-                ContainerScreen<?> gui = (ContainerScreen<?>) mc.currentScreen;
+                ContainerScreen<?> gui = (ContainerScreen<?>) GuiUtils.getCurrentScreen();
                 RecipeStorage recipes = RecipeStorage.getInstance();
 
                 if (dWheel != 0)
@@ -146,7 +145,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 else
                 {
                     Slot slot = AccessorUtils.getSlotUnderMouse(gui);
-                    final boolean isShiftDown = Screen.hasShiftDown();
+                    final boolean isShiftDown = GuiBase.isShiftDown();
 
                     if (keyState && isAttackUseOrPick)
                     {
@@ -205,10 +204,10 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
         if (this.callbacks.functionalityEnabled() &&
             mc.player != null &&
-            mc.currentScreen instanceof ContainerScreen &&
-            Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
+            GuiUtils.getCurrentScreen() instanceof ContainerScreen &&
+            Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false)
         {
-            this.handleDragging((ContainerScreen<?>) mc.currentScreen, mc, mouseX, mouseY, false);
+            this.handleDragging((ContainerScreen<?>) GuiUtils.getCurrentScreen(), mc, mouseX, mouseY, false);
         }
     }
 
