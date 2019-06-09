@@ -19,10 +19,10 @@ import fi.dy.masa.itemscroller.recipes.CraftingRecipe;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.villager.VillagerData;
 import fi.dy.masa.itemscroller.villager.VillagerDataStorage;
+import fi.dy.masa.malilib.util.GuiUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMerchant;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -643,11 +643,9 @@ public class InventoryUtils
 
     public static void villagerClearTradeInputSlots()
     {
-        GuiScreen gui = Minecraft.getInstance().currentScreen;
-
-        if (gui instanceof GuiMerchant)
+        if (GuiUtils.getCurrentScreen() instanceof GuiMerchant)
         {
-            GuiMerchant merchantGui = (GuiMerchant) gui;
+            GuiMerchant merchantGui = (GuiMerchant) GuiUtils.getCurrentScreen();
             Slot slot = merchantGui.inventorySlots.getSlot(0);
 
             if (slot.getHasStack())
@@ -666,11 +664,9 @@ public class InventoryUtils
 
     public static void villagerTradeEverythingPossibleWithCurrentRecipe()
     {
-        GuiScreen gui = Minecraft.getInstance().currentScreen;
-
-        if (gui instanceof GuiMerchant)
+        if (GuiUtils.getCurrentScreen() instanceof GuiMerchant)
         {
-            GuiMerchant merchantGui = (GuiMerchant) gui;
+            GuiMerchant merchantGui = (GuiMerchant) GuiUtils.getCurrentScreen();
             Slot slot = merchantGui.inventorySlots.getSlot(2);
 
             while (true)
@@ -698,12 +694,9 @@ public class InventoryUtils
 
     public static void villagerTradeEverythingPossibleWithAllFavoritedTrades()
     {
-        
-        GuiScreen gui = Minecraft.getInstance().currentScreen;
-
-        if (gui instanceof GuiMerchant)
+        if (GuiUtils.getCurrentScreen() instanceof GuiMerchant)
         {
-            GuiMerchant merchantGui = (GuiMerchant) gui;
+            GuiMerchant merchantGui = (GuiMerchant) GuiUtils.getCurrentScreen();
             VillagerData data = VillagerDataStorage.getInstance().getDataForLastInteractionTarget();
 
             villagerClearTradeInputSlots();

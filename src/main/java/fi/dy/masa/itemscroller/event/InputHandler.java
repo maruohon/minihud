@@ -18,8 +18,8 @@ import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.KeyCodes;
-import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -128,23 +128,22 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             final boolean isUse = InputUtils.isUse(keyCode);
             final boolean isPickBlock = InputUtils.isPickBlock(keyCode);
             final boolean isAttackUseOrPick = isAttack || isUse || isPickBlock;
-            MainWindow window = mc.mainWindow;
-            final int mouseX = (int) (mc.mouseHelper.getMouseX() * (double) window.getScaledWidth() / (double) window.getWidth());
-            final int mouseY = (int) (mc.mouseHelper.getMouseY() * (double) window.getScaledHeight() / (double) window.getHeight());
+            final int mouseX = fi.dy.masa.malilib.util.InputUtils.getMouseX();
+            final int mouseY = fi.dy.masa.malilib.util.InputUtils.getMouseY();
 
             if (Configs.Toggles.VILLAGER_TRADE_LIST.getBooleanValue())
             {
                 VillagerDataStorage storage = VillagerDataStorage.getInstance();
 
-                if (mc.currentScreen == null && mc.objectMouseOver != null &&
+                if (GuiUtils.getCurrentScreen() == null && mc.objectMouseOver != null &&
                     mc.objectMouseOver.type == RayTraceResult.Type.ENTITY &&
                     mc.objectMouseOver.entity instanceof EntityVillager)
                 {
                     storage.setLastInteractedUUID(mc.objectMouseOver.entity.getUniqueID());
                 }
-                else if (mc.currentScreen instanceof GuiMerchant && storage.hasInteractionTarget())
+                else if (GuiUtils.getCurrentScreen() instanceof GuiMerchant && storage.hasInteractionTarget())
                 {
-                    WidgetTradeList widget = ((IGuiMerchant) mc.currentScreen).getTradeListWidget();
+                    WidgetTradeList widget = ((IGuiMerchant) GuiUtils.getCurrentScreen()).getTradeListWidget();
 
                     if (widget != null)
                     {
@@ -172,11 +171,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 }
             }
 
-            if (mc.currentScreen instanceof GuiContainer &&
-                (mc.currentScreen instanceof GuiContainerCreative) == false &&
-                Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
+            if (GuiUtils.getCurrentScreen() instanceof GuiContainer &&
+                (GuiUtils.getCurrentScreen() instanceof GuiContainerCreative) == false &&
+                Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false)
             {
-                GuiContainer gui = (GuiContainer) mc.currentScreen;
+                GuiContainer gui = (GuiContainer) GuiUtils.getCurrentScreen();
                 RecipeStorage recipes = RecipeStorage.getInstance();
 
                 if (dWheel != 0)
@@ -254,10 +253,10 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
         if (this.callbacks.functionalityEnabled() &&
             mc.player != null &&
-            mc.currentScreen instanceof GuiContainer &&
-            Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
+            GuiUtils.getCurrentScreen() instanceof GuiContainer &&
+            Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false)
         {
-            this.handleDragging((GuiContainer) mc.currentScreen, mc, mouseX, mouseY, false);
+            this.handleDragging((GuiContainer) GuiUtils.getCurrentScreen(), mc, mouseX, mouseY, false);
         }
     }
 
