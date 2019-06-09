@@ -7,6 +7,7 @@ import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackAdjustable;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -15,7 +16,6 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.util.MiscUtils;
-import net.minecraft.client.Minecraft;
 
 public class InputHandler implements IKeybindProvider, IMouseInputHandler
 {
@@ -61,10 +61,8 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
     @Override
     public boolean onMouseInput(int eventButton, int dWheel, boolean eventButtonState)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-
         // Not in a GUI
-        if (mc.currentScreen == null && dWheel != 0)
+        if (GuiUtils.getCurrentScreen() == null && dWheel != 0)
         {
             if (Configs.Generic.CHUNK_UNLOAD_BUCKET_WITH_SIZE.getBooleanValue() &&
                 InfoToggle.CHUNK_UNLOAD_ORDER.getKeybind().isKeybindHeld())
