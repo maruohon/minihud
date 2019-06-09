@@ -18,6 +18,7 @@ import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
+import fi.dy.masa.malilib.util.GuiUtils;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMerchant;
@@ -127,15 +128,15 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             {
                 VillagerDataStorage storage = VillagerDataStorage.getInstance();
 
-                if (mc.currentScreen == null && mc.objectMouseOver != null &&
+                if (GuiUtils.getCurrentScreen() == null && mc.objectMouseOver != null &&
                     mc.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY &&
                     mc.objectMouseOver.entityHit instanceof EntityVillager)
                 {
                     storage.setLastInteractedUUID(mc.objectMouseOver.entityHit.getUniqueID());
                 }
-                else if (mc.currentScreen instanceof GuiMerchant && storage.hasInteractionTarget())
+                else if (GuiUtils.getCurrentScreen() instanceof GuiMerchant && storage.hasInteractionTarget())
                 {
-                    WidgetTradeList widget = ((IGuiMerchant) mc.currentScreen).getTradeListWidget();
+                    WidgetTradeList widget = ((IGuiMerchant) GuiUtils.getCurrentScreen()).getTradeListWidget();
 
                     if (widget != null)
                     {
@@ -165,11 +166,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 }
             }
 
-            if (mc.currentScreen instanceof GuiContainer &&
-                (mc.currentScreen instanceof GuiContainerCreative) == false &&
-                Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
+            if (GuiUtils.getCurrentScreen() instanceof GuiContainer &&
+                (GuiUtils.getCurrentScreen() instanceof GuiContainerCreative) == false &&
+                Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false)
             {
-                GuiContainer gui = (GuiContainer) mc.currentScreen;
+                GuiContainer gui = (GuiContainer) GuiUtils.getCurrentScreen();
                 RecipeStorage recipes = RecipeStorage.getInstance();
 
                 if (dWheel != 0)
@@ -249,10 +250,10 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
         if (this.callbacks.functionalityEnabled() &&
             mc.player != null &&
-            mc.currentScreen instanceof GuiContainer &&
-            Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false)
+            GuiUtils.getCurrentScreen() instanceof GuiContainer &&
+            Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false)
         {
-            this.handleDragging((GuiContainer) mc.currentScreen, mc, false);
+            this.handleDragging((GuiContainer) GuiUtils.getCurrentScreen(), mc, false);
         }
     }
 

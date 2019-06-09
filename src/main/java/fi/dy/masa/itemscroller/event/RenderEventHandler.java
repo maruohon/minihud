@@ -8,10 +8,10 @@ import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -42,9 +42,9 @@ public class RenderEventHandler
 
     public void onDrawBackgroundPost()
     {
-        if (this.mc.currentScreen instanceof GuiContainer && InputUtils.isRecipeViewOpen())
+        if (GuiUtils.getCurrentScreen() instanceof GuiContainer && InputUtils.isRecipeViewOpen())
         {
-            GuiContainer gui = (GuiContainer) this.mc.currentScreen;
+            GuiContainer gui = (GuiContainer) GuiUtils.getCurrentScreen();
             RecipeStorage recipes = RecipeStorage.getInstance();
             final int first = recipes.getFirstVisibleRecipeId();
             final int countPerPage = recipes.getRecipeCountPerPage();
@@ -86,9 +86,9 @@ public class RenderEventHandler
 
     public void onDrawScreenPost()
     {
-        if (this.mc.currentScreen instanceof GuiContainer && InputUtils.isRecipeViewOpen())
+        if (GuiUtils.getCurrentScreen() instanceof GuiContainer && InputUtils.isRecipeViewOpen())
         {
-            GuiContainer gui = (GuiContainer) this.mc.currentScreen;
+            GuiContainer gui = (GuiContainer) GuiUtils.getCurrentScreen();
             RecipeStorage recipes = RecipeStorage.getInstance();
 
             final int mouseX = InputUtils.getMouseX();
@@ -115,7 +115,6 @@ public class RenderEventHandler
 
     private void calculateRecipePositions(GuiContainer gui)
     {
-        ScaledResolution sr = new ScaledResolution(this.mc);
         RecipeStorage recipes = RecipeStorage.getInstance();
         final int gapHorizontal = 2;
         final int gapVertical = 2;
@@ -127,7 +126,7 @@ public class RenderEventHandler
         this.numberTextWidth = 12;
         this.gapColumn = 4;
 
-        int usableHeight = sr.getScaledHeight();
+        int usableHeight = GuiUtils.getScaledWindowHeight();
         int usableWidth = guiLeft;
         // Scale the maximum stack size by taking into account the relative gap size
         double gapScaleVertical = (1D - (double) gapVertical / (double) (stackBaseHeight + gapVertical));

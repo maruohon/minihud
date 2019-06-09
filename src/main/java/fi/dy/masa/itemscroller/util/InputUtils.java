@@ -5,36 +5,30 @@ import fi.dy.masa.itemscroller.config.Hotkeys;
 import fi.dy.masa.itemscroller.event.KeybindCallbacks;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
+import fi.dy.masa.malilib.util.GuiUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 
 public class InputUtils
 {
     public static int getMouseX()
     {
-        Minecraft mc = Minecraft.getMinecraft();
-        ScaledResolution scaledresolution = new ScaledResolution(mc);
-        int w = scaledresolution.getScaledWidth();
-        return Mouse.getX() * w / mc.displayWidth;
+        int width = GuiUtils.getScaledWindowWidth();
+        return Mouse.getX() * width / GuiUtils.getDisplayWidth();
     }
 
     public static int getMouseY()
     {
-        Minecraft mc = Minecraft.getMinecraft();
-        ScaledResolution scaledresolution = new ScaledResolution(mc);
-        int h = scaledresolution.getScaledHeight();
-        return h - Mouse.getY() * h / mc.displayHeight - 1;
+        int height = GuiUtils.getScaledWindowHeight();
+        return height - Mouse.getY() * height / GuiUtils.getDisplayHeight() - 1;
     }
 
     public static boolean isRecipeViewOpen()
     {
-        Minecraft mc = Minecraft.getMinecraft();
-
-        return mc.currentScreen != null &&
+        return GuiUtils.getCurrentScreen() != null &&
                Hotkeys.KEY_RECIPE_VIEW.getKeybind().isKeybindHeld() &&
                KeybindCallbacks.getInstance().functionalityEnabled() &&
-               CraftingHandler.isCraftingGui(mc.currentScreen);
+               CraftingHandler.isCraftingGui(GuiUtils.getCurrentScreen());
     }
 
     public static boolean canShiftDropItems(GuiContainer gui, Minecraft mc)
@@ -45,8 +39,8 @@ public class InputUtils
             int top = AccessorUtils.getGuiTop(gui);
             int xSize = AccessorUtils.getGuiXSize(gui);
             int ySize = AccessorUtils.getGuiYSize(gui);
-            int mouseAbsX = Mouse.getEventX() * gui.width / mc.displayWidth;
-            int mouseAbsY = gui.height - Mouse.getEventY() * gui.height / mc.displayHeight - 1;
+            int mouseAbsX = Mouse.getEventX() * gui.width / GuiUtils.getDisplayWidth();
+            int mouseAbsY = gui.height - Mouse.getEventY() * gui.height / GuiUtils.getDisplayHeight() - 1;
             boolean isOutsideGui = mouseAbsX < left || mouseAbsY < top || mouseAbsX >= left + xSize || mouseAbsY >= top + ySize;
 
             return isOutsideGui && AccessorUtils.getSlotAtPosition(gui, mouseAbsX - left, mouseAbsY - top) == null;
