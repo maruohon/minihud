@@ -16,9 +16,9 @@ import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeDespawnSphere;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class GuiShapeEditor extends GuiRenderLayerEditBase
@@ -30,7 +30,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     public GuiShapeEditor(ShapeBase shape)
     {
         this.shape = shape;
-        this.title = I18n.translate("minihud.gui.title.shape_editor");
+        this.title = StringUtils.translate("minihud.gui.title.shape_editor");
         this.configBlockSnap = new ConfigOptionList("blockSnap", BlockSnap.NONE, "");
     }
 
@@ -65,7 +65,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
     private void createColorInput(int x, int y)
     {
-        String label = I18n.translate("minihud.gui.label.color");
+        String label = StringUtils.translate("minihud.gui.label.color");
         int w = this.getStringWidth(label);
         this.addLabel(x, y, w, 14, 0xFFFFFFFF, label);
         y += 12;
@@ -90,7 +90,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
     private void createShapeEditorElementsDespawnSphere(int x, int y)
     {
-        this.addLabel(x, y, 60, 14, 0xFFFFFFFF, I18n.translate("minihud.gui.label.center_colon"));
+        this.addLabel(x, y, 60, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.center_colon"));
         y += 12;
         ShapeDespawnSphere shape = (ShapeDespawnSphere) this.shape;
         GuiUtils.createVec3dInputsVertical(x, y, 120, shape.getCenter(), new DespawnSphereEditor(shape, this), true, this);
@@ -100,7 +100,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.addButton(button, new ButtonListenerDespawnSphere(shape, this));
         y += 30;
 
-        String label = I18n.translate("minihud.gui.label.margin_colon");
+        String label = StringUtils.translate("minihud.gui.label.margin_colon");
         int w = this.getStringWidth(label);
         this.addLabel(x + 12, y, w, 12, 0xFFFFFFFF, label);
         y += 12;
@@ -128,7 +128,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
         for (BlockSnap val : BlockSnap.values())
         {
-            width = Math.max(width, this.getStringWidth(I18n.translate("minihud.gui.label.block_snap", val.getDisplayName())) + 10);
+            width = Math.max(width, this.getStringWidth(StringUtils.translate("minihud.gui.label.block_snap", val.getDisplayName())) + 10);
         }
 
         return width;

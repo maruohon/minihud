@@ -1,7 +1,7 @@
 package fi.dy.masa.minihud.util;
 
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
-import net.minecraft.client.resource.language.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public enum BlockGridMode implements IConfigOptionListEntry
 {
@@ -27,7 +27,7 @@ public enum BlockGridMode implements IConfigOptionListEntry
     @Override
     public String getDisplayName()
     {
-        return I18n.translate(this.unlocName);
+        return StringUtils.translate(this.unlocName);
     }
 
     @Override

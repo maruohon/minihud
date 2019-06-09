@@ -8,8 +8,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.renderer.RenderContainer;
-import net.minecraft.client.resource.language.I18n;
 
 public class ShapeManager
 {
@@ -156,7 +156,7 @@ public class ShapeManager
 
         public String getDisplayName()
         {
-            return I18n.translate(this.translationKey);
+            return StringUtils.translate(this.translationKey);
         }
 
         @Nullable

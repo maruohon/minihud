@@ -12,13 +12,13 @@ import fi.dy.masa.malilib.util.BlockSnap;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.Quadrant;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.RenderObjectBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -195,14 +195,14 @@ public class ShapeDespawnSphere extends ShapeBase
     {
         List<String> lines = new ArrayList<>();
         Vec3d c = this.center;
-        lines.add(I18n.translate("minihud.gui.label.center_value", String.format("x: %.2f, y: %.2f, z: %.2f", c.x, c.y, c.z)));
-        lines.add(I18n.translate("minihud.gui.label.block_snap", this.snap.getDisplayName()));
-        lines.add(I18n.translate("minihud.gui.label.margin_value", String.format("%.2f", this.margin)));
+        lines.add(StringUtils.translate("minihud.gui.label.center_value", String.format("x: %.2f, y: %.2f, z: %.2f", c.x, c.y, c.z)));
+        lines.add(StringUtils.translate("minihud.gui.label.block_snap", this.snap.getDisplayName()));
+        lines.add(StringUtils.translate("minihud.gui.label.margin_value", String.format("%.2f", this.margin)));
 
         if (this.snap != BlockSnap.NONE)
         {
             c = this.effectiveCenter;
-            lines.add(I18n.translate("minihud.gui.label.effective_center_value", String.format("x: %.2f, y: %.2f, z: %.2f", c.x, c.y, c.z)));
+            lines.add(StringUtils.translate("minihud.gui.label.effective_center_value", String.format("x: %.2f, y: %.2f, z: %.2f", c.x, c.y, c.z)));
         }
 
         return lines;

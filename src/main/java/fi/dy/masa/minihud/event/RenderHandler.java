@@ -6,13 +6,14 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
@@ -24,7 +25,6 @@ import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Screen;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.chunk.ChunkRenderer;
 import net.minecraft.entity.Entity;
@@ -34,8 +34,6 @@ import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -90,7 +88,7 @@ public class RenderHandler implements IRenderer
         if (Configs.Generic.FIX_VANILLA_DEBUG_RENDERERS.getBooleanValue())
         {
             GlStateManager.disableLighting();
-            //GlStateManager.color(1, 1, 1, 1);
+            //RenderUtils.color(1, 1, 1, 1);
             //OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f);
         }
     }
@@ -128,7 +126,7 @@ public class RenderHandler implements IRenderer
             boolean useBackground = Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue();
             boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
 
-            RenderUtils.renderText(mc, x, y, this.fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.lines);
+            RenderUtils.renderText(x, y, this.fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.lines);
         }
     }
 
@@ -144,7 +142,7 @@ public class RenderHandler implements IRenderer
         }
         else if (Configs.Generic.SHULKER_BOX_PREVIEW.getBooleanValue())
         {
-            boolean render = Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || Screen.hasShiftDown();
+            boolean render = Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown();
 
             if (render)
             {
@@ -175,8 +173,7 @@ public class RenderHandler implements IRenderer
 
         if (align == HudAlignment.BOTTOM_RIGHT)
         {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            int offset = (int) (this.lineWrappers.size() * (mc.textRenderer.fontHeight + 2) * this.fontScale);
+            int offset = (int) (this.lineWrappers.size() * (StringUtils.getFontHeight() + 2) * this.fontScale);
 
             return -(offset - 16);
         }
@@ -797,7 +794,6 @@ public class RenderHandler implements IRenderer
         }
     }
 
-    @SuppressWarnings("unchecked")
     private <T extends Comparable<T>> void getBlockProperties(MinecraftClient mc)
     {
         if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.BLOCK)
@@ -808,30 +804,9 @@ public class RenderHandler implements IRenderer
 
             this.addLine(rl != null ? rl.toString() : "<null>");
 
-            for (Entry <Property<?>, Comparable<?>> entry : state.getEntries().entrySet())
+            for (String line : BlockUtils.getFormattedBlockStateProperties(state))
             {
-                Property<T> property = (Property<T>) entry.getKey();
-                T value = (T) entry.getValue();
-                String valueName = property.getValueAsString(value);
-
-                if (property instanceof DirectionProperty)
-                {
-                    valueName = GuiBase.TXT_GOLD + valueName;
-                }
-                else if (Boolean.TRUE.equals(value))
-                {
-                    valueName = GuiBase.TXT_GREEN + valueName;
-                }
-                else if (Boolean.FALSE.equals(value))
-                {
-                    valueName = GuiBase.TXT_RED + valueName;
-                }
-                else if (Integer.class.equals(property.getValueClass()))
-                {
-                    valueName = GuiBase.TXT_GREEN + valueName;
-                }
-
-                this.addLine(property.getName() + ": " + valueName);
+                this.addLine(line);
             }
         }
     }

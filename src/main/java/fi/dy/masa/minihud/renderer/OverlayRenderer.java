@@ -18,7 +18,7 @@ public class OverlayRenderer
 
     public static void renderOverlays(MinecraftClient mc, float partialTicks)
     {
-        Entity entity = mc.player;
+        Entity entity = mc.getCameraEntity();
 
         if (canRender == false)
         {

@@ -103,7 +103,7 @@ public class RenderContainer
             GlStateManager.polygonOffset(-3f, -3f);
             GlStateManager.enablePolygonOffset();
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
-            GlStateManager.color4f(1f, 1f, 1f, 1f);
+            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
             if (GLX.useVbo())
             {
@@ -147,7 +147,7 @@ public class RenderContainer
 
             GlStateManager.polygonOffset(0f, 0f);
             GlStateManager.disablePolygonOffset();
-            GlStateManager.color4f(1f, 1f, 1f, 1f);
+            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
             GlStateManager.disableBlend();
             GlStateManager.enableDepthTest();
             GlStateManager.enableLighting();

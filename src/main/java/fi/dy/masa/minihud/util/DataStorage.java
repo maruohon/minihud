@@ -519,6 +519,7 @@ public class DataStorage
         }
 
         this.structuresDirty = true;
+
         //MiniHUD.logger.info("Structure data updated from the integrated server");
     }
 

@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -14,7 +15,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableIntBoundingBox;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.OverworldDimension;
 
@@ -122,7 +122,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
     private void renderStructure(StructureType type, StructureData structure)
     {
         Color4f color = type.getToggle().getColorMain().getColor();
-        ImmutableList<MutableIntBoundingBox> components = structure.getComponents();
+        ImmutableList<IntBoundingBox> components = structure.getComponents();
 
         fi.dy.masa.malilib.render.RenderUtils.drawBox(structure.getBoundingBox(), color, BUFFER_1, BUFFER_2);
 
@@ -132,7 +132,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
             {
                 color = type.getToggle().getColorComponents().getColor();
 
-                for (MutableIntBoundingBox bb : components)
+                for (IntBoundingBox bb : components)
                 {
                     fi.dy.masa.malilib.render.RenderUtils.drawBox(bb, color, BUFFER_1, BUFFER_2);
                 }

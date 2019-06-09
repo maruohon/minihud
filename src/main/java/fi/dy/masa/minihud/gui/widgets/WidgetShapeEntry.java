@@ -2,17 +2,18 @@ package fi.dy.masa.minihud.gui.widgets;
 
 import java.util.List;
 import com.mojang.blaze3d.platform.GlStateManager;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
-import net.minecraft.client.render.GuiLighting;
-import net.minecraft.client.resource.language.I18n;
 
 public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
 {
@@ -61,7 +62,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        GlStateManager.color4f(1f, 1f, 1f, 1f);
+        RenderUtils.color(1f, 1f, 1f, 1f);
 
         boolean shapeSelected = ShapeManager.INSTANCE.getSelectedShape() == this.entry;
 
@@ -86,14 +87,14 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         }
 
         String name = this.shape.getType().getDisplayName();
-        this.drawString(name, this.x + 4, this.y + 7, 0xFFFFFFFF);
+        this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name);
 
-        GlStateManager.color4f(1f, 1f, 1f, 1f);
+        RenderUtils.color(1f, 1f, 1f, 1f);
         GlStateManager.disableBlend();
 
         super.render(mouseX, mouseY, selected);
 
-        GuiLighting.disable();
+        RenderUtils.disableItemLighting();
         GlStateManager.disableLighting();
     }
 
@@ -125,8 +126,8 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
             if (this.type == Type.CONFIGURE)
             {
                 GuiShapeEditor gui = new GuiShapeEditor(this.widget.shape);
-                gui.setParent(this.widget.mc.currentScreen);
-                this.widget.mc.openScreen(gui);
+                gui.setParent(GuiUtils.getCurrentScreen());
+                GuiBase.openGui(gui);
             }
             else if (this.type == Type.ENABLED)
             {
@@ -160,7 +161,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
             
             public String getDisplayName(Object... args)
             {
-                return I18n.translate(this.translationKey, args);
+                return StringUtils.translate(this.translationKey, args);
             }
         }
     }
