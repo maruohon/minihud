@@ -6,11 +6,11 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
 
@@ -28,36 +28,36 @@ public class StructureData
 
     private static final CarpetBoxReader CARPET_BOX_READER = new CarpetBoxReader();
 
-    private final StructureBoundingBox mainBox;
-    private final ImmutableList<StructureBoundingBox> componentBoxes;
+    private final IntBoundingBox mainBox;
+    private final ImmutableList<IntBoundingBox> componentBoxes;
 
-    private StructureData(StructureBoundingBox mainBox, ImmutableList<StructureBoundingBox> componentBoxes)
+    private StructureData(IntBoundingBox mainBox, ImmutableList<IntBoundingBox> componentBoxes)
     {
         this.mainBox = mainBox;
         this.componentBoxes = componentBoxes;
     }
 
-    public StructureBoundingBox getBoundingBox()
+    public IntBoundingBox getBoundingBox()
     {
         return this.mainBox;
     }
 
-    public ImmutableList<StructureBoundingBox> getComponents()
+    public ImmutableList<IntBoundingBox> getComponents()
     {
         return this.componentBoxes;
     }
 
     public static StructureData fromStructure(StructureStart structure)
     {
-        ImmutableList.Builder<StructureBoundingBox> builder = ImmutableList.builder();
+        ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
         List<StructureComponent> components = structure.getComponents();
 
         for (StructureComponent component : components)
         {
-            builder.add(component.getBoundingBox());
+            builder.add(IntBoundingBox.fromVanillaBox(component.getBoundingBox()));
         }
 
-        return new StructureData(structure.getBoundingBox(), builder.build());
+        return new StructureData(IntBoundingBox.fromVanillaBox(structure.getBoundingBox()), builder.build());
     }
 
     @Nullable
@@ -86,7 +86,7 @@ public class StructureData
                             if (type.getStructureName().equals(id))
                             {
                                 NBTTagList tagList = tag.getTagList("Children", Constants.NBT.TAG_COMPOUND);
-                                ImmutableList.Builder<StructureBoundingBox> builder = ImmutableList.builder();
+                                ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
 
                                 for (int i = 0; i < tagList.tagCount(); ++i)
                                 {
@@ -95,11 +95,11 @@ public class StructureData
                                     if (componentTag.hasKey("id", Constants.NBT.TAG_STRING) &&
                                         componentTag.hasKey("BB", Constants.NBT.TAG_INT_ARRAY))
                                     {
-                                        builder.add(new StructureBoundingBox(componentTag.getIntArray("BB")));
+                                        builder.add(IntBoundingBox.fromArray(componentTag.getIntArray("BB")));
                                     }
                                 }
 
-                                map.put(type, new StructureData(new StructureBoundingBox(tag.getIntArray("BB")), builder.build()));
+                                map.put(type, new StructureData(IntBoundingBox.fromArray(tag.getIntArray("BB")), builder.build()));
                             }
                         }
                     }
@@ -145,8 +145,8 @@ public class StructureData
 
                                     if (type != null)
                                     {
-                                        StructureBoundingBox bb = new StructureBoundingBox(componentTag.getIntArray("BB"));
-                                        map.put(type, new StructureData(new StructureBoundingBox(tag.getIntArray("BB")), ImmutableList.of(bb)));
+                                        IntBoundingBox bb = IntBoundingBox.fromArray(componentTag.getIntArray("BB"));
+                                        map.put(type, new StructureData(IntBoundingBox.fromArray(tag.getIntArray("BB")), ImmutableList.of(bb)));
                                     }
                                 }
                             }
@@ -177,8 +177,8 @@ public class StructureData
 
     public static void readStructureDataCarpetAllBoxes(ArrayListMultimap<StructureType, StructureData> map, List<NBTTagCompound> tags)
     {
-        ImmutableList.Builder<StructureBoundingBox> builder = ImmutableList.builder();
-        StructureBoundingBox bbMain = null;
+        ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
+        IntBoundingBox bbMain = null;
         StructureType type = null;
         int componentBoxes = 0;
 
@@ -201,7 +201,7 @@ public class StructureData
 
                 if (tags.size() > i + 1)
                 {
-                    bbMain = new StructureBoundingBox(tag.getIntArray("bb"));
+                    bbMain = IntBoundingBox.fromArray(tag.getIntArray("bb"));
                     id = tags.get(i + 1).getInteger("type");
                     type = getTypeFromCarpetId(id);
                 }
@@ -209,7 +209,7 @@ public class StructureData
             // Don't add the component boxes of unknown/unsupported structure types to the builder
             else if (type != null)
             {
-                builder.add(new StructureBoundingBox(tag.getIntArray("bb")));
+                builder.add(IntBoundingBox.fromArray(tag.getIntArray("bb")));
                 ++componentBoxes;
             }
         }
@@ -240,7 +240,7 @@ public class StructureData
     public static void readStructureDataCarpetIndividualBoxes(ArrayListMultimap<StructureType, StructureData> map, NBTTagCompound tag)
     {
         int id = tag.getInteger("type");
-        StructureBoundingBox bb = new StructureBoundingBox(tag.getIntArray("bb"));
+        IntBoundingBox bb = IntBoundingBox.fromArray(tag.getIntArray("bb"));
 
         CARPET_BOX_READER.seenBoxes++;
 
@@ -311,8 +311,8 @@ public class StructureData
         private int expectedBoxes = -1;
         private int seenBoxes;
         private int componentBoxes;
-        private ImmutableList.Builder<StructureBoundingBox> componentsBuilder;
-        private StructureBoundingBox bbMain;
+        private ImmutableList.Builder<IntBoundingBox> componentsBuilder;
+        private IntBoundingBox bbMain;
         private boolean readTypeFromNextBox;
         private StructureType type;
     }

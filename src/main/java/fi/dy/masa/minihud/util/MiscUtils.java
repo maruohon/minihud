@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
@@ -131,6 +132,19 @@ public class MiscUtils
         }
     }
 
+    public static boolean isStructureWithinRange(IntBoundingBox bb, BlockPos playerPos, int maxRange)
+    {
+        if (playerPos.getX() < (bb.minX - maxRange) ||
+            playerPos.getX() > (bb.maxX + maxRange) ||
+            playerPos.getZ() < (bb.minZ - maxRange) ||
+            playerPos.getZ() > (bb.maxZ + maxRange))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public static boolean isStructureWithinRange(StructureBoundingBox bb, BlockPos playerPos, int maxRange)
     {
         if (playerPos.getX() < (bb.minX - maxRange) ||
@@ -144,7 +158,7 @@ public class MiscUtils
         return true;
     }
 
-    public static boolean areBoxesEqual(StructureBoundingBox bb1, StructureBoundingBox bb2)
+    public static boolean areBoxesEqual(IntBoundingBox bb1, IntBoundingBox bb2)
     {
         return bb1.minX == bb2.minX && bb1.minY == bb2.minY && bb1.minZ == bb2.minZ &&
                bb1.maxX == bb2.maxX && bb1.maxY == bb2.maxY && bb1.maxZ == bb2.maxZ;
