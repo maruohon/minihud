@@ -8,6 +8,7 @@ import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
@@ -125,7 +126,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
             if (this.type == Type.CONFIGURE)
             {
                 GuiShapeEditor gui = new GuiShapeEditor(this.widget.shape);
-                gui.setParent(this.widget.mc.currentScreen);
+                gui.setParent(GuiUtils.getCurrentScreen());
                 GuiBase.openGui(gui);
             }
             else if (this.type == Type.ENABLED)

@@ -6,12 +6,12 @@ import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackAdjustable;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
-import net.minecraft.client.Minecraft;
 
 public class InputHandler implements IKeybindProvider, IMouseInputHandler
 {
@@ -55,17 +55,15 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
     }
 
     @Override
-    public boolean onMouseScroll(int mouseX, int mouseY, double amount)
+    public boolean onMouseScroll(int mouseX, int mouseY, double dWheel)
     {
-        Minecraft mc = Minecraft.getInstance();
-
         // Not in a GUI
-        if (mc.currentScreen == null && amount != 0)
+        if (GuiUtils.getCurrentScreen() == null && dWheel != 0)
         {
             if (RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() &&
                 RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind().isKeybindHeld())
             {
-                OverlayRendererSlimeChunks.overlayTopY += (amount < 0 ? 1 : -1);
+                OverlayRendererSlimeChunks.overlayTopY += (dWheel < 0 ? 1 : -1);
                 KeyCallbackAdjustable.setValueChanged();
                 return true;
             }
