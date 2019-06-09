@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.util;
 
 import java.util.Random;
 import javax.annotation.Nullable;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 
@@ -45,7 +46,21 @@ public class MiscUtils
         return true;
     }
 
-    public static boolean areBoxesEqual(MutableBoundingBox bb1, MutableBoundingBox bb2)
+    public static boolean isStructureWithinRange(@Nullable IntBoundingBox bb, BlockPos playerPos, int maxRange)
+    {
+        if (bb == null ||
+            playerPos.getX() < (bb.minX - maxRange) ||
+            playerPos.getX() > (bb.maxX + maxRange) ||
+            playerPos.getZ() < (bb.minZ - maxRange) ||
+            playerPos.getZ() > (bb.maxZ + maxRange))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean areBoxesEqual(IntBoundingBox bb1, IntBoundingBox bb2)
     {
         return bb1.minX == bb2.minX && bb1.minY == bb2.minY && bb1.minZ == bb2.minZ &&
                bb1.maxX == bb2.maxX && bb1.maxY == bb2.maxY && bb1.maxZ == bb2.maxZ;
