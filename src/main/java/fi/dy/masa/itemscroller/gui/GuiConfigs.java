@@ -22,9 +22,9 @@ public class GuiConfigs extends GuiConfigsBase
     }
 
     @Override
-    public void init()
+    public void initGui()
     {
-        super.init();
+        super.initGui();
         this.clearOptions();
 
         int x = 10;
@@ -102,7 +102,7 @@ public class GuiConfigs extends GuiConfigsBase
 
             this.parent.reCreateListWidget(); // apply the new config width
             this.parent.getListWidget().resetScrollbarPosition();
-            this.parent.init();
+            this.parent.initGui();
         }
     }
 
