@@ -35,9 +35,9 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     }
 
     @Override
-    public void init()
+    public void initGui()
     {
-        super.init();
+        super.initGui();
 
         int x = 10;
         int y = 26;
@@ -149,7 +149,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         public boolean modifyValue(CoordinateType type, int amount)
         {
             this.shape.setCenter(PositionUtils.modifyValue(type, this.shape.getCenter(), amount));
-            this.gui.init();
+            this.gui.initGui();
             return true;
         }
 
@@ -186,7 +186,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
             if (player != null)
             {
                 this.shape.setCenter(player.getPos());
-                this.gui.init();
+                this.gui.initGui();
             }
         }
     }

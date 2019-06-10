@@ -41,9 +41,9 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
     }
 
     @Override
-    public void init()
+    public void initGui()
     {
-        super.init();
+        super.initGui();
 
         int x = 10;
         int y = 26;
