@@ -7,9 +7,9 @@
         "IMixinAbstractContainerScreen",
         "IMixinMerchantScreen",
         "IMixinSlot",
+        "MixinAbstractInventoryScreen",
         "MixinCraftingTableContainer",
         "MixinGameRenderer",
-        "MixinMinecraftClient",
         "MixinScreen"
     ],
     "injectors": {

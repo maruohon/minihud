@@ -1,8 +1,8 @@
 package fi.dy.masa.itemscroller.util;
 
 import fi.dy.masa.itemscroller.mixin.IMixinAbstractContainerScreen;
-import fi.dy.masa.itemscroller.mixin.IMixinSlot;
 import fi.dy.masa.itemscroller.mixin.IMixinMerchantScreen;
+import fi.dy.masa.itemscroller.mixin.IMixinSlot;
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 import net.minecraft.container.Slot;

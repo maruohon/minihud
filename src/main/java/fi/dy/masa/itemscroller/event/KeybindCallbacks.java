@@ -12,24 +12,25 @@ import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.itemscroller.util.MoveAction;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
+import fi.dy.masa.malilib.interfaces.IClientTickHandler;
+import fi.dy.masa.malilib.util.GuiUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.util.Window;
 import net.minecraft.container.Slot;
 import net.minecraft.sound.SoundEvents;
 
-public class KeybindCallbacks implements IHotkeyCallback
+public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
 {
     private static final KeybindCallbacks INSTANCE = new KeybindCallbacks();
 
     private boolean disabled;
-    private RecipeStorage recipes;
 
     public static KeybindCallbacks getInstance()
     {
@@ -51,24 +52,6 @@ public class KeybindCallbacks implements IHotkeyCallback
     public boolean functionalityEnabled()
     {
         return this.disabled == false;
-    }
-
-    public RecipeStorage getRecipes()
-    {
-        if (this.recipes == null)
-        {
-            this.recipes = new RecipeStorage(18, Configs.Generic.SCROLL_CRAFT_RECIPE_FILE_GLOBAL.getBooleanValue());
-        }
-
-        return this.recipes;
-    }
-
-    public void onWorldChanged()
-    {
-        if (Configs.Generic.SCROLL_CRAFT_STORE_RECIPES_TO_FILE.getBooleanValue())
-        {
-            this.getRecipes().readFromDisk();
-        }
     }
 
     @Override
@@ -93,27 +76,26 @@ public class KeybindCallbacks implements IHotkeyCallback
         }
         else if (key == Hotkeys.KEY_OPEN_CONFIG_GUI.getKeybind())
         {
-            mc.openScreen(new GuiConfigs());
+            GuiBase.openGui(new GuiConfigs());
             return true;
         }
 
-        if (this.disabled || mc == null || mc.player == null || (mc.currentScreen instanceof AbstractContainerScreen) == false)
+        if (this.disabled || mc == null || mc.player == null || (GuiUtils.getCurrentScreen() instanceof AbstractContainerScreen) == false)
         {
             return false;
         }
 
-        AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) mc.currentScreen;
+        AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) GuiUtils.getCurrentScreen();
         Slot slot = AccessorUtils.getSlotUnderMouse(gui);
-        RecipeStorage recipes = this.getRecipes();
+        RecipeStorage recipes = RecipeStorage.getInstance();
         MoveAction moveAction = InputUtils.getDragMoveAction(key);
 
         if (slot != null)
         {
             if (moveAction != MoveAction.NONE)
             {
-                Window window = mc.window;
-                final int mouseX = (int) (mc.mouse.getX() * (double) window.getScaledWidth() / (double) window.getWidth());
-                final int mouseY = (int) (mc.mouse.getY() * (double) window.getScaledHeight() / (double) window.getHeight());
+                final int mouseX = fi.dy.masa.malilib.util.InputUtils.getMouseX();
+                final int mouseY = fi.dy.masa.malilib.util.InputUtils.getMouseY();
                 return InventoryUtils.dragMoveItems(gui, mc, moveAction, mouseX, mouseY, true);
             }
             else if (key == Hotkeys.KEY_MOVE_EVERYTHING.getKeybind())
@@ -157,6 +139,14 @@ public class KeybindCallbacks implements IHotkeyCallback
             InventoryUtils.moveAllCraftingResultsToOtherInventory(recipes.getSelectedRecipe(), gui);
             return true;
         }
+        else if (key == Hotkeys.KEY_STORE_RECIPE.getKeybind())
+        {
+            if (InputUtils.isRecipeViewOpen() && InventoryUtils.isCraftingSlot(gui, slot))
+            {
+                recipes.storeCraftingRecipeToCurrentSelection(slot, gui, true);
+                return true;
+            }
+        }
         else if (key == Hotkeys.KEY_SLOT_DEBUG.getKeybind())
         {
             if (slot != null)
@@ -174,23 +164,24 @@ public class KeybindCallbacks implements IHotkeyCallback
         return false;
     }
 
-    public void onTick(MinecraftClient mc)
+    @Override
+    public void onClientTick(MinecraftClient mc)
     {
         if (this.disabled == false &&
             mc != null &&
             mc.player != null &&
-            mc.currentScreen instanceof AbstractContainerScreen &&
-            (mc.currentScreen instanceof CreativeInventoryScreen) == false &&
-            Configs.GUI_BLACKLIST.contains(mc.currentScreen.getClass().getName()) == false &&
+            GuiUtils.getCurrentScreen() instanceof AbstractContainerScreen &&
+            (GuiUtils.getCurrentScreen() instanceof CreativeInventoryScreen) == false &&
+            Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false &&
             Hotkeys.KEY_MASS_CRAFT.getKeybind().isKeybindHeld())
         {
-            Screen guiScreen = mc.currentScreen;
+            Screen guiScreen = GuiUtils.getCurrentScreen();
             AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) guiScreen;
             Slot outputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
 
             if (outputSlot != null)
             {
-                RecipePattern recipe = this.getRecipes().getSelectedRecipe();
+                RecipePattern recipe = RecipeStorage.getInstance().getSelectedRecipe();
 
                 InventoryUtils.tryClearCursor(gui, mc);
                 InventoryUtils.throwAllCraftingResultsToGround(recipe, gui);

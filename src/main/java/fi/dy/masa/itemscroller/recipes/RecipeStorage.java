@@ -6,29 +6,32 @@ import java.io.FileOutputStream;
 import javax.annotation.Nonnull;
 import fi.dy.masa.itemscroller.ItemScroller;
 import fi.dy.masa.itemscroller.Reference;
+import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.util.Constants;
-import net.minecraft.client.MinecraftClient;
+import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
-import net.minecraft.client.options.ServerEntry;
 import net.minecraft.container.Slot;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.server.integrated.IntegratedServer;
 
 public class RecipeStorage
 {
+    private static final RecipeStorage INSTANCE = new RecipeStorage(8 * 18);
+
     private final RecipePattern[] recipes;
-    private final int recipeCount;
-    private final boolean global;
     private int selected;
     private boolean dirty;
 
-    public RecipeStorage(int recipeCount, boolean global)
+    public static RecipeStorage getInstance()
+    {
+        return INSTANCE;
+    }
+
+    public RecipeStorage(int recipeCount)
     {
         this.recipes = new RecipePattern[recipeCount];
-        this.recipeCount = recipeCount;
-        this.global = global;
         this.initRecipes();
     }
 
@@ -59,9 +62,24 @@ public class RecipeStorage
         this.changeSelectedRecipe(this.selected + (forward ? 1 : -1));
     }
 
-    public int getRecipeCount()
+    public int getFirstVisibleRecipeId()
     {
-        return this.recipeCount;
+        return this.getCurrentRecipePage() * this.getRecipeCountPerPage();
+    }
+
+    public int getTotalRecipeCount()
+    {
+        return this.recipes.length;
+    }
+
+    public int getRecipeCountPerPage()
+    {
+        return 18;
+    }
+
+    public int getCurrentRecipePage()
+    {
+        return this.getSelection() / this.getRecipeCountPerPage();
     }
 
     /**
@@ -155,38 +173,22 @@ public class RecipeStorage
 
     private String getFileName()
     {
-        String name = "recipes.nbt";
-
-        if (this.global == false)
+        if (Configs.Generic.SCROLL_CRAFT_RECIPE_FILE_GLOBAL.getBooleanValue() == false)
         {
-            MinecraftClient mc = MinecraftClient.getInstance();
+            String worldName = StringUtils.getWorldOrServerName();
 
-            if (mc.isIntegratedServerRunning())
+            if (worldName != null)
             {
-                IntegratedServer server = mc.getServer();
-
-                if (server != null)
-                {
-                    name = "recipes_" + server.getLevelName() + ".nbt";
-                }
-            }
-            else
-            {
-                ServerEntry server = mc.getCurrentServerEntry();
-
-                if (server != null)
-                {
-                    name = "recipes_" + server.address.replace(':', '_') + ".nbt";
-                }
+                return "recipes_" + worldName + ".nbt";
             }
         }
 
-        return name;
+        return "recipes.nbt";
     }
 
     private File getSaveDir()
     {
-        return new File(MinecraftClient.getInstance().runDirectory, Reference.MOD_ID);
+        return new File(FileUtils.getMinecraftDirectory(), Reference.MOD_ID);
     }
 
     public void readFromDisk()
