@@ -7,6 +7,7 @@
         "IMixinChunkDeltaUpdateS2CPacket",
         "IMixinDebugRenderer",
         "IMixinEntityNavigation",
+        "IMixinServerWorld",
         "IMixinWorldRenderer",
         "MixinAbstractRedstoneGateBlock",
         "MixinClientPlayNetworkHandler",

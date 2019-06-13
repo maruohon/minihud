@@ -3,19 +3,19 @@ package fi.dy.masa.minihud.util;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum BlockGridMode implements IConfigOptionListEntry
+public enum LightLevelMarkerMode implements IConfigOptionListEntry
 {
-    ALL         ("all",         "minihud.label.blockgridmode.all"),
-    NON_AIR     ("non_air",     "minihud.label.blockgridmode.non_air"),
-    ADJACENT    ("adjacent",    "minihud.label.blockgridmode.adjacent");
+    NONE    ("none",    "minihud.label.light_level_marker_mode.none"),
+    CROSS   ("cross",   "minihud.label.light_level_marker_mode.cross"),
+    SQUARE  ("square",  "minihud.label.light_level_marker_mode.square");
 
     private final String configString;
-    private final String unlocName;
+    private final String translationKey;
 
-    private BlockGridMode(String configString, String unlocName)
+    private LightLevelMarkerMode(String configString, String translationKey)
     {
         this.configString = configString;
-        this.unlocName = unlocName;
+        this.translationKey = translationKey;
     }
 
     @Override
@@ -27,7 +27,7 @@ public enum BlockGridMode implements IConfigOptionListEntry
     @Override
     public String getDisplayName()
     {
-        return StringUtils.translate(this.unlocName);
+        return StringUtils.translate(this.translationKey);
     }
 
     @Override
@@ -54,22 +54,21 @@ public enum BlockGridMode implements IConfigOptionListEntry
     }
 
     @Override
-    public BlockGridMode fromString(String name)
+    public LightLevelMarkerMode fromString(String name)
     {
         return fromStringStatic(name);
     }
 
-    public static BlockGridMode fromStringStatic(String name)
+    public static LightLevelMarkerMode fromStringStatic(String name)
     {
-        for (BlockGridMode aligment : BlockGridMode.values())
+        for (LightLevelMarkerMode val : LightLevelMarkerMode.values())
         {
-            if (aligment.configString.equalsIgnoreCase(name))
+            if (val.configString.equalsIgnoreCase(name))
             {
-                return aligment;
+                return val;
             }
         }
 
-        return BlockGridMode.ADJACENT;
+        return LightLevelMarkerMode.NONE;
     }
-
 }

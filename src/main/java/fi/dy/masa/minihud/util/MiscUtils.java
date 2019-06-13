@@ -1,13 +1,10 @@
 package fi.dy.masa.minihud.util;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Random;
-import fi.dy.masa.minihud.MiniHUD;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.chat.ChatMessageType;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.util.math.ChunkPos;
+import javax.annotation.Nullable;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MutableIntBoundingBox;
 
 public class MiscUtils
 {
@@ -35,27 +32,37 @@ public class MiscUtils
         return RAND.nextInt(10) == 0;
     }
 
-    public static void printInfoMessage(String key, Object... args)
+    public static boolean isStructureWithinRange(@Nullable MutableIntBoundingBox bb, BlockPos playerPos, int maxRange)
     {
-        MinecraftClient.getInstance().inGameHud.addChatMessage(ChatMessageType.GAME_INFO, new TranslatableComponent(key, args));
+        if (bb == null ||
+            playerPos.getX() < (bb.minX - maxRange) ||
+            playerPos.getX() > (bb.maxX + maxRange) ||
+            playerPos.getZ() < (bb.minZ - maxRange) ||
+            playerPos.getZ() > (bb.maxZ + maxRange))
+        {
+            return false;
+        }
+
+        return true;
     }
 
-    /**
-     * This method has been taken from the Carpet mod, by gnembon
-     */
-    public static int getChunkOrder(int chunkX, int chunkZ, int hashSize)
+    public static boolean isStructureWithinRange(@Nullable IntBoundingBox bb, BlockPos playerPos, int maxRange)
     {
-        try
+        if (bb == null ||
+            playerPos.getX() < (bb.minX - maxRange) ||
+            playerPos.getX() > (bb.maxX + maxRange) ||
+            playerPos.getZ() < (bb.minZ - maxRange) ||
+            playerPos.getZ() > (bb.maxZ + maxRange))
         {
-            Method method = HashMap.class.getDeclaredMethod("hash", Object.class);
-            method.setAccessible(true);
+            return false;
+        }
 
-            return (Integer) method.invoke(null, Long.hashCode(ChunkPos.toLong(chunkX, chunkZ))) & (hashSize - 1);
-        }
-        catch (Exception e)
-        {
-            MiniHUD.logger.error("Error while trying to get the chunk unload order");
-            return -1;
-        }
+        return true;
+    }
+
+    public static boolean areBoxesEqual(IntBoundingBox bb1, IntBoundingBox bb2)
+    {
+        return bb1.minX == bb2.minX && bb1.minY == bb2.minY && bb1.minZ == bb2.minZ &&
+               bb1.maxX == bb2.maxX && bb1.maxY == bb2.maxY && bb1.maxZ == bb2.maxZ;
     }
 }

@@ -1,35 +1,33 @@
 {
-  "schemaVersion": 1,
-  "id": "minihud",
-  "name": "MiniHUD",
-  "version": "${mod_version}",
+    "schemaVersion": 1,
+    "id": "minihud",
+    "name": "MiniHUD",
+    "version": "${mod_version}",
 
-  "description": "Configurable mini-F3 info lines, and various overlay renderers",
-  "authors": [
-    "masa"
-  ],
-  "contact": {
-    "homepage": "https://minecraft.curseforge.com/projects/minihud",
-    "sources": "https://github.com/maruohon/minihud",
-    "twitter": "https://twitter.com/maruohon",
-    "discord": "https://discordapp.com/channels/211786369951989762/453662800460644354/"
-  },
+    "description": "Configurable mini-F3 info lines, and various overlay renderers",
+    "authors": [
+        "masa"
+    ],
+    "contact": {
+        "homepage": "https://minecraft.curseforge.com/projects/minihud",
+        "sources": "https://github.com/maruohon/minihud",
+        "twitter": "https://twitter.com/maruohon",
+        "discord": "https://discordapp.com/channels/211786369951989762/453662800460644354/"
+    },
 
-  "license": "LGPLv3",
+    "license": "LGPLv3",
 
-  "environment": "client",
-  "entrypoints": {
-    "main": [
-      "fi.dy.masa.minihud.MiniHUD"
-    ]
-  },
-  "mixins": [
-    "mixins.minihud.json"
-  ],
+    "environment": "client",
+    "entrypoints": {
+        "main": [
+            "fi.dy.masa.minihud.MiniHUD"
+        ]
+    },
+    "mixins": [
+        "mixins.minihud.json"
+    ],
 
-  "requires": {
-    "fabricloader": ">=0.4.0",
-    "fabric": "*",
-    "malilib": ">=0.9.5 <0.10.0"
-  }
+    "depends": {
+        "malilib": "*"
+    }
 }

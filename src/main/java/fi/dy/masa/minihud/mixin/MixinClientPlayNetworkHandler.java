@@ -11,9 +11,9 @@ import net.minecraft.client.network.packet.ChatMessageS2CPacket;
 import net.minecraft.client.network.packet.ChunkDataS2CPacket;
 import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
 import net.minecraft.client.network.packet.PlayerListHeaderS2CPacket;
+import net.minecraft.client.network.packet.PlayerSpawnPositionS2CPacket;
 import net.minecraft.client.network.packet.WorldTimeUpdateS2CPacket;
 import net.minecraft.util.math.ChunkPos;
-
 
 @Mixin(ClientPlayNetworkHandler.class)
 public abstract class MixinClientPlayNetworkHandler
@@ -53,5 +53,11 @@ public abstract class MixinClientPlayNetworkHandler
     private void onTimeUpdate(WorldTimeUpdateS2CPacket packetIn, CallbackInfo ci)
     {
         DataStorage.getInstance().onServerTimeUpdate(packetIn.getTime());
+    }
+
+    @Inject(method = "onPlayerSpawnPosition", at = @At("RETURN"))
+    private void onSetSpawn(PlayerSpawnPositionS2CPacket packet, CallbackInfo ci)
+    {
+        DataStorage.getInstance().setWorldSpawnIfUnknown(packet.getPos());
     }
 }

@@ -9,11 +9,18 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.OverworldDimension;
 
 public class OverlayRendererSpawnChunks extends OverlayRendererBase
 {
+    protected static boolean needsUpdate = true;
+
     protected final RendererToggle toggle;
-    protected boolean rendered;
+
+    public static void setNeedsUpdate()
+    {
+        needsUpdate = true;
+    }
 
     public OverlayRendererSpawnChunks(RendererToggle toggle)
     {
@@ -23,21 +30,16 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     @Override
     public boolean shouldRender(MinecraftClient mc)
     {
-        if (this.toggle.getBooleanValue() == false)
-        {
-            // A cheap hack to get it to re-render after toggling off/on
-            this.rendered = false;
-        }
-
         return this.toggle.getBooleanValue() &&
                 (this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ||
-                 DataStorage.getInstance().isWorldSpawnKnown());
+                 (mc.world != null && mc.world.dimension instanceof OverworldDimension &&
+                  DataStorage.getInstance().isWorldSpawnKnown()));
     }
 
     @Override
     public boolean needsUpdate(Entity entity, MinecraftClient mc)
     {
-        if (this.rendered == false)
+        if (needsUpdate)
         {
             return true;
         }
@@ -89,8 +91,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
 
-        this.lastUpdatePos = new BlockPos(entity);
-        this.rendered = true;
+        needsUpdate = false;
     }
 
     @Override

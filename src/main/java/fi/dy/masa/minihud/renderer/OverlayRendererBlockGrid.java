@@ -15,8 +15,6 @@ import net.minecraft.world.World;
 
 public class OverlayRendererBlockGrid extends OverlayRendererBase
 {
-    private BlockPos lastUpdatePos;
-
     @Override
     public boolean shouldRender(MinecraftClient mc)
     {
@@ -39,7 +37,6 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
     @Override
     public void update(Entity entity, MinecraftClient mc)
     {
-        this.lastUpdatePos = new BlockPos(entity);
         Color4f color = Configs.Colors.BLOCK_GRID_OVERLAY_COLOR.getColor();
         int radius = Configs.Generic.BLOCK_GRID_OVERLAY_RADIUS.getIntegerValue();
 
