@@ -3,22 +3,32 @@ package fi.dy.masa.minihud.util;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import com.google.gson.JsonObject;
+import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
+import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.Reference;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.network.StructurePacketHandler;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
+import fi.dy.masa.minihud.util.StructureTypes.StructureType;
 import net.minecraft.ChatFormat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
@@ -45,9 +55,11 @@ public class DataStorage
     private boolean serverTPSValid;
     private boolean carpetServer;
     private boolean worldSpawnValid;
-    //private boolean hasStructureDataFromServer;
-    private boolean structuresDirty;
+    private boolean hasStructureDataFromServer;
+    private boolean structureRendererNeedsUpdate;
     private boolean structuresNeedUpdating;
+    private boolean shouldRegisterStructureChannel;
+    private int structureDataTimeout = 800;
     private long worldSeed;
     private long lastServerTick;
     private long lastServerTimeUpdate;
@@ -56,7 +68,7 @@ public class DataStorage
     private double serverMSPT;
     private BlockPos worldSpawn = BlockPos.ORIGIN;
     private Vec3d distanceReferencePoint = Vec3d.ZERO;
-    private final ArrayListMultimap<StructureType, StructureData> structures = ArrayListMultimap.create();
+    private final Multimap<StructureType, StructureData> structures = MultimapBuilder.hashKeys().hashSetValues().build();
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public static DataStorage getInstance()
@@ -71,13 +83,23 @@ public class DataStorage
         this.carpetServer = false;
         this.worldSpawnValid = false;
         this.structuresNeedUpdating = true;
-        //this.hasStructureDataFromServer = false;
-        this.structuresDirty = false;
+        this.hasStructureDataFromServer = false;
+        this.structureRendererNeedsUpdate = false;
+        StructurePacketHandler.INSTANCE.reset();
 
         this.lastStructureUpdatePos = null;
         this.structures.clear();
+        this.structureDataTimeout = 800;
         this.worldSeed = 0;
         this.worldSpawn = BlockPos.ORIGIN;
+    }
+
+    public void onWorldJoin()
+    {
+        if (this.mc.isIntegratedServerRunning() == false && RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
+        {
+            this.shouldRegisterStructureChannel = true;
+        }
     }
 
     public void setWorldSeed(long seed)
@@ -162,9 +184,9 @@ public class DataStorage
         return this.serverMSPT;
     }
 
-    public boolean hasStructureDataChanged()
+    public boolean structureRendererNeedsUpdate()
     {
-        return this.structuresDirty;
+        return this.structureRendererNeedsUpdate;
     }
 
     public void setStructuresNeedUpdating()
@@ -172,9 +194,9 @@ public class DataStorage
         this.structuresNeedUpdating = true;
     }
 
-    public void setStructuresDirty()
+    public void setStructureRendererNeedsUpdate()
     {
-        this.structuresDirty = true;
+        this.structureRendererNeedsUpdate = true;
     }
 
     public Vec3d getDistanceReferencePoint()
@@ -343,32 +365,44 @@ public class DataStorage
                 }
             }
 
-            this.structuresDirty = false;
+            this.structureRendererNeedsUpdate = false;
         }
 
         return copy;
-    }
-
-    public void requestStructureDataFromServer()
-    {
     }
 
     public void updateStructureData()
     {
         if (this.mc != null && this.mc.world != null && this.mc.player != null)
         {
-            final BlockPos playerPos = new BlockPos(this.mc.player);
+            long currentTime = this.mc.world.getTime();
 
-            if (this.mc.isIntegratedServerRunning())
+            if ((currentTime % 20) == 0)
             {
-                if (this.structuresNeedUpdating(playerPos, 32))
+                if (this.mc.isIntegratedServerRunning())
                 {
-                    this.updateStructureDataFromIntegratedServer(playerPos);
+                    BlockPos playerPos = new BlockPos(this.mc.player);
+
+                    if (this.structuresNeedUpdating(playerPos, 32))
+                    {
+                        this.updateStructureDataFromIntegratedServer(playerPos);
+                    }
                 }
-            }
-            else if (this.structuresNeedUpdating(playerPos, 256))
-            {
-                this.requestStructureDataFromServer();
+                else if (this.hasStructureDataFromServer)
+                {
+                    this.removeExpiredStructures(currentTime, this.structureDataTimeout);
+                }
+                else if (this.shouldRegisterStructureChannel && this.mc.getNetworkHandler() != null)
+                {
+                    if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
+                    {
+                        // (re-)register the structure packet handler
+                        ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandler.INSTANCE);
+                        ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandler.INSTANCE);
+                    }
+
+                    this.shouldRegisterStructureChannel = false;
+                }
             }
         }
     }
@@ -386,11 +420,6 @@ public class DataStorage
         final DimensionType dimension = this.mc.player.dimension;
         final ServerWorld world = this.mc.getServer().getWorld(dimension);
 
-        synchronized (this.structures)
-        {
-            this.structures.clear();
-        }
-
         if (world != null)
         {
             MinecraftServer server = this.mc.getServer();
@@ -404,112 +433,71 @@ public class DataStorage
                 }
             }));
         }
+        else
+        {
+            synchronized (this.structures)
+            {
+                this.structures.clear();
+            }
+        }
 
         this.lastStructureUpdatePos = playerPos;
         this.structuresNeedUpdating = false;
     }
 
-    /*
-    public void updateStructureDataFromServer(PacketBuffer data)
+    public void addOrUpdateStructuresFromServer(ListTag structures, int timeout)
     {
-        try
+        if (structures.getListType() == Constants.NBT.TAG_COMPOUND)
         {
-            data.readerIndex(0);
+            this.structureDataTimeout = timeout;
 
-            if (data.readerIndex() < data.writerIndex() - 4)
+            long currentTime = this.mc.world.getTime();
+            final int count = structures.size();
+
+            this.removeExpiredStructures(currentTime, timeout);
+
+            for (int i = 0; i < count; ++i)
             {
-                int type = data.readInt();
+                CompoundTag tag = structures.getCompoundTag(i);
+                StructureData data = StructureData.fromStructureStartTag(tag, currentTime);
 
-                if (type == CARPET_ID_BOUNDINGBOX_MARKERS)
+                if (data != null)
                 {
-                    this.readStructureDataCarpetAll(data.readCompoundTag());
-                }
-                else if (type == CARPET_ID_LARGE_BOUNDINGBOX_MARKERS_START)
-                {
-                    NBTTagCompound nbt = data.readCompoundTag();
-                    int boxCount = data.readVarInt();
-                    this.readStructureDataCarpetSplitHeader(nbt, boxCount);
-                }
-                else if (type == CARPET_ID_LARGE_BOUNDINGBOX_MARKERS)
-                {
-                    int boxCount = data.readByte();
-                    this.readStructureDataCarpetSplitBoxes(data, boxCount);
+                    // Remove the old entry and replace it with the new entry with the current refresh time
+                    if (this.structures.containsEntry(data.getStructureType(), data))
+                    {
+                        this.structures.remove(data.getStructureType(), data);
+                    }
+
+                    this.structures.put(data.getStructureType(), data);
                 }
             }
 
-            data.readerIndex(0);
-        }
-        catch (Exception e)
-        {
-            MiniHUD.logger.warn("Failed to read structure data from Carpet mod packet", e);
-        }
-    }
-
-    private void readStructureDataCarpetAll(NBTTagCompound nbt)
-    {
-        NBTTagList tagList = nbt.getList("Boxes", Constants.NBT.TAG_LIST);
-        this.setWorldSeed(nbt.getLong("Seed"));
-
-        synchronized (this.structures)
-        {
-            this.structures.clear();
-            StructureData.readStructureDataCarpetAllBoxes(this.structures, tagList);
+            this.structureRendererNeedsUpdate = true;
             this.hasStructureDataFromServer = true;
-            this.structuresDirty = true;
-            this.structuresNeedUpdating = false;
-
-            EntityPlayer player = Minecraft.getInstance().player;
-
-            if (player != null)
-            {
-                this.lastStructureUpdatePos = new BlockPos(player);
-            }
-
-            MiniHUD.logger.info("Structure data updated from Carpet server (all), structures: {}", this.structures.size());
         }
     }
 
-    private void readStructureDataCarpetSplitHeader(NBTTagCompound nbt, int boxCount)
+    private void removeExpiredStructures(long currentTime, int timeout)
     {
-        this.setWorldSeed(nbt.getLong("Seed"));
+        long maxAge = timeout + 200;
+        Iterator<StructureData> iter = this.structures.values().iterator();
 
-        synchronized (this.structures)
+        while (iter.hasNext())
         {
-            this.structures.clear();
-            StructureData.readStructureDataCarpetIndividualBoxesHeader(boxCount);
-        }
+            StructureData data = iter.next();
 
-        MiniHUD.logger.info("Structure data header received from Carpet server, expecting {} boxes", boxCount);
-    }
-
-    private void readStructureDataCarpetSplitBoxes(PacketBuffer data, int boxCount) throws IOException
-    {
-        synchronized (this.structures)
-        {
-            for (int i = 0; i < boxCount; ++i)
+            if (currentTime > (data.getRefreshTime() + maxAge))
             {
-                NBTTagCompound nbt = data.readCompoundTag();
-                StructureData.readStructureDataCarpetIndividualBoxes(this.structures, nbt);
+                iter.remove();
             }
-
-            this.hasStructureDataFromServer = true;
-            this.structuresDirty = true;
-            this.structuresNeedUpdating = false;
-
-            EntityPlayer player = Minecraft.getInstance().player;
-
-            if (player != null)
-            {
-                this.lastStructureUpdatePos = new BlockPos(player);
-            }
-
-            MiniHUD.logger.info("Structure data received from Carpet server (split boxes), received {} boxes", boxCount);
         }
     }
-    */
 
     private void addStructureDataFromGenerator(ServerWorld world, DimensionType dimensionType, BlockPos playerPos, int maxRange)
     {
+        this.structures.clear();
+
         for (StructureType type : StructureType.values())
         {
             if (type.isEnabled() && type.existsInDimension(dimensionType))
@@ -518,7 +506,7 @@ public class DataStorage
             }
         }
 
-        this.structuresDirty = true;
+        this.structureRendererNeedsUpdate = true;
 
         //MiniHUD.logger.info("Structure data updated from the integrated server");
     }
@@ -550,7 +538,7 @@ public class DataStorage
         {
             if (MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxRange))
             {
-                this.structures.put(type, StructureData.fromStructure(start));
+                this.structures.put(type, StructureData.fromStructureStart(type, start));
             }
         }
     }

@@ -10,7 +10,7 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 import fi.dy.masa.minihud.util.StructureData;
-import fi.dy.masa.minihud.util.StructureType;
+import fi.dy.masa.minihud.util.StructureTypes.StructureType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
@@ -30,19 +30,15 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
         if (mc.world.dimension instanceof OverworldDimension)
         {
-            return StructureType.BURIED_TREASURE.isEnabled() ||
-                   StructureType.DESERT_PYRAMID.isEnabled() ||
-                   StructureType.IGLOO.isEnabled() ||
-                   StructureType.JUNGLE_TEMPLE.isEnabled() ||
-                   StructureType.MANSION.isEnabled() ||
-                   StructureType.MINESHAFT.isEnabled() ||
-                   StructureType.OCEAN_MONUMENT.isEnabled() ||
-                   StructureType.OCEAN_RUIN.isEnabled() ||
-                   StructureType.PILLAGER_OUTPOST.isEnabled() ||
-                   StructureType.SHIPWRECK.isEnabled() ||
-                   StructureType.STRONGHOLD.isEnabled() ||
-                   StructureType.VILLAGE.isEnabled() ||
-                   StructureType.WITCH_HUT.isEnabled();
+            for (StructureType type : StructureType.values())
+            {
+                if (type.isEnabled() && type.existsInDimension(DimensionType.OVERWORLD))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         else if (mc.world.dimension.isNether())
         {
@@ -59,7 +55,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
     {
         int hysteresis = 16;
 
-        return DataStorage.getInstance().hasStructureDataChanged() ||
+        return DataStorage.getInstance().structureRendererNeedsUpdate() ||
                Math.abs(entity.x - this.lastUpdatePos.getX()) > hysteresis ||
                Math.abs(entity.y - this.lastUpdatePos.getY()) > hysteresis ||
                Math.abs(entity.z - this.lastUpdatePos.getZ()) > hysteresis;

@@ -6,7 +6,6 @@ import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.minihud.util.DataStorage;
 
 public enum StructureToggle
@@ -38,7 +37,8 @@ public enum StructureToggle
         this.colorMain       = new ConfigColor(name +  " Main", colorMain, prettyName + " full box");
         this.colorComponents = new ConfigColor(name + " Components", colorComponents, prettyName + " components");
         this.hotkey          = new ConfigHotkey(name, defaultHotkey, comment);
-        this.toggleOption.setValueChangeCallback(new StructureRefresh());
+
+        this.toggleOption.setValueChangeCallback((config) -> { DataStorage.getInstance().setStructuresNeedUpdating(); } );
     }
 
     public IConfigBoolean getToggleOption()
@@ -96,19 +96,5 @@ public enum StructureToggle
         }
 
         return builder.build();
-    }
-
-    public static class StructureRefresh implements IValueChangeCallback<ConfigBoolean>
-    {
-        @Override
-        public void onValueChanged(ConfigBoolean config)
-        {
-            if (config.getBooleanValue())
-            {
-                DataStorage.getInstance().requestStructureDataFromServer();
-            }
-
-            DataStorage.getInstance().setStructuresDirty();
-        }
     }
 }
