@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.renderer;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
+import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -69,12 +70,16 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        final int colorEntity = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
-                Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getIntegerValue() :
-                Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getIntegerValue();
+        Color4f colorEntity = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
+                Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getColor() :
+                Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getColor();
+        final int colorIntEntity = colorEntity.intValue;
         final int colorLazy = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
                 Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getIntegerValue() :
                 Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
+
+        fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(spawn, colorEntity, 0.001, BUFFER_2);
+        fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxSidesBatchedQuads(spawn, colorEntity, 0.001, BUFFER_1);
 
         int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
         Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 128);
@@ -83,7 +88,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
 
         corners = this.getSpawnChunkCorners(spawn, 128 - 32);
         RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
-                rangeH, 256, 16, 16, entity, colorEntity);
+                rangeH, 256, 16, 16, entity, colorIntEntity);
 
         BUFFER_1.finishDrawing();
         BUFFER_2.finishDrawing();
