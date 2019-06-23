@@ -151,28 +151,27 @@ public class Configs implements IConfigHandler
 
     public static class Colors
     {
-        public static final ConfigColor BLOCK_GRID_OVERLAY_COLOR            = new ConfigColor("blockGridOverlayColor", "0x80FFFFFF", "Color for the block grid overlay");
-        public static final ConfigColor DESPAWN_SPHERE_OVERLAY_COLOR        = new ConfigColor("despawnSphereOverlayColor", "0x80A04050", "Color for the despawn sphere overlay");
+        public static final ConfigColor BLOCK_GRID_OVERLAY_COLOR            = new ConfigColor("blockGrid", "0x80FFFFFF", "Color for the block grid overlay");
+        public static final ConfigColor DESPAWN_SPHERE_OVERLAY_COLOR        = new ConfigColor("despawnSphereDefault", "0x60A04050", "Color for the despawn sphere overlay");
         public static final ConfigColor LIGHT_LEVEL_MARKER_DARK             = new ConfigColor("lightLevelMarkerDark", "0xFFFF4848", "The color for the spawnable spots marker");
         public static final ConfigColor LIGHT_LEVEL_MARKER_LIT              = new ConfigColor("lightLevelMarkerLit", "0xFFFFFF33", "The color for the safe (during day) spots marker");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_DARK       = new ConfigColor("lightLevelNumberBlockDark", "0xFFC03030", "The color for the spawnable spots number of the block light value");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_LIT        = new ConfigColor("lightLevelNumberBlockLit", "0xFF209040", "The color for the safe spots number of the block light value");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_DARK         = new ConfigColor("lightLevelNumberSkyDark", "0xFFFFF030", "The color for the spawnable spots number of the sky light value");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_LIT          = new ConfigColor("lightLevelNumberSkyLit", "0xFF40E0FF", "The color for the safe spots number of the sky light value");
-        public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR    = new ConfigColor("randomTicksFixedOverlayColor", "0xFFF9F225", "Color for the fixed-point random ticked chunks overlay");
-        public static final ConfigColor RANDOM_TICKS_PLAYER_OVERLAY_COLOR   = new ConfigColor("randomTicksPlayerOverlayColor", "0xFF30FE73", "Color for the player-following random ticked chunks overlay");
-        public static final ConfigColor REGION_OVERLAY_COLOR                = new ConfigColor("regionOverlayColor", "0xFFFF8019", "Color for the region file overlay");
-        public static final ConfigColor SLIME_CHUNKS_OVERLAY_COLOR          = new ConfigColor("slimeChunksOverlayColor", "0xFF20F020", "Color for the slime chunks overlay");
-        public static final ConfigColor SPAWN_PLAYER_ENTITY_OVERLAY_COLOR   = new ConfigColor("spawnPlayerEntityOverlayColor", "0xFF2050D0", "Color for the entity-processing spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
-        public static final ConfigColor SPAWN_PLAYER_LAZY_OVERLAY_COLOR     = new ConfigColor("spawnPlayerLazyOverlayColor", "0xFFD030D0", "Color for the \"lazy-loaded\" spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
-        public static final ConfigColor SPAWN_REAL_ENTITY_OVERLAY_COLOR     = new ConfigColor("spawnRealEntityOverlayColor", "0xFF30FF20", "Color for the entity-processing real spawn chunks overlay");
-        public static final ConfigColor SPAWN_REAL_LAZY_OVERLAY_COLOR       = new ConfigColor("spawnRealLazyOverlayColor", "0xFFFF3020", "Color for the \"lazy-loaded\" real spawn chunks overlay");
-        public static final ConfigColor SPAWNABLE_CHUNKS_FIXED_OVERLAY_COLOR    = new ConfigColor("spawnableChunkFixedOverlayColor", "0xFFFF2090", "Color for the location-fixed spawnable chunks overlay");
-        public static final ConfigColor SPAWNABLE_CHUNKS_PLAYER_OVERLAY_COLOR   = new ConfigColor("spawnableChunksPlayerOverlayColor", "0xFFFF3030", "Color for the player-following spawnable chunks overlay");
-        public static final ConfigColor SPAWNABLE_COLUMNS_OVERLAY_COLOR     = new ConfigColor("spawnableColumnHeightsOverlayColor", "0xA0FF00FF", "Color for the spawnable sub-chunks overlay");
-        public static final ConfigColor SPAWNABLE_SUB_CHUNKS_OVERLAY_COLOR  = new ConfigColor("spawnableSubChunksOverlayColor", "0xFF2050D0", "Color for the spawnable sub-chunks overlay");
+        public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR    = new ConfigColor("randomTicksFixed", "0x40F9F225", "Color for the fixed-point random ticked chunks overlay");
+        public static final ConfigColor RANDOM_TICKS_PLAYER_OVERLAY_COLOR   = new ConfigColor("randomTicksPlayer", "0x4030FE73", "Color for the player-following random ticked chunks overlay");
+        public static final ConfigColor REGION_OVERLAY_COLOR                = new ConfigColor("regionFileBorders", "0x40FF8019", "Color for the region file overlay");
+        public static final ConfigColor SLIME_CHUNKS_OVERLAY_COLOR          = new ConfigColor("slimeChunks", "0xB020F020", "Color for the slime chunks overlay");
+        public static final ConfigColor SPAWN_PLAYER_ENTITY_OVERLAY_COLOR   = new ConfigColor("spawnPreviewAtPlayerEntity", "0x402050D0", "Color for the entity-processing spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
+        public static final ConfigColor SPAWN_PLAYER_LAZY_OVERLAY_COLOR     = new ConfigColor("spawnPreviewAtPlayerLazy", "0x40D030D0", "Color for the \"lazy-loaded\" spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
+        public static final ConfigColor SPAWN_REAL_ENTITY_OVERLAY_COLOR     = new ConfigColor("spawnChunksRealEntity", "0x4030FF20", "Color for the entity-processing real spawn chunks overlay");
+        public static final ConfigColor SPAWN_REAL_LAZY_OVERLAY_COLOR       = new ConfigColor("spawnChunksRealLazy", "0x40FF3020", "Color for the \"lazy-loaded\" real spawn chunks overlay");
+        public static final ConfigColor SPAWNABLE_CHUNKS_FIXED              = new ConfigColor("spawnableChunkFixed", "0x40FF2090", "Color for the location-fixed spawnable chunks overlay");
+        public static final ConfigColor SPAWNABLE_CHUNKS_PLAYER             = new ConfigColor("spawnableChunksPlayer", "0x40FF3030", "Color for the player-following spawnable chunks overlay");
+        public static final ConfigColor SPAWNABLE_COLUMNS_OVERLAY_COLOR     = new ConfigColor("spawnableColumnHeights", "0xA0FF00FF", "Color for the spawnable sub-chunks overlay");
         public static final ConfigColor TEXT_BACKGROUND_COLOR               = new ConfigColor("textBackgroundColor", "0xA0505050", "Text background color");
-        public static final ConfigColor TEXT_COLOR                          = new ConfigColor("textColor", "0xE0E0E0", "Info line text color");
+        public static final ConfigColor TEXT_COLOR                          = new ConfigColor("textColor", "0xFFE0E0E0", "Info line text color");
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
                 BLOCK_GRID_OVERLAY_COLOR,
@@ -191,10 +190,9 @@ public class Configs implements IConfigHandler
                 SPAWN_PLAYER_LAZY_OVERLAY_COLOR,
                 SPAWN_REAL_ENTITY_OVERLAY_COLOR,
                 SPAWN_REAL_LAZY_OVERLAY_COLOR,
-                SPAWNABLE_CHUNKS_FIXED_OVERLAY_COLOR,
-                SPAWNABLE_CHUNKS_PLAYER_OVERLAY_COLOR,
+                SPAWNABLE_CHUNKS_FIXED,
+                SPAWNABLE_CHUNKS_PLAYER,
                 SPAWNABLE_COLUMNS_OVERLAY_COLOR,
-                SPAWNABLE_SUB_CHUNKS_OVERLAY_COLOR,
                 TEXT_BACKGROUND_COLOR,
                 TEXT_COLOR
         );

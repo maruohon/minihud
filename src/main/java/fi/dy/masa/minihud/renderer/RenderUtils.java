@@ -98,21 +98,22 @@ public class RenderUtils
         {
             double hMin = Math.max(Math.ceil((posOnPerpAxis - rangeH) / lineIntervalH) * lineIntervalV, perpendicularMin);
             double hMax = Math.min(Math.ceil((posOnPerpAxis + rangeH) / lineIntervalH) * lineIntervalV, perpendicularMax);
-            float quadAlpha = a / 6f;
+            float quadAlpha = a;
+            float lineAlpha = 1f;
 
             switch (axis)
             {
                 case X:
                     for (double y = yMin; y <= yMax; y += lineIntervalV)
                     {
-                        bufferLines.pos(hMin, y, edge).color(r, g, b, a).endVertex();
-                        bufferLines.pos(hMax, y, edge).color(r, g, b, a).endVertex();
+                        bufferLines.pos(hMin, y, edge).color(r, g, b, lineAlpha).endVertex();
+                        bufferLines.pos(hMax, y, edge).color(r, g, b, lineAlpha).endVertex();
                     }
 
                     for (double h = hMin; h <= hMax; h += lineIntervalH)
                     {
-                        bufferLines.pos(h, yMin, edge).color(r, g, b, a).endVertex();
-                        bufferLines.pos(h, yMax, edge).color(r, g, b, a).endVertex();
+                        bufferLines.pos(h, yMin, edge).color(r, g, b, lineAlpha).endVertex();
+                        bufferLines.pos(h, yMax, edge).color(r, g, b, lineAlpha).endVertex();
                     }
 
                     bufferQuads.pos(hMin, yMin, edge).color(r, g, b, quadAlpha).endVertex();
@@ -124,14 +125,14 @@ public class RenderUtils
                 case Z:
                     for (double y = yMin; y <= yMax; y += lineIntervalV)
                     {
-                        bufferLines.pos(edge, y, hMin).color(r, g, b, a).endVertex();
-                        bufferLines.pos(edge, y, hMax).color(r, g, b, a).endVertex();
+                        bufferLines.pos(edge, y, hMin).color(r, g, b, lineAlpha).endVertex();
+                        bufferLines.pos(edge, y, hMax).color(r, g, b, lineAlpha).endVertex();
                     }
 
                     for (double h = hMin; h <= hMax; h += lineIntervalH)
                     {
-                        bufferLines.pos(edge, yMin, h).color(r, g, b, a).endVertex();
-                        bufferLines.pos(edge, yMax, h).color(r, g, b, a).endVertex();
+                        bufferLines.pos(edge, yMin, h).color(r, g, b, lineAlpha).endVertex();
+                        bufferLines.pos(edge, yMax, h).color(r, g, b, lineAlpha).endVertex();
                     }
 
                     bufferQuads.pos(edge, yMin, hMin).color(r, g, b, quadAlpha).endVertex();

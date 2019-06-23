@@ -81,8 +81,8 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
         int centerZ = this.posCenter.getZ() >> 4;
         int r = 7;
         final int color = this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED ?
-                Configs.Colors.SPAWNABLE_CHUNKS_FIXED_OVERLAY_COLOR.getIntegerValue() :
-                Configs.Colors.SPAWNABLE_CHUNKS_PLAYER_OVERLAY_COLOR.getIntegerValue();
+                Configs.Colors.SPAWNABLE_CHUNKS_FIXED.getIntegerValue() :
+                Configs.Colors.SPAWNABLE_CHUNKS_PLAYER.getIntegerValue();
 
         this.lastUpdatePos = new BlockPos(centerX, 0, centerZ);
         this.setPosition(this.lastUpdatePos);
