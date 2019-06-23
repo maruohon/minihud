@@ -4,6 +4,8 @@ import java.io.File;
 import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -15,8 +17,6 @@ import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.util.DataStorage;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
 
 public class WorldLoadListener implements IWorldLoadListener
 {
@@ -47,13 +47,6 @@ public class WorldLoadListener implements IWorldLoadListener
         }
         else
         {
-            // Logging in to a world, load the global data
-            if (worldAfter != null)
-            {
-                this.readStoredDataGlobal();
-                OverlayRenderer.resetRenderTimeout();
-            }
-
             this.hasCachedSeed = false;
         }
     }
@@ -61,14 +54,20 @@ public class WorldLoadListener implements IWorldLoadListener
     @Override
     public void onWorldLoadPost(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, MinecraftClient mc)
     {
-        ShapeManager.INSTANCE.clear();
-
         // Clear the cached data
         DataStorage.getInstance().reset();
 
+        // Logging in to a world or changing dimensions or respawning
         if (worldAfter != null)
         {
+            // Logging in to a world, load the stored data
+            if (worldBefore == null)
+            {
+                this.readStoredDataGlobal();
+            }
+
             this.readStoredDataPerDimension();
+            OverlayRenderer.resetRenderTimeout();
 
             if (this.hasCachedSeed)
             {

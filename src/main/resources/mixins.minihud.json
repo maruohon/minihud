@@ -12,7 +12,6 @@
         "MixinAbstractRedstoneGateBlock",
         "MixinClientPlayNetworkHandler",
         "MixinHeightmapDebugRenderer",
-        "MixinMinecraftClient",
         "MixinMinecraftServer",
         "MixinNeighborUpdateDebugRenderer",
         "MixinBlockOutlineDebugRenderer",

@@ -1,29 +1,14 @@
 package fi.dy.masa.minihud.util;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.gson.JsonObject;
-import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.minihud.MiniHUD;
-import fi.dy.masa.minihud.Reference;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.network.StructurePacketHandler;
-import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
-import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
-import fi.dy.masa.minihud.util.StructureTypes.StructureType;
 import net.minecraft.ChatFormat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
@@ -41,6 +26,17 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.dimension.DimensionType;
+import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.minihud.MiniHUD;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.network.StructurePacketHandler;
+import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
+import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
+import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
+import fi.dy.masa.minihud.util.StructureTypes.StructureType;
 
 public class DataStorage
 {
@@ -85,13 +81,15 @@ public class DataStorage
         this.structuresNeedUpdating = true;
         this.hasStructureDataFromServer = false;
         this.structureRendererNeedsUpdate = false;
-        StructurePacketHandler.INSTANCE.reset();
 
         this.lastStructureUpdatePos = null;
         this.structures.clear();
         this.structureDataTimeout = 800;
         this.worldSeed = 0;
         this.worldSpawn = BlockPos.ORIGIN;
+
+        StructurePacketHandler.INSTANCE.reset();
+        ShapeManager.INSTANCE.clear();
     }
 
     public void onWorldJoin()
@@ -572,20 +570,6 @@ public class DataStorage
         }
 
         this.serverTPSValid = false;
-    }
-
-    @Nullable
-    private File getLocalStructureFileDirectory()
-    {
-        String dirName = StringUtils.getWorldOrServerName();
-
-        if (dirName != null)
-        {
-            File dir = new File(new File(FileUtils.getConfigDirectory(), Reference.MOD_ID), "structures");
-            return new File(dir, dirName);
-        }
-
-        return null;
     }
 
     public JsonObject toJson()
