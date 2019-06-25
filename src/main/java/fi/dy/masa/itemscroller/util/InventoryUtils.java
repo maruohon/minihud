@@ -10,13 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
-import fi.dy.masa.itemscroller.ItemScroller;
-import fi.dy.masa.itemscroller.config.Configs;
-import fi.dy.masa.itemscroller.config.Hotkeys;
-import fi.dy.masa.itemscroller.recipes.CraftingHandler;
-import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
-import fi.dy.masa.itemscroller.recipes.RecipePattern;
-import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
@@ -41,7 +34,15 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TraderOfferList;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import fi.dy.masa.itemscroller.ItemScroller;
+import fi.dy.masa.itemscroller.config.Configs;
+import fi.dy.masa.itemscroller.config.Hotkeys;
+import fi.dy.masa.itemscroller.recipes.CraftingHandler;
+import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
+import fi.dy.masa.itemscroller.recipes.RecipePattern;
+import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 
 public class InventoryUtils
 {
@@ -70,7 +71,7 @@ public class InventoryUtils
                 CraftingRecipe recipe = optional.get();
 
                 if ((recipe.isIgnoredInRecipeBook() ||
-                     world.getGameRules().getBoolean("doLimitedCrafting") == false ||
+                     world.getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
                      ((ClientPlayerEntity) player).getRecipeBook().contains(recipe))
                )
                {
@@ -90,7 +91,7 @@ public class InventoryUtils
             Identifier rl = Registry.ITEM.getId(stack.getItem());
 
             return String.format("[%s - display: %s - NBT: %s] (%s)",
-                    rl != null ? rl.toString() : "null", stack.getDisplayName().getString(),
+                    rl != null ? rl.toString() : "null", stack.getName().getString(),
                     stack.getTag() != null ? stack.getTag().toString() : "<no NBT>",
                     stack.toString());
         }
@@ -606,7 +607,7 @@ public class InventoryUtils
 
         // Picked up or swapped items to the cursor, grab a reference to the slot that the items came from
         // Note that we are only checking the item here!
-        if (isStackEmpty(stackCursor) == false && stackCursor.isEqualIgnoreTags(stackInCursorLast) == false && sourceSlotCandidate != null)
+        if (isStackEmpty(stackCursor) == false && stackCursor.isItemEqual(stackInCursorLast) == false && sourceSlotCandidate != null)
         {
             sourceSlot = new WeakReference<>(sourceSlotCandidate.get());
         }
@@ -662,7 +663,7 @@ public class InventoryUtils
         }
 
         // Can take all the items to the cursor at once, use a shift-click method to move one item from the slot
-        if (getStackSize(stackOrig) <= stackOrig.getMaxAmount())
+        if (getStackSize(stackOrig) <= stackOrig.getMaxCount())
         {
             return clickSlotsToMoveSingleItemByShiftClick(gui, slot.id);
         }
@@ -707,7 +708,7 @@ public class InventoryUtils
         PlayerEntity player = mc.player;
         ItemStack stackOrig = slot.getStack().copy();
 
-        if (getStackSize(stackOrig) == 1 || getStackSize(stackOrig) > stackOrig.getMaxAmount() ||
+        if (getStackSize(stackOrig) == 1 || getStackSize(stackOrig) > stackOrig.getMaxCount() ||
             slot.canTakeItems(player) == false || slot.canInsert(stackOrig) == false)
         {
             return true;
@@ -1343,7 +1344,7 @@ public class InventoryUtils
 
             // Failed to craft items, or the stack became full, or ran out of ingredients
             if (isStackEmpty(stackCursor) || getStackSize(stackCursor) <= sizeLast ||
-                getStackSize(stackCursor) >= stackCursor.getMaxAmount() ||
+                getStackSize(stackCursor) >= stackCursor.getMaxCount() ||
                 areStacksEqual(slot.getStack(), stackCursor) == false)
             {
                 break;
@@ -1670,7 +1671,7 @@ public class InventoryUtils
                 areSlotsInSameInventory(slot, slotReference, treatHotbarAsDifferent) == sameInventory &&
                 areStacksEqual(slot.getStack(), stackReference))
             {
-                if ((getStackSize(slot.getStack()) < stackReference.getMaxAmount()) == preferPartial)
+                if ((getStackSize(slot.getStack()) < stackReference.getMaxCount()) == preferPartial)
                 {
                     slots.add(0, slot.id);
                 }
@@ -1695,7 +1696,7 @@ public class InventoryUtils
 
             if (slot != null && slot.hasStack() && areStacksEqual(slot.getStack(), stackReference))
             {
-                if ((getStackSize(slot.getStack()) < stackReference.getMaxAmount()) == preferPartial)
+                if ((getStackSize(slot.getStack()) < stackReference.getMaxCount()) == preferPartial)
                 {
                     slots.add(0, slot.id);
                 }
@@ -1751,7 +1752,7 @@ public class InventoryUtils
 
     public static boolean areStacksEqual(ItemStack stack1, ItemStack stack2)
     {
-        return stack1.isEmpty() == false && stack1.isEqualIgnoreTags(stack2) && ItemStack.areTagsEqual(stack1, stack2);
+        return stack1.isEmpty() == false && stack1.isItemEqual(stack2) && ItemStack.areTagsEqual(stack1, stack2);
     }
 
     private static boolean areSlotsInSameInventory(Slot slot1, Slot slot2)
@@ -2212,7 +2213,7 @@ public class InventoryUtils
     {
         ItemStack stackCursor = mc.player.inventory.getCursorStack();
 
-        if (stackCursor.isEmpty() == false)
+        if (isStackEmpty(stackCursor) == false)
         {
             List<Integer> emptySlots = getSlotNumbersOfEmptySlotsInPlayerInventory(gui.getContainer(), false);
 
@@ -2232,7 +2233,7 @@ public class InventoryUtils
                         ItemStack stackSlot = slot.getStack();
 
                         if (slot == null || areStacksEqual(stackSlot, stackCursor) == false ||
-                            stackSlot.getAmount() >= stackCursor.getMaxAmount())
+                            getStackSize(stackSlot) >= stackCursor.getMaxCount())
                         {
                             break;
                         }
@@ -2244,7 +2245,7 @@ public class InventoryUtils
             }
         }
 
-        if (mc.player.inventory.getCursorStack().isEmpty() == false)
+        if (isStackEmpty(mc.player.inventory.getCursorStack()) == false)
         {
             dropItemsFromCursor(gui);
         }
@@ -2450,11 +2451,11 @@ public class InventoryUtils
 
     public static int getStackSize(ItemStack stack)
     {
-        return stack.getAmount();
+        return stack.getCount();
     }
 
     public static void setStackSize(ItemStack stack, int size)
     {
-        stack.setAmount(size);
+        stack.setCount(size);
     }
 }
