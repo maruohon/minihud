@@ -9,17 +9,17 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.gson.JsonObject;
-import net.minecraft.ChatFormat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerTask;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureStart;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -244,11 +244,11 @@ public class DataStorage
         return false;
     }
 
-    public void onChatMessage(Component message)
+    public void onChatMessage(Text message)
     {
-        if (message instanceof TranslatableComponent)
+        if (message instanceof TranslatableText)
         {
-            TranslatableComponent text = (TranslatableComponent) message;
+            TranslatableText text = (TranslatableText) message;
 
             // The vanilla "/seed" command
             if ("commands.seed.success".equals(text.getKey()))
@@ -268,7 +268,7 @@ public class DataStorage
                 }
                 catch (Exception e)
                 {
-                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getParams()[0], e);
+                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getArgs()[0], e);
                 }
             }
             // The "/jed seed" command
@@ -276,20 +276,20 @@ public class DataStorage
             {
                 try
                 {
-                    this.setWorldSeed(Long.parseLong(text.getParams()[1].toString()));
+                    this.setWorldSeed(Long.parseLong(text.getArgs()[1].toString()));
                     MiniHUD.logger.info("Received world seed from the JED '/jed seed' command: {}", this.worldSeed);
                     InfoUtils.printActionbarMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
                 }
                 catch (Exception e)
                 {
-                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getParams()[1], e);
+                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getArgs()[1], e);
                 }
             }
-            else if ("commands.setworldspawn.success".equals(text.getKey()) && text.getParams().length == 3)
+            else if ("commands.setworldspawn.success".equals(text.getKey()) && text.getArgs().length == 3)
             {
                 try
                 {
-                    Object[] o = text.getParams();
+                    Object[] o = text.getArgs();
                     int x = Integer.parseInt(o[0].toString());
                     int y = Integer.parseInt(o[1].toString());
                     int z = Integer.parseInt(o[2].toString());
@@ -302,7 +302,7 @@ public class DataStorage
                 }
                 catch (Exception e)
                 {
-                    MiniHUD.logger.warn("Failed to read the world spawn point from '{}'", text.getParams(), e);
+                    MiniHUD.logger.warn("Failed to read the world spawn point from '{}'", text.getArgs(), e);
                 }
             }
         }
@@ -541,11 +541,11 @@ public class DataStorage
         }
     }
 
-    public void handleCarpetServerTPSData(Component textComponent)
+    public void handleCarpetServerTPSData(Text textComponent)
     {
-        if (textComponent.getFormattedText().isEmpty() == false)
+        if (textComponent.asFormattedString().isEmpty() == false)
         {
-            String text = ChatFormat.stripFormatting(textComponent.getString());
+            String text = Formatting.strip(textComponent.getString());
             String[] lines = text.split("\n");
 
             for (String line : lines)

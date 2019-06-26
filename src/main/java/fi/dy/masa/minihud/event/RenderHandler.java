@@ -637,7 +637,7 @@ public class RenderHandler implements IRenderer
 
                 if (chunk.isEmpty() == false)
                 {
-                    this.addLine("Biome: " + chunk.getBiome(pos).getTextComponent().getString());
+                    this.addLine("Biome: " + chunk.getBiome(pos).getName().getString());
                 }
             }
         }

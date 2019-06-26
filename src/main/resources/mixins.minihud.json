@@ -5,12 +5,12 @@
     "minVersion": "0.7",
     "client": [
         "IMixinChunkDeltaUpdateS2CPacket",
-        "IMixinDebugRenderer",
         "IMixinEntityNavigation",
         "IMixinServerWorld",
         "IMixinWorldRenderer",
         "MixinAbstractRedstoneGateBlock",
         "MixinClientPlayNetworkHandler",
+        "MixinGameRenderer",
         "MixinHeightmapDebugRenderer",
         "MixinMinecraftServer",
         "MixinNeighborUpdateDebugRenderer",

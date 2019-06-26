@@ -6,13 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import com.google.common.collect.MapMaker;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.mixin.IMixinDebugRenderer;
-import fi.dy.masa.minihud.mixin.IMixinEntityNavigation;
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket;
+import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.client.render.debug.NeighborUpdateDebugRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
@@ -26,6 +22,10 @@ import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.mixin.IMixinEntityNavigation;
+import io.netty.buffer.Unpooled;
 
 public class DebugInfoUtils
 {
@@ -213,35 +213,43 @@ public class DebugInfoUtils
 
     public static void toggleDebugRenderer(RendererToggle config)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        boolean enabled = config.getBooleanValue();
-
-        if (config == RendererToggle.DEBUG_COLLISION_BOXES)
+        if (config == RendererToggle.DEBUG_NEIGHBOR_UPDATES)
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setCollisionBoxEnabled(enabled);
-        }
-        else if (config == RendererToggle.DEBUG_HEIGHT_MAP)
-        {
-            // This crashes in 1.13+, because it uses a world gen heightmap which doesn't exist normally
-            //((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(enabled);
-        }
-        else if (config == RendererToggle.DEBUG_NEIGHBOR_UPDATES)
-        {
-            ((IMixinDebugRenderer) mc.debugRenderer).setNeighborsUpdateEnabled(enabled);
-            neighborUpdateEnabled = enabled;
+            neighborUpdateEnabled = config.getBooleanValue();
         }
         else if (config == RendererToggle.DEBUG_PATH_FINDING)
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setPathfindingEnabled(enabled);
-            pathfindingEnabled = enabled;
+            pathfindingEnabled = config.getBooleanValue();
         }
-        else if (config == RendererToggle.DEBUG_SOLID_FACES)
+    }
+
+    public static void renderVanillaDebug(long finishTime)
+    {
+        DebugRenderer renderer = MinecraftClient.getInstance().debugRenderer;
+
+        if (RendererToggle.DEBUG_COLLISION_BOXES.getBooleanValue())
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setSolidFaceEnabled(enabled);
+            renderer.voxelDebugRenderer.render(finishTime);
         }
-        else if (config == RendererToggle.DEBUG_WATER)
+
+        if (RendererToggle.DEBUG_NEIGHBOR_UPDATES.getBooleanValue())
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setWaterEnabled(enabled);
+            renderer.neighborUpdateDebugRenderer.render(finishTime);
+        }
+
+        if (RendererToggle.DEBUG_PATH_FINDING.getBooleanValue())
+        {
+            renderer.pathfindingDebugRenderer.render(finishTime);
+        }
+
+        if (RendererToggle.DEBUG_SOLID_FACES.getBooleanValue())
+        {
+            renderer.blockOutlineDebugRenderer.render(finishTime);
+        }
+
+        if (RendererToggle.DEBUG_WATER.getBooleanValue())
+        {
+            renderer.waterDebugRenderer.render(finishTime);
         }
     }
 }
