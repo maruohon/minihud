@@ -12,7 +12,6 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.gui.GuiConfigs;
-import fi.dy.masa.minihud.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.gui.GuiShapeManager;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
@@ -66,7 +65,7 @@ public class KeyCallbacks
                 }
                 else
                 {
-                    GuiConfigs.tab = ConfigGuiTab.SHAPES;
+                    GuiConfigs.tab = GuiConfigs.SHAPES;
                     GuiBase.openGui(new GuiShapeManager());
                 }
             }

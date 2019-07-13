@@ -3,15 +3,16 @@ package fi.dy.masa.minihud.config;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.config.ConfigType;
-import fi.dy.masa.malilib.config.IConfigInteger;
-import fi.dy.masa.malilib.config.IHotkeyTogglable;
+import fi.dy.masa.malilib.config.options.IConfigBoolean;
+import fi.dy.masa.malilib.config.options.IConfigInteger;
+import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBoolean;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.minihud.LiteModMiniHud;
 
-public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
+public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey
 {
     BIOME                   ("infoBiome",                   false, 19, "", "Show the name of the current biome"),
     BIOME_REG_NAME          ("infoBiomeRegistryName",       false, 20, "", "Show the registry name of the current biome"),
@@ -62,7 +63,9 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     private final boolean defaultValueBoolean;
     private final int defaultLinePosition;
     private boolean valueBoolean;
+    private boolean lastSavedValueBoolean;
     private int linePosition;
+    private int lastSavedLinePosition;
 
     private InfoToggle(String name, boolean defaultValue, int linePosition, String defaultHotkey, String comment)
     {
@@ -74,10 +77,12 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
         this.name = name;
         this.prettyName = name;
         this.valueBoolean = defaultValue;
+        this.lastSavedValueBoolean = defaultValue;
         this.defaultValueBoolean = defaultValue;
         this.keybind = KeybindMulti.fromStorageString(defaultHotkey, settings);
         this.keybind.setCallback(new KeyCallbackToggleBoolean(this));
         this.linePosition = linePosition;
+        this.lastSavedLinePosition = linePosition;
         this.defaultLinePosition = linePosition;
         this.comment = comment;
     }
@@ -185,6 +190,14 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     }
 
     @Override
+    public boolean isDirty()
+    {
+        return this.lastSavedValueBoolean != this.valueBoolean ||
+               this.lastSavedLinePosition != this.linePosition ||
+               this.keybind.isDirty();
+    }
+
+    @Override
     public void resetToDefault()
     {
         this.valueBoolean = this.defaultValueBoolean;
@@ -204,28 +217,32 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     }
 
     @Override
-    public void setValueFromJsonElement(JsonElement element)
+    public void setValueFromJsonElement(JsonElement element, String configName)
     {
         try
         {
             if (element.isJsonPrimitive())
             {
                 this.valueBoolean = element.getAsBoolean();
+                this.lastSavedValueBoolean = this.valueBoolean;
+                this.lastSavedLinePosition = this.linePosition;
             }
             else
             {
-                LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", this.getName());
+                LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", configName);
             }
         }
         catch (Exception e)
         {
-            LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", this.getName(), e);
+            LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", configName, e);
         }
     }
 
     @Override
     public JsonElement getAsJsonElement()
     {
+        this.lastSavedValueBoolean = this.valueBoolean;
+        this.lastSavedLinePosition = this.linePosition;
         return new JsonPrimitive(this.valueBoolean);
     }
 }

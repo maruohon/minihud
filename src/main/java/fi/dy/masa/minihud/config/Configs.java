@@ -1,16 +1,12 @@
 package fi.dy.masa.minihud.config;
 
-import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.ConfigUtils;
-import fi.dy.masa.malilib.config.HudAlignment;
-import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.IConfigHandler;
-import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.config.options.ConfigDouble;
@@ -18,9 +14,10 @@ import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.options.ConfigString;
+import fi.dy.masa.malilib.config.options.IConfigBase;
+import fi.dy.masa.malilib.config.options.IConfigValue;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.HudAlignment;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.event.RenderHandler;
 import fi.dy.masa.minihud.util.BlockGridMode;
@@ -29,9 +26,6 @@ import fi.dy.masa.minihud.util.LightLevelNumberMode;
 
 public class Configs implements IConfigHandler
 {
-    private static final String CONFIG_FILE_NAME = Reference.MOD_ID + ".json";
-    private static final int CONFIG_VERSION = 1;
-
     public static class Generic
     {
         public static final ConfigOptionList    BLOCK_GRID_OVERLAY_MODE             = new ConfigOptionList("blockGridOverlayMode", BlockGridMode.ALL, "The block grid render mode");
@@ -198,82 +192,37 @@ public class Configs implements IConfigHandler
         );
     }
 
-    public static void loadFromFile()
+    @Override
+    public String getConfigFileName()
     {
-        File configFile = new File(FileUtils.getConfigDirectory(), CONFIG_FILE_NAME);
+        return Reference.MOD_ID + ".json";
+    }
 
-        if (configFile.exists() && configFile.isFile() && configFile.canRead())
-        {
-            JsonElement element = JsonUtils.parseJsonFile(configFile);
+    @Override
+    public Map<String, List<? extends IConfigBase>> getConfigsPerCategories()
+    {
+        Map<String, List<? extends IConfigBase>> map = new LinkedHashMap<>();
 
-            if (element != null && element.isJsonObject())
-            {
-                JsonObject root = element.getAsJsonObject();
-                JsonObject objInfoLineOrders = JsonUtils.getNestedObject(root, "InfoLineOrders", false);
+        map.put("Generic", Generic.OPTIONS);
+        map.put("Colors", Colors.OPTIONS);
 
-                ConfigUtils.readConfigBase(root, "Colors", Configs.Colors.OPTIONS);
-                ConfigUtils.readConfigBase(root, "Generic", Configs.Generic.OPTIONS);
-                ConfigUtils.readHotkeyToggleOptions(root, "InfoHotkeys", "InfoTypeToggles", ImmutableList.copyOf(InfoToggle.values()));
-                ConfigUtils.readHotkeyToggleOptions(root, "RendererHotkeys", "RendererToggles", ImmutableList.copyOf(RendererToggle.values()));
-                ConfigUtils.readConfigBase(root, "StructureColors", StructureToggle.getColorConfigs());
-                ConfigUtils.readConfigBase(root, "StructureHotkeys", StructureToggle.getHotkeys());
-                ConfigUtils.readConfigBase(root, "StructureToggles", StructureToggle.getToggleConfigs());
+        map.put("InfoTypeToggles", ConfigUtils.createConfigWrapperForType(ConfigType.BOOLEAN, ImmutableList.copyOf(InfoToggle.values())));
+        map.put("InfoHotkeys", ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(InfoToggle.values())));
+        map.put("InfoLineOrders",  ConfigUtils.createConfigWrapperForType(ConfigType.INTEGER, ImmutableList.copyOf(InfoToggle.values())));
 
-                int version = JsonUtils.getIntegerOrDefault(root, "config_version", 0);
+        map.put("RendererToggles", ConfigUtils.createConfigWrapperForType(ConfigType.BOOLEAN, ImmutableList.copyOf(RendererToggle.values())));
+        map.put("RendererHotkeys", ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(RendererToggle.values())));
 
-                if (objInfoLineOrders != null && version >= 1)
-                {
-                    for (InfoToggle toggle : InfoToggle.values())
-                    {
-                        if (JsonUtils.hasInteger(objInfoLineOrders, toggle.getName()))
-                        {
-                            toggle.setIntegerValue(JsonUtils.getInteger(objInfoLineOrders, toggle.getName()));
-                        }
-                    }
-                }
-            }
-        }
+        map.put("StructureToggles", StructureToggle.getToggleConfigs());
+        map.put("StructureHotkeys", StructureToggle.getHotkeys());
+        map.put("StructureColors", StructureToggle.getColorConfigs());
 
+        return map;
+    }
+
+    @Override
+    public void onPostLoad()
+    {
         RenderHandler.getInstance().setFontScale(Configs.Generic.FONT_SCALE.getDoubleValue());
-    }
-
-    public static void saveToFile()
-    {
-        File dir = FileUtils.getConfigDirectory();
-
-        if (dir.exists() && dir.isDirectory())
-        {
-            JsonObject root = new JsonObject();
-            JsonObject objInfoLineOrders = JsonUtils.getNestedObject(root, "InfoLineOrders", true);
-
-            ConfigUtils.writeConfigBase(root, "Colors", Configs.Colors.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "Generic", Configs.Generic.OPTIONS);
-            ConfigUtils.writeHotkeyToggleOptions(root, "InfoHotkeys", "InfoTypeToggles", ImmutableList.copyOf(InfoToggle.values()));
-            ConfigUtils.writeHotkeyToggleOptions(root, "RendererHotkeys", "RendererToggles", ImmutableList.copyOf(RendererToggle.values()));
-            ConfigUtils.writeConfigBase(root, "StructureColors", StructureToggle.getColorConfigs());
-            ConfigUtils.writeConfigBase(root, "StructureHotkeys", StructureToggle.getHotkeys());
-            ConfigUtils.writeConfigBase(root, "StructureToggles", StructureToggle.getToggleConfigs());
-
-            for (InfoToggle toggle : InfoToggle.values())
-            {
-                objInfoLineOrders.add(toggle.getName(), new JsonPrimitive(toggle.getIntegerValue()));
-            }
-
-            root.add("config_version", new JsonPrimitive(CONFIG_VERSION));
-
-            JsonUtils.writeJsonToFile(root, new File(dir, CONFIG_FILE_NAME));
-        }
-    }
-
-    @Override
-    public void load()
-    {
-        loadFromFile();
-    }
-
-    @Override
-    public void save()
-    {
-        saveToFile();
     }
 }

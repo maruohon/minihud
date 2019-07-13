@@ -3,10 +3,10 @@ package fi.dy.masa.minihud.config;
 import com.google.common.collect.ImmutableList;
 import com.mumfrey.liteloader.core.ClientPluginChannels;
 import com.mumfrey.liteloader.core.PluginChannels.ChannelPolicy;
-import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
+import fi.dy.masa.malilib.config.options.IConfigBoolean;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.minihud.LiteModMiniHud;
@@ -38,7 +38,7 @@ public enum StructureToggle
         this.toggleOption    = new ConfigBoolean(name, false, comment, prettyName);
         this.colorMain       = new ConfigColor(name +  " Main", colorMain, prettyName + " full box");
         this.colorComponents = new ConfigColor(name + " Components", colorComponents, prettyName + " components");
-        this.hotkey          = new ConfigHotkey(name, defaultHotkey, comment);
+        this.hotkey          = new ConfigHotkey("Toggle " + name, defaultHotkey, comment);
         this.toggleOption.setValueChangeCallback(new StructureRefresh());
     }
 
