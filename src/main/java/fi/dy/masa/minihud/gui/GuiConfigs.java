@@ -26,7 +26,7 @@ public class GuiConfigs extends GuiConfigsBase
     private static final ConfigGuiTabBase INFO_HOTKEYS      = new ConfigGuiTabBase("minihud.gui.button.config_gui.info_hotkeys",     204, true,  ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(InfoToggle.values())));
     private static final ConfigGuiTabBase STRUCTURES        = new ConfigGuiTabBase("minihud.gui.button.config_gui.structures",       160, false, getStructureConfigs());
     private static final ConfigGuiTabBase RENDERER_HOTKEYS  = new ConfigGuiTabBase("minihud.gui.button.config_gui.renderer_hotkeys", 204, true,  ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(RendererToggle.values())));
-    public  static final ConfigGuiTabBase SHAPES            = new ConfigGuiTabBase("shapes", "minihud.gui.button.config_gui.shapes", 204, false, Collections.emptyList(),
+    public  static final ConfigGuiTabBase SHAPES            = new ConfigGuiTabBase("minihud.gui.button.config_gui.shapes",           204, false, Collections.emptyList(),
             (tab, gui) -> (button, mouseButton) -> { GuiBase.openGui(new GuiShapeManager()); });
 
     public static final ImmutableList<IConfigGuiTab> TABS = ImmutableList.of(
