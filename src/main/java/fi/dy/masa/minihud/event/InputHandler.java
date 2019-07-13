@@ -1,12 +1,13 @@
 package fi.dy.masa.minihud.event;
 
+import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackAdjustable;
+import fi.dy.masa.malilib.hotkeys.KeybindCategory;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.minihud.Reference;
@@ -32,30 +33,25 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
     }
 
     @Override
-    public void addKeysToMap(IKeybindManager manager)
+    public List<? extends IHotkey> getAllHotkeys()
     {
-        for (InfoToggle toggle : InfoToggle.values())
-        {
-            manager.addKeybindToMap(toggle.getKeybind());
-        }
+        ImmutableList.Builder<IHotkey> builder = ImmutableList.builder();
 
-        for (RendererToggle toggle : RendererToggle.values())
-        {
-            manager.addKeybindToMap(toggle.getKeybind());
-        }
+        builder.add(InfoToggle.values());
+        builder.add(RendererToggle.values());
+        builder.addAll(Configs.Generic.HOTKEY_LIST);
 
-        for (IHotkey hotkey : Configs.Generic.HOTKEY_LIST)
-        {
-            manager.addKeybindToMap(hotkey.getKeybind());
-        }
+        return builder.build();
     }
 
     @Override
-    public void addHotkeys(IKeybindManager manager)
+    public List<KeybindCategory> getHotkeyCategoriesForCombinedView()
     {
-        manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST);
-        manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", ImmutableList.copyOf(InfoToggle.values()));
-        manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", ImmutableList.copyOf(RendererToggle.values()));
+        return ImmutableList.of(
+                new KeybindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST),
+                new KeybindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", ImmutableList.copyOf(InfoToggle.values())),
+                new KeybindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", ImmutableList.copyOf(RendererToggle.values()))
+        );
     }
 
     @Override
