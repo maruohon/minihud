@@ -70,6 +70,8 @@ public enum RendererToggle implements IConfigBoolean, IHotkey
         {
             this.keybind.setCallback(new KeyCallbackToggleRenderer(this));
         }
+
+        this.cacheSavedValue();
     }
 
     @Override
@@ -151,6 +153,13 @@ public enum RendererToggle implements IConfigBoolean, IHotkey
     }
 
     @Override
+    public void cacheSavedValue()
+    {
+        this.lastSavedValueBoolean = this.valueBoolean;
+        this.keybind.cacheSavedValue();
+    }
+
+    @Override
     public void resetToDefault()
     {
         this.valueBoolean = this.defaultValueBoolean;
@@ -177,7 +186,6 @@ public enum RendererToggle implements IConfigBoolean, IHotkey
             if (element.isJsonPrimitive())
             {
                 this.valueBoolean = element.getAsBoolean();
-                this.lastSavedValueBoolean = this.valueBoolean;
             }
             else
             {
@@ -188,12 +196,13 @@ public enum RendererToggle implements IConfigBoolean, IHotkey
         {
             LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", configName, e);
         }
+
+        this.cacheSavedValue();
     }
 
     @Override
     public JsonElement getAsJsonElement()
     {
-        this.lastSavedValueBoolean = this.valueBoolean;
         return new JsonPrimitive(this.valueBoolean);
     }
 }

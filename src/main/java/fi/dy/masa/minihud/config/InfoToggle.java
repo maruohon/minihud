@@ -77,14 +77,14 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey
         this.name = name;
         this.prettyName = name;
         this.valueBoolean = defaultValue;
-        this.lastSavedValueBoolean = defaultValue;
         this.defaultValueBoolean = defaultValue;
         this.keybind = KeybindMulti.fromStorageString(defaultHotkey, settings);
         this.keybind.setCallback(new KeyCallbackToggleBoolean(this));
         this.linePosition = linePosition;
-        this.lastSavedLinePosition = linePosition;
         this.defaultLinePosition = linePosition;
         this.comment = comment;
+
+        this.cacheSavedValue();
     }
 
     @Override
@@ -198,6 +198,14 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey
     }
 
     @Override
+    public void cacheSavedValue()
+    {
+        this.lastSavedValueBoolean = this.valueBoolean;
+        this.lastSavedLinePosition = this.linePosition;
+        this.keybind.cacheSavedValue();
+    }
+
+    @Override
     public void resetToDefault()
     {
         this.valueBoolean = this.defaultValueBoolean;
@@ -224,8 +232,6 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey
             if (element.isJsonPrimitive())
             {
                 this.valueBoolean = element.getAsBoolean();
-                this.lastSavedValueBoolean = this.valueBoolean;
-                this.lastSavedLinePosition = this.linePosition;
             }
             else
             {
@@ -236,13 +242,13 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey
         {
             LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", configName, e);
         }
+
+        this.cacheSavedValue();
     }
 
     @Override
     public JsonElement getAsJsonElement()
     {
-        this.lastSavedValueBoolean = this.valueBoolean;
-        this.lastSavedLinePosition = this.linePosition;
         return new JsonPrimitive(this.valueBoolean);
     }
 }
