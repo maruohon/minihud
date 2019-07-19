@@ -424,7 +424,7 @@ public class DataStorage
 
     public void updateIntegratedServerTPS()
     {
-        if (this.mc != null && this.mc.player != null && this.mc.getIntegratedServer() != null)
+        if (this.mc != null && this.mc.player != null && this.mc.isSingleplayer())
         {
             this.serverMSPT = (double) MathHelper.average(this.mc.getIntegratedServer().tickTimeArray) / 1000000D;
             this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
@@ -758,6 +758,11 @@ public class DataStorage
 
     public void handleCarpetServerTPSData(ITextComponent textComponent)
     {
+        if (this.mc.isSingleplayer())
+        {
+            return;
+        }
+
         if (textComponent.getFormattedText().isEmpty() == false)
         {
             String text = TextFormatting.getTextWithoutFormattingCodes(textComponent.getUnformattedText());
