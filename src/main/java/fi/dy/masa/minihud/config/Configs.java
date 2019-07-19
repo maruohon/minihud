@@ -1,538 +1,228 @@
 package fi.dy.masa.minihud.config;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.lwjgl.input.Keyboard;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.settings.KeyModifier;
-import net.minecraftforge.common.config.ConfigCategory;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.ConfigType;
+import fi.dy.masa.malilib.config.ConfigUtils;
+import fi.dy.masa.malilib.config.IConfigHandler;
+import fi.dy.masa.malilib.config.options.ConfigBoolean;
+import fi.dy.masa.malilib.config.options.ConfigColor;
+import fi.dy.masa.malilib.config.options.ConfigDouble;
+import fi.dy.masa.malilib.config.options.ConfigHotkey;
+import fi.dy.masa.malilib.config.options.ConfigInteger;
+import fi.dy.masa.malilib.config.options.ConfigOptionList;
+import fi.dy.masa.malilib.config.options.ConfigString;
+import fi.dy.masa.malilib.config.options.IConfigBase;
+import fi.dy.masa.malilib.config.options.IConfigValue;
+import fi.dy.masa.malilib.hotkeys.KeybindSettings;
+import fi.dy.masa.malilib.util.HudAlignment;
 import fi.dy.masa.minihud.Reference;
-import fi.dy.masa.minihud.event.InputEventHandler;
-import fi.dy.masa.minihud.event.RenderEventHandler;
-import fi.dy.masa.minihud.event.RenderEventHandler.HudAlignment;
+import fi.dy.masa.minihud.event.RenderHandler;
+import fi.dy.masa.minihud.util.BlockGridMode;
+import fi.dy.masa.minihud.util.LightLevelMarkerMode;
+import fi.dy.masa.minihud.util.LightLevelNumberMode;
 
-public class Configs
+public class Configs implements IConfigHandler
 {
-    public static boolean enableByDefault;
-    public static boolean sortLinesByLength;
-    public static boolean sortLinesReversed;
-    public static boolean coordinateFormatCustomized;
-    public static boolean requireSneak;
-    public static boolean requireHoldingKey;
-    public static boolean useFontShadow;
-    public static boolean useScaledFont;
-    public static boolean useTextBackground;
-
-    public static boolean debugRendererPathfindingEnablePointWidth;
-
-    private static double fontScale;
-    public static double activeFontScale;
-
-    public static int enabledInfoTypes;
-    public static int fontColor;
-    public static int regionOverlayColor;
-    public static int textBackgroundColor;
-    public static int textPosX;
-    public static int textPosY;
-
-    public static String coordinateFormat;
-    public static String dateFormatMinecraft;
-    public static String dateFormatReal;
-
-    public static HudAlignment hudAlignment = HudAlignment.TOP_LEFT;
-
-    public static KeyModifier requiredKey;
-    private static final Multimap<Integer, Long> HOTKEY_DEBUG_MAP = HashMultimap.create();
-    private static final Multimap<Integer, Long> HOTKEY_INFO_MAP = HashMultimap.create();
-    private static final Map<Long, Integer> LINE_ORDER_MAP = new HashMap<>();
-
-    public static File configurationFile;
-    public static Configuration config;
-    
-    public static final String CATEGORY_DEBUG_HOTKEYS = "VanillaDebugRendererHotkeys";
-    public static final String CATEGORY_DEBUG_RENDERER = "VanillaDebugRendererOptions";
-    public static final String CATEGORY_GENERIC = "Generic";
-    public static final String CATEGORY_INFO_TOGGLE = "InfoTypes";
-    public static final String CATEGORY_INFO_HOTKEYS = "InfoToggleHotkeys";
-    public static final String CATEGORY_INFO_LINE_ORDER = "InfoLineOrder";
-    public static final String CATEGORY_RENDERER_HOTKEYS = "RenderHotkeys";
-
-    @SubscribeEvent
-    public void onConfigChangedEvent(OnConfigChangedEvent event)
+    public static class Generic
     {
-        if (Reference.MOD_ID.equals(event.getModID()))
-        {
-            loadConfigs(config);
-        }
+        public static final ConfigOptionList    BLOCK_GRID_OVERLAY_MODE             = new ConfigOptionList("blockGridOverlayMode", BlockGridMode.ALL, "The block grid render mode");
+        public static final ConfigInteger       BLOCK_GRID_OVERLAY_RADIUS           = new ConfigInteger("blockGridOverlayRadius", 32, "The radius of the block grid lines to render");
+        public static final ConfigDouble        CHUNK_UNLOAD_BUCKET_FONT_SCALE      = new ConfigDouble("chunkUnloadBucketOverlayFontScale", 0.1625, "The font scale for the Chunk unload order bucket overlay.\nValid range: 0.01 - 1.0");
+        public static final ConfigInteger       DROPPED_CHUNKS_HASH_SIZE            = new ConfigInteger("droppedChunksHashSize", -1, -1, Integer.MAX_VALUE, "The HashSet size for the chunk unload bucket calculation,\nif 'chunkUnloadBucketWithSize' is true.\nUse -1 for automatically getting the current value in single player.");
+        public static final ConfigInteger       CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS  = new ConfigInteger("chunkUnloadBucketOverlayChunkRadius", -1, "The radius of chunks to render the text for in the overlay.\nValid range: -1 - 40, where -1 = render distance");
+        public static final ConfigBoolean       CHUNK_UNLOAD_BUCKET_WITH_SIZE       = new ConfigBoolean("chunkUnloadBucketWithSize", false, "If enabled, uses the more accurate (but still experimental)\nchunk unload bucket calculations, taken from the Carpet mod");
+        public static final ConfigString        COORDINATE_FORMAT_STRING            = new ConfigString("coordinateFormat", "x: %.1f y: %.1f z: %.1f", "The format string for the coordinate line.\nNeeds to have three %f format strings!\nDefault: x: %.1f y: %.1f z: %.1f");
+        public static final ConfigString        DATE_FORMAT_REAL                    = new ConfigString("dateFormatReal", "yyyy-MM-dd HH:mm:ss", "The format string for real time, see the Java SimpleDateFormat\nclass for the format patterns, if needed.");
+        public static final ConfigString        DATE_FORMAT_MINECRAFT               = new ConfigString("dateFormatMinecraft", "MC time: (day {DAY}) {HOUR}:{MIN}:xx", "The format string for the Minecraft time.\nThe supported placeholders are: {DAY}, {HOUR}, {MIN},;{SEC}");
+        public static final ConfigBoolean       DEBUG_RENDERER_PATH_MAX_DIST        = new ConfigBoolean("debugRendererPathFindingEnablePointWidth", true, "If true, then the vanilla pathfinding debug renderer\nwill render the path point width boxes.");
+        public static final ConfigBoolean       DONT_RESET_SEED_ON_DIMENSION_CHANGE = new ConfigBoolean("dontResetSeedOnDimensionChange", false, "Don't reset the world seed when just changing dimensions.\nSome mods may use per-dimension seeds, so by default the seed\nis reset every time the player changes dimensions.");
+        public static final ConfigBoolean       ENABLED                             = new ConfigBoolean("enabled", true, "If true, the HUD will be rendered");
+        public static final ConfigBoolean       FIX_VANILLA_DEBUG_RENDERERS         = new ConfigBoolean("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed.");
+        public static final ConfigDouble        FONT_SCALE                          = new ConfigDouble("fontScale", 0.5, 0.0, 100.0, "Font scale factor. Default: 0.5\n");
+        public static final ConfigOptionList    HUD_ALIGNMENT                       = new ConfigOptionList("hudAlignment", HudAlignment.TOP_LEFT, "The alignment of the HUD.");
+        public static final ConfigBoolean       LIGHT_LEVEL_COLORED_NUMBERS         = new ConfigBoolean("lightLevelColoredNumbers", true, "Whether to use colored or white numbers\nfor the Light Level overlay numbers");
+        public static final ConfigOptionList    LIGHT_LEVEL_MARKER_MODE             = new ConfigOptionList("lightLevelMarkers", LightLevelMarkerMode.SQUARE, "Which type of colored marker to use in the\nLight Level overlay, if any");
+        public static final ConfigDouble        LIGHT_LEVEL_MARKER_SIZE             = new ConfigDouble("lightLevelMarkerSize", 0.84, 0.0, 1.0, "The size of the light level colored marker.\nRange: 0.0 - 1.0");
+        public static final ConfigOptionList    LIGHT_LEVEL_NUMBER_MODE             = new ConfigOptionList("lightLevelNumbers", LightLevelNumberMode.BLOCK, "Which light level number(s) to render in the Light Level overlay");
+        public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X   = new ConfigDouble("lightLevelNumberOffsetBlockX", 0.09, 0.0, 1.0, "The relative \"x\" offset for the block light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y   = new ConfigDouble("lightLevelNumberOffsetBlockY", 0.12, 0.0, 1.0, "The relative \"y\" offset for the block light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_SKY_X     = new ConfigDouble("lightLevelNumberOffsetSkyX", 0.42, 0.0, 1.0, "The relative \"x\" offset for the sky light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y     = new ConfigDouble("lightLevelNumberOffsetSkyY", 0.56, 0.0, 1.0, "The relative \"y\" offset for the sky light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigBoolean       LIGHT_LEVEL_NUMBER_ROTATION         = new ConfigBoolean("lightLevelNumberRotation", true, "If true, then the light level numbers will rotate\naccording to the player's current facing");
+        public static final ConfigInteger       LIGHT_LEVEL_RANGE                   = new ConfigInteger("lightLevelRange", 24, 1, 64, "The block range to render the Light Level overlay in");
+        public static final ConfigInteger       LIGHT_LEVEL_THRESHOLD               = new ConfigInteger("lightLevelThreshold", 8, 0, 15, "The light level threshold which is considered safe");
+        public static final ConfigBoolean       MAP_PREVIEW                         = new ConfigBoolean("mapPreview", false, "Enables rendering a preview of the map,\nwhen you hold shift while hovering over a map item");
+        public static final ConfigInteger       MAP_PREVIEW_SIZE                    = new ConfigInteger("mapPreviewSize", 160, 16, 512, "The size of the rendered map previews");
+        public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "H,C", "A hotkey to open the in-game Config GUI");
+        public static final ConfigBoolean       REQUIRE_SNEAK                       = new ConfigBoolean("requireSneak", false, "Require the player to be sneaking to render the HUD");
+        public static final ConfigHotkey        REQUIRED_KEY                        = new ConfigHotkey("requiredKey", "", KeybindSettings.MODIFIER_INGAME_EMPTY, "Require holding this key to render the HUD");
+        public static final ConfigHotkey        SET_DISTANCE_REFERENCE_POINT        = new ConfigHotkey("setDistanceReferencePoint", "", "A htokey to store the player's current position\nas the reference point for the distance info line type");
+        public static final ConfigHotkey        SHAPE_EDITOR                        = new ConfigHotkey("shapeEditor", "", "Opens the Shape Editor GUI for the selected shape");
+        public static final ConfigBoolean       SHULKER_BOX_PREVIEW                 = new ConfigBoolean("shulkerBoxPreview", false, "Enables rendering a preview of the Shulker Box contents,\nwhen you hold shift while hovering over a Shulker Box item");
+        public static final ConfigBoolean       SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean("shulkerDisplayBgColor", true, "Enables tinting/coloring the Shulker Box display\nbackground texture with the dye color of the box");
+        public static final ConfigBoolean       SHULKER_DISPLAY_REQUIRE_SHIFT       = new ConfigBoolean("shulkerDisplayRequireShift", true, "Whether or not holding shift is required for the Shulker Box preview");
+        public static final ConfigInteger       SLIME_CHUNK_OVERLAY_RADIUS          = new ConfigInteger("slimeChunkOverlayRadius", -1, "The radius of chunks to render the slime chunk overlay in.\nValid range: 0 - 40, where -1 = render distance");
+        public static final ConfigBoolean       SORT_LINES_BY_LENGTH                = new ConfigBoolean("sortLinesByLength", false, "Sort the lines by their text's length");
+        public static final ConfigBoolean       SORT_LINES_REVERSED                 = new ConfigBoolean("sortLinesReversed", false, "Reverse the line sorting order");
+        public static final ConfigInteger       SPAWNABLE_COLUMNS_OVERLAY_RADIUS    = new ConfigInteger("spawnableColumnHeightsOverlayRadius", 40, 0, 128, "The radius (in blocks) to render the spawnable\ncolumn heights overlay in. Valid range: 0 - 128");
+        public static final ConfigInteger       SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL  = new ConfigInteger("spawnableSubChunkCheckInterval", 20, 1, 10000, "The interval in game ticks for the spawnable sub-chunk heightmap checks");
+        public static final ConfigInteger       SPAWNABLE_SUB_CHUNKS_OVERLAY_RADIUS = new ConfigInteger("spawnableSubChunksOverlayRadius", -1, "The radius of chunks to render the spawnable sub-chunks\noverlay in. Valid range: -1 - 40, where -1 = render distance");
+        public static final ConfigInteger       TEXT_POS_X                          = new ConfigInteger("textPosX", 4, "Text X position from the screen edge (default: 4)");
+        public static final ConfigInteger       TEXT_POS_Y                          = new ConfigInteger("textPosY", 4, "Text Y position from the screen edge (default: 4)");
+        public static final ConfigInteger       TIME_DAY_DIVISOR                    = new ConfigInteger("timeDayDivisor", 24000, 1, Integer.MAX_VALUE, "The divisor value for the modulo of the day time");
+        public static final ConfigInteger       TIME_TOTAL_DIVISOR                  = new ConfigInteger("timeTotalDivisor", 24000, 1, Integer.MAX_VALUE, "The divisor value for the modulo of the total world time");
+        public static final ConfigHotkey        TOGGLE_KEY                          = new ConfigHotkey("toggleKey", "H", KeybindSettings.RELEASE_EXCLUSIVE, "The main toggle key");
+        public static final ConfigBoolean       USE_CUSTOMIZED_COORDINATES          = new ConfigBoolean("useCustomizedCoordinateFormat", true, "Use the customized coordinate format string");
+        public static final ConfigBoolean       USE_FONT_SHADOW                     = new ConfigBoolean("useFontShadow", false, "Use font shadow");
+        public static final ConfigBoolean       USE_TEXT_BACKGROUND                 = new ConfigBoolean("useTextBackground", true, "Use a solid background color behind the text");
+
+        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
+                ENABLED,
+                CHUNK_UNLOAD_BUCKET_WITH_SIZE,
+                DEBUG_RENDERER_PATH_MAX_DIST,
+                DONT_RESET_SEED_ON_DIMENSION_CHANGE,
+                FIX_VANILLA_DEBUG_RENDERERS,
+                LIGHT_LEVEL_COLORED_NUMBERS,
+                LIGHT_LEVEL_NUMBER_ROTATION,
+                MAP_PREVIEW,
+                REQUIRE_SNEAK,
+                SHULKER_BOX_PREVIEW,
+                SHULKER_DISPLAY_BACKGROUND_COLOR,
+                SHULKER_DISPLAY_REQUIRE_SHIFT,
+                SORT_LINES_BY_LENGTH,
+                SORT_LINES_REVERSED,
+                USE_CUSTOMIZED_COORDINATES,
+                USE_FONT_SHADOW,
+                USE_TEXT_BACKGROUND,
+
+                TOGGLE_KEY,
+                REQUIRED_KEY,
+                SET_DISTANCE_REFERENCE_POINT,
+                SHAPE_EDITOR,
+                OPEN_CONFIG_GUI,
+                BLOCK_GRID_OVERLAY_MODE,
+                LIGHT_LEVEL_MARKER_MODE,
+                LIGHT_LEVEL_NUMBER_MODE,
+                HUD_ALIGNMENT,
+
+                BLOCK_GRID_OVERLAY_RADIUS,
+                CHUNK_UNLOAD_BUCKET_FONT_SCALE,
+                CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS,
+                COORDINATE_FORMAT_STRING,
+                DATE_FORMAT_REAL,
+                DATE_FORMAT_MINECRAFT,
+                DROPPED_CHUNKS_HASH_SIZE,
+                FONT_SCALE,
+                LIGHT_LEVEL_MARKER_SIZE,
+                LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X,
+                LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y,
+                LIGHT_LEVEL_NUMBER_OFFSET_SKY_X,
+                LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
+                LIGHT_LEVEL_RANGE,
+                LIGHT_LEVEL_THRESHOLD,
+                MAP_PREVIEW_SIZE,
+                SLIME_CHUNK_OVERLAY_RADIUS,
+                SPAWNABLE_COLUMNS_OVERLAY_RADIUS,
+                SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL,
+                SPAWNABLE_SUB_CHUNKS_OVERLAY_RADIUS,
+                TEXT_POS_X,
+                TEXT_POS_Y,
+                TIME_DAY_DIVISOR,
+                TIME_TOTAL_DIVISOR
+        );
+
+        public static final List<ConfigHotkey> HOTKEY_LIST = ImmutableList.of(
+                TOGGLE_KEY,
+                REQUIRED_KEY,
+                OPEN_CONFIG_GUI,
+                SET_DISTANCE_REFERENCE_POINT,
+                SHAPE_EDITOR
+        );
     }
 
-    public static void loadConfigsFromFile(File configFile)
+    public static class Colors
     {
-        configurationFile = configFile;
-        config = new Configuration(configFile, null, true);
-        config.load();
+        public static final ConfigColor BLOCK_GRID_OVERLAY_COLOR            = new ConfigColor("blockGrid", "0x80FFFFFF", "Color for the block grid overlay");
+        public static final ConfigColor DESPAWN_SPHERE_OVERLAY_COLOR        = new ConfigColor("despawnSphereDefault", "0x60A04050", "Color for the despawn sphere overlay");
+        public static final ConfigColor LIGHT_LEVEL_MARKER_DARK             = new ConfigColor("lightLevelMarkerDark", "0xFFFF4848", "The color for the spawnable spots marker");
+        public static final ConfigColor LIGHT_LEVEL_MARKER_LIT              = new ConfigColor("lightLevelMarkerLit", "0xFFFFFF33", "The color for the safe (during day) spots marker");
+        public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_DARK       = new ConfigColor("lightLevelNumberBlockDark", "0xFFC03030", "The color for the spawnable spots number of the block light value");
+        public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_LIT        = new ConfigColor("lightLevelNumberBlockLit", "0xFF209040", "The color for the safe spots number of the block light value");
+        public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_DARK         = new ConfigColor("lightLevelNumberSkyDark", "0xFFFFF030", "The color for the spawnable spots number of the sky light value");
+        public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_LIT          = new ConfigColor("lightLevelNumberSkyLit", "0xFF40E0FF", "The color for the safe spots number of the sky light value");
+        public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR    = new ConfigColor("randomTicksFixed", "0x40F9F225", "Color for the fixed-point random ticked chunks overlay");
+        public static final ConfigColor RANDOM_TICKS_PLAYER_OVERLAY_COLOR   = new ConfigColor("randomTicksPlayer", "0x4030FE73", "Color for the player-following random ticked chunks overlay");
+        public static final ConfigColor REGION_OVERLAY_COLOR                = new ConfigColor("regionFileBorders", "0x40FF8019", "Color for the region file overlay");
+        public static final ConfigColor SLIME_CHUNKS_OVERLAY_COLOR          = new ConfigColor("slimeChunks", "0xB020F020", "Color for the slime chunks overlay");
+        public static final ConfigColor SPAWN_PLAYER_ENTITY_OVERLAY_COLOR   = new ConfigColor("spawnPreviewAtPlayerEntity", "0x402050D0", "Color for the entity-processing spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
+        public static final ConfigColor SPAWN_PLAYER_LAZY_OVERLAY_COLOR     = new ConfigColor("spawnPreviewAtPlayerLazy", "0x40D030D0", "Color for the \"lazy-loaded\" spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
+        public static final ConfigColor SPAWN_REAL_ENTITY_OVERLAY_COLOR     = new ConfigColor("spawnChunksRealEntity", "0x4030FF20", "Color for the entity-processing real spawn chunks overlay");
+        public static final ConfigColor SPAWN_REAL_LAZY_OVERLAY_COLOR       = new ConfigColor("spawnChunksRealLazy", "0x40FF3020", "Color for the \"lazy-loaded\" real spawn chunks overlay");
+        public static final ConfigColor SPAWNABLE_CHUNKS_FIXED              = new ConfigColor("spawnableChunkFixed", "0x40FF2090", "Color for the location-fixed spawnable chunks overlay");
+        public static final ConfigColor SPAWNABLE_CHUNKS_PLAYER             = new ConfigColor("spawnableChunksPlayer", "0x40FF3030", "Color for the player-following spawnable chunks overlay");
+        public static final ConfigColor SPAWNABLE_COLUMNS_OVERLAY_COLOR     = new ConfigColor("spawnableColumnHeights", "0xA0FF00FF", "Color for the spawnable sub-chunks overlay");
+        public static final ConfigColor TEXT_BACKGROUND_COLOR               = new ConfigColor("textBackgroundColor", "0xA0505050", "Text background color");
+        public static final ConfigColor TEXT_COLOR                          = new ConfigColor("textColor", "0xFFE0E0E0", "Info line text color");
 
-        loadConfigs(config);
+        public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
+                BLOCK_GRID_OVERLAY_COLOR,
+                DESPAWN_SPHERE_OVERLAY_COLOR,
+                LIGHT_LEVEL_MARKER_DARK,
+                LIGHT_LEVEL_MARKER_LIT,
+                LIGHT_LEVEL_NUMBER_BLOCK_DARK,
+                LIGHT_LEVEL_NUMBER_BLOCK_LIT,
+                LIGHT_LEVEL_NUMBER_SKY_DARK,
+                LIGHT_LEVEL_NUMBER_SKY_LIT,
+                RANDOM_TICKS_FIXED_OVERLAY_COLOR,
+                RANDOM_TICKS_PLAYER_OVERLAY_COLOR,
+                REGION_OVERLAY_COLOR,
+                SLIME_CHUNKS_OVERLAY_COLOR,
+                SPAWN_PLAYER_ENTITY_OVERLAY_COLOR,
+                SPAWN_PLAYER_LAZY_OVERLAY_COLOR,
+                SPAWN_REAL_ENTITY_OVERLAY_COLOR,
+                SPAWN_REAL_LAZY_OVERLAY_COLOR,
+                SPAWNABLE_CHUNKS_FIXED,
+                SPAWNABLE_CHUNKS_PLAYER,
+                SPAWNABLE_COLUMNS_OVERLAY_COLOR,
+                TEXT_BACKGROUND_COLOR,
+                TEXT_COLOR
+        );
     }
 
-    public static void loadConfigs(Configuration conf)
+    @Override
+    public String getConfigFileName()
     {
-        Property prop;
-
-        prop = conf.get(CATEGORY_GENERIC, "coordinateFormat", "x: %.1f y: %.1f z: %.1f");
-        prop.setComment("The format string for the coordinate line (needs to have three %f format strings!) Default: x: %.1f y: %.1f z: %.1f");
-        coordinateFormat = prop.getString();
-
-        prop = conf.get(CATEGORY_GENERIC, "coordinateFormatCustomized", true);
-        prop.setComment("Use the customized coordinate format string");
-        coordinateFormatCustomized = prop.getBoolean();
-
-        prop = conf.get(CATEGORY_GENERIC, "dateFormatReal", "yyyy-MM-dd HH:mm:ss");
-        prop.setComment("The format string for real time, see the Java SimpleDateFormat class for the format patterns, if needed");
-        dateFormatReal = prop.getString();
-
-        prop = conf.get(CATEGORY_GENERIC, "dateFormatMinecraft", "MC time: (day {DAY}) {HOUR}:{MIN}:xx");
-        prop.setComment("The format string for the Minecraft time.\n" +
-                        "The supported placeholders are: {DAY}, {HOUR}, {MIN}, {SEC}");
-        dateFormatMinecraft = prop.getString();
-
-        prop = conf.get(CATEGORY_GENERIC, "enableByDefault", true);
-        prop.setComment("If true, the HUD will be enabled by default on game launch");
-        enableByDefault = prop.getBoolean();
-
-        prop = conf.get(CATEGORY_GENERIC, "fontColor", "0xE0E0E0");
-        prop.setComment("Font color (RGB, default: 0xE0E0E0 = 14737632)");
-        fontColor = getColor(prop.getString(), 0xE0E0E0);
-
-        prop = conf.get(CATEGORY_GENERIC, "fontScale", 1.0d);
-        prop.setComment("Font scale factor. Valid range: 0.0 - 10.0. Default: 1.0\n" +
-                        "Note that the 'useScaledFont' option will override this option (with 0.5) if it's enabled!");
-        fontScale = MathHelper.clamp(prop.getDouble(), 0d, 10d);
-
-        prop = conf.get(CATEGORY_GENERIC, "hudAlignment", "top_left");
-        prop.setComment("The alignment of the HUD. Valid values: top_left, rop_right, bottom_left, bottom_right, center.");
-        hudAlignment = HudAlignment.fromString(prop.getString());
-
-        prop = conf.get(CATEGORY_GENERIC, "regionOverlayColor", "0xFFFF8019");
-        prop.setComment("Color for the region file overlay rendering (RGB, default: 0xFFFF8019)");
-        regionOverlayColor = getColor(prop.getString(), 0xFFFF8019);
-
-        prop = conf.get(CATEGORY_GENERIC, "requireSneak", false);
-        prop.setComment("Require the player to be sneaking to render the HUD");
-        requireSneak = prop.getBoolean();
-
-        prop = conf.get(CATEGORY_GENERIC, "requireHoldingKey", false);
-        prop.setComment("Require holding a key to render the HUD. Valid keys are Alt, Ctrl and Shift.");
-        requireHoldingKey = prop.getBoolean();
-
-        prop = conf.get(CATEGORY_GENERIC, "requiredKey", "none");
-        prop.setComment("The key required to render the HUD, if 'requireHoldingKey' is enabled. Valid values are 'alt', 'ctrl' and 'shift'.");
-        requiredKey = getKeyModifier(prop.getString());
-
-        prop = conf.get(CATEGORY_GENERIC, "sortLinesByLength", false);
-        prop.setComment("Sort the lines by their text's length");
-        sortLinesByLength = prop.getBoolean();
-
-        prop = conf.get(CATEGORY_GENERIC, "sortLinesReversed", false);
-        prop.setComment("Reverse the line sorting order");
-        sortLinesReversed = prop.getBoolean();
-
-        prop = conf.get(CATEGORY_GENERIC, "textBackgroundColor", "0xA0505050");
-        prop.setComment("Text background color (ARGB, default: 0xA0505050)");
-        textBackgroundColor = getColor(prop.getString(), 0xA0505050);
-
-        prop = conf.get(CATEGORY_GENERIC, "textPosX", 4);
-        prop.setComment("Text X position (default: 4)");
-        textPosX = prop.getInt();
-
-        prop = conf.get(CATEGORY_GENERIC, "textPosY", 4);
-        prop.setComment("Text Y position (default: 4)");
-        textPosY = prop.getInt();
-
-        prop = conf.get(CATEGORY_GENERIC, "useFontShadow", false);
-        prop.setComment("Use font shadow");
-        useFontShadow = prop.getBoolean();
-
-        prop = conf.get(CATEGORY_GENERIC, "useScaledFont", true);
-        prop.setComment("Use 0.5x scale font size. Note that this overrides the 'fontScale' option!");
-        useScaledFont = prop.getBoolean();
-
-        prop = conf.get(CATEGORY_GENERIC, "useTextBackground", true);
-        prop.setComment("Use a solid background color behind the text");
-        useTextBackground = prop.getBoolean();
-
-
-        // Debug renderer related options
-
-        prop = conf.get(CATEGORY_DEBUG_RENDERER, "debugRendererPathfindingEnablePointWidth", true);
-        prop.setComment("If true, then the vanilla pathfinding debug renderer will render the max distance boxes.");
-        debugRendererPathfindingEnablePointWidth = prop.getBoolean();
-
-
-        // Information types individual toggle
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBiome", false);
-        prop.setComment("Show the the name of the current biome");
-        setInfoType(RenderEventHandler.MASK_BIOME, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBiomeRegistryName", false);
-        prop.setComment("Show the registry name of the current biome");
-        setInfoType(RenderEventHandler.MASK_BIOME_REGISTRY_NAME, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockPosition", false);
-        prop.setComment("Show the player's current block position");
-        setInfoType(RenderEventHandler.MASK_BLOCK, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockProperties", false);
-        prop.setComment("Show the BlockState properties and values of the looked-at block");
-        setInfoType(RenderEventHandler.MASK_BLOCK_PROPERTIES, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoBlockInChunk", false);
-        prop.setComment("Show the player's current position within the chunk");
-        setInfoType(RenderEventHandler.MASK_BLOCK_IN_CHUNK, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkPosition", false);
-        prop.setComment("Show the chunk position the player is currently in");
-        setInfoType(RenderEventHandler.MASK_CHUNK, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkSections", false);
-        prop.setComment("Show the currently rendered number of Chunk sections (the C value from F3)");
-        setInfoType(RenderEventHandler.MASK_CHUNK_SECTIONS, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkSectionsLine", false);
-        prop.setComment("Show the entire line of the C value from the F3 screen");
-        setInfoType(RenderEventHandler.MASK_CHUNK_SECTIONS_LINE, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoChunkUpdates", false);
-        prop.setComment("Show the current number of chunk updates per second");
-        setInfoType(RenderEventHandler.MASK_CHUNK_UPDATES, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoCoordinates", true);
-        prop.setComment("Show the player's current coordinates");
-        setInfoType(RenderEventHandler.MASK_COORDINATES, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoDifficulty", false);
-        prop.setComment("Show the local difficulty");
-        setInfoType(RenderEventHandler.MASK_DIFFICULTY, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoDimensionId", true);
-        prop.setComment("Show the current dimension ID (might not be accurate in every case, depending on the server!)");
-        setInfoType(RenderEventHandler.MASK_DIMENSION, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoEntities", false);
-        prop.setComment("Show the visible/loaded entity count");
-        setInfoType(RenderEventHandler.MASK_ENTITIES, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoEntityRegistryName", false);
-        prop.setComment("Show the registry name of the entity the player is currently looking at");
-        setInfoType(RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFacing", true);
-        prop.setComment("Show the player's current facing");
-        setInfoType(RenderEventHandler.MASK_FACING, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoFPS", false);
-        prop.setComment("Show the current FPS");
-        setInfoType(RenderEventHandler.MASK_FPS, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLightLevel", false);
-        prop.setComment("Show the current light level");
-        setInfoType(RenderEventHandler.MASK_LIGHT, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAtBlock", false);
-        prop.setComment("Show which block the player is currently looking at");
-        setInfoType(RenderEventHandler.MASK_LOOKING_AT_BLOCK, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAtBlockInChunk", false);
-        prop.setComment("Show which block within its containing chunk the player is currently looking at");
-        setInfoType(RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoLookingAtEntity", false);
-        prop.setComment("Show the entity name and health when looked at");
-        setInfoType(RenderEventHandler.MASK_LOOKING_AT_ENTITY, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoParticleCount", false);
-        prop.setComment("Show the currently renderer particle count (P from F3)");
-        setInfoType(RenderEventHandler.MASK_PARTICLE_COUNT, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRealTime", true);
-        prop.setComment("Show the current real time formatted according to dateFormatReal");
-        setInfoType(RenderEventHandler.MASK_TIME_REAL, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRegionFile", false);
-        prop.setComment("Show the region file the player is currently in");
-        setInfoType(RenderEventHandler.MASK_REGION_FILE, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationPitch", false);
-        prop.setComment("Show the player's current pitch rotation");
-        setInfoType(RenderEventHandler.MASK_PITCH, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoRotationYaw", false);
-        prop.setComment("Show the player's current yaw rotation");
-        setInfoType(RenderEventHandler.MASK_YAW, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoSlimeChunk", false);
-        prop.setComment("Show whether the player is currently in a slime chunk.\n" +
-                        "NOTE: This only works in single player without any user intervention!\n" +
-                        "On a server the player needs to be admin/OP and\n" +
-                        "run the /seed command manually EVERY TIME they join or change dimensions!");
-        setInfoType(RenderEventHandler.MASK_SLIME_CHUNK, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoSpeed", false);
-        prop.setComment("Show the player's current moving speed");
-        setInfoType(RenderEventHandler.MASK_SPEED, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTime", false);
-        prop.setComment("Show the current world time in ticks");
-        setInfoType(RenderEventHandler.MASK_TIME_TICKS, prop.getBoolean());
-
-        prop = conf.get(CATEGORY_INFO_TOGGLE, "infoWorldTimeFormatted", false);
-        prop.setComment("Show the current world time formatted to days, hours, minutes");
-        setInfoType(RenderEventHandler.MASK_TIME_MC, prop.getBoolean());
-
-        // Info hotkey assignments
-        ConfigCategory cat = conf.getCategory(CATEGORY_INFO_HOTKEYS);
-        cat.setComment("Here you can assign hotkeys to toggle the different information types on/off.\n" +
-                        "NOTE: Make sure you don't have the same value for more than one info type, or " +
-                        "the latest one will override all the earlier ones.\n" +
-                        "You can give the key \"names\", like \"a\" or \"7\", or you can give " +
-                        "the raw numeric LWJGL keycodes (only works for key codes > 11).\n" +
-                        "To toggle the info type while in-game, press and hold the Toggle key and then " +
-                        "press the keys set here to toggle the info types on/off.");
-
-        HOTKEY_INFO_MAP.clear();
-
-        assignInfoHotkey(conf, "infoFPS",                   RenderEventHandler.MASK_FPS                         , "");
-        assignInfoHotkey(conf, "infoRealTime",              RenderEventHandler.MASK_TIME_REAL                   , "t");
-        assignInfoHotkey(conf, "infoWorldTime",             RenderEventHandler.MASK_TIME_TICKS                  , "");
-        assignInfoHotkey(conf, "infoWorldTimeFormatted",    RenderEventHandler.MASK_TIME_MC                     , "");
-        assignInfoHotkey(conf, "infoCoordinates",           RenderEventHandler.MASK_COORDINATES                 , "n");
-        assignInfoHotkey(conf, "infoDimensionId",           RenderEventHandler.MASK_DIMENSION                   , "d");
-        assignInfoHotkey(conf, "infoBlockPosition",         RenderEventHandler.MASK_BLOCK                       , "o");
-        assignInfoHotkey(conf, "infoBlockInChunk",          RenderEventHandler.MASK_BLOCK_IN_CHUNK              , "");
-        assignInfoHotkey(conf, "infoFacing",                RenderEventHandler.MASK_FACING                      , "f");
-        assignInfoHotkey(conf, "infoLightLevel",            RenderEventHandler.MASK_LIGHT                       , "l");
-        assignInfoHotkey(conf, "infoRotationYaw",           RenderEventHandler.MASK_YAW                         , "r");
-        assignInfoHotkey(conf, "infoRotationPitch",         RenderEventHandler.MASK_PITCH                       , "r");
-        assignInfoHotkey(conf, "infoSpeed",                 RenderEventHandler.MASK_SPEED                       , "s");
-        assignInfoHotkey(conf, "infoChunkSections",         RenderEventHandler.MASK_CHUNK_SECTIONS              , "");
-        assignInfoHotkey(conf, "infoChunkSectionsLine",     RenderEventHandler.MASK_CHUNK_SECTIONS_LINE         , "");
-        assignInfoHotkey(conf, "infoChunkUpdates",          RenderEventHandler.MASK_CHUNK_UPDATES               , "");
-        assignInfoHotkey(conf, "infoParticleCount",         RenderEventHandler.MASK_PARTICLE_COUNT              , "");
-        assignInfoHotkey(conf, "infoDifficulty",            RenderEventHandler.MASK_DIFFICULTY                  , "");
-        assignInfoHotkey(conf, "infoBiome",                 RenderEventHandler.MASK_BIOME                       , "b");
-        assignInfoHotkey(conf, "infoBiomeRegistryName",     RenderEventHandler.MASK_BIOME_REGISTRY_NAME         , "b");
-        assignInfoHotkey(conf, "infoEntities",              RenderEventHandler.MASK_ENTITIES                    , "");
-        assignInfoHotkey(conf, "infoSlimeChunk",            RenderEventHandler.MASK_SLIME_CHUNK                 , "i");
-        assignInfoHotkey(conf, "infoLookingAtEntity",       RenderEventHandler.MASK_LOOKING_AT_ENTITY           , "l");
-        assignInfoHotkey(conf, "infoEntityRegistryName",    RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME   , "l");
-        assignInfoHotkey(conf, "infoLookingAtBlock",        RenderEventHandler.MASK_LOOKING_AT_BLOCK            , "l");
-        assignInfoHotkey(conf, "infoLookingAtBlockInChunk", RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK      , "");
-        assignInfoHotkey(conf, "infoBlockProperties",       RenderEventHandler.MASK_BLOCK_PROPERTIES            , "p");
-        assignInfoHotkey(conf, "infoChunkPosition",         RenderEventHandler.MASK_CHUNK                       , "c");
-        assignInfoHotkey(conf, "infoRegionFile",            RenderEventHandler.MASK_REGION_FILE                 , "g");
-
-        assignHotkey(HOTKEY_INFO_MAP, conf, CATEGORY_RENDERER_HOTKEYS, "renderRegionOverlay", "j", RenderEventHandler.MASK_REGION_OVERLAY);
-
-
-        cat = conf.getCategory(CATEGORY_DEBUG_HOTKEYS);
-        cat.setComment("Hotkeys to toggle ON/OFF the vanilla debug renderers.\n" +
-                       "To use these, first press down F3 and then press the\n" +
-                       "keys defined here to toggle the feature ON/OFF.");
-
-        HOTKEY_DEBUG_MAP.clear();
-
-        assignDebugRendererHotkey(conf, "debugCollisionBoxEnabled",     InputEventHandler.MASK_DEBUG_COLLISION_BOXES,   "1");
-        assignDebugRendererHotkey(conf, "debugHeightMapEnabled",        InputEventHandler.MASK_DEBUG_HEIGHT_MAP,        "2");
-        assignDebugRendererHotkey(conf, "debugNeighborsUpdateEnabled",  InputEventHandler.MASK_DEBUG_NEIGHBOR_UPDATE,   "3");
-        assignDebugRendererHotkey(conf, "debugPathfindingEnabled",      InputEventHandler.MASK_DEBUG_PATHFINDING,       "4");
-        assignDebugRendererHotkey(conf, "debugSolidFaceEnabled",        InputEventHandler.MASK_DEBUG_SOLID_FACES,       "5");
-        assignDebugRendererHotkey(conf, "debugWaterEnabled",            InputEventHandler.MASK_DEBUG_WATER,             "6");
-
-
-        cat = conf.getCategory(CATEGORY_INFO_LINE_ORDER);
-        cat.setComment("Here you can set the order of the info lines.\n" +
-                       "The number is the position in the list the line gets added to.\n" +
-                       "The indexing starts from 0.\n" +
-                       "If multiple types have the same index, then the last one that\n" +
-                       "is actually added internally, will bump previous entries downwards.");
-
-        LINE_ORDER_MAP.clear();
-
-        setLinePosition(conf, "infoFPS",                    RenderEventHandler.MASK_FPS);
-        setLinePosition(conf, "infoRealTime",               RenderEventHandler.MASK_TIME_REAL);
-        setLinePosition(conf, "infoWorldTime",              RenderEventHandler.MASK_TIME_TICKS);
-        setLinePosition(conf, "infoWorldTimeFormatted",     RenderEventHandler.MASK_TIME_MC);
-        setLinePosition(conf, "infoCoordinates",            RenderEventHandler.MASK_COORDINATES);
-        setLinePosition(conf, "infoDimensionId",            RenderEventHandler.MASK_DIMENSION);
-        setLinePosition(conf, "infoBlockPosition",          RenderEventHandler.MASK_BLOCK);
-        setLinePosition(conf, "infoBlockInChunk",           RenderEventHandler.MASK_BLOCK_IN_CHUNK);
-        setLinePosition(conf, "infoChunkPosition",          RenderEventHandler.MASK_CHUNK);
-        setLinePosition(conf, "infoRegionFile",             RenderEventHandler.MASK_REGION_FILE);
-        setLinePosition(conf, "infoFacing",                 RenderEventHandler.MASK_FACING);
-        setLinePosition(conf, "infoLightLevel",             RenderEventHandler.MASK_LIGHT);
-        setLinePosition(conf, "infoRotationYaw",            RenderEventHandler.MASK_YAW);
-        setLinePosition(conf, "infoRotationPitch",          RenderEventHandler.MASK_PITCH);
-        setLinePosition(conf, "infoSpeed",                  RenderEventHandler.MASK_SPEED);
-        setLinePosition(conf, "infoChunkSections",          RenderEventHandler.MASK_CHUNK_SECTIONS);
-        setLinePosition(conf, "infoChunkSectionsLine",      RenderEventHandler.MASK_CHUNK_SECTIONS_LINE);
-        setLinePosition(conf, "infoChunkUpdates",           RenderEventHandler.MASK_CHUNK_UPDATES);
-        setLinePosition(conf, "infoParticleCount",          RenderEventHandler.MASK_PARTICLE_COUNT);
-        setLinePosition(conf, "infoDifficulty",             RenderEventHandler.MASK_DIFFICULTY);
-        setLinePosition(conf, "infoBiome",                  RenderEventHandler.MASK_BIOME);
-        setLinePosition(conf, "infoBiomeRegistryName",      RenderEventHandler.MASK_BIOME_REGISTRY_NAME);
-        setLinePosition(conf, "infoEntities",               RenderEventHandler.MASK_ENTITIES);
-        setLinePosition(conf, "infoSlimeChunk",             RenderEventHandler.MASK_SLIME_CHUNK);
-        setLinePosition(conf, "infoLookingAtEntity",        RenderEventHandler.MASK_LOOKING_AT_ENTITY);
-        setLinePosition(conf, "infoEntityRegistryName",     RenderEventHandler.MASK_LOOKING_AT_ENTITY_REGNAME);
-        setLinePosition(conf, "infoLookingAtBlock",         RenderEventHandler.MASK_LOOKING_AT_BLOCK);
-        setLinePosition(conf, "infoLookingAtBlockInChunk",  RenderEventHandler.MASK_LOOKING_AT_BLOCK_CHUNK);
-        setLinePosition(conf, "infoBlockProperties",        RenderEventHandler.MASK_BLOCK_PROPERTIES);
-
-        RenderEventHandler.getInstance().setEnabledMask(enabledInfoTypes);
-
-        activeFontScale = useScaledFont ? 0.5d : fontScale;
-
-        if (conf.hasChanged())
-        {
-            conf.save();
-        }
+        return Reference.MOD_ID + ".json";
     }
 
-    private static void setInfoType(int mask, boolean value)
+    @Override
+    public Map<String, List<? extends IConfigBase>> getConfigsPerCategories()
     {
-        if (value)
-        {
-            enabledInfoTypes |= mask;
-        }
-        else
-        {
-            enabledInfoTypes &= ~mask;
-        }
+        Map<String, List<? extends IConfigBase>> map = new LinkedHashMap<>();
+
+        map.put("Generic", Generic.OPTIONS);
+        map.put("Colors", Colors.OPTIONS);
+
+        map.put("InfoTypeToggles", ConfigUtils.createConfigWrapperForType(ConfigType.BOOLEAN, ImmutableList.copyOf(InfoToggle.values())));
+        map.put("InfoHotkeys", ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(InfoToggle.values())));
+        map.put("InfoLineOrders",  ConfigUtils.createConfigWrapperForType(ConfigType.INTEGER, ImmutableList.copyOf(InfoToggle.values())));
+
+        map.put("RendererToggles", ConfigUtils.createConfigWrapperForType(ConfigType.BOOLEAN, ImmutableList.copyOf(RendererToggle.values())));
+        map.put("RendererHotkeys", ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(RendererToggle.values())));
+
+        map.put("StructureToggles", StructureToggle.getToggleConfigs());
+        map.put("StructureHotkeys", StructureToggle.getHotkeys());
+        map.put("StructureColors", StructureToggle.getColorConfigs());
+
+        return map;
     }
 
-    private static int getColor(String colorStr, int defaultColor)
+    @Override
+    public void onPostLoad()
     {
-        Pattern pattern = Pattern.compile("(?:0x|#)([a-fA-F0-9]{1,8})");
-        Matcher matcher = pattern.matcher(colorStr);
-
-        if (matcher.matches())
-        {
-            try { return (int) Long.parseLong(matcher.group(1), 16); }
-            catch (NumberFormatException e) { return defaultColor; }
-        }
-
-        try { return Integer.parseInt(colorStr, 10); }
-        catch (NumberFormatException e) { return defaultColor; }
-    }
-
-    private static KeyModifier getKeyModifier(String value)
-    {
-        if (value == null)
-        {
-            return KeyModifier.NONE;
-        }
-
-        if (value.equalsIgnoreCase("shift"))
-        {
-            return KeyModifier.SHIFT;
-        }
-
-        if (value.equalsIgnoreCase("ctrl") || value.equalsIgnoreCase("control"))
-        {
-            return KeyModifier.CONTROL;
-        }
-
-        if (value.equalsIgnoreCase("alt"))
-        {
-            return KeyModifier.ALT;
-        }
-
-        return KeyModifier.NONE;
-    }
-
-    private static void assignInfoHotkey(Configuration conf, String configKey, long infoBitmask, String defaultKey)
-    {
-        assignHotkey(HOTKEY_INFO_MAP, conf, CATEGORY_INFO_HOTKEYS, configKey, defaultKey, infoBitmask);
-    }
-
-    private static void assignDebugRendererHotkey(Configuration conf, String configKey, int bitmask, String defaultKey)
-    {
-        assignHotkey(HOTKEY_DEBUG_MAP, conf, CATEGORY_DEBUG_HOTKEYS, configKey, defaultKey, bitmask);
-    }
-
-    private static void assignHotkey(Multimap<Integer, Long> map, Configuration conf, String configCategory, String configKey, String defaultKey, long bitmask)
-    {
-        String keyName = conf.get(configCategory, configKey, defaultKey).getString();
-
-        try
-        {
-            int keyCode = Integer.parseInt(keyName);
-
-            // Don't interpret the numbers 0..9 as raw keycodes, but instead as the number keys (below)
-            if (keyCode > Keyboard.KEY_0)
-            {
-                map.put(keyCode, bitmask);
-                return;
-            }
-        }
-        catch (NumberFormatException e)
-        {
-        }
-
-        int keyCode = Keyboard.getKeyIndex(keyName.toUpperCase());
-
-        if (keyCode != Keyboard.KEY_NONE)
-        {
-            map.put(keyCode, bitmask);
-        }
-    }
-
-    public static long getBitmaskForInfoKey(int keyCode)
-    {
-        return getBitmaskForKey(HOTKEY_INFO_MAP, keyCode);
-    }
-
-    public static long getBitmaskForDebugKey(int keyCode)
-    {
-        return getBitmaskForKey(HOTKEY_DEBUG_MAP, keyCode);
-    }
-
-    public static long getBitmaskForKey(Multimap<Integer, Long> map, int keyCode)
-    {
-        Collection<Long> masks = map.get(keyCode);
-        long fullMask = 0;
-
-        if (masks != null)
-        {
-            for (Long mask : masks)
-            {
-                fullMask |= mask;
-            }
-        }
-
-        return fullMask;
-    }
-
-    private static void setLinePosition(Configuration conf, String configKey, long infoBitmask)
-    {
-        int value = conf.get(CATEGORY_INFO_LINE_ORDER, configKey, -1).getInt();
-        LINE_ORDER_MAP.put(infoBitmask, value);
-    }
-
-    public static int getLinePositionFor(long infoType)
-    {
-        Integer value = LINE_ORDER_MAP.get(infoType);
-        return value != null ? value.intValue() : -1;
+        RenderHandler.getInstance().setFontScale(Configs.Generic.FONT_SCALE.getDoubleValue());
     }
 }

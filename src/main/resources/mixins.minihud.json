@@ -1,0 +1,32 @@
+{
+    "required": true,
+    "package": "fi.dy.masa.minihud.mixin",
+    "refmap": "mixins.minihud.refmap.json",
+    "minVersion": "0.7",
+    "compatibilityLevel": "JAVA_8",
+    "client": [
+        "IMixinChunkGeneratorEnd",
+        "IMixinChunkGeneratorFlat",
+        "IMixinChunkGeneratorHell",
+        "IMixinChunkGeneratorOverworld",
+        "IMixinChunkProviderServer",
+        "IMixinDebugRenderer",
+        "IMixinMapGenStructure",
+        "IMixinPathNavigate",
+        "IMixinRenderGlobal",
+        "IMixinSPacketMultiBlockChange",
+        "MixinDebugRendererCollisionBox",
+        "MixinDebugRendererHeightMap",
+        "MixinDebugRendererNeighborsUpdate",
+        "MixinDebugRendererSolidFace",
+        "MixinGuiScreen",
+        "MixinGuiSubtitleOverlay",
+        "MixinMinecraftServer",
+        "MixinNetHandlerPlayClient",
+        "MixinWorld",
+        "MixinWorldClient"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

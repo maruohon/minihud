@@ -3,37 +3,28 @@ package fi.dy.masa.minihud;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.event.RenderEventHandler;
-import fi.dy.masa.minihud.proxy.CommonProxy;
+import fi.dy.masa.malilib.event.InitializationHandler;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, certificateFingerprint = Reference.FINGERPRINT,
-    guiFactory = "fi.dy.masa.minihud.config.MiniHudGuiFactory",
+    guiFactory = "fi.dy.masa.minihud.config.gui.MiniHudGuiFactory",
     updateJSON = "https://raw.githubusercontent.com/maruohon/minihud/master/update.json",
-    clientSideOnly=true, acceptedMinecraftVersions = "1.12")
+    clientSideOnly=true, acceptedMinecraftVersions = "1.12.2", dependencies = "required-after:malilib;")
 public class MiniHud
 {
     @Mod.Instance(Reference.MOD_ID)
     public static MiniHud instance;
 
-    @SidedProxy(clientSide = "fi.dy.masa.minihud.proxy.ClientProxy", serverSide = "fi.dy.masa.minihud.proxy.CommonProxy")
-    public static CommonProxy proxy;
-
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
+
+    public static final String CHANNEL_CARPET_CLIENT = "CarpetClient";
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         instance = this;
-
-        Configs.loadConfigsFromFile(event.getSuggestedConfigurationFile());
-        RenderEventHandler.getInstance().setEnabled(Configs.enableByDefault);
-
-        proxy.registerKeyBindings();
-        proxy.registerEventHandlers();
+        InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
     }
 
     @Mod.EventHandler

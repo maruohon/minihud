@@ -1,7 +1,7 @@
 [
 {
   "modid": "minihud",
-  "name": "Mini HUD",
+  "name": "MiniHUD",
   "description": "Adds some basic information like the coordinates to the screen",
   "version": "${mod_version}",
   "mcversion": "${minecraft_version}",
