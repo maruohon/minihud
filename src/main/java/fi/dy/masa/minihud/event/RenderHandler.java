@@ -7,20 +7,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.interfaces.IRenderer;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.HudAlignment;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.InfoToggle;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
-import fi.dy.masa.minihud.renderer.OverlayRenderer;
-import fi.dy.masa.minihud.util.DataStorage;
-import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -46,6 +32,20 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.interfaces.IRenderer;
+import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.HudAlignment;
+import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
+import fi.dy.masa.minihud.renderer.OverlayRenderer;
+import fi.dy.masa.minihud.util.DataStorage;
+import fi.dy.masa.minihud.util.MiscUtils;
 
 public class RenderHandler implements IRenderer
 {
@@ -56,7 +56,6 @@ public class RenderHandler implements IRenderer
     private int fpsCounter;
     private long fpsUpdateTime = Minecraft.getSystemTime();
     private long infoUpdateTime;
-    private double fontScale = 0.5d;
     private Set<InfoToggle> addedTypes = new HashSet<>();
 
     private final List<StringHolder> lineWrappers = new ArrayList<>();
@@ -121,7 +120,7 @@ public class RenderHandler implements IRenderer
             boolean useBackground = Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue();
             boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
 
-            RenderUtils.renderText(x, y, this.fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.lines);
+            RenderUtils.renderText(x, y, Configs.Generic.FONT_SCALE.getDoubleValue(), textColor, bgColor, alignment, useBackground, useShadow, this.lines);
         }
     }
 
@@ -157,18 +156,13 @@ public class RenderHandler implements IRenderer
         }
     }
 
-    public void setFontScale(double scale)
-    {
-        this.fontScale = MathHelper.clamp(scale, 0, 10D);
-    }
-
     public int getSubtitleOffset()
     {
         HudAlignment align = (HudAlignment) Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
 
         if (align == HudAlignment.BOTTOM_RIGHT)
         {
-            int offset = (int) (this.lineWrappers.size() * (StringUtils.getFontHeight() + 2) * this.fontScale);
+            int offset = (int) (this.lineWrappers.size() * (StringUtils.getFontHeight() + 2) * Configs.Generic.FONT_SCALE.getDoubleValue());
 
             return -(offset - 16);
         }

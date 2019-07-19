@@ -19,7 +19,6 @@ import fi.dy.masa.malilib.config.options.IConfigValue;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.malilib.util.HudAlignment;
 import fi.dy.masa.minihud.Reference;
-import fi.dy.masa.minihud.event.RenderHandler;
 import fi.dy.masa.minihud.util.BlockGridMode;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
 import fi.dy.masa.minihud.util.LightLevelNumberMode;
@@ -218,11 +217,5 @@ public class Configs implements IConfigHandler
         map.put("StructureColors", StructureToggle.getColorConfigs());
 
         return map;
-    }
-
-    @Override
-    public void onPostLoad()
-    {
-        RenderHandler.getInstance().setFontScale(Configs.Generic.FONT_SCALE.getDoubleValue());
     }
 }
