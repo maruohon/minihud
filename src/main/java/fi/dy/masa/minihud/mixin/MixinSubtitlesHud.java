@@ -12,7 +12,7 @@ import net.minecraft.client.gui.hud.SubtitlesHud;
 @Mixin(SubtitlesHud.class)
 public abstract class MixinSubtitlesHud
 {
-    @Inject(method = "draw", at = @At(
+    @Inject(method = "render", at = @At(
             value = "INVOKE",
             target = "Lcom/mojang/blaze3d/platform/GlStateManager;enableBlend()V",
             shift = Shift.AFTER, ordinal = 0))
