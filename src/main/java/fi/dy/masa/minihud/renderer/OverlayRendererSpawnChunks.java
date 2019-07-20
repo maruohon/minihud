@@ -81,7 +81,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
                 rangeH, 256, 16, 16, entity, colorLazy);
 
-        corners = this.getSpawnChunkCorners(spawn, 10);
+        corners = this.getSpawnChunkCorners(spawn, 9);
         RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
                 rangeH, 256, 16, 16, entity, colorEntity);
 
