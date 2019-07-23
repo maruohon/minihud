@@ -45,6 +45,13 @@ public class DebugInfoUtils
         server.getPlayerManager().sendToAll(packet);
     }
 
+    private static void writeBlockPosToBuffer(PacketByteBuf buf, BlockPos pos)
+    {
+        buf.writeInt(pos.getX());
+        buf.writeInt(pos.getY());
+        buf.writeInt(pos.getZ());
+    }
+
     private static void writePathPointToBuffer(PacketByteBuf buf, PathNode node)
     {
         buf.writeInt(node.x);
@@ -67,50 +74,48 @@ public class DebugInfoUtils
 
     private static void writePathToBuffer(PacketByteBuf buf, Path path)
     {
-        PathNode target = path.getEnd(); // FIXME is this the target?
+        // This is the path node the navigation ends on
+        PathNode destination = path.getEnd();
 
-        if (target != null)
+        // This is the actual block the path is targeting. Not all targets
+        // and paths will be the same. For example, a valid path (destination
+        // in this case) to the the "meeting" POI can be up to 6 Manhattan
+        // distance away from the target BlockPos; the actual POI.
+        BlockPos target = path.method_48();
+
+        if (destination != null)
         {
+            // Whether or not the destination is within the manhattan distance
+            // of the target POI (the last param to PointOfInterestType::register)
+            buf.writeBoolean(path.method_21655());
             buf.writeInt(path.getCurrentNodeIndex());
 
-            writePathPointToBuffer(buf, target);
+            // There is a hash set of class_4459 prefixed with its count here, which
+            // gets written to Path.field_20300, but field_20300 doesn't appear to be
+            // used anywhere, so for now we'll write a zero so the set is treated as
+            // empty.
+            buf.writeInt(0);
 
-            int countTotal = path.getLength();
-            List<PathNode> openSet = new ArrayList<>();
-            List<PathNode> closedSet = new ArrayList<>();
-            List<PathNode> allSet = new ArrayList<>();
+            writeBlockPosToBuffer(buf, target);
 
-            for (int i = 0; i < countTotal; i++)
-            {
-                PathNode node = path.getNode(i);
+            List<PathNode> nodes = path.getNodes();
+            PathNode[] openSet = path.method_43();
+            PathNode[] closedSet = path.method_37();
 
-                if (node.type.getWeight() < 0F)
-                {
-                    closedSet.add(node);
-                }
-                else if (node.type.getWeight() > 0F)
-                {
-                    openSet.add(node);
-                }
-
-                allSet.add(node);
-            }
-
-            buf.writeInt(allSet.size());
-
-            for (PathNode point : allSet)
+            buf.writeInt(nodes.size());
+            for (PathNode point : nodes)
             {
                 writePathPointToBuffer(buf, point);
             }
 
-            buf.writeInt(openSet.size());
+            buf.writeInt(openSet.length);
 
             for (PathNode point : openSet)
             {
                 writePathPointToBuffer(buf, point);
             }
 
-            buf.writeInt(closedSet.size());
+            buf.writeInt(closedSet.length);
 
             for (PathNode point : closedSet)
             {
