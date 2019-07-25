@@ -1,13 +1,11 @@
 package fi.dy.masa.minihud.hotkeys;
 
-import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackAdjustable;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBoolean;
-import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -15,6 +13,7 @@ import fi.dy.masa.minihud.gui.GuiConfigs;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.gui.GuiShapeManager;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
+import fi.dy.masa.minihud.renderer.OverlayRendererStructures;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -25,11 +24,15 @@ public class KeyCallbacks
     public static void init()
     {
         Callbacks callback = new Callbacks();
+
         Configs.Generic.SET_DISTANCE_REFERENCE_POINT.getKeybind().setCallback(callback);
         Configs.Generic.OPEN_CONFIG_GUI.getKeybind().setCallback(callback);
         Configs.Generic.SHAPE_EDITOR.getKeybind().setCallback(callback);
         Configs.Generic.TOGGLE_KEY.getKeybind().setCallback(new KeyCallbackToggleBoolean(Configs.Generic.ENABLED));
-        Configs.Generic.LIGHT_LEVEL_RANGE.setValueChangeCallback(new IValueChangeCallback<ConfigInteger>() { @Override public void onValueChanged(ConfigInteger config) { OverlayRendererLightLevel.setNeedsUpdate(); } });
+
+        Configs.Generic.LIGHT_LEVEL_RANGE.setValueChangeCallback((config) -> { OverlayRendererLightLevel.setNeedsUpdate(); });
+        Configs.Generic.STRUCTURES_RENDER_THROUGH.setValueChangeCallback((config) -> { OverlayRendererStructures.instance.setRenderThrough(config.getBooleanValue()); });
+
         InfoToggle.CHUNK_UNLOAD_ORDER.getKeybind().setCallback(new KeyCallbackAdjustable(InfoToggle.CHUNK_UNLOAD_ORDER, null));
         RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET)));
         RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY)));

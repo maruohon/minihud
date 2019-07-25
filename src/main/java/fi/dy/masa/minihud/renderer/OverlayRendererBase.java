@@ -16,6 +16,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     protected static final BufferBuilder BUFFER_3 = new BufferBuilder(2097152);
 
     protected final List<RenderObjectBase> renderObjects = new ArrayList<>();
+    protected boolean renderThrough = false;
     protected float glLineWidth = 1f;
     protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
     private BlockPos position = BlockPos.ORIGIN;
@@ -24,6 +25,21 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     {
         GlStateManager.glLineWidth(this.glLineWidth);
         GlStateManager.translate(this.position.getX() - x, this.position.getY() - y, this.position.getZ() - z);
+
+        if (this.renderThrough)
+        {
+            GlStateManager.disableDepth();
+            //GlStateManager.depthMask(false);
+        }
+    }
+
+    protected void postRender(double x, double y, double z)
+    {
+        if (this.renderThrough)
+        {
+            GlStateManager.enableDepth();
+            //GlStateManager.depthMask(true);
+        }
     }
 
     @Override
@@ -37,6 +53,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
             obj.draw();
         }
 
+        this.postRender(x, y, z);
         GlStateManager.popMatrix();
     }
 
@@ -81,6 +98,11 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         this.renderObjects.add(obj);
 
         return obj;
+    }
+
+    public void setRenderThrough(boolean renderThrough)
+    {
+        this.renderThrough = renderThrough;
     }
 
     public String getSaveId()

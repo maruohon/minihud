@@ -70,6 +70,7 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       SPAWNABLE_COLUMNS_OVERLAY_RADIUS    = new ConfigInteger("spawnableColumnHeightsOverlayRadius", 40, 0, 128, "The radius (in blocks) to render the spawnable\ncolumn heights overlay in. Valid range: 0 ... 128");
         public static final ConfigInteger       SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL  = new ConfigInteger("spawnableSubChunkCheckInterval", 20, 1, 10000, "The interval in game ticks for the spawnable sub-chunk heightmap checks");
         public static final ConfigInteger       SPAWNABLE_SUB_CHUNKS_OVERLAY_RADIUS = new ConfigInteger("spawnableSubChunksOverlayRadius", -1, -1, 40, "The radius of chunks to render the spawnable sub-chunks\noverlay in. Valid range: -1 ... 40, where -1 = render distance");
+        public static final ConfigBoolean       STRUCTURES_RENDER_THROUGH           = new ConfigBoolean("structuresRenderThrough", false, "If enabled, then the Structure Bounding Boxes\nwill be rendered through blocks");
         public static final ConfigInteger       TEXT_POS_X                          = new ConfigInteger("textPosX", 4, "Info line text X position from the screen edge (default: 4)");
         public static final ConfigInteger       TEXT_POS_Y                          = new ConfigInteger("textPosY", 4, "Info line text Y position from the screen edge (default: 4)");
         public static final ConfigInteger       TIME_DAY_DIVISOR                    = new ConfigInteger("timeDayDivisor", 24000, 1, Integer.MAX_VALUE, "The divisor value for the modulo of the day time,\nused for 'infoTimeDayModulo' info line");
@@ -94,6 +95,7 @@ public class Configs implements IConfigHandler
                 SHULKER_DISPLAY_REQUIRE_SHIFT,
                 SORT_LINES_BY_LENGTH,
                 SORT_LINES_REVERSED,
+                STRUCTURES_RENDER_THROUGH,
                 USE_CUSTOMIZED_COORDINATES,
                 USE_FONT_SHADOW,
                 USE_TEXT_BACKGROUND,
