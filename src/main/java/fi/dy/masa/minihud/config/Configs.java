@@ -16,8 +16,8 @@ import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.options.ConfigString;
 import fi.dy.masa.malilib.config.options.IConfigBase;
 import fi.dy.masa.malilib.config.options.IConfigValue;
+import fi.dy.masa.malilib.config.values.HudAlignment;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
-import fi.dy.masa.malilib.util.HudAlignment;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.util.BlockGridMode;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
@@ -193,6 +193,12 @@ public class Configs implements IConfigHandler
                 TEXT_BACKGROUND_COLOR,
                 TEXT_COLOR
         );
+    }
+
+    @Override
+    public String getModName()
+    {
+        return Reference.MOD_NAME;
     }
 
     @Override

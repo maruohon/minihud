@@ -59,9 +59,10 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey
     private final String name;
     private final String prettyName;
     private final String comment;
-    private final IKeybind keybind;
+    private final KeybindMulti keybind;
     private final boolean defaultValueBoolean;
     private final int defaultLinePosition;
+    private String modName = "";
     private boolean valueBoolean;
     private boolean lastSavedValueBoolean;
     private int linePosition;
@@ -78,7 +79,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey
         this.prettyName = name;
         this.valueBoolean = defaultValue;
         this.defaultValueBoolean = defaultValue;
-        this.keybind = KeybindMulti.fromStorageString(defaultHotkey, settings);
+        this.keybind = KeybindMulti.fromStorageString(name, defaultHotkey, settings);
         this.keybind.setCallback(new KeyCallbackToggleBoolean(this));
         this.linePosition = linePosition;
         this.defaultLinePosition = linePosition;
@@ -121,6 +122,19 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey
     public String getComment()
     {
         return comment != null ? this.comment : "";
+    }
+
+    @Override
+    public String getModName()
+    {
+        return this.modName;
+    }
+
+    @Override
+    public void setModName(String modName)
+    {
+        this.modName = modName;
+        this.keybind.setModName(modName);
     }
 
     @Override
