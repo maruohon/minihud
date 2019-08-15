@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.minihud.Reference;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.util.LightLevelMarkerMode;
-import fi.dy.masa.minihud.util.LightLevelNumberMode;
-import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -25,6 +20,11 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.minihud.Reference;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.util.LightLevelMarkerMode;
+import fi.dy.masa.minihud.util.LightLevelNumberMode;
 
 public class OverlayRendererLightLevel
 {
@@ -374,10 +374,14 @@ public class OverlayRendererLightLevel
                     {
                         final int startY = Math.max(minY, 0);
                         final int endY   = Math.min(maxY, chunk.getTopFilledSegment() + 15);
+                        IBlockState stateDown = chunk.getBlockState(x, startY - 1, z);
+                        IBlockState state    = chunk.getBlockState(x, startY, z);
+                        IBlockState stateUp  = chunk.getBlockState(x, startY + 1, z);
+                        IBlockState stateUp2 = chunk.getBlockState(x, startY + 2, z);
 
-                        for (int y = startY; y <= endY; ++y)
+                        for (int y = startY; y <= endY; )
                         {
-                            if (canSpawnAt(x, y, z, chunk))
+                            if (canSpawnAt(stateDown, state, stateUp, stateUp2))
                             {
                                 posMutable.setPos(x, y, z);
 
@@ -388,6 +392,12 @@ public class OverlayRendererLightLevel
 
                                 //y += 2; // if the spot is spawnable, that means the next spawnable spot can be the third block up
                             }
+
+                            ++y;
+                            stateDown = state;
+                            state = stateUp;
+                            stateUp = stateUp2;
+                            stateUp2 = chunk.getBlockState(x, y + 2, z);
                         }
                     }
                 }
@@ -405,22 +415,24 @@ public class OverlayRendererLightLevel
      * @param pos
      * @return
      */
-    public static boolean canSpawnAt(int x, int y, int z, Chunk chunk)
+    public static boolean canSpawnAt(IBlockState stateDown, IBlockState state, IBlockState stateUp, IBlockState stateUp2)
     {
-        IBlockState state = chunk.getBlockState(x, y - 1, z);
-
-        if (state.isTopSolid() == false)
+        if (stateDown.isTopSolid() == false ||
+            stateDown.getBlock() == Blocks.BEDROCK ||
+            stateDown.getBlock() == Blocks.BARRIER)
         {
             return false;
         }
         else
         {
-            Block block = state.getBlock();
-            boolean spawnable = block != Blocks.BEDROCK && block != Blocks.BARRIER;
+            if (state.getMaterial() == Material.WATER)
+            {
+                return stateUp.getMaterial() == Material.WATER &&
+                       stateUp2.isNormalCube() == false;
+            }
 
-            return spawnable &&
-                   WorldEntitySpawner.isValidEmptySpawnBlock(chunk.getBlockState(x, y    , z)) &&
-                   WorldEntitySpawner.isValidEmptySpawnBlock(chunk.getBlockState(x, y + 1, z));
+            return WorldEntitySpawner.isValidEmptySpawnBlock(state) &&
+                   WorldEntitySpawner.isValidEmptySpawnBlock(stateUp);
         }
     }
 
