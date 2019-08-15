@@ -94,7 +94,7 @@ public class RenderHandler implements IRenderer
 
         if (Configs.Generic.ENABLED.getBooleanValue() &&
             mc.gameSettings.showDebugInfo == false &&
-            mc.player != null &&
+            mc.player != null && mc.gameSettings.hideGUI == false &&
             (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
             Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld())
         {
@@ -150,7 +150,8 @@ public class RenderHandler implements IRenderer
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (Configs.Generic.ENABLED.getBooleanValue() && mc.world != null && mc.player != null)
+        if (Configs.Generic.ENABLED.getBooleanValue() &&
+            mc.world != null && mc.player != null && mc.gameSettings.hideGUI == false)
         {
             OverlayRenderer.renderOverlays(mc, partialTicks);
         }
