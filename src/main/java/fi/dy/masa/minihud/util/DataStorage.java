@@ -13,31 +13,13 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.gson.JsonObject;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.minihud.LiteModMiniHud;
-import fi.dy.masa.minihud.Reference;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.StructureToggle;
-import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorEnd;
-import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorFlat;
-import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorHell;
-import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorOverworld;
-import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
-import fi.dy.masa.minihud.mixin.IMixinMapGenStructure;
-import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
-import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -61,6 +43,24 @@ import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.Reference;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.StructureToggle;
+import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorEnd;
+import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorFlat;
+import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorHell;
+import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorOverworld;
+import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
+import fi.dy.masa.minihud.mixin.IMixinMapGenStructure;
+import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
+import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
 public class DataStorage
 {
@@ -140,20 +140,22 @@ public class DataStorage
         }
         else if (this.mc.isSingleplayer())
         {
-            MinecraftServer server = this.mc.getIntegratedServer();
-            World worldTmp = server.getWorld(dimension);
-            return worldTmp != null;
+            return this.mc.getIntegratedServer().getWorld(dimension) != null;
         }
 
         return false;
+    }
+
+    public boolean hasStoredWorldSeed()
+    {
+        return this.worldSeedValid;
     }
 
     public long getWorldSeed(int dimension)
     {
         if (this.worldSeedValid == false && this.mc.isSingleplayer())
         {
-            MinecraftServer server = this.mc.getIntegratedServer();
-            World worldTmp = server.getWorld(dimension);
+            World worldTmp = this.mc.getIntegratedServer().getWorld(dimension);
 
             if (worldTmp != null)
             {
@@ -807,6 +809,11 @@ public class DataStorage
 
         obj.add("distance_pos", JsonUtils.vec3dToJson(this.distanceReferencePoint));
 
+        if (this.worldSeedValid)
+        {
+            obj.add("seed", new JsonPrimitive(this.worldSeed));
+        }
+
         return obj;
     }
 
@@ -821,6 +828,12 @@ public class DataStorage
         else
         {
             this.distanceReferencePoint = Vec3d.ZERO;
+        }
+
+        if (JsonUtils.hasLong(obj, "seed"))
+        {
+            this.worldSeed = JsonUtils.getLong(obj, "seed");
+            this.worldSeedValid = true;
         }
     }
 }

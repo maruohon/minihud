@@ -4,10 +4,13 @@ import java.io.File;
 import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -15,8 +18,6 @@ import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.util.DataStorage;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
 
 public class WorldLoadListener implements IWorldLoadListener
 {
@@ -38,11 +39,14 @@ public class WorldLoadListener implements IWorldLoadListener
                 this.writeDataGlobal();
             }
 
-            this.hasCachedSeed = worldAfter != null && Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue();
-
-            if (this.hasCachedSeed)
+            if (worldAfter != null)
             {
-                this.cachedSeed = worldAfter.getSeed();
+                this.hasCachedSeed = DataStorage.getInstance().hasStoredWorldSeed() && Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue();
+
+                if (this.hasCachedSeed)
+                {
+                    this.cachedSeed = DataStorage.getInstance().getWorldSeed(WorldUtils.getDimensionId(worldAfter));
+                }
             }
         }
         else
