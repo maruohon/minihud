@@ -53,6 +53,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       LIGHT_LEVEL_NUMBER_ROTATION         = new ConfigBoolean("lightLevelNumberRotation", true, "If true, then the light level numbers will rotate\naccording to the player's current facing");
         public static final ConfigInteger       LIGHT_LEVEL_RANGE                   = new ConfigInteger("lightLevelRange", 24, 1, 64, "The block range to render the Light Level overlay in");
         public static final ConfigInteger       LIGHT_LEVEL_THRESHOLD               = new ConfigInteger("lightLevelThreshold", 8, 0, 15, "The light level threshold which is considered safe");
+        public static final ConfigDouble        LIGHT_LEVEL_Z_OFFSET                = new ConfigDouble("lightLevelZOffset", 0.005, 0.0, 1.0, "The relative \"z\" offset for the light level overlay.\nMeant to help with potential z-fighting issues.\nRange: 0.0 - 1.0");
         public static final ConfigBoolean       MAP_PREVIEW                         = new ConfigBoolean("mapPreview", false, "Enables rendering a preview of the map,\nwhen you hold shift while hovering over a map item");
         public static final ConfigInteger       MAP_PREVIEW_SIZE                    = new ConfigInteger("mapPreviewSize", 160, 16, 512, "The size of the rendered map previews");
         public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "H,C", "A hotkey to open the in-game Config GUI");
@@ -126,6 +127,7 @@ public class Configs implements IConfigHandler
                 LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
                 LIGHT_LEVEL_RANGE,
                 LIGHT_LEVEL_THRESHOLD,
+                LIGHT_LEVEL_Z_OFFSET,
                 MAP_PREVIEW_SIZE,
                 SLIME_CHUNK_OVERLAY_RADIUS,
                 SPAWNABLE_COLUMNS_OVERLAY_RADIUS,

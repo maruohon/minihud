@@ -60,6 +60,8 @@ public class OverlayRendererLightLevel
 
         if (count > 0)
         {
+            dy -= Configs.Generic.LIGHT_LEVEL_Z_OFFSET.getDoubleValue();
+
             mc.getTextureManager().bindTexture(TEXTURE_NUMBERS);
 
             GlStateManager.enableAlpha();
@@ -236,8 +238,6 @@ public class OverlayRendererLightLevel
         double u = (lightLevel & 0x3) * 0.25;
         double v = (lightLevel >> 2) * 0.25;
 
-        y += 0.005;
-
         switch (facing)
         {
             case NORTH:
@@ -276,7 +276,6 @@ public class OverlayRendererLightLevel
     {
         double u = (lightLevel & 0x3) * 0.25;
         double v = (lightLevel >> 2) * 0.25;
-        y += 0.005;
 
         switch (facing)
         {
@@ -314,8 +313,6 @@ public class OverlayRendererLightLevel
 
     private static void renderLightLevelCross(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
     {
-        y += 0.005;
-
         buffer.pos(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
         buffer.pos(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
 
@@ -325,8 +322,6 @@ public class OverlayRendererLightLevel
 
     private static void renderLightLevelSquare(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
     {
-        y += 0.005;
-
         buffer.pos(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
         buffer.pos(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
 
