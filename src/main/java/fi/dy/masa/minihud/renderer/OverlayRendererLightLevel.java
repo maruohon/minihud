@@ -136,6 +136,7 @@ public class OverlayRendererLightLevel
                 double offset1 = (1.0 - markerSize) / 2.0;
                 double offset2 = (1.0 - offset1);
 
+                GlStateManager.glLineWidth(1f);
                 GlStateManager.disableTexture2D();
 
                 buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
@@ -164,6 +165,7 @@ public class OverlayRendererLightLevel
                 double offset1 = (1.0 - markerSize) / 2.0;
                 double offset2 = (1.0 - offset1);
 
+                GlStateManager.glLineWidth(1f);
                 GlStateManager.disableTexture2D();
 
                 buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
