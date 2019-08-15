@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -14,6 +11,9 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 
 public class RenderContainer
 {
@@ -152,7 +152,6 @@ public class RenderContainer
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
             GlStateManager.disableBlend();
             GlStateManager.enableDepth();
-            GlStateManager.enableLighting();
             GlStateManager.enableCull();
             GlStateManager.depthMask(true);
             GlStateManager.enableTexture2D();
