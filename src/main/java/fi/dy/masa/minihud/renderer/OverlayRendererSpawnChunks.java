@@ -75,9 +75,16 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         final int colorLazy = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
                 Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getIntegerValue() :
                 Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
+        final int colorOuter = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
+                Configs.Colors.SPAWN_REAL_OUTER_OVERLAY_COLOR.getIntegerValue() :
+                Configs.Colors.SPAWN_PLAYER_OUTER_OVERLAY_COLOR.getIntegerValue();
 
         int rangeH = (mc.options.viewDistance + 1) * 16;
-        Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 11);
+        Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 22);
+        RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
+                rangeH, 256, 16, 16, entity, colorOuter);
+
+        corners = this.getSpawnChunkCorners(spawn, 11);
         RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
                 rangeH, 256, 16, 16, entity, colorLazy);
 
