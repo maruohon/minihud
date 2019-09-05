@@ -7,14 +7,6 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.malilib.config.values.BlockSnap;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.Quadrant;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.renderer.RenderObjectBase;
-import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -24,6 +16,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.malilib.config.values.BlockSnap;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.Quadrant;
+import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.renderer.RenderObjectBase;
+import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
 
 public class ShapeDespawnSphere extends ShapeBase
 {
@@ -33,7 +33,7 @@ public class ShapeDespawnSphere extends ShapeBase
     protected Vec3d effectiveCenter = Vec3d.ZERO;
     protected final Vec3d[] quadrantCenters = new Vec3d[4];
     protected Vec3d lastUpdatePos = Vec3d.ZERO;
-    protected BlockSnap snap = BlockSnap.NONE;
+    protected BlockSnap snap = BlockSnap.CENTER;
     protected double margin = 1.5;
     protected long lastUpdateTime;
 
@@ -45,7 +45,9 @@ public class ShapeDespawnSphere extends ShapeBase
 
         if (player != null)
         {
-            this.setCenter(player.getPositionVector());
+            Vec3d center = player.getPositionVector();
+            center = new Vec3d(Math.floor(center.x) + 0.5, Math.floor(center.y), Math.floor(center.z) + 0.5);
+            this.setCenter(center);
         }
         else
         {
