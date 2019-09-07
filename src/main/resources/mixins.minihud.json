@@ -10,7 +10,7 @@
         "IMixinWorldRenderer",
         "MixinAbstractRedstoneGateBlock",
         "MixinClientPlayNetworkHandler",
-        "MixinGameRenderer",
+        "MixinDebugRenderer",
         "MixinHeightmapDebugRenderer",
         "MixinMinecraftServer",
         "MixinNeighborUpdateDebugRenderer",

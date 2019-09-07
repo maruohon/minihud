@@ -8,21 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import com.mojang.blaze3d.platform.GlStateManager;
-import fi.dy.masa.malilib.config.HudAlignment;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.interfaces.IRenderer;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.InfoToggle;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.mixin.IMixinServerWorld;
-import fi.dy.masa.minihud.mixin.IMixinWorldRenderer;
-import fi.dy.masa.minihud.renderer.OverlayRenderer;
-import fi.dy.masa.minihud.util.DataStorage;
-import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
@@ -51,6 +36,21 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.dimension.DimensionType;
+import fi.dy.masa.malilib.config.HudAlignment;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.interfaces.IRenderer;
+import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.mixin.IMixinServerWorld;
+import fi.dy.masa.minihud.mixin.IMixinWorldRenderer;
+import fi.dy.masa.minihud.renderer.OverlayRenderer;
+import fi.dy.masa.minihud.util.DataStorage;
+import fi.dy.masa.minihud.util.MiscUtils;
 
 public class RenderHandler implements IRenderer
 {
@@ -504,26 +504,29 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.LIGHT_LEVEL)
         {
             // Prevent a crash when outside of world
-            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
+            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.method_22340(pos)) // isBlockLoaded
             {
                 WorldChunk chunk = mc.world.getWorldChunk(pos);
 
                 if (chunk.isEmpty() == false)
                 {
+                    LightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
+
                     this.addLine(String.format("Client Light: %d (block: %d, sky: %d)",
-                            chunk.getLightLevel(pos, 0),
-                            mc.world.getLightLevel(LightType.BLOCK, pos),
-                            mc.world.getLightLevel(LightType.SKY, pos)));
+                            lightingProvider.method_22363(pos, 0),
+                            lightingProvider.get(LightType.BLOCK).getLightLevel(pos),
+                            lightingProvider.get(LightType.SKY).getLightLevel(pos)));
 
                     World bestWorld = WorldUtils.getBestWorld(mc);
                     WorldChunk serverChunk = WorldUtils.getBestChunk(chunkPos.x, chunkPos.z, mc);
 
                     if (serverChunk != null)
                     {
-                        LightingProvider lightingProvider = bestWorld.getChunkManager().getLightingProvider();
-                        int sky = lightingProvider.get(LightType.SKY).getLightLevel(pos);
+                        lightingProvider = bestWorld.getChunkManager().getLightingProvider();
+                        int total = lightingProvider.method_22363(pos, 0);
                         int block = lightingProvider.get(LightType.BLOCK).getLightLevel(pos);
-                        this.addLine(String.format("Server Light: (%d sky, %d block)", sky, block));
+                        int sky = lightingProvider.get(LightType.SKY).getLightLevel(pos);
+                        this.addLine(String.format("Server Light: %d (block: %d, sky: %d)", total, block, sky));
                     }
                 }
             }
@@ -591,7 +594,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.LOADED_CHUNKS_COUNT)
         {
-            String chunksClient = mc.world.getChunkProviderStatus();
+            String chunksClient = mc.world.getDebugString();
             World worldServer = WorldUtils.getBestWorld(mc);
 
             if (worldServer != null && worldServer != mc.world)
@@ -611,7 +614,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.DIFFICULTY)
         {
-            if (mc.world.isBlockLoaded(pos))
+            if (mc.world.method_22340(pos)) // isBlockLoaded
             {
                 long chunkInhabitedTime = 0L;
                 float moonPhaseFactor = 0.0F;
@@ -631,26 +634,26 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.BIOME)
         {
             // Prevent a crash when outside of world
-            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
+            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.method_22340(pos)) // isBlockLoaded
             {
                 WorldChunk chunk = mc.world.getWorldChunk(pos);
 
                 if (chunk.isEmpty() == false)
                 {
-                    this.addLine("Biome: " + chunk.getBiome(pos).getName().getString());
+                    this.addLine("Biome: " + mc.world.getBiome(pos).getName().getString());
                 }
             }
         }
         else if (type == InfoToggle.BIOME_REG_NAME)
         {
             // Prevent a crash when outside of world
-            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
+            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.method_22340(pos)) // isBlockLoaded
             {
                 WorldChunk chunk = mc.world.getWorldChunk(pos);
 
                 if (chunk.isEmpty() == false)
                 {
-                    Biome biome = chunk.getBiome(pos);
+                    Biome biome = mc.world.getBiome(pos);
                     Identifier rl = Registry.BIOME.getId(biome);
                     String name = rl != null ? rl.toString() : "?";
                     this.addLine("Biome reg name: " + name);
@@ -732,7 +735,7 @@ public class RenderHandler implements IRenderer
                 {
                     LivingEntity living = (LivingEntity) lookedEntity;
                     this.addLine(String.format("Entity: %s - HP: %.1f / %.1f",
-                            living.getName().getString(), living.getHealth(), living.getHealthMaximum()));
+                            living.getName().getString(), living.getHealth(), living.getMaximumHealth()));
                 }
                 else
                 {

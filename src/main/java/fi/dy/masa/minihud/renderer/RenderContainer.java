@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlBuffer;
 import net.minecraft.client.render.VertexFormatElement;
@@ -16,14 +12,16 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 
 public class RenderContainer
 {
     public static final RenderContainer INSTANCE = new RenderContainer();
 
-    protected final List<OverlayRendererBase> renderers = new ArrayList<>();
+    private final List<OverlayRendererBase> renderers = new ArrayList<>();
     protected boolean resourcesAllocated;
-    protected boolean useVbo;
     protected int countActive;
 
     private RenderContainer()
@@ -67,7 +65,7 @@ public class RenderContainer
 
     protected void update(Entity entity, MinecraftClient mc)
     {
-        this.checkVideoSettings();
+        this.allocateResourcesIfNeeded();
         this.countActive = 0;
 
         for (int i = 0; i < this.renderers.size(); ++i)
@@ -105,11 +103,8 @@ public class RenderContainer
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
-            if (GLX.useVbo())
-            {
-                GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
-                GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
-            }
+            GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
+            GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
 
             Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
 
@@ -123,25 +118,22 @@ public class RenderContainer
                 }
             }
 
-            if (GLX.useVbo())
+            GlBuffer.unbind();
+            GlStateManager.clearCurrentColor();
+
+            for (VertexFormatElement element : VertexFormats.POSITION_COLOR.getElements())
             {
-                GlBuffer.unbind();
-                GlStateManager.clearCurrentColor();
+                VertexFormatElement.Type usage = element.getType();
 
-                for (VertexFormatElement element : VertexFormats.POSITION_COLOR.getElements())
+                switch (usage)
                 {
-                    VertexFormatElement.Type usage = element.getType();
-
-                    switch (usage)
-                    {
-                        case POSITION:
-                            GlStateManager.disableClientState(GL11.GL_VERTEX_ARRAY);
-                            break;
-                        case COLOR:
-                            GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
-                            GlStateManager.clearCurrentColor();
-                        default:
-                    }
+                    case POSITION:
+                        GlStateManager.disableClientState(GL11.GL_VERTEX_ARRAY);
+                        break;
+                    case COLOR:
+                        GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
+                        GlStateManager.clearCurrentColor();
+                    default:
                 }
             }
 
@@ -158,12 +150,9 @@ public class RenderContainer
         }
     }
 
-    protected void checkVideoSettings()
+    protected void allocateResourcesIfNeeded()
     {
-        boolean vboLast = this.useVbo;
-        this.useVbo = GLX.useVbo();
-
-        if (vboLast != this.useVbo || this.resourcesAllocated == false)
+        if (this.resourcesAllocated == false)
         {
             this.deleteGlResources();
             this.allocateGlResources();

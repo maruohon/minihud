@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.util.math.BlockPos;
@@ -67,19 +66,8 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
      */
     protected RenderObjectBase allocateBuffer(int glMode)
     {
-        RenderObjectBase obj;
-
-        if (GLX.useVbo())
-        {
-            obj = new RenderObjectVbo(glMode);
-        }
-        else
-        {
-            obj = new RenderObjectDisplayList(glMode);
-        }
-
+        RenderObjectBase obj = new RenderObjectVbo(glMode);
         this.renderObjects.add(obj);
-
         return obj;
     }
 

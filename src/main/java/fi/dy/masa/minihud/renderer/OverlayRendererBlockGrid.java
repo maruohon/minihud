@@ -122,7 +122,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
                 {
                     posMutable.set(x, y, z);
 
-                    if (world.isAir(posMutable) == false)
+                    if (world.method_22347(posMutable) == false) // isAir
                     {
                         fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(posMutable, color, 0.001, buffer);
                     }
@@ -150,7 +150,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
                 {
                     posMutable.set(x, y, z);
 
-                    if (world.isAir(posMutable))
+                    if (world.method_22347(posMutable)) // isAir
                     {
                         for (Direction side : Direction.values())
                         {
@@ -159,7 +159,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
                                     posMutable.getY() + side.getOffsetY(),
                                     posMutable.getZ() + side.getOffsetZ());
 
-                            if (world.isAir(posMutable2) == false)
+                            if (world.method_22347(posMutable2) == false) // isAir
                             {
                                 fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(posMutable, color, 0.001, buffer);
                                 break;

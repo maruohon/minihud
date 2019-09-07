@@ -5,11 +5,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.minihud.Reference;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.util.LightLevelMarkerMode;
-import fi.dy.masa.minihud.util.LightLevelNumberMode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -26,6 +21,12 @@ import net.minecraft.world.LightType;
 import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.light.LightingProvider;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.minihud.Reference;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.util.LightLevelMarkerMode;
+import fi.dy.masa.minihud.util.LightLevelNumberMode;
 
 public class OverlayRendererLightLevel
 {
@@ -355,6 +356,7 @@ public class OverlayRendererLightLevel
         final int minCZ = (minZ >> 4);
         final int maxCX = (maxX >> 4);
         final int maxCZ = (maxZ >> 4);
+        LightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
 
         for (int cx = minCX; cx <= maxCX; ++cx)
         {
@@ -380,8 +382,8 @@ public class OverlayRendererLightLevel
                             {
                                 MUTABLE_POS.set(x, y, z);
 
-                                int block = chunk.getLightingProvider().get(LightType.BLOCK).getLightLevel(MUTABLE_POS);
-                                int sky = chunk.getLightingProvider().get(LightType.SKY).getLightLevel(MUTABLE_POS);
+                                int block = lightingProvider.get(LightType.BLOCK).getLightLevel(MUTABLE_POS);
+                                int sky = lightingProvider.get(LightType.SKY).getLightLevel(MUTABLE_POS);
 
                                 LIGHT_INFOS.add(new LightLevelInfo(new BlockPos(x, y, z), block, sky));
 

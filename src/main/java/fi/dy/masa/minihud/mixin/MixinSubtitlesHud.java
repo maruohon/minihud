@@ -6,15 +6,15 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.platform.GlStateManager;
-import fi.dy.masa.minihud.event.RenderHandler;
 import net.minecraft.client.gui.hud.SubtitlesHud;
+import fi.dy.masa.minihud.event.RenderHandler;
 
 @Mixin(SubtitlesHud.class)
 public abstract class MixinSubtitlesHud
 {
     @Inject(method = "render", at = @At(
             value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/platform/GlStateManager;enableBlend()V",
+            target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V",
             shift = Shift.AFTER, ordinal = 0))
     private void nudgeSubtitleOverlay(CallbackInfo ci)
     {
