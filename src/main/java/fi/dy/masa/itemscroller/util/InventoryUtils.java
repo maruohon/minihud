@@ -2322,7 +2322,7 @@ public class InventoryUtils
             try
             {
                 MinecraftClient mc = MinecraftClient.getInstance();
-                mc.interactionManager.method_2906(gui.getContainer().syncId, slotNum, mouseButton, type, mc.player);
+                mc.interactionManager.clickSlot(gui.getContainer().syncId, slotNum, mouseButton, type, mc.player);
             }
             catch (Exception e)
             {
