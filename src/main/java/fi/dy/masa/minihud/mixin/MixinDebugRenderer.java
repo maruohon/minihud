@@ -10,7 +10,7 @@ import fi.dy.masa.minihud.util.DebugInfoUtils;
 @Mixin(DebugRenderer.class)
 public abstract class MixinDebugRenderer
 {
-    @Inject(method = "renderDebuggers", at = @At("RETURN"))
+    @Inject(method = "render", at = @At("RETURN"))
     private void renderDebugRenderers(long finishTimeNano, CallbackInfo ci)
     {
         DebugInfoUtils.renderVanillaDebug(finishTimeNano);

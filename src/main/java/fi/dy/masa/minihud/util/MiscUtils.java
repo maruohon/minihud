@@ -2,9 +2,9 @@ package fi.dy.masa.minihud.util;
 
 import java.util.Random;
 import javax.annotation.Nullable;
-import fi.dy.masa.malilib.util.IntBoundingBox;
+import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableIntBoundingBox;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 
 public class MiscUtils
 {
@@ -32,7 +32,7 @@ public class MiscUtils
         return RAND.nextInt(10) == 0;
     }
 
-    public static boolean isStructureWithinRange(@Nullable MutableIntBoundingBox bb, BlockPos playerPos, int maxRange)
+    public static boolean isStructureWithinRange(@Nullable BlockBox bb, BlockPos playerPos, int maxRange)
     {
         if (bb == null ||
             playerPos.getX() < (bb.minX - maxRange) ||

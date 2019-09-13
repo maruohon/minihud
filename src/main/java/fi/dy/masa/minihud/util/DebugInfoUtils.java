@@ -1,6 +1,5 @@
 package fi.dy.masa.minihud.util;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -58,9 +57,9 @@ public class DebugInfoUtils
         buf.writeInt(node.y);
         buf.writeInt(node.z);
 
-        buf.writeFloat(node.field_46);
-        buf.writeFloat(node.field_43);
-        buf.writeBoolean(node.field_42);
+        buf.writeFloat(node.pathLength);
+        buf.writeFloat(node.penalty);
+        buf.writeBoolean(node.visited);
         buf.writeInt(node.type.ordinal());
         buf.writeFloat(node.heapWeight);
     }
@@ -81,13 +80,13 @@ public class DebugInfoUtils
         // and paths will be the same. For example, a valid path (destination
         // in this case) to the the "meeting" POI can be up to 6 Manhattan
         // distance away from the target BlockPos; the actual POI.
-        BlockPos target = path.method_48();
+        BlockPos target = path.getTarget();
 
         if (destination != null)
         {
             // Whether or not the destination is within the manhattan distance
             // of the target POI (the last param to PointOfInterestType::register)
-            buf.writeBoolean(path.method_21655());
+            buf.writeBoolean(path.reachesTarget());
             buf.writeInt(path.getCurrentNodeIndex());
 
             // There is a hash set of class_4459 prefixed with its count here, which

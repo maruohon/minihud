@@ -504,7 +504,7 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.LIGHT_LEVEL)
         {
             // Prevent a crash when outside of world
-            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.method_22340(pos)) // isBlockLoaded
+            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isChunkLoaded(pos))
             {
                 WorldChunk chunk = mc.world.getWorldChunk(pos);
 
@@ -513,7 +513,7 @@ public class RenderHandler implements IRenderer
                     LightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
 
                     this.addLine(String.format("Client Light: %d (block: %d, sky: %d)",
-                            lightingProvider.method_22363(pos, 0),
+                            lightingProvider.getLight(pos, 0),
                             lightingProvider.get(LightType.BLOCK).getLightLevel(pos),
                             lightingProvider.get(LightType.SKY).getLightLevel(pos)));
 
@@ -523,7 +523,7 @@ public class RenderHandler implements IRenderer
                     if (serverChunk != null)
                     {
                         lightingProvider = bestWorld.getChunkManager().getLightingProvider();
-                        int total = lightingProvider.method_22363(pos, 0);
+                        int total = lightingProvider.getLight(pos, 0);
                         int block = lightingProvider.get(LightType.BLOCK).getLightLevel(pos);
                         int sky = lightingProvider.get(LightType.SKY).getLightLevel(pos);
                         this.addLine(String.format("Server Light: %d (block: %d, sky: %d)", total, block, sky));
@@ -614,7 +614,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.DIFFICULTY)
         {
-            if (mc.world.method_22340(pos)) // isBlockLoaded
+            if (mc.world.isChunkLoaded(pos))
             {
                 long chunkInhabitedTime = 0L;
                 float moonPhaseFactor = 0.0F;
@@ -634,7 +634,7 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.BIOME)
         {
             // Prevent a crash when outside of world
-            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.method_22340(pos)) // isBlockLoaded
+            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isChunkLoaded(pos))
             {
                 WorldChunk chunk = mc.world.getWorldChunk(pos);
 
@@ -647,7 +647,7 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.BIOME_REG_NAME)
         {
             // Prevent a crash when outside of world
-            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.method_22340(pos)) // isBlockLoaded
+            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isChunkLoaded(pos))
             {
                 WorldChunk chunk = mc.world.getWorldChunk(pos);
 

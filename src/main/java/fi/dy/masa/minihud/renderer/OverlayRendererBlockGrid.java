@@ -1,10 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
 import org.lwjgl.opengl.GL11;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.util.BlockGridMode;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
@@ -12,6 +8,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.util.BlockGridMode;
 
 public class OverlayRendererBlockGrid extends OverlayRendererBase
 {
@@ -122,7 +122,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
                 {
                     posMutable.set(x, y, z);
 
-                    if (world.method_22347(posMutable) == false) // isAir
+                    if (world.isAir(posMutable) == false)
                     {
                         fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(posMutable, color, 0.001, buffer);
                     }
@@ -150,7 +150,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
                 {
                     posMutable.set(x, y, z);
 
-                    if (world.method_22347(posMutable)) // isAir
+                    if (world.isAir(posMutable))
                     {
                         for (Direction side : Direction.values())
                         {
@@ -159,7 +159,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
                                     posMutable.getY() + side.getOffsetY(),
                                     posMutable.getZ() + side.getOffsetZ());
 
-                            if (world.method_22347(posMutable2) == false) // isAir
+                            if (world.isAir(posMutable2) == false)
                             {
                                 fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(posMutable, color, 0.001, buffer);
                                 break;
