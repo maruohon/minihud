@@ -1,5 +1,7 @@
 package fi.dy.masa.minihud.hotkeys;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
@@ -17,7 +19,6 @@ import fi.dy.masa.minihud.renderer.OverlayRendererStructures;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.util.DataStorage;
-import net.minecraft.client.Minecraft;
 
 public class KeyCallbacks
 {
@@ -56,7 +57,8 @@ public class KeyCallbacks
             }
             else if (key == Configs.Generic.SET_DISTANCE_REFERENCE_POINT.getKeybind())
             {
-                DataStorage.getInstance().setDistanceReferencePoint(mc.player.getPositionVector());
+                Entity entity = mc.getRenderViewEntity() != null ? mc.getRenderViewEntity() : mc.player;
+                DataStorage.getInstance().setDistanceReferencePoint(entity.getPositionVector());
             }
             else if (key == Configs.Generic.SHAPE_EDITOR.getKeybind())
             {

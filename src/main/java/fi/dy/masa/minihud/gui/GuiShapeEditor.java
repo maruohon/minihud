@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.gui;
 
+import net.minecraft.entity.Entity;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.values.BlockSnap;
 import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
@@ -19,7 +20,6 @@ import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeDespawnSphere;
-import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiShapeEditor extends GuiRenderLayerEditBase
 {
@@ -181,11 +181,11 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
-            EntityPlayer player = this.gui.mc.player;
+            Entity entity = this.gui.mc.getRenderViewEntity();
 
-            if (player != null)
+            if (entity != null)
             {
-                this.shape.setCenter(player.getPositionVector());
+                this.shape.setCenter(entity.getPositionVector());
                 this.gui.initGui();
             }
         }
