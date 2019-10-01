@@ -1,6 +1,14 @@
 package fi.dy.masa.itemscroller.event;
 
+import java.nio.FloatBuffer;
+import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
+import net.minecraft.client.util.GlAllocationUtils;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.recipes.RecipePattern;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
@@ -11,18 +19,13 @@ import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
-import net.minecraft.client.render.GuiLighting;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Vec3d;
 
 public class RenderEventHandler
 {
     private static final RenderEventHandler INSTANCE = new RenderEventHandler();
     private static final Vec3d LIGHT0_POS = (new Vec3d( 0.2D, 1.0D, -0.7D)).normalize();
     private static final Vec3d LIGHT1_POS = (new Vec3d(-0.2D, 1.0D,  0.7D)).normalize();
+    private static final FloatBuffer FLOAT_BUFFER = GlAllocationUtils.allocateFloatBuffer(4);
 
     private final MinecraftClient mc = MinecraftClient.getInstance();
     private int recipeListX;
@@ -312,19 +315,31 @@ public class RenderEventHandler
         GlStateManager.enableLight(1);
         GlStateManager.enableColorMaterial();
         GlStateManager.colorMaterial(1032, 5634);
-        GlStateManager.light(16384, 4611, GuiLighting.singletonBuffer((float) LIGHT0_POS.x, (float) LIGHT0_POS.y, (float) LIGHT0_POS.z, 0.0f));
 
         float lightStrength = 0.3F * scale;
-        GlStateManager.light(16384, 4609, GuiLighting.singletonBuffer(lightStrength, lightStrength, lightStrength, 1.0F));
-        GlStateManager.light(16384, 4608, GuiLighting.singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-        GlStateManager.light(16384, 4610, GuiLighting.singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-        GlStateManager.light(16385, 4611, GuiLighting.singletonBuffer((float) LIGHT1_POS.x, (float) LIGHT1_POS.y, (float) LIGHT1_POS.z, 0.0f));
-        GlStateManager.light(16385, 4609, GuiLighting.singletonBuffer(lightStrength, lightStrength, lightStrength, 1.0F));
-        GlStateManager.light(16385, 4608, GuiLighting.singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-        GlStateManager.light(16385, 4610, GuiLighting.singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-        GlStateManager.shadeModel(7424);
-
         float ambientLightStrength = 0.4F;
-        GlStateManager.lightModel(2899, GuiLighting.singletonBuffer(ambientLightStrength, ambientLightStrength, ambientLightStrength, 1.0F));
+
+        GlStateManager.light(16384, 4611, singletonBuffer((float) LIGHT0_POS.x, (float) LIGHT0_POS.y, (float) LIGHT0_POS.z, 0.0f));
+        GlStateManager.light(16384, 4609, singletonBuffer(lightStrength, lightStrength, lightStrength, 1.0F));
+        GlStateManager.light(16384, 4608, singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
+        GlStateManager.light(16384, 4610, singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
+
+        GlStateManager.light(16385, 4611, singletonBuffer((float) LIGHT1_POS.x, (float) LIGHT1_POS.y, (float) LIGHT1_POS.z, 0.0f));
+        GlStateManager.light(16385, 4609, singletonBuffer(lightStrength, lightStrength, lightStrength, 1.0F));
+        GlStateManager.light(16385, 4608, singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
+        GlStateManager.light(16385, 4610, singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
+
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+
+        GlStateManager.lightModel(2899, singletonBuffer(ambientLightStrength, ambientLightStrength, ambientLightStrength, 1.0F));
+    }
+
+    private static FloatBuffer singletonBuffer(float val1, float val2, float val3, float val4)
+    {
+        FLOAT_BUFFER.clear();
+        FLOAT_BUFFER.put(val1).put(val2).put(val3).put(val4);
+        FLOAT_BUFFER.flip();
+
+        return FLOAT_BUFFER;
     }
 }

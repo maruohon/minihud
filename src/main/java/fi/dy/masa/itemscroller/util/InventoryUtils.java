@@ -332,7 +332,7 @@ public class InventoryUtils
         {
             if (gui instanceof CreativeInventoryScreen)
             {
-                boolean isPlayerInv = ((CreativeInventoryScreen) gui).method_2469() == ItemGroup.INVENTORY.getIndex();
+                boolean isPlayerInv = ((CreativeInventoryScreen) gui).getSelectedTab() == ItemGroup.INVENTORY.getIndex();
                 int slotNumber = isPlayerInv ? AccessorUtils.getSlotIndex(slot) : slot.id;
                 slotNumberLast = slotNumber;
             }
@@ -430,7 +430,7 @@ public class InventoryUtils
     {
         CreativeInventoryScreen guiCreative = (CreativeInventoryScreen) gui;
         Slot slot = AccessorUtils.getSlotAtPosition(gui, x, y);
-        boolean isPlayerInv = guiCreative.method_2469() == ItemGroup.INVENTORY.getIndex();
+        boolean isPlayerInv = guiCreative.getSelectedTab() == ItemGroup.INVENTORY.getIndex();
 
         // Only allow dragging from the hotbar slots
         if (slot == null || (slot.getClass() != Slot.class && isPlayerInv == false))
