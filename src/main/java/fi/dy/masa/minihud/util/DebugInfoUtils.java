@@ -35,6 +35,7 @@ public class DebugInfoUtils
 
     public static void sendPacketDebugPath(MinecraftServer server, int entityId, Path path, float maxDistance)
     {
+        /*
         PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
         buffer.writeInt(entityId);
         buffer.writeFloat(maxDistance);
@@ -42,6 +43,7 @@ public class DebugInfoUtils
 
         CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(CustomPayloadS2CPacket.DEBUG_PATH, buffer);
         server.getPlayerManager().sendToAll(packet);
+        */
     }
 
     private static void writeBlockPosToBuffer(PacketByteBuf buf, BlockPos pos)
@@ -73,6 +75,7 @@ public class DebugInfoUtils
 
     private static void writePathToBuffer(PacketByteBuf buf, Path path)
     {
+        /*
         // This is the path node the navigation ends on
         PathNode destination = path.getEnd();
 
@@ -121,6 +124,7 @@ public class DebugInfoUtils
                 writePathPointToBuffer(buf, point);
             }
         }
+        */
     }
 
     public static void onNeighborNotify(World world, BlockPos pos, EnumSet<Direction> notifiedSides)
@@ -229,6 +233,7 @@ public class DebugInfoUtils
 
     public static void renderVanillaDebug(long finishTime)
     {
+        /*
         DebugRenderer renderer = MinecraftClient.getInstance().debugRenderer;
 
         if (RendererToggle.DEBUG_COLLISION_BOXES.getBooleanValue())
@@ -255,5 +260,6 @@ public class DebugInfoUtils
         {
             renderer.waterDebugRenderer.render(finishTime);
         }
+        */
     }
 }

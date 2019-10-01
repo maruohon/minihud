@@ -11,7 +11,6 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.render.chunk.ChunkRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -590,7 +589,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.CHUNK_UPDATES)
         {
-            this.addLine(String.format("Chunk updates: %d", ChunkRenderer.chunkUpdateCount));
+            this.addLine("TODO" /*String.format("Chunk updates: %d", ChunkRenderer.chunkUpdateCount)*/);
         }
         else if (type == InfoToggle.LOADED_CHUNKS_COUNT)
         {

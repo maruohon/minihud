@@ -10,14 +10,9 @@
         "IMixinWorldRenderer",
         "MixinAbstractRedstoneGateBlock",
         "MixinClientPlayNetworkHandler",
-        "MixinDebugRenderer",
-        "MixinHeightmapDebugRenderer",
         "MixinMinecraftServer",
-        "MixinNeighborUpdateDebugRenderer",
-        "MixinBlockOutlineDebugRenderer",
         "MixinScreen",
         "MixinSubtitlesHud",
-        "MixinVoxelDebugRenderer",
         "MixinWorld"
     ],
     "injectors": {

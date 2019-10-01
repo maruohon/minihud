@@ -3,14 +3,11 @@ package fi.dy.masa.minihud.renderer;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.gl.GlBuffer;
-import net.minecraft.client.gl.GlBufferRenderer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
 
 public class RenderObjectVbo extends RenderObjectBase
 {
-    protected static final GlBufferRenderer VERTEX_UPLOADER = new GlBufferRenderer(); // MCP: VertexBufferUploader
-
     protected final GlBuffer vertexBuffer;
 
     public RenderObjectVbo(int glMode)
@@ -23,8 +20,7 @@ public class RenderObjectVbo extends RenderObjectBase
     @Override
     public void uploadData(BufferBuilder buffer)
     {
-        VERTEX_UPLOADER.setGlBuffer(this.vertexBuffer); // MCP: setVertexBuffer
-        VERTEX_UPLOADER.draw(buffer);
+        this.vertexBuffer.method_22643(buffer);
     }
 
     @Override
@@ -35,6 +31,7 @@ public class RenderObjectVbo extends RenderObjectBase
         this.vertexBuffer.bind();
         this.setupArrayPointers();
         this.vertexBuffer.draw(this.getGlMode());
+        GlBuffer.unbind();
 
         GlStateManager.popMatrix();
     }

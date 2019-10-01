@@ -63,7 +63,7 @@ public class OverlayRendererLightLevel
 
         if (count > 0)
         {
-            mc.getTextureManager().bindTexture(TEXTURE_NUMBERS);
+            fi.dy.masa.malilib.render.RenderUtils.bindTexture(TEXTURE_NUMBERS);
 
             GlStateManager.enableAlphaTest();
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
