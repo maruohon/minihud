@@ -122,7 +122,7 @@ public class RecipeStorage
 
     private void readFromNBT(CompoundTag nbt)
     {
-        if (nbt == null || nbt.containsKey("Recipes", Constants.NBT.TAG_LIST) == false)
+        if (nbt == null || nbt.contains("Recipes", Constants.NBT.TAG_LIST) == false)
         {
             return;
         }
@@ -137,7 +137,7 @@ public class RecipeStorage
 
         for (int i = 0; i < count; i++)
         {
-            CompoundTag tag = tagList.getCompoundTag(i);
+            CompoundTag tag = tagList.getCompound(i);
 
             int index = tag.getByte("RecipeIndex");
 

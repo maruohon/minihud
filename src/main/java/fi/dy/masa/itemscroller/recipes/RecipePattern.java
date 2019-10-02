@@ -90,7 +90,7 @@ public class RecipePattern
 
     public void readFromNBT(@Nonnull CompoundTag nbt)
     {
-        if (nbt.containsKey("Result", Constants.NBT.TAG_COMPOUND) && nbt.containsKey("Ingredients", Constants.NBT.TAG_LIST))
+        if (nbt.contains("Result", Constants.NBT.TAG_COMPOUND) && nbt.contains("Ingredients", Constants.NBT.TAG_LIST))
         {
             ListTag tagIngredients = nbt.getList("Ingredients", Constants.NBT.TAG_COMPOUND);
             int count = tagIngredients.size();
@@ -103,7 +103,7 @@ public class RecipePattern
 
             for (int i = 0; i < count; i++)
             {
-                CompoundTag tag = tagIngredients.getCompoundTag(i);
+                CompoundTag tag = tagIngredients.getCompound(i);
                 int slot = tag.getInt("Slot");
 
                 if (slot >= 0 && slot < this.recipe.length)
