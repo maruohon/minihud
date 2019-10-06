@@ -3,17 +3,17 @@ package fi.dy.masa.minihud.renderer;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos.PooledMutable;
+import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos.PooledMutable;
-import net.minecraft.util.math.MathHelper;
 
 public class OverlayRendererSlimeChunks extends OverlayRendererBase
 {
@@ -24,7 +24,9 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     @Override
     public boolean shouldRender(MinecraftClient mc)
     {
-        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() && mc.world.dimension.hasVisibleSky();
+        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() &&
+                DataStorage.getInstance().isWorldSeedKnown(mc.world.dimension.getType()) &&
+                mc.world.dimension.hasVisibleSky();
     }
 
     @Override
