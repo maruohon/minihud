@@ -6,23 +6,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import javax.annotation.Nullable;
 import com.mojang.blaze3d.platform.GlStateManager;
-import fi.dy.masa.malilib.config.HudAlignment;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.interfaces.IRenderer;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.InfoToggle;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.mixin.IMixinServerWorld;
-import fi.dy.masa.minihud.mixin.IMixinWorldRenderer;
-import fi.dy.masa.minihud.renderer.OverlayRenderer;
-import fi.dy.masa.minihud.util.DataStorage;
-import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
@@ -32,6 +20,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
@@ -48,13 +37,30 @@ import net.minecraft.world.LightType;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.dimension.DimensionType;
+import fi.dy.masa.malilib.config.HudAlignment;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.interfaces.IRenderer;
+import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.mixin.IMixinServerWorld;
+import fi.dy.masa.minihud.mixin.IMixinWorldRenderer;
+import fi.dy.masa.minihud.renderer.OverlayRenderer;
+import fi.dy.masa.minihud.util.DataStorage;
+import fi.dy.masa.minihud.util.MiscUtils;
 
 public class RenderHandler implements IRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
+    private final MinecraftClient mc;
     private final DataStorage data;
     private final Date date;
     private int fps;
@@ -63,6 +69,10 @@ public class RenderHandler implements IRenderer
     private long infoUpdateTime;
     private double fontScale = 0.5d;
     private Set<InfoToggle> addedTypes = new HashSet<>();
+    @Nullable private ChunkPos chunkPos;
+    @Nullable private WorldChunk cachedServerChunk;
+    @Nullable private WorldChunk cachedClientChunk;
+    @Nullable private CompletableFuture<WorldChunk> chunkFuture;
 
     private final List<StringHolder> lineWrappers = new ArrayList<>();
     private final List<String> lines = new ArrayList<>();
@@ -71,6 +81,7 @@ public class RenderHandler implements IRenderer
     {
         this.data = DataStorage.getInstance();
         this.date = new Date();
+        this.mc = MinecraftClient.getInstance();
     }
 
     public static RenderHandler getInstance()
@@ -251,6 +262,8 @@ public class RenderHandler implements IRenderer
         {
             this.lines.add(holder.str);
         }
+
+        this.resetCachedChunk();
     }
 
     private void addLine(String text)
@@ -265,6 +278,12 @@ public class RenderHandler implements IRenderer
         World world = entity.getEntityWorld();
         BlockPos pos = new BlockPos(entity.x, entity.getBoundingBox().minY, entity.z);
         ChunkPos chunkPos = new ChunkPos(pos);
+
+        if (Objects.equals(this.chunkPos, chunkPos) == false)
+        {
+           this.chunkPos = chunkPos;
+           this.resetCachedChunk();
+        }
 
         if (type == InfoToggle.FPS)
         {
@@ -506,19 +525,19 @@ public class RenderHandler implements IRenderer
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
             {
-                WorldChunk chunk = mc.world.getWorldChunk(pos);
+                WorldChunk clientChunk = this.getClientChunk(chunkPos);
 
-                if (chunk.isEmpty() == false)
+                if (clientChunk.isEmpty() == false)
                 {
                     this.addLine(String.format("Client Light: %d (block: %d, sky: %d)",
-                            chunk.getLightLevel(pos, 0),
+                            clientChunk.getLightLevel(pos, 0),
                             mc.world.getLightLevel(LightType.BLOCK, pos),
                             mc.world.getLightLevel(LightType.SKY, pos)));
 
                     World bestWorld = WorldUtils.getBestWorld(mc);
-                    WorldChunk serverChunk = WorldUtils.getBestChunk(chunkPos.x, chunkPos.z, mc);
+                    WorldChunk serverChunk = this.getChunk(chunkPos);
 
-                    if (serverChunk != null)
+                    if (serverChunk != null && serverChunk != clientChunk)
                     {
                         LightingProvider lightingProvider = bestWorld.getChunkManager().getLightingProvider();
                         int sky = lightingProvider.get(LightType.SKY).getLightLevel(pos);
@@ -615,7 +634,7 @@ public class RenderHandler implements IRenderer
             {
                 long chunkInhabitedTime = 0L;
                 float moonPhaseFactor = 0.0F;
-                WorldChunk serverChunk = WorldUtils.getBestChunk(chunkPos.x, chunkPos.z, mc);
+                WorldChunk serverChunk = this.getChunk(chunkPos);
 
                 if (serverChunk != null)
                 {
@@ -633,11 +652,11 @@ public class RenderHandler implements IRenderer
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
             {
-                WorldChunk chunk = mc.world.getWorldChunk(pos);
+                WorldChunk clientChunk = this.getClientChunk(chunkPos);
 
-                if (chunk.isEmpty() == false)
+                if (clientChunk.isEmpty() == false)
                 {
-                    this.addLine("Biome: " + chunk.getBiome(pos).getName().getString());
+                    this.addLine("Biome: " + clientChunk.getBiome(pos).getName().getString());
                 }
             }
         }
@@ -646,11 +665,11 @@ public class RenderHandler implements IRenderer
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
             {
-                WorldChunk chunk = mc.world.getWorldChunk(pos);
+                WorldChunk clientChunk = this.getClientChunk(chunkPos);
 
-                if (chunk.isEmpty() == false)
+                if (clientChunk.isEmpty() == false)
                 {
-                    Biome biome = chunk.getBiome(pos);
+                    Biome biome = clientChunk.getBiome(pos);
                     Identifier rl = Registry.BIOME.getId(biome);
                     String name = rl != null ? rl.toString() : "?";
                     this.addLine("Biome reg name: " + name);
@@ -809,6 +828,62 @@ public class RenderHandler implements IRenderer
                 this.addLine(line);
             }
         }
+    }
+
+    @Nullable
+    private WorldChunk getChunk(ChunkPos chunkPos)
+    {
+        if (this.cachedServerChunk != null)
+        {
+            return this.cachedServerChunk;
+        }
+
+        if (this.chunkFuture == null)
+        {
+            IntegratedServer integratedServer_1 = this.mc.getServer();
+
+            if (integratedServer_1 != null)
+            {
+                ServerWorld serverWorld_1 = integratedServer_1.getWorld(this.mc.world.dimension.getType());
+
+                if (serverWorld_1 != null)
+                {
+                    this.chunkFuture = serverWorld_1.method_14178().getChunkFutureSyncOnMainThread(chunkPos.x, chunkPos.z, ChunkStatus.FULL, false).thenApply((either_1) -> {
+                        return (WorldChunk)either_1.map((chunk_1) -> {
+                            return (WorldChunk)chunk_1;
+                        }, (chunkHolder$Unloaded_1) -> {
+                            return null;
+                        });
+                    });
+                }
+            }
+
+            if (this.chunkFuture == null)
+            {
+                this.chunkFuture = CompletableFuture.completedFuture(this.getClientChunk(chunkPos));
+            }
+        }
+
+        this.cachedServerChunk = this.chunkFuture.getNow(null);
+
+        return this.cachedServerChunk;
+    }
+
+    private WorldChunk getClientChunk(ChunkPos chunkPos)
+    {
+        if (this.cachedClientChunk == null)
+        {
+            this.cachedClientChunk = this.mc.world.method_8497(chunkPos.x, chunkPos.z);
+        }
+
+        return this.cachedClientChunk;
+    }
+
+    private void resetCachedChunk()
+    {
+        this.cachedServerChunk = null;
+        this.cachedClientChunk = null;
+        this.chunkFuture = null;
     }
 
     private class StringHolder implements Comparable<StringHolder>
