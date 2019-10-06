@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos.PooledMutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -26,7 +27,9 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() && mc.world.provider.isSurfaceWorld();
+        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() &&
+                DataStorage.getInstance().isWorldSeedKnown(WorldUtils.getDimensionId(mc.world)) &&
+                mc.world.provider.isSurfaceWorld();
     }
 
     @Override
