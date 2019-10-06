@@ -1,6 +1,9 @@
 package fi.dy.masa.minihud.config;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
 import com.mumfrey.liteloader.core.ClientPluginChannels;
 import com.mumfrey.liteloader.core.PluginChannels.ChannelPolicy;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
@@ -9,11 +12,10 @@ import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.config.options.IConfigBoolean;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
+import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.util.DataStorage;
 import io.netty.buffer.Unpooled;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
 
 public enum StructureToggle
 {
@@ -101,11 +103,19 @@ public enum StructureToggle
 
     public static void updateStructureData()
     {
-        if (Minecraft.getMinecraft().isSingleplayer() == false)
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (mc.isSingleplayer() == false)
         {
+            // Request the data using both the old and the new protocol/channel name
             PacketBuffer data = new PacketBuffer(Unpooled.buffer());
             data.writeInt(DataStorage.CARPET_ID_BOUNDINGBOX_MARKERS);
-            ClientPluginChannels.sendMessage(LiteModMiniHud.CHANNEL_CARPET_CLIENT, data, ChannelPolicy.DISPATCH_ALWAYS);
+            ClientPluginChannels.sendMessage(LiteModMiniHud.CHANNEL_CARPET_CLIENT_OLD, data, ChannelPolicy.DISPATCH_ALWAYS);
+
+            data = new PacketBuffer(Unpooled.buffer());
+            data.writeInt(DataStorage.CARPET_ID_BOUNDINGBOX_MARKERS);
+            PacketSplitter.send(mc.getConnection(), new ResourceLocation(LiteModMiniHud.CHANNEL_CARPET_CLIENT_NEW), data);
+
             LiteModMiniHud.logger.info("Requesting structure data from Carpet server");
         }
 

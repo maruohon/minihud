@@ -558,16 +558,19 @@ public class DataStorage
                     StructureData.readAndAddTemplesToMap(this.structures, nbt);
                 }
 
+                if (this.structures.size() > 0)
+                {
+                    this.lastStructureUpdatePos = playerPos;
+                    this.structuresDirty = true;
+                    this.structuresNeedUpdating = false;
+                }
+
                 LiteModMiniHud.logger.info("Structure data updated from local structure files, structures: {}", this.structures.size());
             }
         }
-
-        this.lastStructureUpdatePos = playerPos;
-        this.structuresDirty = true;
-        this.structuresNeedUpdating = false;
     }
 
-    public void updateStructureDataFromServer(PacketBuffer data)
+    public void updateStructureDataFromCarpetServer(PacketBuffer data)
     {
         try
         {
