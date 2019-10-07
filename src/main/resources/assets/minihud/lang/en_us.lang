@@ -42,7 +42,9 @@ minihud.label.light_level_number_mode.block=Block
 minihud.label.light_level_number_mode.both=Both
 minihud.label.light_level_number_mode.sky=Sky
 
-minihud.label.shapes.despawn_sphere=Despawn Sphere
+minihud.label.shapes.can_spawn_sphere=Can Spawn Sphere ( > 24)
+minihud.label.shapes.can_despawn_sphere=Can Despawn Sphere ( > 32)
+minihud.label.shapes.despawn_sphere=Despawn Sphere ( > 128)
 
 minihud.hotkeys.category.generic_hotkeys=Generic hotkeys
 minihud.hotkeys.category.info_toggle_hotkeys=Info Toggle hotkeys

@@ -151,7 +151,6 @@ public class Configs implements IConfigHandler
     public static class Colors
     {
         public static final ConfigColor BLOCK_GRID_OVERLAY_COLOR            = new ConfigColor("blockGrid", "0x80FFFFFF", "Color for the block grid overlay");
-        public static final ConfigColor DESPAWN_SPHERE_OVERLAY_COLOR        = new ConfigColor("despawnSphereDefault", "0x60A04050", "Default color for the despawn sphere overlay.\nThe color can be changed for each Despawn Sphere via its configuration GUI.");
         public static final ConfigColor LIGHT_LEVEL_MARKER_DARK             = new ConfigColor("lightLevelMarkerDark", "0xFFFF4848", "The color for the spawnable spots marker");
         public static final ConfigColor LIGHT_LEVEL_MARKER_LIT              = new ConfigColor("lightLevelMarkerLit", "0xFFFFFF33", "The color for the safe (during day) spots marker");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_DARK       = new ConfigColor("lightLevelNumberBlockDark", "0xFFC03030", "The color for the spawnable spots number of the block light value");
@@ -161,6 +160,9 @@ public class Configs implements IConfigHandler
         public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR    = new ConfigColor("randomTicksFixed", "0x40F9F225", "Color for the fixed-point random ticked chunks overlay");
         public static final ConfigColor RANDOM_TICKS_PLAYER_OVERLAY_COLOR   = new ConfigColor("randomTicksPlayer", "0x4030FE73", "Color for the player-following random ticked chunks overlay");
         public static final ConfigColor REGION_OVERLAY_COLOR                = new ConfigColor("regionFileBorders", "0x40FF8019", "Color for the region file overlay");
+        public static final ConfigColor SHAPE_CAN_DESPAWN_SPHERE            = new ConfigColor("shapeCanDespawnSphere", "0x60A04050", "Default color for the \"Can Despawn Sphere\" overlay.\nThe color can be changed for each sphere via its configuration GUI.");
+        public static final ConfigColor SHAPE_CAN_SPAWN_SPHERE              = new ConfigColor("shapeCanSpawnSphere", "0x60A04050", "Default color for the \"Can Spawn Sphere\" overlay.\nThe color can be changed for each sphere via its configuration GUI.");
+        public static final ConfigColor SHAPE_DESPAWN_SPHERE                = new ConfigColor("shapeDespawnSphere", "0x60A04050", "Default color for the \"Despawn Sphere\" overlay.\nThe color can be changed for each sphere via its configuration GUI.");
         public static final ConfigColor SLIME_CHUNKS_OVERLAY_COLOR          = new ConfigColor("slimeChunks", "0xB020F020", "Color for the slime chunks overlay");
         public static final ConfigColor SPAWN_PLAYER_ENTITY_OVERLAY_COLOR   = new ConfigColor("spawnPreviewAtPlayerEntity", "0x402050D0", "Color for the entity-processing spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
         public static final ConfigColor SPAWN_PLAYER_LAZY_OVERLAY_COLOR     = new ConfigColor("spawnPreviewAtPlayerLazy", "0x40D030D0", "Color for the \"lazy-loaded\" spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
@@ -174,7 +176,6 @@ public class Configs implements IConfigHandler
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
                 BLOCK_GRID_OVERLAY_COLOR,
-                DESPAWN_SPHERE_OVERLAY_COLOR,
                 LIGHT_LEVEL_MARKER_DARK,
                 LIGHT_LEVEL_MARKER_LIT,
                 LIGHT_LEVEL_NUMBER_BLOCK_DARK,
@@ -184,6 +185,9 @@ public class Configs implements IConfigHandler
                 RANDOM_TICKS_FIXED_OVERLAY_COLOR,
                 RANDOM_TICKS_PLAYER_OVERLAY_COLOR,
                 REGION_OVERLAY_COLOR,
+                SHAPE_CAN_DESPAWN_SPHERE,
+                SHAPE_CAN_SPAWN_SPHERE,
+                SHAPE_DESPAWN_SPHERE,
                 SLIME_CHUNKS_OVERLAY_COLOR,
                 SPAWN_PLAYER_ENTITY_OVERLAY_COLOR,
                 SPAWN_PLAYER_LAZY_OVERLAY_COLOR,

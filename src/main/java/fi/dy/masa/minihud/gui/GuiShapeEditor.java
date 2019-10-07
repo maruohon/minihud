@@ -19,7 +19,7 @@ import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
-import fi.dy.masa.minihud.renderer.shapes.ShapeDespawnSphere;
+import fi.dy.masa.minihud.renderer.shapes.ShapeSpawnSphere;
 
 public class GuiShapeEditor extends GuiRenderLayerEditBase
 {
@@ -82,6 +82,8 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     {
         switch (this.shape.getType())
         {
+            case CAN_DESPAWN_SPHERE:
+            case CAN_SPAWN_SPHERE:
             case DESPAWN_SPHERE:
                 this.createShapeEditorElementsDespawnSphere(x, y);
                 break;
@@ -92,7 +94,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     {
         this.addLabel(x, y, 60, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.center_colon"));
         y += 12;
-        ShapeDespawnSphere shape = (ShapeDespawnSphere) this.shape;
+        ShapeSpawnSphere shape = (ShapeSpawnSphere) this.shape;
         GuiUtils.createVec3dInputsVertical(x, y, 120, shape.getCenter(), new DespawnSphereEditor(shape, this), true, this);
         y += 54;
 
@@ -137,9 +139,9 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     private static class DespawnSphereEditor implements ICoordinateValueModifier
     {
         private final GuiShapeEditor gui;
-        private final ShapeDespawnSphere shape;
+        private final ShapeSpawnSphere shape;
 
-        private DespawnSphereEditor(ShapeDespawnSphere shape, GuiShapeEditor gui)
+        private DespawnSphereEditor(ShapeSpawnSphere shape, GuiShapeEditor gui)
         {
             this.shape = shape;
             this.gui = gui;
@@ -170,9 +172,9 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     private static class ButtonListenerDespawnSphere implements IButtonActionListener
     {
         private final GuiShapeEditor gui;
-        private final ShapeDespawnSphere shape;
+        private final ShapeSpawnSphere shape;
 
-        private ButtonListenerDespawnSphere(ShapeDespawnSphere shape, GuiShapeEditor gui)
+        private ButtonListenerDespawnSphere(ShapeSpawnSphere shape, GuiShapeEditor gui)
         {
             this.shape = shape;
             this.gui = gui;
@@ -194,9 +196,9 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     private static class ButtonListenerDespawnSphereBlockSnap implements IButtonActionListener
     {
         private final GuiShapeEditor gui;
-        private final ShapeDespawnSphere shape;
+        private final ShapeSpawnSphere shape;
 
-        private ButtonListenerDespawnSphereBlockSnap(ShapeDespawnSphere shape, GuiShapeEditor gui)
+        private ButtonListenerDespawnSphereBlockSnap(ShapeSpawnSphere shape, GuiShapeEditor gui)
         {
             this.shape = shape;
             this.gui = gui;
@@ -228,9 +230,9 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
     private static class TextFieldListenerMargin implements ITextFieldListener<GuiTextFieldDouble>
     {
-        private final ShapeDespawnSphere shape;
+        private final ShapeSpawnSphere shape;
 
-        private TextFieldListenerMargin(ShapeDespawnSphere shape)
+        private TextFieldListenerMargin(ShapeSpawnSphere shape)
         {
             this.shape = shape;
         }

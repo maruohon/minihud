@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.renderer.shapes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -111,14 +112,9 @@ public class ShapeManager
 
                         if (type != null)
                         {
-                            switch (type)
-                            {
-                                case DESPAWN_SPHERE:
-                                    ShapeDespawnSphere shape = new ShapeDespawnSphere();
-                                    shape.fromJson(o);
-                                    this.addShape(shape);
-                                    break;
-                            }
+                            ShapeBase shape = type.createShape();
+                            shape.fromJson(o);
+                            this.addShape(shape);
                         }
                     }
                 }
@@ -138,15 +134,19 @@ public class ShapeManager
 
     public enum ShapeTypes
     {
-        DESPAWN_SPHERE      ("despawn_sphere",  "minihud.label.shapes.despawn_sphere");
+        CAN_SPAWN_SPHERE   ("can_spawn_sphere",   "minihud.label.shapes.can_spawn_sphere",   ShapeCanSpawnSphere::new),
+        CAN_DESPAWN_SPHERE ("can_despawn_sphere", "minihud.label.shapes.can_despawn_sphere", ShapeCanDespawnSphere::new),
+        DESPAWN_SPHERE     ("despawn_sphere",     "minihud.label.shapes.despawn_sphere",     ShapeDespawnSphere::new);
 
         private final String id;
         private final String translationKey;
+        private final Supplier<ShapeBase> shapeFactory;
 
-        private ShapeTypes(String id, String translationKey)
+        private ShapeTypes(String id, String translationKey, Supplier<ShapeBase> shapeFactory)
         {
             this.id = id;
             this.translationKey = translationKey;
+            this.shapeFactory = shapeFactory;
         }
 
         public String getId()
@@ -157,6 +157,11 @@ public class ShapeManager
         public String getDisplayName()
         {
             return StringUtils.translate(this.translationKey);
+        }
+
+        public ShapeBase createShape()
+        {
+            return this.shapeFactory.get();
         }
 
         @Nullable
