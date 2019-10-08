@@ -24,6 +24,7 @@ minihud.gui.label.color=Color:
 minihud.gui.label.effective_center_value=Effective center: %s
 minihud.gui.label.margin_colon=Margin:
 minihud.gui.label.margin_value=Margin: %s
+minihud.gui.label.radius_colon=Radius:
 
 minihud.gui.title.configs=MiniHUD Configs
 minihud.gui.title.shape_editor=Shape Editor
@@ -45,6 +46,7 @@ minihud.label.light_level_number_mode.sky=Sky
 minihud.label.shapes.can_spawn_sphere=Can Spawn Sphere ( > 24)
 minihud.label.shapes.can_despawn_sphere=Can Despawn Sphere ( > 32)
 minihud.label.shapes.despawn_sphere=Despawn Sphere ( > 128)
+minihud.label.shapes.sphere_blocky=Sphere (block-based)
 
 minihud.hotkeys.category.generic_hotkeys=Generic hotkeys
 minihud.hotkeys.category.info_toggle_hotkeys=Info Toggle hotkeys

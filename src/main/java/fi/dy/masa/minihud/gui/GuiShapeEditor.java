@@ -20,6 +20,7 @@ import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeSpawnSphere;
+import fi.dy.masa.minihud.renderer.shapes.ShapeSphereBlocky;
 
 public class GuiShapeEditor extends GuiRenderLayerEditBase
 {
@@ -85,22 +86,54 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
             case CAN_DESPAWN_SPHERE:
             case CAN_SPAWN_SPHERE:
             case DESPAWN_SPHERE:
-                this.createShapeEditorElementsDespawnSphere(x, y);
+                this.createShapeEditorElementsSphereBase(x, y, false);
+                this.createShapeEditorElementsSpawnSphere(x, y);
+                break;
+
+            case SPHERE_BLOCKY:
+                this.createShapeEditorElementsSphereBase(x, y, true);
                 break;
         }
     }
 
-    private void createShapeEditorElementsDespawnSphere(int x, int y)
+    private void createShapeEditorElementsSphereBase(int x, int y, boolean addRadiusInput)
     {
         this.addLabel(x, y, 60, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.center_colon"));
         y += 12;
-        ShapeSpawnSphere shape = (ShapeSpawnSphere) this.shape;
-        GuiUtils.createVec3dInputsVertical(x, y, 120, shape.getCenter(), new DespawnSphereEditor(shape, this), true, this);
+        ShapeSphereBlocky shape = (ShapeSphereBlocky) this.shape;
+        GuiUtils.createVec3dInputsVertical(x, y, 120, shape.getCenter(), new SphereEditor(shape, this), true, this);
         y += 54;
 
         ButtonGeneric button = new ButtonGeneric(x + 11, y, -1, false, "malilib.gui.button.render_layers_gui.set_here");
-        this.addButton(button, new ButtonListenerDespawnSphere(shape, this));
+        this.addButton(button, new ButtonListenerSphere(shape, this));
         y += 30;
+
+        if (addRadiusInput)
+        {
+            String label = StringUtils.translate("minihud.gui.label.radius_colon");
+            this.addLabel(x + 12, y, -1, 12, 0xFFFFFFFF, label);
+
+            GuiTextFieldDouble txtField = new GuiTextFieldDouble(x + 12, y + 12, 60, 16, this.textRenderer);
+            txtField.setText(String.valueOf(shape.getRadius()));
+            this.addTextField(txtField, new TextFieldListenerRadius(shape));
+        }
+
+        // Color input in this spot
+        this.nextY = y + 32;
+
+        y += 68;
+        int w = this.getSnapButtonWidth();
+        this.configBlockSnap.setOptionListValue(shape.getBlockSnap());
+        ConfigButtonOptionList buttonSnap = new ConfigButtonOptionList(x + 11, y, w, 20, this.configBlockSnap, "minihud.gui.label.block_snap");
+        this.addButton(buttonSnap, new ButtonListenerSphereBlockSnap(shape, this));
+        y += 22;
+    }
+
+    private void createShapeEditorElementsSpawnSphere(int x, int y)
+    {
+        y += 96;
+
+        ShapeSpawnSphere shape = (ShapeSpawnSphere) this.shape;
 
         String label = StringUtils.translate("minihud.gui.label.margin_colon");
         int w = this.getStringWidth(label);
@@ -110,18 +143,6 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         GuiTextFieldDouble txtField = new GuiTextFieldDouble(x + 12, y, 60, 16, this.textRenderer);
         txtField.setText(String.valueOf(shape.getMargin()));
         this.addTextField(txtField, new TextFieldListenerMargin(shape));
-        y += 20;
-
-        // Color input in this spot
-        this.nextY = y;
-
-        y += 36;
-        w = this.getSnapButtonWidth();
-        this.configBlockSnap.setOptionListValue(shape.getBlockSnap());
-        ConfigButtonOptionList buttonSnap = new ConfigButtonOptionList(x + 11, y, w, 20, this.configBlockSnap, "minihud.gui.label.block_snap");
-        ButtonListenerDespawnSphereBlockSnap listener = new ButtonListenerDespawnSphereBlockSnap(shape, this);
-        this.addButton(buttonSnap, listener);
-        y += 22;
     }
 
     private int getSnapButtonWidth()
@@ -136,12 +157,12 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         return width;
     }
 
-    private static class DespawnSphereEditor implements ICoordinateValueModifier
+    private static class SphereEditor implements ICoordinateValueModifier
     {
         private final GuiShapeEditor gui;
-        private final ShapeSpawnSphere shape;
+        private final ShapeSphereBlocky shape;
 
-        private DespawnSphereEditor(ShapeSpawnSphere shape, GuiShapeEditor gui)
+        private SphereEditor(ShapeSphereBlocky shape, GuiShapeEditor gui)
         {
             this.shape = shape;
             this.gui = gui;
@@ -169,12 +190,12 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static class ButtonListenerDespawnSphere implements IButtonActionListener
+    private static class ButtonListenerSphere implements IButtonActionListener
     {
         private final GuiShapeEditor gui;
-        private final ShapeSpawnSphere shape;
+        private final ShapeSphereBlocky shape;
 
-        private ButtonListenerDespawnSphere(ShapeSpawnSphere shape, GuiShapeEditor gui)
+        private ButtonListenerSphere(ShapeSphereBlocky shape, GuiShapeEditor gui)
         {
             this.shape = shape;
             this.gui = gui;
@@ -193,12 +214,12 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static class ButtonListenerDespawnSphereBlockSnap implements IButtonActionListener
+    private static class ButtonListenerSphereBlockSnap implements IButtonActionListener
     {
         private final GuiShapeEditor gui;
-        private final ShapeSpawnSphere shape;
+        private final ShapeSphereBlocky shape;
 
-        private ButtonListenerDespawnSphereBlockSnap(ShapeSpawnSphere shape, GuiShapeEditor gui)
+        private ButtonListenerSphereBlockSnap(ShapeSphereBlocky shape, GuiShapeEditor gui)
         {
             this.shape = shape;
             this.gui = gui;
@@ -243,6 +264,29 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
             try
             {
                 this.shape.setMargin(Double.parseDouble(textField.getText()));
+                return true;
+            }
+            catch (Exception e) {}
+
+            return false;
+        }
+    }
+
+    private static class TextFieldListenerRadius implements ITextFieldListener<GuiTextFieldDouble>
+    {
+        private final ShapeSphereBlocky shape;
+
+        private TextFieldListenerRadius(ShapeSphereBlocky shape)
+        {
+            this.shape = shape;
+        }
+
+        @Override
+        public boolean onTextChange(GuiTextFieldDouble textField)
+        {
+            try
+            {
+                this.shape.setRadius(Double.parseDouble(textField.getText()));
                 return true;
             }
             catch (Exception e) {}

@@ -163,6 +163,7 @@ public class Configs implements IConfigHandler
         public static final ConfigColor SHAPE_CAN_DESPAWN_SPHERE            = new ConfigColor("shapeCanDespawnSphere", "0x60A04050", "Default color for the \"Can Despawn Sphere\" overlay.\nThe color can be changed for each sphere via its configuration GUI.");
         public static final ConfigColor SHAPE_CAN_SPAWN_SPHERE              = new ConfigColor("shapeCanSpawnSphere", "0x60A04050", "Default color for the \"Can Spawn Sphere\" overlay.\nThe color can be changed for each sphere via its configuration GUI.");
         public static final ConfigColor SHAPE_DESPAWN_SPHERE                = new ConfigColor("shapeDespawnSphere", "0x60A04050", "Default color for the \"Despawn Sphere\" overlay.\nThe color can be changed for each sphere via its configuration GUI.");
+        public static final ConfigColor SHAPE_SPHERE_BLOCKY                 = new ConfigColor("shapeSphereBlocky", "0x6030B0B0", "Default color for the blocky/block-based Sphere renderer.\nThe color can be changed for each sphere via its configuration GUI.");
         public static final ConfigColor SLIME_CHUNKS_OVERLAY_COLOR          = new ConfigColor("slimeChunks", "0xB020F020", "Color for the slime chunks overlay");
         public static final ConfigColor SPAWN_PLAYER_ENTITY_OVERLAY_COLOR   = new ConfigColor("spawnPreviewAtPlayerEntity", "0x402050D0", "Color for the entity-processing spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
         public static final ConfigColor SPAWN_PLAYER_LAZY_OVERLAY_COLOR     = new ConfigColor("spawnPreviewAtPlayerLazy", "0x40D030D0", "Color for the \"lazy-loaded\" spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
@@ -188,6 +189,7 @@ public class Configs implements IConfigHandler
                 SHAPE_CAN_DESPAWN_SPHERE,
                 SHAPE_CAN_SPAWN_SPHERE,
                 SHAPE_DESPAWN_SPHERE,
+                SHAPE_SPHERE_BLOCKY,
                 SLIME_CHUNKS_OVERLAY_COLOR,
                 SPAWN_PLAYER_ENTITY_OVERLAY_COLOR,
                 SPAWN_PLAYER_LAZY_OVERLAY_COLOR,

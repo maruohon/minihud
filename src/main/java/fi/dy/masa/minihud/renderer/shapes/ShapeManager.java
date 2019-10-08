@@ -134,9 +134,10 @@ public class ShapeManager
 
     public enum ShapeTypes
     {
-        CAN_SPAWN_SPHERE   ("can_spawn_sphere",   "minihud.label.shapes.can_spawn_sphere",   ShapeCanSpawnSphere::new),
-        CAN_DESPAWN_SPHERE ("can_despawn_sphere", "minihud.label.shapes.can_despawn_sphere", ShapeCanDespawnSphere::new),
-        DESPAWN_SPHERE     ("despawn_sphere",     "minihud.label.shapes.despawn_sphere",     ShapeDespawnSphere::new);
+        SPHERE_BLOCKY       ("sphere_blocky",       "minihud.label.shapes.sphere_blocky",      ShapeSphereBlocky::new),
+        CAN_SPAWN_SPHERE    ("can_spawn_sphere",    "minihud.label.shapes.can_spawn_sphere",   ShapeCanSpawnSphere::new),
+        CAN_DESPAWN_SPHERE  ("can_despawn_sphere",  "minihud.label.shapes.can_despawn_sphere", ShapeCanDespawnSphere::new),
+        DESPAWN_SPHERE      ("despawn_sphere",      "minihud.label.shapes.despawn_sphere",     ShapeDespawnSphere::new);
 
         private final String id;
         private final String translationKey;
