@@ -10,7 +10,7 @@ import net.minecraft.client.render.debug.VoxelDebugRenderer;
 @Mixin(VoxelDebugRenderer.class)
 public abstract class MixinVoxelDebugRenderer
 {
-    @Inject(method = "render", at = @At("HEAD"))
+    @Inject(method = "method_23109", at = @At("HEAD"))
     public void fixDebugRendererState(CallbackInfo ci)
     {
         RenderHandler.fixDebugRendererState();

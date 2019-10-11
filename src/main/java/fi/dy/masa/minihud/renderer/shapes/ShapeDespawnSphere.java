@@ -8,7 +8,6 @@ import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.class_4587;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
@@ -135,24 +134,24 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Override
-    public void draw(double x, double y, double z, class_4587 matrixQueue)
+    public void draw(double x, double y, double z, net.minecraft.util.math.MatrixStack matrixStack)
     {
         GlStateManager.pushMatrix();
         this.preRender(x, y, z);
 
-        matrixQueue.method_22903();
-        matrixQueue.method_22904(-x, -y, -z);
+        matrixStack.push();
+        matrixStack.translate(-x, -y, -z);
 
-        this.renderObjects.get(0).draw(matrixQueue);
+        this.renderObjects.get(0).draw(matrixStack);
 
         // Render the lines as quads with glPolygonMode(GL_LINE)
         GlStateManager.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
         GlStateManager.disableBlend();
-        this.renderObjects.get(0).draw(matrixQueue);
+        this.renderObjects.get(0).draw(matrixStack);
         GlStateManager.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
         GlStateManager.enableBlend();
 
-        matrixQueue.method_22909();
+        matrixStack.pop();
 
         GlStateManager.popMatrix();
     }
@@ -478,40 +477,40 @@ public class ShapeDespawnSphere extends ShapeBase
         switch (side)
         {
             case DOWN:
-                buffer.vertex(x    , y, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z + 1).color(color.r, color.g, color.b, color.a).next();
                 break;
             case UP:
-                buffer.vertex(x    , y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
                 break;
             case NORTH:
-                buffer.vertex(x    , y    , z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z    ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
                 break;
             case SOUTH:
-                buffer.vertex(x    , y    , z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
                 break;
             case WEST:
-                buffer.vertex(x    , y    , z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y    , z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
                 break;
             case EAST:
-                buffer.vertex(x + 1, y    , z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z + 1).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
                 break;
         }
     }
@@ -525,64 +524,64 @@ public class ShapeDespawnSphere extends ShapeBase
         switch (side)
         {
             case DOWN:
-                buffer.vertex(x    , y, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z    ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z    ).color(color.r, color.g, color.b, color.a).next();
                 break;
             case UP:
-                buffer.vertex(x    , y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
                 break;
             case NORTH:
-                buffer.vertex(x    , y    , z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y    , z    ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
                 break;
             case SOUTH:
-                buffer.vertex(x    , y    , z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y    , z + 1).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
                 break;
             case WEST:
-                buffer.vertex(x    , y    , z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y    , z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y    , z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y    , z    ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
                 break;
             case EAST:
-                buffer.vertex(x + 1, y    , z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z + 1).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z    ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
                 break;
         }
     }

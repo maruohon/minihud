@@ -5,9 +5,9 @@ import java.util.List;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.class_4587;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MatrixStack;
 
 public abstract class OverlayRendererBase implements IOverlayRenderer
 {
@@ -19,7 +19,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     protected float glLineWidth = 1f;
     protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
     private BlockPos position = BlockPos.ORIGIN;
-    private class_4587 matrixQueue;
+    private MatrixStack matrixStack;
 
     protected void preRender(double x, double y, double z)
     {
@@ -27,24 +27,24 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         //RenderSystem.translated(this.position.getX() - x, this.position.getY() - y, this.position.getZ() - z);
     }
 
-    protected void setMatrixQueue(class_4587 matrixQueue)
+    protected void setMatrixQueue(MatrixStack matrixQueue)
     {
-        this.matrixQueue = matrixQueue;
+        this.matrixStack = matrixQueue;
     }
 
-    protected class_4587 getMatrixQueue()
+    protected MatrixStack getMatrixQueue()
     {
-        return this.matrixQueue;
+        return this.matrixStack;
     }
 
     @Override
-    public void draw(double x, double y, double z, class_4587 matrixQueue)
+    public void draw(double x, double y, double z, MatrixStack matrixQueue)
     {
         GlStateManager.pushMatrix();
         this.preRender(x, y, z);
 
-        matrixQueue.method_22903();
-        matrixQueue.method_22904(-x, -y, -z);
+        matrixQueue.push();
+        matrixQueue.translate(-x, -y, -z);
         //this.matrixQueue.method_22904(this.position.getX() - x, this.position.getY() - y, this.position.getZ() - z);
 
         for (RenderObjectBase obj : this.renderObjects)
@@ -52,7 +52,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
             obj.draw(matrixQueue);
         }
 
-        matrixQueue.method_22909();
+        matrixQueue.pop();
 
         GlStateManager.popMatrix();
     }

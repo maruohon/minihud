@@ -2,14 +2,14 @@ package fi.dy.masa.minihud.renderer;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.OverworldDimension;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.util.DataStorage;
 
 public class OverlayRendererSpawnChunks extends OverlayRendererBase
 {
@@ -44,8 +44,8 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
             return true;
         }
 
-        int ex = (int) Math.floor(entity.x);
-        int ez = (int) Math.floor(entity.z);
+        int ex = (int) Math.floor(entity.getX());
+        int ez = (int) Math.floor(entity.getZ());
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 

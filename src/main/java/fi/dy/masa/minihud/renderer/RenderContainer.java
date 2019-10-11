@@ -5,13 +5,13 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.class_4587;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlBuffer;
 import net.minecraft.client.render.VertexFormatElement;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -22,7 +22,7 @@ public class RenderContainer
     public static final RenderContainer INSTANCE = new RenderContainer();
 
     private final List<OverlayRendererBase> renderers = new ArrayList<>();
-    private final class_4587 matrixQueue = new class_4587();
+    private final MatrixStack matrixStack = new MatrixStack();
     protected boolean resourcesAllocated;
     protected int countActive;
 
@@ -46,7 +46,7 @@ public class RenderContainer
             renderer.allocateGlResources();
         }
 
-        renderer.setMatrixQueue(this.matrixQueue);
+        renderer.setMatrixQueue(this.matrixStack);
         this.renderers.add(renderer);
     }
 
@@ -65,10 +65,10 @@ public class RenderContainer
         }
     }
 
-    public void render(Entity entity, MinecraftClient mc, float partialTicks, class_4587 matrixQueue)
+    public void render(Entity entity, MinecraftClient mc, float partialTicks, MatrixStack matrixStack)
     {
         this.update(entity, mc);
-        this.draw(entity, mc, partialTicks, matrixQueue);
+        this.draw(entity, mc, partialTicks, matrixStack);
     }
 
     protected void update(Entity entity, MinecraftClient mc)
@@ -95,7 +95,7 @@ public class RenderContainer
         }
     }
 
-    protected void draw(Entity entity, MinecraftClient mc, float partialTicks, class_4587 matrixQueue)
+    protected void draw(Entity entity, MinecraftClient mc, float partialTicks, MatrixStack matrixStack)
     {
         if (this.resourcesAllocated && this.countActive > 0)
         {
@@ -122,7 +122,7 @@ public class RenderContainer
 
                 if (renderer.shouldRender(mc))
                 {
-                    renderer.draw(cameraPos.x, cameraPos.y, cameraPos.z, matrixQueue);
+                    renderer.draw(cameraPos.x, cameraPos.y, cameraPos.z, matrixStack);
                 }
             }
 

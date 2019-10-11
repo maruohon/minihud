@@ -1,5 +1,8 @@
 package fi.dy.masa.minihud.hotkeys;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
@@ -13,9 +16,6 @@ import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnChunks;
 import fi.dy.masa.minihud.util.DataStorage;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWithMessage
 {
@@ -46,7 +46,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             }
             else if (key == RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind())
             {
-                OverlayRendererSlimeChunks.overlayTopY = mc.player.y;
+                OverlayRendererSlimeChunks.overlayTopY = mc.player.getY();
             }
             else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind())
             {

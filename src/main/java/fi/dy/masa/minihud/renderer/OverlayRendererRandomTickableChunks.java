@@ -45,7 +45,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
         // Player-following renderer
         else if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
         {
-            return entity.x != this.pos.x || entity.z != this.pos.z;
+            return entity.getX() != this.pos.x || entity.getZ() != this.pos.z;
         }
 
         return false;

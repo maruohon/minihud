@@ -203,7 +203,7 @@ public class DebugInfoUtils
         {
             PlayerEntity player = world.getPlayers().get(i);
 
-            double distSq = player.squaredDistanceTo(entity.x, entity.y, entity.z);
+            double distSq = player.squaredDistanceTo(entity.getX(), entity.getY(), entity.getZ());
 
             if (range < 0.0D || distSq < range * range)
             {

@@ -45,9 +45,9 @@ public class OverlayRendererLightLevel
     public static void render(double dx, double dy, double dz, Entity entity, MinecraftClient mc)
     {
         if (needsUpdate || lastUpdatePos == null ||
-            Math.abs(entity.x - lastUpdatePos.getX()) > 4 ||
-            Math.abs(entity.y - lastUpdatePos.getY()) > 4 ||
-            Math.abs(entity.z - lastUpdatePos.getZ()) > 4)
+            Math.abs(entity.getX() - lastUpdatePos.getX()) > 4 ||
+            Math.abs(entity.getY() - lastUpdatePos.getY()) > 4 ||
+            Math.abs(entity.getZ() - lastUpdatePos.getZ()) > 4)
         {
             //long pre = System.nanoTime();
             updateLightLevels(mc.world, new BlockPos(entity));
@@ -284,31 +284,31 @@ public class OverlayRendererLightLevel
         switch (facing)
         {
             case NORTH:
-                buffer.vertex(x    , y, z    ).texture(u    , v    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).texture(u    , v + w).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).texture(u + w, v + w).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).texture(u + w, v    ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z    ).texture(u    , v    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z + 1).texture(u    , v + w).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z + 1).texture(u + w, v + w).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z    ).texture(u + w, v    ).color(color.r, color.g, color.b, color.a).next();
                 break;
 
             case SOUTH:
-                buffer.vertex(x + 1, y, z + 1).texture(u    , v    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).texture(u    , v + w).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z    ).texture(u + w, v + w).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).texture(u + w, v    ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z + 1).texture(u    , v    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z    ).texture(u    , v + w).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z    ).texture(u + w, v + w).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z + 1).texture(u + w, v    ).color(color.r, color.g, color.b, color.a).next();
                 break;
 
             case EAST:
-                buffer.vertex(x + 1, y, z    ).texture(u    , v    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z    ).texture(u    , v + w).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).texture(u + w, v + w).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).texture(u + w, v    ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z    ).texture(u    , v    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z    ).texture(u    , v + w).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z + 1).texture(u + w, v + w).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z + 1).texture(u + w, v    ).color(color.r, color.g, color.b, color.a).next();
                 break;
 
             case WEST:
-                buffer.vertex(x    , y, z + 1).texture(u    , v    ).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).texture(u    , v + w).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).texture(u + w, v + w).method_22915(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z    ).texture(u + w, v    ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z + 1).texture(u    , v    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z + 1).texture(u    , v + w).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y, z    ).texture(u + w, v + w).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y, z    ).texture(u + w, v    ).color(color.r, color.g, color.b, color.a).next();
                 break;
 
             default:
@@ -319,28 +319,28 @@ public class OverlayRendererLightLevel
     {
         y += 0.005;
 
-        buffer.vertex(x + offset1, y, z + offset1).method_22915(color.r, color.g, color.b, color.a).next();
-        buffer.vertex(x + offset2, y, z + offset2).method_22915(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
 
-        buffer.vertex(x + offset1, y, z + offset2).method_22915(color.r, color.g, color.b, color.a).next();
-        buffer.vertex(x + offset2, y, z + offset1).method_22915(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
     }
 
     private static void renderLightLevelSquare(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
     {
         y += 0.005;
 
-        buffer.vertex(x + offset1, y, z + offset1).method_22915(color.r, color.g, color.b, color.a).next();
-        buffer.vertex(x + offset1, y, z + offset2).method_22915(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
 
-        buffer.vertex(x + offset1, y, z + offset2).method_22915(color.r, color.g, color.b, color.a).next();
-        buffer.vertex(x + offset2, y, z + offset2).method_22915(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
 
-        buffer.vertex(x + offset2, y, z + offset2).method_22915(color.r, color.g, color.b, color.a).next();
-        buffer.vertex(x + offset2, y, z + offset1).method_22915(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
 
-        buffer.vertex(x + offset2, y, z + offset1).method_22915(color.r, color.g, color.b, color.a).next();
-        buffer.vertex(x + offset1, y, z + offset1).method_22915(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
+        buffer.vertex(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
     }
 
     private static void updateLightLevels(World world, BlockPos center)

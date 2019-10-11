@@ -4,6 +4,12 @@ import java.util.Collection;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.dimension.OverworldDimension;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -11,12 +17,6 @@ import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 import fi.dy.masa.minihud.util.StructureData;
 import fi.dy.masa.minihud.util.StructureTypes.StructureType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.dimension.OverworldDimension;
 
 public class OverlayRendererStructures extends OverlayRendererBase
 {
@@ -56,9 +56,9 @@ public class OverlayRendererStructures extends OverlayRendererBase
         int hysteresis = 16;
 
         return DataStorage.getInstance().structureRendererNeedsUpdate() ||
-               Math.abs(entity.x - this.lastUpdatePos.getX()) > hysteresis ||
-               Math.abs(entity.y - this.lastUpdatePos.getY()) > hysteresis ||
-               Math.abs(entity.z - this.lastUpdatePos.getZ()) > hysteresis;
+               Math.abs(entity.getX() - this.lastUpdatePos.getX()) > hysteresis ||
+               Math.abs(entity.getY() - this.lastUpdatePos.getY()) > hysteresis ||
+               Math.abs(entity.getZ() - this.lastUpdatePos.getZ()) > hysteresis;
     }
 
     @Override

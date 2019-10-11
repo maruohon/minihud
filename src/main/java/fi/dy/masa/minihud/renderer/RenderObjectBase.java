@@ -1,6 +1,5 @@
 package fi.dy.masa.minihud.renderer;
 
-import net.minecraft.class_4587;
 import net.minecraft.client.render.BufferBuilder;
 
 public abstract class RenderObjectBase
@@ -19,7 +18,7 @@ public abstract class RenderObjectBase
 
     public abstract void uploadData(BufferBuilder buffer);
 
-    public abstract void draw(class_4587 matrixQueue);
+    public abstract void draw(net.minecraft.util.math.MatrixStack matrixStack);
 
     public abstract void deleteGlResources();
 }

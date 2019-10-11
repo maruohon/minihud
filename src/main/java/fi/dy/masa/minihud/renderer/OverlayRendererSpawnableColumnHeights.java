@@ -3,9 +3,6 @@ package fi.dy.masa.minihud.renderer;
 import java.util.HashSet;
 import java.util.Set;
 import org.lwjgl.opengl.GL11;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
@@ -14,6 +11,9 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
 
 public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
 {
@@ -42,8 +42,8 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
     @Override
     public boolean needsUpdate(Entity entity, MinecraftClient mc)
     {
-        int ex = (int) Math.floor(entity.x);
-        int ez = (int) Math.floor(entity.z);
+        int ex = (int) Math.floor(entity.getX());
+        int ez = (int) Math.floor(entity.getZ());
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -55,10 +55,10 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
         if (System.currentTimeMillis() - this.lastCheckTime > 1000)
         {
             final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
-            final int xStart = (((int) entity.x) >> 4) - radius;
-            final int zStart = (((int) entity.z) >> 4) - radius;
-            final int xEnd = (((int) entity.x) >> 4) + radius;
-            final int zEnd = (((int) entity.z) >> 4) + radius;
+            final int xStart = (((int) entity.getX()) >> 4) - radius;
+            final int zStart = (((int) entity.getZ()) >> 4) - radius;
+            final int xEnd = (((int) entity.getX()) >> 4) + radius;
+            final int zEnd = (((int) entity.getZ()) >> 4) + radius;
 
             synchronized (DIRTY_CHUNKS)
             {
@@ -86,10 +86,10 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
         final Color4f color = Configs.Colors.SPAWNABLE_COLUMNS_OVERLAY_COLOR.getColor();
         final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
 
-        final int xStart = (int) entity.x - radius;
-        final int zStart = (int) entity.z - radius;
-        final int xEnd = (int) entity.x + radius;
-        final int zEnd = (int) entity.z + radius;
+        final int xStart = (int) entity.getX() - radius;
+        final int zStart = (int) entity.getZ() - radius;
+        final int xEnd = (int) entity.getX() + radius;
+        final int zEnd = (int) entity.getZ() + radius;
         final World world = mc.world;
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);

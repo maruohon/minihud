@@ -7,6 +7,6 @@ import net.minecraft.client.render.WorldRenderer;
 @Mixin(WorldRenderer.class)
 public interface IMixinWorldRenderer
 {
-    @Invoker("getChunkNumber")
+    @Invoker("getCompletedChunkCount")
     int getRenderedChunksInvoker();
 }

@@ -35,8 +35,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
             return true;
         }
 
-        int ex = (int) Math.floor(entity.x);
-        int ez = (int) Math.floor(entity.z);
+        int ex = (int) Math.floor(entity.getX());
+        int ez = (int) Math.floor(entity.getZ());
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -51,8 +51,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
 
         if (data.isWorldSeedKnown(entity.dimension))
         {
-            final int centerX = ((int) MathHelper.floor(entity.x)) >> 4;
-            final int centerZ = ((int) MathHelper.floor(entity.z)) >> 4;
+            final int centerX = ((int) MathHelper.floor(entity.getX())) >> 4;
+            final int centerZ = ((int) MathHelper.floor(entity.getZ())) >> 4;
             final long worldSeed = data.getWorldSeed(entity.dimension);
             final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
             final Color4f colorSides = Color4f.fromColor(colorLines, colorLines.a / 6);

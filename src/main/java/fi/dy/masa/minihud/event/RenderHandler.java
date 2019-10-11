@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.class_4587;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
@@ -27,6 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.LightType;
@@ -152,13 +152,13 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLast(float partialTicks, class_4587 matrixQueue)
+    public void onRenderWorldLast(float partialTicks, MatrixStack matrixStack)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         if (Configs.Generic.ENABLED.getBooleanValue() && mc.world != null && mc.player != null)
         {
-            OverlayRenderer.renderOverlays(mc, partialTicks, matrixQueue);
+            OverlayRenderer.renderOverlays(mc, partialTicks, matrixStack);
         }
     }
 
@@ -263,7 +263,7 @@ public class RenderHandler implements IRenderer
         MinecraftClient mc = MinecraftClient.getInstance();
         Entity entity = mc.getCameraEntity();
         World world = entity.getEntityWorld();
-        BlockPos pos = new BlockPos(entity.x, entity.getBoundingBox().minY, entity.z);
+        BlockPos pos = new BlockPos(entity.getX(), entity.getBoundingBox().minY, entity.getZ());
         ChunkPos chunkPos = new ChunkPos(pos);
 
         if (type == InfoToggle.FPS)
@@ -406,7 +406,7 @@ public class RenderHandler implements IRenderer
                     try
                     {
                         str.append(String.format(Configs.Generic.COORDINATE_FORMAT_STRING.getStringValue(),
-                            entity.x, entity.getBoundingBox().minY, entity.z));
+                            entity.getX(), entity.getBoundingBox().minY, entity.getZ()));
                     }
                     // Uh oh, someone done goofed their format string... :P
                     catch (Exception e)
@@ -417,7 +417,7 @@ public class RenderHandler implements IRenderer
                 else
                 {
                     str.append(String.format("XYZ: %.2f / %.4f / %.2f",
-                        entity.x, entity.getBoundingBox().minY, entity.z));
+                        entity.getX(), entity.getBoundingBox().minY, entity.getZ()));
                 }
 
                 pre = " / ";
@@ -481,9 +481,9 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.DISTANCE)
         {
             Vec3d ref = DataStorage.getInstance().getDistanceReferencePoint();
-            double dist = MathHelper.sqrt(ref.squaredDistanceTo(entity.x, entity.y, entity.z));
+            double dist = MathHelper.sqrt(ref.squaredDistanceTo(entity.getX(), entity.getY(), entity.getZ()));
             this.addLine(String.format("Distance: %.2f (x: %.2f y: %.2f z: %.2f) [to x: %.2f y: %.2f z: %.2f]",
-                    dist, entity.x - ref.x, entity.y - ref.y, entity.z - ref.z, ref.x, ref.y, ref.z));
+                    dist, entity.getX() - ref.x, entity.getY() - ref.y, entity.getZ() - ref.z, ref.x, ref.y, ref.z));
         }
         else if (type == InfoToggle.FACING)
         {
@@ -560,9 +560,9 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.SPEED.getBooleanValue())
             {
-                double dx = entity.x - entity.prevRenderX;
-                double dy = entity.y - entity.prevRenderY;
-                double dz = entity.z - entity.prevRenderZ;
+                double dx = entity.getX() - entity.prevRenderX;
+                double dy = entity.getY() - entity.prevRenderY;
+                double dz = entity.getZ() - entity.prevRenderZ;
                 double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
                 str.append(pre).append(String.format("speed: %.3f m/s", dist * 20));
             }
@@ -575,9 +575,9 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.SPEED_AXIS)
         {
-            double dx = entity.x - entity.prevRenderX;
-            double dy = entity.y - entity.prevRenderY;
-            double dz = entity.z - entity.prevRenderZ;
+            double dx = entity.getX() - entity.prevRenderX;
+            double dy = entity.getY() - entity.prevRenderY;
+            double dz = entity.getZ() - entity.prevRenderZ;
             this.addLine(String.format("speed: x: %.3f y: %.3f z: %.3f m/s", dx * 20, dy * 20, dz * 20));
         }
         else if (type == InfoToggle.CHUNK_SECTIONS)
