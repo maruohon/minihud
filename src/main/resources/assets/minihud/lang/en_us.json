@@ -37,6 +37,13 @@
     "minihud.label.light_level_number_mode.block": "Block",
     "minihud.label.light_level_number_mode.both": "Both",
     "minihud.label.light_level_number_mode.sky": "Sky",
+    
+    "minihud.label.harvest_level_marker_mode.cross": "Cross",
+    "minihud.label.harvest_level_marker_mode.none": "None",
+    "minihud.label.harvest_level_marker_mode.square": "Square",
+    
+    "minihud.label.harvest_level_number_mode.none": "None",
+    "minihud.label.harvest_level_number_mode.block": "Block",
 
     "minihud.label.shapes.despawn_sphere": "Despawn Sphere",
 

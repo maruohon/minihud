@@ -24,6 +24,8 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.event.RenderHandler;
 import fi.dy.masa.minihud.util.BlockGridMode;
+import fi.dy.masa.minihud.util.HarvestLevelMarkerMode;
+import fi.dy.masa.minihud.util.HarvestLevelNumberMode;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
 import fi.dy.masa.minihud.util.LightLevelNumberMode;
 
@@ -56,6 +58,16 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       LIGHT_LEVEL_NUMBER_ROTATION         = new ConfigBoolean("lightLevelNumberRotation", true, "If true, then the light level numbers will rotate\naccording to the player's current facing");
         public static final ConfigInteger       LIGHT_LEVEL_RANGE                   = new ConfigInteger("lightLevelRange", 24, 1, 64, "The block range to render the Light Level overlay in");
         public static final ConfigInteger       LIGHT_LEVEL_THRESHOLD               = new ConfigInteger("lightLevelThreshold", 8, 0, 15, "The light level threshold which is considered safe");
+        public static final ConfigBoolean       HARVEST_LEVEL_COLORED_NUMBERS         = new ConfigBoolean("harvestLevelColoredNumbers", true, "Whether to use colored or white numbers\nfor the Harvest Level overlay numbers");
+        public static final ConfigOptionList    HARVEST_LEVEL_MARKER_MODE             = new ConfigOptionList("harvestLevelMarkers", HarvestLevelMarkerMode.SQUARE, "Which type of colored marker to use in the\nHarvest Level overlay, if any");
+        public static final ConfigDouble        HARVEST_LEVEL_MARKER_SIZE             = new ConfigDouble("harvestLevelMarkerSize", 0.84, 0.0, 1.0, "The size of the harvest level colored marker.\nRange: 0.0 - 1.0");
+        public static final ConfigOptionList    HARVEST_LEVEL_NUMBER_MODE             = new ConfigOptionList("harvestLevelNumbers", HarvestLevelNumberMode.BLOCK, "Which Harvest level number(s) to render in the Harvest Level overlay");
+        public static final ConfigDouble        HARVEST_LEVEL_NUMBER_OFFSET_BLOCK_X   = new ConfigDouble("harvestLevelNumberOffsetBlockX", 0.26, 0.0, 1.0, "The relative \"x\" offset for the block light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigDouble        HARVEST_LEVEL_NUMBER_OFFSET_BLOCK_Y   = new ConfigDouble("harvestLevelNumberOffsetBlockY", 0.32, 0.0, 1.0, "The relative \"y\" offset for the block light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigDouble        HARVEST_LEVEL_NUMBER_OFFSET_SKY_X     = new ConfigDouble("harvestLevelNumberOffsetSkyX", 0.42, 0.0, 1.0, "The relative \"x\" offset for the sky light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigDouble        HARVEST_LEVEL_NUMBER_OFFSET_SKY_Y     = new ConfigDouble("harvestLevelNumberOffsetSkyY", 0.56, 0.0, 1.0, "The relative \"y\" offset for the sky light level number.\nRange: 0.0 - 1.0");
+        public static final ConfigBoolean       HARVEST_LEVEL_NUMBER_ROTATION         = new ConfigBoolean("harvestLevelNumberRotation", true, "If true, then the harvest level numbers will rotate\naccording to the player's current facing");
+        public static final ConfigInteger       HARVEST_LEVEL_RANGE                   = new ConfigInteger("harvestLevelRange", 24, 1, 64, "The block range to render the Harvest Level overlay in");
         public static final ConfigBoolean       MAP_PREVIEW                         = new ConfigBoolean("mapPreview", false, "Enables rendering a preview of the map,\nwhen you hold shift while hovering over a map item");
         public static final ConfigInteger       MAP_PREVIEW_SIZE                    = new ConfigInteger("mapPreviewSize", 160, 16, 512, "The size of the rendered map previews");
         public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "H,C", "A hotkey to open the in-game Config GUI");
@@ -105,6 +117,8 @@ public class Configs implements IConfigHandler
                 BLOCK_GRID_OVERLAY_MODE,
                 LIGHT_LEVEL_MARKER_MODE,
                 LIGHT_LEVEL_NUMBER_MODE,
+                HARVEST_LEVEL_MARKER_MODE,
+                HARVEST_LEVEL_NUMBER_MODE,
                 HUD_ALIGNMENT,
 
                 BLOCK_GRID_OVERLAY_RADIUS,
@@ -119,6 +133,12 @@ public class Configs implements IConfigHandler
                 LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
                 LIGHT_LEVEL_RANGE,
                 LIGHT_LEVEL_THRESHOLD,
+                HARVEST_LEVEL_MARKER_SIZE,
+                HARVEST_LEVEL_NUMBER_OFFSET_BLOCK_X,
+                HARVEST_LEVEL_NUMBER_OFFSET_BLOCK_Y,
+                HARVEST_LEVEL_NUMBER_OFFSET_SKY_X,
+                HARVEST_LEVEL_NUMBER_OFFSET_SKY_Y,
+                HARVEST_LEVEL_RANGE,
                 MAP_PREVIEW_SIZE,
                 SLIME_CHUNK_OVERLAY_RADIUS,
                 SPAWNABLE_COLUMNS_OVERLAY_RADIUS,
@@ -147,6 +167,12 @@ public class Configs implements IConfigHandler
         public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_LIT        = new ConfigColor("lightLevelNumberBlockLit", "#FF209040", "The color for the safe spots number of the block light value");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_DARK         = new ConfigColor("lightLevelNumberSkyDark", "#FFFFF030", "The color for the spawnable spots number of the sky light value");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_LIT          = new ConfigColor("lightLevelNumberSkyLit", "#FF40E0FF", "The color for the safe spots number of the sky light value");
+        public static final ConfigColor HARVEST_LEVEL_MARKER_DARK             = new ConfigColor("harvestLevelMarkerDark", "#FFFF4848", "The color for the spawnable spots marker");
+        public static final ConfigColor HARVEST_LEVEL_MARKER_LIT              = new ConfigColor("harvestLevelMarkerLit", "#FFFFFF33", "The color for the safe (during day) spots marker");
+        public static final ConfigColor HARVEST_LEVEL_NUMBER_BLOCK_DARK       = new ConfigColor("harvestLevelNumberBlockDark", "#FFC03030", "The color for the spawnable spots number of the block harvest value");
+        public static final ConfigColor HARVEST_LEVEL_NUMBER_BLOCK_LIT        = new ConfigColor("harvestLevelNumberBlockLit", "#FF209040", "The color for the safe spots number of the block harvest value");
+        public static final ConfigColor HARVEST_LEVEL_NUMBER_SKY_DARK         = new ConfigColor("harvestLevelNumberSkyDark", "#FFFFF030", "The color for the spawnable spots number of the sky harvest value");
+        public static final ConfigColor HARVEST_LEVEL_NUMBER_SKY_LIT          = new ConfigColor("harvestLevelNumberSkyLit", "#FF40E0FF", "The color for the safe spots number of the sky harvest value");
         public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR    = new ConfigColor("randomTicksFixedOverlayColor", "#FFF9F225", "Color for the fixed-point random ticked chunks overlay");
         public static final ConfigColor RANDOM_TICKS_PLAYER_OVERLAY_COLOR   = new ConfigColor("randomTicksPlayerOverlayColor", "#FF30FE73", "Color for the player-following random ticked chunks overlay");
         public static final ConfigColor REGION_OVERLAY_COLOR                = new ConfigColor("regionOverlayColor", "#FFFF8019", "Color for the region file overlay");
@@ -173,6 +199,12 @@ public class Configs implements IConfigHandler
                 LIGHT_LEVEL_NUMBER_BLOCK_LIT,
                 LIGHT_LEVEL_NUMBER_SKY_DARK,
                 LIGHT_LEVEL_NUMBER_SKY_LIT,
+                HARVEST_LEVEL_MARKER_DARK,
+                HARVEST_LEVEL_MARKER_LIT,
+                HARVEST_LEVEL_NUMBER_BLOCK_DARK,
+                HARVEST_LEVEL_NUMBER_BLOCK_LIT,
+                HARVEST_LEVEL_NUMBER_SKY_DARK,
+                HARVEST_LEVEL_NUMBER_SKY_LIT,
                 RANDOM_TICKS_FIXED_OVERLAY_COLOR,
                 RANDOM_TICKS_PLAYER_OVERLAY_COLOR,
                 REGION_OVERLAY_COLOR,
