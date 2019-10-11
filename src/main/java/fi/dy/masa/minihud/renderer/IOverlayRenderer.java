@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
+import net.minecraft.class_4587;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 
@@ -32,7 +33,7 @@ public interface IOverlayRenderer
      * @param y
      * @param z
      */
-    void draw(double x, double y, double z);
+    void draw(double x, double y, double z, class_4587 matrixQueue);
 
     /**
      * Allocates the OpenGL resources according to the current Video settings

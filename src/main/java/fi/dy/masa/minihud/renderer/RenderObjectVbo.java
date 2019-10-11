@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.renderer;
 
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.class_4587;
 import net.minecraft.client.gl.GlBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
@@ -24,13 +25,13 @@ public class RenderObjectVbo extends RenderObjectBase
     }
 
     @Override
-    public void draw()
+    public void draw(class_4587 matrixQueue)
     {
         GlStateManager.pushMatrix();
 
         this.vertexBuffer.bind();
         this.setupArrayPointers();
-        this.vertexBuffer.draw(this.getGlMode());
+        this.vertexBuffer.draw(matrixQueue.method_22910(), this.getGlMode());
         GlBuffer.unbind();
 
         GlStateManager.popMatrix();

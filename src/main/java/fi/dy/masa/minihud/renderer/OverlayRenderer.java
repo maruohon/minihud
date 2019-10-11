@@ -1,6 +1,7 @@
 package fi.dy.masa.minihud.renderer;
 
 import fi.dy.masa.minihud.config.RendererToggle;
+import net.minecraft.class_4587;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
@@ -16,7 +17,7 @@ public class OverlayRenderer
         loginTime = System.currentTimeMillis();
     }
 
-    public static void renderOverlays(MinecraftClient mc, float partialTicks)
+    public static void renderOverlays(MinecraftClient mc, float partialTicks, class_4587 matrixQueue)
     {
         Entity entity = mc.getCameraEntity();
 
@@ -41,6 +42,6 @@ public class OverlayRenderer
             OverlayRendererLightLevel.render(cameraPos.x, cameraPos.y, cameraPos.z, entity, mc);
         }
 
-        RenderContainer.INSTANCE.render(entity, mc, partialTicks);
+        RenderContainer.INSTANCE.render(entity, mc, partialTicks, matrixQueue);
     }
 }

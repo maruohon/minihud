@@ -5,6 +5,7 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.class_4587;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlBuffer;
 import net.minecraft.client.render.VertexFormatElement;
@@ -21,30 +22,37 @@ public class RenderContainer
     public static final RenderContainer INSTANCE = new RenderContainer();
 
     private final List<OverlayRendererBase> renderers = new ArrayList<>();
+    private final class_4587 matrixQueue = new class_4587();
     protected boolean resourcesAllocated;
     protected int countActive;
 
     private RenderContainer()
     {
-        this.renderers.add(new OverlayRendererBlockGrid());
-        this.renderers.add(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_FIXED));
-        this.renderers.add(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER));
-        this.renderers.add(new OverlayRendererRegion());
-        this.renderers.add(new OverlayRendererSlimeChunks());
-        this.renderers.add(new OverlayRendererSpawnableColumnHeights());
-        this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL));
-        this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER));
-        this.renderers.add(new OverlayRendererStructures());
+        this.addRenderer(new OverlayRendererBlockGrid());
+        this.addRenderer(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_FIXED));
+        this.addRenderer(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER));
+        this.addRenderer(new OverlayRendererRegion());
+        this.addRenderer(new OverlayRendererSlimeChunks());
+        this.addRenderer(new OverlayRendererSpawnableColumnHeights());
+        this.addRenderer(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL));
+        this.addRenderer(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER));
+        this.addRenderer(new OverlayRendererStructures());
     }
 
-    public void addShapeRenderer(ShapeBase renderer)
+    private void addRenderer(OverlayRendererBase renderer)
     {
         if (this.resourcesAllocated)
         {
             renderer.allocateGlResources();
         }
 
+        renderer.setMatrixQueue(this.matrixQueue);
         this.renderers.add(renderer);
+    }
+
+    public void addShapeRenderer(ShapeBase renderer)
+    {
+        this.addRenderer(renderer);
     }
 
     public void removeShapeRenderer(ShapeBase renderer)
@@ -57,10 +65,10 @@ public class RenderContainer
         }
     }
 
-    public void render(Entity entity, MinecraftClient mc, float partialTicks)
+    public void render(Entity entity, MinecraftClient mc, float partialTicks, class_4587 matrixQueue)
     {
         this.update(entity, mc);
-        this.draw(entity, mc, partialTicks);
+        this.draw(entity, mc, partialTicks, matrixQueue);
     }
 
     protected void update(Entity entity, MinecraftClient mc)
@@ -87,7 +95,7 @@ public class RenderContainer
         }
     }
 
-    protected void draw(Entity entity, MinecraftClient mc, float partialTicks)
+    protected void draw(Entity entity, MinecraftClient mc, float partialTicks, class_4587 matrixQueue)
     {
         if (this.resourcesAllocated && this.countActive > 0)
         {
@@ -114,7 +122,7 @@ public class RenderContainer
 
                 if (renderer.shouldRender(mc))
                 {
-                    renderer.draw(cameraPos.x, cameraPos.y, cameraPos.z);
+                    renderer.draw(cameraPos.x, cameraPos.y, cameraPos.z, matrixQueue);
                 }
             }
 

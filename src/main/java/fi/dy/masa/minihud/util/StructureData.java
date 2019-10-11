@@ -80,8 +80,8 @@ public class StructureData
     @Nullable
     public static StructureData fromStructureStartTag(CompoundTag tag, long currentTime)
     {
-        if (tag.containsKey("BB", Constants.NBT.TAG_INT_ARRAY) &&
-            tag.containsKey("Children", Constants.NBT.TAG_LIST))
+        if (tag.contains("BB", Constants.NBT.TAG_INT_ARRAY) &&
+            tag.contains("Children", Constants.NBT.TAG_LIST))
         {
             StructureType type = StructureTypes.byStructureId(tag.getString("id"));
 
@@ -91,7 +91,7 @@ public class StructureData
 
             for (int i = 0; i < count; ++i)
             {
-                CompoundTag pieceTag = pieces.getCompoundTag(i);
+                CompoundTag pieceTag = pieces.getCompound(i);
                 builder.add(IntBoundingBox.fromArray(pieceTag.getIntArray("BB")));
             }
 

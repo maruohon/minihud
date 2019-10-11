@@ -105,39 +105,39 @@ public class RenderUtils
                 case X:
                     for (double y = yMin; y <= yMax; y += lineIntervalV)
                     {
-                        bufferLines.vertex(hMin, y, edge).color(r, g, b, a).next();
-                        bufferLines.vertex(hMax, y, edge).color(r, g, b, a).next();
+                        bufferLines.vertex(hMin, y, edge).method_22915(r, g, b, a).next();
+                        bufferLines.vertex(hMax, y, edge).method_22915(r, g, b, a).next();
                     }
 
                     for (double h = hMin; h <= hMax; h += lineIntervalH)
                     {
-                        bufferLines.vertex(h, yMin, edge).color(r, g, b, a).next();
-                        bufferLines.vertex(h, yMax, edge).color(r, g, b, a).next();
+                        bufferLines.vertex(h, yMin, edge).method_22915(r, g, b, a).next();
+                        bufferLines.vertex(h, yMax, edge).method_22915(r, g, b, a).next();
                     }
 
-                    bufferQuads.vertex(hMin, yMin, edge).color(r, g, b, quadAlpha).next();
-                    bufferQuads.vertex(hMin, yMax, edge).color(r, g, b, quadAlpha).next();
-                    bufferQuads.vertex(hMax, yMax, edge).color(r, g, b, quadAlpha).next();
-                    bufferQuads.vertex(hMax, yMin, edge).color(r, g, b, quadAlpha).next();
+                    bufferQuads.vertex(hMin, yMin, edge).method_22915(r, g, b, quadAlpha).next();
+                    bufferQuads.vertex(hMin, yMax, edge).method_22915(r, g, b, quadAlpha).next();
+                    bufferQuads.vertex(hMax, yMax, edge).method_22915(r, g, b, quadAlpha).next();
+                    bufferQuads.vertex(hMax, yMin, edge).method_22915(r, g, b, quadAlpha).next();
 
                     break;
                 case Z:
                     for (double y = yMin; y <= yMax; y += lineIntervalV)
                     {
-                        bufferLines.vertex(edge, y, hMin).color(r, g, b, a).next();
-                        bufferLines.vertex(edge, y, hMax).color(r, g, b, a).next();
+                        bufferLines.vertex(edge, y, hMin).method_22915(r, g, b, a).next();
+                        bufferLines.vertex(edge, y, hMax).method_22915(r, g, b, a).next();
                     }
 
                     for (double h = hMin; h <= hMax; h += lineIntervalH)
                     {
-                        bufferLines.vertex(edge, yMin, h).color(r, g, b, a).next();
-                        bufferLines.vertex(edge, yMax, h).color(r, g, b, a).next();
+                        bufferLines.vertex(edge, yMin, h).method_22915(r, g, b, a).next();
+                        bufferLines.vertex(edge, yMax, h).method_22915(r, g, b, a).next();
                     }
 
-                    bufferQuads.vertex(edge, yMin, hMin).color(r, g, b, quadAlpha).next();
-                    bufferQuads.vertex(edge, yMax, hMin).color(r, g, b, quadAlpha).next();
-                    bufferQuads.vertex(edge, yMax, hMax).color(r, g, b, quadAlpha).next();
-                    bufferQuads.vertex(edge, yMin, hMax).color(r, g, b, quadAlpha).next();
+                    bufferQuads.vertex(edge, yMin, hMin).method_22915(r, g, b, quadAlpha).next();
+                    bufferQuads.vertex(edge, yMax, hMin).method_22915(r, g, b, quadAlpha).next();
+                    bufferQuads.vertex(edge, yMax, hMax).method_22915(r, g, b, quadAlpha).next();
+                    bufferQuads.vertex(edge, yMin, hMax).method_22915(r, g, b, quadAlpha).next();
                     break;
                 default:
             }

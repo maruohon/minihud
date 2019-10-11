@@ -445,7 +445,7 @@ public class DataStorage
 
     public void addOrUpdateStructuresFromServer(ListTag structures, int timeout)
     {
-        if (structures.getListType() == Constants.NBT.TAG_COMPOUND)
+        if (structures.getType() == Constants.NBT.TAG_COMPOUND)
         {
             this.structureDataTimeout = timeout;
 
@@ -456,7 +456,7 @@ public class DataStorage
 
             for (int i = 0; i < count; ++i)
             {
-                CompoundTag tag = structures.getCompoundTag(i);
+                CompoundTag tag = structures.getCompound(i);
                 StructureData data = StructureData.fromStructureStartTag(tag, currentTime);
 
                 if (data != null)

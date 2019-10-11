@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.class_4587;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
@@ -151,13 +152,13 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLast(float partialTicks)
+    public void onRenderWorldLast(float partialTicks, class_4587 matrixQueue)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         if (Configs.Generic.ENABLED.getBooleanValue() && mc.world != null && mc.player != null)
         {
-            OverlayRenderer.renderOverlays(mc, partialTicks);
+            OverlayRenderer.renderOverlays(mc, partialTicks, matrixQueue);
         }
     }
 

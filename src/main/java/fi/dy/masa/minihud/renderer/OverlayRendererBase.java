@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.class_4587;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.util.math.BlockPos;
 
@@ -18,23 +19,40 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     protected float glLineWidth = 1f;
     protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
     private BlockPos position = BlockPos.ORIGIN;
+    private class_4587 matrixQueue;
 
     protected void preRender(double x, double y, double z)
     {
         GlStateManager.lineWidth(this.glLineWidth);
-        GlStateManager.translated(this.position.getX() - x, this.position.getY() - y, this.position.getZ() - z);
+        //RenderSystem.translated(this.position.getX() - x, this.position.getY() - y, this.position.getZ() - z);
+    }
+
+    protected void setMatrixQueue(class_4587 matrixQueue)
+    {
+        this.matrixQueue = matrixQueue;
+    }
+
+    protected class_4587 getMatrixQueue()
+    {
+        return this.matrixQueue;
     }
 
     @Override
-    public void draw(double x, double y, double z)
+    public void draw(double x, double y, double z, class_4587 matrixQueue)
     {
         GlStateManager.pushMatrix();
         this.preRender(x, y, z);
 
+        matrixQueue.method_22903();
+        matrixQueue.method_22904(-x, -y, -z);
+        //this.matrixQueue.method_22904(this.position.getX() - x, this.position.getY() - y, this.position.getZ() - z);
+
         for (RenderObjectBase obj : this.renderObjects)
         {
-            obj.draw();
+            obj.draw(matrixQueue);
         }
+
+        matrixQueue.method_22909();
 
         GlStateManager.popMatrix();
     }
@@ -53,10 +71,12 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     protected void setPosition(BlockPos pos)
     {
         this.position = pos;
+    }
 
-        BUFFER_1.setOffset(-pos.getX(), -pos.getY(), -pos.getZ());
-        BUFFER_2.setOffset(-pos.getX(), -pos.getY(), -pos.getZ());
-        BUFFER_3.setOffset(-pos.getX(), -pos.getY(), -pos.getZ());
+    protected BufferBuilder vertex(BufferBuilder buffer, double x, double y, double z)
+    {
+        buffer.vertex(x - this.position.getX(), y - this.position.getY(), z - this.position.getZ());
+        return buffer;
     }
 
     /**

@@ -80,8 +80,8 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         {
             for (int y = startY; y <= endY; ++y)
             {
-                buffer.vertex(x, y, startZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x, y, endZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x, y, startZ).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x, y, endZ).method_22915(color.r, color.g, color.b, color.a).next();
             }
         }
 
@@ -89,8 +89,8 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         {
             for (int z = startZ; z <= endZ; ++z)
             {
-                buffer.vertex(x, startY, z).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x, endY, z).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x, startY, z).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x, endY, z).method_22915(color.r, color.g, color.b, color.a).next();
             }
         }
 
@@ -98,8 +98,8 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         {
             for (int y = startY; y <= endY; ++y)
             {
-                buffer.vertex(startX, y, z).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(endX, y, z).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(startX, y, z).method_22915(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(endX, y, z).method_22915(color.r, color.g, color.b, color.a).next();
             }
         }
     }

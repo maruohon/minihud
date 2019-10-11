@@ -7,7 +7,6 @@ import java.util.function.Predicate;
 import com.google.common.collect.MapMaker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket;
-import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.client.render.debug.NeighborUpdateDebugRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
@@ -35,7 +34,6 @@ public class DebugInfoUtils
 
     public static void sendPacketDebugPath(MinecraftServer server, int entityId, Path path, float maxDistance)
     {
-        /*
         PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
         buffer.writeInt(entityId);
         buffer.writeFloat(maxDistance);
@@ -43,7 +41,6 @@ public class DebugInfoUtils
 
         CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(CustomPayloadS2CPacket.DEBUG_PATH, buffer);
         server.getPlayerManager().sendToAll(packet);
-        */
     }
 
     private static void writeBlockPosToBuffer(PacketByteBuf buf, BlockPos pos)
@@ -75,7 +72,6 @@ public class DebugInfoUtils
 
     private static void writePathToBuffer(PacketByteBuf buf, Path path)
     {
-        /*
         // This is the path node the navigation ends on
         PathNode destination = path.getEnd();
 
@@ -101,8 +97,8 @@ public class DebugInfoUtils
             writeBlockPosToBuffer(buf, target);
 
             List<PathNode> nodes = path.getNodes();
-            PathNode[] openSet = path.method_43();
-            PathNode[] closedSet = path.method_37();
+            PathNode[] openSet = path.method_22880();
+            PathNode[] closedSet = path.method_22881();
 
             buf.writeInt(nodes.size());
             for (PathNode point : nodes)
@@ -124,7 +120,6 @@ public class DebugInfoUtils
                 writePathPointToBuffer(buf, point);
             }
         }
-        */
     }
 
     public static void onNeighborNotify(World world, BlockPos pos, EnumSet<Direction> notifiedSides)
