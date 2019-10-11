@@ -7,6 +7,6 @@ import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 @Mixin(MerchantScreen.class)
 public interface IMixinMerchantScreen
 {
-    @Accessor("field_19161")
+    @Accessor("selectedIndex")
     int getSelectedMerchantRecipe();
 }
