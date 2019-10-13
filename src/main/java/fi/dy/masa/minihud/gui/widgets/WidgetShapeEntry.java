@@ -60,6 +60,12 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
     }
 
     @Override
+    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    {
+        return super.canSelectAt(mouseX, mouseY, mouseButton) && mouseX < this.buttonsStartX;
+    }
+
+    @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
