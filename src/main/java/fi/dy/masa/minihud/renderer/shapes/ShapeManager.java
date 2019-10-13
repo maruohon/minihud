@@ -2,14 +2,12 @@ package fi.dy.masa.minihud.renderer.shapes;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 
 public class ShapeManager
@@ -108,7 +106,7 @@ public class ShapeManager
 
                     if (JsonUtils.hasString(o, "type"))
                     {
-                        ShapeTypes type = ShapeTypes.fromString(JsonUtils.getString(o, "type"));
+                        ShapeType type = ShapeType.fromString(JsonUtils.getString(o, "type"));
 
                         if (type != null)
                         {
@@ -129,54 +127,6 @@ public class ShapeManager
                     this.selectedShape = this.shapes.get(selected);
                 }
             }
-        }
-    }
-
-    public enum ShapeTypes
-    {
-        SPHERE_BLOCKY       ("sphere_blocky",       "minihud.label.shapes.sphere_blocky",      ShapeSphereBlocky::new),
-        CAN_SPAWN_SPHERE    ("can_spawn_sphere",    "minihud.label.shapes.can_spawn_sphere",   ShapeCanSpawnSphere::new),
-        CAN_DESPAWN_SPHERE  ("can_despawn_sphere",  "minihud.label.shapes.can_despawn_sphere", ShapeCanDespawnSphere::new),
-        DESPAWN_SPHERE      ("despawn_sphere",      "minihud.label.shapes.despawn_sphere",     ShapeDespawnSphere::new);
-
-        private final String id;
-        private final String translationKey;
-        private final Supplier<ShapeBase> shapeFactory;
-
-        private ShapeTypes(String id, String translationKey, Supplier<ShapeBase> shapeFactory)
-        {
-            this.id = id;
-            this.translationKey = translationKey;
-            this.shapeFactory = shapeFactory;
-        }
-
-        public String getId()
-        {
-            return this.id;
-        }
-
-        public String getDisplayName()
-        {
-            return StringUtils.translate(this.translationKey);
-        }
-
-        public ShapeBase createShape()
-        {
-            return this.shapeFactory.get();
-        }
-
-        @Nullable
-        public static ShapeTypes fromString(String id)
-        {
-            for (ShapeTypes type : ShapeTypes.values())
-            {
-                if (type.getId().equalsIgnoreCase(id))
-                {
-                    return type;
-                }
-            }
-
-            return null;
         }
     }
 }

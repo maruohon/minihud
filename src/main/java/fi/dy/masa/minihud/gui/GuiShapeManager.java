@@ -16,12 +16,12 @@ import fi.dy.masa.minihud.gui.widgets.WidgetListShapes;
 import fi.dy.masa.minihud.gui.widgets.WidgetShapeEntry;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
-import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
+import fi.dy.masa.minihud.renderer.shapes.ShapeType;
 
 public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, WidgetListShapes>
                              implements ISelectionListener<ShapeBase>
 {
-    protected final WidgetDropDownList<ShapeTypes> widgetDropDown;
+    protected final WidgetDropDownList<ShapeType> widgetDropDown;
 
     public GuiShapeManager()
     {
@@ -30,7 +30,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         this.title = StringUtils.translate("minihud.gui.title.shape_manager");
 
         // The position will get updated later
-        this.widgetDropDown = new WidgetDropDownList<ShapeTypes>(0, 0, 160, 18, 200, 10, ImmutableList.copyOf(ShapeTypes.values()), (type) -> type.getDisplayName());
+        this.widgetDropDown = new WidgetDropDownList<ShapeType>(0, 0, 160, 18, 200, 10, ImmutableList.copyOf(ShapeType.values()), (type) -> type.getDisplayName());
         this.widgetDropDown.setZLevel(this.zLevel + 1);
     }
 
@@ -161,7 +161,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         }
     }
 
-    private static class ButtonListenerTab implements IButtonActionListener
+    public static class ButtonListenerTab implements IButtonActionListener
     {
         private final IConfigGuiTab tab;
 

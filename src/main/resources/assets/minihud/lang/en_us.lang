@@ -20,11 +20,15 @@ minihud.gui.button.shape_entry.enabled=Enabled: %s
 minihud.gui.label.block_snap=Block snap: %s
 minihud.gui.label.center_colon=Center:
 minihud.gui.label.center_value=Center: %s
+minihud.gui.label.circle.main_axis_colon=Axis:
 minihud.gui.label.color=Color:
 minihud.gui.label.effective_center_value=Effective center: %s
+minihud.gui.label.height_colon=Height:
+minihud.gui.label.height_value=Height: %s
 minihud.gui.label.margin_colon=Margin:
 minihud.gui.label.margin_value=Margin: %s
 minihud.gui.label.radius_colon=Radius:
+minihud.gui.label.radius_value=Radius: %s
 
 minihud.gui.title.configs=MiniHUD Configs
 minihud.gui.title.shape_editor=Shape Editor
@@ -45,6 +49,7 @@ minihud.label.light_level_number_mode.sky=Sky
 
 minihud.label.shapes.can_spawn_sphere=Can Spawn Sphere ( > 24)
 minihud.label.shapes.can_despawn_sphere=Can Despawn Sphere ( > 32)
+minihud.label.shapes.circle=Circle / Cylinder
 minihud.label.shapes.despawn_sphere=Despawn Sphere ( > 128)
 minihud.label.shapes.sphere_blocky=Sphere (block-based)
 

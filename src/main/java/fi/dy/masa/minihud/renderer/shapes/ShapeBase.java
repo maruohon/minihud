@@ -3,6 +3,8 @@ package fi.dy.masa.minihud.renderer.shapes;
 import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import fi.dy.masa.malilib.interfaces.IRangeChangeListener;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -10,20 +12,17 @@ import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.OverlayRendererBase;
-import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
 
 public abstract class ShapeBase extends OverlayRendererBase implements IRangeChangeListener
 {
-    protected final ShapeTypes type;
+    protected final ShapeType type;
     protected final LayerRange layerRange;
     protected final Minecraft mc;
     protected Color4f color;
     protected boolean enabled;
     protected boolean needsUpdate;
 
-    public ShapeBase(ShapeTypes type, Color4f color)
+    public ShapeBase(ShapeType type, Color4f color)
     {
         this.type = type;
         this.color = color;
@@ -34,7 +33,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
 
     public abstract List<String> getWidgetHoverLines();
 
-    public ShapeTypes getType()
+    public ShapeType getType()
     {
         return this.type;
     }
@@ -49,15 +48,18 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
         return this.color;
     }
 
-    public void setColorFromString(String newValue)
+    public void setColor(int newColor)
     {
-        int newColor = StringUtils.getColor(newValue, 0);
-
         if (newColor != this.color.intValue)
         {
             this.color = Color4f.fromColor(newColor);
             this.setNeedsUpdate();
         }
+    }
+
+    public void setColorFromString(String newValue)
+    {
+        this.setColor(StringUtils.getColor(newValue, 0));
     }
 
     public boolean isEnabled()

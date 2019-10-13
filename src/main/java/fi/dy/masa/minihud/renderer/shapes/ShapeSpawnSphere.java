@@ -4,22 +4,23 @@ import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.Quadrant;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
 
 public class ShapeSpawnSphere extends ShapeSphereBlocky
 {
-    protected Vec3d[] quadrantCenters = new Vec3d[4];
+    protected Vec3d[] quadrantCenters;
     protected double margin = 1.5;
 
-    public ShapeSpawnSphere(ShapeTypes shape, Color4f color, double radius)
+    public ShapeSpawnSphere(ShapeType shape, Color4f color, double radius)
     {
         super(shape, color, radius);
+
+        this.updateQuadrantPoints();
     }
 
     @Override
@@ -65,7 +66,11 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
     {
         List<String> lines = super.getWidgetHoverLines();
 
-        lines.add(StringUtils.translate("minihud.gui.label.margin_value", String.format("%.2f", this.margin)));
+        String gl = GuiBase.TXT_GOLD;
+        String gr = GuiBase.TXT_GRAY;
+        String rst = GuiBase.TXT_GRAY;
+
+        lines.add(1, gr + StringUtils.translate("minihud.gui.label.margin_value", String.format("%s%.2f%s", gl, this.margin, rst)));
 
         return lines;
     }
@@ -87,7 +92,7 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
     }
 
     @Override
-    protected boolean isPositionOnOrInsideSphere(int x, int y, int z, EnumFacing outSide)
+    protected boolean isPositionOnOrInsideRing(int x, int y, int z, EnumFacing outSide, EnumFacing mainAxis)
     {
         final double maxDistSq = this.radiusSq;
         Vec3d quadrantCenter = this.quadrantCenters[Quadrant.getQuadrant(x, z, this.effectiveCenter).ordinal()];
@@ -96,17 +101,5 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
         double dz = z + 0.5;
 
         return quadrantCenter.squareDistanceTo(dx, dy, dz) < maxDistSq || this.effectiveCenter.squareDistanceTo(dx, dy, dz) < maxDistSq;
-    }
-
-    @Override
-    protected boolean isAdjacentPositionOutside(BlockPos pos, EnumFacing dir)
-    {
-        final double maxDistSq = this.radiusSq;
-        Vec3d quadrantCenter = this.quadrantCenters[Quadrant.getQuadrant(pos.getX(), pos.getZ(), this.effectiveCenter).ordinal()];
-        double x = pos.getX() + dir.getXOffset() + 0.5;
-        double y = pos.getY() + dir.getYOffset() + 1;
-        double z = pos.getZ() + dir.getZOffset() + 0.5;
-
-        return quadrantCenter.squareDistanceTo(x, y, z) >= maxDistSq && this.effectiveCenter.squareDistanceTo(x, y, z) >= maxDistSq;
     }
 }
