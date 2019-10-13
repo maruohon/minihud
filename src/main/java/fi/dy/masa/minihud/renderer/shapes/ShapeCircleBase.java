@@ -123,6 +123,8 @@ public abstract class ShapeCircleBase extends ShapeBase
             this.effectiveCenter = center;
         }
 
+        this.center = this.effectiveCenter;
+
         this.setNeedsUpdate();
     }
 

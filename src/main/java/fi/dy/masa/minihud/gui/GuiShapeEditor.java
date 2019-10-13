@@ -257,6 +257,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             this.shape.setBlockSnap((BlockSnap) this.gui.configBlockSnap.getOptionListValue());
+            this.gui.initGui();
         }
     }
 
