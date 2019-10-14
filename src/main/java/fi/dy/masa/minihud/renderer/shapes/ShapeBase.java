@@ -1,10 +1,12 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRangeChangeListener;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -12,30 +14,38 @@ import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.OverlayRendererBase;
+import fi.dy.masa.minihud.util.ShapeRenderType;
 
 public abstract class ShapeBase extends OverlayRendererBase implements IRangeChangeListener
 {
+    protected final Minecraft mc;
     protected final ShapeType type;
     protected final LayerRange layerRange;
-    protected final Minecraft mc;
+    protected String displayName;
+    protected ShapeRenderType renderType;
     protected Color4f color;
     protected boolean enabled;
     protected boolean needsUpdate;
 
     public ShapeBase(ShapeType type, Color4f color)
     {
+        this.mc = Minecraft.getMinecraft();
         this.type = type;
         this.color = color;
         this.layerRange = new LayerRange(this);
-        this.mc = Minecraft.getMinecraft();
+        this.renderType = ShapeRenderType.OUTER_EDGE;
+        this.displayName = type.getDisplayName();
         this.needsUpdate = true;
     }
-
-    public abstract List<String> getWidgetHoverLines();
 
     public ShapeType getType()
     {
         return this.type;
+    }
+
+    public String getDisplayName()
+    {
+        return this.displayName;
     }
 
     public LayerRange getLayerRange()
@@ -46,6 +56,22 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
     public Color4f getColor()
     {
         return this.color;
+    }
+
+    public ShapeRenderType getRenderType()
+    {
+        return this.renderType;
+    }
+
+    public void setDisplayName(String displayName)
+    {
+        this.displayName = displayName;
+    }
+
+    public void setRenderType(ShapeRenderType renderType)
+    {
+        this.renderType = renderType;
+        this.setNeedsUpdate();
     }
 
     public void setColor(int newColor)
@@ -118,12 +144,26 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
         this.setNeedsUpdate();
     }
 
+    public List<String> getWidgetHoverLines()
+    {
+        List<String> lines = new ArrayList<>();
+
+        String aq = GuiBase.TXT_AQUA;
+        String rst = GuiBase.TXT_GRAY;
+        lines.add(StringUtils.translate("minihud.gui.label.shape.type_value", aq + this.type.getDisplayName() + rst));
+
+        return lines;
+    }
+
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
 
         obj.add("type", new JsonPrimitive(this.type.getId()));
+        obj.add("color", new JsonPrimitive(this.color.intValue));
         obj.add("enabled", new JsonPrimitive(this.enabled));
+        obj.add("display_name", new JsonPrimitive(this.displayName));
+        obj.add("render_type", new JsonPrimitive(this.renderType.getStringValue()));
         obj.add("layers", this.layerRange.toJson());
 
         return obj;
@@ -133,9 +173,29 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
     {
         this.enabled = JsonUtils.getBoolean(obj, "enabled");
 
+        if (JsonUtils.hasInteger(obj, "color"))
+        {
+            this.color = Color4f.fromColor(JsonUtils.getInteger(obj, "color"));
+        }
+
         if (JsonUtils.hasObject(obj, "layers"))
         {
             this.layerRange.fromJson(JsonUtils.getNestedObject(obj, "layers", false));
+        }
+
+        if (JsonUtils.hasString(obj, "render_type"))
+        {
+            ShapeRenderType type = ShapeRenderType.fromStringStatic(ShapeRenderType.VALUES, obj.get("render_type").getAsString());
+
+            if (type != null)
+            {
+                this.renderType = type;
+            }
+        }
+
+        if (JsonUtils.hasString(obj, "display_name"))
+        {
+            this.displayName = obj.get("display_name").getAsString();
         }
     }
 }

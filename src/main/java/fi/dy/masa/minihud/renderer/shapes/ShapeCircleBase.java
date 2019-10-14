@@ -1,6 +1,5 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -17,17 +16,19 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.minihud.util.ShapeRenderType;
 
 public abstract class ShapeCircleBase extends ShapeBase
 {
     protected static final EnumFacing[] FACING_ALL = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
 
+    protected BlockSnap snap = BlockSnap.CENTER;
     protected EnumFacing mainAxis = EnumFacing.UP;
     protected double radius;
     protected double radiusSq;
     protected double maxRadius = 256.0; // TODO use per-chunk VBOs or something to allow bigger shapes?
-    protected BlockSnap snap = BlockSnap.CENTER;
     protected Vec3d center = Vec3d.ZERO;
     protected Vec3d effectiveCenter = Vec3d.ZERO;
     protected Vec3d lastUpdatePos = Vec3d.ZERO;
@@ -166,7 +167,6 @@ public abstract class ShapeCircleBase extends ShapeBase
 
         obj.add("center", JsonUtils.vec3dToJson(this.center));
         obj.add("snap", new JsonPrimitive(this.snap.getStringValue()));
-        obj.add("color", new JsonPrimitive(this.color.intValue));
 
         return obj;
     }
@@ -188,17 +188,12 @@ public abstract class ShapeCircleBase extends ShapeBase
         {
             this.setCenter(center);
         }
-
-        if (JsonUtils.hasInteger(obj, "color"))
-        {
-            this.color = Color4f.fromColor(JsonUtils.getInteger(obj, "color"));
-        }
     }
 
     @Override
     public List<String> getWidgetHoverLines()
     {
-        List<String> lines = new ArrayList<>();
+        List<String> lines = super.getWidgetHoverLines();
         Vec3d c = this.center;
 
         String aq = GuiBase.TXT_AQUA;
@@ -222,6 +217,43 @@ public abstract class ShapeCircleBase extends ShapeBase
         }
 
         return lines;
+    }
+
+    protected void renderPositions(HashSet<BlockPos> positions, EnumFacing[] sides, EnumFacing mainAxis, Color4f color)
+    {
+        boolean full = this.renderType == ShapeRenderType.FULL_BLOCK;
+        boolean outer = this.renderType == ShapeRenderType.OUTER_EDGE;
+        boolean inner = this.renderType == ShapeRenderType.INNER_EDGE;
+        LayerRange range = this.layerRange;
+        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+
+        for (BlockPos pos : positions)
+        {
+            if (range.isPositionWithinRange(pos))
+            {
+                for (int i = 0; i < sides.length; ++i)
+                {
+                    EnumFacing side = sides[i];
+                    posMutable.setPos(pos.getX() + side.getXOffset(), pos.getY() + side.getYOffset(), pos.getZ() + side.getZOffset());
+
+                    if (positions.contains(posMutable) == false)
+                    {
+                        boolean render = full;
+
+                        if (full == false)
+                        {
+                            boolean onOrIn = this.isPositionOnOrInsideRing(posMutable.getX(), posMutable.getY(), posMutable.getZ(), side, mainAxis);
+                            render |= ((outer && onOrIn == false) || (inner && onOrIn));
+                        }
+
+                        if (render)
+                        {
+                            fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceSideBatchedQuads(pos, side, color, 0, BUFFER_1);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     protected void addPositionsOnHorizontalRing(HashSet<BlockPos> positions, BlockPos.MutableBlockPos posMutable, EnumFacing direction)

@@ -33,6 +33,7 @@ import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircleBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeSpawnSphere;
+import fi.dy.masa.minihud.util.ShapeRenderType;
 
 public class GuiShapeEditor extends GuiRenderLayerEditBase
 {
@@ -53,13 +54,14 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         super.initGui();
 
         int x = 10;
-        int y = 26;
+        int y = 20;
 
-        this.createLayerEditControls(x, y, this.getLayerRange());
-        this.createShapeEditorElements(x, this.nextY);
+        this.createShapeEditorElements(x, y);
 
-        ButtonGeneric button = new ButtonGeneric(10, this.height - 24, -1, 20, GuiConfigs.SHAPES.getDisplayName());
+        ButtonGeneric button = new ButtonGeneric(x, this.height - 24, -1, 20, GuiConfigs.SHAPES.getDisplayName());
         this.addButton(button, new GuiShapeManager.ButtonListenerTab(GuiConfigs.SHAPES));
+
+        this.createLayerEditControls(146, 142, this.getLayerRange());
     }
 
     @Override
@@ -70,9 +72,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
     private void createColorInput(int x, int y)
     {
-        String label = StringUtils.translate("minihud.gui.label.color");
-        int w = this.getStringWidth(label);
-        this.addLabel(x, y, w, 14, 0xFFFFFFFF, label);
+        this.addLabel(x, y, -1, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.color"));
         y += 12;
 
         GuiTextFieldGeneric textField = new GuiTextFieldGeneric(x, y, 70, 17, this.textRenderer);
@@ -87,6 +87,17 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
     private void createShapeEditorElements(int x, int y)
     {
+        this.addLabel(x, y, -1, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.display_name_colon"));
+        y += 12;
+
+        GuiTextFieldGeneric textField = new GuiTextFieldGeneric(x, y, 240, 17, this.textRenderer);
+        textField.setText(this.shape.getDisplayName());
+        this.addTextField(textField, (txtFld) -> { this.shape.setDisplayName(txtFld.getText()); return true; });
+        y += 20;
+
+        int renderTypeX = x + 230;
+        int renderTypeY = y + 2;
+
         switch (this.shape.getType())
         {
             case CAN_DESPAWN_SPHERE:
@@ -104,12 +115,14 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
                 ShapeCircle shape = (ShapeCircle) this.shape;
                 this.createShapeEditorElementsSphereBase(x, y, true);
                 this.createShapeEditorElementIntField(x + 150, y + 36, () -> shape.getHeight(), (val) -> shape.setHeight(val), "minihud.gui.label.height_colon", true);
-                this.createDirectionButton(x + 230, y + 2, () -> shape.getMainAxis(), (val) -> shape.setMainAxis(val), "minihud.gui.label.circle.main_axis_colon");
+                this.createDirectionButton(x + 230, y + 36, () -> shape.getMainAxis(), (val) -> shape.setMainAxis(val), "minihud.gui.label.circle.main_axis_colon");
+                this.createRenderTypeButton(renderTypeX, renderTypeY, () -> this.shape.getRenderType(), (val) -> this.shape.setRenderType(val), "minihud.gui.label.render_type_colon");
                 break;
             }
 
             case SPHERE_BLOCKY:
                 this.createShapeEditorElementsSphereBase(x, y, true);
+                this.createRenderTypeButton(renderTypeX, renderTypeY, () -> this.shape.getRenderType(), (val) -> this.shape.setRenderType(val), "minihud.gui.label.render_type_colon");
                 break;
         }
     }
@@ -130,14 +143,14 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         x += 11;
         y += 54;
 
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, false, "malilib.gui.button.render_layers_gui.set_here");
+        ButtonGeneric button = new ButtonGeneric(x, y, -1, false, "malilib.gui.button.render_layers_gui.set_to_player");
         this.addButton(button, new ButtonListenerSphere(shape, this));
 
         this.configBlockSnap.setOptionListValue(shape.getBlockSnap());
         ConfigButtonOptionList buttonSnap = new ConfigButtonOptionList(x + button.getWidth() + 4, y, -1, 20, this.configBlockSnap, "minihud.gui.label.block_snap");
         this.addButton(buttonSnap, new ButtonListenerSphereBlockSnap(shape, this));
 
-        y += 24;
+        y += 34;
 
         this.createColorInput(x, y);
     }
@@ -183,6 +196,15 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
         ButtonGeneric button = new ButtonGeneric(x, y, 50, 20, org.apache.commons.lang3.StringUtils.capitalize(supplier.get().toString().toLowerCase()));
         this.addButton(button, (btn, mouseBtn) -> { consumer.accept(PositionUtils.cycleDirection(supplier.get(), mouseBtn == 1)); this.initGui(); } );
+    }
+
+    private void createRenderTypeButton(int x, int y, Supplier<ShapeRenderType> supplier, Consumer<ShapeRenderType> consumer, String translationKey)
+    {
+        this.addLabel(x, y, -1, 12, 0xFFFFFFFF, translationKey);
+        y += 10;
+
+        ButtonGeneric button = new ButtonGeneric(x, y, -1, 20, supplier.get().getDisplayName());
+        this.addButton(button, (btn, mouseBtn) -> { consumer.accept(supplier.get().cycle(mouseBtn == 0)); this.initGui(); } );
     }
 
     private static class SphereEditor implements ICoordinateValueModifier

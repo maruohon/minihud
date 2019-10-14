@@ -70,7 +70,7 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
         String gr = GuiBase.TXT_GRAY;
         String rst = GuiBase.TXT_GRAY;
 
-        lines.add(1, gr + StringUtils.translate("minihud.gui.label.margin_value", String.format("%s%.2f%s", gl, this.margin, rst)));
+        lines.add(2, gr + StringUtils.translate("minihud.gui.label.margin_value", String.format("%s%.2f%s", gl, this.margin, rst)));
 
         return lines;
     }

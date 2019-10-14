@@ -11,11 +11,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.RenderObjectBase;
+import fi.dy.masa.minihud.util.ShapeRenderType;
 
 public class ShapeCircle extends ShapeCircleBase
 {
@@ -49,7 +49,6 @@ public class ShapeCircle extends ShapeCircleBase
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        Color4f colorQuad = this.color;
         BlockPos posCenter = this.getCenterBlock();
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
         HashSet<BlockPos> circlePositions = new HashSet<>();
@@ -75,22 +74,25 @@ public class ShapeCircle extends ShapeCircleBase
         }
 
         EnumFacing mainAxis = this.mainAxis;
+        EnumFacing[] sides = FACING_ALL;
 
-        for (BlockPos pos : circlePositions)
+        // Exclude the two sides on the main axis
+        if (this.renderType != ShapeRenderType.FULL_BLOCK)
         {
-            for (int i = 0; i < 6; ++i)
+            sides = new EnumFacing[4];
+
+            for (int i = 0, index = 0; i < 6; ++i)
             {
                 EnumFacing side = FACING_ALL[i];
-                posMutable.setPos(pos.getX() + side.getXOffset(), pos.getY() + side.getYOffset(), pos.getZ() + side.getZOffset());
 
-                if (this.layerRange.isPositionWithinRange(pos) &&
-                    circlePositions.contains(posMutable) == false &&
-                    this.isAdjacentPositionOutside(pos, side, mainAxis))
+                if (side.getAxis() != mainAxis.getAxis())
                 {
-                    fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceSideBatchedQuads(pos, side, colorQuad, 0, BUFFER_1);
+                    sides[index++] = side;
                 }
             }
         }
+
+        this.renderPositions(circlePositions, sides, mainAxis, this.color);
 
         BUFFER_1.finishDrawing();
 
@@ -132,8 +134,8 @@ public class ShapeCircle extends ShapeCircleBase
         String gr = GuiBase.TXT_GRAY;
         String rst = GuiBase.TXT_GRAY;
 
-        lines.add(1, gr + StringUtils.translate("minihud.gui.label.height_value", gl + this.getHeight() + rst));
-        lines.add(2, gr + StringUtils.translate("minihud.gui.label.cicle.main_axis_value",
+        lines.add(2, gr + StringUtils.translate("minihud.gui.label.height_value", gl + this.getHeight() + rst));
+        lines.add(3, gr + StringUtils.translate("minihud.gui.label.circle.main_axis_value",
                 aq + org.apache.commons.lang3.StringUtils.capitalize(this.getMainAxis().toString().toLowerCase()) + rst));
 
         return lines;

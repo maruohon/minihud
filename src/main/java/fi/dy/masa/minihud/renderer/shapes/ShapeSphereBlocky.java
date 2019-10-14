@@ -34,7 +34,6 @@ public class ShapeSphereBlocky extends ShapeCircleBase
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        Color4f colorQuad = this.color;
         BlockPos posCenter = this.getCenterBlock();
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
         HashSet<BlockPos> spherePositions = new HashSet<>();
@@ -69,25 +68,9 @@ public class ShapeSphereBlocky extends ShapeCircleBase
         //System.out.printf("time: %.6f s - margin: %.4f\n", (double) (System.nanoTime() - before) / 1000000000D, this.margin);
         //System.out.printf("spherePositions: %d\n", spherePositions.size());
 
-        EnumFacing mainAxis = this.mainAxis;
+        EnumFacing[] sides = FACING_ALL;
 
-        for (BlockPos pos : spherePositions)
-        {
-            for (int i = 0; i < 6; ++i)
-            {
-                EnumFacing side = FACING_ALL[i];
-                posMutable.setPos(pos).move(side);
-
-                if (this.layerRange.isPositionWithinRange(pos) &&
-                    spherePositions.contains(posMutable) == false &&
-                    this.isAdjacentPositionOutside(pos, side, mainAxis))
-                {
-                    fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceSideBatchedQuads(pos, side, colorQuad, 0, BUFFER_1);
-                    //renderBlockSideLines(pos, side, BUFFER_2, colorLine);
-                    //r++;
-                }
-            }
-        }
+        this.renderPositions(spherePositions, sides, this.mainAxis, this.color);
         //System.out.printf("rendered: %d\n", r);
 
         BUFFER_1.finishDrawing();
