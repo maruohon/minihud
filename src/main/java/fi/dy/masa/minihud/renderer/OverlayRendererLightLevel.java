@@ -369,7 +369,7 @@ public class OverlayRendererLightLevel
                     for (int z = startZ; z <= endZ; ++z)
                     {
                         final int startY = Math.max(minY, 0);
-                        final int endY   = Math.min(maxY, chunk.getTopFilledSegment() + 15);
+                        final int endY   = Math.min(maxY, chunk.getTopFilledSegment() + 15 + 1);
                         IBlockState stateDown = chunk.getBlockState(x, startY - 1, z);
                         IBlockState state    = chunk.getBlockState(x, startY, z);
                         IBlockState stateUp  = chunk.getBlockState(x, startY + 1, z);
