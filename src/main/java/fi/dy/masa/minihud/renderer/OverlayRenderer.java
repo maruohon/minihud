@@ -2,7 +2,6 @@ package fi.dy.masa.minihud.renderer;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.minihud.config.RendererToggle;
 
@@ -17,7 +16,7 @@ public class OverlayRenderer
         loginTime = System.currentTimeMillis();
     }
 
-    public static void renderOverlays(MinecraftClient mc, float partialTicks, MatrixStack matrixStack)
+    public static void renderOverlays(MinecraftClient mc, float partialTicks, net.minecraft.client.util.math.MatrixStack matrixStack)
     {
         Entity entity = mc.getCameraEntity();
 

@@ -32,7 +32,7 @@ public interface IOverlayRenderer
      * @param y
      * @param z
      */
-    void draw(double x, double y, double z, net.minecraft.util.math.MatrixStack matrixStack);
+    void draw(double x, double y, double z, net.minecraft.client.util.math.MatrixStack matrixStack);
 
     /**
      * Allocates the OpenGL resources according to the current Video settings

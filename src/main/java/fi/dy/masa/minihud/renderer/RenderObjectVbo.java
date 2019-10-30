@@ -24,7 +24,7 @@ public class RenderObjectVbo extends RenderObjectBase
     }
 
     @Override
-    public void draw(net.minecraft.util.math.MatrixStack matrixStack)
+    public void draw(net.minecraft.client.util.math.MatrixStack matrixStack)
     {
         GlStateManager.pushMatrix();
 

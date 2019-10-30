@@ -26,7 +26,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.LightType;
@@ -152,7 +151,7 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLast(float partialTicks, MatrixStack matrixStack)
+    public void onRenderWorldLast(float partialTicks, net.minecraft.client.util.math.MatrixStack matrixStack)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 

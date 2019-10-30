@@ -134,7 +134,7 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Override
-    public void draw(double x, double y, double z, net.minecraft.util.math.MatrixStack matrixStack)
+    public void draw(double x, double y, double z, net.minecraft.client.util.math.MatrixStack matrixStack)
     {
         GlStateManager.pushMatrix();
         this.preRender(x, y, z);

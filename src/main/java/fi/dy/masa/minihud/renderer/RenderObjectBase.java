@@ -18,7 +18,7 @@ public abstract class RenderObjectBase
 
     public abstract void uploadData(BufferBuilder buffer);
 
-    public abstract void draw(net.minecraft.util.math.MatrixStack matrixStack);
+    public abstract void draw(net.minecraft.client.util.math.MatrixStack matrixStack);
 
     public abstract void deleteGlResources();
 }
