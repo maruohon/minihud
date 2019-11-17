@@ -62,10 +62,13 @@ public class LiteModMiniHud implements LiteMod, Configurable, PluginChannelListe
     {
         if (CHANNEL_CARPET_CLIENT_OLD.equals(channel))
         {
+            data.readerIndex(0);
             DataStorage.getInstance().updateStructureDataFromCarpetServer(data);
+            data.readerIndex(0);
         }
         else if (CHANNEL_CARPET_CLIENT_NEW.equals(channel))
         {
+            data.readerIndex(0);
             PacketBuffer buffer = PacketSplitter.receive(channel, data);
 
             // Received the complete packet
@@ -73,6 +76,8 @@ public class LiteModMiniHud implements LiteMod, Configurable, PluginChannelListe
             {
                 DataStorage.getInstance().updateStructureDataFromCarpetServer(buffer);
             }
+
+            data.readerIndex(0);
         }
     }
 
