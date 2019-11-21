@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.GlBuffer;
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.VertexFormatElement;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
@@ -126,7 +126,7 @@ public class RenderContainer
                 }
             }
 
-            GlBuffer.unbind();
+            VertexBuffer.unbind();
             GlStateManager.clearCurrentColor();
 
             for (VertexFormatElement element : VertexFormats.POSITION_COLOR.getElements())

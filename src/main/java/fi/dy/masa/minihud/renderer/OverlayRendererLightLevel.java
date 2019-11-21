@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -42,7 +43,7 @@ public class OverlayRendererLightLevel
         needsUpdate = true;
     }
 
-    public static void render(double dx, double dy, double dz, Entity entity, MinecraftClient mc)
+    public static void render(double x, double y, double z, Entity entity, MinecraftClient mc, net.minecraft.client.util.math.MatrixStack matrixStack)
     {
         if (needsUpdate || lastUpdatePos == null ||
             Math.abs(entity.getX() - lastUpdatePos.getX()) > 4 ||
@@ -54,7 +55,19 @@ public class OverlayRendererLightLevel
             //System.out.printf("LL markers: %d, time: %.3f s\n", LIGHT_INFOS.size(), (double) (System.nanoTime() - pre) / 1000000000D);
         }
 
-        renderLightLevels(dx, dy, dz, mc);
+        //matrixStack.push();
+        //matrixStack.translate(-x, -y, -z);
+        RenderSystem.pushMatrix();
+        //RenderSystem.translatef((float) -x, (float) -y, (float) -z);
+        //RenderSystem.normal3f(0.0F, 1.0F, 0.0F);
+        //EntityRenderDispatcher disp = mc.getEntityRenderManager();
+        //RenderSystem.rotatef(disp.cameraYaw, 0.0F, 1.0F, 0.0F);
+        //RenderSystem.rotatef(disp.cameraPitch, 1.0F, 0.0F, 0.0F);
+
+        renderLightLevels(x, y, z, mc);
+
+        //matrixStack.pop();
+        RenderSystem.popMatrix();
     }
 
     private static void renderLightLevels(double dx, double dy, double dz, MinecraftClient mc)
@@ -72,7 +85,7 @@ public class OverlayRendererLightLevel
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
             Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBufferBuilder();
+            BufferBuilder buffer = tessellator.getBuffer();
             Direction numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? mc.player.getHorizontalFacing() : Direction.NORTH;
             LightLevelNumberMode numberMode = (LightLevelNumberMode) Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getOptionListValue();
             LightLevelMarkerMode markerMode = (LightLevelMarkerMode) Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
@@ -201,7 +214,7 @@ public class OverlayRendererLightLevel
 
         if (colorLit != null)
         {
-            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV_COLOR);
+            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 
             for (int i = 0; i < count; ++i)
             {
@@ -217,7 +230,7 @@ public class OverlayRendererLightLevel
         }
         else
         {
-            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV);
+            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
 
             for (int i = 0; i < count; ++i)
             {

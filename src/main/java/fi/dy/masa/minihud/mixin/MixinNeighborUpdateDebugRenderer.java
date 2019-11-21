@@ -10,7 +10,7 @@ import net.minecraft.client.render.debug.NeighborUpdateDebugRenderer;
 @Mixin(NeighborUpdateDebugRenderer.class)
 public abstract class MixinNeighborUpdateDebugRenderer
 {
-    @Inject(method = "method_23109", at = @At("HEAD"))
+    @Inject(method = "render", at = @At("HEAD"))
     public void fixDebugRendererState(CallbackInfo ci)
     {
         RenderHandler.fixDebugRendererState();

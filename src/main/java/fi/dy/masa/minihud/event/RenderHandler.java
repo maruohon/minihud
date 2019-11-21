@@ -262,7 +262,7 @@ public class RenderHandler implements IRenderer
         MinecraftClient mc = MinecraftClient.getInstance();
         Entity entity = mc.getCameraEntity();
         World world = entity.getEntityWorld();
-        BlockPos pos = new BlockPos(entity.getX(), entity.getBoundingBox().minY, entity.getZ());
+        BlockPos pos = new BlockPos(entity.getX(), entity.getBoundingBox().y1, entity.getZ());
         ChunkPos chunkPos = new ChunkPos(pos);
 
         if (type == InfoToggle.FPS)
@@ -405,7 +405,7 @@ public class RenderHandler implements IRenderer
                     try
                     {
                         str.append(String.format(Configs.Generic.COORDINATE_FORMAT_STRING.getStringValue(),
-                            entity.getX(), entity.getBoundingBox().minY, entity.getZ()));
+                            entity.getX(), entity.getBoundingBox().y1, entity.getZ()));
                     }
                     // Uh oh, someone done goofed their format string... :P
                     catch (Exception e)
@@ -416,7 +416,7 @@ public class RenderHandler implements IRenderer
                 else
                 {
                     str.append(String.format("XYZ: %.2f / %.4f / %.2f",
-                        entity.getX(), entity.getBoundingBox().minY, entity.getZ()));
+                        entity.getX(), entity.getBoundingBox().y1, entity.getZ()));
                 }
 
                 pre = " / ";
@@ -639,7 +639,7 @@ public class RenderHandler implements IRenderer
 
                 if (chunk.isEmpty() == false)
                 {
-                    this.addLine("Biome: " + mc.world.getBiome(pos).getName().getString());
+                    this.addLine("Biome: " + mc.world.method_23753(pos).getName().getString());
                 }
             }
         }
@@ -652,7 +652,7 @@ public class RenderHandler implements IRenderer
 
                 if (chunk.isEmpty() == false)
                 {
-                    Biome biome = mc.world.getBiome(pos);
+                    Biome biome = mc.world.method_23753(pos);
                     Identifier rl = Registry.BIOME.getId(biome);
                     String name = rl != null ? rl.toString() : "?";
                     this.addLine("Biome reg name: " + name);
@@ -726,9 +726,9 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.LOOKING_AT_ENTITY)
         {
-            if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.ENTITY)
+            if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.ENTITY)
             {
-                Entity lookedEntity = ((EntityHitResult) mc.hitResult).getEntity();
+                Entity lookedEntity = ((EntityHitResult) mc.crosshairTarget).getEntity();
 
                 if (lookedEntity instanceof LivingEntity)
                 {
@@ -744,9 +744,9 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.ENTITY_REG_NAME)
         {
-            if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.ENTITY)
+            if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.ENTITY)
             {
-                Entity lookedEntity = ((EntityHitResult) mc.hitResult).getEntity();
+                Entity lookedEntity = ((EntityHitResult) mc.crosshairTarget).getEntity();
                 Identifier regName = EntityType.getId(lookedEntity.getType());
 
                 if (regName != null)
@@ -765,9 +765,9 @@ public class RenderHandler implements IRenderer
                 return;
             }
 
-            if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.BLOCK)
+            if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK)
             {
-                BlockPos lookPos = ((BlockHitResult) mc.hitResult).getBlockPos();
+                BlockPos lookPos = ((BlockHitResult) mc.crosshairTarget).getBlockPos();
                 String pre = "";
                 StringBuilder str = new StringBuilder(128);
 
@@ -798,9 +798,9 @@ public class RenderHandler implements IRenderer
 
     private <T extends Comparable<T>> void getBlockProperties(MinecraftClient mc)
     {
-        if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.BLOCK)
+        if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK)
         {
-            BlockPos posLooking = ((BlockHitResult) mc.hitResult).getBlockPos();
+            BlockPos posLooking = ((BlockHitResult) mc.crosshairTarget).getBlockPos();
             BlockState state = mc.world.getBlockState(posLooking);
             Identifier rl = Registry.BLOCK.getId(state.getBlock());
 

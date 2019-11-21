@@ -9,8 +9,12 @@
         "IMixinServerWorld",
         "IMixinWorldRenderer",
         "MixinAbstractRedstoneGateBlock",
+        "MixinBlockOutlineDebugRenderer",
         "MixinClientPlayNetworkHandler",
+        "MixinDebugRenderer",
+        "MixinHeightmapDebugRenderer",
         "MixinMinecraftServer",
+        "MixinNeighborUpdateDebugRenderer",
         "MixinScreen",
         "MixinSubtitlesHud",
         "MixinWorld"

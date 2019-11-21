@@ -38,7 +38,7 @@ public class OverlayRenderer
         if (RendererToggle.OVERLAY_LIGHT_LEVEL.getBooleanValue())
         {
             Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
-            OverlayRendererLightLevel.render(cameraPos.x, cameraPos.y, cameraPos.z, entity, mc);
+            OverlayRendererLightLevel.render(cameraPos.x, cameraPos.y, cameraPos.z, entity, mc, matrixStack);
         }
 
         RenderContainer.INSTANCE.render(entity, mc, partialTicks, matrixStack);

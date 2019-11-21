@@ -38,21 +38,21 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     }
 
     @Override
-    public void draw(double x, double y, double z, MatrixStack matrixQueue)
+    public void draw(double x, double y, double z, MatrixStack matrixStack)
     {
         GlStateManager.pushMatrix();
         this.preRender(x, y, z);
 
-        matrixQueue.push();
-        matrixQueue.translate(-x, -y, -z);
+        matrixStack.push();
+        matrixStack.translate(-x, -y, -z);
         //this.matrixQueue.method_22904(this.position.getX() - x, this.position.getY() - y, this.position.getZ() - z);
 
         for (RenderObjectBase obj : this.renderObjects)
         {
-            obj.draw(matrixQueue);
+            obj.draw(matrixStack);
         }
 
-        matrixQueue.pop();
+        matrixStack.pop();
 
         GlStateManager.popMatrix();
     }

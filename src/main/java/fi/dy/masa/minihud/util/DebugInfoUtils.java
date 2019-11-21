@@ -7,7 +7,10 @@ import java.util.function.Predicate;
 import com.google.common.collect.MapMaker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.packet.CustomPayloadS2CPacket;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.client.render.debug.NeighborUpdateDebugRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
@@ -136,7 +139,7 @@ public class DebugInfoUtils
                 {
                     for (Direction side : notifiedSides)
                     {
-                        ((NeighborUpdateDebugRenderer) MinecraftClient.getInstance().debugRenderer.neighborUpdateDebugRenderer).method_3870(time, pos.offset(side));
+                        ((NeighborUpdateDebugRenderer) MinecraftClient.getInstance().debugRenderer.neighborUpdateDebugRenderer).addNeighborUpdate(time, pos.offset(side));
                     }
                 }
             });
@@ -226,35 +229,34 @@ public class DebugInfoUtils
         }
     }
 
-    public static void renderVanillaDebug(long finishTime)
+    public static void renderVanillaDebug(MatrixStack matrixStack, VertexConsumerProvider.Immediate vtx,
+            double cameraX, double cameraY, double cameraZ, long finishTime)
     {
-        /*
         DebugRenderer renderer = MinecraftClient.getInstance().debugRenderer;
 
         if (RendererToggle.DEBUG_COLLISION_BOXES.getBooleanValue())
         {
-            renderer.voxelDebugRenderer.render(finishTime);
+            renderer.collisionDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ, finishTime);
         }
 
         if (RendererToggle.DEBUG_NEIGHBOR_UPDATES.getBooleanValue())
         {
-            renderer.neighborUpdateDebugRenderer.render(finishTime);
+            renderer.neighborUpdateDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ, finishTime);
         }
 
         if (RendererToggle.DEBUG_PATH_FINDING.getBooleanValue())
         {
-            renderer.pathfindingDebugRenderer.render(finishTime);
+            renderer.pathfindingDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ, finishTime);
         }
 
         if (RendererToggle.DEBUG_SOLID_FACES.getBooleanValue())
         {
-            renderer.blockOutlineDebugRenderer.render(finishTime);
+            renderer.blockOutlineDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ, finishTime);
         }
 
         if (RendererToggle.DEBUG_WATER.getBooleanValue())
         {
-            renderer.waterDebugRenderer.render(finishTime);
+            renderer.waterDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ, finishTime);
         }
-        */
     }
 }
