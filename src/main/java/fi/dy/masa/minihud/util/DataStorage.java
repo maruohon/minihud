@@ -10,6 +10,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.gson.JsonObject;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -211,8 +212,19 @@ public class DataStorage
 
     public void markChunkForHeightmapCheck(int chunkX, int chunkZ)
     {
-        OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
-        OverlayRendererLightLevel.setNeedsUpdate();
+        Entity entity = MinecraftClient.getInstance().getCameraEntity();
+
+        // Only update the renderers when blocks change near the camera
+        if (entity != null)
+        {
+            Vec3d pos = entity.getPos();
+
+            if (Math.abs(pos.x - (chunkX << 4) - 8) <= 48D || Math.abs(pos.z - (chunkZ << 4) - 8) <= 48D)
+            {
+                OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
+                OverlayRendererLightLevel.setNeedsUpdate();
+            }
+        }
     }
 
     public boolean onSendChatMessage(PlayerEntity player, String message)

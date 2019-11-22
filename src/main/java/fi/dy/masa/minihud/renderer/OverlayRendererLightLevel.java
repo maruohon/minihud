@@ -2,16 +2,13 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -23,69 +20,100 @@ import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.light.LightingProvider;
+import fi.dy.masa.malilib.config.IConfigDouble;
+import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
 import fi.dy.masa.minihud.util.LightLevelNumberMode;
 
-public class OverlayRendererLightLevel
+public class OverlayRendererLightLevel extends OverlayRendererBase
 {
     private static final Identifier TEXTURE_NUMBERS = new Identifier(Reference.MOD_ID, "textures/misc/light_level_numbers.png");
-    private static final List<LightLevelInfo> LIGHT_INFOS = new ArrayList<>();
-    private static final BlockPos.Mutable MUTABLE_POS = new BlockPos.Mutable();
+
+    private final List<LightLevelInfo> lightInfos = new ArrayList<>();
+    private final BlockPos.Mutable mutablePos = new BlockPos.Mutable();
+    private Direction lastDirection = Direction.NORTH;
 
     private static boolean needsUpdate;
-    private static BlockPos lastUpdatePos = null;
 
     public static void setNeedsUpdate()
     {
         needsUpdate = true;
     }
 
-    public static void render(double x, double y, double z, Entity entity, MinecraftClient mc, net.minecraft.client.util.math.MatrixStack matrixStack)
+    @Override
+    public boolean shouldRender(MinecraftClient mc)
     {
-        if (needsUpdate || lastUpdatePos == null ||
-            Math.abs(entity.getX() - lastUpdatePos.getX()) > 4 ||
-            Math.abs(entity.getY() - lastUpdatePos.getY()) > 4 ||
-            Math.abs(entity.getZ() - lastUpdatePos.getZ()) > 4)
-        {
-            //long pre = System.nanoTime();
-            updateLightLevels(mc.world, new BlockPos(entity));
-            //System.out.printf("LL markers: %d, time: %.3f s\n", LIGHT_INFOS.size(), (double) (System.nanoTime() - pre) / 1000000000D);
-        }
-
-        //matrixStack.push();
-        //matrixStack.translate(-x, -y, -z);
-        RenderSystem.pushMatrix();
-        //RenderSystem.translatef((float) -x, (float) -y, (float) -z);
-        //RenderSystem.normal3f(0.0F, 1.0F, 0.0F);
-        //EntityRenderDispatcher disp = mc.getEntityRenderManager();
-        //RenderSystem.rotatef(disp.cameraYaw, 0.0F, 1.0F, 0.0F);
-        //RenderSystem.rotatef(disp.cameraPitch, 1.0F, 0.0F, 0.0F);
-
-        renderLightLevels(x, y, z, mc);
-
-        //matrixStack.pop();
-        RenderSystem.popMatrix();
+        return RendererToggle.OVERLAY_LIGHT_LEVEL.getBooleanValue();
     }
 
-    private static void renderLightLevels(double dx, double dy, double dz, MinecraftClient mc)
+    @Override
+    public boolean needsUpdate(Entity entity, MinecraftClient mc)
     {
-        final int count = LIGHT_INFOS.size();
+        return needsUpdate || this.lastUpdatePos == null ||
+                Math.abs(entity.getX() - this.lastUpdatePos.getX()) > 4 ||
+                Math.abs(entity.getY() - this.lastUpdatePos.getY()) > 4 ||
+                Math.abs(entity.getZ() - this.lastUpdatePos.getZ()) > 4 ||
+                (Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() && this.lastDirection != entity.getHorizontalFacing());
+    }
+
+    @Override
+    public void update(Entity entity, MinecraftClient mc)
+    {
+        BlockPos pos = new BlockPos(entity);
+        RenderObjectBase renderQuads = this.renderObjects.get(0);
+        RenderObjectBase renderLines = this.renderObjects.get(1);
+        BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_TEXTURE_COLOR);
+        BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
+
+        //long pre = System.nanoTime();
+        this.updateLightLevels(mc.world, pos);
+        //System.out.printf("LL markers: %d, time: %.3f s\n", LIGHT_INFOS.size(), (double) (System.nanoTime() - pre) / 1000000000D);
+        this.renderLightLevels(mc);
+
+        BUFFER_1.end();
+        BUFFER_2.end();
+        renderQuads.uploadData(BUFFER_1);
+        renderLines.uploadData(BUFFER_2);
+
+        this.lastUpdatePos = pos;
+        this.lastDirection = entity.getHorizontalFacing();
+        needsUpdate = false;
+    }
+
+    @Override
+    protected void preRender(double x, double y, double z)
+    {
+        super.preRender(x, y, z);
+
+        fi.dy.masa.malilib.render.RenderUtils.bindTexture(TEXTURE_NUMBERS);
+        RenderSystem.enableTexture();
+    }
+
+    @Override
+    protected void postRender(double x, double y, double z)
+    {
+        RenderSystem.disableTexture();
+    }
+
+    @Override
+    public void allocateGlResources()
+    {
+        this.allocateBuffer(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+        this.allocateBuffer(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+    }
+
+    private void renderLightLevels(MinecraftClient mc)
+    {
+        final int count = this.lightInfos.size();
 
         if (count > 0)
         {
-            fi.dy.masa.malilib.render.RenderUtils.bindTexture(TEXTURE_NUMBERS);
-
-            GlStateManager.enableAlphaTest();
-            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
-            GlStateManager.disableLighting();
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
-            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
-
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
+            BufferBuilder bufferQuads = BUFFER_1;
+            BufferBuilder bufferLines = BUFFER_2;
             Direction numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? mc.player.getHorizontalFacing() : Direction.NORTH;
             LightLevelNumberMode numberMode = (LightLevelNumberMode) Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getOptionListValue();
             LightLevelMarkerMode markerMode = (LightLevelMarkerMode) Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
@@ -94,200 +122,115 @@ public class OverlayRendererLightLevel
 
             if (numberMode == LightLevelNumberMode.BLOCK || numberMode == LightLevelNumberMode.BOTH)
             {
-                double ox = Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X.getDoubleValue();
-                double oz = Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y.getDoubleValue();
-                double tmpX, tmpZ;
-                Color4f colorLit = null, colorDark = null;
-
-                switch (numberFacing)
-                {
-                    case NORTH: tmpX = dx - ox; tmpZ = dz - oz; break;
-                    case SOUTH: tmpX = dx + ox; tmpZ = dz + oz; break;
-                    case WEST:  tmpX = dx - oz; tmpZ = dz + ox; break;
-                    case EAST:  tmpX = dx + oz; tmpZ = dz - ox; break;
-                    default:    tmpX = dx - ox; tmpZ = dz - oz; break;
-                }
-
-                if (useColoredNumbers)
-                {
-                    colorLit = Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_LIT.getColor();
-                    colorDark = Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_DARK.getColor();
-                }
-
-                renderLightLevelNumbers(tmpX, dy, tmpZ, numberFacing, lightThreshold, LightLevelNumberMode.BLOCK, colorLit, colorDark, buffer);
-                tessellator.draw();
+                this.renderNumbers(LightLevelNumberMode.BLOCK,
+                        Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X,
+                        Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y,
+                        Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_LIT,
+                        Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_DARK,
+                        useColoredNumbers, lightThreshold, numberFacing, bufferQuads);
             }
 
             if (numberMode == LightLevelNumberMode.SKY || numberMode == LightLevelNumberMode.BOTH)
             {
-                double ox = Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_X.getDoubleValue();
-                double oz = Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y.getDoubleValue();
-                double tmpX, tmpZ;
-                Color4f colorLit = null, colorDark = null;
-
-                switch (numberFacing)
-                {
-                    case NORTH: tmpX = dx - ox; tmpZ = dz - oz; break;
-                    case SOUTH: tmpX = dx + ox; tmpZ = dz + oz; break;
-                    case WEST:  tmpX = dx - oz; tmpZ = dz + ox; break;
-                    case EAST:  tmpX = dx + oz; tmpZ = dz - ox; break;
-                    default:    tmpX = dx - ox; tmpZ = dz - oz; break;
-                }
-
-                if (useColoredNumbers)
-                {
-                    colorLit = Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_LIT.getColor();
-                    colorDark = Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_DARK.getColor();
-                }
-
-                renderLightLevelNumbers(tmpX, dy, tmpZ, numberFacing, lightThreshold, LightLevelNumberMode.SKY, colorLit, colorDark, buffer);
-                tessellator.draw();
+                this.renderNumbers(LightLevelNumberMode.SKY,
+                        Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_X,
+                        Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
+                        Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_LIT,
+                        Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_DARK,
+                        useColoredNumbers, lightThreshold, numberFacing, bufferQuads);
             }
 
             if (markerMode == LightLevelMarkerMode.SQUARE)
             {
-                double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
-                Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
-                Color4f colorDark = Configs.Colors.LIGHT_LEVEL_MARKER_DARK.getColor();
-                double offset1 = (1.0 - markerSize) / 2.0;
-                double offset2 = (1.0 - offset1);
-
-                GlStateManager.disableTexture();
-
-                buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
-
-                for (int i = 0; i < count; ++i)
-                {
-                    LightLevelInfo info = LIGHT_INFOS.get(i);
-
-                    if (info.block < lightThreshold)
-                    {
-                        BlockPos pos = info.pos;
-                        Color4f color = info.sky >= lightThreshold ? colorLit : colorDark;
-                        renderLightLevelSquare(pos.getX() - dx, pos.getY() - dy, pos.getZ() - dz, color, offset1, offset2, buffer);
-                    }
-                }
-
-                tessellator.draw();
-
-                GlStateManager.enableTexture();
+                this.renderMarkers(this::renderLightLevelSquare, lightThreshold, bufferLines);
             }
             else if (markerMode == LightLevelMarkerMode.CROSS)
             {
-                double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
-                Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
-                Color4f colorDark = Configs.Colors.LIGHT_LEVEL_MARKER_DARK.getColor();
-                double offset1 = (1.0 - markerSize) / 2.0;
-                double offset2 = (1.0 - offset1);
-
-                GlStateManager.disableTexture();
-
-                buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
-
-                for (int i = 0; i < count; ++i)
-                {
-                    LightLevelInfo info = LIGHT_INFOS.get(i);
-
-                    if (info.block < lightThreshold)
-                    {
-                        BlockPos pos = info.pos;
-                        Color4f color = info.sky >= lightThreshold ? colorLit : colorDark;
-                        renderLightLevelCross(pos.getX() - dx, pos.getY() - dy, pos.getZ() - dz, color, offset1, offset2, buffer);
-                    }
-                }
-
-                tessellator.draw();
-
-                GlStateManager.enableTexture();
+                this.renderMarkers(this::renderLightLevelCross, lightThreshold, bufferLines);
             }
-
-            GlStateManager.disableBlend();
-            GlStateManager.enableLighting();
         }
     }
 
-    private static void renderLightLevelNumbers(double dx, double dy, double dz, Direction facing,
-            int lightThreshold, LightLevelNumberMode numberMode,
-            @Nullable Color4f colorLit, @Nullable Color4f colorDark, BufferBuilder buffer)
+    private void renderNumbers(LightLevelNumberMode mode, IConfigDouble cfgOffX, IConfigDouble cfgOffZ,
+            ConfigColor cfgColorLit, ConfigColor cfgColorDark, boolean useColoredNumbers,
+            int lightThreshold, Direction numberFacing, BufferBuilder buffer)
     {
-        final int count = LIGHT_INFOS.size();
+        double dx = 0, dy = 0, dz = 0;
+        double ox = cfgOffX.getDoubleValue();
+        double oz = cfgOffZ.getDoubleValue();
+        double tmpX, tmpZ;
+        Color4f colorLit, colorDark;
 
-        if (colorLit != null)
+        switch (numberFacing)
         {
-            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+            case NORTH: tmpX = dx - ox; tmpZ = dz - oz; break;
+            case SOUTH: tmpX = dx + ox; tmpZ = dz + oz; break;
+            case WEST:  tmpX = dx - oz; tmpZ = dz + ox; break;
+            case EAST:  tmpX = dx + oz; tmpZ = dz - ox; break;
+            default:    tmpX = dx - ox; tmpZ = dz - oz; break;
+        }
 
-            for (int i = 0; i < count; ++i)
-            {
-                LightLevelInfo info = LIGHT_INFOS.get(i);
-                BlockPos pos = info.pos;
-                double x = pos.getX() - dx;
-                double z = pos.getZ() - dz;
-                int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
-                Color4f color = lightLevel >= lightThreshold ? colorLit : colorDark;
-
-                renderLightLevelTextureColor(x, pos.getY() - dy, z, facing, lightLevel, color, buffer);
-            }
+        if (useColoredNumbers)
+        {
+            colorLit = cfgColorLit.getColor();
+            colorDark = cfgColorDark.getColor();
         }
         else
         {
-            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
+            colorLit = Color4f.fromColor(0xFFFFFFFF);
+            colorDark = Color4f.fromColor(0xFFFFFFFF);
+        }
 
-            for (int i = 0; i < count; ++i)
+        this.renderLightLevelNumbers(tmpX, dy, tmpZ, numberFacing, lightThreshold, mode, colorLit, colorDark, buffer);
+    }
+
+    private void renderMarkers(IMarkerRenderer renderer, int lightThreshold, BufferBuilder buffer)
+    {
+        double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
+        Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
+        Color4f colorDark = Configs.Colors.LIGHT_LEVEL_MARKER_DARK.getColor();
+        double offset1 = (1.0 - markerSize) / 2.0;
+        double offset2 = (1.0 - offset1);
+        final int count = this.lightInfos.size();
+
+        for (int i = 0; i < count; ++i)
+        {
+            LightLevelInfo info = this.lightInfos.get(i);
+
+            if (info.block < lightThreshold)
             {
-                LightLevelInfo info = LIGHT_INFOS.get(i);
                 BlockPos pos = info.pos;
-                double x = pos.getX() - dx;
-                double z = pos.getZ() - dz;
-                int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
-
-                renderLightLevelTexture(x, pos.getY() - dy, z, facing, lightLevel, buffer);
+                Color4f color = info.sky >= lightThreshold ? colorLit : colorDark;
+                renderer.render(pos.getX(), pos.getY(), pos.getZ(), color, offset1, offset2, buffer);
             }
         }
     }
 
-    private static void renderLightLevelTexture(double x, double y, double z, Direction facing, int lightLevel, BufferBuilder buffer)
+    private interface IMarkerRenderer
     {
-        float w = 0.25f;
-        float u = (lightLevel & 0x3) * w;
-        float v = (lightLevel >> 2) * w;
+        void render(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer);
+    }
 
-        y += 0.005;
+    private void renderLightLevelNumbers(double dx, double dy, double dz, Direction facing,
+            int lightThreshold, LightLevelNumberMode numberMode,
+            Color4f colorLit, Color4f colorDark, BufferBuilder buffer)
+    {
+        final int count = this.lightInfos.size();
 
-        switch (facing)
+        for (int i = 0; i < count; ++i)
         {
-            case NORTH:
-                buffer.vertex(x    , y, z    ).texture(u    , v    ).next();
-                buffer.vertex(x    , y, z + 1).texture(u    , v + w).next();
-                buffer.vertex(x + 1, y, z + 1).texture(u + w, v + w).next();
-                buffer.vertex(x + 1, y, z    ).texture(u + w, v    ).next();
-                break;
+            LightLevelInfo info = this.lightInfos.get(i);
+            BlockPos pos = info.pos;
+            double x = pos.getX() - dx;
+            double z = pos.getZ() - dz;
+            int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
+            Color4f color = lightLevel >= lightThreshold ? colorLit : colorDark;
 
-            case SOUTH:
-                buffer.vertex(x + 1, y, z + 1).texture(u    , v    ).next();
-                buffer.vertex(x + 1, y, z    ).texture(u    , v + w).next();
-                buffer.vertex(x    , y, z    ).texture(u + w, v + w).next();
-                buffer.vertex(x    , y, z + 1).texture(u + w, v    ).next();
-                break;
-
-            case EAST:
-                buffer.vertex(x + 1, y, z    ).texture(u    , v    ).next();
-                buffer.vertex(x    , y, z    ).texture(u    , v + w).next();
-                buffer.vertex(x    , y, z + 1).texture(u + w, v + w).next();
-                buffer.vertex(x + 1, y, z + 1).texture(u + w, v    ).next();
-                break;
-
-            case WEST:
-                buffer.vertex(x    , y, z + 1).texture(u    , v    ).next();
-                buffer.vertex(x + 1, y, z + 1).texture(u    , v + w).next();
-                buffer.vertex(x + 1, y, z    ).texture(u + w, v + w).next();
-                buffer.vertex(x    , y, z    ).texture(u + w, v    ).next();
-                break;
-
-            default:
+            this.renderLightLevelTextureColor(x, pos.getY() - dy, z, facing, lightLevel, color, buffer);
         }
     }
 
-    private static void renderLightLevelTextureColor(double x, double y, double z, Direction facing, int lightLevel, Color4f color, BufferBuilder buffer)
+    private void renderLightLevelTextureColor(double x, double y, double z, Direction facing, int lightLevel, Color4f color, BufferBuilder buffer)
     {
         float w = 0.25f;
         float u = (lightLevel & 0x3) * w;
@@ -328,7 +271,7 @@ public class OverlayRendererLightLevel
         }
     }
 
-    private static void renderLightLevelCross(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
+    private void renderLightLevelCross(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
     {
         y += 0.005;
 
@@ -339,7 +282,7 @@ public class OverlayRendererLightLevel
         buffer.vertex(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
     }
 
-    private static void renderLightLevelSquare(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
+    private void renderLightLevelSquare(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
     {
         y += 0.005;
 
@@ -356,9 +299,9 @@ public class OverlayRendererLightLevel
         buffer.vertex(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
     }
 
-    private static void updateLightLevels(World world, BlockPos center)
+    private void updateLightLevels(World world, BlockPos center)
     {
-        LIGHT_INFOS.clear();
+        this.lightInfos.clear();
 
         int radius = Configs.Generic.LIGHT_LEVEL_RANGE.getIntegerValue();
         final int minX = center.getX() - radius;
@@ -393,14 +336,14 @@ public class OverlayRendererLightLevel
 
                         for (int y = startY; y <= endY; ++y)
                         {
-                            if (canSpawnAt(x, y, z, chunk, world))
+                            if (this.canSpawnAt(x, y, z, chunk, world))
                             {
-                                MUTABLE_POS.set(x, y, z);
+                                this.mutablePos.set(x, y, z);
 
-                                int block = lightingProvider.get(LightType.BLOCK).getLightLevel(MUTABLE_POS);
-                                int sky = lightingProvider.get(LightType.SKY).getLightLevel(MUTABLE_POS);
+                                int block = lightingProvider.get(LightType.BLOCK).getLightLevel(this.mutablePos);
+                                int sky = lightingProvider.get(LightType.SKY).getLightLevel(this.mutablePos);
 
-                                LIGHT_INFOS.add(new LightLevelInfo(new BlockPos(x, y, z), block, sky));
+                                this.lightInfos.add(new LightLevelInfo(new BlockPos(x, y, z), block, sky));
 
                                 //y += 2; // if the spot is spawnable, that means the next spawnable spot can be the third block up
                             }
@@ -409,9 +352,6 @@ public class OverlayRendererLightLevel
                 }
             }
         }
-
-        needsUpdate = false;
-        lastUpdatePos = center;
     }
 
     /**
@@ -421,12 +361,12 @@ public class OverlayRendererLightLevel
      * @param pos
      * @return
      */
-    public static boolean canSpawnAt(int x, int y, int z, Chunk chunk, World world)
+    private boolean canSpawnAt(int x, int y, int z, Chunk chunk, World world)
     {
-        MUTABLE_POS.set(x, y - 1, z);
-        BlockState state = chunk.getBlockState(MUTABLE_POS);
+        this.mutablePos.set(x, y - 1, z);
+        BlockState state = chunk.getBlockState(this.mutablePos);
 
-        if (state.allowsSpawning(world, MUTABLE_POS, EntityType.SKELETON) == false)
+        if (state.allowsSpawning(world, this.mutablePos, EntityType.SKELETON) == false)
         {
             return false;
         }
@@ -437,14 +377,14 @@ public class OverlayRendererLightLevel
 
             if (spawnable)
             {
-                MUTABLE_POS.set(x, y , z);
-                state = chunk.getBlockState(MUTABLE_POS);
+                this.mutablePos.set(x, y , z);
+                state = chunk.getBlockState(this.mutablePos);
 
-                if (SpawnHelper.isClearForSpawn(world, MUTABLE_POS, state, state.getFluidState()))
+                if (SpawnHelper.isClearForSpawn(world, this.mutablePos, state, state.getFluidState()))
                 {
-                    MUTABLE_POS.set(x, y + 1, z);
-                    state = chunk.getBlockState(MUTABLE_POS);
-                    return SpawnHelper.isClearForSpawn(world, MUTABLE_POS, state, state.getFluidState());
+                    this.mutablePos.set(x, y + 1, z);
+                    state = chunk.getBlockState(this.mutablePos);
+                    return SpawnHelper.isClearForSpawn(world, this.mutablePos, state, state.getFluidState());
                 }
             }
 

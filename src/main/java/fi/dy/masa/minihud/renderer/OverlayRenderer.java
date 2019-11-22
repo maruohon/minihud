@@ -2,8 +2,6 @@ package fi.dy.masa.minihud.renderer;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.minihud.config.RendererToggle;
 
 public class OverlayRenderer
 {
@@ -33,12 +31,6 @@ public class OverlayRenderer
             {
                 return;
             }
-        }
-
-        if (RendererToggle.OVERLAY_LIGHT_LEVEL.getBooleanValue())
-        {
-            Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
-            OverlayRendererLightLevel.render(cameraPos.x, cameraPos.y, cameraPos.z, entity, mc, matrixStack);
         }
 
         RenderContainer.INSTANCE.render(entity, mc, partialTicks, matrixStack);

@@ -6,6 +6,8 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
@@ -24,6 +26,10 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         GlStateManager.lineWidth(this.glLineWidth);
     }
 
+    protected void postRender(double x, double y, double z)
+    {
+    }
+
     @Override
     public void draw(double x, double y, double z, MatrixStack matrixStack)
     {
@@ -39,6 +45,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         }
 
         matrixStack.pop();
+        this.postRender(x, y, z);
 
         GlStateManager.popMatrix();
     }
@@ -61,7 +68,17 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
      */
     protected RenderObjectBase allocateBuffer(int glMode)
     {
-        RenderObjectBase obj = new RenderObjectVbo(glMode);
+        return this.allocateBuffer(glMode, VertexFormats.POSITION_COLOR);
+    }
+
+    /**
+     * Allocates a new VBO or display list, adds it to the list, and returns it
+     * @param glMode
+     * @return
+     */
+    protected RenderObjectBase allocateBuffer(int glMode, VertexFormat format)
+    {
+        RenderObjectBase obj = new RenderObjectVbo(glMode, format);
         this.renderObjects.add(obj);
         return obj;
     }
