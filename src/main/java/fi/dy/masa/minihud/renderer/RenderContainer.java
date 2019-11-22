@@ -5,6 +5,7 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.VertexFormatElement;
@@ -96,15 +97,15 @@ public class RenderContainer
     {
         if (this.resourcesAllocated && this.countActive > 0)
         {
-            GlStateManager.pushMatrix();
+            RenderSystem.pushMatrix();
 
-            GlStateManager.disableTexture();
-            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
-            GlStateManager.disableCull();
-            GlStateManager.disableLighting();
-            GlStateManager.depthMask(false);
-            GlStateManager.polygonOffset(-3f, -3f);
-            GlStateManager.enablePolygonOffset();
+            RenderSystem.disableTexture();
+            RenderSystem.alphaFunc(GL11.GL_GREATER, 0.01F);
+            RenderSystem.disableCull();
+            RenderSystem.disableLighting();
+            RenderSystem.depthMask(false);
+            RenderSystem.polygonOffset(-3f, -3f);
+            RenderSystem.enablePolygonOffset();
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -124,7 +125,7 @@ public class RenderContainer
             }
 
             VertexBuffer.unbind();
-            GlStateManager.clearCurrentColor();
+            RenderSystem.clearCurrentColor();
 
             for (VertexFormatElement element : VertexFormats.POSITION_COLOR.getElements())
             {
@@ -137,21 +138,21 @@ public class RenderContainer
                         break;
                     case COLOR:
                         GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
-                        GlStateManager.clearCurrentColor();
+                        RenderSystem.clearCurrentColor();
                     default:
                 }
             }
 
-            GlStateManager.polygonOffset(0f, 0f);
-            GlStateManager.disablePolygonOffset();
+            RenderSystem.polygonOffset(0f, 0f);
+            RenderSystem.disablePolygonOffset();
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
-            GlStateManager.disableBlend();
-            GlStateManager.enableDepthTest();
-            GlStateManager.enableLighting();
-            GlStateManager.enableCull();
-            GlStateManager.depthMask(true);
-            GlStateManager.enableTexture();
-            GlStateManager.popMatrix();
+            RenderSystem.disableBlend();
+            RenderSystem.enableDepthTest();
+            RenderSystem.enableLighting();
+            RenderSystem.enableCull();
+            RenderSystem.depthMask(true);
+            RenderSystem.enableTexture();
+            RenderSystem.popMatrix();
         }
     }
 

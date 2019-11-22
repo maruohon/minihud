@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
@@ -86,7 +86,7 @@ public class RenderHandler implements IRenderer
     {
         if (Configs.Generic.FIX_VANILLA_DEBUG_RENDERERS.getBooleanValue())
         {
-            GlStateManager.disableLighting();
+            RenderSystem.disableLighting();
             //RenderUtils.color(1, 1, 1, 1);
             //OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f);
         }

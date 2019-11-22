@@ -1,6 +1,5 @@
 package fi.dy.masa.minihud.renderer;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
@@ -29,7 +28,7 @@ public class RenderObjectVbo extends RenderObjectBase
     @Override
     public void draw(net.minecraft.client.util.math.MatrixStack matrixStack)
     {
-        GlStateManager.pushMatrix();
+        RenderSystem.pushMatrix();
 
         boolean texture = false;
 
@@ -55,7 +54,7 @@ public class RenderObjectVbo extends RenderObjectBase
         }
 
         VertexBuffer.unbind();
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 
     /*

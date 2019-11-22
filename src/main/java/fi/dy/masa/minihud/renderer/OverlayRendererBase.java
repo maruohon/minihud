@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -23,7 +23,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
 
     protected void preRender(double x, double y, double z)
     {
-        GlStateManager.lineWidth(this.glLineWidth);
+        RenderSystem.lineWidth(this.glLineWidth);
     }
 
     protected void postRender(double x, double y, double z)
@@ -33,7 +33,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     @Override
     public void draw(double x, double y, double z, MatrixStack matrixStack)
     {
-        GlStateManager.pushMatrix();
+        RenderSystem.pushMatrix();
         this.preRender(x, y, z);
 
         matrixStack.push();
@@ -47,7 +47,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         matrixStack.pop();
         this.postRender(x, y, z);
 
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 
     @Override

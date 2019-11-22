@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
@@ -136,7 +136,7 @@ public class ShapeDespawnSphere extends ShapeBase
     @Override
     public void draw(double x, double y, double z, net.minecraft.client.util.math.MatrixStack matrixStack)
     {
-        GlStateManager.pushMatrix();
+        RenderSystem.pushMatrix();
         this.preRender(x, y, z);
 
         matrixStack.push();
@@ -145,15 +145,15 @@ public class ShapeDespawnSphere extends ShapeBase
         this.renderObjects.get(0).draw(matrixStack);
 
         // Render the lines as quads with glPolygonMode(GL_LINE)
-        GlStateManager.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
-        GlStateManager.disableBlend();
+        RenderSystem.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+        RenderSystem.disableBlend();
         this.renderObjects.get(0).draw(matrixStack);
-        GlStateManager.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
-        GlStateManager.enableBlend();
+        RenderSystem.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+        RenderSystem.enableBlend();
 
         matrixStack.pop();
 
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 
     @Override

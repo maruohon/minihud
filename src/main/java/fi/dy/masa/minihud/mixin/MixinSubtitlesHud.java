@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.hud.SubtitlesHud;
 import fi.dy.masa.minihud.event.RenderHandler;
 
@@ -22,7 +22,7 @@ public abstract class MixinSubtitlesHud
 
         if (offset != 0)
         {
-            GlStateManager.translatef(0, offset, 0);
+            RenderSystem.translatef(0, offset, 0);
         }
     }
 }
