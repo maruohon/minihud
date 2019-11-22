@@ -102,6 +102,7 @@ public class RenderContainer
             RenderSystem.disableTexture();
             RenderSystem.alphaFunc(GL11.GL_GREATER, 0.01F);
             RenderSystem.disableCull();
+            RenderSystem.enableDepthTest();
             RenderSystem.disableLighting();
             RenderSystem.depthMask(false);
             RenderSystem.polygonOffset(-3f, -3f);
