@@ -22,7 +22,6 @@ public class RenderContainer
     public static final RenderContainer INSTANCE = new RenderContainer();
 
     private final List<OverlayRendererBase> renderers = new ArrayList<>();
-    private final MatrixStack matrixStack = new MatrixStack();
     protected boolean resourcesAllocated;
     protected int countActive;
 
@@ -46,7 +45,6 @@ public class RenderContainer
             renderer.allocateGlResources();
         }
 
-        renderer.setMatrixQueue(this.matrixStack);
         this.renderers.add(renderer);
     }
 
@@ -85,8 +83,6 @@ public class RenderContainer
                 if (renderer.needsUpdate(entity, mc))
                 {
                     renderer.lastUpdatePos = new BlockPos(entity);
-                    renderer.setPosition(renderer.lastUpdatePos);
-
                     renderer.update(entity, mc);
                 }
 

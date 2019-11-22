@@ -5,9 +5,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
@@ -15,6 +12,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
 
 public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 {
@@ -63,8 +63,6 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
             this.pos = newPos;
             newPos = null;
         }
-
-        this.setPosition(new BlockPos(this.pos));
 
         final int color = this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER ?
                 Configs.Colors.RANDOM_TICKS_PLAYER_OVERLAY_COLOR.getIntegerValue() :

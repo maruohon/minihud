@@ -223,8 +223,6 @@ public class ShapeDespawnSphere extends ShapeBase
         BlockPos.Mutable posMutable = new BlockPos.Mutable();
         HashSet<BlockPos> spherePositions = new HashSet<>();
 
-        this.setPosition(posCenter);
-
         //long before = System.nanoTime();
         posMutable.set(posCenter);
         this.addPositionsOnRing(spherePositions, posMutable, Direction.EAST);
