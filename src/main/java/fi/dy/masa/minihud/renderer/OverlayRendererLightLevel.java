@@ -13,6 +13,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.Identifier;
@@ -55,18 +56,14 @@ public class OverlayRendererLightLevel
             //System.out.printf("LL markers: %d, time: %.3f s\n", LIGHT_INFOS.size(), (double) (System.nanoTime() - pre) / 1000000000D);
         }
 
-        //matrixStack.push();
-        //matrixStack.translate(-x, -y, -z);
         RenderSystem.pushMatrix();
-        //RenderSystem.translatef((float) -x, (float) -y, (float) -z);
-        //RenderSystem.normal3f(0.0F, 1.0F, 0.0F);
-        //EntityRenderDispatcher disp = mc.getEntityRenderManager();
-        //RenderSystem.rotatef(disp.cameraYaw, 0.0F, 1.0F, 0.0F);
-        //RenderSystem.rotatef(disp.cameraPitch, 1.0F, 0.0F, 0.0F);
+        EntityRenderDispatcher disp = mc.getEntityRenderManager();
+        RenderSystem.rotatef(disp.camera.getPitch(), 1.0F, 0.0F, 0.0F);
+        RenderSystem.rotatef(disp.camera.getYaw(), 0.0F, 1.0F, 0.0F);
+        RenderSystem.scalef(-1, 1, -1);
 
         renderLightLevels(x, y, z, mc);
 
-        //matrixStack.pop();
         RenderSystem.popMatrix();
     }
 
