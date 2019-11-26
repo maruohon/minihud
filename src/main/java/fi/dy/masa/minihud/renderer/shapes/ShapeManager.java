@@ -118,6 +118,11 @@ public class ShapeManager
                                     shape.fromJson(o);
                                     this.addShape(shape);
                                     break;
+                                case SPHERE:
+                                    ShapeSphere shapeSphere = new ShapeSphere();
+                                    shapeSphere.fromJson(o);
+                                    this.addShape(shapeSphere);
+                                    break;
                             }
                         }
                     }
@@ -138,7 +143,8 @@ public class ShapeManager
 
     public enum ShapeTypes
     {
-        DESPAWN_SPHERE      ("despawn_sphere",  "minihud.label.shapes.despawn_sphere");
+        DESPAWN_SPHERE      ("despawn_sphere",  "minihud.label.shapes.despawn_sphere"),
+        SPHERE              ("sphere", "minihud.label.shapes.sphere");
 
         private final String id;
         private final String translationKey;

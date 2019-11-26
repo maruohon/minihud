@@ -9,6 +9,7 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetDropDownList;
+import fi.dy.masa.malilib.interfaces.IStringRetriever;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.gui.GuiConfigs.ConfigGuiTab;
@@ -17,10 +18,13 @@ import fi.dy.masa.minihud.gui.widgets.WidgetShapeEntry;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeDespawnSphere;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
+import fi.dy.masa.minihud.renderer.shapes.ShapeSphere;
 
 public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, WidgetListShapes>
                              implements ISelectionListener<ShapeBase>
 {
+    public WidgetDropDownList widgetShapeDropDownList;
+
     public GuiShapeManager()
     {
         super(10, 64);
@@ -77,9 +81,14 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         ButtonGeneric button = new ButtonGeneric(x, y, -1, true, type.getDisplayName());
         this.addButton(button, new ButtonListener(ButtonListener.Type.ADD_SHAPE, this));
 
-        WidgetDropDownList<InfoToggle> dd = new WidgetDropDownList<InfoToggle>(button.getX() - 160, y, 140, 18, 200, 6, ImmutableList.copyOf(InfoToggle.values()));
-        dd.setZLevel(this.blitOffset + 1);
-        this.addWidget(dd);
+        //Once despawn sphere is working replace entries with ImmutableList.copyOf(ShapeManager.ShapeTypes.values())
+        ShapeManager.ShapeTypes[] shapeTypesList = {ShapeManager.ShapeTypes.SPHERE};
+        WidgetDropDownList<ShapeManager.ShapeTypes> dropDownList = new WidgetDropDownList<ShapeManager.ShapeTypes>(button.getX() - 160, y, 140, 18, 200, 6, ImmutableList.copyOf(shapeTypesList));
+        dropDownList.setZLevel(this.blitOffset + 1);
+        this.addWidget(dropDownList);
+
+        dropDownList.setSelectedEntry(ShapeManager.ShapeTypes.SPHERE); //Have to set default rather than letting no selection being the default
+        this.widgetShapeDropDownList = dropDownList; //used to get around the this.gui.widget not returning the same WidgetDropDownList object
 
         return button.getWidth();
     }
@@ -120,9 +129,20 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
-            if (this.type == Type.ADD_SHAPE)
+            if (this.type == Type.ADD_SHAPE) //Use selected shape, default to SPHERE if nothing selected
             {
-                ShapeManager.INSTANCE.addShape(new ShapeDespawnSphere());
+                if (this.gui.widgetShapeDropDownList.getSelectedEntry() != null) {
+                    ShapeManager.ShapeTypes selectedShape = (ShapeManager.ShapeTypes) this.gui.widgetShapeDropDownList.getSelectedEntry();
+
+                    switch (selectedShape) {
+                        case DESPAWN_SPHERE: //Currently not working
+                            ShapeManager.INSTANCE.addShape(new ShapeDespawnSphere());
+                        case SPHERE:
+                            ShapeManager.INSTANCE.addShape(new ShapeSphere());
+                            break;
+                    }
+                }
+
                 this.gui.getListWidget().refreshEntries();
             }
         }

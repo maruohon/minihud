@@ -20,6 +20,8 @@
     "minihud.gui.label.effective_center_value": "Effective center: %s",
     "minihud.gui.label.margin_colon": "Margin:",
     "minihud.gui.label.margin_value": "Margin: %s",
+    "minihud.gui.label.radius": "Radius",
+    "minihud.gui.label.radius_colon": "Radius:",
 
     "minihud.gui.title.configs": "MiniHUD Configs",
     "minihud.gui.title.shape_editor": "Shape Editor",
@@ -39,6 +41,8 @@
     "minihud.label.light_level_number_mode.sky": "Sky",
 
     "minihud.label.shapes.despawn_sphere": "Despawn Sphere",
+    "minihud.label.shapes.sphere": "Normal Sphere",
+
 
     "minihud.hotkeys.category.generic_hotkeys": "Generic hotkeys",
     "minihud.hotkeys.category.info_toggle_hotkeys": "Info Toggle hotkeys",
