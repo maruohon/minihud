@@ -1,9 +1,15 @@
 package fi.dy.masa.minihud.util;
 
+import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 
 public class MiscUtils
@@ -64,5 +70,18 @@ public class MiscUtils
     {
         return bb1.minX == bb2.minX && bb1.minY == bb2.minY && bb1.minZ == bb2.minZ &&
                bb1.maxX == bb2.maxX && bb1.maxY == bb2.maxY && bb1.maxZ == bb2.maxZ;
+    }
+
+    @Nullable
+    public static void addBeeTooltip(ItemStack stack, List<Text> lines)
+    {
+        CompoundTag tag = stack.getTag();
+
+        if (tag != null && tag.contains("BlockEntityTag", Constants.NBT.TAG_COMPOUND))
+        {
+            tag = tag.getCompound("BlockEntityTag");
+            String count = String.valueOf(tag.getList("Bees", Constants.NBT.TAG_COMPOUND).size());
+            lines.add(Math.min(1, lines.size()), new TranslatableText("minihud.label.bee_info.count", count));
+        }
     }
 }
