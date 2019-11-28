@@ -230,33 +230,33 @@ public class DebugInfoUtils
     }
 
     public static void renderVanillaDebug(MatrixStack matrixStack, VertexConsumerProvider.Immediate vtx,
-            double cameraX, double cameraY, double cameraZ, long finishTime)
+            double cameraX, double cameraY, double cameraZ)
     {
         DebugRenderer renderer = MinecraftClient.getInstance().debugRenderer;
 
         if (RendererToggle.DEBUG_COLLISION_BOXES.getBooleanValue())
         {
-            renderer.collisionDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ, finishTime);
+            renderer.collisionDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ);
         }
 
         if (RendererToggle.DEBUG_NEIGHBOR_UPDATES.getBooleanValue())
         {
-            renderer.neighborUpdateDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ, finishTime);
+            renderer.neighborUpdateDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ);
         }
 
         if (RendererToggle.DEBUG_PATH_FINDING.getBooleanValue())
         {
-            renderer.pathfindingDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ, finishTime);
+            renderer.pathfindingDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ);
         }
 
         if (RendererToggle.DEBUG_SOLID_FACES.getBooleanValue())
         {
-            renderer.blockOutlineDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ, finishTime);
+            renderer.blockOutlineDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ);
         }
 
         if (RendererToggle.DEBUG_WATER.getBooleanValue())
         {
-            renderer.waterDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ, finishTime);
+            renderer.waterDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ);
         }
     }
 }

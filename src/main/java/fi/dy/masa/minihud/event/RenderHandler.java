@@ -639,7 +639,7 @@ public class RenderHandler implements IRenderer
 
                 if (chunk.isEmpty() == false)
                 {
-                    this.addLine("Biome: " + mc.world.method_23753(pos).getName().getString());
+                    this.addLine("Biome: " + mc.world.getBiome(pos).getName().getString());
                 }
             }
         }
@@ -652,7 +652,7 @@ public class RenderHandler implements IRenderer
 
                 if (chunk.isEmpty() == false)
                 {
-                    Biome biome = mc.world.method_23753(pos);
+                    Biome biome = mc.world.getBiome(pos);
                     Identifier rl = Registry.BIOME.getId(biome);
                     String name = rl != null ? rl.toString() : "?";
                     this.addLine("Biome reg name: " + name);

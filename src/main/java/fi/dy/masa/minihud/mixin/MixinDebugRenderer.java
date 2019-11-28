@@ -14,8 +14,8 @@ public abstract class MixinDebugRenderer
 {
     @Inject(method = "render", at = @At("RETURN"))
     private void renderDebugRenderers(MatrixStack matrixStack, VertexConsumerProvider.Immediate vtx,
-            double cameraX, double cameraY, double cameraZ, long finishTimeNano, CallbackInfo ci)
+            double cameraX, double cameraY, double cameraZ, CallbackInfo ci)
     {
-        DebugInfoUtils.renderVanillaDebug(matrixStack, vtx, cameraX, cameraY, cameraZ, finishTimeNano);
+        DebugInfoUtils.renderVanillaDebug(matrixStack, vtx, cameraX, cameraY, cameraZ);
     }
 }

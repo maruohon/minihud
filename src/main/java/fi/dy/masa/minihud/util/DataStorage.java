@@ -435,7 +435,7 @@ public class DataStorage
             MinecraftServer server = this.mc.getServer();
             final int maxRange = (this.mc.options.viewDistance) * 16;
 
-            server.method_18858(new ServerTask(server.getTicks(), () ->
+            server.send(new ServerTask(server.getTicks(), () ->
             {
                 synchronized (this.structures)
                 {
