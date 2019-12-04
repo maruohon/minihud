@@ -559,9 +559,9 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.SPEED.getBooleanValue())
             {
-                double dx = entity.getX() - entity.prevRenderX;
-                double dy = entity.getY() - entity.prevRenderY;
-                double dz = entity.getZ() - entity.prevRenderZ;
+                double dx = entity.getX() - entity.lastRenderX;
+                double dy = entity.getY() - entity.lastRenderY;
+                double dz = entity.getZ() - entity.lastRenderZ;
                 double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
                 str.append(pre).append(String.format("speed: %.3f m/s", dist * 20));
             }
@@ -574,9 +574,9 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.SPEED_AXIS)
         {
-            double dx = entity.getX() - entity.prevRenderX;
-            double dy = entity.getY() - entity.prevRenderY;
-            double dz = entity.getZ() - entity.prevRenderZ;
+            double dx = entity.getX() - entity.lastRenderX;
+            double dy = entity.getY() - entity.lastRenderY;
+            double dz = entity.getZ() - entity.lastRenderZ;
             this.addLine(String.format("speed: x: %.3f y: %.3f z: %.3f m/s", dx * 20, dy * 20, dz * 20));
         }
         else if (type == InfoToggle.CHUNK_SECTIONS)
