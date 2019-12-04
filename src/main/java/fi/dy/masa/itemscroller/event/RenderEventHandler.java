@@ -292,7 +292,7 @@ public class RenderEventHandler
             this.mc.getItemRenderer().zOffset -= 100;
         }
 
-        RenderUtils.disableItemLighting();
+        RenderUtils.disableDiffuseLighting();
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }

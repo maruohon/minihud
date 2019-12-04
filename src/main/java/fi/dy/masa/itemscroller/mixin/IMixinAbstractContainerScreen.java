@@ -19,10 +19,10 @@ public interface IMixinAbstractContainerScreen
     @Accessor("focusedSlot")
     Slot getHoveredSlot();
 
-    @Accessor("left")
+    @Accessor("x")
     int getGuiLeft();
 
-    @Accessor("top")
+    @Accessor("y")
     int getGuiTop();
 
     @Accessor("containerWidth")
