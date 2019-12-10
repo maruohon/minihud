@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-import net.minecraft.block.BeeHiveBlock;
+import net.minecraft.block.BeehiveBlock;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
@@ -29,7 +29,7 @@ public abstract class MixinItemStack
     {
         if (Configs.Generic.BEE_TOOLTIPS.getBooleanValue() &&
             this.getItem() instanceof BlockItem &&
-            ((BlockItem) this.getItem()).getBlock() instanceof BeeHiveBlock)
+            ((BlockItem) this.getItem()).getBlock() instanceof BeehiveBlock)
         {
             MiscUtils.addBeeTooltip((ItemStack) (Object) this, list);
         }
