@@ -1,18 +1,23 @@
 package fi.dy.masa.minihud.config;
 
+import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.client.Minecraft;
 import fi.dy.masa.malilib.config.ConfigType;
+import fi.dy.masa.malilib.config.IConfigBoolean;
+import fi.dy.masa.malilib.config.IConfigNotifiable;
 import fi.dy.masa.malilib.config.IHotkeyTogglable;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
+import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
-import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleStructures;
+import fi.dy.masa.minihud.util.DataStorage;
 
-public enum RendererToggle implements IHotkeyTogglable
+public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfigBoolean>
 {
     DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled",    "", "Toggles the vanilla Block Collision Boxes debug renderer", "Block Collision Boxes"),
     DEBUG_HEIGHT_MAP                    ("debugHeightMapEnabled",       "", "Toggles the vanilla Height Map debug renderer", "Height Map"),
@@ -27,8 +32,6 @@ public enum RendererToggle implements IHotkeyTogglable
     OVERLAY_RANDOM_TICKS_PLAYER         ("overlayRandomTicksPlayer",    "", "Toggle the player-following random ticked chunks overlay renderer", "Random Ticked Chunks (player-following) overlay"),
     OVERLAY_REGION_FILE                 ("overlayRegionFile",           "", "Toggle the region file border overlay renderer", "Region File Border overlay"),
     OVERLAY_SLIME_CHUNKS_OVERLAY        ("overlaySlimeChunks",          "", KeybindSettings.INGAME_BOTH, "Toggle the Slime Chunk overlay renderer", "Slime Chunks overlay"),
-    OVERLAY_SPAWNABLE_CHUNKS_FIXED      ("overlaySpawnableChunksFixed", "", "Toggle the location-fixed spawnable chunks overlay renderer", "Spawnable Chunks (fixed) overlay"),
-    OVERLAY_SPAWNABLE_CHUNKS_PLAYER     ("overlaySpawnableChunksPlayer","", "Toggle the player-following spawnable chunks overlay renderer", "Spawnable Chunks (player-following) overlay"),
     OVERLAY_SPAWNABLE_COLUMN_HEIGHTS    ("overlaySpawnableColumnHeights","", "Toggle the spawnable column heights overlay renderer", "Spawnable column heights overlay"),
     OVERLAY_SPAWN_CHUNK_OVERLAY_REAL    ("overlaySpawnChunkReal",       "", "Toggle the spawn chunks overlay renderer", "Spawn Chunks (real) overlay"),
     OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER  ("overlaySpawnChunkPlayer",     "", "Toggle the pseudo (player-following) spawn chunks overlay renderer", "Spawn Chunks (player-following, would-be) overlay"),
@@ -41,6 +44,7 @@ public enum RendererToggle implements IHotkeyTogglable
     private final IKeybind keybind;
     private final boolean defaultValueBoolean;
     private boolean valueBoolean;
+    @Nullable private IValueChangeCallback<IConfigBoolean> callback;
 
     RendererToggle(String name, String defaultHotkey, String comment, String prettyName)
     {
@@ -55,17 +59,42 @@ public enum RendererToggle implements IHotkeyTogglable
         this.defaultValueBoolean = false;
         this.keybind = KeybindMulti.fromStorageString(defaultHotkey, settings);
 
-        if (name.equals("overlayStructureMainToggle"))
-        {
-            this.keybind.setCallback(new KeyCallbackToggleStructures(this));
-        }
-        else if (name.startsWith("debug"))
+        if (name.startsWith("debug"))
         {
             this.keybind.setCallback(new KeyCallbackToggleDebugRenderer(this));
         }
         else
         {
             this.keybind.setCallback(new KeyCallbackToggleRenderer(this));
+        }
+
+        if (name.equals("overlayStructureMainToggle"))
+        {
+            this.setValueChangeCallback((config) ->
+            {
+                Minecraft mc = Minecraft.getInstance();
+
+                if (mc != null && mc.player != null)
+                {
+                    if (mc.isIntegratedServerRunning() == false)
+                    {
+                        /*
+                        if (this.getBooleanValue())
+                        {
+                            ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandler.INSTANCE);
+                        }
+                        else
+                        {
+                            ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandler.INSTANCE);
+                        }
+                        */
+                    }
+                    else
+                    {
+                        DataStorage.getInstance().setStructuresNeedUpdating();
+                    }
+                }
+            });
         }
     }
 
@@ -120,7 +149,28 @@ public enum RendererToggle implements IHotkeyTogglable
     @Override
     public void setBooleanValue(boolean value)
     {
+        boolean oldValue = this.valueBoolean;
         this.valueBoolean = value;
+
+        if (oldValue != this.valueBoolean)
+        {
+            this.onValueChanged();
+        }
+    }
+
+    @Override
+    public void setValueChangeCallback(IValueChangeCallback<IConfigBoolean> callback)
+    {
+        this.callback = callback;
+    }
+
+    @Override
+    public void onValueChanged()
+    {
+        if (this.callback != null)
+        {
+            this.callback.onValueChanged(this);
+        }
     }
 
     @Override

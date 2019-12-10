@@ -1,9 +1,9 @@
 package fi.dy.masa.minihud.renderer;
 
 import org.lwjgl.opengl.GL11;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
 
 public class RenderObjectDisplayList extends RenderObjectBase

@@ -5,21 +5,21 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
 
 public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 {
     @Nullable public static Vec3d newPos;
-    private static final EnumFacing[] HORIZONTALS = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
+    private static final Direction[] HORIZONTALS = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST };
 
     protected final RendererToggle toggle;
     protected Vec3d pos = Vec3d.ZERO;
@@ -116,7 +116,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 
     protected void renderChunkEdgesIfApplicable(ChunkPos pos, Set<ChunkPos> chunks, Entity entity, int color)
     {
-        for (EnumFacing side : HORIZONTALS)
+        for (Direction side : HORIZONTALS)
         {
             ChunkPos posTmp = new ChunkPos(pos.x + side.getXOffset(), pos.z + side.getZOffset());
 
@@ -129,7 +129,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
         }
     }
 
-    protected BlockPos getStartPos(ChunkPos chunkPos, EnumFacing side)
+    protected BlockPos getStartPos(ChunkPos chunkPos, Direction side)
     {
         switch (side)
         {
@@ -140,10 +140,10 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
             default:
         }
 
-        return BlockPos.ORIGIN;
+        return BlockPos.ZERO;
     }
 
-    protected BlockPos getEndPos(ChunkPos chunkPos, EnumFacing side)
+    protected BlockPos getEndPos(ChunkPos chunkPos, Direction side)
     {
         switch (side)
         {
@@ -154,7 +154,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
             default:
         }
 
-        return BlockPos.ORIGIN;
+        return BlockPos.ZERO;
     }
 
     @Override

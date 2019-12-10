@@ -1,6 +1,0 @@
-{
-    "id": "minihud",
-    "name": "MiniHUD",
-    "authors": [ "masa" ],
-    "listeners": [ "fi.dy.masa.minihud.MiniHUD" ]
-}

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.platform.GLX;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.math.BlockPos;
 
 public abstract class OverlayRendererBase implements IOverlayRenderer
@@ -17,8 +17,8 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
 
     protected final List<RenderObjectBase> renderObjects = new ArrayList<>();
     protected float glLineWidth = 1f;
-    protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
-    private BlockPos position = BlockPos.ORIGIN;
+    protected BlockPos lastUpdatePos = BlockPos.ZERO;
+    private BlockPos position = BlockPos.ZERO;
 
     protected void preRender(double x, double y, double z)
     {
@@ -69,7 +69,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     {
         RenderObjectBase obj;
 
-        if (OpenGlHelper.useVbo())
+        if (GLX.useVbo())
         {
             obj = new RenderObjectVbo(glMode);
         }

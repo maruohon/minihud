@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.event;
 
+import java.lang.invoke.MethodHandle;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +8,32 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.network.play.NetworkPlayerInfo;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.chunk.ChunkRender;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.FilledMapItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.EntityRayTraceResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.LightType;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
@@ -14,42 +41,22 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.mixin.IMixinWorldRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.DataStorage;
+import fi.dy.masa.minihud.util.MethodHandleUtils;
+import fi.dy.masa.minihud.util.MethodHandleUtils.UnableToFindMethodHandleException;
 import fi.dy.masa.minihud.util.MiscUtils;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.chunk.RenderChunk;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemMap;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.IRegistry;
-import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.EnumLightType;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class RenderHandler implements IRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
+
+    private final MethodHandle methodHandle_WorldRenderer_getRenderedChunks;
     private final DataStorage data;
     private final Date date;
     private int fps;
@@ -66,6 +73,20 @@ public class RenderHandler implements IRenderer
     {
         this.data = DataStorage.getInstance();
         this.date = new Date();
+        this.methodHandle_WorldRenderer_getRenderedChunks = this.getMethodHandle_getRenderedChunks();
+    }
+
+    private MethodHandle getMethodHandle_getRenderedChunks()
+    {
+        try
+        {
+            return MethodHandleUtils.getMethodHandleVirtual(WorldRenderer.class, new String[] { "func_184382_g", "getRenderedChunks" });
+        }
+        catch (UnableToFindMethodHandleException e)
+        {
+            MiniHUD.logger.error("Failed to get a MethodHandle for WorldRenderer#getRenderedChunks()", e);
+            return null;
+        }
     }
 
     public static RenderHandler getInstance()
@@ -128,7 +149,7 @@ public class RenderHandler implements IRenderer
     @Override
     public void onRenderTooltipLast(ItemStack stack, int x, int y)
     {
-        if (stack.getItem() instanceof ItemMap)
+        if (stack.getItem() instanceof FilledMapItem)
         {
             if (Configs.Generic.MAP_PREVIEW.getBooleanValue())
             {
@@ -193,12 +214,6 @@ public class RenderHandler implements IRenderer
     {
         if (mc.world != null)
         {
-            if (InfoToggle.SPAWNABLE_SUB_CHUNKS.getBooleanValue() &&
-                mc.world.getGameTime() % Configs.Generic.SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL.getIntegerValue() == 0)
-            {
-                DataStorage.getInstance().checkQueuedDirtyChunkHeightmaps();
-            }
-
             if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue() && (mc.world.getGameTime() % 20) == 0)
             {
                 DataStorage.getInstance().updateStructureData();
@@ -259,6 +274,7 @@ public class RenderHandler implements IRenderer
         this.lineWrappers.add(new StringHolder(text));
     }
 
+    @SuppressWarnings("deprecation")
     private void addLine(InfoToggle type)
     {
         Minecraft mc = Minecraft.getInstance();
@@ -487,7 +503,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.FACING)
         {
-            EnumFacing facing = entity.getHorizontalFacing();
+            Direction facing = entity.getHorizontalFacing();
             String str = "Invalid";
 
             switch (facing)
@@ -506,14 +522,14 @@ public class RenderHandler implements IRenderer
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
             {
-                Chunk chunk = mc.world.getChunk(pos);
+                Chunk chunk = mc.world.getChunkAt(pos);
 
                 if (chunk.isEmpty() == false)
                 {
                     this.addLine(String.format("Light: %d (block: %d, sky: %d)",
                             chunk.getLightSubtracted(pos, 0),
-                            chunk.getLightFor(EnumLightType.BLOCK, pos),
-                            chunk.getLightFor(EnumLightType.SKY, pos)));
+                            mc.world.getLightFor(LightType.BLOCK, pos),
+                            mc.world.getLightFor(LightType.SKY, pos)));
                 }
             }
         }
@@ -568,7 +584,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.CHUNK_SECTIONS)
         {
-            this.addLine(String.format("C: %d", ((IMixinWorldRenderer) mc.worldRenderer).getRenderedChunksInvoker()));
+            this.addLine(String.format("C: %d", this.getRenderedChunks()));
         }
         else if (type == InfoToggle.CHUNK_SECTIONS_FULL)
         {
@@ -576,7 +592,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.CHUNK_UPDATES)
         {
-            this.addLine(String.format("Chunk updates: %d", RenderChunk.renderChunksUpdated));
+            this.addLine(String.format("Chunk updates: %d", ChunkRender.renderChunksUpdated));
         }
         else if (type == InfoToggle.LOADED_CHUNKS_COUNT)
         {
@@ -605,7 +621,7 @@ public class RenderHandler implements IRenderer
 
                 if (mc.isIntegratedServerRunning() && mc.getIntegratedServer() != null)
                 {
-                    EntityPlayerMP player = mc.getIntegratedServer().getPlayerList().getPlayerByUUID(mc.player.getUniqueID());
+                    PlayerEntity player = mc.getIntegratedServer().getPlayerList().getPlayerByUUID(mc.player.getUniqueID());
 
                     if (player != null)
                     {
@@ -622,7 +638,7 @@ public class RenderHandler implements IRenderer
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
             {
-                Chunk chunk = mc.world.getChunk(pos);
+                Chunk chunk = mc.world.getChunkAt(pos);
 
                 if (chunk.isEmpty() == false)
                 {
@@ -635,12 +651,12 @@ public class RenderHandler implements IRenderer
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
             {
-                Chunk chunk = mc.world.getChunk(pos);
+                Chunk chunk = mc.world.getChunkAt(pos);
 
                 if (chunk.isEmpty() == false)
                 {
                     Biome biome = chunk.getBiome(pos);
-                    ResourceLocation rl = IRegistry.BIOME.getKey(biome);
+                    ResourceLocation rl = ForgeRegistries.BIOMES.getKey(biome);
                     String name = rl != null ? rl.toString() : "?";
                     this.addLine("Biome reg name: " + name);
                 }
@@ -665,13 +681,14 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.ENTITIES_CLIENT_WORLD)
         {
-            int countClient = mc.world.loadedEntityList.size();
+            /* FIXME Forge 1.14
+            int countClient = mc.world.func_217425_f(); // regular entity count
 
             if (mc.isIntegratedServerRunning())
             {
                 World serverWorld = WorldUtils.getBestWorld(mc);
 
-                if (serverWorld != null && serverWorld instanceof WorldServer)
+                if (serverWorld != null && serverWorld instanceof ServerWorld)
                 {
                     int countServer = serverWorld.loadedEntityList.size();
                     this.addLine(String.format("Entities - Client: %d, Server: %d", countClient, countServer));
@@ -680,6 +697,7 @@ public class RenderHandler implements IRenderer
             }
 
             this.addLine(String.format("Entities - Client: %d", countClient));
+            */
         }
         else if (type == InfoToggle.SLIME_CHUNK)
         {
@@ -714,14 +732,13 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.LOOKING_AT_ENTITY)
         {
             if (mc.objectMouseOver != null &&
-                mc.objectMouseOver.type == RayTraceResult.Type.ENTITY &&
-                mc.objectMouseOver.entity != null)
+                mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY)
             {
-                Entity target = mc.objectMouseOver.entity;
+                Entity target = ((EntityRayTraceResult) mc.objectMouseOver).getEntity();
 
-                if (target instanceof EntityLivingBase)
+                if (target instanceof LivingEntity)
                 {
-                    EntityLivingBase living = (EntityLivingBase) target;
+                    LivingEntity living = (LivingEntity) target;
                     this.addLine(String.format("Entity: %s - HP: %.1f / %.1f",
                             target.getName().getString(), living.getHealth(), living.getMaxHealth()));
                 }
@@ -734,10 +751,10 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.ENTITY_REG_NAME)
         {
             if (mc.objectMouseOver != null &&
-                mc.objectMouseOver.type == RayTraceResult.Type.ENTITY &&
-                mc.objectMouseOver.entity != null)
+                mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY)
             {
-                ResourceLocation regName = EntityType.getId(mc.objectMouseOver.entity.getType());
+                Entity lookedEntity = ((EntityRayTraceResult) mc.objectMouseOver).getEntity();
+                ResourceLocation regName = EntityType.getKey(lookedEntity.getType());
 
                 if (regName != null)
                 {
@@ -756,10 +773,9 @@ public class RenderHandler implements IRenderer
             }
 
             if (mc.objectMouseOver != null &&
-                mc.objectMouseOver.type == RayTraceResult.Type.BLOCK &&
-                mc.objectMouseOver.getBlockPos() != null)
+                mc.objectMouseOver.getType() == RayTraceResult.Type.BLOCK)
             {
-                BlockPos lookPos = mc.objectMouseOver.getBlockPos();
+                BlockPos lookPos = ((BlockRayTraceResult) mc.objectMouseOver).getPos();
                 String pre = "";
                 StringBuilder str = new StringBuilder(128);
 
@@ -786,36 +802,34 @@ public class RenderHandler implements IRenderer
         {
             this.getBlockProperties(mc);
         }
-        else if (type == InfoToggle.SPAWNABLE_SUB_CHUNKS)
-        {
-            int value = DataStorage.getInstance().getSpawnableSubChunkCountFor(pos.getX() >> 4, pos.getZ() >> 4);
-
-            if (value >= 0)
-            {
-                this.addLine(String.format("Spawnable sub-chunks: %d (y: 0 - %d)", value, value * 16 - 1));
-            }
-            else
-            {
-                this.addLine(String.format("Spawnable sub-chunks: <no data>"));
-            }
-        }
     }
 
     private <T extends Comparable<T>> void getBlockProperties(Minecraft mc)
     {
-        if (mc.objectMouseOver != null &&
-            mc.objectMouseOver.type == RayTraceResult.Type.BLOCK &&
-            mc.objectMouseOver.getBlockPos() != null)
+        if (mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.BLOCK)
         {
-            BlockPos posLooking = mc.objectMouseOver.getBlockPos();
-            IBlockState state = mc.world.getBlockState(posLooking);
+            BlockPos posLooking = ((BlockRayTraceResult) mc.objectMouseOver).getPos();
+            BlockState state = mc.world.getBlockState(posLooking);
 
-            this.addLine(String.valueOf(IRegistry.BLOCK.getKey(state.getBlock())));
+            this.addLine(String.valueOf(ForgeRegistries.BLOCKS.getKey(state.getBlock())));
 
             for (String line : BlockUtils.getFormattedBlockStateProperties(state))
             {
                 this.addLine(line);
             }
+        }
+    }
+
+    private int getRenderedChunks()
+    {
+        try
+        {
+            return (int) this.methodHandle_WorldRenderer_getRenderedChunks.invokeExact(Minecraft.getInstance().worldRenderer);
+        }
+        catch (Throwable t)
+        {
+            MiniHUD.logger.error("Error while trying invoke WorldRenderer#getRenderedChunks()");
+            return -1;
         }
     }
 

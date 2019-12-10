@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
+import com.mojang.blaze3d.platform.GLX;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 
 public class RenderContainer
 {
@@ -32,8 +34,6 @@ public class RenderContainer
         this.renderers.add(new OverlayRendererRegion());
         this.renderers.add(new OverlayRendererSlimeChunks());
         this.renderers.add(new OverlayRendererSpawnableColumnHeights());
-        this.renderers.add(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED));
-        this.renderers.add(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER));
         this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL));
         this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER));
         this.renderers.add(new OverlayRendererStructures());
@@ -95,7 +95,7 @@ public class RenderContainer
         {
             GlStateManager.pushMatrix();
 
-            GlStateManager.disableTexture2D();
+            GlStateManager.disableTexture();
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
             GlStateManager.disableCull();
             GlStateManager.disableLighting();
@@ -105,15 +105,13 @@ public class RenderContainer
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
-            if (OpenGlHelper.useVbo())
+            if (GLX.useVbo())
             {
                 GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
                 GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
             }
 
-            double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
-            double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
-            double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
+            Vec3d cameraPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
 
             for (int i = 0; i < this.renderers.size(); ++i)
             {
@@ -121,18 +119,18 @@ public class RenderContainer
 
                 if (renderer.shouldRender(mc))
                 {
-                    renderer.draw(x, y, z);
+                    renderer.draw(cameraPos.x, cameraPos.y, cameraPos.z);
                 }
             }
 
-            if (OpenGlHelper.useVbo())
+            if (GLX.useVbo())
             {
-                OpenGlHelper.glBindBuffer(OpenGlHelper.GL_ARRAY_BUFFER, 0);
-                GlStateManager.resetColor();
+                VertexBuffer.unbindBuffer();
+                GlStateManager.clearCurrentColor();
 
                 for (VertexFormatElement element : DefaultVertexFormats.POSITION_COLOR.getElements())
                 {
-                    VertexFormatElement.EnumUsage usage = element.getUsage();
+                    VertexFormatElement.Usage usage = element.getUsage();
 
                     switch (usage)
                     {
@@ -141,7 +139,7 @@ public class RenderContainer
                             break;
                         case COLOR:
                             GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
-                            GlStateManager.resetColor();
+                            GlStateManager.clearCurrentColor();
                         default:
                     }
                 }
@@ -155,7 +153,7 @@ public class RenderContainer
             GlStateManager.enableLighting();
             GlStateManager.enableCull();
             GlStateManager.depthMask(true);
-            GlStateManager.enableTexture2D();
+            GlStateManager.enableTexture();
             GlStateManager.popMatrix();
         }
     }
@@ -163,7 +161,7 @@ public class RenderContainer
     protected void checkVideoSettings()
     {
         boolean vboLast = this.useVbo;
-        this.useVbo = OpenGlHelper.useVbo();
+        this.useVbo = GLX.useVbo();
 
         if (vboLast != this.useVbo || this.resourcesAllocated == false)
         {

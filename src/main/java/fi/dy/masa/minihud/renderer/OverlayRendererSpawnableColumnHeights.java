@@ -3,21 +3,23 @@ package fi.dy.masa.minihud.renderer;
 import java.util.HashSet;
 import java.util.Set;
 import org.lwjgl.opengl.GL11;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.Heightmap;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.gen.Heightmap;
 
 public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
 {
     private static final Set<Long> DIRTY_CHUNKS = new HashSet<>();
 
+    private final BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
     private long lastCheckTime;
 
     public static void markChunkChanged(int cx, int cz)
@@ -88,7 +90,7 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
         final int zStart = (int) entity.posZ - radius;
         final int xEnd = (int) entity.posX + radius;
         final int zEnd = (int) entity.posZ + radius;
-        final WorldClient world = mc.world;
+        final World world = mc.world;
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
@@ -100,7 +102,7 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
             for (int z = zStart; z <= zEnd; ++z)
             {
                 // See WorldEntitySpawner.getRandomChunkPosition()
-                final int height = world.getHeight(Heightmap.Type.LIGHT_BLOCKING, x, z);
+                final int height = world.getChunk(this.posMutable.setPos(x, 0, z)).getTopBlockY(Heightmap.Type.WORLD_SURFACE, x, z) + 1;
                 final double minY = height;
                 final double maxY = height + 0.09375;
                 final double minX = x + 0.25;

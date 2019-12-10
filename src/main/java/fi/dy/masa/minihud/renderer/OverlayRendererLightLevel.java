@@ -4,32 +4,34 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.LightType;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.spawner.WorldEntitySpawner;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
 import fi.dy.masa.minihud.util.LightLevelNumberMode;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.EnumLightType;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldEntitySpawner;
-import net.minecraft.world.chunk.Chunk;
 
 public class OverlayRendererLightLevel
 {
     private static final ResourceLocation TEXTURE_NUMBERS = new ResourceLocation(Reference.MOD_ID, "textures/misc/light_level_numbers.png");
     private static final List<LightLevelInfo> LIGHT_INFOS = new ArrayList<>();
+    private static final BlockPos.MutableBlockPos MUTABLE_POS = new BlockPos.MutableBlockPos();
 
     private static boolean needsUpdate;
     private static BlockPos lastUpdatePos = null;
@@ -70,7 +72,7 @@ public class OverlayRendererLightLevel
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();
-            EnumFacing numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? mc.player.getHorizontalFacing() : EnumFacing.NORTH;
+            Direction numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? mc.player.getHorizontalFacing() : Direction.NORTH;
             LightLevelNumberMode numberMode = (LightLevelNumberMode) Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getOptionListValue();
             LightLevelMarkerMode markerMode = (LightLevelMarkerMode) Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
             boolean useColoredNumbers = Configs.Generic.LIGHT_LEVEL_COLORED_NUMBERS.getBooleanValue();
@@ -136,7 +138,7 @@ public class OverlayRendererLightLevel
                 double offset1 = (1.0 - markerSize) / 2.0;
                 double offset2 = (1.0 - offset1);
 
-                GlStateManager.disableTexture2D();
+                GlStateManager.disableTexture();
 
                 buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
@@ -154,7 +156,7 @@ public class OverlayRendererLightLevel
 
                 tessellator.draw();
 
-                GlStateManager.enableTexture2D();
+                GlStateManager.enableTexture();
             }
             else if (markerMode == LightLevelMarkerMode.CROSS)
             {
@@ -164,7 +166,7 @@ public class OverlayRendererLightLevel
                 double offset1 = (1.0 - markerSize) / 2.0;
                 double offset2 = (1.0 - offset1);
 
-                GlStateManager.disableTexture2D();
+                GlStateManager.disableTexture();
 
                 buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
@@ -182,7 +184,7 @@ public class OverlayRendererLightLevel
 
                 tessellator.draw();
 
-                GlStateManager.enableTexture2D();
+                GlStateManager.enableTexture();
             }
 
             GlStateManager.disableBlend();
@@ -190,7 +192,7 @@ public class OverlayRendererLightLevel
         }
     }
 
-    private static void renderLightLevelNumbers(double dx, double dy, double dz, EnumFacing facing,
+    private static void renderLightLevelNumbers(double dx, double dy, double dz, Direction facing,
             int lightThreshold, LightLevelNumberMode numberMode,
             @Nullable Color4f colorLit, @Nullable Color4f colorDark, BufferBuilder buffer)
     {
@@ -229,7 +231,7 @@ public class OverlayRendererLightLevel
         }
     }
 
-    private static void renderLightLevelTexture(double x, double y, double z, EnumFacing facing, int lightLevel, BufferBuilder buffer)
+    private static void renderLightLevelTexture(double x, double y, double z, Direction facing, int lightLevel, BufferBuilder buffer)
     {
         double u = (lightLevel & 0x3) * 0.25;
         double v = (lightLevel >> 2) * 0.25;
@@ -270,7 +272,7 @@ public class OverlayRendererLightLevel
         }
     }
 
-    private static void renderLightLevelTextureColor(double x, double y, double z, EnumFacing facing, int lightLevel, Color4f color, BufferBuilder buffer)
+    private static void renderLightLevelTextureColor(double x, double y, double z, Direction facing, int lightLevel, Color4f color, BufferBuilder buffer)
     {
         double u = (lightLevel & 0x3) * 0.25;
         double v = (lightLevel >> 2) * 0.25;
@@ -353,7 +355,6 @@ public class OverlayRendererLightLevel
         final int minCZ = (minZ >> 4);
         final int maxCX = (maxX >> 4);
         final int maxCZ = (maxZ >> 4);
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
 
         for (int cx = minCX; cx <= maxCX; ++cx)
         {
@@ -375,12 +376,12 @@ public class OverlayRendererLightLevel
 
                         for (int y = startY; y <= endY; ++y)
                         {
-                            if (canSpawnAt(x, y, z, chunk))
+                            if (canSpawnAt(x, y, z, chunk, world))
                             {
-                                posMutable.setPos(x, y, z);
+                                MUTABLE_POS.setPos(x, y, z);
 
-                                int block = chunk.getLightFor(EnumLightType.BLOCK, posMutable);
-                                int sky = chunk.getLightFor(EnumLightType.SKY, posMutable);
+                                int block = chunk.getWorldLightManager().getLightEngine(LightType.BLOCK).getLightFor(MUTABLE_POS);
+                                int sky = chunk.getWorldLightManager().getLightEngine(LightType.SKY).getLightFor(MUTABLE_POS);
 
                                 LIGHT_INFOS.add(new LightLevelInfo(new BlockPos(x, y, z), block, sky));
 
@@ -403,11 +404,12 @@ public class OverlayRendererLightLevel
      * @param pos
      * @return
      */
-    public static boolean canSpawnAt(int x, int y, int z, Chunk chunk)
+    public static boolean canSpawnAt(int x, int y, int z, Chunk chunk, World world)
     {
-        IBlockState state = chunk.getBlockState(x, y - 1, z);
+        MUTABLE_POS.setPos(x, y - 1, z);
+        BlockState state = chunk.getBlockState(MUTABLE_POS);
 
-        if (state.isTopSolid() == false)
+        if (state.canEntitySpawn(world, MUTABLE_POS, EntityType.CREEPER) == false)
         {
             return false;
         }
@@ -415,12 +417,21 @@ public class OverlayRendererLightLevel
         {
             Block block = state.getBlock();
             boolean spawnable = block != Blocks.BEDROCK && block != Blocks.BARRIER;
-            IBlockState state1 = chunk.getBlockState(x, y    , z);
-            IBlockState state2 = chunk.getBlockState(x, y + 1, z);
 
-            return spawnable &&
-                   WorldEntitySpawner.isValidEmptySpawnBlock(state1, state1.getFluidState()) &&
-                   WorldEntitySpawner.isValidEmptySpawnBlock(state2, state2.getFluidState());
+            if (spawnable)
+            {
+                MUTABLE_POS.setPos(x, y , z);
+                state = chunk.getBlockState(MUTABLE_POS);
+
+                if (WorldEntitySpawner.isSpawnableSpace(world, MUTABLE_POS, state, state.getFluidState()))
+                {
+                    MUTABLE_POS.setPos(x, y + 1, z);
+                    state = chunk.getBlockState(MUTABLE_POS);
+                    return WorldEntitySpawner.isSpawnableSpace(world, MUTABLE_POS, state, state.getFluidState());
+                }
+            }
+
+            return false;
         }
     }
 

@@ -77,11 +77,11 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
                 Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
 
         int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
-        Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 128);
+        Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 11);
         RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
                 rangeH, 256, 16, 16, entity, colorLazy);
 
-        corners = this.getSpawnChunkCorners(spawn, 128 - 32);
+        corners = this.getSpawnChunkCorners(spawn, 9);
         RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
                 rangeH, 256, 16, 16, entity, colorEntity);
 
@@ -101,17 +101,13 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         this.allocateBuffer(GL11.GL_LINES);
     }
 
-    protected Pair<BlockPos, BlockPos> getSpawnChunkCorners(BlockPos worldSpawn, int spawnChunkRange)
+    protected Pair<BlockPos, BlockPos> getSpawnChunkCorners(BlockPos worldSpawn, int chunkRange)
     {
-        int x;
-        int z;
-        x = (worldSpawn.getX() - (spawnChunkRange - 7)) & ~0xF;
-        z = (worldSpawn.getZ() - (spawnChunkRange - 7)) & ~0xF;
-        BlockPos pos1 = new BlockPos(x, 0, z);
+        int cx = (worldSpawn.getX() >> 4);
+        int cz = (worldSpawn.getZ() >> 4);
 
-        x = ((worldSpawn.getX() + (spawnChunkRange - 8)) & ~0xF) + 16 - 1;
-        z = ((worldSpawn.getZ() + (spawnChunkRange - 8)) & ~0xF) + 16 - 1;
-        BlockPos pos2 = new BlockPos(x, 256, z);
+        BlockPos pos1 = new BlockPos( (cx - chunkRange) << 4      ,   0,  (cz - chunkRange) << 4);
+        BlockPos pos2 = new BlockPos(((cx + chunkRange) << 4) + 15, 256, ((cz + chunkRange) << 4) + 15);
 
         return Pair.of(pos1, pos2);
     }

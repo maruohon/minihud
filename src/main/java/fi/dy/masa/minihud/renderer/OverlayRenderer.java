@@ -1,8 +1,9 @@
 package fi.dy.masa.minihud.renderer;
 
-import fi.dy.masa.minihud.config.RendererToggle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.minihud.config.RendererToggle;
 
 public class OverlayRenderer
 {
@@ -34,13 +35,11 @@ public class OverlayRenderer
             }
         }
 
-        double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
-        double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
-        double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
+        Vec3d cameraPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
 
         if (RendererToggle.OVERLAY_LIGHT_LEVEL.getBooleanValue())
         {
-            OverlayRendererLightLevel.render(dx, dy, dz, entity, mc);
+            OverlayRendererLightLevel.render(cameraPos.x, cameraPos.y, cameraPos.z, entity, mc);
         }
 
         RenderContainer.INSTANCE.render(entity, mc, partialTicks);

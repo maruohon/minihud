@@ -1,16 +1,34 @@
 package fi.dy.masa.minihud.util;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.gson.JsonObject;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.concurrent.TickDelayedTask;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.feature.structure.StructureStart;
+import net.minecraft.world.server.ServerWorld;
+import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -19,25 +37,7 @@ import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.gen.IChunkGenerator;
-import net.minecraft.world.gen.feature.structure.StructureStart;
+import fi.dy.masa.minihud.util.StructureTypes.StructureType;
 
 public class DataStorage
 {
@@ -52,19 +52,19 @@ public class DataStorage
     private boolean serverTPSValid;
     private boolean carpetServer;
     private boolean worldSpawnValid;
-    //private boolean hasStructureDataFromServer;
-    private boolean structuresDirty;
+    private boolean hasStructureDataFromServer;
+    private boolean structureRendererNeedsUpdate;
     private boolean structuresNeedUpdating;
+    //private boolean shouldRegisterStructureChannel;
+    private int structureDataTimeout = 800;
     private long worldSeed;
     private long lastServerTick;
     private long lastServerTimeUpdate;
     private BlockPos lastStructureUpdatePos;
     private double serverTPS;
     private double serverMSPT;
-    private BlockPos worldSpawn = BlockPos.ORIGIN;
+    private BlockPos worldSpawn = BlockPos.ZERO;
     private Vec3d distanceReferencePoint = Vec3d.ZERO;
-    private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
-    private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
     private final ArrayListMultimap<StructureType, StructureData> structures = ArrayListMultimap.create();
     private final Minecraft mc = Minecraft.getInstance();
 
@@ -80,13 +80,14 @@ public class DataStorage
         this.carpetServer = false;
         this.worldSpawnValid = false;
         this.structuresNeedUpdating = true;
-        //this.hasStructureDataFromServer = false;
-        this.structuresDirty = false;
+        this.hasStructureDataFromServer = false;
+        this.structureRendererNeedsUpdate = false;
 
         this.lastStructureUpdatePos = null;
         this.structures.clear();
+        this.structureDataTimeout = 800;
         this.worldSeed = 0;
-        this.worldSpawn = BlockPos.ORIGIN;
+        this.worldSpawn = BlockPos.ZERO;
     }
 
     public void setWorldSeed(long seed)
@@ -171,9 +172,9 @@ public class DataStorage
         return this.serverMSPT;
     }
 
-    public boolean hasStructureDataChanged()
+    public boolean structureRendererNeedsUpdate()
     {
-        return this.structuresDirty;
+        return this.structureRendererNeedsUpdate;
     }
 
     public void setStructuresNeedUpdating()
@@ -181,9 +182,9 @@ public class DataStorage
         this.structuresNeedUpdating = true;
     }
 
-    public void setStructuresDirty()
+    public void setStructureRendererNeedsUpdate()
     {
-        this.structuresDirty = true;
+        this.structureRendererNeedsUpdate = true;
     }
 
     public Vec3d getDistanceReferencePoint()
@@ -201,77 +202,10 @@ public class DataStorage
     public void markChunkForHeightmapCheck(int chunkX, int chunkZ)
     {
         OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
-        this.chunkHeightmapsToCheck.add(new ChunkPos(chunkX, chunkZ));
         OverlayRendererLightLevel.setNeedsUpdate();
     }
 
-    public void checkQueuedDirtyChunkHeightmaps()
-    {
-        WorldClient world = this.mc.world;
-
-        if (world != null)
-        {
-            if (this.chunkHeightmapsToCheck.isEmpty() == false)
-            {
-                for (ChunkPos pos : this.chunkHeightmapsToCheck)
-                {
-                    Chunk chunk = world.getChunk(pos.x, pos.z);
-                    Heightmap hm = chunk.getHeightmap(Heightmap.Type.LIGHT_BLOCKING);
-                    int maxHeight = -1;
-
-                    for (int x = 0; x < 16; ++x)
-                    {
-                        for (int z = 0; z < 16; ++z)
-                        {
-                            int h = hm.getHeight(x, z);
-
-                            if (h > maxHeight)
-                            {
-                                maxHeight = h;
-                            }
-                        }
-                    }
-
-                    int subChunks;
-
-                    if (maxHeight >= 0)
-                    {
-                        subChunks = MathHelper.clamp((maxHeight / 16) + 1, 1, 16);
-                    }
-                    // Void world? Use the topFilledSegment, see WorldEntitySpawner.getRandomChunkPosition()
-                    else
-                    {
-                        subChunks = MathHelper.clamp((chunk.getTopFilledSegment() + 16) / 16, 1, 16);
-                    }
-
-                    //System.out.printf("@ %d, %d - subChunks: %d, maxHeight: %d\n", pos.x, pos.z, subChunks, maxHeight);
-
-                    this.spawnableSubChunks.put(pos, subChunks);
-                }
-            }
-        }
-        else
-        {
-            this.spawnableSubChunks.clear();
-        }
-
-        this.chunkHeightmapsToCheck.clear();
-    }
-
-    public void onChunkUnload(int chunkX, int chunkZ)
-    {
-        ChunkPos pos = new ChunkPos(chunkX, chunkZ);
-        this.chunkHeightmapsToCheck.remove(pos);
-        this.spawnableSubChunks.remove(pos);
-    }
-
-    public int getSpawnableSubChunkCountFor(int chunkX, int chunkZ)
-    {
-        Integer count = this.spawnableSubChunks.get(new ChunkPos(chunkX, chunkZ));
-        return count != null ? count.intValue() : -1;
-    }
-
-    public boolean onSendChatMessage(EntityPlayer player, String message)
+    public boolean onSendChatMessage(PlayerEntity player, String message)
     {
         String[] parts = message.split(" ");
 
@@ -302,9 +236,9 @@ public class DataStorage
 
     public void onChatMessage(ITextComponent message)
     {
-        if (message instanceof TextComponentTranslation)
+        if (message instanceof TranslationTextComponent)
         {
-            TextComponentTranslation text = (TextComponentTranslation) message;
+            TranslationTextComponent text = (TranslationTextComponent) message;
 
             // The vanilla "/seed" command
             if ("commands.seed.success".equals(text.getKey()))
@@ -419,42 +353,46 @@ public class DataStorage
                 }
             }
 
-            this.structuresDirty = false;
+            this.structureRendererNeedsUpdate = false;
         }
 
         return copy;
-    }
-
-    public void requestStructureDataFromServer()
-    {
-        if (Minecraft.getInstance().isSingleplayer() == false)
-        {
-            // 1.13 TODO
-            /*
-            PacketBuffer data = new PacketBuffer(Unpooled.buffer());
-            data.writeInt(DataStorage.CARPET_ID_BOUNDINGBOX_MARKERS);
-            ClientPluginChannels.sendMessage(LiteModMiniHud.CHANNEL_CARPET_CLIENT, data, ChannelPolicy.DISPATCH_ALWAYS);
-            MiniHUD.logger.info("Requesting structure data from Carpet server");
-            */
-        }
     }
 
     public void updateStructureData()
     {
         if (this.mc != null && this.mc.world != null && this.mc.player != null)
         {
-            final BlockPos playerPos = new BlockPos(this.mc.player);
+            long currentTime = this.mc.world.getGameTime();
 
-            if (this.mc.isSingleplayer())
+            if ((currentTime % 20) == 0)
             {
-                if (this.structuresNeedUpdating(playerPos, 32))
+                if (this.mc.isIntegratedServerRunning())
                 {
-                    this.updateStructureDataFromIntegratedServer(playerPos);
+                    BlockPos playerPos = new BlockPos(this.mc.player);
+
+                    if (this.structuresNeedUpdating(playerPos, 32))
+                    {
+                        this.updateStructureDataFromIntegratedServer(playerPos);
+                    }
                 }
-            }
-            else if (this.structuresNeedUpdating(playerPos, 256))
-            {
-                this.requestStructureDataFromServer();
+                else if (this.hasStructureDataFromServer)
+                {
+                    this.removeExpiredStructures(currentTime, this.structureDataTimeout);
+                }
+                /*
+                else if (this.shouldRegisterStructureChannel && this.mc.getNetworkHandler() != null)
+                {
+                    if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
+                    {
+                        // (re-)register the structure packet handler
+                        ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandler.INSTANCE);
+                        ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandler.INSTANCE);
+                    }
+
+                    this.shouldRegisterStructureChannel = false;
+                }
+                */
             }
         }
     }
@@ -470,162 +408,132 @@ public class DataStorage
     private void updateStructureDataFromIntegratedServer(final BlockPos playerPos)
     {
         final DimensionType dimension = this.mc.player.dimension;
-        final WorldServer world = this.mc.getIntegratedServer().getWorld(dimension);
-
-        synchronized (this.structures)
-        {
-            this.structures.clear();
-        }
+        final ServerWorld world = this.mc.getIntegratedServer().getWorld(dimension);
 
         if (world != null)
         {
-            final IChunkGenerator<?> chunkGenerator = world.getChunkProvider().getChunkGenerator();
-            final DimensionType dimensionType = world.dimension.getType();
-            final DataStorage storage = this;
-            final int maxRange = (this.mc.gameSettings.renderDistanceChunks + 4) * 16;
+            MinecraftServer server = this.mc.getIntegratedServer();
+            final int maxChunkRange = this.mc.gameSettings.renderDistanceChunks + 2;
 
-            world.addScheduledTask(new Runnable()
+            server.enqueue(new TickDelayedTask(server.getTickCounter(), () ->
             {
-                @Override
-                public void run()
+                synchronized (this.structures)
                 {
-                    synchronized (storage.structures)
-                    {
-                        storage.addStructureDataFromGenerator(chunkGenerator, dimensionType, playerPos, maxRange);
-                    }
+                    this.addStructureDataFromGenerator(world, dimension, playerPos, maxChunkRange);
                 }
-            });
+            }));
+        }
+        else
+        {
+            synchronized (this.structures)
+            {
+                this.structures.clear();
+            }
         }
 
         this.lastStructureUpdatePos = playerPos;
         this.structuresNeedUpdating = false;
     }
 
-    /*
-    public void updateStructureDataFromServer(PacketBuffer data)
+    public void addOrUpdateStructuresFromServer(ListNBT structures, int timeout)
     {
-        try
+        if (structures.getTagType() == Constants.NBT.TAG_COMPOUND)
         {
-            data.readerIndex(0);
+            this.structureDataTimeout = timeout;
 
-            if (data.readerIndex() < data.writerIndex() - 4)
+            long currentTime = this.mc.world.getGameTime();
+            final int count = structures.size();
+
+            this.removeExpiredStructures(currentTime, timeout);
+
+            for (int i = 0; i < count; ++i)
             {
-                int type = data.readInt();
+                CompoundNBT tag = structures.getCompound(i);
+                StructureData data = StructureData.fromStructureStartTag(tag, currentTime);
 
-                if (type == CARPET_ID_BOUNDINGBOX_MARKERS)
+                if (data != null)
                 {
-                    this.readStructureDataCarpetAll(data.readCompoundTag());
-                }
-                else if (type == CARPET_ID_LARGE_BOUNDINGBOX_MARKERS_START)
-                {
-                    NBTTagCompound nbt = data.readCompoundTag();
-                    int boxCount = data.readVarInt();
-                    this.readStructureDataCarpetSplitHeader(nbt, boxCount);
-                }
-                else if (type == CARPET_ID_LARGE_BOUNDINGBOX_MARKERS)
-                {
-                    int boxCount = data.readByte();
-                    this.readStructureDataCarpetSplitBoxes(data, boxCount);
+                    // Remove the old entry and replace it with the new entry with the current refresh time
+                    if (this.structures.containsEntry(data.getStructureType(), data))
+                    {
+                        this.structures.remove(data.getStructureType(), data);
+                    }
+
+                    this.structures.put(data.getStructureType(), data);
                 }
             }
 
-            data.readerIndex(0);
-        }
-        catch (Exception e)
-        {
-            MiniHUD.logger.warn("Failed to read structure data from Carpet mod packet", e);
-        }
-    }
-
-    private void readStructureDataCarpetAll(NBTTagCompound nbt)
-    {
-        NBTTagList tagList = nbt.getList("Boxes", Constants.NBT.TAG_LIST);
-        this.setWorldSeed(nbt.getLong("Seed"));
-
-        synchronized (this.structures)
-        {
-            this.structures.clear();
-            StructureData.readStructureDataCarpetAllBoxes(this.structures, tagList);
+            this.structureRendererNeedsUpdate = true;
             this.hasStructureDataFromServer = true;
-            this.structuresDirty = true;
-            this.structuresNeedUpdating = false;
-
-            EntityPlayer player = Minecraft.getInstance().player;
-
-            if (player != null)
-            {
-                this.lastStructureUpdatePos = new BlockPos(player);
-            }
-
-            MiniHUD.logger.info("Structure data updated from Carpet server (all), structures: {}", this.structures.size());
         }
     }
 
-    private void readStructureDataCarpetSplitHeader(NBTTagCompound nbt, int boxCount)
+    private void removeExpiredStructures(long currentTime, int timeout)
     {
-        this.setWorldSeed(nbt.getLong("Seed"));
+        long maxAge = timeout + 200;
+        Iterator<StructureData> iter = this.structures.values().iterator();
 
-        synchronized (this.structures)
+        while (iter.hasNext())
         {
-            this.structures.clear();
-            StructureData.readStructureDataCarpetIndividualBoxesHeader(boxCount);
-        }
+            StructureData data = iter.next();
 
-        MiniHUD.logger.info("Structure data header received from Carpet server, expecting {} boxes", boxCount);
-    }
-
-    private void readStructureDataCarpetSplitBoxes(PacketBuffer data, int boxCount) throws IOException
-    {
-        synchronized (this.structures)
-        {
-            for (int i = 0; i < boxCount; ++i)
+            if (currentTime > (data.getRefreshTime() + maxAge))
             {
-                NBTTagCompound nbt = data.readCompoundTag();
-                StructureData.readStructureDataCarpetIndividualBoxes(this.structures, nbt);
+                iter.remove();
             }
-
-            this.hasStructureDataFromServer = true;
-            this.structuresDirty = true;
-            this.structuresNeedUpdating = false;
-
-            EntityPlayer player = Minecraft.getInstance().player;
-
-            if (player != null)
-            {
-                this.lastStructureUpdatePos = new BlockPos(player);
-            }
-
-            MiniHUD.logger.info("Structure data received from Carpet server (split boxes), received {} boxes", boxCount);
         }
     }
-    */
 
-    private void addStructureDataFromGenerator(IChunkGenerator<?> chunkGenerator, DimensionType dimensionType, BlockPos playerPos, int maxRange)
+    private void addStructureDataFromGenerator(ServerWorld world, DimensionType dimensionType, BlockPos playerPos, int maxChunkRange)
     {
+        this.structures.clear();
+
+        List<StructureType> enabledTypes = new ArrayList<>();
+
         for (StructureType type : StructureType.values())
         {
             if (type.isEnabled() && type.existsInDimension(dimensionType))
             {
-                this.addStructuresWithinRange(type, chunkGenerator, playerPos, maxRange);
+                enabledTypes.add(type);
             }
         }
 
-        this.structuresDirty = true;
+        if (enabledTypes.isEmpty() == false)
+        {
+            int minCX = (playerPos.getX() >> 4) - maxChunkRange;
+            int minCZ = (playerPos.getZ() >> 4) - maxChunkRange;
+            int maxCX = (playerPos.getX() >> 4) + maxChunkRange;
+            int maxCZ = (playerPos.getZ() >> 4) + maxChunkRange;
+
+            for (int cz = minCZ; cz <= maxCZ; ++cz)
+            {
+                for (int cx = minCX; cx <= maxCX; ++cx)
+                {
+                    // Don't load the chunk
+                    IChunk chunk = world.getChunk(cx, cz, ChunkStatus.FULL, false);
+
+                    if (chunk != null)
+                    {
+                        for (StructureType type : enabledTypes)
+                        {
+                            StructureStart start = chunk.getStructureStart(type.getStructureName());
+
+                            if (start != null)
+                            {
+                                if (MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxChunkRange << 4))
+                                {
+                                    this.structures.put(type, StructureData.fromStructureStart(type, start));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        this.structureRendererNeedsUpdate = true;
 
         //MiniHUD.logger.info("Structure data updated from the integrated server");
-    }
-
-    private void addStructuresWithinRange(StructureType type, IChunkGenerator<?> chunkGen, BlockPos playerPos, int maxRange)
-    {
-        Long2ObjectMap<StructureStart> structureMap = chunkGen.getStructureReferenceToStartMap(type.getStructure());
-
-        for (StructureStart start : structureMap.values())
-        {
-            if (MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxRange))
-            {
-                this.structures.put(type, StructureData.fromStructure(start));
-            }
-        }
     }
 
     public void handleCarpetServerTPSData(ITextComponent textComponent)

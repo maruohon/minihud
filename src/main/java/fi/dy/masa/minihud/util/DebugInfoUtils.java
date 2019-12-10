@@ -1,35 +1,40 @@
 package fi.dy.masa.minihud.util;
 
-import java.util.ArrayList;
+import java.lang.reflect.Field;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import com.google.common.collect.MapMaker;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.mixin.IMixinDebugRenderer;
-import fi.dy.masa.minihud.mixin.IMixinPathNavigate;
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.debug.DebugRendererNeighborsUpdate;
+import net.minecraft.client.renderer.debug.DebugRenderer;
+import net.minecraft.client.renderer.debug.NeighborsUpdateDebugRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.server.SPacketCustomPayload;
+import net.minecraft.network.play.server.SCustomPayloadPlayPacket;
 import net.minecraft.pathfinding.Path;
-import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
+import fi.dy.masa.minihud.MiniHUD;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
+import io.netty.buffer.Unpooled;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class DebugInfoUtils
 {
     private static boolean neighborUpdateEnabled;
     private static boolean pathfindingEnabled;
     private static int tickCounter;
+    private static Field field_PathNavigator_maxDistanceToWaypoint = ObfuscationReflectionHelper.findField(PathNavigator.class, "field_188561_o"); // maxDistanceToWaypoint
+
     private static final Map<Entity, Path> OLD_PATHS = new MapMaker().weakKeys().weakValues().<Entity, Path>makeMap();
 
     public static void sendPacketDebugPath(MinecraftServer server, int entityId, Path path, float maxDistance)
@@ -39,8 +44,15 @@ public class DebugInfoUtils
         buffer.writeFloat(maxDistance);
         writePathToBuffer(buffer, path);
 
-        SPacketCustomPayload packet = new SPacketCustomPayload(SPacketCustomPayload.DEBUG_PATH, buffer);
+        SCustomPayloadPlayPacket packet = new SCustomPayloadPlayPacket(SCustomPayloadPlayPacket.DEBUG_PATH, buffer);
         server.getPlayerList().sendPacketToAllPlayers(packet);
+    }
+
+    private static void writeBlockPosToBuffer(PacketBuffer buf, BlockPos pos)
+    {
+        buf.writeInt(pos.getX());
+        buf.writeInt(pos.getY());
+        buf.writeInt(pos.getZ());
     }
 
     private static void writePathPointToBuffer(PacketBuffer buf, PathPoint point)
@@ -49,8 +61,7 @@ public class DebugInfoUtils
         buf.writeInt(point.y);
         buf.writeInt(point.z);
 
-        buf.writeFloat(point.distanceFromOrigin);
-        buf.writeFloat(point.cost);
+        buf.writeFloat(point.field_222861_j);
         buf.writeFloat(point.costMalus);
         buf.writeBoolean(point.visited);
         buf.writeInt(point.nodeType.ordinal());
@@ -66,50 +77,48 @@ public class DebugInfoUtils
 
     private static void writePathToBuffer(PacketBuffer buf, Path path)
     {
-        PathPoint target = path.getFinalPathPoint(); // FIXME is this the target?
+        // This is the path node the navigation ends on
+        PathPoint destination = path.getFinalPathPoint();
 
-        if (target != null)
+        // This is the actual block the path is targeting. Not all targets
+        // and paths will be the same. For example, a valid path (destination
+        // in this case) to the the "meeting" POI can be up to 6 Manhattan
+        // distance away from the target BlockPos; the actual POI.
+        BlockPos target = path.func_224770_k();
+
+        if (destination != null)
         {
+            // Whether or not the destination is within the manhattan distance
+            // of the target POI (the last param to PointOfInterestType::register)
+            buf.writeBoolean(path.func_224771_h());
             buf.writeInt(path.getCurrentPathIndex());
 
-            writePathPointToBuffer(buf, target);
+            // There is a hash set of class_4459 prefixed with its count here, which
+            // gets written to Path.field_20300, but field_20300 doesn't appear to be
+            // used anywhere, so for now we'll write a zero so the set is treated as
+            // empty.
+            buf.writeInt(0);
 
-            int countTotal = path.getCurrentPathLength();
-            List<PathPoint> openSet = new ArrayList<PathPoint>();
-            List<PathPoint> closedSet = new ArrayList<PathPoint>();
-            List<PathPoint> allSet = new ArrayList<PathPoint>();
+            writeBlockPosToBuffer(buf, target);
 
-            for (int i = 0; i < countTotal; i++)
-            {
-                PathPoint point = path.getPathPointFromIndex(i);
+            List<PathPoint> nodes = path.func_215746_d();
+            PathPoint[] openSet = path.getOpenSet();
+            PathPoint[] closedSet = path.getClosedSet();
 
-                if (point.nodeType.getPriority() < 0F)
-                {
-                    closedSet.add(point);
-                }
-                else if (point.nodeType.getPriority() > 0F)
-                {
-                    openSet.add(point);
-                }
-
-                allSet.add(point);
-            }
-
-            buf.writeInt(allSet.size());
-
-            for (PathPoint point : allSet)
+            buf.writeInt(nodes.size());
+            for (PathPoint point : nodes)
             {
                 writePathPointToBuffer(buf, point);
             }
 
-            buf.writeInt(openSet.size());
+            buf.writeInt(openSet.length);
 
             for (PathPoint point : openSet)
             {
                 writePathPointToBuffer(buf, point);
             }
 
-            buf.writeInt(closedSet.size());
+            buf.writeInt(closedSet.length);
 
             for (PathPoint point : closedSet)
             {
@@ -118,7 +127,7 @@ public class DebugInfoUtils
         }
     }
 
-    public static void onNeighborNotify(World world, BlockPos pos, EnumSet<EnumFacing> notifiedSides)
+    public static void onNeighborNotify(World world, BlockPos pos, EnumSet<Direction> notifiedSides)
     {
         // This will only work in single player...
         // We are catching updates from the server world, and adding them to the debug renderer directly
@@ -126,13 +135,13 @@ public class DebugInfoUtils
         {
             final long time = world.getGameTime();
 
-            Minecraft.getInstance().addScheduledTask(new Runnable()
+            Minecraft.getInstance().execute(new Runnable()
             {
                 public void run()
                 {
-                    for (EnumFacing side : notifiedSides)
+                    for (Direction side : notifiedSides)
                     {
-                        ((DebugRendererNeighborsUpdate) Minecraft.getInstance().debugRenderer.neighborsUpdate).addUpdate(time, pos.offset(side));
+                        ((NeighborsUpdateDebugRenderer) Minecraft.getInstance().debugRenderer.neighborsUpdate).addUpdate(time, pos.offset(side));
                     }
                 }
             });
@@ -147,13 +156,15 @@ public class DebugInfoUtils
         if (pathfindingEnabled && mc.world != null && ++tickCounter >= 10)
         {
             tickCounter = 0;
-            World world = server.getWorld(mc.world.dimension.getType());
+            ServerWorld world = server.getWorld(mc.world.dimension.getType());
 
             if (world != null)
             {
-                for (Entity entity : world.loadedEntityList)
+                Predicate<Entity> predicate = (entity) -> { return (entity instanceof MobEntity) && entity.isAlive(); };
+
+                for (Entity entity : world.getEntities(null, predicate))
                 {
-                    PathNavigate navigator = entity instanceof EntityLiving ? ((EntityLiving) entity).getNavigator() : null;
+                    PathNavigator navigator = ((MobEntity) entity).getNavigator();
 
                     if (navigator != null && isAnyPlayerWithinRange(world, entity, 64))
                     {
@@ -170,7 +181,7 @@ public class DebugInfoUtils
                         if (old == null || isSamepath == false || old.getCurrentPathIndex() != path.getCurrentPathIndex())
                         {
                             final int id = entity.getEntityId();
-                            final float maxDistance = Configs.Generic.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? ((IMixinPathNavigate) navigator).getMaxDistanceToWaypoint() : 0F;
+                            final float maxDistance = Configs.Generic.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? getPathPointWidth(navigator) : 0F;
 
                             DebugInfoUtils.sendPacketDebugPath(server, id, path, maxDistance);
 
@@ -191,11 +202,25 @@ public class DebugInfoUtils
         }
     }
 
-    private static boolean isAnyPlayerWithinRange(World world, Entity entity, double range)
+    private static float getPathPointWidth(PathNavigator navigator)
     {
-        for (int i = 0; i < world.playerEntities.size(); ++i)
+        try
         {
-            EntityPlayer player = world.playerEntities.get(i);
+            return field_PathNavigator_maxDistanceToWaypoint.getFloat(navigator);
+        }
+        catch (Exception e)
+        {
+            MiniHUD.logger.warn("Failed to reflect PathNavigate#maxDistanceToWaypoint value", e);
+        }
+
+        return 0f;
+    }
+
+    private static boolean isAnyPlayerWithinRange(ServerWorld world, Entity entity, double range)
+    {
+        for (int i = 0; i < world.getPlayers().size(); ++i)
+        {
+            PlayerEntity player = world.getPlayers().get(i);
 
             double distSq = player.getDistanceSq(entity.posX, entity.posY, entity.posZ);
 
@@ -210,35 +235,43 @@ public class DebugInfoUtils
 
     public static void toggleDebugRenderer(RendererToggle config)
     {
-        Minecraft mc = Minecraft.getInstance();
-        boolean enabled = config.getBooleanValue();
-
-        if (config == RendererToggle.DEBUG_COLLISION_BOXES)
+        if (config == RendererToggle.DEBUG_NEIGHBOR_UPDATES)
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setCollisionBoxEnabled(enabled);
-        }
-        else if (config == RendererToggle.DEBUG_HEIGHT_MAP)
-        {
-            // This crashes in 1.13+, because it uses a world gen heightmap which doesn't exist normally
-            //((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(enabled);
-        }
-        else if (config == RendererToggle.DEBUG_NEIGHBOR_UPDATES)
-        {
-            ((IMixinDebugRenderer) mc.debugRenderer).setNeighborsUpdateEnabled(enabled);
-            neighborUpdateEnabled = enabled;
+            neighborUpdateEnabled = config.getBooleanValue();
         }
         else if (config == RendererToggle.DEBUG_PATH_FINDING)
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setPathfindingEnabled(enabled);
-            pathfindingEnabled = enabled;
+            pathfindingEnabled = config.getBooleanValue();
         }
-        else if (config == RendererToggle.DEBUG_SOLID_FACES)
+    }
+
+    public static void renderVanillaDebug(long finishTime)
+    {
+        DebugRenderer renderer = Minecraft.getInstance().debugRenderer;
+
+        if (RendererToggle.DEBUG_COLLISION_BOXES.getBooleanValue())
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setSolidFaceEnabled(enabled);
+            renderer.collisionBox.render(finishTime);
         }
-        else if (config == RendererToggle.DEBUG_WATER)
+
+        if (RendererToggle.DEBUG_NEIGHBOR_UPDATES.getBooleanValue())
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setWaterEnabled(enabled);
+            renderer.neighborsUpdate.render(finishTime);
+        }
+
+        if (RendererToggle.DEBUG_PATH_FINDING.getBooleanValue())
+        {
+            renderer.pathfinding.render(finishTime);
+        }
+
+        if (RendererToggle.DEBUG_SOLID_FACES.getBooleanValue())
+        {
+            renderer.solidFace.render(finishTime);
+        }
+
+        if (RendererToggle.DEBUG_WATER.getBooleanValue())
+        {
+            renderer.water.render(finishTime);
         }
     }
 }

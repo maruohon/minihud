@@ -2,7 +2,7 @@ package fi.dy.masa.minihud.renderer;
 
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class RenderUtils
@@ -34,20 +34,20 @@ public class RenderUtils
         double yMin = posStart.getY();
         double yMax = posEnd.getY();
 
-        renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, EnumFacing.Axis.X, zMin, posZ, posX, yMin, yMax, rangeH,
+        renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, Direction.Axis.X, zMin, posZ, posX, yMin, yMax, rangeH,
                 lineIntervalH, lineIntervalV, xMin, xMax, r, g, b, a);
-        renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, EnumFacing.Axis.X, zMax, posZ, posX, yMin, yMax, rangeH,
+        renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, Direction.Axis.X, zMax, posZ, posX, yMin, yMax, rangeH,
                 lineIntervalH, lineIntervalV, xMin, xMax, r, g, b, a);
 
-        renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, EnumFacing.Axis.Z, xMin, posX, posZ, yMin, yMax, rangeH,
+        renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, Direction.Axis.Z, xMin, posX, posZ, yMin, yMax, rangeH,
                 lineIntervalH, lineIntervalV, zMin, zMax, r, g, b, a);
-        renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, EnumFacing.Axis.Z, xMax, posX, posZ, yMin, yMax, rangeH,
+        renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, Direction.Axis.Z, xMax, posX, posZ, yMin, yMax, rangeH,
                 lineIntervalH, lineIntervalV, zMin, zMax, r, g, b, a);
     }
 
     public static void renderVerticalWallsOfLinesWithinRange(
             BufferBuilder bufferQuads, BufferBuilder bufferLines,
-            EnumFacing.Axis axis,
+            Direction.Axis axis,
             BlockPos posStart,
             BlockPos posEnd,
             float rangeH,
@@ -73,21 +73,21 @@ public class RenderUtils
         double yMin = posStart.getY();
         double yMax = posEnd.getY();
 
-        if (axis == EnumFacing.Axis.Z)
+        if (axis == Direction.Axis.Z)
         {
-            renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, EnumFacing.Axis.X, zMin, posZ, posX, yMin, yMax, rangeH,
+            renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, Direction.Axis.X, zMin, posZ, posX, yMin, yMax, rangeH,
                     lineIntervalH, lineIntervalV, xMin, xMax, r, g, b, a);
         }
-        else if (axis == EnumFacing.Axis.X)
+        else if (axis == Direction.Axis.X)
         {
-            renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, EnumFacing.Axis.Z, xMin, posX, posZ, yMin, yMax, rangeH,
+            renderVerticalWallsOfLinesIfWithinRange(bufferQuads, bufferLines, Direction.Axis.Z, xMin, posX, posZ, yMin, yMax, rangeH,
                     lineIntervalH, lineIntervalV, zMin, zMax, r, g, b, a);
         }
     }
 
     public static void renderVerticalWallsOfLinesIfWithinRange(
             BufferBuilder bufferQuads, BufferBuilder bufferLines,
-            EnumFacing.Axis axis,
+            Direction.Axis axis,
             double edge, double posOnEdgeAxis, double posOnPerpAxis,
             double yMin, double yMax, float rangeH,
             float lineIntervalH, float lineIntervalV,

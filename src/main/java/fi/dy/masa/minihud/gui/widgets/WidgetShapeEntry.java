@@ -1,6 +1,7 @@
 package fi.dy.masa.minihud.gui.widgets;
 
 import java.util.List;
+import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -13,7 +14,6 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
-import net.minecraft.client.renderer.GlStateManager;
 
 public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
 {

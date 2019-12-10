@@ -1,20 +1,16 @@
 
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
-        maven { url 'http://files.minecraftforge.net/maven' }
-        maven { url 'http://repo.spongepowered.org/maven' }
-        maven { url 'https://www.jitpack.io' }
+        mavenCentral()
     }
-
     dependencies {
-        classpath 'com.github.Chocohead:ForgeGradle:moderniser-SNAPSHOT'
-        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle.tweaker-client'
-apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
@@ -22,10 +18,6 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
-    mavenCentral()
-    maven { url 'https://www.jitpack.io' }
-    maven { url 'https://www.dimdev.org/maven/' }
-    maven { url 'http://repo.strezz.org/artifactory/list/Strezz-Central' }
     maven { url 'https://masa.dy.fi/maven' }
 }
 
@@ -38,25 +30,32 @@ configFile.withReader {
 }
 
 minecraft {
-    version = config.minecraft_version
     mappings = config.mappings_version
-    runDir = 'minecraft'
-    makeObfSourceJar = false
-    tweakClass = 'org.dimdev.riftloader.launch.RiftLoaderClientTweaker'
 
-    ext.mod_version = config.mod_version
+    //makeObfSourceJar = false
 
-    if (mod_version.endsWith('-dev')) {
-        mod_version = mod_version + "." + new Date().format('yyyyMMdd.HHmmss')
+    //ext.mod_version = config.mod_version
+
+    if (config.mod_version.endsWith('-dev')) {
+        config.mod_version = config.mod_version + "." + new Date().format('yyyyMMdd.HHmmss')
     }
 
-    replaceIn "Reference.java"
-    replace "@MOD_VERSION@", mod_version
+    //replaceIn "MaLiLibReference.java"
+    //replace "@MOD_VERSION@", mod_version
 }
 
 dependencies {
-    implementation 'fi.dy.masa.malilib:malilib-rift-' + config.minecraft_version_out + ':' + config.malilib_version + ':deobf'
-    implementation 'com.github.Chocohead:Rift:jitpack-SNAPSHOT:dev'
+    minecraft 'net.minecraftforge:forge:' + config.minecraft_version + '-' + config.forge_version
+
+    compile fg.deobf (project.dependencies.create('fi.dy.masa.malilib:malilib-forge-' + config.minecraft_version_out + ':' + config.malilib_version) {
+        transitive = false
+    })
+}
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.encoding = 'UTF-8'
 }
 
 /*
@@ -67,30 +66,9 @@ sourceSets {
 }
 */
 
-group = config.group + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = config.group + "." + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = config.mod_file_name + '-' + config.minecraft_version_out
-version = project.minecraft.mod_version
-
-/**
- * This section allows you to customise the generated litemod.json file
- */
- /*
-litemod {
-    json {
-        name = config.mod_id
-        displayName = config.mod_name
-        mcversion = config.minecraft_version
-        version = config.mod_version
-        author = config.author
-
-        // Uncomment any of the following lines and fill in your own details as required
-        //requiredAPIs = [ 'someapi' ]
-        //tweakClass = 'name.of.tweaker.here'
-        dependsOn = [ 'malilib' ]
-        mixinConfigs = [ 'mixins.' + config.mod_id + '.json' ]
-    }
-}
-*/
+version = config.mod_version
 
 /**
  * This section allows you to customise your generated jar (litemod) file. By
@@ -98,29 +76,28 @@ litemod {
  * include your own file from resources, simply remove the line below.
  */
 jar {
-    // Remove the "-mc1.12" suffix from the file name
-    //classifier = ""
     // Don't append a 'mod-' filename prefix >_>
     baseName = archivesBaseName
 
-    //from litemod.outputs
-
-    /*
-    manifest.mainAttributes (
-        'Built-By': System.properties['user.name'],
-        'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
-        'Implementation-Title': config.mod_id,
-        'Implementation-Version': project.version
-    )
-    */
+    manifest {
+        attributes([
+            "Specification-Title": "${config.mod_id}",
+            "Specification-Vendor": "${config.author}",
+            "Specification-Version": "1", // We are version 1 of ourselves
+            "Implementation-Title": "${config.mod_name}",
+            "Implementation-Version": "${config.mod_version}",
+            "Implementation-Vendor": "${config.author}",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
 }
 
+/*
 mixin {
     defaultObfuscationEnv notch
     add sourceSets.main, 'mixins.' + config.mod_id + '.refmap.json'
 }
-
-//tasks.withType(Jar)*.baseName = archivesBaseName
+*/
 
 processResources
 {
@@ -129,19 +106,6 @@ processResources
     exclude '**/xcf'
 
     // this will ensure that this task is redone when the versions change.
-    inputs.property "mod_version", project.minecraft.mod_version
+    inputs.property "mod_version", project.config.mod_version
     inputs.property "minecraft_version", project.config.minecraft_version
-
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'mod_version': project.minecraft.mod_version, 'minecraft_version': project.config.minecraft_version
-    }
-      
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
 }

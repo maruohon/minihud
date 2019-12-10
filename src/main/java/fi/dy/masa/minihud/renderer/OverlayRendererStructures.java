@@ -4,18 +4,18 @@ import java.util.Collection;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 import fi.dy.masa.minihud.util.StructureData;
-import fi.dy.masa.minihud.util.StructureType;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
+import fi.dy.masa.minihud.util.StructureTypes.StructureType;
 
 public class OverlayRendererStructures extends OverlayRendererBase
 {
@@ -53,7 +53,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
     {
         int hysteresis = 16;
 
-        return DataStorage.getInstance().hasStructureDataChanged() ||
+        return DataStorage.getInstance().structureRendererNeedsUpdate() ||
                Math.abs(entity.posX - this.lastUpdatePos.getX()) > hysteresis ||
                Math.abs(entity.posY - this.lastUpdatePos.getY()) > hysteresis ||
                Math.abs(entity.posZ - this.lastUpdatePos.getZ()) > hysteresis;

@@ -7,6 +7,14 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.BlockSnap;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -15,18 +23,10 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.RenderObjectBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 public class ShapeDespawnSphere extends ShapeBase
 {
-    private static final EnumFacing[] FACING_ALL = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
+    private static final Direction[] FACING_ALL = new Direction[] { Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST };
 
     protected Vec3d center = Vec3d.ZERO;
     protected Vec3d effectiveCenter = Vec3d.ZERO;
@@ -222,26 +222,26 @@ public class ShapeDespawnSphere extends ShapeBase
 
         //long before = System.nanoTime();
         posMutable.setPos(posCenter);
-        this.addPositionsOnRing(spherePositions, posMutable, EnumFacing.EAST);
+        this.addPositionsOnRing(spherePositions, posMutable, Direction.EAST);
 
         posMutable.setPos(posCenter);
-        this.addPositionsOnRing(spherePositions, posMutable, EnumFacing.UP);
+        this.addPositionsOnRing(spherePositions, posMutable, Direction.UP);
 
         for (int i = 1; i < 130; ++i)
         {
             // Horizontal rings
             posMutable.setPos(posCenter.getX(), posCenter.getY() - i, posCenter.getZ());
-            this.addPositionsOnRing(spherePositions, posMutable, EnumFacing.EAST);
+            this.addPositionsOnRing(spherePositions, posMutable, Direction.EAST);
 
             posMutable.setPos(posCenter.getX(), posCenter.getY() + i, posCenter.getZ());
-            this.addPositionsOnRing(spherePositions, posMutable, EnumFacing.EAST);
+            this.addPositionsOnRing(spherePositions, posMutable, Direction.EAST);
 
             // Vertical rings
             posMutable.setPos(posCenter.getX() - i, posCenter.getY(), posCenter.getZ());
-            this.addPositionsOnRing(spherePositions, posMutable, EnumFacing.UP);
+            this.addPositionsOnRing(spherePositions, posMutable, Direction.UP);
 
             posMutable.setPos(posCenter.getX() + i, posCenter.getY(), posCenter.getZ());
-            this.addPositionsOnRing(spherePositions, posMutable, EnumFacing.UP);
+            this.addPositionsOnRing(spherePositions, posMutable, Direction.UP);
         }
         //System.out.printf("time: %.6f s - margin: %.4f\n", (double) (System.nanoTime() - before) / 1000000000D, this.margin);
 
@@ -249,7 +249,7 @@ public class ShapeDespawnSphere extends ShapeBase
         {
             for (int i = 0; i < 6; ++i)
             {
-                EnumFacing side = FACING_ALL[i];
+                Direction side = FACING_ALL[i];
                 posMutable.setPos(pos).move(side);
 
                 if (this.layerRange.isPositionWithinRange(pos) &&
@@ -269,18 +269,18 @@ public class ShapeDespawnSphere extends ShapeBase
         renderQuads.uploadData(BUFFER_1);
     }
 
-    private void addPositionsOnRing(HashSet<BlockPos> positions, BlockPos.MutableBlockPos posMutable, EnumFacing direction)
+    private void addPositionsOnRing(HashSet<BlockPos> positions, BlockPos.MutableBlockPos posMutable, Direction direction)
     {
         if (this.movePositionToRing(posMutable, direction))
         {
             BlockPos posFirst = posMutable.toImmutable();
             positions.add(posFirst);
             int failsafe = 860;
-            EnumFacing.Axis axis = direction.getAxis();
+            Direction.Axis axis = direction.getAxis();
 
             while (--failsafe > 0)
             {
-                if (axis == EnumFacing.Axis.Y)
+                if (axis == Direction.Axis.Y)
                 {
                     direction = this.getNextPositionOnRingVertical(posMutable, direction);
                 }
@@ -299,7 +299,7 @@ public class ShapeDespawnSphere extends ShapeBase
         }
     }
 
-    private boolean movePositionToRing(BlockPos.MutableBlockPos posMutable, EnumFacing dir)
+    private boolean movePositionToRing(BlockPos.MutableBlockPos posMutable, Direction dir)
     {
         int x = posMutable.getX();
         int y = posMutable.getY();
@@ -331,10 +331,10 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Nullable
-    private EnumFacing getNextPositionOnRing(BlockPos.MutableBlockPos posMutable, EnumFacing dir)
+    private Direction getNextPositionOnRing(BlockPos.MutableBlockPos posMutable, Direction dir)
     {
-        EnumFacing dirOut = dir;
-        EnumFacing ccw90 = getNextDirRotating(dir);
+        Direction dirOut = dir;
+        Direction ccw90 = getNextDirRotating(dir);
         final int y = posMutable.getY();
 
         for (int i = 0; i < 4; ++i)
@@ -369,10 +369,10 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Nullable
-    private EnumFacing getNextPositionOnRingVertical(BlockPos.MutableBlockPos posMutable, EnumFacing dir)
+    private Direction getNextPositionOnRingVertical(BlockPos.MutableBlockPos posMutable, Direction dir)
     {
-        EnumFacing dirOut = dir;
-        EnumFacing ccw90 = getNextDirRotatingVertical(dir);
+        Direction dirOut = dir;
+        Direction ccw90 = getNextDirRotatingVertical(dir);
 
         for (int i = 0; i < 4; ++i)
         {
@@ -418,7 +418,7 @@ public class ShapeDespawnSphere extends ShapeBase
         return quadrantCenter.squareDistanceTo(dx, dy, dz) < maxDistSq || this.effectiveCenter.squareDistanceTo(dx, dy, dz) < maxDistSq;
     }
 
-    private boolean isAdjacentPositionOutside(BlockPos pos, EnumFacing dir)
+    private boolean isAdjacentPositionOutside(BlockPos pos, Direction dir)
     {
         final double maxDistSq = 128 * 128;
         Vec3d quadrantCenter = this.quadrantCenters[Quadrant.getQuadrant(pos.getX(), pos.getZ(), this.effectiveCenter).ordinal()];
@@ -434,15 +434,15 @@ public class ShapeDespawnSphere extends ShapeBase
      * @param dirIn
      * @return
      */
-    private static EnumFacing getNextDirRotating(EnumFacing dirIn)
+    private static Direction getNextDirRotating(Direction dirIn)
     {
         switch (dirIn)
         {
-            case EAST:  return EnumFacing.NORTH;
-            case NORTH: return EnumFacing.WEST;
-            case WEST:  return EnumFacing.SOUTH;
-            case SOUTH: return EnumFacing.EAST;
-            default:    return EnumFacing.NORTH;
+            case EAST:  return Direction.NORTH;
+            case NORTH: return Direction.WEST;
+            case WEST:  return Direction.SOUTH;
+            case SOUTH: return Direction.EAST;
+            default:    return Direction.NORTH;
         }
     }
 
@@ -451,19 +451,19 @@ public class ShapeDespawnSphere extends ShapeBase
      * @param dirIn
      * @return
      */
-    private static EnumFacing getNextDirRotatingVertical(EnumFacing dirIn)
+    private static Direction getNextDirRotatingVertical(Direction dirIn)
     {
         switch (dirIn)
         {
-            case UP:    return EnumFacing.NORTH;
-            case NORTH: return EnumFacing.DOWN;
-            case DOWN:  return EnumFacing.SOUTH;
-            case SOUTH: return EnumFacing.UP;
-            default:    return EnumFacing.NORTH;
+            case UP:    return Direction.NORTH;
+            case NORTH: return Direction.DOWN;
+            case DOWN:  return Direction.SOUTH;
+            case SOUTH: return Direction.UP;
+            default:    return Direction.NORTH;
         }
     }
 
-    public static void renderBlockSideQuads(BlockPos pos, EnumFacing side, BufferBuilder buffer, Color4f color)
+    public static void renderBlockSideQuads(BlockPos pos, Direction side, BufferBuilder buffer, Color4f color)
     {
         double x = pos.getX();
         double y = pos.getY();
@@ -510,7 +510,7 @@ public class ShapeDespawnSphere extends ShapeBase
         }
     }
 
-    public static void renderBlockSideLines(BlockPos pos, EnumFacing side, BufferBuilder buffer, Color4f color)
+    public static void renderBlockSideLines(BlockPos pos, Direction side, BufferBuilder buffer, Color4f color)
     {
         double x = pos.getX();
         double y = pos.getY();
