@@ -5,16 +5,16 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.minihud.LiteModMiniHud;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
 
 public class MiscUtils
 {
@@ -23,6 +23,19 @@ public class MiscUtils
     public static long bytesToMb(long bytes)
     {
         return bytes / 1024L / 1024L;
+    }
+
+    public static double intAverage(int[] values)
+    {
+        final int size = values.length;
+        long sum = 0L;
+
+        for (int i = 0; i < size; ++i)
+        {
+            sum += values[i];
+        }
+
+        return (double) sum / (double) values.length;
     }
 
     public static boolean canSlimeSpawnAt(int posX, int posZ, long worldSeed)

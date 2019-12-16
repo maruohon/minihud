@@ -86,6 +86,7 @@ public class DataStorage
     private double serverMSPT;
     private BlockPos worldSpawn = BlockPos.ORIGIN;
     private Vec3d distanceReferencePoint = Vec3d.ZERO;
+    private int[] blockBreakCounter = new int[100];
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
     private final ArrayListMultimap<StructureType, StructureData> structures = ArrayListMultimap.create();
@@ -276,6 +277,29 @@ public class DataStorage
         }
 
         this.chunkHeightmapsToCheck.clear();
+    }
+
+    public void onClientTickPre(Minecraft mc)
+    {
+        if (mc.world != null)
+        {
+            int tick = (int) mc.world.getTotalWorldTime();
+            this.blockBreakCounter[tick % this.blockBreakCounter.length] = 0;
+        }
+    }
+
+    public void onPlayerBlockBreak(Minecraft mc)
+    {
+        if (mc.world != null)
+        {
+            int tick = (int) mc.world.getTotalWorldTime();
+            ++this.blockBreakCounter[tick % this.blockBreakCounter.length];
+        }
+    }
+
+    public double getBlockBreakingSpeed()
+    {
+        return MiscUtils.intAverage(this.blockBreakCounter) * 20;
     }
 
     public void onChunkUnload(int chunkX, int chunkZ)
