@@ -8,7 +8,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 
 public class ShapeManager
@@ -107,18 +106,13 @@ public class ShapeManager
 
                     if (JsonUtils.hasString(o, "type"))
                     {
-                        ShapeTypes type = ShapeTypes.fromString(JsonUtils.getString(o, "type"));
+                        ShapeType type = ShapeType.fromString(JsonUtils.getString(o, "type"));
 
                         if (type != null)
                         {
-                            switch (type)
-                            {
-                                case DESPAWN_SPHERE:
-                                    ShapeDespawnSphere shape = new ShapeDespawnSphere();
-                                    shape.fromJson(o);
-                                    this.addShape(shape);
-                                    break;
-                            }
+                            ShapeBase shape = type.createShape();
+                            shape.fromJson(o);
+                            this.addShape(shape);
                         }
                     }
                 }
@@ -133,44 +127,6 @@ public class ShapeManager
                     this.selectedShape = this.shapes.get(selected);
                 }
             }
-        }
-    }
-
-    public enum ShapeTypes
-    {
-        DESPAWN_SPHERE      ("despawn_sphere",  "minihud.label.shapes.despawn_sphere");
-
-        private final String id;
-        private final String translationKey;
-
-        private ShapeTypes(String id, String translationKey)
-        {
-            this.id = id;
-            this.translationKey = translationKey;
-        }
-
-        public String getId()
-        {
-            return this.id;
-        }
-
-        public String getDisplayName()
-        {
-            return StringUtils.translate(this.translationKey);
-        }
-
-        @Nullable
-        public static ShapeTypes fromString(String id)
-        {
-            for (ShapeTypes type : ShapeTypes.values())
-            {
-                if (type.getId().equalsIgnoreCase(id))
-                {
-                    return type;
-                }
-            }
-
-            return null;
         }
     }
 }

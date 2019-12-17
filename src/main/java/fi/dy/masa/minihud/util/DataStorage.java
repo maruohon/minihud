@@ -13,13 +13,13 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -86,6 +86,7 @@ public class DataStorage
     private double serverMSPT;
     private BlockPos worldSpawn = BlockPos.ORIGIN;
     private Vec3d distanceReferencePoint = Vec3d.ZERO;
+    private int[] blockBreakCounter = new int[100];
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
     private final ArrayListMultimap<StructureType, StructureData> structures = ArrayListMultimap.create();
@@ -140,20 +141,22 @@ public class DataStorage
         }
         else if (this.mc.isSingleplayer())
         {
-            MinecraftServer server = this.mc.getIntegratedServer();
-            World worldTmp = server.getWorld(dimension);
-            return worldTmp != null;
+            return this.mc.getIntegratedServer().getWorld(dimension) != null;
         }
 
         return false;
+    }
+
+    public boolean hasStoredWorldSeed()
+    {
+        return this.worldSeedValid;
     }
 
     public long getWorldSeed(int dimension)
     {
         if (this.worldSeedValid == false && this.mc.isSingleplayer())
         {
-            MinecraftServer server = this.mc.getIntegratedServer();
-            World worldTmp = server.getWorld(dimension);
+            World worldTmp = this.mc.getIntegratedServer().getWorld(dimension);
 
             if (worldTmp != null)
             {
@@ -274,6 +277,29 @@ public class DataStorage
         }
 
         this.chunkHeightmapsToCheck.clear();
+    }
+
+    public void onClientTickPre(Minecraft mc)
+    {
+        if (mc.world != null)
+        {
+            int tick = (int) mc.world.getTotalWorldTime();
+            this.blockBreakCounter[tick % this.blockBreakCounter.length] = 0;
+        }
+    }
+
+    public void onPlayerBlockBreak(Minecraft mc)
+    {
+        if (mc.world != null)
+        {
+            int tick = (int) mc.world.getTotalWorldTime();
+            ++this.blockBreakCounter[tick % this.blockBreakCounter.length];
+        }
+    }
+
+    public double getBlockBreakingSpeed()
+    {
+        return MiscUtils.intAverage(this.blockBreakCounter) * 20;
     }
 
     public void onChunkUnload(int chunkX, int chunkZ)
@@ -556,16 +582,19 @@ public class DataStorage
                     StructureData.readAndAddTemplesToMap(this.structures, nbt);
                 }
 
+                if (this.structures.size() > 0)
+                {
+                    this.lastStructureUpdatePos = playerPos;
+                    this.structuresDirty = true;
+                    this.structuresNeedUpdating = false;
+                }
+
                 MiniHud.logger.info("Structure data updated from local structure files, structures: {}", this.structures.size());
             }
         }
-
-        this.lastStructureUpdatePos = playerPos;
-        this.structuresDirty = true;
-        this.structuresNeedUpdating = false;
     }
 
-    public void updateStructureDataFromServer(PacketBuffer data)
+    public void updateStructureDataFromCarpetServer(PacketBuffer data)
     {
         try
         {
@@ -812,6 +841,11 @@ public class DataStorage
 
         obj.add("distance_pos", JsonUtils.vec3dToJson(this.distanceReferencePoint));
 
+        if (this.worldSeedValid)
+        {
+            obj.add("seed", new JsonPrimitive(this.worldSeed));
+        }
+
         return obj;
     }
 
@@ -826,6 +860,12 @@ public class DataStorage
         else
         {
             this.distanceReferencePoint = Vec3d.ZERO;
+        }
+
+        if (JsonUtils.hasLong(obj, "seed"))
+        {
+            this.worldSeed = JsonUtils.getLong(obj, "seed");
+            this.worldSeedValid = true;
         }
     }
 }

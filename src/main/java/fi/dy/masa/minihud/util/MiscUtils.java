@@ -25,6 +25,19 @@ public class MiscUtils
         return bytes / 1024L / 1024L;
     }
 
+    public static double intAverage(int[] values)
+    {
+        final int size = values.length;
+        long sum = 0L;
+
+        for (int i = 0; i < size; ++i)
+        {
+            sum += values[i];
+        }
+
+        return (double) sum / (double) values.length;
+    }
+
     public static boolean canSlimeSpawnAt(int posX, int posZ, long worldSeed)
     {
         return canSlimeSpawnInChunk(posX >> 4, posZ >> 4, worldSeed);

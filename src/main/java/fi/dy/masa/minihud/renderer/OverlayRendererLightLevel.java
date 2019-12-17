@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
-import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -30,7 +30,6 @@ public class OverlayRendererLightLevel
 {
     private static final ResourceLocation TEXTURE_NUMBERS = new ResourceLocation(Reference.MOD_ID, "textures/misc/light_level_numbers.png");
     private static final List<LightLevelInfo> LIGHT_INFOS = new ArrayList<>();
-    private static final BlockPos.MutableBlockPos POS_MUTABLE = new BlockPos.MutableBlockPos();
 
     private static boolean needsUpdate;
     private static BlockPos lastUpdatePos = null;
@@ -61,6 +60,8 @@ public class OverlayRendererLightLevel
 
         if (count > 0)
         {
+            dy -= Configs.Generic.LIGHT_LEVEL_Z_OFFSET.getDoubleValue();
+
             mc.getTextureManager().bindTexture(TEXTURE_NUMBERS);
 
             GlStateManager.enableAlpha();
@@ -71,7 +72,8 @@ public class OverlayRendererLightLevel
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();
-            EnumFacing numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? mc.player.getHorizontalFacing() : EnumFacing.NORTH;
+            Entity entity = mc.getRenderViewEntity() != null ? mc.getRenderViewEntity() : mc.player;
+            EnumFacing numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? entity.getHorizontalFacing() : EnumFacing.NORTH;
             LightLevelNumberMode numberMode = (LightLevelNumberMode) Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getOptionListValue();
             LightLevelMarkerMode markerMode = (LightLevelMarkerMode) Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
             boolean useColoredNumbers = Configs.Generic.LIGHT_LEVEL_COLORED_NUMBERS.getBooleanValue();
@@ -137,6 +139,7 @@ public class OverlayRendererLightLevel
                 double offset1 = (1.0 - markerSize) / 2.0;
                 double offset2 = (1.0 - offset1);
 
+                GlStateManager.glLineWidth(1f);
                 GlStateManager.disableTexture2D();
 
                 buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
@@ -165,6 +168,7 @@ public class OverlayRendererLightLevel
                 double offset1 = (1.0 - markerSize) / 2.0;
                 double offset2 = (1.0 - offset1);
 
+                GlStateManager.glLineWidth(1f);
                 GlStateManager.disableTexture2D();
 
                 buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
@@ -235,8 +239,6 @@ public class OverlayRendererLightLevel
         double u = (lightLevel & 0x3) * 0.25;
         double v = (lightLevel >> 2) * 0.25;
 
-        y += 0.005;
-
         switch (facing)
         {
             case NORTH:
@@ -275,7 +277,6 @@ public class OverlayRendererLightLevel
     {
         double u = (lightLevel & 0x3) * 0.25;
         double v = (lightLevel >> 2) * 0.25;
-        y += 0.005;
 
         switch (facing)
         {
@@ -313,8 +314,6 @@ public class OverlayRendererLightLevel
 
     private static void renderLightLevelCross(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
     {
-        y += 0.005;
-
         buffer.pos(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
         buffer.pos(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
 
@@ -324,8 +323,6 @@ public class OverlayRendererLightLevel
 
     private static void renderLightLevelSquare(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
     {
-        y += 0.005;
-
         buffer.pos(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
         buffer.pos(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
 
@@ -372,11 +369,15 @@ public class OverlayRendererLightLevel
                     for (int z = startZ; z <= endZ; ++z)
                     {
                         final int startY = Math.max(minY, 0);
-                        final int endY   = Math.min(maxY, chunk.getTopFilledSegment() + 15);
+                        final int endY   = Math.min(maxY, chunk.getTopFilledSegment() + 15 + 1);
+                        IBlockState stateDown = chunk.getBlockState(x, startY - 1, z);
+                        IBlockState state    = chunk.getBlockState(x, startY, z);
+                        IBlockState stateUp  = chunk.getBlockState(x, startY + 1, z);
+                        IBlockState stateUp2 = chunk.getBlockState(x, startY + 2, z);
 
-                        for (int y = startY; y <= endY; ++y)
+                        for (int y = startY; y <= endY; )
                         {
-                            if (canSpawnAt(x, y, z, chunk))
+                            if (canSpawnAt(stateDown, state, stateUp, stateUp2, world, posMutable.setPos(x, y - 1, z)))
                             {
                                 posMutable.setPos(x, y, z);
 
@@ -387,6 +388,12 @@ public class OverlayRendererLightLevel
 
                                 //y += 2; // if the spot is spawnable, that means the next spawnable spot can be the third block up
                             }
+
+                            ++y;
+                            stateDown = state;
+                            state = stateUp;
+                            stateUp = stateUp2;
+                            stateUp2 = chunk.getBlockState(x, y + 2, z);
                         }
                     }
                 }
@@ -404,22 +411,24 @@ public class OverlayRendererLightLevel
      * @param pos
      * @return
      */
-    public static boolean canSpawnAt(int x, int y, int z, Chunk chunk)
+    public static boolean canSpawnAt(IBlockState stateDown, IBlockState state, IBlockState stateUp, IBlockState stateUp2, World world, BlockPos pos)
     {
-        IBlockState state = chunk.getBlockState(x, y - 1, z);
-
-        if (state.isSideSolid(chunk.getWorld(), POS_MUTABLE.setPos(x, y - 1, z), EnumFacing.UP) == false)
+        if (stateDown.isSideSolid(world, pos, EnumFacing.UP) == false ||
+            stateDown.getBlock() == Blocks.BEDROCK ||
+            stateDown.getBlock() == Blocks.BARRIER)
         {
             return false;
         }
         else
         {
-            Block block = state.getBlock();
-            boolean spawnable = block != Blocks.BEDROCK && block != Blocks.BARRIER;
+            if (state.getMaterial() == Material.WATER)
+            {
+                return stateUp.getMaterial() == Material.WATER &&
+                       stateUp2.isNormalCube() == false;
+            }
 
-            return spawnable &&
-                   WorldEntitySpawner.isValidEmptySpawnBlock(chunk.getBlockState(x, y    , z)) &&
-                   WorldEntitySpawner.isValidEmptySpawnBlock(chunk.getBlockState(x, y + 1, z));
+            return WorldEntitySpawner.isValidEmptySpawnBlock(state) &&
+                   WorldEntitySpawner.isValidEmptySpawnBlock(stateUp);
         }
     }
 

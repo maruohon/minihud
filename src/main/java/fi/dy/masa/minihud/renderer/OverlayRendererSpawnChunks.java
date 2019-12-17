@@ -78,8 +78,8 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
                 Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getIntegerValue() :
                 Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
 
-        fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(spawn, colorEntity, 0.001, BUFFER_2);
-        fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxSidesBatchedQuads(spawn, colorEntity, 0.001, BUFFER_1);
+        fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllOutlinesBatchedLines(spawn, colorEntity, 0.001, BUFFER_2);
+        fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllSidesBatchedQuads(spawn, colorEntity, 0.001, BUFFER_1);
 
         int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
         Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 128);

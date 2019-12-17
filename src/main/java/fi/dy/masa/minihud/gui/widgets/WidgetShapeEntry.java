@@ -60,6 +60,12 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
     }
 
     @Override
+    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    {
+        return super.canSelectAt(mouseX, mouseY, mouseButton) && mouseX < this.buttonsStartX;
+    }
+
+    @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
@@ -86,7 +92,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
             RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
         }
 
-        String name = this.shape.getType().getDisplayName();
+        String name = this.shape.getDisplayName();
         this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name);
 
         RenderUtils.color(1f, 1f, 1f, 1f);

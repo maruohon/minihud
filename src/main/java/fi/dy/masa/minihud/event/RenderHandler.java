@@ -32,11 +32,11 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.malilib.config.values.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.HudAlignment;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
@@ -94,7 +94,7 @@ public class RenderHandler implements IRenderer
 
         if (Configs.Generic.ENABLED.getBooleanValue() &&
             mc.gameSettings.showDebugInfo == false &&
-            mc.player != null &&
+            mc.player != null && mc.gameSettings.hideGUI == false &&
             (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
             Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld())
         {
@@ -150,7 +150,8 @@ public class RenderHandler implements IRenderer
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (Configs.Generic.ENABLED.getBooleanValue() && mc.world != null && mc.player != null)
+        if (Configs.Generic.ENABLED.getBooleanValue() &&
+            mc.world != null && mc.player != null && mc.gameSettings.hideGUI == false)
         {
             OverlayRenderer.renderOverlays(mc, partialTicks);
         }
@@ -301,7 +302,7 @@ public class RenderHandler implements IRenderer
             try
             {
                 long timeDay = world.getWorldTime();
-                long day = (int) (timeDay / 24000) + 1;
+                long day = (int) (timeDay / 24000);
                 // 1 tick = 3.6 seconds in MC (0.2777... seconds IRL)
                 int dayTicks = (int) (timeDay % 24000);
                 int hour = (int) ((dayTicks / 1000) + 6) % 24;
@@ -310,6 +311,7 @@ public class RenderHandler implements IRenderer
 
                 String str = Configs.Generic.DATE_FORMAT_MINECRAFT.getStringValue();
                 str = str.replace("{DAY}",  String.format("%d", day));
+                str = str.replace("{DAY_1}",String.format("%d", day + 1));
                 str = str.replace("{HOUR}", String.format("%02d", hour));
                 str = str.replace("{MIN}",  String.format("%02d", min));
                 str = str.replace("{SEC}",  String.format("%02d", sec));
@@ -470,6 +472,10 @@ public class RenderHandler implements IRenderer
             this.addLine(String.format("Block: %d, %d, %d within Sub-Chunk: %d, %d, %d",
                         pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF,
                         pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4));
+        }
+        else if (type == InfoToggle.BLOCK_BREAK_SPEED)
+        {
+            this.addLine(String.format("BBS: %.2f", DataStorage.getInstance().getBlockBreakingSpeed()));
         }
         else if (type == InfoToggle.DISTANCE)
         {

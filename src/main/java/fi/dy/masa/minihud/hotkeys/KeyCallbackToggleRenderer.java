@@ -1,5 +1,9 @@
 package fi.dy.masa.minihud.hotkeys;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.options.IConfigBoolean;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
@@ -15,9 +19,6 @@ import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableChunks;
 import fi.dy.masa.minihud.util.DataStorage;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWithMessage
 {
@@ -38,13 +39,14 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
                 return true;
             }
 
+            Entity entity = mc.getRenderViewEntity() != null ? mc.getRenderViewEntity() : mc.player;
             String green = GuiBase.TXT_GREEN;
             String rst = GuiBase.TXT_RST;
             String strStatus = green + StringUtils.translate("malilib.message.value.on") + rst;
 
             if (key == RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind())
             {
-                OverlayRenderer.chunkUnloadBucketOverlayY = mc.player.posY - 2;
+                OverlayRenderer.chunkUnloadBucketOverlayY = entity.posY - 2;
             }
             else if (key == RendererToggle.OVERLAY_LIGHT_LEVEL.getKeybind())
             {
@@ -52,7 +54,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             }
             else if (key == RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind())
             {
-                OverlayRendererSlimeChunks.overlayTopY = mc.player.posY;
+                OverlayRendererSlimeChunks.overlayTopY = entity.posY;
             }
             else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind())
             {
@@ -66,7 +68,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             }
             else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getKeybind())
             {
-                Vec3d pos = mc.player.getPositionVector();
+                Vec3d pos = entity.getPositionVector();
                 OverlayRendererRandomTickableChunks.newPos = pos;
                 String strPos = String.format("x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
                 String message = StringUtils.translate("minihud.message.toggled_using_position", this.config.getPrettyName(), strStatus, strPos);
@@ -75,13 +77,13 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             }
             else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.getKeybind())
             {
-                OverlayRendererSpawnableChunks.overlayTopY = mc.player.posY;
+                OverlayRendererSpawnableChunks.overlayTopY = entity.posY;
             }
             else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getKeybind())
             {
-                BlockPos pos = new BlockPos(mc.player);
+                BlockPos pos = new BlockPos(entity);
                 OverlayRendererSpawnableChunks.newPos = pos;
-                OverlayRendererSpawnableChunks.overlayTopY = mc.player.posY;
+                OverlayRendererSpawnableChunks.overlayTopY = entity.posY;
                 String strPos = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                 String message = StringUtils.translate("minihud.message.toggled_using_position", this.config.getPrettyName(), strStatus, strPos);
 

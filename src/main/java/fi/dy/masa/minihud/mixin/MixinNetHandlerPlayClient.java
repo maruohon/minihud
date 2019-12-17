@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SPacketBlockChange;
 import net.minecraft.network.play.server.SPacketChat;
 import net.minecraft.network.play.server.SPacketChunkData;
@@ -14,6 +15,7 @@ import net.minecraft.network.play.server.SPacketPlayerListHeaderFooter;
 import net.minecraft.network.play.server.SPacketSpawnPosition;
 import net.minecraft.network.play.server.SPacketTimeUpdate;
 import net.minecraft.util.math.ChunkPos;
+import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.minihud.MiniHud;
 import fi.dy.masa.minihud.util.DataStorage;
 
@@ -66,9 +68,21 @@ public abstract class MixinNetHandlerPlayClient
     @Inject(method = "handleCustomPayload", at = @At("RETURN"))
     private void onCustomPayload(SPacketCustomPayload packet, CallbackInfo ci)
     {
-        if (MiniHud.CHANNEL_CARPET_CLIENT.equals(packet.getChannelName()))
+        String channel = packet.getChannelName();
+
+        if (MiniHud.CHANNEL_CARPET_CLIENT_NEW.equals(channel))
         {
-            DataStorage.getInstance().updateStructureDataFromServer(packet.getBufferData());
+            PacketBuffer data = packet.getBufferData();
+            data.readerIndex(0);
+            PacketBuffer buffer = PacketSplitter.receive(channel, data);
+
+            // Received the complete packet
+            if (buffer != null)
+            {
+                DataStorage.getInstance().updateStructureDataFromCarpetServer(buffer);
+            }
+
+            data.readerIndex(0);
         }
     }
 }

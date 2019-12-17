@@ -124,7 +124,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
 
                     if (world.isAirBlock(posMutable) == false)
                     {
-                        fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(posMutable, color, 0.001, buffer);
+                        fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllOutlinesBatchedLines(posMutable, color, 0.001, buffer);
                     }
                 }
             }
@@ -161,7 +161,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
 
                             if (world.isAirBlock(posMutable2) == false)
                             {
-                                fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(posMutable, color, 0.001, buffer);
+                                fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllOutlinesBatchedLines(posMutable, color, 0.001, buffer);
                                 break;
                             }
                         }

@@ -19,6 +19,13 @@ import net.minecraft.world.WorldProvider;
 
 public class OverlayRendererStructures extends OverlayRendererBase
 {
+    public static OverlayRendererStructures instance;
+
+    public OverlayRendererStructures()
+    {
+        instance = this;
+    }
+
     @Override
     public boolean shouldRender(Minecraft mc)
     {

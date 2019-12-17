@@ -18,7 +18,7 @@ public class MiniHud
 
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
-    public static final String CHANNEL_CARPET_CLIENT = "CarpetClient";
+    public static final String CHANNEL_CARPET_CLIENT_NEW = "carpet:client";
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)

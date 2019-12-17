@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.gui;
 
 import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -9,21 +10,28 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IConfigGuiTab;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetDropDownList;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.gui.widgets.WidgetListShapes;
 import fi.dy.masa.minihud.gui.widgets.WidgetShapeEntry;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
-import fi.dy.masa.minihud.renderer.shapes.ShapeDespawnSphere;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
+import fi.dy.masa.minihud.renderer.shapes.ShapeType;
 
 public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, WidgetListShapes>
                              implements ISelectionListener<ShapeBase>
 {
+    protected final WidgetDropDownList<ShapeType> widgetDropDown;
+
     public GuiShapeManager()
     {
         super(10, 64);
 
         this.title = StringUtils.translate("minihud.gui.title.shape_manager");
+
+        // The position will get updated later
+        this.widgetDropDown = new WidgetDropDownList<ShapeType>(0, 0, 160, 18, 200, 10, ImmutableList.copyOf(ShapeType.values()), (type) -> type.getDisplayName());
+        this.widgetDropDown.setZLevel(this.zLevel + 1);
     }
 
     @Override
@@ -45,6 +53,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
 
         super.initGui();
 
+        this.clearWidgets();
         this.clearButtons();
         this.createTabButtons();
 
@@ -75,7 +84,13 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         //this.reCreateListWidget();
 
         y += 24;
-        this.addButton(this.width - 10, y, ButtonListener.Type.ADD_SHAPE);
+
+        x = this.width - 10;
+        x -= this.addButton(x, y, ButtonListener.Type.ADD_SHAPE);
+
+        this.widgetDropDown.setPosition(x - this.widgetDropDown.getWidth() - 4, y + 1);
+
+        this.addWidget(this.widgetDropDown);
     }
 
     protected int createTabButton(int x, int y, int width, IConfigGuiTab tab)
@@ -123,7 +138,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         {
             if (this.type == Type.ADD_SHAPE)
             {
-                ShapeManager.INSTANCE.addShape(new ShapeDespawnSphere());
+                ShapeManager.INSTANCE.addShape(this.gui.widgetDropDown.getSelectedEntry().createShape());
                 this.gui.getListWidget().refreshEntries();
             }
         }
@@ -146,7 +161,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         }
     }
 
-    private static class ButtonListenerTab implements IButtonActionListener
+    public static class ButtonListenerTab implements IButtonActionListener
     {
         private final IConfigGuiTab tab;
 

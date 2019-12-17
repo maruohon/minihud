@@ -3,34 +3,42 @@ package fi.dy.masa.minihud.renderer;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.util.DataStorage;
-import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos.PooledMutableBlockPos;
 import net.minecraft.util.math.MathHelper;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.util.DataStorage;
+import fi.dy.masa.minihud.util.MiscUtils;
 
 public class OverlayRendererSlimeChunks extends OverlayRendererBase
 {
     public static double overlayTopY;
 
+    protected boolean wasSeedKnown;
+    protected long seed;
     protected double topY;
 
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() && mc.world.provider.isSurfaceWorld();
+        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() &&
+                DataStorage.getInstance().isWorldSeedKnown(WorldUtils.getDimensionId(mc.world)) &&
+                mc.world.provider.isSurfaceWorld();
     }
 
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
-        if (this.topY != overlayTopY)
+        boolean isSeedKnown = DataStorage.getInstance().isWorldSeedKnown(entity.dimension);
+        long seed = DataStorage.getInstance().getWorldSeed(entity.dimension);
+
+        if (this.topY != overlayTopY || this.wasSeedKnown != isSeedKnown || this.seed != seed)
         {
             return true;
         }
@@ -48,12 +56,13 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     {
         DataStorage data = DataStorage.getInstance();
         this.topY = overlayTopY;
+        this.wasSeedKnown = data.isWorldSeedKnown(entity.dimension);
+        this.seed = data.getWorldSeed(entity.dimension);
 
-        if (data.isWorldSeedKnown(entity.dimension))
+        if (this.wasSeedKnown)
         {
             final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
             final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
-            final long worldSeed = data.getWorldSeed(entity.dimension);
             final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
             final Color4f colorSides = Color4f.fromColor(colorLines, colorLines.a / 6);
             PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();
@@ -78,7 +87,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
                     int cx = centerX + xOff;
                     int cz = centerZ + zOff;
 
-                    if (MiscUtils.canSlimeSpawnInChunk(cx, cz, worldSeed))
+                    if (MiscUtils.canSlimeSpawnInChunk(cx, cz, this.seed))
                     {
                         pos1.setPos( cx << 4,          0,  cz << 4);
                         pos2.setPos((cx << 4) + 15, topY, (cz << 4) + 15);

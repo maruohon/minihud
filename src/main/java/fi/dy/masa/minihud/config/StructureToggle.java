@@ -3,13 +3,14 @@ package fi.dy.masa.minihud.config;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.client.CPacketCustomPayload;
+import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.config.options.IConfigBoolean;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
+import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.minihud.MiniHud;
 import fi.dy.masa.minihud.util.DataStorage;
 import io.netty.buffer.Unpooled;
@@ -100,35 +101,19 @@ public enum StructureToggle
 
     public static void updateStructureData()
     {
-        if (Minecraft.getMinecraft().isSingleplayer() == false)
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (mc.isSingleplayer() == false)
         {
+            // Request the data using just the new protocol/channel name
             PacketBuffer data = new PacketBuffer(Unpooled.buffer());
             data.writeInt(DataStorage.CARPET_ID_BOUNDINGBOX_MARKERS);
-
-            CPacketCustomPayload payload = new CPacketCustomPayload(MiniHud.CHANNEL_CARPET_CLIENT, data);
-            sendMessage(payload);
+            PacketSplitter.send(mc.getConnection(), new ResourceLocation(MiniHud.CHANNEL_CARPET_CLIENT_NEW), data);
 
             MiniHud.logger.info("Requesting structure data from Carpet server");
         }
 
         DataStorage.getInstance().setStructuresNeedUpdating();
-    }
-
-    private static boolean sendMessage(CPacketCustomPayload payload)
-    {
-        try
-        {
-            Minecraft mc = Minecraft.getMinecraft();
-
-            if (mc.player != null && mc.player.connection != null)
-            {
-                mc.player.connection.sendPacket(payload);
-                return true;
-            }
-        }
-        catch (Exception ex) {}
-
-        return false;
     }
 
     public static class StructureRefresh implements IValueChangeCallback<ConfigBoolean>
