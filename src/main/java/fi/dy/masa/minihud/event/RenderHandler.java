@@ -7,8 +7,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BeehiveBlockEntity;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.Entity;
@@ -530,6 +533,16 @@ public class RenderHandler implements IRenderer
                 }
             }
         }
+        else if (type == InfoToggle.BEE_COUNT)
+        {
+            World bestWorld = WorldUtils.getBestWorld(mc);
+            BlockEntity be = this.getTargetedBlockEntity(bestWorld, mc);
+
+            if (be instanceof BeehiveBlockEntity)
+            {
+                this.addLine("Bees: " + GuiBase.TXT_AQUA + ((BeehiveBlockEntity) be).getBeeCount());
+            }
+        }
         else if (type == InfoToggle.ROTATION_YAW ||
                  type == InfoToggle.ROTATION_PITCH ||
                  type == InfoToggle.SPEED)
@@ -794,6 +807,19 @@ public class RenderHandler implements IRenderer
         {
             this.getBlockProperties(mc);
         }
+    }
+
+    @Nullable
+    private BlockEntity getTargetedBlockEntity(World world, MinecraftClient mc)
+    {
+        if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK)
+        {
+            BlockPos posLooking = ((BlockHitResult) mc.crosshairTarget).getBlockPos();
+            // The method in World now checks that the caller is from the same thread...
+            return world.getWorldChunk(posLooking).getBlockEntity(posLooking);
+        }
+
+        return null;
     }
 
     private <T extends Comparable<T>> void getBlockProperties(MinecraftClient mc)
