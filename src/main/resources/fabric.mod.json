@@ -4,12 +4,13 @@
     "name": "MiniHUD",
     "version": "${mod_version}",
 
-    "description": "Configurable mini-F3 info lines, and various overlay renderers",
+    "description": "Configurable \"mini-F3\" info lines, and various overlay renderers",
     "authors": [
         "masa"
     ],
     "contact": {
-        "homepage": "https://minecraft.curseforge.com/projects/minihud",
+        "homepage": "https://www.curseforge.com/minecraft/mc-mods/mini-hud",
+        "issues": "https://github.com/maruohon/minihud/issues",
         "sources": "https://github.com/maruohon/minihud",
         "twitter": "https://twitter.com/maruohon",
         "discord": "https://discordapp.com/channels/211786369951989762/453662800460644354/"
@@ -21,13 +22,21 @@
     "entrypoints": {
         "main": [
             "fi.dy.masa.minihud.MiniHUD"
+        ],
+        "modmenu": [
+            "fi.dy.masa.minihud.compat.modmenu.ModMenuImpl"
         ]
     },
+
     "mixins": [
         "mixins.minihud.json"
     ],
 
     "depends": {
         "malilib": ">=0.10.0-dev.20"
+    },
+
+    "custom": {
+        "modmenu:clientsideOnly": true
     }
 }

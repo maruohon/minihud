@@ -1,8 +1,9 @@
 package fi.dy.masa.minihud.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.google.common.collect.ArrayListMultimap;
@@ -26,6 +27,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.util.Constants;
@@ -433,13 +435,13 @@ public class DataStorage
         if (world != null)
         {
             MinecraftServer server = this.mc.getServer();
-            final int maxRange = (this.mc.options.viewDistance) * 16;
+            final int maxChunkRange = this.mc.options.viewDistance + 2;
 
             server.send(new ServerTask(server.getTicks(), () ->
             {
                 synchronized (this.structures)
                 {
-                    this.addStructureDataFromGenerator(world, dimension, playerPos, maxRange);
+                    this.addStructureDataFromGenerator(world, dimension, playerPos, maxChunkRange);
                 }
             }));
         }
@@ -504,53 +506,56 @@ public class DataStorage
         }
     }
 
-    private void addStructureDataFromGenerator(ServerWorld world, DimensionType dimensionType, BlockPos playerPos, int maxRange)
+    private void addStructureDataFromGenerator(ServerWorld world, DimensionType dimensionType, BlockPos playerPos, int maxChunkRange)
     {
         this.structures.clear();
+
+        List<StructureType> enabledTypes = new ArrayList<>();
 
         for (StructureType type : StructureType.values())
         {
             if (type.isEnabled() && type.existsInDimension(dimensionType))
             {
-                this.addStructuresWithinRange(type, world, playerPos, maxRange);
+                enabledTypes.add(type);
+            }
+        }
+
+        if (enabledTypes.isEmpty() == false)
+        {
+            int minCX = (playerPos.getX() >> 4) - maxChunkRange;
+            int minCZ = (playerPos.getZ() >> 4) - maxChunkRange;
+            int maxCX = (playerPos.getX() >> 4) + maxChunkRange;
+            int maxCZ = (playerPos.getZ() >> 4) + maxChunkRange;
+
+            for (int cz = minCZ; cz <= maxCZ; ++cz)
+            {
+                for (int cx = minCX; cx <= maxCX; ++cx)
+                {
+                    // Don't load the chunk
+                    Chunk chunk = world.getChunk(cx, cz, ChunkStatus.FULL, false);
+
+                    if (chunk != null)
+                    {
+                        for (StructureType type : enabledTypes)
+                        {
+                            StructureStart start = chunk.getStructureStart(type.getStructureName());
+
+                            if (start != null)
+                            {
+                                if (MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxChunkRange << 4))
+                                {
+                                    this.structures.put(type, StructureData.fromStructureStart(type, start));
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
         this.structureRendererNeedsUpdate = true;
 
         //MiniHUD.logger.info("Structure data updated from the integrated server");
-    }
-
-    private void addStructuresWithinRange(StructureType type, ServerWorld world, BlockPos playerPos, int maxRange)
-    {
-        int minCX = (playerPos.getX() >> 4) - (maxRange >> 4);
-        int minCZ = (playerPos.getZ() >> 4) - (maxRange >> 4);
-        int maxCX = (playerPos.getX() >> 4) + (maxRange >> 4);
-        int maxCZ = (playerPos.getZ() >> 4) + (maxRange >> 4);
-        HashMap<BlockPos, StructureStart> structures = new HashMap<>();
-
-        for (int cz = minCZ; cz <= maxCZ; ++cz)
-        {
-            for (int cx = minCX; cx <= maxCX; ++cx)
-            {
-                Chunk chunk = world.getChunk(cx, cz);
-
-                StructureStart start = chunk.getStructureStart(type.getStructureName());
-
-                if (start != null)
-                {
-                    structures.put(start.getPos(), start);
-                }
-            }
-        }
-
-        for (StructureStart start : structures.values())
-        {
-            if (MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxRange))
-            {
-                this.structures.put(type, StructureData.fromStructureStart(type, start));
-            }
-        }
     }
 
     public void handleCarpetServerTPSData(Text textComponent)
