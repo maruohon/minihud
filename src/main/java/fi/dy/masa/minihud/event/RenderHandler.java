@@ -4,10 +4,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
@@ -60,28 +62,27 @@ import fi.dy.masa.minihud.util.MiscUtils;
 public class RenderHandler implements IRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
+
     private final MinecraftClient mc;
     private final DataStorage data;
     private final Date date;
+    private final Map<ChunkPos, CompletableFuture<WorldChunk>> chunkFutures = new HashMap<>();
     private int fps;
     private int fpsCounter;
     private long fpsUpdateTime = System.currentTimeMillis();
     private long infoUpdateTime;
     private double fontScale = 0.5d;
     private Set<InfoToggle> addedTypes = new HashSet<>();
-    @Nullable private ChunkPos chunkPos;
-    @Nullable private WorldChunk cachedServerChunk;
     @Nullable private WorldChunk cachedClientChunk;
-    @Nullable private CompletableFuture<WorldChunk> chunkFuture;
 
     private final List<StringHolder> lineWrappers = new ArrayList<>();
     private final List<String> lines = new ArrayList<>();
 
     public RenderHandler()
     {
+        this.mc = MinecraftClient.getInstance();
         this.data = DataStorage.getInstance();
         this.date = new Date();
-        this.mc = MinecraftClient.getInstance();
     }
 
     public static RenderHandler getInstance()
@@ -107,12 +108,15 @@ public class RenderHandler implements IRenderer
     @Override
     public void onRenderGameOverlayPost(float partialTicks)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        if (Configs.Generic.ENABLED.getBooleanValue() == false)
+        {
+            this.resetCachedChunks();
+            return;
+        }
 
-        if (Configs.Generic.ENABLED.getBooleanValue() &&
-            mc.options.debugEnabled == false &&
-            mc.player != null &&
-            (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
+        if (this.mc.options.debugEnabled == false &&
+            this.mc.player != null &&
+            (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || this.mc.player.isSneaking()) &&
             Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld())
         {
             if (InfoToggle.FPS.getBooleanValue())
@@ -165,11 +169,9 @@ public class RenderHandler implements IRenderer
     @Override
     public void onRenderWorldLast(float partialTicks, net.minecraft.client.util.math.MatrixStack matrixStack)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
-
-        if (Configs.Generic.ENABLED.getBooleanValue() && mc.world != null && mc.player != null)
+        if (Configs.Generic.ENABLED.getBooleanValue() && this.mc.world != null && this.mc.player != null)
         {
-            OverlayRenderer.renderOverlays(mc, partialTicks, matrixStack);
+            OverlayRenderer.renderOverlays(this.mc, partialTicks, matrixStack);
         }
     }
 
@@ -221,6 +223,11 @@ public class RenderHandler implements IRenderer
         this.lineWrappers.clear();
         this.addedTypes.clear();
 
+        if (this.chunkFutures.size() >= 4)
+        {
+            this.resetCachedChunks();
+        }
+
         // Get the info line order based on the configs
         List<LinePos> positions = new ArrayList<LinePos>();
 
@@ -262,8 +269,6 @@ public class RenderHandler implements IRenderer
         {
             this.lines.add(holder.str);
         }
-
-        this.resetCachedChunk();
     }
 
     private void addLine(String text)
@@ -273,17 +278,11 @@ public class RenderHandler implements IRenderer
 
     private void addLine(InfoToggle type)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        MinecraftClient mc = this.mc;
         Entity entity = mc.getCameraEntity();
         World world = entity.getEntityWorld();
         BlockPos pos = new BlockPos(entity.getX(), entity.getBoundingBox().y1, entity.getZ());
         ChunkPos chunkPos = new ChunkPos(pos);
-
-        if (Objects.equals(this.chunkPos, chunkPos) == false)
-        {
-           this.chunkPos = chunkPos;
-           this.resetCachedChunk();
-        }
 
         if (type == InfoToggle.FPS)
         {
@@ -832,8 +831,10 @@ public class RenderHandler implements IRenderer
         if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK)
         {
             BlockPos posLooking = ((BlockHitResult) mc.crosshairTarget).getBlockPos();
+            WorldChunk chunk = this.getChunk(new ChunkPos(posLooking));
+
             // The method in World now checks that the caller is from the same thread...
-            return world.getWorldChunk(posLooking).getBlockEntity(posLooking);
+            return chunk != null ? chunk.getBlockEntity(posLooking) : null;
         }
 
         return null;
@@ -859,57 +860,56 @@ public class RenderHandler implements IRenderer
     @Nullable
     private WorldChunk getChunk(ChunkPos chunkPos)
     {
-        if (this.cachedServerChunk != null)
+        CompletableFuture<WorldChunk> future = this.chunkFutures.get(chunkPos);
+
+        if (future == null)
         {
-            return this.cachedServerChunk;
+            future = this.setupChunkFuture(chunkPos);
         }
 
-        if (this.chunkFuture == null)
+        return future.getNow(null);
+    }
+
+    private CompletableFuture<WorldChunk> setupChunkFuture(ChunkPos chunkPos)
+    {
+        IntegratedServer server = this.mc.getServer();
+        CompletableFuture<WorldChunk> future = null;
+
+        if (server != null)
         {
-            IntegratedServer integratedServer_1 = this.mc.getServer();
+            ServerWorld world = server.getWorld(this.mc.world.dimension.getType());
 
-            if (integratedServer_1 != null)
+            if (world != null)
             {
-                ServerWorld serverWorld_1 = integratedServer_1.getWorld(this.mc.world.dimension.getType());
-
-                if (serverWorld_1 != null)
-                {
-                    this.chunkFuture = serverWorld_1.method_14178().getChunkFutureSyncOnMainThread(chunkPos.x, chunkPos.z, ChunkStatus.FULL, false).thenApply((either_1) -> {
-                        return (WorldChunk)either_1.map((chunk_1) -> {
-                            return (WorldChunk)chunk_1;
-                        }, (chunkHolder$Unloaded_1) -> {
-                            return null;
-                        });
-                    });
-                }
-            }
-
-            if (this.chunkFuture == null)
-            {
-                this.chunkFuture = CompletableFuture.completedFuture(this.getClientChunk(chunkPos));
+                future = world.getChunkManager().getChunkFutureSyncOnMainThread(chunkPos.x, chunkPos.z, ChunkStatus.FULL, false)
+                        .thenApply((either) -> either.map((chunk) -> (WorldChunk) chunk, (unloaded) -> null) );
             }
         }
 
-        this.cachedServerChunk = this.chunkFuture.getNow(null);
+        if (future == null)
+        {
+            future = CompletableFuture.completedFuture(this.getClientChunk(chunkPos));
+        }
 
-        return this.cachedServerChunk;
+        this.chunkFutures.put(chunkPos, future);
+
+        return future;
     }
 
     private WorldChunk getClientChunk(ChunkPos chunkPos)
     {
-        if (this.cachedClientChunk == null)
+        if (this.cachedClientChunk == null || this.cachedClientChunk.getPos().equals(chunkPos) == false)
         {
-            this.cachedClientChunk = this.mc.world.method_8497(chunkPos.x, chunkPos.z);
+            this.cachedClientChunk = this.mc.world.getChunk(chunkPos.x, chunkPos.z);
         }
 
         return this.cachedClientChunk;
     }
 
-    private void resetCachedChunk()
+    private void resetCachedChunks()
     {
-        this.cachedServerChunk = null;
+        this.chunkFutures.clear();
         this.cachedClientChunk = null;
-        this.chunkFuture = null;
     }
 
     private class StringHolder implements Comparable<StringHolder>
