@@ -342,35 +342,9 @@ public class RenderHandler implements IRenderer
                 this.data.updateIntegratedServerTPS();
             }
 
-            if (this.data.isServerTPSValid())
+            if (this.data.getHasValidTPSData())
             {
-                double tps = this.data.getServerTPS();
-                double mspt = this.data.getServerMSPT();
-                String rst = GuiBase.TXT_RST;
-                String preTps = tps >= 20.0D ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
-                String preMspt;
-
-                // Carpet server and integrated server have actual meaningful MSPT data available
-                if (this.data.isCarpetServer() || mc.isSingleplayer())
-                {
-                    if      (mspt <= 40) { preMspt = GuiBase.TXT_GREEN; }
-                    else if (mspt <= 45) { preMspt = GuiBase.TXT_YELLOW; }
-                    else if (mspt <= 50) { preMspt = GuiBase.TXT_GOLD; }
-                    else                 { preMspt = GuiBase.TXT_RED; }
-
-                    this.addLine(String.format("Server TPS: %s%.1f%s MSPT: %s%.1f%s", preTps, tps, rst, preMspt, mspt, rst));
-                }
-                else
-                {
-                    if (mspt <= 51) { preMspt = GuiBase.TXT_GREEN; }
-                    else            { preMspt = GuiBase.TXT_RED; }
-
-                    this.addLine(String.format("Server TPS: %s%.1f%s (MSPT*: %s%.1f%s)", preTps, tps, rst, preMspt, mspt, rst));
-                }
-            }
-            else
-            {
-                this.addLine("Server TPS: <no valid data>");
+                this.addLine(this.data.getTPSInfoLine());
             }
         }
         else if (type == InfoToggle.PING)

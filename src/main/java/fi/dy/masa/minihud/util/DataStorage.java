@@ -43,6 +43,7 @@ import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -71,26 +72,23 @@ public class DataStorage
     public static final int CARPET_ID_LARGE_BOUNDINGBOX_MARKERS_START = 7;
     public static final int CARPET_ID_LARGE_BOUNDINGBOX_MARKERS = 8;
 
+    private final Minecraft mc = Minecraft.getMinecraft();
+    private final TPSData tpsData = new TPSData();
+    private final ArrayListMultimap<StructureType, StructureData> structures = ArrayListMultimap.create();
+    private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
+    private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
+    private BlockPos worldSpawn = BlockPos.ORIGIN;
+    @Nullable private BlockPos lastStructureUpdatePos;
+    private Vec3d distanceReferencePoint = Vec3d.ZERO;
+    private int[] blockBreakCounter = new int[100];
     private boolean worldSeedValid;
-    private boolean serverTPSValid;
-    private boolean carpetServer;
     private boolean worldSpawnValid;
     private boolean hasStructureDataFromServer;
     private boolean structuresDirty;
     private boolean structuresNeedUpdating;
     private long worldSeed;
-    private long lastServerTick;
-    private long lastServerTimeUpdate;
-    private BlockPos lastStructureUpdatePos;
-    private double serverTPS;
-    private double serverMSPT;
-    private BlockPos worldSpawn = BlockPos.ORIGIN;
-    private Vec3d distanceReferencePoint = Vec3d.ZERO;
-    private int[] blockBreakCounter = new int[100];
-    private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
-    private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
-    private final ArrayListMultimap<StructureType, StructureData> structures = ArrayListMultimap.create();
-    private final Minecraft mc = Minecraft.getMinecraft();
+    private long lastServerTick = -1;
+    private long lastServerTimeUpdate = -1;
 
     public static DataStorage getInstance()
     {
@@ -100,13 +98,14 @@ public class DataStorage
     public void reset()
     {
         this.worldSeedValid = false;
-        this.serverTPSValid = false;
-        this.carpetServer = false;
         this.worldSpawnValid = false;
         this.structuresNeedUpdating = true;
         this.hasStructureDataFromServer = false;
         this.structuresDirty = false;
+        this.lastServerTick = -1;
+        this.lastServerTimeUpdate = -1;
 
+        this.tpsData.clear();
         this.lastStructureUpdatePos = null;
         this.structures.clear();
         this.worldSeed = 0;
@@ -177,24 +176,14 @@ public class DataStorage
         return this.worldSpawn;
     }
 
-    public boolean isServerTPSValid()
+    public boolean getHasValidTPSData()
     {
-        return this.serverTPSValid;
+        return this.tpsData.getHasValidData();
     }
 
-    public boolean isCarpetServer()
+    public String getTPSInfoLine()
     {
-        return this.carpetServer;
-    }
-
-    public double getServerTPS()
-    {
-        return this.serverTPS;
-    }
-
-    public double getServerMSPT()
-    {
-        return this.serverMSPT;
+        return this.tpsData.getFormattedInfoLine();
     }
 
     public boolean hasStructureDataChanged()
@@ -427,34 +416,42 @@ public class DataStorage
     {
         // Carpet server sends the TPS and MSPT values via the player list footer data,
         // and for single player the data is grabbed directly from the integrated server.
-        if (this.carpetServer == false && this.mc.isSingleplayer() == false)
+        if (this.tpsData.getHasSyncedData() == false)
         {
             long currentTime = System.nanoTime();
 
-            if (this.serverTPSValid)
+            if (this.lastServerTick != -1 && this.lastServerTimeUpdate != -1)
             {
                 long elapsedTicks = totalWorldTime - this.lastServerTick;
 
                 if (elapsedTicks > 0)
                 {
-                    this.serverMSPT = ((double) (currentTime - this.lastServerTimeUpdate) / (double) elapsedTicks) / 1000000D;
-                    this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
+                    double mspt = ((double) (currentTime - this.lastServerTimeUpdate) / (double) elapsedTicks) / 1000000D;
+                    double tps = mspt <= 50 ? 20D : (1000D / mspt);
+                    this.tpsData.setCalculatedData(tps, mspt, totalWorldTime);
                 }
             }
 
-            this.lastServerTick = totalWorldTime;
             this.lastServerTimeUpdate = currentTime;
-            this.serverTPSValid = true;
         }
+        // Presumably a Carpet server, check that there has been received data recently,
+        // otherwise invalidate the data (for example when unsubscribing from the tps logger).
+        else if (this.mc.isIntegratedServerRunning() == false && totalWorldTime - this.tpsData.getLastSyncedTick() > 40)
+        {
+            this.tpsData.clear();
+            this.lastServerTimeUpdate = System.nanoTime();
+        }
+
+        this.lastServerTick = totalWorldTime;
     }
 
     public void updateIntegratedServerTPS()
     {
-        if (this.mc != null && this.mc.getIntegratedServer() != null)
+        if (this.mc.getIntegratedServer() != null && this.mc.world != null)
         {
-            this.serverMSPT = (double) MathHelper.average(this.mc.getIntegratedServer().tickTimeArray) / 1000000D;
-            this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
-            this.serverTPSValid = true;
+            double mspt = (double) MathHelper.average(this.mc.getIntegratedServer().tickTimeArray) / 1000000D;
+            double tps = mspt <= 50 ? 20D : (1000D / mspt);
+            this.tpsData.setSyncedData(tps, mspt, this.mc.world.getTotalWorldTime());
         }
     }
 
@@ -486,7 +483,7 @@ public class DataStorage
 
     public void updateStructureData()
     {
-        if (this.mc != null && this.mc.world != null && this.mc.player != null)
+        if (this.mc.world != null && this.mc.player != null)
         {
             final BlockPos playerPos = new BlockPos(this.mc.player);
 
@@ -800,11 +797,10 @@ public class DataStorage
                 {
                     try
                     {
-                        this.serverTPS = Double.parseDouble(matcher.group("tps"));
-                        this.serverMSPT = Double.parseDouble(matcher.group("mspt"));
-                        this.serverTPSValid = true;
-                        this.carpetServer = true;
-                        return;
+                        this.tpsData.setSyncedData(
+                                Double.parseDouble(matcher.group("tps")),
+                                Double.parseDouble(matcher.group("mspt")),
+                                this.lastServerTick);
                     }
                     catch (NumberFormatException e)
                     {
@@ -812,8 +808,6 @@ public class DataStorage
                 }
             }
         }
-
-        this.serverTPSValid = false;
     }
 
     @Nullable
@@ -861,6 +855,88 @@ public class DataStorage
         {
             this.worldSeed = JsonUtils.getLong(obj, "seed");
             this.worldSeedValid = true;
+        }
+    }
+
+    public static class TPSData
+    {
+        private boolean hasCalculatedTPSData;
+        private boolean hasSyncedTPSData;
+        private double calculatedServerTPS;
+        private double calculatedServerMSPT;
+        private double syncedServerTPS;
+        private double syncedServerMSPT;
+        private long lastSync;
+
+        public void clear()
+        {
+            this.hasCalculatedTPSData = false;
+            this.hasSyncedTPSData = false;
+            this.lastSync = -1;
+        }
+
+        public boolean getHasValidData()
+        {
+            return this.hasSyncedTPSData || this.hasCalculatedTPSData;
+        }
+
+        public boolean getHasSyncedData()
+        {
+            return this.hasSyncedTPSData;
+        }
+
+        public long getLastSyncedTick()
+        {
+            return this.lastSync;
+        }
+
+        public void setCalculatedData(double tps, double mspt, long worldTime)
+        {
+            this.calculatedServerTPS = tps;
+            this.calculatedServerMSPT = mspt;
+            this.lastSync = worldTime;
+            this.hasCalculatedTPSData = true;
+        }
+
+        public void setSyncedData(double tps, double mspt, long worldTime)
+        {
+            this.syncedServerTPS = tps;
+            this.syncedServerMSPT = mspt;
+            this.lastSync = worldTime;
+            this.hasSyncedTPSData = true;
+        }
+
+        public String getFormattedInfoLine()
+        {
+            if (this.getHasValidData() == false)
+            {
+                return "Server TPS: <no valid data>";
+            }
+
+            boolean isSynced = this.hasSyncedTPSData;
+            double tps = isSynced ? this.syncedServerTPS : this.calculatedServerTPS;
+            double mspt = isSynced ? this.syncedServerMSPT : this.calculatedServerMSPT;
+            String rst = GuiBase.TXT_RST;
+            String preTps = tps >= 20.0D ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
+            String preMspt;
+
+            // Carpet server and integrated server have actual meaningful MSPT data available
+            if (isSynced)
+            {
+                if      (mspt <= 40) { preMspt = GuiBase.TXT_GREEN; }
+                else if (mspt <= 45) { preMspt = GuiBase.TXT_YELLOW; }
+                else if (mspt <= 50) { preMspt = GuiBase.TXT_GOLD; }
+                else                 { preMspt = GuiBase.TXT_RED; }
+
+                return String.format("Server TPS: %s%.1f%s MSPT: %s%.1f%s", preTps, tps, rst, preMspt, mspt, rst);
+            }
+            else
+            {
+                if (mspt <= 51) { preMspt = GuiBase.TXT_GREEN; }
+                else            { preMspt = GuiBase.TXT_RED; }
+
+                return String.format("Server TPS: %s%.1f%s (MSPT [est]: %s%.1f%s)", preTps, tps, rst, preMspt, mspt, rst);
+            }
         }
     }
 }
