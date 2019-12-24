@@ -5,12 +5,14 @@ import org.lwjgl.input.Keyboard;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IConfigGuiTab;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetDropDownList;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.gui.widgets.WidgetListShapes;
 import fi.dy.masa.minihud.gui.widgets.WidgetShapeEntry;
@@ -138,8 +140,17 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         {
             if (this.type == Type.ADD_SHAPE)
             {
-                ShapeManager.INSTANCE.addShape(this.gui.widgetDropDown.getSelectedEntry().createShape());
-                this.gui.getListWidget().refreshEntries();
+                ShapeType type = this.gui.widgetDropDown.getSelectedEntry();
+
+                if (type != null)
+                {
+                    ShapeManager.INSTANCE.addShape(type.createShape());
+                    this.gui.getListWidget().refreshEntries();
+                }
+                else
+                {
+                    InfoUtils.showGuiMessage(MessageType.ERROR, "minihud.message.error.shapes.select_shape_from_dropdown");
+                }
             }
         }
 
