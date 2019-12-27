@@ -459,7 +459,7 @@ public class DataStorage
 
     public void addOrUpdateStructuresFromServer(ListTag structures, int timeout)
     {
-        if (structures.getType() == Constants.NBT.TAG_COMPOUND)
+        if (structures.getElementType() == Constants.NBT.TAG_COMPOUND)
         {
             this.structureDataTimeout = timeout;
 
