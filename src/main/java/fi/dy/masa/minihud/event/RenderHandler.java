@@ -195,7 +195,7 @@ public class RenderHandler implements IRenderer
 
             if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue() && (mc.world.getTotalWorldTime() % 20) == 0)
             {
-                DataStorage.getInstance().updateStructureData();
+                DataStorage.getInstance().updateStructureDataIfNeeded();
             }
         }
     }

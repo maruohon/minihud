@@ -1,21 +1,12 @@
 package fi.dy.masa.minihud.config;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import com.mumfrey.liteloader.core.ClientPluginChannels;
-import com.mumfrey.liteloader.core.PluginChannels.ChannelPolicy;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.config.options.IConfigBoolean;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
-import fi.dy.masa.malilib.network.PacketSplitter;
-import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.util.DataStorage;
-import io.netty.buffer.Unpooled;
 
 public enum StructureToggle
 {
@@ -41,7 +32,8 @@ public enum StructureToggle
         this.colorMain       = new ConfigColor(name +  " Main", colorMain, prettyName + " full box");
         this.colorComponents = new ConfigColor(name + " Components", colorComponents, prettyName + " components");
         this.hotkey          = new ConfigHotkey("Toggle " + name, defaultHotkey, comment);
-        this.toggleOption.setValueChangeCallback(new StructureRefresh());
+
+        this.toggleOption.setValueChangeCallback((config) -> DataStorage.getInstance().requestStructureDataUpdates());
     }
 
     public IConfigBoolean getToggleOption()
@@ -99,40 +91,5 @@ public enum StructureToggle
         }
 
         return builder.build();
-    }
-
-    public static void updateStructureData()
-    {
-        Minecraft mc = Minecraft.getMinecraft();
-
-        if (mc.isSingleplayer() == false)
-        {
-            // Request the data using both the old and the new protocol/channel name
-            PacketBuffer data = new PacketBuffer(Unpooled.buffer());
-            data.writeInt(DataStorage.CARPET_ID_BOUNDINGBOX_MARKERS);
-            ClientPluginChannels.sendMessage(LiteModMiniHud.CHANNEL_CARPET_CLIENT_OLD, data, ChannelPolicy.DISPATCH_ALWAYS);
-
-            data = new PacketBuffer(Unpooled.buffer());
-            data.writeInt(DataStorage.CARPET_ID_BOUNDINGBOX_MARKERS);
-            PacketSplitter.send(mc.getConnection(), new ResourceLocation(LiteModMiniHud.CHANNEL_CARPET_CLIENT_NEW), data);
-
-            LiteModMiniHud.logger.info("Requesting structure data from Carpet server");
-        }
-
-        DataStorage.getInstance().setStructuresNeedUpdating();
-    }
-
-    public static class StructureRefresh implements IValueChangeCallback<ConfigBoolean>
-    {
-        @Override
-        public void onValueChanged(ConfigBoolean config)
-        {
-            if (config.getBooleanValue())
-            {
-                StructureToggle.updateStructureData();
-            }
-
-            DataStorage.getInstance().setStructuresDirty();
-        }
     }
 }

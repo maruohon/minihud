@@ -1,19 +1,22 @@
 package fi.dy.masa.minihud.config;
 
+import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.options.IConfigBoolean;
+import fi.dy.masa.malilib.config.options.IConfigNotifiable;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
+import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
-import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleStructures;
+import fi.dy.masa.minihud.util.DataStorage;
 
-public enum RendererToggle implements IConfigBoolean, IHotkey
+public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable<IConfigBoolean>
 {
     DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled",    "", "Toggles the vanilla Block Collision Boxes debug renderer", "Block Collision Boxes"),
     DEBUG_HEIGHT_MAP                    ("debugHeightMapEnabled",       "", "Toggles the vanilla Height Map debug renderer", "Height Map"),
@@ -45,6 +48,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey
     private String modName = "";
     private boolean valueBoolean;
     private boolean lastSavedValueBoolean;
+    @Nullable private IValueChangeCallback<IConfigBoolean> callback;
 
     RendererToggle(String name, String defaultHotkey, String comment, String prettyName)
     {
@@ -59,17 +63,18 @@ public enum RendererToggle implements IConfigBoolean, IHotkey
         this.defaultValueBoolean = false;
         this.keybind = KeybindMulti.fromStorageString(name, defaultHotkey, settings);
 
-        if (name.equals("overlayStructureMainToggle"))
-        {
-            this.keybind.setCallback(new KeyCallbackToggleStructures(this));
-        }
-        else if (name.startsWith("debug"))
+        if (name.startsWith("debug"))
         {
             this.keybind.setCallback(new KeyCallbackToggleDebugRenderer(this));
         }
         else
         {
             this.keybind.setCallback(new KeyCallbackToggleRenderer(this));
+        }
+
+        if (name.equals("overlayStructureMainToggle"))
+        {
+            this.setValueChangeCallback((config) -> DataStorage.getInstance().requestStructureDataUpdates());
         }
 
         this.cacheSavedValue();
@@ -139,7 +144,28 @@ public enum RendererToggle implements IConfigBoolean, IHotkey
     @Override
     public void setBooleanValue(boolean value)
     {
+        boolean oldValue = this.valueBoolean;
         this.valueBoolean = value;
+
+        if (oldValue != this.valueBoolean)
+        {
+            this.onValueChanged();
+        }
+    }
+
+    @Override
+    public void setValueChangeCallback(IValueChangeCallback<IConfigBoolean> callback)
+    {
+        this.callback = callback;
+    }
+
+    @Override
+    public void onValueChanged()
+    {
+        if (this.callback != null)
+        {
+            this.callback.onValueChanged(this);
+        }
     }
 
     @Override

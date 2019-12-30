@@ -20,6 +20,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -43,7 +44,11 @@ import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
+import com.mumfrey.liteloader.core.ClientPluginChannels;
+import com.mumfrey.liteloader.core.PluginChannels.ChannelPolicy;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
+import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -52,15 +57,17 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.StructureToggle;
+import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorEnd;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorFlat;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorHell;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorOverworld;
 import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
 import fi.dy.masa.minihud.mixin.IMixinMapGenStructure;
+import fi.dy.masa.minihud.network.StructurePacketHandler;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
+import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
 public class DataStorage
@@ -110,6 +117,8 @@ public class DataStorage
         this.structures.clear();
         this.worldSeed = 0;
         this.worldSpawn = BlockPos.ORIGIN;
+
+        this.requestStructureDataUpdates();
     }
 
     public void setWorldSeed(long seed)
@@ -481,7 +490,7 @@ public class DataStorage
         return copy;
     }
 
-    public void updateStructureData()
+    public void updateStructureDataIfNeeded()
     {
         if (this.mc.world != null && this.mc.player != null)
         {
@@ -494,7 +503,7 @@ public class DataStorage
                     this.updateStructureDataFromIntegratedServer(playerPos);
                 }
             }
-            else if (this.structuresNeedUpdating(playerPos, 256))
+            else if (this.structuresNeedUpdating(playerPos, 128))
             {
                 if (this.hasStructureDataFromServer == false)
                 {
@@ -502,9 +511,48 @@ public class DataStorage
                 }
                 else
                 {
-                    StructureToggle.updateStructureData();
+                    this.requestStructureDataUpdates();
                 }
             }
+        }
+    }
+
+    public void requestStructureDataUpdates()
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (mc.world != null)
+        {
+            boolean enabled = RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue();
+
+            if (mc.isSingleplayer() == false)
+            {
+                if (enabled)
+                {
+                    ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandler.INSTANCE);
+
+                    // Request the data using both the old and the new protocol/channel name
+                    PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+                    data.writeInt(DataStorage.CARPET_ID_BOUNDINGBOX_MARKERS);
+                    ClientPluginChannels.sendMessage(LiteModMiniHud.CHANNEL_CARPET_CLIENT_OLD, data, ChannelPolicy.DISPATCH_ALWAYS);
+
+                    data = new PacketBuffer(Unpooled.buffer());
+                    data.writeInt(DataStorage.CARPET_ID_BOUNDINGBOX_MARKERS);
+                    PacketSplitter.send(mc.getConnection(), new ResourceLocation(LiteModMiniHud.CHANNEL_CARPET_CLIENT_NEW), data);
+
+                    LiteModMiniHud.logger.info("Requesting structure data from Carpet server");
+                }
+                else
+                {
+                    ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandler.INSTANCE);
+                }
+            }
+            else if (enabled)
+            {
+                this.setStructuresNeedUpdating();
+            }
+
+            this.setStructuresDirty();
         }
     }
 
