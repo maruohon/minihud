@@ -1,6 +1,5 @@
 package fi.dy.masa.minihud.util;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -230,6 +229,11 @@ public class DebugInfoUtils
 
     public static void renderVanillaDebug(long finishTime)
     {
+        if (Configs.Generic.ENABLED.getBooleanValue() == false)
+        {
+            return;
+        }
+
         DebugRenderer renderer = MinecraftClient.getInstance().debugRenderer;
 
         if (RendererToggle.DEBUG_COLLISION_BOXES.getBooleanValue())
