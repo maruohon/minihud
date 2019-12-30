@@ -14,6 +14,7 @@ import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.config.StructureToggle;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -39,6 +40,7 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
 
         builder.add(InfoToggle.values());
         builder.add(RendererToggle.values());
+        builder.addAll(StructureToggle.getHotkeys());
         builder.addAll(Configs.Generic.HOTKEY_LIST);
 
         return builder.build();
@@ -50,7 +52,8 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
         return ImmutableList.of(
                 new KeybindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST),
                 new KeybindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", ImmutableList.copyOf(InfoToggle.values())),
-                new KeybindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", ImmutableList.copyOf(RendererToggle.values()))
+                new KeybindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", ImmutableList.copyOf(RendererToggle.values())),
+                new KeybindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.structure_toggle_hotkeys", ImmutableList.copyOf(StructureToggle.getHotkeys()))
         );
     }
 

@@ -66,6 +66,7 @@ minihud.label.shapes.sphere_blocky=Sphere (block-based)
 minihud.hotkeys.category.generic_hotkeys=Generic hotkeys
 minihud.hotkeys.category.info_toggle_hotkeys=Info Toggle hotkeys
 minihud.hotkeys.category.renderer_toggle_hotkeys=Renderer Toggle hotkeys
+minihud.hotkeys.category.structure_toggle_hotkeys=Structure Toggle hotkeys
 
 minihud.message.toggled_debug_mode.collisions=Toggled Collison Boxes debug rendering to %s
 minihud.message.toggled_debug_mode.height_map=Toggled Height Map debug rendering to %s
