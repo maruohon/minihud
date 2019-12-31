@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
@@ -46,8 +47,8 @@ import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
 import com.mumfrey.liteloader.core.ClientPluginChannels;
 import com.mumfrey.liteloader.core.PluginChannels.ChannelPolicy;
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
+import fi.dy.masa.malilib.network.IClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -57,6 +58,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorEnd;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorFlat;
@@ -64,6 +66,7 @@ import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorHell;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorOverworld;
 import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
 import fi.dy.masa.minihud.mixin.IMixinMapGenStructure;
+import fi.dy.masa.minihud.network.CarpetPubsubPacketHandler;
 import fi.dy.masa.minihud.network.StructurePacketHandler;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
@@ -118,7 +121,28 @@ public class DataStorage
         this.worldSeed = 0;
         this.worldSpawn = BlockPos.ORIGIN;
 
-        this.requestStructureDataUpdates();
+        if (this.mc.world != null)
+        {
+            this.requestStructureDataUpdates();
+            this.updatePubsubRegistration();
+        }
+    }
+
+    public void updatePubsubRegistration()
+    {
+        IClientPacketChannelHandler handler = ClientPacketChannelHandler.getInstance();
+        boolean enabled = InfoToggle.SERVER_TPS.getBooleanValue();
+
+        if (enabled)
+        {
+            handler.registerClientChannelHandler(CarpetPubsubPacketHandler.INSTANCE);
+            CarpetPubsubPacketHandler.subscribe(ImmutableList.of(CarpetPubsubPacketHandler.NODE_SERVER_TPS, CarpetPubsubPacketHandler.NODE_SERVER_MSPT));
+        }
+        else
+        {
+            CarpetPubsubPacketHandler.unsubscribe(ImmutableList.of(CarpetPubsubPacketHandler.NODE_SERVER_TPS, CarpetPubsubPacketHandler.NODE_SERVER_MSPT));
+            handler.unregisterClientChannelHandler(CarpetPubsubPacketHandler.INSTANCE);
+        }
     }
 
     public void setWorldSeed(long seed)
@@ -445,7 +469,7 @@ public class DataStorage
         }
         // Presumably a Carpet server, check that there has been received data recently,
         // otherwise invalidate the data (for example when unsubscribing from the tps logger).
-        else if (this.mc.isIntegratedServerRunning() == false && totalWorldTime - this.tpsData.getLastSyncedTick() > 40)
+        else if (this.mc.isIntegratedServerRunning() == false && totalWorldTime - this.tpsData.getLastSyncedTick() > 80)
         {
             this.tpsData.clear();
             this.lastServerTimeUpdate = System.nanoTime();
@@ -460,7 +484,7 @@ public class DataStorage
         {
             double mspt = (double) MathHelper.average(this.mc.getIntegratedServer().tickTimeArray) / 1000000D;
             double tps = mspt <= 50 ? 20D : (1000D / mspt);
-            this.tpsData.setSyncedData(tps, mspt, this.mc.world.getTotalWorldTime());
+            this.tpsData.setIntegratedServerData(tps, mspt, this.mc.world.getTotalWorldTime());
         }
     }
 
@@ -832,7 +856,7 @@ public class DataStorage
 
     public void handleCarpetServerTPSData(ITextComponent textComponent)
     {
-        if (textComponent.getFormattedText().isEmpty() == false)
+        if (this.tpsData.shouldParsePlayerListData() && textComponent.getFormattedText().isEmpty() == false)
         {
             String text = TextFormatting.getTextWithoutFormattingCodes(textComponent.getUnformattedText());
             String[] lines = text.split("\n");
@@ -845,7 +869,7 @@ public class DataStorage
                 {
                     try
                     {
-                        this.tpsData.setSyncedData(
+                        this.tpsData.setPlayerListParsedData(
                                 Double.parseDouble(matcher.group("tps")),
                                 Double.parseDouble(matcher.group("mspt")),
                                 this.lastServerTick);
@@ -856,6 +880,16 @@ public class DataStorage
                 }
             }
         }
+    }
+
+    public void handleCarpetServerPubsubTPS(double tps)
+    {
+        this.tpsData.setSyncedTPS(tps, this.lastServerTick);
+    }
+
+    public void handleCarpetServerPubsubMSPT(double mspt)
+    {
+        this.tpsData.setSyncedMSPT(mspt, this.lastServerTick);
     }
 
     @Nullable
@@ -903,88 +937,6 @@ public class DataStorage
         {
             this.worldSeed = JsonUtils.getLong(obj, "seed");
             this.worldSeedValid = true;
-        }
-    }
-
-    public static class TPSData
-    {
-        private boolean hasCalculatedTPSData;
-        private boolean hasSyncedTPSData;
-        private double calculatedServerTPS;
-        private double calculatedServerMSPT;
-        private double syncedServerTPS;
-        private double syncedServerMSPT;
-        private long lastSync;
-
-        public void clear()
-        {
-            this.hasCalculatedTPSData = false;
-            this.hasSyncedTPSData = false;
-            this.lastSync = -1;
-        }
-
-        public boolean getHasValidData()
-        {
-            return this.hasSyncedTPSData || this.hasCalculatedTPSData;
-        }
-
-        public boolean getHasSyncedData()
-        {
-            return this.hasSyncedTPSData;
-        }
-
-        public long getLastSyncedTick()
-        {
-            return this.lastSync;
-        }
-
-        public void setCalculatedData(double tps, double mspt, long worldTime)
-        {
-            this.calculatedServerTPS = tps;
-            this.calculatedServerMSPT = mspt;
-            this.lastSync = worldTime;
-            this.hasCalculatedTPSData = true;
-        }
-
-        public void setSyncedData(double tps, double mspt, long worldTime)
-        {
-            this.syncedServerTPS = tps;
-            this.syncedServerMSPT = mspt;
-            this.lastSync = worldTime;
-            this.hasSyncedTPSData = true;
-        }
-
-        public String getFormattedInfoLine()
-        {
-            if (this.getHasValidData() == false)
-            {
-                return "Server TPS: <no valid data>";
-            }
-
-            boolean isSynced = this.hasSyncedTPSData;
-            double tps = isSynced ? this.syncedServerTPS : this.calculatedServerTPS;
-            double mspt = isSynced ? this.syncedServerMSPT : this.calculatedServerMSPT;
-            String rst = GuiBase.TXT_RST;
-            String preTps = tps >= 20.0D ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
-            String preMspt;
-
-            // Carpet server and integrated server have actual meaningful MSPT data available
-            if (isSynced)
-            {
-                if      (mspt <= 40) { preMspt = GuiBase.TXT_GREEN; }
-                else if (mspt <= 45) { preMspt = GuiBase.TXT_YELLOW; }
-                else if (mspt <= 50) { preMspt = GuiBase.TXT_GOLD; }
-                else                 { preMspt = GuiBase.TXT_RED; }
-
-                return String.format("Server TPS: %s%.1f%s MSPT: %s%.1f%s", preTps, tps, rst, preMspt, mspt, rst);
-            }
-            else
-            {
-                if (mspt <= 51) { preMspt = GuiBase.TXT_GREEN; }
-                else            { preMspt = GuiBase.TXT_RED; }
-
-                return String.format("Server TPS: %s%.1f%s (MSPT [est]: %s%.1f%s)", preTps, tps, rst, preMspt, mspt, rst);
-            }
         }
     }
 }

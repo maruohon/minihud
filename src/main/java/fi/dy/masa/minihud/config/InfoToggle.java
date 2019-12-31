@@ -1,18 +1,21 @@
 package fi.dy.masa.minihud.config;
 
+import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.options.IConfigBoolean;
 import fi.dy.masa.malilib.config.options.IConfigInteger;
+import fi.dy.masa.malilib.config.options.IConfigNotifiable;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBoolean;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
+import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.minihud.LiteModMiniHud;
 
-public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey
+public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConfigNotifiable<IConfigBoolean>
 {
     BIOME                   ("infoBiome",                   false, 19, "", "Show the name of the current biome"),
     BIOME_REG_NAME          ("infoBiomeRegistryName",       false, 20, "", "Show the registry name of the current biome"),
@@ -68,6 +71,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey
     private boolean lastSavedValueBoolean;
     private int linePosition;
     private int lastSavedLinePosition;
+    @Nullable private IValueChangeCallback<IConfigBoolean> callback;
 
     private InfoToggle(String name, boolean defaultValue, int linePosition, String defaultHotkey, String comment)
     {
@@ -153,7 +157,28 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey
     @Override
     public void setBooleanValue(boolean value)
     {
+        boolean oldValue = this.valueBoolean;
         this.valueBoolean = value;
+
+        if (oldValue != this.valueBoolean)
+        {
+            this.onValueChanged();
+        }
+    }
+
+    @Override
+    public void setValueChangeCallback(IValueChangeCallback<IConfigBoolean> callback)
+    {
+        this.callback = callback;
+    }
+
+    @Override
+    public void onValueChanged()
+    {
+        if (this.callback != null)
+        {
+            this.callback.onValueChanged(this);
+        }
     }
 
     @Override

@@ -20,6 +20,7 @@ public class LiteModMiniHud implements LiteMod, Configurable, PluginChannelListe
 
     public static final String CHANNEL_CARPET_CLIENT_OLD = "CarpetClient";
     public static final String CHANNEL_CARPET_CLIENT_NEW = "carpet:client";
+    public static final String CHANNEL_CARPET_PUBSUB = "carpet:pubsub";
 
     private final ImmutableList<String> pluginChannels = ImmutableList.of(CHANNEL_CARPET_CLIENT_OLD);
 
