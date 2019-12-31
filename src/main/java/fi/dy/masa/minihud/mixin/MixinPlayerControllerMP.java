@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import fi.dy.masa.minihud.util.DataStorage;
+import fi.dy.masa.minihud.data.DataStorage;
 
 @Mixin(net.minecraft.client.multiplayer.PlayerControllerMP.class)
 public abstract class MixinPlayerControllerMP

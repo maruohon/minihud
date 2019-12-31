@@ -4,7 +4,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.play.server.SPacketBlockChange;
 import net.minecraft.network.play.server.SPacketChat;
@@ -14,6 +13,7 @@ import net.minecraft.network.play.server.SPacketPlayerListHeaderFooter;
 import net.minecraft.network.play.server.SPacketSpawnPosition;
 import net.minecraft.network.play.server.SPacketTimeUpdate;
 import net.minecraft.util.math.ChunkPos;
+import fi.dy.masa.minihud.data.DataStorage;
 
 @Mixin(NetHandlerPlayClient.class)
 public abstract class MixinNetHandlerPlayClient
@@ -27,13 +27,13 @@ public abstract class MixinNetHandlerPlayClient
     @Inject(method = "handleTimeUpdate", at = @At("RETURN"))
     private void onTimeUpdate(SPacketTimeUpdate packetIn, CallbackInfo ci)
     {
-        DataStorage.getInstance().onServerTimeUpdate(packetIn.getTotalWorldTime());
+        DataStorage.getInstance().getTpsData().onServerTimeUpdate(packetIn.getTotalWorldTime());
     }
 
     @Inject(method = "handlePlayerListHeaderFooter", at = @At("RETURN"))
     private void onHandlePlayerListHeaderFooter(SPacketPlayerListHeaderFooter packetIn, CallbackInfo ci)
     {
-        DataStorage.getInstance().handleCarpetServerTPSData(packetIn.getFooter());
+        DataStorage.getInstance().getTpsData().parsePlayerListFooterTpsData(packetIn.getFooter());
     }
 
     @Inject(method = "handleChunkData", at = @At("RETURN"))

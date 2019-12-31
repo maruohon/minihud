@@ -1,18 +1,19 @@
-package fi.dy.masa.minihud.util;
+package fi.dy.masa.minihud.data;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.minihud.LiteModMiniHud;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.util.StructureType;
 
 public class StructureData
 {
@@ -60,6 +61,13 @@ public class StructureData
         return new StructureData(IntBoundingBox.fromVanillaBox(structure.getBoundingBox()), builder.build());
     }
 
+    /**
+     * Reads structures from the vanilla 1.12 and below structure files,
+     * and adds any structures of the provided StructureType <b>type</b> to the provided map.
+     * @param map
+     * @param rootCompound
+     * @param type
+     */
     @Nullable
     public static void readAndAddStructuresToMap(ArrayListMultimap<StructureType, StructureData> map, NBTTagCompound rootCompound, StructureType type)
     {
@@ -108,6 +116,12 @@ public class StructureData
         }
     }
 
+    /**
+     * Reads Temple structures from the vanilla 1.12 and below structure files,
+     * and adds them to the provided map. The structure type is read from the child component. 
+     * @param map
+     * @param rootCompound
+     */
     @Nullable
     public static void readAndAddTemplesToMap(ArrayListMultimap<StructureType, StructureData> map, NBTTagCompound rootCompound)
     {

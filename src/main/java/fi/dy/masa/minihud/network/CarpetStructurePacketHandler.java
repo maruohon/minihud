@@ -6,12 +6,12 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.malilib.network.IPluginChannelHandler;
 import fi.dy.masa.minihud.LiteModMiniHud;
-import fi.dy.masa.minihud.util.DataStorage;
+import fi.dy.masa.minihud.data.DataStorage;
 
-public class StructurePacketHandler implements IPluginChannelHandler
+public class CarpetStructurePacketHandler implements IPluginChannelHandler
 {
     public static final List<ResourceLocation> CHANNELS = ImmutableList.of(new ResourceLocation(LiteModMiniHud.CHANNEL_CARPET_CLIENT_NEW));
-    public static final StructurePacketHandler INSTANCE = new StructurePacketHandler();
+    public static final CarpetStructurePacketHandler INSTANCE = new CarpetStructurePacketHandler();
 
     @Override
     public List<ResourceLocation> getChannels()
@@ -22,6 +22,6 @@ public class StructurePacketHandler implements IPluginChannelHandler
     @Override
     public void onPacketReceived(PacketBuffer buf)
     {
-        DataStorage.getInstance().updateStructureDataFromCarpetServer(buf);
+        DataStorage.getInstance().getStructureStorage().updateStructureDataFromCarpetServer(buf);
     }
 }

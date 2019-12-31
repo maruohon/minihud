@@ -42,9 +42,10 @@ import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.data.DataStorage;
+import fi.dy.masa.minihud.data.TpsData;
 import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
-import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 
 public class RenderHandler implements IRenderer
@@ -195,7 +196,7 @@ public class RenderHandler implements IRenderer
 
             if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue() && (mc.world.getTotalWorldTime() % 20) == 0)
             {
-                DataStorage.getInstance().updateStructureDataIfNeeded();
+                DataStorage.getInstance().getStructureStorage().updateStructureDataIfNeeded();
             }
         }
     }
@@ -337,14 +338,16 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.SERVER_TPS)
         {
+            TpsData tpsData = this.data.getTpsData();
+
             if (mc.isSingleplayer() && (mc.getIntegratedServer().getTickCounter() % 10) == 0)
             {
-                this.data.updateIntegratedServerTPS();
+                tpsData.updateIntegratedServerTps();
             }
 
-            if (this.data.getHasValidTPSData())
+            if (tpsData.getHasValidData())
             {
-                this.addLine(this.data.getTPSInfoLine());
+                this.addLine(tpsData.getFormattedInfoLine());
             }
         }
         else if (type == InfoToggle.PING)

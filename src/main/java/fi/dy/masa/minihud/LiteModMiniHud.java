@@ -12,7 +12,7 @@ import com.mumfrey.liteloader.PluginChannelListener;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.malilib.event.InitializationHandler;
 import fi.dy.masa.minihud.config.gui.MiniHudConfigPanel;
-import fi.dy.masa.minihud.util.DataStorage;
+import fi.dy.masa.minihud.data.DataStorage;
 
 public class LiteModMiniHud implements LiteMod, Configurable, PluginChannelListener
 {
@@ -63,7 +63,7 @@ public class LiteModMiniHud implements LiteMod, Configurable, PluginChannelListe
         if (CHANNEL_CARPET_CLIENT_OLD.equals(channel))
         {
             data.readerIndex(0);
-            DataStorage.getInstance().updateStructureDataFromCarpetServer(data);
+            DataStorage.getInstance().getStructureStorage().updateStructureDataFromCarpetServer(data);
             data.readerIndex(0);
         }
     }

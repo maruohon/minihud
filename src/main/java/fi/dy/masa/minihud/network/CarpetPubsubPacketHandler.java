@@ -15,9 +15,12 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
+import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
+import fi.dy.masa.malilib.network.IClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.IPluginChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
-import fi.dy.masa.minihud.util.DataStorage;
+import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.data.DataStorage;
 import io.netty.buffer.Unpooled;
 
 public class CarpetPubsubPacketHandler implements IPluginChannelHandler
@@ -71,8 +74,8 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
         ImmutableMap.Builder<String, NodeType> builder = ImmutableMap.builder();
         DataStorage data = DataStorage.getInstance();
 
-        builder.put(NODE_SERVER_TPS,    NodeType.create(TYPE_DOUBLE, buf -> data.handleCarpetServerPubsubTPS(buf.readDouble())));
-        builder.put(NODE_SERVER_MSPT,   NodeType.create(TYPE_DOUBLE, buf -> data.handleCarpetServerPubsubMSPT(buf.readDouble())));
+        builder.put(NODE_SERVER_TPS,    NodeType.create(TYPE_DOUBLE, buf -> data.getTpsData().handleCarpetServerPubsubTps(buf.readDouble())));
+        builder.put(NODE_SERVER_MSPT,   NodeType.create(TYPE_DOUBLE, buf -> data.getTpsData().handleCarpetServerPubsubMspt(buf.readDouble())));
 
         for (EnumDyeColor color : EnumDyeColor.values())
         {
@@ -178,6 +181,23 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
             }
 
             PacketSplitter.send(handler, CHANNEL_NAME, buf);
+        }
+    }
+
+    public static void updatePubsubRegistration()
+    {
+        IClientPacketChannelHandler handler = ClientPacketChannelHandler.getInstance();
+        boolean enabled = InfoToggle.SERVER_TPS.getBooleanValue();
+
+        if (enabled)
+        {
+            handler.registerClientChannelHandler(INSTANCE);
+            subscribe(ImmutableList.of(NODE_SERVER_TPS, NODE_SERVER_MSPT));
+        }
+        else
+        {
+            unsubscribe(ImmutableList.of(NODE_SERVER_TPS, NODE_SERVER_MSPT));
+            handler.unregisterClientChannelHandler(INSTANCE);
         }
     }
 }

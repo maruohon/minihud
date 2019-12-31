@@ -12,9 +12,9 @@ import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
-import fi.dy.masa.minihud.util.DataStorage;
 
 public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable<IConfigBoolean>
 {
@@ -74,7 +74,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
 
         if (name.equals("overlayStructureMainToggle"))
         {
-            this.setValueChangeCallback((config) -> DataStorage.getInstance().requestStructureDataUpdates());
+            this.setValueChangeCallback((config) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
         }
 
         this.cacheSavedValue();

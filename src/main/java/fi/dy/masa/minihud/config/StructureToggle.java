@@ -6,7 +6,7 @@ import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.config.options.IConfigBoolean;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.minihud.util.DataStorage;
+import fi.dy.masa.minihud.data.DataStorage;
 
 public enum StructureToggle
 {
@@ -34,7 +34,7 @@ public enum StructureToggle
         this.hotkey          = new ConfigHotkey("Toggle " + name, defaultHotkey, comment);
 
         this.hotkey.getKeybind().setCallback((action, key) -> { this.toggleOption.toggleBooleanValue(); return true; });
-        this.toggleOption.setValueChangeCallback((config) -> DataStorage.getInstance().requestStructureDataUpdates());
+        this.toggleOption.setValueChangeCallback((config) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
     }
 
     public IConfigBoolean getToggleOption()
