@@ -1,10 +1,13 @@
 package fi.dy.masa.minihud.network;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -15,12 +18,14 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.IClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.IPluginChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.data.DataStorage;
+import fi.dy.masa.minihud.data.MobcapData;
 import io.netty.buffer.Unpooled;
 
 public class CarpetPubsubPacketHandler implements IPluginChannelHandler
@@ -44,6 +49,9 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
 
     public static final String NODE_SERVER_TPS = "minecraft.performance.tps";
     public static final String NODE_SERVER_MSPT = "minecraft.performance.mspt";
+
+    private static final HashSet<String> SUBSCRIPTIONS = new HashSet<>();
+    private static final HashSet<String> MOB_CAP_SUBSCRIPTIONS = new HashSet<>();
 
     private static final Map<String, NodeType> NODE_TYPES;
 
@@ -82,6 +90,8 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
             builder.put("carpet.counter." + color.getName(), NodeType.create(TYPE_LONG, buf -> {}));
         }
 
+        MobcapData mobcapData = data.getMobcapData();
+
         for (DimensionType dim : DimensionType.values())
         {
             String prefix = "minecraft." + dim.getName();
@@ -90,9 +100,10 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
 
             for (EnumCreatureType creatureType : EnumCreatureType.values())
             {
-                String mobcapPrefix = prefix + ".mob_cap." + creatureType.name().toLowerCase(Locale.ROOT);
-                builder.put(mobcapPrefix + ".filled", NodeType.create(TYPE_INT, buf -> {}));
-                builder.put(mobcapPrefix + ".total", NodeType.create(TYPE_INT, buf -> {}));
+                String name = creatureType.name().toLowerCase(Locale.ROOT);
+                String mobcapPrefix = prefix + ".mob_cap." + name;
+                builder.put(mobcapPrefix + ".filled", NodeType.create(TYPE_INT, buf -> mobcapData.handleCarpetServerPubsubMobcap(name, false, buf.readInt())));
+                builder.put(mobcapPrefix + ".total",  NodeType.create(TYPE_INT, buf -> mobcapData.handleCarpetServerPubsubMobcap(name, true, buf.readInt())));
             }
         }
 
@@ -153,6 +164,7 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
     public static void unsubscribeAll()
     {
         unsubscribe(NODE_TYPES.keySet());
+        SUBSCRIPTIONS.clear();
     }
 
     public static void unsubscribe(String... nodes)
@@ -174,30 +186,98 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
             PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
             buf.writeVarInt(updateType);
             buf.writeVarInt(nodes.size());
+            int nodeCount = 0;
 
             for (String node : nodes)
             {
-                buf.writeString(node);
+                if (updateType == PACKET_C2S_SUBSCRIBE && SUBSCRIPTIONS.contains(node) == false)
+                {
+                    buf.writeString(node);
+                    SUBSCRIPTIONS.add(node);
+                    ++nodeCount;
+                }
+                else if (updateType == PACKET_C2S_UNSUBSCRIBE && SUBSCRIPTIONS.contains(node))
+                {
+                    buf.writeString(node);
+                    SUBSCRIPTIONS.remove(node);
+                    ++nodeCount;
+                }
             }
 
-            PacketSplitter.send(handler, CHANNEL_NAME, buf);
+            if (nodeCount > 0)
+            {
+                PacketSplitter.send(handler, CHANNEL_NAME, buf);
+            }
         }
     }
 
-    public static void updatePubsubRegistration()
+    public static void updatePubsubSubscriptions()
     {
-        IClientPacketChannelHandler handler = ClientPacketChannelHandler.getInstance();
-        boolean enabled = InfoToggle.SERVER_TPS.getBooleanValue();
+        World world = Minecraft.getMinecraft().world;
 
-        if (enabled)
+        if (world != null)
         {
+            IClientPacketChannelHandler handler = ClientPacketChannelHandler.getInstance();
+            Set<String> unsubs = new HashSet<>();
+            Set<String> newsubs = new HashSet<>();
+
             handler.registerClientChannelHandler(INSTANCE);
-            subscribe(ImmutableList.of(NODE_SERVER_TPS, NODE_SERVER_MSPT));
+
+            if (InfoToggle.SERVER_TPS.getBooleanValue())
+            {
+                newsubs.add(NODE_SERVER_TPS);
+                newsubs.add(NODE_SERVER_MSPT);
+            }
+            else
+            {
+                unsubs.add(NODE_SERVER_TPS);
+                unsubs.add(NODE_SERVER_MSPT);
+            }
+
+            //List<String> mobCaps = getMobcapNodeNames(world.provider.getDimensionType());
+
+            // First unsubscribe from any previous subscriptions, plus in case the game
+            // was restarted, also unsubscribe from the current dimension mob caps
+            unsubs.addAll(MOB_CAP_SUBSCRIPTIONS);
+            //unsubs.addAll(mobCaps);
+            MOB_CAP_SUBSCRIPTIONS.clear();
+
+            if (InfoToggle.MOB_CAPS.getBooleanValue())
+            {
+                List<String> mobCaps = getMobcapNodeNames(world.provider.getDimensionType());
+                newsubs.addAll(mobCaps);
+                unsubs.removeAll(mobCaps);
+                MOB_CAP_SUBSCRIPTIONS.addAll(mobCaps);
+            }
+
+            if (unsubs.isEmpty() == false)
+            {
+                unsubscribe(unsubs);
+            }
+
+            if (newsubs.isEmpty() == false)
+            {
+                subscribe(newsubs);
+            }
+            else
+            {
+                handler.unregisterClientChannelHandler(INSTANCE);
+            }
         }
-        else
+    }
+
+    private static List<String> getMobcapNodeNames(DimensionType dimensionType)
+    {
+        List<String> nodes = new ArrayList<>();
+        String prefix = "minecraft." + dimensionType.getName() + ".mob_cap.";
+
+        for (EnumCreatureType creatureType : EnumCreatureType.values())
         {
-            unsubscribe(ImmutableList.of(NODE_SERVER_TPS, NODE_SERVER_MSPT));
-            handler.unregisterClientChannelHandler(INSTANCE);
+            String pre = prefix + creatureType.name().toLowerCase(Locale.ROOT);
+            nodes.add(pre + ".filled");
+            nodes.add(pre + ".total");
         }
+
+        return nodes;
     }
 }

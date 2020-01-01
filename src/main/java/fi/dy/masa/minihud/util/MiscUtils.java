@@ -3,11 +3,15 @@ package fi.dy.masa.minihud.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.management.PlayerChunkMapEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import fi.dy.masa.malilib.util.IntBoundingBox;
@@ -143,6 +147,48 @@ public class MiscUtils
             LiteModMiniHud.logger.error("Error while trying to get the chunk unload order");
             return -1;
         }
+    }
+
+    public static int getSpawnableChunksCount(WorldServer world)
+    {
+        Set<ChunkPos> eligibleChunksForSpawning = new HashSet<>();
+        int chunkCount = 0;
+
+        for (EntityPlayer player : world.playerEntities)
+        {
+            if (player.isSpectator() == false)
+            {
+                int cx = MathHelper.floor(player.posX / 16.0D);
+                int cz = MathHelper.floor(player.posZ / 16.0D);
+                int chunkRadius = 8;
+
+                for (int cxOff = -chunkRadius; cxOff <= chunkRadius; ++cxOff)
+                {
+                    for (int czOff = -chunkRadius; czOff <= chunkRadius; ++czOff)
+                    {
+                        boolean edgeChunk = cxOff == -chunkRadius || cxOff == chunkRadius || czOff == -chunkRadius || czOff == chunkRadius;
+                        ChunkPos chunkPos = new ChunkPos(cxOff + cx, czOff + cz);
+
+                        if (eligibleChunksForSpawning.contains(chunkPos) == false)
+                        {
+                            ++chunkCount;
+
+                            if (edgeChunk == false && world.getWorldBorder().contains(chunkPos))
+                            {
+                                PlayerChunkMapEntry playerchunkmapentry = world.getPlayerChunkMap().getEntry(chunkPos.x, chunkPos.z);
+
+                                if (playerchunkmapentry != null && playerchunkmapentry.isSentToPlayers())
+                                {
+                                    eligibleChunksForSpawning.add(chunkPos);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return chunkCount;
     }
 
     public static boolean isStructureWithinRange(IntBoundingBox bb, BlockPos playerPos, int maxRange)

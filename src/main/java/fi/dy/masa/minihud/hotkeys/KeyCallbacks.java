@@ -36,7 +36,8 @@ public class KeyCallbacks
         Configs.Generic.STRUCTURES_RENDER_THROUGH.setValueChangeCallback((config) -> { OverlayRendererStructures.instance.setRenderThrough(config.getBooleanValue()); });
 
         InfoToggle.CHUNK_UNLOAD_ORDER.getKeybind().setCallback(new KeyCallbackAdjustable(InfoToggle.CHUNK_UNLOAD_ORDER, null));
-        InfoToggle.SERVER_TPS.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubRegistration());
+        InfoToggle.MOB_CAPS.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
+        InfoToggle.SERVER_TPS.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
 
         RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET)));
         RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY)));

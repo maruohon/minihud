@@ -43,6 +43,7 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
+import fi.dy.masa.minihud.data.MobcapData;
 import fi.dy.masa.minihud.data.TpsData;
 import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
@@ -188,15 +189,25 @@ public class RenderHandler implements IRenderer
     {
         if (mc.world != null)
         {
+            long worldTick = mc.world.getTotalWorldTime();
+
             if (InfoToggle.SPAWNABLE_SUB_CHUNKS.getBooleanValue() &&
-                mc.world.getTotalWorldTime() % Configs.Generic.SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL.getIntegerValue() == 0)
+                worldTick % Configs.Generic.SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL.getIntegerValue() == 0)
             {
                 DataStorage.getInstance().checkQueuedDirtyChunkHeightmaps();
             }
 
-            if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue() && (mc.world.getTotalWorldTime() % 20) == 0)
+            if ((worldTick % 20) == 0)
             {
-                DataStorage.getInstance().getStructureStorage().updateStructureDataIfNeeded();
+                if (InfoToggle.MOB_CAPS.getBooleanValue())
+                {
+                    DataStorage.getInstance().getMobcapData().updateIntegratedServerMobcaps();
+                }
+
+                if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
+                {
+                    DataStorage.getInstance().getStructureStorage().updateStructureDataIfNeeded();
+                }
             }
         }
     }
@@ -348,6 +359,20 @@ public class RenderHandler implements IRenderer
             if (tpsData.getHasValidData())
             {
                 this.addLine(tpsData.getFormattedInfoLine());
+            }
+        }
+        else if (type == InfoToggle.MOB_CAPS)
+        {
+            MobcapData mobcapData = this.data.getMobcapData();
+
+            if (mc.isSingleplayer() && (mc.getIntegratedServer().getTickCounter() % 100) == 0)
+            {
+                mobcapData.updateIntegratedServerMobcaps();
+            }
+
+            if (mobcapData.getHasValidData())
+            {
+                this.addLine(mobcapData.getFormattedInfoLine());
             }
         }
         else if (type == InfoToggle.PING)

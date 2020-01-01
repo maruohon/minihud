@@ -31,8 +31,11 @@ public class DataStorage
     private static final DataStorage INSTANCE = new DataStorage();
 
     private final Minecraft mc = Minecraft.getMinecraft();
-    private final TpsData tpsData = new TpsData();
+
+    private final MobcapData mobcapData = new MobcapData();
     private final StructureStorage structureStorage = new StructureStorage();
+    private final TpsData tpsData = new TpsData();
+
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
     private BlockPos worldSpawn = BlockPos.ORIGIN;
@@ -45,6 +48,11 @@ public class DataStorage
     public static DataStorage getInstance()
     {
         return INSTANCE;
+    }
+
+    public MobcapData getMobcapData()
+    {
+        return this.mobcapData;
     }
 
     public StructureStorage getStructureStorage()
@@ -62,15 +70,20 @@ public class DataStorage
         this.worldSeedValid = false;
         this.worldSpawnValid = false;
 
-        this.tpsData.clear();
+        this.mobcapData.clear();
         this.structureStorage.clear();
+        this.tpsData.clear();
         this.worldSeed = 0;
         this.worldSpawn = BlockPos.ORIGIN;
 
         if (this.mc.world != null)
         {
             this.structureStorage.requestStructureDataUpdates();
-            CarpetPubsubPacketHandler.updatePubsubRegistration();
+            CarpetPubsubPacketHandler.updatePubsubSubscriptions();
+        }
+        else
+        {
+            CarpetPubsubPacketHandler.unsubscribeAll();
         }
     }
 
