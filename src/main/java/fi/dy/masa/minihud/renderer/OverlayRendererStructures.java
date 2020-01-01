@@ -129,7 +129,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
         if (components.isEmpty() == false)
         {
-            if (components.size() > 1 || MiscUtils.areBoxesEqual(components.get(0), structure.getBoundingBox()) == false)
+            if (components.size() > 1 || components.get(0).equals(structure.getBoundingBox()) == false)
             {
                 color = type.getToggle().getColorComponents().getColor();
 
