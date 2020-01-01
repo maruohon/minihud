@@ -23,7 +23,9 @@ import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.IClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.IPluginChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
+import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.MobcapData;
 import io.netty.buffer.Unpooled;
@@ -51,7 +53,7 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
     public static final String NODE_SERVER_MSPT = "minecraft.performance.mspt";
 
     private static final HashSet<String> SUBSCRIPTIONS = new HashSet<>();
-    private static final HashSet<String> MOB_CAP_SUBSCRIPTIONS = new HashSet<>();
+    private static final HashSet<String> PER_DIMENSION_SUBSCRIPTIONS = new HashSet<>();
 
     private static final Map<String, NodeType> NODE_TYPES;
 
@@ -96,7 +98,7 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
         {
             String prefix = "minecraft." + dim.getName();
             String node = prefix + ".chunk_loading.dropped_chunks.hash_size";
-            builder.put(node, NodeType.create(TYPE_INT, buf -> {}));
+            builder.put(node, NodeType.create(TYPE_INT, buf -> data.setServerDroppedChunksHashSize(buf.readInt())));
 
             for (EnumCreatureType creatureType : EnumCreatureType.values())
             {
@@ -220,8 +222,11 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
             IClientPacketChannelHandler handler = ClientPacketChannelHandler.getInstance();
             Set<String> unsubs = new HashSet<>();
             Set<String> newsubs = new HashSet<>();
+            DimensionType dimType = world.provider.getDimensionType();
 
-            handler.registerClientChannelHandler(INSTANCE);
+            // First unsubscribe from any previous subscriptions
+            unsubs.addAll(PER_DIMENSION_SUBSCRIPTIONS);
+            PER_DIMENSION_SUBSCRIPTIONS.clear();
 
             if (InfoToggle.SERVER_TPS.getBooleanValue())
             {
@@ -234,36 +239,52 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
                 unsubs.add(NODE_SERVER_MSPT);
             }
 
-            //List<String> mobCaps = getMobcapNodeNames(world.provider.getDimensionType());
-
-            // First unsubscribe from any previous subscriptions, plus in case the game
-            // was restarted, also unsubscribe from the current dimension mob caps
-            unsubs.addAll(MOB_CAP_SUBSCRIPTIONS);
-            //unsubs.addAll(mobCaps);
-            MOB_CAP_SUBSCRIPTIONS.clear();
-
             if (InfoToggle.MOB_CAPS.getBooleanValue())
             {
-                List<String> mobCaps = getMobcapNodeNames(world.provider.getDimensionType());
-                newsubs.addAll(mobCaps);
-                unsubs.removeAll(mobCaps);
-                MOB_CAP_SUBSCRIPTIONS.addAll(mobCaps);
+                List<String> mobCaps = getMobcapNodeNames(dimType);
+                addPerDimensionSubs(mobCaps, newsubs, unsubs);
             }
 
-            if (unsubs.isEmpty() == false)
+            if ((InfoToggle.CHUNK_UNLOAD_ORDER.getBooleanValue()
+                 || RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getBooleanValue()
+                )
+                && Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue())
             {
-                unsubscribe(unsubs);
+                String node = getDroppedChunksHashSizeNodeName(dimType);
+                addPerDimensionSubs(Arrays.asList(node), newsubs, unsubs);
             }
 
-            if (newsubs.isEmpty() == false)
+            if (unsubs.isEmpty() == false || newsubs.isEmpty() == false)
             {
-                subscribe(newsubs);
+                handler.registerClientChannelHandler(INSTANCE);
+
+                if (unsubs.isEmpty() == false)
+                {
+                    unsubscribe(unsubs);
+                }
+
+                if (newsubs.isEmpty() == false)
+                {
+                    subscribe(newsubs);
+                }
             }
             else
             {
                 handler.unregisterClientChannelHandler(INSTANCE);
             }
         }
+    }
+
+    private static void addPerDimensionSubs(List<String> nodes, Set<String> newsubs, Set<String> unsubs)
+    {
+        newsubs.addAll(nodes);
+        unsubs.removeAll(nodes);
+        PER_DIMENSION_SUBSCRIPTIONS.addAll(nodes);
+    }
+
+    private static String getDroppedChunksHashSizeNodeName(DimensionType dimType)
+    {
+        return "minecraft." + dimType.getName() + ".chunk_loading.dropped_chunks.hash_size";
     }
 
     private static List<String> getMobcapNodeNames(DimensionType dimensionType)

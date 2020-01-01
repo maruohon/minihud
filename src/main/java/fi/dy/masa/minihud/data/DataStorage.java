@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.network.CarpetPubsubPacketHandler;
@@ -41,9 +42,11 @@ public class DataStorage
     private BlockPos worldSpawn = BlockPos.ORIGIN;
     private Vec3d distanceReferencePoint = Vec3d.ZERO;
     private int[] blockBreakCounter = new int[100];
+    private long worldSeed;
+    private int serverDroppedChunksHashSize;
     private boolean worldSeedValid;
     private boolean worldSpawnValid;
-    private long worldSeed;
+    private boolean hasServerDroppedChunksHashSize;
 
     public static DataStorage getInstance()
     {
@@ -69,10 +72,12 @@ public class DataStorage
     {
         this.worldSeedValid = false;
         this.worldSpawnValid = false;
+        this.hasServerDroppedChunksHashSize = false;
 
         this.mobcapData.clear();
         this.structureStorage.clear();
         this.tpsData.clear();
+        this.serverDroppedChunksHashSize = 0;
         this.worldSeed = 0;
         this.worldSpawn = BlockPos.ORIGIN;
 
@@ -97,6 +102,12 @@ public class DataStorage
     {
         this.worldSpawn = spawn;
         this.worldSpawnValid = true;
+    }
+
+    public void setServerDroppedChunksHashSize(int size)
+    {
+        this.serverDroppedChunksHashSize = size;
+        this.hasServerDroppedChunksHashSize = true;
     }
 
     public void setWorldSpawnIfUnknown(BlockPos spawn)
@@ -124,6 +135,11 @@ public class DataStorage
     public boolean hasStoredWorldSeed()
     {
         return this.worldSeedValid;
+    }
+
+    public boolean getHasDroppedChunksHashSizeFromServer()
+    {
+        return this.hasServerDroppedChunksHashSize;
     }
 
     public long getWorldSeed(int dimension)
@@ -168,6 +184,50 @@ public class DataStorage
         OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
         this.chunkHeightmapsToCheck.add(new ChunkPos(chunkX, chunkZ));
         OverlayRendererLightLevel.setNeedsUpdate();
+    }
+
+    public HashSizeType getDroppedChunksHashSizeType()
+    {
+        int size = Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
+
+        if (size != -1)
+        {
+            return HashSizeType.CONFIG;
+        }
+
+        if (this.hasServerDroppedChunksHashSize)
+        {
+            return HashSizeType.CARPET;
+        }
+
+        if (this.mc.isSingleplayer() && this.mc.world != null)
+        {
+            return HashSizeType.SINGLE_PLAYER;
+        }
+
+        return HashSizeType.FALLBACK;
+    }
+
+    public int getDroppedChunksHashSize()
+    {
+        HashSizeType type = this.getDroppedChunksHashSizeType();
+
+        switch (type)
+        {
+            case CONFIG:
+                return Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
+
+            case CARPET:
+                return this.serverDroppedChunksHashSize;
+
+            case SINGLE_PLAYER:
+                int dimId = WorldUtils.getDimensionId(this.mc.world);
+                return MiscUtils.getCurrentHashSize(this.mc.getIntegratedServer().getWorld(dimId));
+
+            case FALLBACK:
+            default:
+                return 0xFFFF;
+        }
     }
 
     public void checkQueuedDirtyChunkHeightmaps()
@@ -287,7 +347,8 @@ public class DataStorage
                 {
                     int size = Integer.parseInt(parts[1]);
                     Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.setIntegerValue(size);
-                    InfoUtils.printActionbarMessage("minihud.message.dropped_chunks_hash_size_set", Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue());
+                    // Fetch it again from the config, to take the bounds clamping into account
+                    InfoUtils.printActionbarMessage("minihud.message.dropped_chunks_hash_size_set_to", Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue());
                 }
                 catch (NumberFormatException e)
                 {
@@ -296,7 +357,7 @@ public class DataStorage
             }
             else if (parts.length == 1)
             {
-                InfoUtils.printActionbarMessage("minihud.message.dropped_chunks_hash_size_set", Integer.valueOf(MiscUtils.getDroppedChunksHashSize()));
+                InfoUtils.printActionbarMessage("minihud.message.dropped_chunks_hash_size_get", Integer.valueOf(this.getDroppedChunksHashSize()));
             }
 
             return true;
@@ -393,6 +454,26 @@ public class DataStorage
         {
             this.worldSeed = JsonUtils.getLong(obj, "seed");
             this.worldSeedValid = true;
+        }
+    }
+
+    public enum HashSizeType
+    {
+        CARPET          ("Carpet"),
+        CONFIG          ("Config"),
+        SINGLE_PLAYER   ("SP"),
+        FALLBACK        ("0xFFFF");
+
+        private final String displayName;
+
+        HashSizeType(String displayName)
+        {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName()
+        {
+            return this.displayName;
         }
     }
 }

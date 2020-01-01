@@ -38,8 +38,10 @@ public class KeyCallbacks
         InfoToggle.CHUNK_UNLOAD_ORDER.getKeybind().setCallback(new KeyCallbackAdjustable(InfoToggle.CHUNK_UNLOAD_ORDER, null));
         InfoToggle.MOB_CAPS.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
         InfoToggle.SERVER_TPS.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
+        InfoToggle.CHUNK_UNLOAD_ORDER.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
 
         RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET)));
+        RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
         RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY)));
     }
 

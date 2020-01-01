@@ -17,7 +17,6 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.config.StructureToggle;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
-import fi.dy.masa.minihud.util.MiscUtils;
 
 public class InputHandler implements IKeybindProvider, IMouseInputHandler
 {
@@ -63,12 +62,16 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
         // Not in a GUI
         if (GuiUtils.getCurrentScreen() == null && dWheel != 0)
         {
-            if (Configs.Generic.CHUNK_UNLOAD_BUCKET_WITH_SIZE.getBooleanValue() &&
+            if (Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue() &&
                 InfoToggle.CHUNK_UNLOAD_ORDER.getKeybind().isKeybindHeld())
             {
-                int size = MiscUtils.getDroppedChunksHashSize();
+                int size = Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
 
-                if (dWheel < 0)
+                if (size == 0)
+                {
+                    size = dWheel < 0 ? 1 : -1;
+                }
+                else if (dWheel < 0)
                 {
                     size <<= 1;
                 }
@@ -82,6 +85,7 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
                 String preGreen = GuiBase.TXT_GREEN;
                 String rst = GuiBase.TXT_RST;
                 Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.setIntegerValue(size);
+                size = Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
                 String strValue = preGreen + size + rst;
 
                 InfoUtils.printActionbarMessage("minihud.message.dropped_chunks_hash_size_set_to", strValue);

@@ -43,6 +43,7 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
+import fi.dy.masa.minihud.data.DataStorage.HashSizeType;
 import fi.dy.masa.minihud.data.MobcapData;
 import fi.dy.masa.minihud.data.TpsData;
 import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
@@ -52,7 +53,6 @@ import fi.dy.masa.minihud.util.MiscUtils;
 public class RenderHandler implements IRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
-    private final DataStorage data;
     private final Date date;
     private int fps;
     private int fpsCounter;
@@ -65,18 +65,12 @@ public class RenderHandler implements IRenderer
 
     public RenderHandler()
     {
-        this.data = DataStorage.getInstance();
         this.date = new Date();
     }
 
     public static RenderHandler getInstance()
     {
         return INSTANCE;
-    }
-
-    public DataStorage getDataStorage()
-    {
-        return this.data;
     }
 
     public static void fixDebugRendererState()
@@ -271,6 +265,7 @@ public class RenderHandler implements IRenderer
         Entity entity = mc.getRenderViewEntity();
         World world = entity.getEntityWorld();
         BlockPos pos = new BlockPos(entity.posX, entity.getEntityBoundingBox().minY, entity.posZ);
+        DataStorage data = DataStorage.getInstance();
 
         if (type == InfoToggle.FPS)
         {
@@ -349,7 +344,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.SERVER_TPS)
         {
-            TpsData tpsData = this.data.getTpsData();
+            TpsData tpsData = data.getTpsData();
 
             if (mc.isSingleplayer() && (mc.getIntegratedServer().getTickCounter() % 10) == 0)
             {
@@ -363,7 +358,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.MOB_CAPS)
         {
-            MobcapData mobcapData = this.data.getMobcapData();
+            MobcapData mobcapData = data.getMobcapData();
 
             if (mc.isSingleplayer() && (mc.getIntegratedServer().getTickCounter() % 100) == 0)
             {
@@ -584,9 +579,10 @@ public class RenderHandler implements IRenderer
             int bucket = MiscUtils.getChunkUnloadBucket(pos.getX() >> 4, pos.getZ() >> 4);
             String str1 = String.format("Chunk unload bucket: %d", bucket);
 
-            if (Configs.Generic.CHUNK_UNLOAD_BUCKET_WITH_SIZE.getBooleanValue())
+            if (Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue())
             {
-                str1 += String.format(" - Hash size: %d", MiscUtils.getDroppedChunksHashSize());
+                HashSizeType hashType = data.getDroppedChunksHashSizeType();
+                str1 += String.format(" - Hash size [%s]: %d", hashType.getDisplayName(), data.getDroppedChunksHashSize());
             }
 
             this.addLine(str1);
@@ -704,9 +700,9 @@ public class RenderHandler implements IRenderer
             String result;
             int dimension = entity.dimension;
 
-            if (this.data.isWorldSeedKnown(dimension))
+            if (data.isWorldSeedKnown(dimension))
             {
-                long seed = this.data.getWorldSeed(dimension);
+                long seed = data.getWorldSeed(dimension);
 
                 if (MiscUtils.canSlimeSpawnAt(pos.getX(), pos.getZ(), seed))
                 {

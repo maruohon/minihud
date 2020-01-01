@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.management.PlayerChunkMapEntry;
 import net.minecraft.util.math.BlockPos;
@@ -15,9 +14,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
 
 public class MiscUtils
@@ -59,32 +58,11 @@ public class MiscUtils
         return RAND.nextInt(10) == 0;
     }
 
-    public static int getDroppedChunksHashSize()
-    {
-        int size = Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
-
-        if (size > 0)
-        {
-            return size;
-        }
-
-        Minecraft mc = Minecraft.getMinecraft();
-
-        if (mc.isSingleplayer())
-        {
-            return getCurrentHashSize(mc.getIntegratedServer().getWorld(WorldUtils.getDimensionId(mc.player.getEntityWorld())));
-        }
-        else
-        {
-            return 0xFFFF;
-        }
-    }
-
     public static int getChunkUnloadBucket(int chunkX, int chunkZ)
     {
-        if (Configs.Generic.CHUNK_UNLOAD_BUCKET_WITH_SIZE.getBooleanValue())
+        if (Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue())
         {
-            return getChunkOrder(chunkX, chunkZ, getDroppedChunksHashSize());
+            return getChunkOrder(chunkX, chunkZ, DataStorage.getInstance().getDroppedChunksHashSize());
         }
         // The old simple calculation, without knowledge of the HashSet size
         else
