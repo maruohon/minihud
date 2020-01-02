@@ -19,6 +19,7 @@ import fi.dy.masa.malilib.config.options.IConfigValue;
 import fi.dy.masa.malilib.config.values.HudAlignment;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.minihud.Reference;
+import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.util.BlockGridMode;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
 import fi.dy.masa.minihud.util.LightLevelNumberMode;
@@ -79,6 +80,8 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       USE_CUSTOMIZED_COORDINATES          = new ConfigBoolean("useCustomizedCoordinateFormat", true, "Use the customized coordinate format string from 'coordinateFormat'");
         public static final ConfigBoolean       USE_FONT_SHADOW                     = new ConfigBoolean("useFontShadow", false, "Use font shadow for the info line HUD text");
         public static final ConfigBoolean       USE_TEXT_BACKGROUND                 = new ConfigBoolean("useTextBackground", true, "Use a solid background color behind the text\nfor the info line HUD text");
+        public static final ConfigBoolean       WOOL_COUNTER_ENABLE_ALL             = new ConfigBoolean("woolCounterEnableAll", true, "This overrides the 'woolCounterTypes' config,\nand enables all the colors. It's meant for quickly seeing all of them,\nwithout having to change the other config all the time.");
+        public static final ConfigString        WOOL_COUNTER_TYPES                  = new ConfigString("woolCounterTypes", "0-15", "This defines which wool counter colors are enabled\nfor the Carpet Wool Counters info lines.\nAccepted values are individual metadata values like 0,1,2,\nmetadata ranges like 4-6,8-11 and dye names like purple,blue,white.\nDifferent values should be separated by commas, without spaces.");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ENABLED,
@@ -99,6 +102,7 @@ public class Configs implements IConfigHandler
                 USE_CUSTOMIZED_COORDINATES,
                 USE_FONT_SHADOW,
                 USE_TEXT_BACKGROUND,
+                WOOL_COUNTER_ENABLE_ALL,
 
                 OPEN_CONFIG_GUI,
                 REQUIRED_KEY,
@@ -114,6 +118,7 @@ public class Configs implements IConfigHandler
                 COORDINATE_FORMAT_STRING,
                 DATE_FORMAT_REAL,
                 DATE_FORMAT_MINECRAFT,
+                WOOL_COUNTER_TYPES,
 
                 BLOCK_GRID_OVERLAY_RADIUS,
                 CHUNK_UNLOAD_BUCKET_FONT_SCALE,
@@ -237,5 +242,11 @@ public class Configs implements IConfigHandler
         map.put("StructureColors", StructureToggle.getColorConfigs());
 
         return map;
+    }
+
+    @Override
+    public void onPostLoad()
+    {
+        DataStorage.getInstance().getWoolCounters().updateEnabledCounters(Generic.WOOL_COUNTER_TYPES.getStringValue());
     }
 }

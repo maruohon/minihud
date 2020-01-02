@@ -28,6 +28,7 @@ import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.MobcapData;
+import fi.dy.masa.minihud.data.WoolCounters;
 import io.netty.buffer.Unpooled;
 
 public class CarpetPubsubPacketHandler implements IPluginChannelHandler
@@ -89,7 +90,7 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
 
         for (EnumDyeColor color : EnumDyeColor.values())
         {
-            builder.put("carpet.counter." + color.getName(), NodeType.create(TYPE_LONG, buf -> {}));
+            builder.put("carpet.counter." + color.getName(), NodeType.create(TYPE_LONG, buf -> data.getWoolCounters().setValue(color, buf.readLong())));
         }
 
         MobcapData mobcapData = data.getMobcapData();
@@ -239,6 +240,15 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
                 unsubs.add(NODE_SERVER_MSPT);
             }
 
+            if (InfoToggle.CARPET_WOOL_COUNTERS.getBooleanValue())
+            {
+                newsubs.addAll(getWoolCounterNodeNames(true));
+            }
+            else
+            {
+                unsubs.addAll(getWoolCounterNodeNames(false));
+            }
+
             if (InfoToggle.MOB_CAPS.getBooleanValue())
             {
                 List<String> mobCaps = getMobcapNodeNames(dimType);
@@ -297,6 +307,22 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
             String pre = prefix + creatureType.name().toLowerCase(Locale.ROOT);
             nodes.add(pre + ".filled");
             nodes.add(pre + ".total");
+        }
+
+        return nodes;
+    }
+
+    private static List<String> getWoolCounterNodeNames(boolean enabledOnly)
+    {
+        List<String> nodes = new ArrayList<>();
+        WoolCounters wc = DataStorage.getInstance().getWoolCounters();
+
+        for (EnumDyeColor color : EnumDyeColor.values())
+        {
+            if (enabledOnly == false || Configs.Generic.WOOL_COUNTER_ENABLE_ALL.getBooleanValue() || wc.isEnabled(color))
+            {
+                nodes.add("carpet.counter." + color.getName());
+            }
         }
 
         return nodes;

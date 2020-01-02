@@ -36,6 +36,7 @@ public class DataStorage
     private final MobcapData mobcapData = new MobcapData();
     private final StructureStorage structureStorage = new StructureStorage();
     private final TpsData tpsData = new TpsData();
+    private final WoolCounters woolCounters = new WoolCounters();
 
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
@@ -68,6 +69,11 @@ public class DataStorage
         return this.tpsData;
     }
 
+    public WoolCounters getWoolCounters()
+    {
+        return this.woolCounters;
+    }
+
     public void reset()
     {
         this.worldSeedValid = false;
@@ -77,6 +83,7 @@ public class DataStorage
         this.mobcapData.clear();
         this.structureStorage.clear();
         this.tpsData.clear();
+        this.woolCounters.clear();
         this.serverDroppedChunksHashSize = 0;
         this.worldSeed = 0;
         this.worldSpawn = BlockPos.ORIGIN;

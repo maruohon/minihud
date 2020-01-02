@@ -27,18 +27,24 @@ public class KeyCallbacks
     {
         Callbacks callback = new Callbacks();
 
-        Configs.Generic.SET_DISTANCE_REFERENCE_POINT.getKeybind().setCallback(callback);
         Configs.Generic.OPEN_CONFIG_GUI.getKeybind().setCallback(callback);
+        Configs.Generic.SET_DISTANCE_REFERENCE_POINT.getKeybind().setCallback(callback);
         Configs.Generic.SHAPE_EDITOR.getKeybind().setCallback(callback);
         Configs.Generic.TOGGLE_KEY.getKeybind().setCallback(new KeyCallbackToggleBoolean(Configs.Generic.ENABLED));
 
         Configs.Generic.LIGHT_LEVEL_RANGE.setValueChangeCallback((config) -> { OverlayRendererLightLevel.setNeedsUpdate(); });
         Configs.Generic.STRUCTURES_RENDER_THROUGH.setValueChangeCallback((config) -> { OverlayRendererStructures.instance.setRenderThrough(config.getBooleanValue()); });
+        Configs.Generic.WOOL_COUNTER_ENABLE_ALL.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
+        Configs.Generic.WOOL_COUNTER_TYPES.setValueChangeCallback((config) -> {
+            DataStorage.getInstance().getWoolCounters().updateEnabledCounters(config.getStringValue());
+            CarpetPubsubPacketHandler.updatePubsubSubscriptions();
+        });
 
+        InfoToggle.CARPET_WOOL_COUNTERS.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
         InfoToggle.CHUNK_UNLOAD_ORDER.getKeybind().setCallback(new KeyCallbackAdjustable(InfoToggle.CHUNK_UNLOAD_ORDER, null));
+        InfoToggle.CHUNK_UNLOAD_ORDER.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
         InfoToggle.MOB_CAPS.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
         InfoToggle.SERVER_TPS.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
-        InfoToggle.CHUNK_UNLOAD_ORDER.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
 
         RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET)));
         RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());

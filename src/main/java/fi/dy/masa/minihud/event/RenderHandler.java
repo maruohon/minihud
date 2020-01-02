@@ -562,6 +562,15 @@ public class RenderHandler implements IRenderer
             double dz = entity.posZ - entity.lastTickPosZ;
             this.addLine(String.format("speed: x: %.3f y: %.3f z: %.3f m/s", dx * 20, dy * 20, dz * 20));
         }
+        else if (type == InfoToggle.CARPET_WOOL_COUNTERS)
+        {
+            List<String> lines = DataStorage.getInstance().getWoolCounters().getInfoLines();
+
+            if (lines.isEmpty() == false)
+            {
+                lines.forEach(this::addLine);
+            }
+        }
         else if (type == InfoToggle.CHUNK_SECTIONS)
         {
             this.addLine(String.format("C: %d", ((IMixinRenderGlobal) mc.renderGlobal).getRenderedChunksInvoker()));

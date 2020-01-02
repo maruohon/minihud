@@ -23,6 +23,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
     BLOCK_IN_CHUNK          ("infoBlockInChunk",            false, 28, "", "Show the player's current position within the Chunk"),
     BLOCK_POS               ("infoBlockPosition",           false,  6, "", "Show the player's current block position"),
     BLOCK_PROPS             ("infoBlockProperties",         false, 27, "", "Show the BlockState properties and values"),
+    CARPET_WOOL_COUNTERS    ("infoCarpetWoolCounters",      false, 50, "", "Show the Carpet mod Wool Counters"),
     CHUNK_POS               ("infoChunkPosition",           false,  7, "", "Show the Chunk the player is currently within"),
     CHUNK_SECTIONS          ("infoChunkSections",           false, 14, "", "Show the currently rendered number of\nChunk sections (the C value from F3)"),
     CHUNK_SECTIONS_FULL     ("infoChunkSectionsLine",       false, 15, "", "Show the entire line of the C value from the F3 screen"),
