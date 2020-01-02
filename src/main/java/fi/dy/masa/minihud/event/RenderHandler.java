@@ -147,7 +147,7 @@ public class RenderHandler implements IRenderer
         Minecraft mc = Minecraft.getMinecraft();
 
         if (Configs.Generic.ENABLED.getBooleanValue() &&
-            mc.world != null && mc.player != null && mc.gameSettings.hideGUI == false)
+            mc.world != null && mc.player != null)
         {
             OverlayRenderer.renderOverlays(mc, partialTicks);
         }
