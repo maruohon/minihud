@@ -5,6 +5,7 @@ import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockBox;
@@ -80,8 +81,20 @@ public class MiscUtils
         if (tag != null && tag.contains("BlockEntityTag", Constants.NBT.TAG_COMPOUND))
         {
             tag = tag.getCompound("BlockEntityTag");
-            String count = String.valueOf(tag.getList("Bees", Constants.NBT.TAG_COMPOUND).size());
-            lines.add(Math.min(1, lines.size()), new TranslatableText("minihud.label.bee_info.count", count));
+            ListTag bees = tag.getList("Bees", Constants.NBT.TAG_COMPOUND);
+            int count = bees.size();
+
+            for (int i = 0; i < count; i++)
+            {
+                tag = bees.getCompound(i).getCompound("EntityData");
+                if (tag != null && tag.contains("CustomName", Constants.NBT.TAG_STRING))
+                {
+                    String beeName = tag.getString("CustomName");
+                    lines.add(Math.min(1, lines.size()), new TranslatableText("minihud.label.bee_info.name", Text.Serializer.fromJson(beeName).getString()));
+                }
+            }
+
+            lines.add(Math.min(1, lines.size()), new TranslatableText("minihud.label.bee_info.count", String.valueOf(count)));
         }
     }
 }
