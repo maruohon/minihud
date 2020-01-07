@@ -9,7 +9,7 @@ import fi.dy.masa.malilib.config.gui.GuiModConfigs;
 import fi.dy.masa.malilib.config.gui.liteloader.ConfigPanelBase;
 import fi.dy.masa.malilib.config.options.IConfigBase;
 import fi.dy.masa.malilib.config.options.IConfigValue;
-import fi.dy.masa.malilib.gui.ConfigInfoProviderSimple;
+import fi.dy.masa.malilib.gui.util.ConfigInfoProviderSimple;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;

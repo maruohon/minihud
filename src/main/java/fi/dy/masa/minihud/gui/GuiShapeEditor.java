@@ -8,7 +8,6 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
-import fi.dy.masa.malilib.MaLiLibIcons;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.values.BlockSnap;
 import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
@@ -22,9 +21,10 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.listener.ButtonListenerDoubleModifier;
 import fi.dy.masa.malilib.gui.listener.ButtonListenerIntModifier;
+import fi.dy.masa.malilib.gui.util.GuiIconBase;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widgets.WidgetColorIndicator;
 import fi.dy.masa.malilib.interfaces.ICoordinateValueModifier;
-import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
@@ -167,7 +167,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            ButtonGeneric button = new ButtonGeneric(x + 54, y - 1, MaLiLibIcons.BTN_PLUSMINUS_16, hover);
+            ButtonGeneric button = new ButtonGeneric(x + 54, y - 1, GuiIconBase.BTN_PLUSMINUS_16, hover);
             this.addButton(button, new ButtonListenerDoubleModifier(supplier, new ChainedDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
         }
     }
@@ -184,7 +184,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            ButtonGeneric button = new ButtonGeneric(x + 54, y - 1, MaLiLibIcons.BTN_PLUSMINUS_16, hover);
+            ButtonGeneric button = new ButtonGeneric(x + 54, y - 1, GuiIconBase.BTN_PLUSMINUS_16, hover);
             this.addButton(button, new ButtonListenerIntModifier(supplier, new ChainedIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
         }
     }
