@@ -27,6 +27,8 @@
 
     "minihud.label.bee_info.count": "§7Contains §b%s§7 bee(s)",
 
+    "minihud.label.stew_info.effect": "§7%s (%s seconds)",
+
     "minihud.label.blockgridmode.all": "All",
     "minihud.label.blockgridmode.non_air": "Non-air",
     "minihud.label.blockgridmode.adjacent": "Adjacent to non-air",

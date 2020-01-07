@@ -14,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.SuspiciousStewItem;
 import net.minecraft.text.Text;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -27,11 +28,19 @@ public abstract class MixinItemStack
     @Inject(method = "getTooltip", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILSOFT)
     private void onGetTooltip(@Nullable PlayerEntity player, TooltipContext context, CallbackInfoReturnable<List<Text>> ci, List<Text> list)
     {
+        Item item = this.getItem();
+
         if (Configs.Generic.BEE_TOOLTIPS.getBooleanValue() &&
-            this.getItem() instanceof BlockItem &&
-            ((BlockItem) this.getItem()).getBlock() instanceof BeehiveBlock)
+            item instanceof BlockItem &&
+            ((BlockItem) item).getBlock() instanceof BeehiveBlock)
         {
             MiscUtils.addBeeTooltip((ItemStack) (Object) this, list);
         }
+
+        if (Configs.Generic.STEW_TOOLTIPS.getBooleanValue() &&
+            item instanceof SuspiciousStewItem)
+        {
+            MiscUtils.addStewTooltip((ItemStack) (Object) this, list);
+        }   
     }
 }
