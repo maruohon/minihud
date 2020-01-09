@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRangeChangeListener;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -148,9 +147,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
     {
         List<String> lines = new ArrayList<>();
 
-        String aq = GuiBase.TXT_AQUA;
-        String rst = GuiBase.TXT_GRAY;
-        lines.add(StringUtils.translate("minihud.gui.label.shape.type_value", aq + this.type.getDisplayName() + rst));
+        lines.add(StringUtils.translate("minihud.gui.label.hover.shape.type_value", this.type.getDisplayName()));
 
         return lines;
     }

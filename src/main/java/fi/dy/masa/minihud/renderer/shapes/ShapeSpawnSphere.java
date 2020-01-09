@@ -1,11 +1,11 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.Quadrant;
@@ -65,12 +65,9 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
     public List<String> getWidgetHoverLines()
     {
         List<String> lines = super.getWidgetHoverLines();
+        DecimalFormat fmt = new DecimalFormat("#.##");
 
-        String gl = GuiBase.TXT_GOLD;
-        String gr = GuiBase.TXT_GRAY;
-        String rst = GuiBase.TXT_GRAY;
-
-        lines.add(2, gr + StringUtils.translate("minihud.gui.label.margin_value", String.format("%s%.2f%s", gl, this.margin, rst)));
+        lines.add(2, StringUtils.translate("minihud.gui.label.hover.shape.margin_value", fmt.format(this.margin)));
 
         return lines;
     }

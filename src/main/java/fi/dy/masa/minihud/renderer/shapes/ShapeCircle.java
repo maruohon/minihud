@@ -10,7 +10,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
@@ -129,14 +128,9 @@ public class ShapeCircle extends ShapeCircleBase
     {
         List<String> lines = super.getWidgetHoverLines();
 
-        String aq = GuiBase.TXT_AQUA;
-        String gl = GuiBase.TXT_GOLD;
-        String gr = GuiBase.TXT_GRAY;
-        String rst = GuiBase.TXT_GRAY;
-
-        lines.add(2, gr + StringUtils.translate("minihud.gui.label.height_value", gl + this.getHeight() + rst));
-        lines.add(3, gr + StringUtils.translate("minihud.gui.label.circle.main_axis_value",
-                aq + org.apache.commons.lang3.StringUtils.capitalize(this.getMainAxis().toString().toLowerCase()) + rst));
+        String axis = org.apache.commons.lang3.StringUtils.capitalize(this.getMainAxis().toString().toLowerCase());
+        lines.add(2, StringUtils.translate("minihud.gui.label.hover.shape.height_value", this.getHeight()));
+        lines.add(3, StringUtils.translate("minihud.gui.label.hover.shape.circle.main_axis_value", axis));
 
         return lines;
     }

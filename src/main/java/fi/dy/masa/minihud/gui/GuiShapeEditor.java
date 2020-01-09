@@ -147,7 +147,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.addButton(button, new ButtonListenerSphere(shape, this));
 
         this.configBlockSnap.setOptionListValue(shape.getBlockSnap());
-        ConfigButtonOptionList buttonSnap = new ConfigButtonOptionList(x + button.getWidth() + 4, y, -1, 20, this.configBlockSnap, "minihud.gui.label.block_snap");
+        ConfigButtonOptionList buttonSnap = new ConfigButtonOptionList(x + button.getWidth() + 4, y, -1, 20, this.configBlockSnap, "minihud.gui.label.shape.block_snap");
         this.addButton(buttonSnap, new ButtonListenerSphereBlockSnap(shape, this));
 
         y += 34;

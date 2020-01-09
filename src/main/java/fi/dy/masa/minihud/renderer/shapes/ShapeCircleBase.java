@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
+import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -12,7 +13,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.values.BlockSnap;
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -194,26 +194,17 @@ public abstract class ShapeCircleBase extends ShapeBase
     public List<String> getWidgetHoverLines()
     {
         List<String> lines = super.getWidgetHoverLines();
+        DecimalFormat fmt = new DecimalFormat("#.##");
         Vec3d c = this.center;
 
-        String aq = GuiBase.TXT_AQUA;
-        String bl = GuiBase.TXT_BLUE;
-        String gl = GuiBase.TXT_GOLD;
-        String gr = GuiBase.TXT_GRAY;
-        String rst = GuiBase.TXT_GRAY;
-
-        lines.add(gr + StringUtils.translate("minihud.gui.label.radius_value", gl + String.valueOf(this.getRadius()) + rst));
-        lines.add(gr + StringUtils.translate("minihud.gui.label.center_value",
-                String.format("x: %s%.2f%s, y: %s%.2f%s, z: %s%.2f%s",
-                        bl, c.x, rst, bl, c.y, rst, bl, c.z, rst)));
-        lines.add(gr + StringUtils.translate("minihud.gui.label.block_snap", aq + this.snap.getDisplayName() + rst));
+        lines.add(StringUtils.translate("minihud.gui.label.hover.shape.radius_value", String.valueOf(this.getRadius())));
+        lines.add(StringUtils.translate("minihud.gui.label.hover.shape.center_value", fmt.format(c.x), fmt.format(c.y), fmt.format(c.z)));
+        lines.add(StringUtils.translate("minihud.gui.label.hover.shape.block_snap", this.snap.getDisplayName()));
 
         if (this.snap != BlockSnap.NONE)
         {
             c = this.effectiveCenter;
-            lines.add(gr + StringUtils.translate("minihud.gui.label.effective_center_value",
-                    String.format("x: %s%.2f%s, y: %s%.2f%s, z: %s%.2f%s",
-                        bl, c.x, rst, bl, c.y, rst, bl, c.z, rst)));
+            lines.add(StringUtils.translate("minihud.gui.label.hover.shape.effective_center_value", fmt.format(c.x), fmt.format(c.y), fmt.format(c.z)));
         }
 
         return lines;
