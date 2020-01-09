@@ -202,7 +202,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
     @Override
     public void resetToDefault()
     {
-        this.valueBoolean = this.defaultValueBoolean;
+        this.setBooleanValue(this.defaultValueBoolean);
     }
 
     @Override

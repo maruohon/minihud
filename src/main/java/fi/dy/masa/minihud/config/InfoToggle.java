@@ -250,7 +250,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
     @Override
     public void resetToDefault()
     {
-        this.valueBoolean = this.defaultValueBoolean;
+        this.setBooleanValue(this.defaultValueBoolean);
     }
 
     @Override
