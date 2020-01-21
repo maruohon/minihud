@@ -10,7 +10,7 @@ import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 @Mixin(AbstractInventoryScreen.class)
 public abstract class MixinAbstractInventoryScreen
 {
-    @Inject(method = "drawPotionEffects", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "drawStatusEffects", at = @At("HEAD"), cancellable = true)
     private void preventPotionEffectRendering(CallbackInfo ci)
     {
         if (InputUtils.isRecipeViewOpen())
