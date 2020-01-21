@@ -26,6 +26,7 @@
     "minihud.gui.title.shape_manager": "Shape Manager",
 
     "minihud.label.bee_info.count": "§7Contains §b%s§7 bee(s)",
+    "minihud.label.bee_info.name": "§7- %s",
 
     "minihud.label.blockgridmode.all": "All",
     "minihud.label.blockgridmode.non_air": "Non-air",
