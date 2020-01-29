@@ -1,6 +1,6 @@
 package fi.dy.masa.minihud.gui.widgets;
 
-import java.util.List;
+import net.minecraft.client.renderer.GlStateManager;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -13,13 +13,11 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
-import net.minecraft.client.renderer.GlStateManager;
 
 public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
 {
     private final WidgetListShapes parent;
     private final ShapeBase shape;
-    private final List<String> hoverLines;
     private final boolean isOdd;
     private final int buttonsStartX;
 
@@ -29,7 +27,6 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         super(x, y, width, height, shape, listIndex);
 
         this.shape = shape;
-        this.hoverLines = shape.getWidgetHoverLines();
         this.isOdd = isOdd;
         this.parent = parent;
         y += 1;
@@ -41,6 +38,8 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         posX -= this.addButton(posX, y, ButtonListener.Type.CONFIGURE);
 
         this.buttonsStartX = posX;
+
+        this.getHoverStrings().addAll(shape.getWidgetHoverLines());
     }
 
     protected int addButton(int x, int y, ButtonListener.Type type)
@@ -102,17 +101,6 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
 
         RenderUtils.disableItemLighting();
         GlStateManager.disableLighting();
-    }
-
-    @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
-    {
-        super.postRenderHovered(mouseX, mouseY, selected);
-
-        if (mouseX >= this.x && mouseX < this.buttonsStartX && mouseY >= this.y && mouseY <= this.y + this.height)
-        {
-            RenderUtils.drawHoverText(mouseX, mouseY, this.hoverLines);
-        }
     }
 
     private static class ButtonListener implements IButtonActionListener
