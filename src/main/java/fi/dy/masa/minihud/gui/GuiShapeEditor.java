@@ -72,7 +72,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
     private void createColorInput(int x, int y)
     {
-        this.addLabel(x, y, -1, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.color"));
+        this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.color"));
         y += 12;
 
         GuiTextFieldGeneric textField = new GuiTextFieldGeneric(x, y, 70, 17, this.textRenderer);
@@ -87,7 +87,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
     private void createShapeEditorElements(int x, int y)
     {
-        this.addLabel(x, y, -1, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.display_name_colon"));
+        this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.display_name_colon"));
         y += 12;
 
         GuiTextFieldGeneric textField = new GuiTextFieldGeneric(x, y, 240, 17, this.textRenderer);
@@ -131,7 +131,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     {
         ShapeCircleBase shape = (ShapeCircleBase) this.shape;
 
-        this.addLabel(x, y, 60, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.center_colon"));
+        this.addLabel(x, y + 2, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.center_colon"));
 
         if (addRadiusInput)
         {
@@ -150,14 +150,14 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         ConfigButtonOptionList buttonSnap = new ConfigButtonOptionList(x + button.getWidth() + 4, y, -1, 20, this.configBlockSnap, "minihud.gui.label.shape.block_snap");
         this.addButton(buttonSnap, new ButtonListenerSphereBlockSnap(shape, this));
 
-        y += 34;
+        y += 24;
 
         this.createColorInput(x, y);
     }
 
     private void createShapeEditorElementDoubleField(int x, int y, DoubleSupplier supplier, DoubleConsumer consumer, String translationKey, boolean addButton)
     {
-        this.addLabel(x + 12, y, -1, 12, 0xFFFFFFFF, translationKey);
+        this.addLabel(x + 12, y, 0xFFFFFFFF, translationKey);
         y += 11;
 
         GuiTextFieldDouble txtField = new GuiTextFieldDouble(x + 12, y, 40, 14, this.textRenderer);
@@ -174,7 +174,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
     private void createShapeEditorElementIntField(int x, int y, IntSupplier supplier, IntConsumer consumer, String translationKey, boolean addButton)
     {
-        this.addLabel(x + 12, y, -1, 12, 0xFFFFFFFF, translationKey);
+        this.addLabel(x + 12, y, 0xFFFFFFFF, translationKey);
         y += 11;
 
         GuiTextFieldInteger txtField = new GuiTextFieldInteger(x + 12, y, 40, 14, this.textRenderer);
@@ -191,7 +191,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
     private void createDirectionButton(int x, int y, Supplier<EnumFacing> supplier, Consumer<EnumFacing> consumer, String translationKey)
     {
-        this.addLabel(x, y, -1, 12, 0xFFFFFFFF, translationKey);
+        this.addLabel(x, y, 0xFFFFFFFF, translationKey);
         y += 10;
 
         ButtonGeneric button = new ButtonGeneric(x, y, 50, 20, org.apache.commons.lang3.StringUtils.capitalize(supplier.get().toString().toLowerCase()));
@@ -200,7 +200,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
     private void createRenderTypeButton(int x, int y, Supplier<ShapeRenderType> supplier, Consumer<ShapeRenderType> consumer, String translationKey)
     {
-        this.addLabel(x, y, -1, 12, 0xFFFFFFFF, translationKey);
+        this.addLabel(x, y, 0xFFFFFFFF, translationKey);
         y += 10;
 
         ButtonGeneric button = new ButtonGeneric(x, y, -1, 20, supplier.get().getDisplayName());

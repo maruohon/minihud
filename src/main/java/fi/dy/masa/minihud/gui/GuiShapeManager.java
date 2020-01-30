@@ -33,7 +33,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
 
         // The position will get updated later
         this.widgetDropDown = new WidgetDropDownList<ShapeType>(0, 0, 160, 18, 200, 10, ImmutableList.copyOf(ShapeType.values()), (type) -> type.getDisplayName());
-        this.widgetDropDown.setZLevel(this.zLevel + 1);
+        this.widgetDropDown.setZLevel((int) this.zLevel + 1);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         x = this.width - 10;
         x -= this.addButton(x, y, ButtonListener.Type.ADD_SHAPE);
 
-        this.widgetDropDown.setPosition(x - this.widgetDropDown.getWidth() - 4, y + 1);
+        this.widgetDropDown.setPosition(x - this.widgetDropDown.getWidth() - 4, y);
 
         this.addWidget(this.widgetDropDown);
     }
