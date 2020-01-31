@@ -70,29 +70,34 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         RenderUtils.color(1f, 1f, 1f, 1f);
 
         boolean shapeSelected = ShapeManager.INSTANCE.getSelectedShape() == this.entry;
+        int x = this.getX();
+        int y = this.getY();
+        int z = this.getZLevel();
+        int width = this.getWidth();
+        int height = this.getHeight();
 
         // Draw a lighter background for the hovered and the selected entry
         if (selected || shapeSelected || this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x70FFFFFF);
+            RenderUtils.drawRect(x, y, width, height, 0x70FFFFFF, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x20FFFFFF);
+            RenderUtils.drawRect(x, y, width, height, 0x20FFFFFF, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x50FFFFFF);
+            RenderUtils.drawRect(x, y, width, height, 0x50FFFFFF, z);
         }
 
         if (shapeSelected)
         {
-            RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
+            RenderUtils.drawOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
         }
 
         String name = this.shape.getDisplayName();
-        this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name);
+        this.drawString(x + 4, y + this.getCenteredTextOffsetY(), 0xFFFFFFFF, name);
 
         RenderUtils.color(1f, 1f, 1f, 1f);
         GlStateManager.disableBlend();
@@ -101,6 +106,8 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
 
         RenderUtils.disableItemLighting();
         GlStateManager.disableLighting();
+
+        RenderUtils.color(1f, 1f, 1f, 1f);
     }
 
     private static class ButtonListener implements IButtonActionListener
