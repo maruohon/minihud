@@ -4,16 +4,16 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.packet.BlockUpdateS2CPacket;
-import net.minecraft.client.network.packet.ChatMessageS2CPacket;
-import net.minecraft.client.network.packet.ChunkDataS2CPacket;
-import net.minecraft.client.network.packet.ChunkDeltaUpdateS2CPacket;
-import net.minecraft.client.network.packet.PlayerListHeaderS2CPacket;
-import net.minecraft.client.network.packet.PlayerSpawnPositionS2CPacket;
-import net.minecraft.client.network.packet.WorldTimeUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
+import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
+import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerListHeaderS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerSpawnPositionS2CPacket;
+import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.util.math.ChunkPos;
+import fi.dy.masa.minihud.util.DataStorage;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public abstract class MixinClientPlayNetworkHandler
