@@ -3,21 +3,18 @@ package fi.dy.masa.itemscroller.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
-import net.minecraft.client.gui.screen.ingame.AbstractContainerScreen;
-import net.minecraft.container.Slot;
-import net.minecraft.container.SlotActionType;
 
-@Mixin(AbstractContainerScreen.class)
-public interface IMixinAbstractContainerScreen
+@Mixin(net.minecraft.client.gui.screen.ingame.ContainerScreen.class)
+public interface IMixinContainerScreen
 {
     @Invoker("getSlotAt")
-    Slot getSlotAtPositionInvoker(double x, double y);
+    net.minecraft.container.Slot getSlotAtPositionInvoker(double x, double y);
 
     @Invoker("onMouseClick")
-    void handleMouseClickInvoker(Slot slotIn, int slotId, int mouseButton, SlotActionType type);
+    void handleMouseClickInvoker(net.minecraft.container.Slot slotIn, int slotId, int mouseButton, net.minecraft.container.SlotActionType type);
 
     @Accessor("focusedSlot")
-    Slot getHoveredSlot();
+    net.minecraft.container.Slot getHoveredSlot();
 
     @Accessor("x")
     int getGuiLeft();

@@ -4,7 +4,7 @@
     "compatibilityLevel": "JAVA_8",
     "minVersion": "0.7",
     "client": [
-        "IMixinAbstractContainerScreen",
+        "IMixinContainerScreen",
         "IMixinMerchantScreen",
         "IMixinSlot",
         "MixinAbstractInventoryScreen",
