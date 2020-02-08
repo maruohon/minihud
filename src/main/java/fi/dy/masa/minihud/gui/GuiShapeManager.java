@@ -32,7 +32,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         this.title = StringUtils.translate("minihud.gui.title.shape_manager");
 
         // The position will get updated later
-        this.widgetDropDown = new WidgetDropDownList<ShapeType>(0, 0, 160, 18, 200, 10, ImmutableList.copyOf(ShapeType.values()), (type) -> type.getDisplayName());
+        this.widgetDropDown = new WidgetDropDownList<ShapeType>(0, 0, 160, 20, 200, 10, ImmutableList.copyOf(ShapeType.values()), (type) -> type.getDisplayName());
         this.widgetDropDown.setZLevel((int) this.zLevel + 2);
     }
 

@@ -6,25 +6,27 @@ import java.util.function.DoubleSupplier;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
+import org.lwjgl.input.Keyboard;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.values.BlockSnap;
 import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
-import fi.dy.masa.malilib.gui.GuiTextFieldDouble;
-import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
-import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ConfigButtonOptionList;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.listener.ButtonListenerDoubleModifier;
 import fi.dy.masa.malilib.gui.listener.ButtonListenerIntModifier;
+import fi.dy.masa.malilib.gui.listener.TextFieldListenerDouble;
+import fi.dy.masa.malilib.gui.listener.TextFieldListenerInteger;
 import fi.dy.masa.malilib.gui.util.GuiIconBase;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widgets.WidgetColorIndicator;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldDouble;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldInteger;
 import fi.dy.masa.malilib.interfaces.ICoordinateValueModifier;
+import fi.dy.masa.malilib.util.DualDoubleConsumer;
+import fi.dy.masa.malilib.util.DualIntConsumer;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
@@ -62,6 +64,8 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.addButton(button, new GuiShapeManager.ButtonListenerTab(GuiConfigs.SHAPES));
 
         this.createLayerEditControls(146, 142, this.getLayerRange());
+
+        Keyboard.enableRepeatEvents(true);
     }
 
     @Override
@@ -75,10 +79,10 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.color"));
         y += 12;
 
-        GuiTextFieldGeneric textField = new GuiTextFieldGeneric(x, y, 70, 17, this.textRenderer);
-        textField.setMaxStringLength(12);
-        textField.setText(String.format("#%08X", this.shape.getColor().intValue));
-        this.addTextField(textField, new TextFieldListenerColor(this.shape));
+        WidgetTextFieldBase txtField = new WidgetTextFieldBase(x, y, 70, 17, String.format("#%08X", this.shape.getColor().intValue));
+        txtField.setTextValidator(WidgetTextFieldBase.VALIDATOR_HEX_COLOR_8);
+        txtField.setListener((txt) -> this.shape.setColorFromString(txt));
+        this.addWidget(txtField);
         this.nextY = y + 20;
         this.colorY = y - 1;
 
@@ -90,9 +94,9 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.display_name_colon"));
         y += 12;
 
-        GuiTextFieldGeneric textField = new GuiTextFieldGeneric(x, y, 240, 17, this.textRenderer);
-        textField.setText(this.shape.getDisplayName());
-        this.addTextField(textField, (txtFld) -> { this.shape.setDisplayName(txtFld.getText()); return true; });
+        WidgetTextFieldBase textField = new WidgetTextFieldBase(x, y, 240, 17, this.shape.getDisplayName());
+        textField.setListener((txt) -> this.shape.setDisplayName(txt));
+        this.addWidget(textField);
         y += 20;
 
         int renderTypeX = x + 230;
@@ -144,11 +148,22 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         y += 54;
 
         ButtonGeneric button = new ButtonGeneric(x, y, -1, false, "malilib.gui.button.render_layers_gui.set_to_player");
-        this.addButton(button, new ButtonListenerSphere(shape, this));
+        this.addButton(button, (btn, mbtn) -> {
+            Entity entity = this.mc.getRenderViewEntity();
+
+            if (entity != null)
+            {
+                shape.setCenter(entity.getPositionVector());
+                this.initGui();
+            }
+        });
 
         this.configBlockSnap.setOptionListValue(shape.getBlockSnap());
         ConfigButtonOptionList buttonSnap = new ConfigButtonOptionList(x + button.getWidth() + 4, y, -1, 20, this.configBlockSnap, "minihud.gui.label.shape.block_snap");
-        this.addButton(buttonSnap, new ButtonListenerSphereBlockSnap(shape, this));
+        this.addButton(buttonSnap, (btn, mbtn) -> {
+            shape.setBlockSnap((BlockSnap) this.configBlockSnap.getOptionListValue());
+            this.initGui();
+        });
 
         y += 24;
 
@@ -160,15 +175,16 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.addLabel(x + 12, y, 0xFFFFFFFF, translationKey);
         y += 11;
 
-        GuiTextFieldDouble txtField = new GuiTextFieldDouble(x + 12, y, 40, 14, this.textRenderer);
-        txtField.setText(String.valueOf(supplier.getAsDouble()));
-        this.addTextField(txtField, new TextFieldListenerDouble(consumer));
+        WidgetTextFieldDouble txtField = new WidgetTextFieldDouble(x + 12, y, 40, 14, supplier.getAsDouble());
+        txtField.setListener(new TextFieldListenerDouble(consumer));
+        txtField.setUpdateListenerAlways(true);
+        this.addWidget(txtField);
 
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
             ButtonGeneric button = new ButtonGeneric(x + 54, y - 1, GuiIconBase.BTN_PLUSMINUS_16, hover);
-            this.addButton(button, new ButtonListenerDoubleModifier(supplier, new ChainedDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
+            this.addButton(button, new ButtonListenerDoubleModifier(supplier, new DualDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
         }
     }
 
@@ -177,15 +193,16 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.addLabel(x + 12, y, 0xFFFFFFFF, translationKey);
         y += 11;
 
-        GuiTextFieldInteger txtField = new GuiTextFieldInteger(x + 12, y, 40, 14, this.textRenderer);
-        txtField.setText(String.valueOf(supplier.getAsInt()));
-        this.addTextField(txtField, new TextFieldListenerInteger(consumer));
+        WidgetTextFieldInteger txtField = new WidgetTextFieldInteger(x + 12, y, 40, 14, supplier.getAsInt());
+        txtField.setListener(new TextFieldListenerInteger(consumer));
+        txtField.setUpdateListenerAlways(true);
+        this.addWidget(txtField);
 
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
             ButtonGeneric button = new ButtonGeneric(x + 54, y - 1, GuiIconBase.BTN_PLUSMINUS_16, hover);
-            this.addButton(button, new ButtonListenerIntModifier(supplier, new ChainedIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
+            this.addButton(button, new ButtonListenerIntModifier(supplier, new DualIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
         }
     }
 
@@ -237,150 +254,6 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
             catch (Exception e) {}
 
             return false;
-        }
-    }
-
-    private static class ButtonListenerSphere implements IButtonActionListener
-    {
-        private final GuiShapeEditor gui;
-        private final ShapeCircleBase shape;
-
-        private ButtonListenerSphere(ShapeCircleBase shape, GuiShapeEditor gui)
-        {
-            this.shape = shape;
-            this.gui = gui;
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
-        {
-            Entity entity = this.gui.mc.getRenderViewEntity();
-
-            if (entity != null)
-            {
-                this.shape.setCenter(entity.getPositionVector());
-                this.gui.initGui();
-            }
-        }
-    }
-
-    private static class ButtonListenerSphereBlockSnap implements IButtonActionListener
-    {
-        private final GuiShapeEditor gui;
-        private final ShapeCircleBase shape;
-
-        private ButtonListenerSphereBlockSnap(ShapeCircleBase shape, GuiShapeEditor gui)
-        {
-            this.shape = shape;
-            this.gui = gui;
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
-        {
-            this.shape.setBlockSnap((BlockSnap) this.gui.configBlockSnap.getOptionListValue());
-            this.gui.initGui();
-        }
-    }
-
-    private static class TextFieldListenerColor implements ITextFieldListener<GuiTextFieldGeneric>
-    {
-        private final ShapeBase shape;
-
-        private TextFieldListenerColor(ShapeBase shape)
-        {
-            this.shape = shape;
-        }
-
-        @Override
-        public boolean onTextChange(GuiTextFieldGeneric textField)
-        {
-            this.shape.setColorFromString(textField.getText());
-            return false;
-        }
-    }
-
-    private static class TextFieldListenerInteger implements ITextFieldListener<GuiTextFieldInteger>
-    {
-        private final IntConsumer consumer;
-
-        private TextFieldListenerInteger(IntConsumer consumer)
-        {
-            this.consumer = consumer;
-        }
-
-        @Override
-        public boolean onTextChange(GuiTextFieldInteger textField)
-        {
-            try
-            {
-                this.consumer.accept(Integer.parseInt(textField.getText()));
-                return true;
-            }
-            catch (Exception e) {}
-
-            return false;
-        }
-    }
-
-    private static class TextFieldListenerDouble implements ITextFieldListener<GuiTextFieldDouble>
-    {
-        private final DoubleConsumer consumer;
-
-        private TextFieldListenerDouble(DoubleConsumer consumer)
-        {
-            this.consumer = consumer;
-        }
-
-        @Override
-        public boolean onTextChange(GuiTextFieldDouble textField)
-        {
-            try
-            {
-                this.consumer.accept(Double.parseDouble(textField.getText()));
-                return true;
-            }
-            catch (Exception e) {}
-
-            return false;
-        }
-    }
-
-    private static class ChainedDoubleConsumer implements DoubleConsumer
-    {
-        private final DoubleConsumer consumerOne;
-        private final DoubleConsumer consumerTwo;
-
-        private ChainedDoubleConsumer(DoubleConsumer consumerOne, DoubleConsumer consumerTwo)
-        {
-            this.consumerOne = consumerOne;
-            this.consumerTwo = consumerTwo;
-        }
-
-        @Override
-        public void accept(double value)
-        {
-            this.consumerOne.accept(value);
-            this.consumerTwo.accept(value);
-        }
-    }
-
-    private static class ChainedIntConsumer implements IntConsumer
-    {
-        private final IntConsumer consumerOne;
-        private final IntConsumer consumerTwo;
-
-        private ChainedIntConsumer(IntConsumer consumerOne, IntConsumer consumerTwo)
-        {
-            this.consumerOne = consumerOne;
-            this.consumerTwo = consumerTwo;
-        }
-
-        @Override
-        public void accept(int value)
-        {
-            this.consumerOne.accept(value);
-            this.consumerTwo.accept(value);
         }
     }
 }
