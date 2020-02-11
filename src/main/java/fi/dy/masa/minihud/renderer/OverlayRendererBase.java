@@ -18,16 +18,28 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     //protected static final BufferBuilder BUFFER_3 = new BufferBuilder(2097152);
 
     protected final List<RenderObjectBase> renderObjects = new ArrayList<>();
+    protected boolean renderThrough = false;
     protected float glLineWidth = 1f;
     protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
 
     protected void preRender(double x, double y, double z)
     {
         RenderSystem.lineWidth(this.glLineWidth);
+
+        if (this.renderThrough)
+        {
+            RenderSystem.disableDepthTest();
+            //RenderSystem.depthMask(false);
+        }
     }
 
     protected void postRender(double x, double y, double z)
     {
+        if (this.renderThrough)
+        {
+            RenderSystem.enableDepthTest();
+            //RenderSystem.depthMask(true);
+        }
     }
 
     @Override
@@ -81,6 +93,11 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         RenderObjectBase obj = new RenderObjectVbo(glMode, format);
         this.renderObjects.add(obj);
         return obj;
+    }
+
+    public void setRenderThrough(boolean renderThrough)
+    {
+        this.renderThrough = renderThrough;
     }
 
     public String getSaveId()

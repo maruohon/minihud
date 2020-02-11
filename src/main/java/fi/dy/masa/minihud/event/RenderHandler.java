@@ -71,7 +71,6 @@ public class RenderHandler implements IRenderer
     private int fpsCounter;
     private long fpsUpdateTime = System.currentTimeMillis();
     private long infoUpdateTime;
-    private double fontScale = 0.5d;
     private Set<InfoToggle> addedTypes = new HashSet<>();
     @Nullable private WorldChunk cachedClientChunk;
 
@@ -114,8 +113,9 @@ public class RenderHandler implements IRenderer
             return;
         }
 
-        if (this.mc.options.debugEnabled == false &&
-            this.mc.player != null &&
+        if (Configs.Generic.ENABLED.getBooleanValue() &&
+            this.mc.options.debugEnabled == false &&
+            this.mc.player != null && this.mc.options.hudHidden == false &&
             (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || this.mc.player.isSneaking()) &&
             Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld())
         {
@@ -141,7 +141,7 @@ public class RenderHandler implements IRenderer
             boolean useBackground = Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue();
             boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
 
-            RenderUtils.renderText(x, y, this.fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.lines);
+            RenderUtils.renderText(x, y, Configs.Generic.FONT_SCALE.getDoubleValue(), textColor, bgColor, alignment, useBackground, useShadow, this.lines);
         }
     }
 
@@ -169,15 +169,11 @@ public class RenderHandler implements IRenderer
     @Override
     public void onRenderWorldLast(float partialTicks, net.minecraft.client.util.math.MatrixStack matrixStack)
     {
-        if (Configs.Generic.ENABLED.getBooleanValue() && this.mc.world != null && this.mc.player != null)
+        if (Configs.Generic.ENABLED.getBooleanValue() &&
+            this.mc.world != null && this.mc.player != null && this.mc.options.hudHidden == false)
         {
             OverlayRenderer.renderOverlays(this.mc, partialTicks, matrixStack);
         }
-    }
-
-    public void setFontScale(double scale)
-    {
-        this.fontScale = MathHelper.clamp(scale, 0, 10D);
     }
 
     public int getSubtitleOffset()
@@ -186,7 +182,7 @@ public class RenderHandler implements IRenderer
 
         if (align == HudAlignment.BOTTOM_RIGHT)
         {
-            int offset = (int) (this.lineWrappers.size() * (StringUtils.getFontHeight() + 2) * this.fontScale);
+            int offset = (int) (this.lineWrappers.size() * (StringUtils.getFontHeight() + 2) * Configs.Generic.FONT_SCALE.getDoubleValue());
 
             return -(offset - 16);
         }
@@ -326,7 +322,7 @@ public class RenderHandler implements IRenderer
             try
             {
                 long timeDay = world.getTimeOfDay();
-                long day = (int) (timeDay / 24000) + 1;
+                long day = (int) (timeDay / 24000);
                 // 1 tick = 3.6 seconds in MC (0.2777... seconds IRL)
                 int dayTicks = (int) (timeDay % 24000);
                 int hour = (int) ((dayTicks / 1000) + 6) % 24;
@@ -335,6 +331,7 @@ public class RenderHandler implements IRenderer
 
                 String str = Configs.Generic.DATE_FORMAT_MINECRAFT.getStringValue();
                 str = str.replace("{DAY}",  String.format("%d", day));
+                str = str.replace("{DAY_1}",String.format("%d", day + 1));
                 str = str.replace("{HOUR}", String.format("%02d", hour));
                 str = str.replace("{MIN}",  String.format("%02d", min));
                 str = str.replace("{SEC}",  String.format("%02d", sec));
@@ -495,6 +492,10 @@ public class RenderHandler implements IRenderer
             this.addLine(String.format("Block: %d, %d, %d within Sub-Chunk: %d, %d, %d",
                         pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF,
                         chunkPos.x, pos.getY() >> 4, chunkPos.z));
+        }
+        else if (type == InfoToggle.BLOCK_BREAK_SPEED)
+        {
+            this.addLine(String.format("BBS: %.2f", DataStorage.getInstance().getBlockBreakingSpeed()));
         }
         else if (type == InfoToggle.DISTANCE)
         {

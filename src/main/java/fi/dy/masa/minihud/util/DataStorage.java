@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -67,7 +66,8 @@ public class DataStorage
     private double serverMSPT;
     private BlockPos worldSpawn = BlockPos.ORIGIN;
     private Vec3d distanceReferencePoint = Vec3d.ZERO;
-    private final Multimap<StructureType, StructureData> structures = MultimapBuilder.hashKeys().hashSetValues().build();
+    private int[] blockBreakCounter = new int[100];
+    private final ArrayListMultimap<StructureType, StructureData> structures = ArrayListMultimap.create();
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public static DataStorage getInstance()
@@ -137,6 +137,11 @@ public class DataStorage
         }
 
         return false;
+    }
+
+    public boolean hasStoredWorldSeed()
+    {
+        return this.worldSeedValid;
     }
 
     public long getWorldSeed(DimensionType dimension)
@@ -227,6 +232,29 @@ public class DataStorage
                 OverlayRendererLightLevel.setNeedsUpdate();
             }
         }
+    }
+
+    public void onClientTickPre(MinecraftClient mc)
+    {
+        if (mc.world != null)
+        {
+            int tick = (int) mc.world.getTime();
+            this.blockBreakCounter[tick % this.blockBreakCounter.length] = 0;
+        }
+    }
+
+    public void onPlayerBlockBreak(MinecraftClient mc)
+    {
+        if (mc.world != null)
+        {
+            int tick = (int) mc.world.getTime();
+            ++this.blockBreakCounter[tick % this.blockBreakCounter.length];
+        }
+    }
+
+    public double getBlockBreakingSpeed()
+    {
+        return MiscUtils.intAverage(this.blockBreakCounter) * 20;
     }
 
     public boolean onSendChatMessage(PlayerEntity player, String message)
@@ -595,6 +623,11 @@ public class DataStorage
 
         obj.add("distance_pos", JsonUtils.vec3dToJson(this.distanceReferencePoint));
 
+        if (this.worldSeedValid)
+        {
+            obj.add("seed", new JsonPrimitive(this.worldSeed));
+        }
+
         return obj;
     }
 
@@ -609,6 +642,12 @@ public class DataStorage
         else
         {
             this.distanceReferencePoint = Vec3d.ZERO;
+        }
+
+        if (JsonUtils.hasLong(obj, "seed"))
+        {
+            this.worldSeed = JsonUtils.getLong(obj, "seed");
+            this.worldSeedValid = true;
         }
     }
 }

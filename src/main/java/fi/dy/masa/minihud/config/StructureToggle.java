@@ -36,9 +36,10 @@ public enum StructureToggle
         this.toggleOption    = new ConfigBoolean(name, false, comment, prettyName);
         this.colorMain       = new ConfigColor(name +  " Main", colorMain, prettyName + " full box");
         this.colorComponents = new ConfigColor(name + " Components", colorComponents, prettyName + " components");
-        this.hotkey          = new ConfigHotkey(name, defaultHotkey, comment);
+        this.hotkey          = new ConfigHotkey("Toggle " + name, defaultHotkey, comment);
 
-        this.toggleOption.setValueChangeCallback((config) -> { DataStorage.getInstance().setStructuresNeedUpdating(); } );
+        this.hotkey.getKeybind().setCallback((action, key) -> { this.toggleOption.toggleBooleanValue(); return true; });
+        this.toggleOption.setValueChangeCallback((config) -> DataStorage.getInstance().setStructuresNeedUpdating());
     }
 
     public IConfigBoolean getToggleOption()

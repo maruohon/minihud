@@ -16,6 +16,7 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     BEE_COUNT               ("infoBeeCount",                false, 36, "", "Show the number of bees in the targeted Hive or Nest.\nNote: This only works in single player without server-side support."),
     BIOME                   ("infoBiome",                   false, 19, "", "Show the name of the current biome"),
     BIOME_REG_NAME          ("infoBiomeRegistryName",       false, 20, "", "Show the registry name of the current biome"),
+    BLOCK_BREAK_SPEED       ("infoBlockBreakSpeed",         false,  6, "", "Show the player's current block breaking speed\nover the last 100 ticks (5 seconds)"),
     BLOCK_IN_CHUNK          ("infoBlockInChunk",            false, 28, "", "Show the player's current position within the Chunk"),
     BLOCK_POS               ("infoBlockPosition",           false,  6, "", "Show the player's current block position"),
     BLOCK_PROPS             ("infoBlockProperties",         false, 27, "", "Show the BlockState properties and values"),

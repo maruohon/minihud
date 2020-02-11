@@ -20,6 +20,13 @@ import fi.dy.masa.minihud.util.StructureTypes.StructureType;
 
 public class OverlayRendererStructures extends OverlayRendererBase
 {
+    public static OverlayRendererStructures instance;
+
+    public OverlayRendererStructures()
+    {
+        instance = this;
+    }
+
     @Override
     public boolean shouldRender(MinecraftClient mc)
     {

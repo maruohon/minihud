@@ -149,7 +149,6 @@ public class RenderContainer
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
             RenderSystem.disableBlend();
             RenderSystem.enableDepthTest();
-            RenderSystem.enableLighting();
             RenderSystem.enableCull();
             RenderSystem.depthMask(true);
             RenderSystem.enableTexture();

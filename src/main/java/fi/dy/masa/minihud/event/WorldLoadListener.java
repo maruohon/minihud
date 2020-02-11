@@ -38,11 +38,14 @@ public class WorldLoadListener implements IWorldLoadListener
                 this.writeDataGlobal();
             }
 
-            this.hasCachedSeed = worldAfter != null && Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue();
-
-            if (this.hasCachedSeed)
+            if (worldAfter != null)
             {
-                this.cachedSeed = worldAfter.getSeed();
+                this.hasCachedSeed = DataStorage.getInstance().hasStoredWorldSeed() && Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue();
+
+                if (this.hasCachedSeed)
+                {
+                    this.cachedSeed = DataStorage.getInstance().getWorldSeed(worldAfter.dimension.getType());
+                }
             }
         }
         else
