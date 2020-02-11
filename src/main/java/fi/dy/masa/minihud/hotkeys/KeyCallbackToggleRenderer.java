@@ -14,6 +14,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
+import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
@@ -44,7 +45,11 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             String rst = GuiBase.TXT_RST;
             String strStatus = green + StringUtils.translate("malilib.message.value.on") + rst;
 
-            if (key == RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind())
+            if (key == RendererToggle.OVERLAY_BEACON_RANGE.getKeybind())
+            {
+                OverlayRendererBeaconRange.setNeedsUpdate();
+            }
+            else if (key == RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind())
             {
                 OverlayRenderer.chunkUnloadBucketOverlayY = entity.posY - 2;
             }

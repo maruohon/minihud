@@ -79,6 +79,8 @@ public class WorldLoadListener implements IWorldLoadListener
                 DataStorage.getInstance().setWorldSeed(this.cachedSeed);
                 this.hasCachedSeed = false;
             }
+
+            DataStorage.getInstance().onWorldLoad(worldAfter);
         }
     }
 

@@ -14,6 +14,7 @@ import net.minecraft.network.play.server.SPacketSpawnPosition;
 import net.minecraft.network.play.server.SPacketTimeUpdate;
 import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.minihud.data.DataStorage;
+import fi.dy.masa.minihud.util.NotificationUtils;
 
 @Mixin(NetHandlerPlayClient.class)
 public abstract class MixinNetHandlerPlayClient
@@ -40,20 +41,20 @@ public abstract class MixinNetHandlerPlayClient
     @Inject(method = "handleChunkData", at = @At("RETURN"))
     private void markChunkChangedFullChunk(SPacketChunkData packet, CallbackInfo ci)
     {
-        DataStorage.getInstance().markChunkForHeightmapCheck(packet.getChunkX(), packet.getChunkZ());
+        NotificationUtils.onChunkData(packet.getChunkX(), packet.getChunkZ(), packet.getTileEntityTags());
     }
 
     @Inject(method = "handleBlockChange", at = @At("RETURN"))
     private void markChunkChangedBlockChange(SPacketBlockChange packet, CallbackInfo ci)
     {
-        DataStorage.getInstance().markChunkForHeightmapCheck(packet.getBlockPosition().getX() >> 4, packet.getBlockPosition().getZ() >> 4);
+        NotificationUtils.onBlockChange(packet.getBlockPosition(), packet.getBlockState());
     }
 
     @Inject(method = "handleMultiBlockChange", at = @At("RETURN"))
     private void markChunkChangedMultiBlockChange(SPacketMultiBlockChange packet, CallbackInfo ci)
     {
         ChunkPos pos = ((IMixinSPacketMultiBlockChange) packet).getChunkPos();
-        DataStorage.getInstance().markChunkForHeightmapCheck(pos.x, pos.z);
+        NotificationUtils.onMultiBlockChange(pos, packet.getChangedBlocks());
     }
 
     @Inject(method = "handleSpawnPosition", at = @At("RETURN"))

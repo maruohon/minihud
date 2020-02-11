@@ -23,6 +23,7 @@ import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.network.CarpetPubsubPacketHandler;
+import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -88,6 +89,8 @@ public class DataStorage
         this.worldSeed = 0;
         this.worldSpawn = BlockPos.ORIGIN;
 
+        OverlayRendererBeaconRange.clear();
+
         if (this.mc.world != null)
         {
             this.structureStorage.requestStructureDataUpdates();
@@ -97,6 +100,11 @@ public class DataStorage
         {
             CarpetPubsubPacketHandler.unsubscribeAll();
         }
+    }
+
+    public void onWorldLoad(World world)
+    {
+        OverlayRendererBeaconRange.setNeedsUpdate();
     }
 
     public void setWorldSeed(long seed)

@@ -24,6 +24,7 @@
         "MixinMinecraftServer",
         "MixinNetHandlerPlayClient",
         "MixinPlayerControllerMP",
+        "MixinTileEntityBeacon",
         "MixinWorld",
         "MixinWorldClient"
     ],

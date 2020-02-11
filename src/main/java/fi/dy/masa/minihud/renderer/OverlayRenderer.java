@@ -1,12 +1,12 @@
 package fi.dy.masa.minihud.renderer;
 
 import java.util.Arrays;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.util.MiscUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.util.MiscUtils;
 
 public class OverlayRenderer
 {
@@ -51,6 +51,11 @@ public class OverlayRenderer
         if (RendererToggle.OVERLAY_LIGHT_LEVEL.getBooleanValue())
         {
             OverlayRendererLightLevel.render(dx, dy, dz, entity, mc);
+        }
+
+        if (RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue())
+        {
+            OverlayRendererBeaconRange.renderBeaconBoxForPlayerIfHoldingItem(mc.player, dx, dy, dz, partialTicks);
         }
 
         RenderContainer.INSTANCE.render(entity, mc, partialTicks);
