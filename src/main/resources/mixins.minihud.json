@@ -5,10 +5,13 @@
 	"minVersion": "0.8",
 	"client": [
 		"IMixinAbstractFurnaceBlockEntity",
+		"IMixinBeaconBlockEntity",
 		"IMixinChunkDeltaUpdateS2CPacket",
 		"IMixinEntityNavigation",
 		"IMixinServerWorld",
+		"IMixinWorld",
 		"IMixinWorldRenderer",
+		"MixinBeaconBlockEntity",
 		"MixinBlockOutlineDebugRenderer",
 		"MixinClientPlayerInteractionManager",
 		"MixinClientPlayNetworkHandler",

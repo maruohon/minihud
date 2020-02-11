@@ -34,6 +34,7 @@ public class Configs implements IConfigHandler
     public static class Generic
     {
         public static final ConfigBoolean       AXOLOTL_TOOLTIPS                    = new ConfigBoolean("axolotlTooltipsTooltips", false, "Adds the Axolotl variant name to the bucket tooltip");
+        public static final ConfigBoolean       BEACON_RANGE_AUTO_UPDATE            = new ConfigBoolean("beaconRangeAutoUpdate", false, "This enables the Beacon Range renderer to update automatically\nwhen block or chunk change packets are received.\nThose updates can have a performance impact if tons of blocks are changing often.\nYou can toggle off/on the renderer to update to those changes manually.");
         public static final ConfigBoolean       BEE_TOOLTIPS                        = new ConfigBoolean("beeTooltips", false, "Adds the number of contained bees to the tooltip of Bee Hive and Bee Nest items");
         public static final ConfigBoolean       HONEY_TOOLTIPS                      = new ConfigBoolean("honeyTooltips", false, "Adds the honey level to the tooltip of Bee Hive and Bee Nest items");
         public static final ConfigOptionList    BLOCK_GRID_OVERLAY_MODE             = new ConfigOptionList("blockGridOverlayMode", BlockGridMode.ALL, "The block grid render mode");
@@ -89,6 +90,7 @@ public class Configs implements IConfigHandler
                 BEE_TOOLTIPS,
                 HONEY_TOOLTIPS,
                 ENABLED,
+                BEACON_RANGE_AUTO_UPDATE,
                 DEBUG_MESSAGES,
                 DEBUG_RENDERER_PATH_MAX_DIST,
                 DONT_RESET_SEED_ON_DIMENSION_CHANGE,
@@ -151,6 +153,10 @@ public class Configs implements IConfigHandler
 
     public static class Colors
     {
+        public static final ConfigColor BEACON_RANGE_LVL1_OVERLAY_COLOR     = new ConfigColor("beaconRangeLvl1", "0x20E060FF", "Color for the Beacon Range lvl 1 overlay");
+        public static final ConfigColor BEACON_RANGE_LVL2_OVERLAY_COLOR     = new ConfigColor("beaconRangeLvl2", "0x20FFB040", "Color for the Beacon Range lvl 2 overlay");
+        public static final ConfigColor BEACON_RANGE_LVL3_OVERLAY_COLOR     = new ConfigColor("beaconRangeLvl3", "0x20FFF040", "Color for the Beacon Range lvl 3 overlay");
+        public static final ConfigColor BEACON_RANGE_LVL4_OVERLAY_COLOR     = new ConfigColor("beaconRangeLvl4", "0x2060FF40", "Color for the Beacon Range lvl 4 overlay");
         public static final ConfigColor BLOCK_GRID_OVERLAY_COLOR                = new ConfigColor("blockGridOverlayColor",              "#80FFFFFF", "Color for the block grid overlay");
         public static final ConfigColor LIGHT_LEVEL_MARKER_DARK                 = new ConfigColor("lightLevelMarkerDark",               "#FFFF4848", "The color for the spawnable spots marker");
         public static final ConfigColor LIGHT_LEVEL_MARKER_LIT                  = new ConfigColor("lightLevelMarkerLit",                "#FFFFFF33", "The color for the safe (during day) spots marker");
@@ -178,6 +184,10 @@ public class Configs implements IConfigHandler
         public static final ConfigColor TEXT_COLOR                              = new ConfigColor("textColor",                          "#FFE0E0E0", "Info line text color");
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
+                BEACON_RANGE_LVL1_OVERLAY_COLOR,
+                BEACON_RANGE_LVL2_OVERLAY_COLOR,
+                BEACON_RANGE_LVL3_OVERLAY_COLOR,
+                BEACON_RANGE_LVL4_OVERLAY_COLOR,
                 BLOCK_GRID_OVERLAY_COLOR,
                 LIGHT_LEVEL_MARKER_DARK,
                 LIGHT_LEVEL_MARKER_LIT,
