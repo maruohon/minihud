@@ -3,9 +3,11 @@ package fi.dy.masa.itemscroller.event;
 import java.nio.FloatBuffer;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.ContainerScreen;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.util.GlAllocationUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
@@ -98,6 +100,10 @@ public class RenderEventHandler
             final int mouseY = fi.dy.masa.malilib.util.InputUtils.getMouseY();
             final int recipeId = this.getHoveredRecipeId(mouseX, mouseY, recipes, gui);
 
+            float offset = 300f;
+            RenderSystem.pushMatrix();
+            RenderSystem.translatef(0f, 0f, offset);
+
             if (recipeId >= 0)
             {
                 RecipePattern recipe = recipes.getRecipe(recipeId);
@@ -113,6 +119,8 @@ public class RenderEventHandler
                     InventoryOverlay.renderStackToolTip(mouseX, mouseY, stack, this.mc);
                 }
             }
+
+            RenderSystem.popMatrix();
         }
     }
 
@@ -140,7 +148,7 @@ public class RenderEventHandler
         int maxStackDimensionsHorizontal = (int) (((usableWidth - (this.columns * (this.numberTextWidth + this.gapColumn))) / (this.columns + 3 + 0.8)) * gapScaleHorizontal);
         int stackDimensions = (int) Math.min(maxStackDimensionsVertical, maxStackDimensionsHorizontal);
 
-        this.scale = (int) Math.ceil(((double) stackDimensions / (double) stackBaseHeight));
+        this.scale = (double) stackDimensions / (double) stackBaseHeight;
         this.entryHeight = stackBaseHeight + gapVertical;
         this.recipeListX = guiLeft - (int) ((this.columns * (stackBaseHeight + this.numberTextWidth + this.gapColumn) + gapHorizontal) * this.scale);
         this.recipeListY = (int) (this.entryHeight * this.scale);
@@ -262,7 +270,7 @@ public class RenderEventHandler
     private void renderStackAt(ItemStack stack, int x, int y, boolean border)
     {
         GlStateManager.pushMatrix();
-        GlStateManager.disableLighting();
+
         final int w = 16;
 
         if (border)
@@ -283,7 +291,7 @@ public class RenderEventHandler
 
         if (InventoryUtils.isStackEmpty(stack) == false)
         {
-            enableGUIStandardItemLighting((float) this.scale);
+            DiffuseLighting.enableGuiDepthLighting();
 
             stack = stack.copy();
             InventoryUtils.setStackSize(stack, 1);
@@ -292,8 +300,6 @@ public class RenderEventHandler
             this.mc.getItemRenderer().zOffset -= 100;
         }
 
-        RenderUtils.disableDiffuseLighting();
-        GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
 
