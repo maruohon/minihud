@@ -57,9 +57,9 @@ public class RenderEventHandler
 
             this.calculateRecipePositions(gui);
 
-            GlStateManager.pushMatrix();
-            GlStateManager.translatef(this.recipeListX, this.recipeListY, 0);
-            GlStateManager.scaled(this.scale, this.scale, 1);
+            RenderSystem.pushMatrix();
+            RenderSystem.translatef(this.recipeListX, this.recipeListY, 0);
+            RenderSystem.scaled(this.scale, this.scale, 1);
 
             String str = StringUtils.translate("itemscroller.gui.label.recipe_page", (first / countPerPage) + 1, recipes.getTotalRecipeCount() / countPerPage);
             this.mc.textRenderer.draw(str, 16, -12, 0xC0C0C0C0);
@@ -84,8 +84,8 @@ public class RenderEventHandler
                 this.renderRecipeItems(recipe, recipes.getRecipeCountPerPage(), gui);
             }
 
-            GlStateManager.popMatrix();
-            GlStateManager.enableBlend(); // Fixes the crafting book icon rendering
+            RenderSystem.popMatrix();
+            RenderSystem.enableBlend(); // Fixes the crafting book icon rendering
         }
     }
 
@@ -207,13 +207,13 @@ public class RenderEventHandler
         x = x - (int) (font.getStringWidth(indexStr) * scale) - 2;
         y = row * this.entryHeight + this.entryHeight / 2 - font.fontHeight / 2;
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translatef(x, y, 0);
-        GlStateManager.scaled(scale, scale, 0);
+        RenderSystem.pushMatrix();
+        RenderSystem.translatef(x, y, 0);
+        RenderSystem.scaled(scale, scale, 0);
 
         font.draw(indexStr, 0, 0, 0xC0C0C0);
 
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 
     private void renderRecipeItems(RecipePattern recipe, int recipeCountPerPage, ContainerScreen<?> gui)
@@ -269,7 +269,7 @@ public class RenderEventHandler
 
     private void renderStackAt(ItemStack stack, int x, int y, boolean border)
     {
-        GlStateManager.pushMatrix();
+        RenderSystem.pushMatrix();
 
         final int w = 16;
 
@@ -300,27 +300,27 @@ public class RenderEventHandler
             this.mc.getItemRenderer().zOffset -= 100;
         }
 
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 
     public static void enableGUIStandardItemLighting(float scale)
     {
-        GlStateManager.pushMatrix();
-        GlStateManager.rotatef(-30.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotatef(165.0F, 1.0F, 0.0F, 0.0F);
+        RenderSystem.pushMatrix();
+        RenderSystem.rotatef(-30.0F, 0.0F, 1.0F, 0.0F);
+        RenderSystem.rotatef(165.0F, 1.0F, 0.0F, 0.0F);
 
         enableStandardItemLighting(scale);
 
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 
     public static void enableStandardItemLighting(float scale)
     {
-        GlStateManager.enableLighting();
+        RenderSystem.enableLighting();
         GlStateManager.enableLight(0);
         GlStateManager.enableLight(1);
-        GlStateManager.enableColorMaterial();
-        GlStateManager.colorMaterial(1032, 5634);
+        RenderSystem.enableColorMaterial();
+        RenderSystem.colorMaterial(1032, 5634);
 
         float lightStrength = 0.3F * scale;
         float ambientLightStrength = 0.4F;
@@ -335,7 +335,7 @@ public class RenderEventHandler
         GlStateManager.light(16385, 4608, singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
         GlStateManager.light(16385, 4610, singletonBuffer(0.0F, 0.0F, 0.0F, 1.0F));
 
-        GlStateManager.shadeModel(GL11.GL_FLAT);
+        RenderSystem.shadeModel(GL11.GL_FLAT);
 
         GlStateManager.lightModel(2899, singletonBuffer(ambientLightStrength, ambientLightStrength, ambientLightStrength, 1.0F));
     }
