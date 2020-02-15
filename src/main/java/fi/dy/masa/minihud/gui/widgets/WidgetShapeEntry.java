@@ -65,7 +65,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean isActiveGui, boolean hovered)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -77,7 +77,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         int height = this.getHeight();
 
         // Draw a lighter background for the hovered and the selected entry
-        if (selected || shapeSelected || this.isMouseOver(mouseX, mouseY))
+        if (shapeSelected || hovered)
         {
             RenderUtils.drawRect(x, y, width, height, 0x70FFFFFF, z);
         }
@@ -102,7 +102,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         RenderUtils.color(1f, 1f, 1f, 1f);
         GlStateManager.disableBlend();
 
-        super.render(mouseX, mouseY, selected);
+        super.render(mouseX, mouseY, isActiveGui, hovered);
 
         RenderUtils.disableItemLighting();
         GlStateManager.disableLighting();
