@@ -6,9 +6,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListHeaderS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerSpawnPositionS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
@@ -37,8 +37,8 @@ public abstract class MixinClientPlayNetworkHandler
         DataStorage.getInstance().markChunkForHeightmapCheck(pos.x, pos.z);
     }
 
-    @Inject(method = "onChatMessage", at = @At("RETURN"))
-    private void onChatMessage(ChatMessageS2CPacket packet, CallbackInfo ci)
+    @Inject(method = "onGameMessage", at = @At("RETURN"))
+    private void onChatMessage(GameMessageS2CPacket packet, CallbackInfo ci)
     {
         DataStorage.getInstance().onChatMessage(packet.getMessage());
     }

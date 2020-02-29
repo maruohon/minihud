@@ -7,6 +7,6 @@ import net.minecraft.entity.ai.pathing.EntityNavigation;
 @Mixin(EntityNavigation.class)
 public interface IMixinEntityNavigation
 {
-    @Accessor("field_6683")
+    @Accessor("nodeReachProximity")
     float getMaxDistanceToWaypoint();
 }
