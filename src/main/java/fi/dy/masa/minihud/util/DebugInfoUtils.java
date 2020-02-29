@@ -227,6 +227,14 @@ public class DebugInfoUtils
         {
             pathfindingEnabled = config.getBooleanValue();
         }
+        else if (config == RendererToggle.DEBUG_CHUNK_INFO)
+        {
+            MinecraftClient.getInstance().debugChunkInfo = config.getBooleanValue();
+        }
+        else if (config == RendererToggle.DEBUG_CHUNK_OCCLUSION)
+        {
+            MinecraftClient.getInstance().debugChunkOcculsion = config.getBooleanValue();
+        }
     }
 
     public static void renderVanillaDebug(MatrixStack matrixStack, VertexConsumerProvider.Immediate vtx,
