@@ -6,7 +6,7 @@ import com.google.gson.JsonPrimitive;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos.PooledMutable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -64,8 +64,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
             final int centerZ = ((int) MathHelper.floor(entity.getZ())) >> 4;
             final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
             final Color4f colorSides = Color4f.fromColor(colorLines, colorLines.a / 6);
-            PooledMutable pos1 = PooledMutable.get();
-            PooledMutable pos2 = PooledMutable.get();
+            BlockPos.Mutable pos1 = new BlockPos.Mutable();
+            BlockPos.Mutable pos2 = new BlockPos.Mutable();
             int r = MathHelper.clamp(Configs.Generic.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
 
             if (r == -1)
@@ -94,9 +94,6 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
                     }
                 }
             }
-
-            pos1.close();
-            pos2.close();
 
             BUFFER_1.end();
             BUFFER_2.end();

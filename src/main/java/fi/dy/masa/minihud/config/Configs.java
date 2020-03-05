@@ -166,7 +166,7 @@ public class Configs implements IConfigHandler
         public static final ConfigColor SPAWN_PLAYER_OUTER_OVERLAY_COLOR    = new ConfigColor("spawnPlayerOuterOverlayColor", "#FF6900D2", "Color for the 1.14+ outer loaded would-be spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
         public static final ConfigColor SPAWN_REAL_ENTITY_OVERLAY_COLOR     = new ConfigColor("spawnChunksRealEntity", "0x4030FF20", "Color for the entity-processing real spawn chunks overlay");
         public static final ConfigColor SPAWN_REAL_LAZY_OVERLAY_COLOR       = new ConfigColor("spawnChunksRealLazy", "0x40FF3020", "Color for the \"lazy-loaded\" real spawn chunks overlay");
-        public static final ConfigColor SPAWN_REAL_OUTER_OVERLAY_COLOR      = new ConfigColor("spawnRealOuterOverlayColor", "#FF9D581A", "Color for the 1.14+ outer loaded real spawn chunks overlay");
+        public static final ConfigColor SPAWN_REAL_OUTER_OVERLAY_COLOR      = new ConfigColor("spawnRealOuterOverlayColor", "#409D581A", "Color for the 1.14+ outer loaded real spawn chunks overlay");
         public static final ConfigColor SPAWNABLE_CHUNKS_FIXED              = new ConfigColor("spawnableChunkFixed", "0x40FF2090", "Color for the location-fixed spawnable chunks overlay");
         public static final ConfigColor SPAWNABLE_CHUNKS_PLAYER             = new ConfigColor("spawnableChunksPlayer", "0x40FF3030", "Color for the player-following spawnable chunks overlay");
         public static final ConfigColor SPAWNABLE_COLUMNS_OVERLAY_COLOR     = new ConfigColor("spawnableColumnHeights", "0xA0FF00FF", "Color for the spawnable sub-chunks overlay");

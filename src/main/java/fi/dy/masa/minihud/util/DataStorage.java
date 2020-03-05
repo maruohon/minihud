@@ -32,6 +32,7 @@ import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.network.StructurePacketHandler;
@@ -421,7 +422,7 @@ public class DataStorage
             {
                 if (this.mc.isIntegratedServerRunning())
                 {
-                    BlockPos playerPos = new BlockPos(this.mc.player);
+                    BlockPos playerPos = PositionUtils.getEntityBlockPos(this.mc.player);
 
                     if (this.structuresNeedUpdating(playerPos, 32))
                     {
