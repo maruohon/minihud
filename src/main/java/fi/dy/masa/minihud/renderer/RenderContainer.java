@@ -12,9 +12,9 @@ import net.minecraft.client.render.VertexFormatElement;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 
@@ -84,7 +84,7 @@ public class RenderContainer
             {
                 if (renderer.needsUpdate(entity, mc))
                 {
-                    renderer.lastUpdatePos = new BlockPos(entity);
+                    renderer.lastUpdatePos = PositionUtils.getEntityBlockPos(entity);
                     renderer.update(entity, mc);
                 }
 

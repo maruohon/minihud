@@ -7,6 +7,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.OverworldDimension;
+import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -62,7 +63,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     public void update(Entity entity, MinecraftClient mc)
     {
         DataStorage data = DataStorage.getInstance();
-        BlockPos spawn = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ? new BlockPos(entity) : data.getWorldSpawn();
+        BlockPos spawn = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ? PositionUtils.getEntityBlockPos(entity) : data.getWorldSpawn();
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);

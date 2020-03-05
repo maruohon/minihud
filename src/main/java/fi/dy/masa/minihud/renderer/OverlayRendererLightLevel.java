@@ -23,6 +23,7 @@ import net.minecraft.world.chunk.light.LightingProvider;
 import fi.dy.masa.malilib.config.IConfigDouble;
 import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -63,7 +64,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     @Override
     public void update(Entity entity, MinecraftClient mc)
     {
-        BlockPos pos = new BlockPos(entity);
+        BlockPos pos = PositionUtils.getEntityBlockPos(entity);
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_TEXTURE_COLOR);
