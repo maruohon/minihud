@@ -5,9 +5,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.itemscroller.util.InputUtils;
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 
-@Mixin(AbstractInventoryScreen.class)
+@Mixin(net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen.class)
 public abstract class MixinAbstractInventoryScreen
 {
     @Inject(method = "drawStatusEffects", at = @At("HEAD"), cancellable = true)

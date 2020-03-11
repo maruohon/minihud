@@ -2,10 +2,10 @@ package fi.dy.masa.itemscroller.event;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.container.Slot;
+import net.minecraft.client.gui.screen.ingame.ScreenWithHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundEvents;
 import fi.dy.masa.itemscroller.ItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
@@ -80,12 +80,12 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
             return true;
         }
 
-        if (this.disabled || mc == null || mc.player == null || (GuiUtils.getCurrentScreen() instanceof ContainerScreen) == false)
+        if (this.disabled || mc == null || mc.player == null || (GuiUtils.getCurrentScreen() instanceof ScreenWithHandler) == false)
         {
             return false;
         }
 
-        ContainerScreen<?> gui = (ContainerScreen<?>) GuiUtils.getCurrentScreen();
+        ScreenWithHandler<?> gui = (ScreenWithHandler<?>) GuiUtils.getCurrentScreen();
         Slot slot = AccessorUtils.getSlotUnderMouse(gui);
         RecipeStorage recipes = RecipeStorage.getInstance();
         MoveAction moveAction = InputUtils.getDragMoveAction(key);
@@ -170,13 +170,13 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
         if (this.disabled == false &&
             mc != null &&
             mc.player != null &&
-            GuiUtils.getCurrentScreen() instanceof ContainerScreen &&
+            GuiUtils.getCurrentScreen() instanceof ScreenWithHandler &&
             (GuiUtils.getCurrentScreen() instanceof CreativeInventoryScreen) == false &&
             Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false &&
             Hotkeys.KEY_MASS_CRAFT.getKeybind().isKeybindHeld())
         {
             Screen guiScreen = GuiUtils.getCurrentScreen();
-            ContainerScreen<?> gui = (ContainerScreen<?>) guiScreen;
+            ScreenWithHandler<?> gui = (ScreenWithHandler<?>) guiScreen;
             Slot outputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
 
             if (outputSlot != null)

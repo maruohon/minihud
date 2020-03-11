@@ -6,9 +6,8 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.itemscroller.event.RenderEventHandler;
-import net.minecraft.client.render.GameRenderer;
 
-@Mixin(GameRenderer.class)
+@Mixin(net.minecraft.client.render.GameRenderer.class)
 public abstract class MixinGameRenderer
 {
     @Inject(method = "render(FJZ)V",

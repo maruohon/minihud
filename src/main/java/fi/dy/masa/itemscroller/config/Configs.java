@@ -18,7 +18,7 @@ import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.client.gui.screen.ingame.CraftingTableScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.container.CraftingResultSlot;
+import net.minecraft.screen.slot.CraftingResultSlot;
 
 public class Configs implements IConfigHandler
 {

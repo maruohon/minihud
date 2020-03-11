@@ -2,9 +2,9 @@ package fi.dy.masa.itemscroller.event;
 
 import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.container.Slot;
+import net.minecraft.client.gui.screen.ingame.ScreenWithHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.itemscroller.Reference;
 import fi.dy.masa.itemscroller.config.Configs;
@@ -122,11 +122,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             final int mouseX = fi.dy.masa.malilib.util.InputUtils.getMouseX();
             final int mouseY = fi.dy.masa.malilib.util.InputUtils.getMouseY();
 
-            if (GuiUtils.getCurrentScreen() instanceof ContainerScreen &&
+            if (GuiUtils.getCurrentScreen() instanceof ScreenWithHandler &&
                 (GuiUtils.getCurrentScreen() instanceof CreativeInventoryScreen) == false &&
                 Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false)
             {
-                ContainerScreen<?> gui = (ContainerScreen<?>) GuiUtils.getCurrentScreen();
+                ScreenWithHandler<?> gui = (ScreenWithHandler<?>) GuiUtils.getCurrentScreen();
                 RecipeStorage recipes = RecipeStorage.getInstance();
 
                 if (dWheel != 0)
@@ -204,14 +204,14 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
         if (this.callbacks.functionalityEnabled() &&
             mc.player != null &&
-            GuiUtils.getCurrentScreen() instanceof ContainerScreen &&
+            GuiUtils.getCurrentScreen() instanceof ScreenWithHandler &&
             Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false)
         {
-            this.handleDragging((ContainerScreen<?>) GuiUtils.getCurrentScreen(), mc, mouseX, mouseY, false);
+            this.handleDragging((ScreenWithHandler<?>) GuiUtils.getCurrentScreen(), mc, mouseX, mouseY, false);
         }
     }
 
-    private boolean handleDragging(ContainerScreen<?> gui, MinecraftClient mc, int mouseX, int mouseY, boolean isClick)
+    private boolean handleDragging(ScreenWithHandler<?> gui, MinecraftClient mc, int mouseX, int mouseY, boolean isClick)
     {
         MoveAction action = InventoryUtils.getActiveMoveAction();
 
