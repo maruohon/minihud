@@ -103,7 +103,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
     @Override
     protected WidgetListShapes createListWidget(int listX, int listY)
     {
-        return new WidgetListShapes(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this.getBlitOffset(), this);
+        return new WidgetListShapes(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this.getZOffset(), this);
     }
 
     private static class ButtonListener implements IButtonActionListener
