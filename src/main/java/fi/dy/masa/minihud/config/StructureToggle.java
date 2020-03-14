@@ -34,7 +34,7 @@ public enum StructureToggle
         this.hotkey          = new ConfigHotkey("Toggle " + name, defaultHotkey, comment);
 
         this.hotkey.getKeybind().setCallback((action, key) -> { this.toggleOption.toggleBooleanValue(); return true; });
-        this.toggleOption.setValueChangeCallback((config) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
+        this.toggleOption.setValueChangeCallback((newValue, oldValue) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
     }
 
     public IConfigBoolean getToggleOption()

@@ -29,7 +29,6 @@ public class Configs implements IConfigHandler
     public static class Generic
     {
         public static final ConfigBoolean       BEACON_RANGE_AUTO_UPDATE            = new ConfigBoolean("beaconRangeAutoUpdate", false, "This enables the Beacon Range renderer to update automatically\nwhen block or chunk change packets are received.\nThose updates can have a performance impact if tons of blocks are changing often.\nYou can toggle off/on the renderer to update to those changes manually.");
-        public static final ConfigOptionList    BLOCK_GRID_OVERLAY_MODE             = new ConfigOptionList("blockGridOverlayMode", BlockGridMode.ALL, "The block grid render mode");
         public static final ConfigInteger       BLOCK_GRID_OVERLAY_RADIUS           = new ConfigInteger("blockGridOverlayRadius", 32, "The radius of the block grid lines to render");
         public static final ConfigDouble        CHUNK_UNLOAD_BUCKET_FONT_SCALE      = new ConfigDouble("chunkUnloadBucketOverlayFontScale", 0.1625, "The font scale for the Chunk unload order bucket overlay.\nValid range: 0.01 - 1.0");
         public static final ConfigInteger       DROPPED_CHUNKS_HASH_SIZE            = new ConfigInteger("droppedChunksHashSize", -1, -1, Integer.MAX_VALUE, "The HashSet size for the chunk unload bucket calculation,\nif 'chunkUnloadBucketWithSize' is true.\nUse -1 for automatically getting the current value in single player,\nor on Carpet servers. A value other than -1 will override the automatic value,\nincluding the proper value received from a Carpet server.");
@@ -43,11 +42,8 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       ENABLED                             = new ConfigBoolean("enabled", true, "The main rendering toggle for all MiniHUD rendering");
         public static final ConfigBoolean       FIX_VANILLA_DEBUG_RENDERERS         = new ConfigBoolean("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed.");
         public static final ConfigDouble        FONT_SCALE                          = new ConfigDouble("fontScale", 0.5, 0.0, 100.0, "Font scale factor for the info line HUD. Default: 0.5\n");
-        public static final ConfigOptionList    HUD_ALIGNMENT                       = new ConfigOptionList("hudAlignment", HudAlignment.TOP_LEFT, "The alignment of the info line HUD");
         public static final ConfigBoolean       LIGHT_LEVEL_COLORED_NUMBERS         = new ConfigBoolean("lightLevelColoredNumbers", true, "Whether to use colored or white numbers\nfor the Light Level overlay numbers");
-        public static final ConfigOptionList    LIGHT_LEVEL_MARKER_MODE             = new ConfigOptionList("lightLevelMarkers", LightLevelMarkerMode.SQUARE, "Which type of colored marker to use in the\nLight Level overlay, if any");
         public static final ConfigDouble        LIGHT_LEVEL_MARKER_SIZE             = new ConfigDouble("lightLevelMarkerSize", 0.84, 0.0, 1.0, "The size of the light level colored marker.\nRange: 0.0 - 1.0");
-        public static final ConfigOptionList    LIGHT_LEVEL_NUMBER_MODE             = new ConfigOptionList("lightLevelNumbers", LightLevelNumberMode.BLOCK, "Which light level number(s) to render in the Light Level overlay");
         public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X   = new ConfigDouble("lightLevelNumberOffsetBlockX", 0.09, 0.0, 1.0, "The relative \"x\" offset for the block light level number.\nRange: 0.0 - 1.0");
         public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y   = new ConfigDouble("lightLevelNumberOffsetBlockY", 0.12, 0.0, 1.0, "The relative \"y\" offset for the block light level number.\nRange: 0.0 - 1.0");
         public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_SKY_X     = new ConfigDouble("lightLevelNumberOffsetSkyX", 0.42, 0.0, 1.0, "The relative \"x\" offset for the sky light level number.\nRange: 0.0 - 1.0");
@@ -83,6 +79,11 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       USE_TEXT_BACKGROUND                 = new ConfigBoolean("useTextBackground", true, "Use a solid background color behind the text\nfor the info line HUD text");
         public static final ConfigBoolean       WOOL_COUNTER_ENABLE_ALL             = new ConfigBoolean("woolCounterEnableAll", true, "This overrides the 'woolCounterTypes' config,\nand enables all the colors. It's meant for quickly seeing all of them,\nwithout having to change the other config all the time.");
         public static final ConfigString        WOOL_COUNTER_TYPES                  = new ConfigString("woolCounterTypes", "0-15", "This defines which wool counter colors are enabled\nfor the Carpet Wool Counters info lines.\nAccepted values are individual metadata values like 0,1,2,\nmetadata ranges like 4-6,8-11 and dye names like purple,blue,white.\nDifferent values should be separated by commas, without spaces.");
+
+        public static final ConfigOptionList<BlockGridMode>             BLOCK_GRID_OVERLAY_MODE     = new ConfigOptionList<BlockGridMode>("blockGridOverlayMode", BlockGridMode.ALL, "The block grid render mode");
+        public static final ConfigOptionList<HudAlignment>              HUD_ALIGNMENT               = new ConfigOptionList<HudAlignment>("hudAlignment", HudAlignment.TOP_LEFT, "The alignment of the info line HUD");
+        public static final ConfigOptionList<LightLevelMarkerMode>      LIGHT_LEVEL_MARKER_MODE     = new ConfigOptionList<LightLevelMarkerMode>("lightLevelMarkers", LightLevelMarkerMode.SQUARE, "Which type of colored marker to use in the\nLight Level overlay, if any");
+        public static final ConfigOptionList<LightLevelNumberMode>      LIGHT_LEVEL_NUMBER_MODE     = new ConfigOptionList<LightLevelNumberMode>("lightLevelNumbers", LightLevelNumberMode.BLOCK, "Which light level number(s) to render in the Light Level overlay");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ENABLED,

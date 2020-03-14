@@ -15,7 +15,7 @@ import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.minihud.LiteModMiniHud;
 
-public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConfigNotifiable<IConfigBoolean>
+public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConfigNotifiable<Boolean>
 {
     BIOME                   ("infoBiome",                   false, 19, "", "Show the name of the current biome"),
     BIOME_REG_NAME          ("infoBiomeRegistryName",       false, 20, "", "Show the registry name of the current biome"),
@@ -73,7 +73,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
     private boolean lastSavedValueBoolean;
     private int linePosition;
     private int lastSavedLinePosition;
-    @Nullable private IValueChangeCallback<IConfigBoolean> callback;
+    @Nullable private IValueChangeCallback<Boolean> callback;
 
     private InfoToggle(String name, boolean defaultValue, int linePosition, String defaultHotkey, String comment)
     {
@@ -164,22 +164,22 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
 
         if (oldValue != this.valueBoolean)
         {
-            this.onValueChanged();
+            this.onValueChanged(value, oldValue);
         }
     }
 
     @Override
-    public void setValueChangeCallback(IValueChangeCallback<IConfigBoolean> callback)
+    public void setValueChangeCallback(IValueChangeCallback<Boolean> callback)
     {
         this.callback = callback;
     }
 
     @Override
-    public void onValueChanged()
+    public void onValueChanged(Boolean newValue, Boolean oldValue)
     {
         if (this.callback != null)
         {
-            this.callback.onValueChanged(this);
+            this.callback.onValueChanged(newValue, oldValue);
         }
     }
 

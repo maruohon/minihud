@@ -3,7 +3,7 @@ package fi.dy.masa.minihud.util;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum BlockGridMode implements IConfigOptionListEntry
+public enum BlockGridMode implements IConfigOptionListEntry<BlockGridMode>
 {
     ALL         ("all",         "minihud.label.blockgridmode.all"),
     NON_AIR     ("non_air",     "minihud.label.blockgridmode.non_air"),
@@ -31,7 +31,7 @@ public enum BlockGridMode implements IConfigOptionListEntry
     }
 
     @Override
-    public IConfigOptionListEntry cycle(boolean forward)
+    public BlockGridMode cycle(boolean forward)
     {
         int id = this.ordinal();
 

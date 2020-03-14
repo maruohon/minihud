@@ -3,7 +3,7 @@ package fi.dy.masa.minihud.util;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum LightLevelMarkerMode implements IConfigOptionListEntry
+public enum LightLevelMarkerMode implements IConfigOptionListEntry<LightLevelMarkerMode>
 {
     NONE    ("none",    "minihud.label.light_level_marker_mode.none"),
     CROSS   ("cross",   "minihud.label.light_level_marker_mode.cross"),
@@ -31,7 +31,7 @@ public enum LightLevelMarkerMode implements IConfigOptionListEntry
     }
 
     @Override
-    public IConfigOptionListEntry cycle(boolean forward)
+    public LightLevelMarkerMode cycle(boolean forward)
     {
         int id = this.ordinal();
 

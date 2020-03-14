@@ -40,14 +40,14 @@ import fi.dy.masa.minihud.util.ShapeRenderType;
 public class GuiShapeEditor extends GuiRenderLayerEditBase
 {
     private final ShapeBase shape;
-    private ConfigOptionList configBlockSnap;
+    private ConfigOptionList<BlockSnap> configBlockSnap;
     private int colorY;
 
     public GuiShapeEditor(ShapeBase shape)
     {
         this.shape = shape;
         this.title = StringUtils.translate("minihud.gui.title.shape_editor");
-        this.configBlockSnap = new ConfigOptionList("blockSnap", BlockSnap.NONE, "");
+        this.configBlockSnap = new ConfigOptionList<BlockSnap>("blockSnap", BlockSnap.NONE, "");
     }
 
     @Override
@@ -161,7 +161,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.configBlockSnap.setOptionListValue(shape.getBlockSnap());
         ConfigButtonOptionList buttonSnap = new ConfigButtonOptionList(x + button.getWidth() + 4, y, -1, 20, this.configBlockSnap, "minihud.gui.label.shape.block_snap");
         this.addButton(buttonSnap, (btn, mbtn) -> {
-            shape.setBlockSnap((BlockSnap) this.configBlockSnap.getOptionListValue());
+            shape.setBlockSnap(this.configBlockSnap.getOptionListValue());
             this.initGui();
         });
 

@@ -1,10 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
 import org.lwjgl.opengl.GL11;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.util.BlockGridMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -12,6 +8,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.util.BlockGridMode;
 
 public class OverlayRendererBlockGrid extends OverlayRendererBase
 {
@@ -42,7 +42,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
 
         RenderObjectBase renderLines = this.renderObjects.get(0);
         BUFFER_1.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-        BlockGridMode mode = (BlockGridMode) Configs.Generic.BLOCK_GRID_OVERLAY_MODE.getOptionListValue();
+        BlockGridMode mode = Configs.Generic.BLOCK_GRID_OVERLAY_MODE.getOptionListValue();
 
         switch (mode)
         {

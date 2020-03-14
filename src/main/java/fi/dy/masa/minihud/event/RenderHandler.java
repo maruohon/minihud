@@ -112,7 +112,7 @@ public class RenderHandler implements IRenderer
             int y = Configs.Generic.TEXT_POS_Y.getIntegerValue();
             int textColor = Configs.Colors.TEXT_COLOR.getIntegerValue();
             int bgColor = Configs.Colors.TEXT_BACKGROUND_COLOR.getIntegerValue();
-            HudAlignment alignment = (HudAlignment) Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
+            HudAlignment alignment = Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
             boolean useBackground = Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue();
             boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
 
@@ -155,7 +155,7 @@ public class RenderHandler implements IRenderer
 
     public int getSubtitleOffset()
     {
-        HudAlignment align = (HudAlignment) Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
+        HudAlignment align = Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
 
         if (align == HudAlignment.BOTTOM_RIGHT)
         {

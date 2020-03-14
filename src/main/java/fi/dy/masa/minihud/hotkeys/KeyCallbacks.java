@@ -33,26 +33,26 @@ public class KeyCallbacks
         Configs.Generic.SHAPE_EDITOR.getKeybind().setCallback(callback);
         Configs.Generic.TOGGLE_KEY.getKeybind().setCallback(new KeyCallbackToggleBoolean(Configs.Generic.ENABLED));
 
-        Configs.Colors.BEACON_RANGE_LVL1_OVERLAY_COLOR.setValueChangeCallback((config) -> OverlayRendererBeaconRange.setNeedsUpdate());
-        Configs.Colors.BEACON_RANGE_LVL2_OVERLAY_COLOR.setValueChangeCallback((config) -> OverlayRendererBeaconRange.setNeedsUpdate());
-        Configs.Colors.BEACON_RANGE_LVL3_OVERLAY_COLOR.setValueChangeCallback((config) -> OverlayRendererBeaconRange.setNeedsUpdate());
-        Configs.Colors.BEACON_RANGE_LVL4_OVERLAY_COLOR.setValueChangeCallback((config) -> OverlayRendererBeaconRange.setNeedsUpdate());
-        Configs.Generic.LIGHT_LEVEL_RANGE.setValueChangeCallback((config) -> { OverlayRendererLightLevel.setNeedsUpdate(); });
-        Configs.Generic.STRUCTURES_RENDER_THROUGH.setValueChangeCallback((config) -> { OverlayRendererStructures.instance.setRenderThrough(config.getBooleanValue()); });
-        Configs.Generic.WOOL_COUNTER_ENABLE_ALL.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
-        Configs.Generic.WOOL_COUNTER_TYPES.setValueChangeCallback((config) -> {
-            DataStorage.getInstance().getWoolCounters().updateEnabledCounters(config.getStringValue());
+        Configs.Colors.BEACON_RANGE_LVL1_OVERLAY_COLOR.setValueChangeCallback((newValue, oldValue) -> OverlayRendererBeaconRange.setNeedsUpdate());
+        Configs.Colors.BEACON_RANGE_LVL2_OVERLAY_COLOR.setValueChangeCallback((newValue, oldValue) -> OverlayRendererBeaconRange.setNeedsUpdate());
+        Configs.Colors.BEACON_RANGE_LVL3_OVERLAY_COLOR.setValueChangeCallback((newValue, oldValue) -> OverlayRendererBeaconRange.setNeedsUpdate());
+        Configs.Colors.BEACON_RANGE_LVL4_OVERLAY_COLOR.setValueChangeCallback((newValue, oldValue) -> OverlayRendererBeaconRange.setNeedsUpdate());
+        Configs.Generic.LIGHT_LEVEL_RANGE.setValueChangeCallback((newValue, oldValue) -> { OverlayRendererLightLevel.setNeedsUpdate(); });
+        Configs.Generic.STRUCTURES_RENDER_THROUGH.setValueChangeCallback((newValue, oldValue) -> { OverlayRendererStructures.instance.setRenderThrough(newValue); });
+        Configs.Generic.WOOL_COUNTER_ENABLE_ALL.setValueChangeCallback((newValue, oldValue) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
+        Configs.Generic.WOOL_COUNTER_TYPES.setValueChangeCallback((newValue, oldValue) -> {
+            DataStorage.getInstance().getWoolCounters().updateEnabledCounters(newValue);
             CarpetPubsubPacketHandler.updatePubsubSubscriptions();
         });
 
-        InfoToggle.CARPET_WOOL_COUNTERS.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
+        InfoToggle.CARPET_WOOL_COUNTERS.setValueChangeCallback((newValue, oldValue) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
         InfoToggle.CHUNK_UNLOAD_ORDER.getKeybind().setCallback(new KeyCallbackAdjustable(InfoToggle.CHUNK_UNLOAD_ORDER, null));
-        InfoToggle.CHUNK_UNLOAD_ORDER.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
-        InfoToggle.MOB_CAPS.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
-        InfoToggle.SERVER_TPS.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
+        InfoToggle.CHUNK_UNLOAD_ORDER.setValueChangeCallback((newValue, oldValue) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
+        InfoToggle.MOB_CAPS.setValueChangeCallback((newValue, oldValue) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
+        InfoToggle.SERVER_TPS.setValueChangeCallback((newValue, oldValue) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
 
         RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET)));
-        RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.setValueChangeCallback((config) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
+        RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.setValueChangeCallback((newValue, oldValue) -> CarpetPubsubPacketHandler.updatePubsubSubscriptions());
         RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY)));
     }
 

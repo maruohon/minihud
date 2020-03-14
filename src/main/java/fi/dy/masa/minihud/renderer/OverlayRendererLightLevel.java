@@ -74,8 +74,8 @@ public class OverlayRendererLightLevel
             BufferBuilder buffer = tessellator.getBuffer();
             Entity entity = mc.getRenderViewEntity() != null ? mc.getRenderViewEntity() : mc.player;
             EnumFacing numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? entity.getHorizontalFacing() : EnumFacing.NORTH;
-            LightLevelNumberMode numberMode = (LightLevelNumberMode) Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getOptionListValue();
-            LightLevelMarkerMode markerMode = (LightLevelMarkerMode) Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
+            LightLevelNumberMode numberMode = Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getOptionListValue();
+            LightLevelMarkerMode markerMode = Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
             boolean useColoredNumbers = Configs.Generic.LIGHT_LEVEL_COLORED_NUMBERS.getBooleanValue();
             int lightThreshold = Configs.Generic.LIGHT_LEVEL_THRESHOLD.getIntegerValue();
 

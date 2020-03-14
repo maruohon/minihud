@@ -16,7 +16,7 @@ import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
 
-public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable<IConfigBoolean>
+public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable<Boolean>
 {
     DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled",    "", "Toggles the vanilla Block Collision Boxes debug renderer", "Block Collision Boxes"),
     DEBUG_HEIGHT_MAP                    ("debugHeightMapEnabled",       "", "Toggles the vanilla Height Map debug renderer", "Height Map"),
@@ -49,7 +49,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
     private String modName = "";
     private boolean valueBoolean;
     private boolean lastSavedValueBoolean;
-    @Nullable private IValueChangeCallback<IConfigBoolean> callback;
+    @Nullable private IValueChangeCallback<Boolean> callback;
 
     RendererToggle(String name, String defaultHotkey, String comment, String prettyName)
     {
@@ -75,7 +75,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
 
         if (name.equals("overlayStructureMainToggle"))
         {
-            this.setValueChangeCallback((config) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
+            this.setValueChangeCallback((newValue, oldValue) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
         }
 
         this.cacheSavedValue();
@@ -150,22 +150,22 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
 
         if (oldValue != this.valueBoolean)
         {
-            this.onValueChanged();
+            this.onValueChanged(value, oldValue);
         }
     }
 
     @Override
-    public void setValueChangeCallback(IValueChangeCallback<IConfigBoolean> callback)
+    public void setValueChangeCallback(IValueChangeCallback<Boolean> callback)
     {
         this.callback = callback;
     }
 
     @Override
-    public void onValueChanged()
+    public void onValueChanged(Boolean newValue, Boolean oldValue)
     {
         if (this.callback != null)
         {
-            this.callback.onValueChanged(this);
+            this.callback.onValueChanged(newValue, oldValue);
         }
     }
 
