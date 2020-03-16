@@ -6,9 +6,9 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.malilib.render.RenderObjectBase;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.renderer.RenderObjectBase;
 
 public class ShapeSphereBlocky extends ShapeCircleBase
 {

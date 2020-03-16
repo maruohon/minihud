@@ -4,13 +4,14 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.malilib.render.RenderObjectBase;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
 
 public class OverlayRendererSpawnableChunks extends OverlayRendererBase
 {

@@ -8,6 +8,9 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.malilib.render.RenderObjectBase;
+import fi.dy.masa.malilib.render.RenderObjectDisplayList;
+import fi.dy.masa.malilib.render.RenderObjectVbo;
 
 public abstract class OverlayRendererBase implements IOverlayRenderer
 {

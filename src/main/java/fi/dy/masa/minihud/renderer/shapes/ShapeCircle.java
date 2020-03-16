@@ -10,10 +10,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import fi.dy.masa.malilib.render.RenderObjectBase;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.renderer.RenderObjectBase;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
 public class ShapeCircle extends ShapeCircleBase
