@@ -3,7 +3,7 @@ package fi.dy.masa.itemscroller.event;
 import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.ScreenWithHandler;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.itemscroller.Reference;
@@ -122,11 +122,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             final int mouseX = fi.dy.masa.malilib.util.InputUtils.getMouseX();
             final int mouseY = fi.dy.masa.malilib.util.InputUtils.getMouseY();
 
-            if (GuiUtils.getCurrentScreen() instanceof ScreenWithHandler &&
+            if (GuiUtils.getCurrentScreen() instanceof HandledScreen &&
                 (GuiUtils.getCurrentScreen() instanceof CreativeInventoryScreen) == false &&
                 Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false)
             {
-                ScreenWithHandler<?> gui = (ScreenWithHandler<?>) GuiUtils.getCurrentScreen();
+                HandledScreen<?> gui = (HandledScreen<?>) GuiUtils.getCurrentScreen();
                 RecipeStorage recipes = RecipeStorage.getInstance();
 
                 if (dWheel != 0)
@@ -204,14 +204,14 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
         if (this.callbacks.functionalityEnabled() &&
             mc.player != null &&
-            GuiUtils.getCurrentScreen() instanceof ScreenWithHandler &&
+            GuiUtils.getCurrentScreen() instanceof HandledScreen &&
             Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false)
         {
-            this.handleDragging((ScreenWithHandler<?>) GuiUtils.getCurrentScreen(), mc, mouseX, mouseY, false);
+            this.handleDragging((HandledScreen<?>) GuiUtils.getCurrentScreen(), mc, mouseX, mouseY, false);
         }
     }
 
-    private boolean handleDragging(ScreenWithHandler<?> gui, MinecraftClient mc, int mouseX, int mouseY, boolean isClick)
+    private boolean handleDragging(HandledScreen<?> gui, MinecraftClient mc, int mouseX, int mouseY, boolean isClick)
     {
         MoveAction action = InventoryUtils.getActiveMoveAction();
 

@@ -8,17 +8,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 
-@Mixin(net.minecraft.screen.CraftingTableScreenHandler.class)
-public abstract class MixinCraftingTableScreenHandler
+@Mixin(net.minecraft.screen.CraftingScreenHandler.class)
+public abstract class MixinCraftingScreenHandler
 {
-    @Shadow @Final private net.minecraft.inventory.CraftingInventory craftingInv;
-    @Shadow @Final private net.minecraft.inventory.CraftingResultInventory resultInv;
+    @Shadow @Final private net.minecraft.inventory.CraftingInventory input;
+    @Shadow @Final private net.minecraft.inventory.CraftingResultInventory result;
     @Shadow @Final private net.minecraft.entity.player.PlayerEntity player;
 
     @Inject(method = "onContentChanged", at = @At("RETURN"))
     private void onSlotChangedCraftingGrid(net.minecraft.inventory.Inventory inventory, CallbackInfo ci)
     {
-        InventoryUtils.onSlotChangedCraftingGrid(this.player, this.craftingInv, this.resultInv);
+        InventoryUtils.onSlotChangedCraftingGrid(this.player, this.input, this.result);
     }
 
     @Inject(method = "updateResult", at = @At("RETURN"))

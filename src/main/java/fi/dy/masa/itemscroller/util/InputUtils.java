@@ -1,7 +1,7 @@
 package fi.dy.masa.itemscroller.util;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.ScreenWithHandler;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import fi.dy.masa.itemscroller.config.Hotkeys;
 import fi.dy.masa.itemscroller.event.KeybindCallbacks;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
@@ -19,7 +19,7 @@ public class InputUtils
                CraftingHandler.isCraftingGui(GuiUtils.getCurrentScreen());
     }
 
-    public static boolean canShiftDropItems(ScreenWithHandler<?> gui, MinecraftClient mc, int mouseX, int mouseY)
+    public static boolean canShiftDropItems(HandledScreen<?> gui, MinecraftClient mc, int mouseX, int mouseY)
     {
         if (InventoryUtils.isStackEmpty(mc.player.inventory.getCursorStack()) == false)
         {

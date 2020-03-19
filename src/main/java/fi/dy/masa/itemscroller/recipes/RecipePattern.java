@@ -1,7 +1,7 @@
 package fi.dy.masa.itemscroller.recipes;
 
 import javax.annotation.Nonnull;
-import net.minecraft.client.gui.screen.ingame.ScreenWithHandler;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -45,7 +45,7 @@ public class RecipePattern
         this.clearRecipe();
     }
 
-    public void storeCraftingRecipe(Slot slot, ScreenWithHandler<? extends ScreenHandler> gui, boolean clearIfEmpty)
+    public void storeCraftingRecipe(Slot slot, HandledScreen<? extends ScreenHandler> gui, boolean clearIfEmpty)
     {
         SlotRange range = CraftingHandler.getCraftingGridSlots(gui, slot);
 
