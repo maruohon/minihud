@@ -253,7 +253,7 @@ public class ShapeDespawnSphere extends ShapeBase
             for (int i = 0; i < 6; ++i)
             {
                 Direction side = FACING_ALL[i];
-                posMutable.set(pos).setOffset(side);
+                posMutable.set(pos).move(side);
 
                 if (this.layerRange.isPositionWithinRange(pos) &&
                     spherePositions.contains(posMutable) == false &&

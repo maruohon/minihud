@@ -78,7 +78,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         this.addButton(button, new ButtonListener(ButtonListener.Type.ADD_SHAPE, this));
 
         WidgetDropDownList<InfoToggle> dd = new WidgetDropDownList<InfoToggle>(button.getX() - 160, y, 140, 18, 200, 6, ImmutableList.copyOf(InfoToggle.values()));
-        dd.setZLevel(this.getBlitOffset() + 1);
+        dd.setZLevel(this.getZOffset() + 1);
         this.addWidget(dd);
 
         return button.getWidth();

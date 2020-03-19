@@ -7,8 +7,8 @@ import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
 
 public class StructurePacketHandler implements IPluginChannelHandler
 {
