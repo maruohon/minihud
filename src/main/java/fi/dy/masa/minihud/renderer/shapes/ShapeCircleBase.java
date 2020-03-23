@@ -166,7 +166,9 @@ public abstract class ShapeCircleBase extends ShapeBase
         JsonObject obj = super.toJson();
 
         obj.add("center", JsonUtils.vec3dToJson(this.center));
+        obj.add("main_axis", new JsonPrimitive(this.mainAxis.name()));
         obj.add("snap", new JsonPrimitive(this.snap.getStringValue()));
+        obj.add("radius", new JsonPrimitive(this.radius));
 
         return obj;
     }
@@ -180,6 +182,21 @@ public abstract class ShapeCircleBase extends ShapeBase
         if (JsonUtils.hasString(obj, "snap"))
         {
             this.snap = BlockSnap.fromStringStatic(JsonUtils.getString(obj, "snap"));
+        }
+
+        if (JsonUtils.hasString(obj, "main_axis"))
+        {
+            EnumFacing facing = EnumFacing.valueOf(obj.get("main_axis").getAsString());
+
+            if (facing != null)
+            {
+                this.setMainAxis(facing);
+            }
+        }
+
+        if (JsonUtils.hasDouble(obj, "radius"))
+        {
+            this.setRadius(JsonUtils.getDouble(obj, "radius"));
         }
 
         Vec3d center = JsonUtils.vec3dFromJson(obj, "center");
