@@ -4,16 +4,25 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.management.PlayerChunkMapEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.nbt.NbtStringifierPretty;
+import fi.dy.masa.malilib.util.nbt.NbtStringifierSimple;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.data.DataStorage;
@@ -167,6 +176,45 @@ public class MiscUtils
         }
 
         return chunkCount;
+    }
+
+    public static void getItemTooltip(ItemStack stack, List<String> lines)
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+        boolean showPretty = Configs.Generic.ITEM_NBT_KEY_PRETTY.isHeld();
+        boolean showString = Configs.Generic.ITEM_NBT_KEY_STRING.isHeld();
+
+        // If the vanilla advanced tooltips are disabled, add them here, when showing a tooltip
+        if (mc.gameSettings.advancedItemTooltips == false && (showPretty || showString))
+        {
+            if (stack.isItemDamaged())
+            {
+                lines.add(StringUtils.translate("item.durability", stack.getMaxDamage() - stack.getItemDamage(), stack.getMaxDamage()));
+            }
+
+            lines.add(GuiBase.TXT_DARK_GRAY + Item.REGISTRY.getNameForObject(stack.getItem()).toString());
+
+            if (stack.hasTagCompound())
+            {
+                lines.add(GuiBase.TXT_DARK_GRAY + StringUtils.translate("item.nbt_tags", stack.getTagCompound().getKeySet().size()));
+            }
+        }
+
+        NBTTagCompound tag = stack.getTagCompound();
+
+        if (tag != null)
+        {
+            if (showPretty)
+            {
+                lines.addAll((new NbtStringifierPretty(true, GuiBase.TXT_GRAY).getNbtLines(tag)));
+            }
+
+            if (showString)
+            {
+                String str = (new NbtStringifierSimple(true, GuiBase.TXT_GRAY)).getNbtString(tag);
+                StringUtils.splitTextToLines(lines, str, 240);
+            }
+        }
     }
 
     public static boolean isStructureWithinRange(IntBoundingBox bb, BlockPos playerPos, int maxRange)

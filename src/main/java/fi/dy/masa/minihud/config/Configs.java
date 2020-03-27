@@ -42,6 +42,9 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       ENABLED                             = new ConfigBoolean("enabled", true, "The main rendering toggle for all MiniHUD rendering");
         public static final ConfigBoolean       FIX_VANILLA_DEBUG_RENDERERS         = new ConfigBoolean("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed.");
         public static final ConfigDouble        FONT_SCALE                          = new ConfigDouble("fontScale", 0.5, 0.0, 100.0, "Font scale factor for the info line HUD. Default: 0.5\n");
+        public static final ConfigBoolean       ITEM_NBT_ENABLED                    = new ConfigBoolean("itemNbtEnabled", false, "Enables showing the item NBT data in the tooltip,\nif one of the activation keys is held.");
+        public static final ConfigHotkey        ITEM_NBT_KEY_PRETTY                 = new ConfigHotkey("itemNbtKeyPretty", "", KeybindSettings.MODIFIER_GUI, "Shows pretty formatted item NBT data");
+        public static final ConfigHotkey        ITEM_NBT_KEY_STRING                 = new ConfigHotkey("itemNbtKeyString", "", KeybindSettings.MODIFIER_GUI, "Shows item NBT data in the stringified format");
         public static final ConfigBoolean       LIGHT_LEVEL_COLORED_NUMBERS         = new ConfigBoolean("lightLevelColoredNumbers", true, "Whether to use colored or white numbers\nfor the Light Level overlay numbers");
         public static final ConfigDouble        LIGHT_LEVEL_MARKER_SIZE             = new ConfigDouble("lightLevelMarkerSize", 0.84, 0.0, 1.0, "The size of the light level colored marker.\nRange: 0.0 - 1.0");
         public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X   = new ConfigDouble("lightLevelNumberOffsetBlockX", 0.09, 0.0, 1.0, "The relative \"x\" offset for the block light level number.\nRange: 0.0 - 1.0");
@@ -92,6 +95,7 @@ public class Configs implements IConfigHandler
                 DEBUG_RENDERER_PATH_MAX_DIST,
                 DONT_RESET_SEED_ON_DIMENSION_CHANGE,
                 FIX_VANILLA_DEBUG_RENDERERS,
+                ITEM_NBT_ENABLED,
                 LIGHT_LEVEL_COLORED_NUMBERS,
                 LIGHT_LEVEL_NUMBER_ROTATION,
                 MAP_PREVIEW,
@@ -107,6 +111,8 @@ public class Configs implements IConfigHandler
                 USE_TEXT_BACKGROUND,
                 WOOL_COUNTER_ENABLE_ALL,
 
+                ITEM_NBT_KEY_PRETTY,
+                ITEM_NBT_KEY_STRING,
                 OPEN_CONFIG_GUI,
                 REQUIRED_KEY,
                 SET_DISTANCE_REFERENCE_POINT,
@@ -148,6 +154,8 @@ public class Configs implements IConfigHandler
         );
 
         public static final List<ConfigHotkey> HOTKEY_LIST = ImmutableList.of(
+                ITEM_NBT_KEY_PRETTY,
+                ITEM_NBT_KEY_STRING,
                 TOGGLE_KEY,
                 REQUIRED_KEY,
                 OPEN_CONFIG_GUI,
