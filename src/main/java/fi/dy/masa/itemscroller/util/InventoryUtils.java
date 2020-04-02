@@ -79,7 +79,7 @@ public class InventoryUtils
                    stack = recipe.craft(craftMatrix);
                }
 
-               inventoryCraftResult.setInvStack(0, stack);
+               inventoryCraftResult.setStack(0, stack);
             }
         }
     }
