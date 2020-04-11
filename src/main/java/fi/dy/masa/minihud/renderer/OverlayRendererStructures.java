@@ -4,6 +4,12 @@ import java.util.Collection;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.dimension.OverworldDimension;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -11,17 +17,11 @@ import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 import fi.dy.masa.minihud.util.StructureData;
 import fi.dy.masa.minihud.util.StructureTypes.StructureType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.dimension.OverworldDimension;
 
 public class OverlayRendererStructures extends OverlayRendererBase
 {
     @Override
-    public boolean shouldRender(MinecraftClient mc)
+    public boolean shouldRender(Minecraft mc)
     {
         if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue() == false)
         {
@@ -51,28 +51,28 @@ public class OverlayRendererStructures extends OverlayRendererBase
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, MinecraftClient mc)
+    public boolean needsUpdate(Entity entity, Minecraft mc)
     {
         int hysteresis = 16;
 
         return DataStorage.getInstance().structureRendererNeedsUpdate() ||
-               Math.abs(entity.x - this.lastUpdatePos.getX()) > hysteresis ||
-               Math.abs(entity.y - this.lastUpdatePos.getY()) > hysteresis ||
-               Math.abs(entity.z - this.lastUpdatePos.getZ()) > hysteresis;
+               Math.abs(entity.posX - this.lastUpdatePos.getX()) > hysteresis ||
+               Math.abs(entity.posY - this.lastUpdatePos.getY()) > hysteresis ||
+               Math.abs(entity.posZ - this.lastUpdatePos.getZ()) > hysteresis;
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Entity entity, Minecraft mc)
     {
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
+        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
         this.updateStructures(mc.world.dimension.getType(), this.lastUpdatePos, mc);
 
-        BUFFER_1.end();
-        BUFFER_2.end();
+        BUFFER_1.finishDrawing();
+        BUFFER_2.finishDrawing();
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
@@ -85,10 +85,10 @@ public class OverlayRendererStructures extends OverlayRendererBase
         this.allocateBuffer(GL11.GL_LINES);
     }
 
-    private void updateStructures(DimensionType dimensionType, BlockPos playerPos, MinecraftClient mc)
+    private void updateStructures(DimensionType dimensionType, BlockPos playerPos, Minecraft mc)
     {
         ArrayListMultimap<StructureType, StructureData> structures = DataStorage.getInstance().getCopyOfStructureData();
-        int maxRange = (mc.options.viewDistance + 4) * 16;
+        int maxRange = (mc.gameSettings.renderDistanceChunks + 4) * 16;
 
         for (StructureType type : StructureType.values())
         {

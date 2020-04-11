@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.gui;
 
+import net.minecraft.entity.player.PlayerEntity;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldDouble;
@@ -19,7 +20,6 @@ import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeDespawnSphere;
-import net.minecraft.entity.player.PlayerEntity;
 
 public class GuiShapeEditor extends GuiRenderLayerEditBase
 {
@@ -71,7 +71,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         y += 12;
 
         GuiTextFieldGeneric textField = new GuiTextFieldGeneric(x, y, 70, 17, this.textRenderer);
-        textField.setMaxLength(12);
+        textField.setMaxStringLength(12);
         textField.setText(String.format("#%08X", this.shape.getColor().intValue));
         this.addTextField(textField, new TextFieldListenerColor(this.shape));
         this.nextY = y + 20;
@@ -185,7 +185,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
             if (player != null)
             {
-                this.shape.setCenter(player.getPos());
+                this.shape.setCenter(player.getPositionVec());
                 this.gui.initGui();
             }
         }

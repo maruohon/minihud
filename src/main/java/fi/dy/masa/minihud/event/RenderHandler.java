@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.event;
 
+import java.lang.invoke.MethodHandle;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,35 +13,35 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.render.chunk.ChunkRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.network.play.NetworkPlayerInfo;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.chunk.ChunkRender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.server.world.ServerChunkManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.LightType;
-import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.lighting.WorldLightManager;
+import net.minecraft.world.server.ServerChunkProvider;
+import net.minecraft.world.server.ServerWorld;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
@@ -48,19 +49,23 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.mixin.IMixinServerWorld;
-import fi.dy.masa.minihud.mixin.IMixinWorldRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.DataStorage;
+import fi.dy.masa.minihud.util.MethodHandleUtils;
+import fi.dy.masa.minihud.util.MethodHandleUtils.UnableToFindMethodHandleException;
 import fi.dy.masa.minihud.util.MiscUtils;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class RenderHandler implements IRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
-    private final MinecraftClient mc;
+
+    private final MethodHandle methodHandle_WorldRenderer_getRenderedChunks;
+    private final Minecraft mc;
     private final DataStorage data;
     private final Date date;
     private int fps;
@@ -70,9 +75,9 @@ public class RenderHandler implements IRenderer
     private double fontScale = 0.5d;
     private Set<InfoToggle> addedTypes = new HashSet<>();
     @Nullable private ChunkPos chunkPos;
-    @Nullable private WorldChunk cachedServerChunk;
-    @Nullable private WorldChunk cachedClientChunk;
-    @Nullable private CompletableFuture<WorldChunk> chunkFuture;
+    @Nullable private Chunk cachedServerChunk;
+    @Nullable private Chunk cachedClientChunk;
+    @Nullable private CompletableFuture<Chunk> chunkFuture;
 
     private final List<StringHolder> lineWrappers = new ArrayList<>();
     private final List<String> lines = new ArrayList<>();
@@ -81,7 +86,21 @@ public class RenderHandler implements IRenderer
     {
         this.data = DataStorage.getInstance();
         this.date = new Date();
-        this.mc = MinecraftClient.getInstance();
+        this.mc = Minecraft.getInstance();
+        this.methodHandle_WorldRenderer_getRenderedChunks = this.getMethodHandle_getRenderedChunks();
+    }
+
+    private MethodHandle getMethodHandle_getRenderedChunks()
+    {
+        try
+        {
+            return MethodHandleUtils.getMethodHandleVirtual(WorldRenderer.class, new String[] { "func_184382_g", "getRenderedChunks" });
+        }
+        catch (UnableToFindMethodHandleException e)
+        {
+            MiniHUD.logger.error("Failed to get a MethodHandle for WorldRenderer#getRenderedChunks()", e);
+            return null;
+        }
     }
 
     public static RenderHandler getInstance()
@@ -107,10 +126,10 @@ public class RenderHandler implements IRenderer
     @Override
     public void onRenderGameOverlayPost(float partialTicks)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         if (Configs.Generic.ENABLED.getBooleanValue() &&
-            mc.options.debugEnabled == false &&
+            mc.gameSettings.showDebugInfo == false &&
             mc.player != null &&
             (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
             Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld())
@@ -165,7 +184,7 @@ public class RenderHandler implements IRenderer
     @Override
     public void onRenderWorldLast(float partialTicks)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         if (Configs.Generic.ENABLED.getBooleanValue() && mc.world != null && mc.player != null)
         {
@@ -205,7 +224,7 @@ public class RenderHandler implements IRenderer
         }
     }
 
-    public void updateData(MinecraftClient mc)
+    public void updateData(Minecraft mc)
     {
         if (mc.world != null)
         {
@@ -271,12 +290,13 @@ public class RenderHandler implements IRenderer
         this.lineWrappers.add(new StringHolder(text));
     }
 
+    @SuppressWarnings("deprecation")
     private void addLine(InfoToggle type)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        Entity entity = mc.getCameraEntity();
+        Minecraft mc = Minecraft.getInstance();
+        Entity entity = mc.getRenderViewEntity();
         World world = entity.getEntityWorld();
-        BlockPos pos = new BlockPos(entity.x, entity.getBoundingBox().minY, entity.z);
+        BlockPos pos = new BlockPos(entity.posX, entity.getBoundingBox().minY, entity.posZ);
         ChunkPos chunkPos = new ChunkPos(pos);
 
         if (Objects.equals(this.chunkPos, chunkPos) == false)
@@ -318,15 +338,15 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.TIME_WORLD)
         {
-            long current = world.getTimeOfDay();
-            long total = world.getTime();
+            long current = world.getDayTime();
+            long total = world.getGameTime();
             this.addLine(String.format("World time: %5d - total: %d", current, total));
         }
         else if (type == InfoToggle.TIME_WORLD_FORMATTED)
         {
             try
             {
-                long timeDay = world.getTimeOfDay();
+                long timeDay = world.getDayTime();
                 long day = (int) (timeDay / 24000) + 1;
                 // 1 tick = 3.6 seconds in MC (0.2777... seconds IRL)
                 int dayTicks = (int) (timeDay % 24000);
@@ -350,18 +370,18 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.TIME_DAY_MODULO)
         {
             int mod = Configs.Generic.TIME_DAY_DIVISOR.getIntegerValue();
-            long current = world.getTimeOfDay() % mod;
+            long current = world.getDayTime() % mod;
             this.addLine(String.format("Day time %% %d: %5d", mod, current));
         }
         else if (type == InfoToggle.TIME_TOTAL_MODULO)
         {
             int mod = Configs.Generic.TIME_TOTAL_DIVISOR.getIntegerValue();
-            long current = world.getTime() % mod;
+            long current = world.getGameTime() % mod;
             this.addLine(String.format("Total time %% %d: %5d", mod, current));
         }
         else if (type == InfoToggle.SERVER_TPS)
         {
-            if (mc.isIntegratedServerRunning() && (mc.getServer().getTicks() % 10) == 0)
+            if (mc.isIntegratedServerRunning() && (mc.getIntegratedServer().getTickCounter() % 10) == 0)
             {
                 this.data.updateIntegratedServerTPS();
             }
@@ -375,7 +395,7 @@ public class RenderHandler implements IRenderer
                 String preMspt;
 
                 // Carpet server and integrated server have actual meaningful MSPT data available
-                if (this.data.isCarpetServer() || mc.isInSingleplayer())
+                if (this.data.isCarpetServer() || mc.isSingleplayer())
                 {
                     if      (mspt <= 40) { preMspt = GuiBase.TXT_GREEN; }
                     else if (mspt <= 45) { preMspt = GuiBase.TXT_YELLOW; }
@@ -399,11 +419,11 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.PING)
         {
-            PlayerListEntry info = mc.player.networkHandler.getPlayerListEntry(mc.player.getUuid());
+            NetworkPlayerInfo info = mc.player.connection.getPlayerInfo(mc.player.getUniqueID());
 
             if (info != null)
             {
-                this.addLine("Ping: " + info.getLatency() + " ms");
+                this.addLine("Ping: " + info.getResponseTime() + " ms");
             }
         }
         else if (type == InfoToggle.COORDINATES ||
@@ -425,7 +445,7 @@ public class RenderHandler implements IRenderer
                     try
                     {
                         str.append(String.format(Configs.Generic.COORDINATE_FORMAT_STRING.getStringValue(),
-                            entity.x, entity.getBoundingBox().minY, entity.z));
+                            entity.posX, entity.getBoundingBox().minY, entity.posZ));
                     }
                     // Uh oh, someone done goofed their format string... :P
                     catch (Exception e)
@@ -436,7 +456,7 @@ public class RenderHandler implements IRenderer
                 else
                 {
                     str.append(String.format("XYZ: %.2f / %.4f / %.2f",
-                        entity.x, entity.getBoundingBox().minY, entity.z));
+                        entity.posX, entity.getBoundingBox().minY, entity.posZ));
                 }
 
                 pre = " / ";
@@ -444,7 +464,7 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.DIMENSION.getBooleanValue())
             {
-                int dimension = world.dimension.getType().getRawId();
+                int dimension = world.dimension.getType().getId();
                 str.append(String.format(String.format("%sDimType ID: %d", pre, dimension)));
             }
 
@@ -500,9 +520,9 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.DISTANCE)
         {
             Vec3d ref = DataStorage.getInstance().getDistanceReferencePoint();
-            double dist = MathHelper.sqrt(ref.squaredDistanceTo(entity.x, entity.y, entity.z));
+            double dist = MathHelper.sqrt(ref.squareDistanceTo(entity.posX, entity.posY, entity.posZ));
             this.addLine(String.format("Distance: %.2f (x: %.2f y: %.2f z: %.2f) [to x: %.2f y: %.2f z: %.2f]",
-                    dist, entity.x - ref.x, entity.y - ref.y, entity.z - ref.z, ref.x, ref.y, ref.z));
+                    dist, entity.posX - ref.x, entity.posY - ref.y, entity.posZ - ref.z, ref.x, ref.y, ref.z));
         }
         else if (type == InfoToggle.FACING)
         {
@@ -525,23 +545,23 @@ public class RenderHandler implements IRenderer
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
             {
-                WorldChunk clientChunk = this.getClientChunk(chunkPos);
+                Chunk clientChunk = this.getClientChunk(chunkPos);
 
                 if (clientChunk.isEmpty() == false)
                 {
                     this.addLine(String.format("Client Light: %d (block: %d, sky: %d)",
-                            clientChunk.getLightLevel(pos, 0),
-                            mc.world.getLightLevel(LightType.BLOCK, pos),
-                            mc.world.getLightLevel(LightType.SKY, pos)));
+                            clientChunk.getLightSubtracted(pos, 0),
+                            mc.world.getLightFor(LightType.BLOCK, pos),
+                            mc.world.getLightFor(LightType.SKY, pos)));
 
                     World bestWorld = WorldUtils.getBestWorld(mc);
-                    WorldChunk serverChunk = this.getChunk(chunkPos);
+                    Chunk serverChunk = this.getChunk(chunkPos);
 
                     if (serverChunk != null && serverChunk != clientChunk)
                     {
-                        LightingProvider lightingProvider = bestWorld.getChunkManager().getLightingProvider();
-                        int sky = lightingProvider.get(LightType.SKY).getLightLevel(pos);
-                        int block = lightingProvider.get(LightType.BLOCK).getLightLevel(pos);
+                        WorldLightManager lightingProvider = bestWorld.getChunkProvider().getLightManager();
+                        int sky = lightingProvider.getLightEngine(LightType.SKY).getLightFor(pos);
+                        int block = lightingProvider.getLightEngine(LightType.BLOCK).getLightFor(pos);
                         this.addLine(String.format("Server Light: (%d sky, %d block)", sky, block));
                     }
                 }
@@ -564,21 +584,21 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.ROTATION_YAW.getBooleanValue())
             {
-                str.append(String.format("yaw: %.1f", MathHelper.wrapDegrees(entity.yaw)));
+                str.append(String.format("yaw: %.1f", MathHelper.wrapDegrees(entity.rotationYaw)));
                 pre = " / ";
             }
 
             if (InfoToggle.ROTATION_PITCH.getBooleanValue())
             {
-                str.append(pre).append(String.format("pitch: %.1f", MathHelper.wrapDegrees(entity.pitch)));
+                str.append(pre).append(String.format("pitch: %.1f", MathHelper.wrapDegrees(entity.rotationPitch)));
                 pre = " / ";
             }
 
             if (InfoToggle.SPEED.getBooleanValue())
             {
-                double dx = entity.x - entity.prevRenderX;
-                double dy = entity.y - entity.prevRenderY;
-                double dz = entity.z - entity.prevRenderZ;
+                double dx = entity.posX - entity.lastTickPosX;
+                double dy = entity.posY - entity.lastTickPosY;
+                double dz = entity.posZ - entity.lastTickPosZ;
                 double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
                 str.append(pre).append(String.format("speed: %.3f m/s", dist * 20));
             }
@@ -591,32 +611,32 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.SPEED_AXIS)
         {
-            double dx = entity.x - entity.prevRenderX;
-            double dy = entity.y - entity.prevRenderY;
-            double dz = entity.z - entity.prevRenderZ;
+            double dx = entity.posX - entity.lastTickPosX;
+            double dy = entity.posY - entity.lastTickPosY;
+            double dz = entity.posZ - entity.lastTickPosZ;
             this.addLine(String.format("speed: x: %.3f y: %.3f z: %.3f m/s", dx * 20, dy * 20, dz * 20));
         }
         else if (type == InfoToggle.CHUNK_SECTIONS)
         {
-            this.addLine(String.format("C: %d", ((IMixinWorldRenderer) mc.worldRenderer).getRenderedChunksInvoker()));
+            this.addLine(String.format("C: %d", this.getRenderedChunks()));
         }
         else if (type == InfoToggle.CHUNK_SECTIONS_FULL)
         {
-            this.addLine(mc.worldRenderer.getChunksDebugString());
+            this.addLine(mc.worldRenderer.getDebugInfoRenders());
         }
         else if (type == InfoToggle.CHUNK_UPDATES)
         {
-            this.addLine(String.format("Chunk updates: %d", ChunkRenderer.chunkUpdateCount));
+            this.addLine(String.format("Chunk updates: %d", ChunkRender.renderChunksUpdated));
         }
         else if (type == InfoToggle.LOADED_CHUNKS_COUNT)
         {
-            String chunksClient = mc.world.getChunkProviderStatus();
+            String chunksClient = mc.world.getProviderName();
             World worldServer = WorldUtils.getBestWorld(mc);
 
             if (worldServer != null && worldServer != mc.world)
             {
-                int chunksServer = ((ServerChunkManager) worldServer.getChunkManager()).getLoadedChunkCount();
-                int chunksServerTot = ((ServerChunkManager) worldServer.getChunkManager()).getTotalChunksLoadedCount();
+                int chunksServer = ((ServerChunkProvider) worldServer.getChunkProvider()).getLoadedChunkCount();
+                int chunksServerTot = ((ServerChunkProvider) worldServer.getChunkProvider()).func_217229_b();
                 this.addLine(String.format("Server: %d / %d - Client: %s", chunksServer, chunksServerTot, chunksClient));
             }
             else
@@ -626,7 +646,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.PARTICLE_COUNT)
         {
-            this.addLine(String.format("P: %s", mc.particleManager.getDebugString()));
+            this.addLine(String.format("P: %s", mc.particles.getStatistics()));
         }
         else if (type == InfoToggle.DIFFICULTY)
         {
@@ -634,17 +654,17 @@ public class RenderHandler implements IRenderer
             {
                 long chunkInhabitedTime = 0L;
                 float moonPhaseFactor = 0.0F;
-                WorldChunk serverChunk = this.getChunk(chunkPos);
+                Chunk serverChunk = this.getChunk(chunkPos);
 
                 if (serverChunk != null)
                 {
-                    moonPhaseFactor = mc.world.getMoonSize();
+                    moonPhaseFactor = mc.world.getCurrentMoonPhaseFactor();
                     chunkInhabitedTime = serverChunk.getInhabitedTime();
                 }
 
-                LocalDifficulty diff = new LocalDifficulty(mc.world.getDifficulty(), mc.world.getTimeOfDay(), chunkInhabitedTime, moonPhaseFactor);
+                DifficultyInstance diff = new DifficultyInstance(mc.world.getDifficulty(), mc.world.getDayTime(), chunkInhabitedTime, moonPhaseFactor);
                 this.addLine(String.format("Local Difficulty: %.2f // %.2f (Day %d)",
-                        diff.getLocalDifficulty(), diff.getClampedLocalDifficulty(), mc.world.getTimeOfDay() / 24000L));
+                        diff.getAdditionalDifficulty(), diff.getClampedAdditionalDifficulty(), mc.world.getDayTime() / 24000L));
             }
         }
         else if (type == InfoToggle.BIOME)
@@ -652,11 +672,11 @@ public class RenderHandler implements IRenderer
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
             {
-                WorldChunk clientChunk = this.getClientChunk(chunkPos);
+                Chunk clientChunk = this.getClientChunk(chunkPos);
 
                 if (clientChunk.isEmpty() == false)
                 {
-                    this.addLine("Biome: " + clientChunk.getBiome(pos).getName().getString());
+                    this.addLine("Biome: " + clientChunk.getBiome(pos).getDisplayName().getString());
                 }
             }
         }
@@ -665,12 +685,12 @@ public class RenderHandler implements IRenderer
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
             {
-                WorldChunk clientChunk = this.getClientChunk(chunkPos);
+                Chunk clientChunk = this.getClientChunk(chunkPos);
 
                 if (clientChunk.isEmpty() == false)
                 {
                     Biome biome = clientChunk.getBiome(pos);
-                    Identifier rl = Registry.BIOME.getId(biome);
+                    ResourceLocation rl = ForgeRegistries.BIOMES.getKey(biome);
                     String name = rl != null ? rl.toString() : "?";
                     this.addLine("Biome reg name: " + name);
                 }
@@ -678,7 +698,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.ENTITIES)
         {
-            String ent = mc.worldRenderer.getEntitiesDebugString();
+            String ent = mc.worldRenderer.getDebugInfoEntities();
 
             int p = ent.indexOf(",");
 
@@ -691,12 +711,13 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.TILE_ENTITIES)
         {
-            this.addLine(String.format("Client world TE - L: %d, T: %d", mc.world.blockEntities.size(), mc.world.tickingBlockEntities.size()));
+            this.addLine(String.format("Client world TE - L: %d, T: %d", mc.world.loadedTileEntityList.size(), mc.world.tickableTileEntities.size()));
         }
         else if (type == InfoToggle.ENTITIES_CLIENT_WORLD)
         {
-            int countClient = mc.world.getRegularEntityCount();
+            int countClient = mc.world.func_217425_f();
 
+            /*
             if (mc.isIntegratedServerRunning())
             {
                 World serverWorld = WorldUtils.getBestWorld(mc);
@@ -708,12 +729,13 @@ public class RenderHandler implements IRenderer
                     return;
                 }
             }
+            */
 
             this.addLine(String.format("Entities - Client: %d", countClient));
         }
         else if (type == InfoToggle.SLIME_CHUNK)
         {
-            if (world.dimension.hasVisibleSky() == false)
+            if (world.dimension.isSurfaceWorld() == false)
             {
                 return;
             }
@@ -743,28 +765,30 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.LOOKING_AT_ENTITY)
         {
-            if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.ENTITY)
+            if (mc.objectMouseOver != null &&
+                mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY)
             {
-                Entity lookedEntity = ((EntityHitResult) mc.hitResult).getEntity();
+                Entity target = ((EntityRayTraceResult) mc.objectMouseOver).getEntity();
 
-                if (lookedEntity instanceof LivingEntity)
+                if (target instanceof LivingEntity)
                 {
-                    LivingEntity living = (LivingEntity) lookedEntity;
+                    LivingEntity living = (LivingEntity) target;
                     this.addLine(String.format("Entity: %s - HP: %.1f / %.1f",
-                            living.getName().getString(), living.getHealth(), living.getHealthMaximum()));
+                            target.getName().getString(), living.getHealth(), living.getMaxHealth()));
                 }
                 else
                 {
-                    this.addLine(String.format("Entity: %s", lookedEntity.getName().getString()));
+                    this.addLine(String.format("Entity: %s", target.getName().getString()));
                 }
             }
         }
         else if (type == InfoToggle.ENTITY_REG_NAME)
         {
-            if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.ENTITY)
+            if (mc.objectMouseOver != null &&
+                mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY)
             {
-                Entity lookedEntity = ((EntityHitResult) mc.hitResult).getEntity();
-                Identifier regName = EntityType.getId(lookedEntity.getType());
+                Entity lookedEntity = ((EntityRayTraceResult) mc.objectMouseOver).getEntity();
+                ResourceLocation regName = EntityType.getKey(lookedEntity.getType());
 
                 if (regName != null)
                 {
@@ -782,9 +806,10 @@ public class RenderHandler implements IRenderer
                 return;
             }
 
-            if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.BLOCK)
+            if (mc.objectMouseOver != null &&
+                mc.objectMouseOver.getType() == RayTraceResult.Type.BLOCK)
             {
-                BlockPos lookPos = ((BlockHitResult) mc.hitResult).getBlockPos();
+                BlockPos lookPos = ((BlockRayTraceResult) mc.objectMouseOver).getPos();
                 String pre = "";
                 StringBuilder str = new StringBuilder(128);
 
@@ -813,15 +838,14 @@ public class RenderHandler implements IRenderer
         }
     }
 
-    private <T extends Comparable<T>> void getBlockProperties(MinecraftClient mc)
+    private <T extends Comparable<T>> void getBlockProperties(Minecraft mc)
     {
-        if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.BLOCK)
+        if (mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.BLOCK)
         {
-            BlockPos posLooking = ((BlockHitResult) mc.hitResult).getBlockPos();
+            BlockPos posLooking = ((BlockRayTraceResult) mc.objectMouseOver).getPos();
             BlockState state = mc.world.getBlockState(posLooking);
-            Identifier rl = Registry.BLOCK.getId(state.getBlock());
 
-            this.addLine(rl != null ? rl.toString() : "<null>");
+            this.addLine(String.valueOf(ForgeRegistries.BLOCKS.getKey(state.getBlock())));
 
             for (String line : BlockUtils.getFormattedBlockStateProperties(state))
             {
@@ -830,8 +854,21 @@ public class RenderHandler implements IRenderer
         }
     }
 
+    private int getRenderedChunks()
+    {
+        try
+        {
+            return (int) this.methodHandle_WorldRenderer_getRenderedChunks.invokeExact(Minecraft.getInstance().worldRenderer);
+        }
+        catch (Throwable t)
+        {
+            MiniHUD.logger.error("Error while trying invoke WorldRenderer#getRenderedChunks()");
+            return -1;
+        }
+    }
+
     @Nullable
-    private WorldChunk getChunk(ChunkPos chunkPos)
+    private Chunk getChunk(ChunkPos chunkPos)
     {
         if (this.cachedServerChunk != null)
         {
@@ -840,18 +877,18 @@ public class RenderHandler implements IRenderer
 
         if (this.chunkFuture == null)
         {
-            IntegratedServer integratedServer_1 = this.mc.getServer();
+            IntegratedServer server = this.mc.getIntegratedServer();
 
-            if (integratedServer_1 != null)
+            if (server != null)
             {
-                ServerWorld serverWorld_1 = integratedServer_1.getWorld(this.mc.world.dimension.getType());
+                ServerWorld world = server.getWorld(this.mc.world.dimension.getType());
 
-                if (serverWorld_1 != null)
+                if (world != null)
                 {
-                    this.chunkFuture = serverWorld_1.method_14178().getChunkFutureSyncOnMainThread(chunkPos.x, chunkPos.z, ChunkStatus.FULL, false).thenApply((either_1) -> {
-                        return (WorldChunk)either_1.map((chunk_1) -> {
-                            return (WorldChunk)chunk_1;
-                        }, (chunkHolder$Unloaded_1) -> {
+                    this.chunkFuture = world.getChunkProvider().func_217232_b(chunkPos.x, chunkPos.z, ChunkStatus.FULL, false).thenApply((either) -> {
+                        return either.map((chunk) -> {
+                            return (Chunk) chunk;
+                        }, (unloaded) -> {
                             return null;
                         });
                     });
@@ -869,11 +906,11 @@ public class RenderHandler implements IRenderer
         return this.cachedServerChunk;
     }
 
-    private WorldChunk getClientChunk(ChunkPos chunkPos)
+    private Chunk getClientChunk(ChunkPos chunkPos)
     {
         if (this.cachedClientChunk == null)
         {
-            this.cachedClientChunk = this.mc.world.method_8497(chunkPos.x, chunkPos.z);
+            this.cachedClientChunk = this.mc.world.getChunk(chunkPos.x, chunkPos.z);
         }
 
         return this.cachedClientChunk;

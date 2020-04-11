@@ -2,28 +2,28 @@ package fi.dy.masa.minihud.renderer;
 
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.gl.GlBuffer;
-import net.minecraft.client.gl.GlBufferRenderer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.VertexBufferUploader;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexBuffer;
 
 public class RenderObjectVbo extends RenderObjectBase
 {
-    protected static final GlBufferRenderer VERTEX_UPLOADER = new GlBufferRenderer(); // MCP: VertexBufferUploader
+    protected static final VertexBufferUploader VERTEX_UPLOADER = new VertexBufferUploader(); // MCP: VertexBufferUploader
 
-    protected final GlBuffer vertexBuffer;
+    protected final VertexBuffer vertexBuffer;
 
     public RenderObjectVbo(int glMode)
     {
         super(glMode);
 
-        this.vertexBuffer = new GlBuffer(VertexFormats.POSITION_COLOR);
+        this.vertexBuffer = new VertexBuffer(DefaultVertexFormats.POSITION_COLOR);
     }
 
     @Override
     public void uploadData(BufferBuilder buffer)
     {
-        VERTEX_UPLOADER.setGlBuffer(this.vertexBuffer); // MCP: setVertexBuffer
+        VERTEX_UPLOADER.setVertexBuffer(this.vertexBuffer);
         VERTEX_UPLOADER.draw(buffer);
     }
 
@@ -32,9 +32,9 @@ public class RenderObjectVbo extends RenderObjectBase
     {
         GlStateManager.pushMatrix();
 
-        this.vertexBuffer.bind();
+        this.vertexBuffer.bindBuffer();
         this.setupArrayPointers();
-        this.vertexBuffer.draw(this.getGlMode());
+        this.vertexBuffer.drawArrays(this.getGlMode());
 
         GlStateManager.popMatrix();
     }
@@ -48,6 +48,6 @@ public class RenderObjectVbo extends RenderObjectBase
     @Override
     public void deleteGlResources()
     {
-        this.vertexBuffer.delete();
+        this.vertexBuffer.deleteGlBuffers();
     }
 }

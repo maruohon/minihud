@@ -1,9 +1,9 @@
 package fi.dy.masa.minihud.renderer;
 
-import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 
 public class RenderUtils
 {
@@ -22,8 +22,8 @@ public class RenderUtils
         int zMin = Math.min(posStart.getZ(), posEnd.getZ());
         int xMax = Math.max(posStart.getX(), posEnd.getX()) + 1;
         int zMax = Math.max(posStart.getZ(), posEnd.getZ()) + 1;
-        double posX = entity.x;
-        double posZ = entity.z;
+        double posX = entity.posX;
+        double posZ = entity.posZ;
         float a = ((color >>> 24) & 0xFF) / 255f;
         float r = ((color >>> 16) & 0xFF) / 255f;
         float g = ((color >>>  8) & 0xFF) / 255f;
@@ -61,8 +61,8 @@ public class RenderUtils
         int zMin = Math.min(posStart.getZ(), posEnd.getZ());
         int xMax = Math.max(posStart.getX(), posEnd.getX());
         int zMax = Math.max(posStart.getZ(), posEnd.getZ());
-        double posX = entity.x;
-        double posZ = entity.z;
+        double posX = entity.posX;
+        double posZ = entity.posZ;
         float a = ((color >>> 24) & 0xFF) / 255f;
         float r = ((color >>> 16) & 0xFF) / 255f;
         float g = ((color >>>  8) & 0xFF) / 255f;
@@ -105,39 +105,39 @@ public class RenderUtils
                 case X:
                     for (double y = yMin; y <= yMax; y += lineIntervalV)
                     {
-                        bufferLines.vertex(hMin, y, edge).color(r, g, b, a).next();
-                        bufferLines.vertex(hMax, y, edge).color(r, g, b, a).next();
+                        bufferLines.pos(hMin, y, edge).color(r, g, b, a).endVertex();
+                        bufferLines.pos(hMax, y, edge).color(r, g, b, a).endVertex();
                     }
 
                     for (double h = hMin; h <= hMax; h += lineIntervalH)
                     {
-                        bufferLines.vertex(h, yMin, edge).color(r, g, b, a).next();
-                        bufferLines.vertex(h, yMax, edge).color(r, g, b, a).next();
+                        bufferLines.pos(h, yMin, edge).color(r, g, b, a).endVertex();
+                        bufferLines.pos(h, yMax, edge).color(r, g, b, a).endVertex();
                     }
 
-                    bufferQuads.vertex(hMin, yMin, edge).color(r, g, b, quadAlpha).next();
-                    bufferQuads.vertex(hMin, yMax, edge).color(r, g, b, quadAlpha).next();
-                    bufferQuads.vertex(hMax, yMax, edge).color(r, g, b, quadAlpha).next();
-                    bufferQuads.vertex(hMax, yMin, edge).color(r, g, b, quadAlpha).next();
+                    bufferQuads.pos(hMin, yMin, edge).color(r, g, b, quadAlpha).endVertex();
+                    bufferQuads.pos(hMin, yMax, edge).color(r, g, b, quadAlpha).endVertex();
+                    bufferQuads.pos(hMax, yMax, edge).color(r, g, b, quadAlpha).endVertex();
+                    bufferQuads.pos(hMax, yMin, edge).color(r, g, b, quadAlpha).endVertex();
 
                     break;
                 case Z:
                     for (double y = yMin; y <= yMax; y += lineIntervalV)
                     {
-                        bufferLines.vertex(edge, y, hMin).color(r, g, b, a).next();
-                        bufferLines.vertex(edge, y, hMax).color(r, g, b, a).next();
+                        bufferLines.pos(edge, y, hMin).color(r, g, b, a).endVertex();
+                        bufferLines.pos(edge, y, hMax).color(r, g, b, a).endVertex();
                     }
 
                     for (double h = hMin; h <= hMax; h += lineIntervalH)
                     {
-                        bufferLines.vertex(edge, yMin, h).color(r, g, b, a).next();
-                        bufferLines.vertex(edge, yMax, h).color(r, g, b, a).next();
+                        bufferLines.pos(edge, yMin, h).color(r, g, b, a).endVertex();
+                        bufferLines.pos(edge, yMax, h).color(r, g, b, a).endVertex();
                     }
 
-                    bufferQuads.vertex(edge, yMin, hMin).color(r, g, b, quadAlpha).next();
-                    bufferQuads.vertex(edge, yMax, hMin).color(r, g, b, quadAlpha).next();
-                    bufferQuads.vertex(edge, yMax, hMax).color(r, g, b, quadAlpha).next();
-                    bufferQuads.vertex(edge, yMin, hMax).color(r, g, b, quadAlpha).next();
+                    bufferQuads.pos(edge, yMin, hMin).color(r, g, b, quadAlpha).endVertex();
+                    bufferQuads.pos(edge, yMax, hMin).color(r, g, b, quadAlpha).endVertex();
+                    bufferQuads.pos(edge, yMax, hMax).color(r, g, b, quadAlpha).endVertex();
+                    bufferQuads.pos(edge, yMin, hMax).color(r, g, b, quadAlpha).endVertex();
                     break;
                 default:
             }

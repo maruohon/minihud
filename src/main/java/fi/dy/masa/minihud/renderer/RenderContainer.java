@@ -6,16 +6,16 @@ import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.GlBuffer;
-import net.minecraft.client.render.VertexFormatElement;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexBuffer;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 
 public class RenderContainer
 {
@@ -59,13 +59,13 @@ public class RenderContainer
         }
     }
 
-    public void render(Entity entity, MinecraftClient mc, float partialTicks)
+    public void render(Entity entity, Minecraft mc, float partialTicks)
     {
         this.update(entity, mc);
         this.draw(entity, mc, partialTicks);
     }
 
-    protected void update(Entity entity, MinecraftClient mc)
+    protected void update(Entity entity, Minecraft mc)
     {
         this.checkVideoSettings();
         this.countActive = 0;
@@ -89,7 +89,7 @@ public class RenderContainer
         }
     }
 
-    protected void draw(Entity entity, MinecraftClient mc, float partialTicks)
+    protected void draw(Entity entity, Minecraft mc, float partialTicks)
     {
         if (this.resourcesAllocated && this.countActive > 0)
         {
@@ -111,7 +111,7 @@ public class RenderContainer
                 GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
             }
 
-            Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+            Vec3d cameraPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
 
             for (int i = 0; i < this.renderers.size(); ++i)
             {
@@ -125,12 +125,12 @@ public class RenderContainer
 
             if (GLX.useVbo())
             {
-                GlBuffer.unbind();
+                VertexBuffer.unbindBuffer();
                 GlStateManager.clearCurrentColor();
 
-                for (VertexFormatElement element : VertexFormats.POSITION_COLOR.getElements())
+                for (VertexFormatElement element : DefaultVertexFormats.POSITION_COLOR.getElements())
                 {
-                    VertexFormatElement.Type usage = element.getType();
+                    VertexFormatElement.Usage usage = element.getUsage();
 
                     switch (usage)
                     {

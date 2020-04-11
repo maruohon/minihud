@@ -4,7 +4,7 @@ import java.io.File;
 import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -25,7 +25,7 @@ public class WorldLoadListener implements IWorldLoadListener
     private boolean renderersRead;
 
     @Override
-    public void onWorldLoadPre(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, MinecraftClient mc)
+    public void onWorldLoadPre(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, Minecraft mc)
     {
         // Save the settings before the integrated server gets shut down
         if (worldBefore != null)
@@ -52,7 +52,7 @@ public class WorldLoadListener implements IWorldLoadListener
     }
 
     @Override
-    public void onWorldLoadPost(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, MinecraftClient mc)
+    public void onWorldLoadPost(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, Minecraft mc)
     {
         // Clear the cached data
         DataStorage.getInstance().reset();

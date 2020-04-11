@@ -3,10 +3,10 @@ package fi.dy.masa.minihud.renderer;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos.PooledMutable;
+import net.minecraft.util.math.BlockPos.PooledMutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -24,15 +24,15 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     protected double topY;
 
     @Override
-    public boolean shouldRender(MinecraftClient mc)
+    public boolean shouldRender(Minecraft mc)
     {
         return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() &&
                 DataStorage.getInstance().isWorldSeedKnown(mc.world.dimension.getType()) &&
-                mc.world.dimension.hasVisibleSky();
+                mc.world.dimension.isSurfaceWorld();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, MinecraftClient mc)
+    public boolean needsUpdate(Entity entity, Minecraft mc)
     {
         boolean isSeedKnown = DataStorage.getInstance().isWorldSeedKnown(entity.dimension);
         long seed = DataStorage.getInstance().getWorldSeed(entity.dimension);
@@ -42,8 +42,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
             return true;
         }
 
-        int ex = (int) Math.floor(entity.x);
-        int ez = (int) Math.floor(entity.z);
+        int ex = (int) Math.floor(entity.posX);
+        int ez = (int) Math.floor(entity.posZ);
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -51,7 +51,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Entity entity, Minecraft mc)
     {
         DataStorage data = DataStorage.getInstance();
         this.topY = overlayTopY;
@@ -60,23 +60,23 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
 
         if (this.wasSeedKnown)
         {
-            final int centerX = ((int) MathHelper.floor(entity.x)) >> 4;
-            final int centerZ = ((int) MathHelper.floor(entity.z)) >> 4;
+            final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
+            final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
             final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
             final Color4f colorSides = Color4f.fromColor(colorLines, colorLines.a / 6);
-            PooledMutable pos1 = PooledMutable.get();
-            PooledMutable pos2 = PooledMutable.get();
+            PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();
+            PooledMutableBlockPos pos2 = PooledMutableBlockPos.retain();
             int r = MathHelper.clamp(Configs.Generic.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
 
             if (r == -1)
             {
-                r = mc.options.viewDistance;
+                r = mc.gameSettings.renderDistanceChunks;
             }
 
             RenderObjectBase renderQuads = this.renderObjects.get(0);
             RenderObjectBase renderLines = this.renderObjects.get(1);
-            BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
-            BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
+            BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+            BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
             int topY = (int) Math.floor(this.topY);
 
             for (int xOff = -r; xOff <= r; xOff++)
@@ -88,8 +88,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
 
                     if (MiscUtils.canSlimeSpawnInChunk(cx, cz, this.seed))
                     {
-                        pos1.set( cx << 4,          0,  cz << 4);
-                        pos2.set((cx << 4) + 15, topY, (cz << 4) + 15);
+                        pos1.setPos( cx << 4,          0,  cz << 4);
+                        pos2.setPos((cx << 4) + 15, topY, (cz << 4) + 15);
                         fi.dy.masa.malilib.render.RenderUtils.drawBoxWithEdgesBatched(pos1, pos2, colorLines, colorSides, BUFFER_1, BUFFER_2);
                     }
                 }
@@ -98,8 +98,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
             pos1.close();
             pos2.close();
 
-            BUFFER_1.end();
-            BUFFER_2.end();
+            BUFFER_1.finishDrawing();
+            BUFFER_2.finishDrawing();
 
             renderQuads.uploadData(BUFFER_1);
             renderLines.uploadData(BUFFER_2);

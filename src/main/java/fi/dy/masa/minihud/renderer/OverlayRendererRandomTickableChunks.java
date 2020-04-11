@@ -5,16 +5,16 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 
 public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 {
@@ -30,13 +30,13 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     }
 
     @Override
-    public boolean shouldRender(MinecraftClient mc)
+    public boolean shouldRender(Minecraft mc)
     {
         return this.toggle.getBooleanValue();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, MinecraftClient mc)
+    public boolean needsUpdate(Entity entity, Minecraft mc)
     {
         if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED)
         {
@@ -45,18 +45,18 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
         // Player-following renderer
         else if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
         {
-            return entity.x != this.pos.x || entity.z != this.pos.z;
+            return entity.posX != this.pos.x || entity.posZ != this.pos.z;
         }
 
         return false;
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Entity entity, Minecraft mc)
     {
         if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
         {
-            this.pos = entity.getPosVector();
+            this.pos = entity.getPositionVec();
         }
         else if (newPos != null)
         {
@@ -72,8 +72,8 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
+        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
         Set<ChunkPos> chunks = this.getRandomTickableChunks(this.pos);
 
@@ -82,8 +82,8 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
             this.renderChunkEdgesIfApplicable(pos, chunks, entity, color);
         }
 
-        BUFFER_1.end();
-        BUFFER_2.end();
+        BUFFER_1.finishDrawing();
+        BUFFER_2.finishDrawing();
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
@@ -118,7 +118,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     {
         for (Direction side : HORIZONTALS)
         {
-            ChunkPos posTmp = new ChunkPos(pos.x + side.getOffsetX(), pos.z + side.getOffsetZ());
+            ChunkPos posTmp = new ChunkPos(pos.x + side.getXOffset(), pos.z + side.getZOffset());
 
             if (chunks.contains(posTmp) == false)
             {
@@ -140,7 +140,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
             default:
         }
 
-        return BlockPos.ORIGIN;
+        return BlockPos.ZERO;
     }
 
     protected BlockPos getEndPos(ChunkPos chunkPos, Direction side)
@@ -154,7 +154,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
             default:
         }
 
-        return BlockPos.ORIGIN;
+        return BlockPos.ZERO;
     }
 
     @Override

@@ -2,17 +2,17 @@ package fi.dy.masa.minihud.network;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.malilib.network.IPluginChannelHandler;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.minihud.util.DataStorage;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
 
 public class StructurePacketHandler implements IPluginChannelHandler
 {
-    public static final List<Identifier> CHANNELS = ImmutableList.of(new Identifier("carpet:structures"));
+    public static final List<ResourceLocation> CHANNELS = ImmutableList.of(new ResourceLocation("carpet:structures"));
     public static final int PACKET_S2C_DATA = 0;
     public static final int VERSION = 1;
 
@@ -29,31 +29,31 @@ public class StructurePacketHandler implements IPluginChannelHandler
     }
 
     @Override
-    public List<Identifier> getChannels()
+    public List<ResourceLocation> getChannels()
     {
         return CHANNELS;
     }
 
     @Override
-    public void onPacketReceived(PacketByteBuf buf)
+    public void onPacketReceived(PacketBuffer buf)
     {
         int id = buf.readVarInt();
 
         if (id == PACKET_S2C_DATA)
         {
-            CompoundTag tag = buf.readCompoundTag();
+            CompoundNBT tag = buf.readCompoundTag();
 
             if (tag != null)
             {
                 // Normal structure data packet
-                if (this.registered && this.valid && tag.containsKey("Structures", Constants.NBT.TAG_LIST))
+                if (this.registered && this.valid && tag.contains("Structures", Constants.NBT.TAG_LIST))
                 {
-                    ListTag structures = tag.getList("Structures", Constants.NBT.TAG_COMPOUND);
+                    ListNBT structures = tag.getList("Structures", Constants.NBT.TAG_COMPOUND);
                     DataStorage.getInstance().addOrUpdateStructuresFromServer(structures, this.timeout);
                 }
                 // Metadata packet upon channel registration
-                else if (tag.containsKey("Version", Constants.NBT.TAG_INT) &&
-                         tag.containsKey("Timeout", Constants.NBT.TAG_INT))
+                else if (tag.contains("Version", Constants.NBT.TAG_INT) &&
+                         tag.contains("Timeout", Constants.NBT.TAG_INT))
                 {
                     this.registered = true;
 

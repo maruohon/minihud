@@ -17,7 +17,7 @@ import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
 import fi.dy.masa.minihud.network.StructurePacketHandler;
 import fi.dy.masa.minihud.util.DataStorage;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfigBoolean>
 {
@@ -73,7 +73,7 @@ public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfi
         {
             this.setValueChangeCallback((config) ->
             {
-                MinecraftClient mc = MinecraftClient.getInstance();
+                Minecraft mc = Minecraft.getInstance();
 
                 if (mc != null && mc.player != null)
                 {

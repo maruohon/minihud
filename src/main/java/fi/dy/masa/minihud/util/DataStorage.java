@@ -10,24 +10,24 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.gson.JsonObject;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.ServerTask;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.structure.StructureStart;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
+import net.minecraft.util.concurrent.TickDelayedTask;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.feature.structure.StructureStart;
+import net.minecraft.world.server.ServerWorld;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -64,10 +64,10 @@ public class DataStorage
     private BlockPos lastStructureUpdatePos;
     private double serverTPS;
     private double serverMSPT;
-    private BlockPos worldSpawn = BlockPos.ORIGIN;
+    private BlockPos worldSpawn = BlockPos.ZERO;
     private Vec3d distanceReferencePoint = Vec3d.ZERO;
     private final Multimap<StructureType, StructureData> structures = MultimapBuilder.hashKeys().hashSetValues().build();
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private final Minecraft mc = Minecraft.getInstance();
 
     public static DataStorage getInstance()
     {
@@ -88,7 +88,7 @@ public class DataStorage
         this.structures.clear();
         this.structureDataTimeout = 800;
         this.worldSeed = 0;
-        this.worldSpawn = BlockPos.ORIGIN;
+        this.worldSpawn = BlockPos.ZERO;
 
         StructurePacketHandler.INSTANCE.reset();
         ShapeManager.INSTANCE.clear();
@@ -130,7 +130,7 @@ public class DataStorage
         }
         else if (this.mc.isIntegratedServerRunning())
         {
-            MinecraftServer server = this.mc.getServer();
+            MinecraftServer server = this.mc.getIntegratedServer();
             World worldTmp = server.getWorld(dimension);
             return worldTmp != null;
         }
@@ -142,7 +142,7 @@ public class DataStorage
     {
         if (this.worldSeedValid == false && this.mc.isIntegratedServerRunning())
         {
-            MinecraftServer server = this.mc.getServer();
+            MinecraftServer server = this.mc.getIntegratedServer();
             World worldTmp = server.getWorld(dimension);
 
             if (worldTmp != null)
@@ -246,11 +246,11 @@ public class DataStorage
         return false;
     }
 
-    public void onChatMessage(Text message)
+    public void onChatMessage(ITextComponent message)
     {
-        if (message instanceof TranslatableText)
+        if (message instanceof TranslationTextComponent)
         {
-            TranslatableText text = (TranslatableText) message;
+            TranslationTextComponent text = (TranslationTextComponent) message;
 
             // The vanilla "/seed" command
             if ("commands.seed.success".equals(text.getKey()))
@@ -270,7 +270,7 @@ public class DataStorage
                 }
                 catch (Exception e)
                 {
-                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getArgs()[0], e);
+                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[0], e);
                 }
             }
             // The "/jed seed" command
@@ -278,20 +278,20 @@ public class DataStorage
             {
                 try
                 {
-                    this.setWorldSeed(Long.parseLong(text.getArgs()[1].toString()));
+                    this.setWorldSeed(Long.parseLong(text.getFormatArgs()[1].toString()));
                     MiniHUD.logger.info("Received world seed from the JED '/jed seed' command: {}", this.worldSeed);
                     InfoUtils.printActionbarMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
                 }
                 catch (Exception e)
                 {
-                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getArgs()[1], e);
+                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getFormatArgs()[1], e);
                 }
             }
-            else if ("commands.setworldspawn.success".equals(text.getKey()) && text.getArgs().length == 3)
+            else if ("commands.setworldspawn.success".equals(text.getKey()) && text.getFormatArgs().length == 3)
             {
                 try
                 {
-                    Object[] o = text.getArgs();
+                    Object[] o = text.getFormatArgs();
                     int x = Integer.parseInt(o[0].toString());
                     int y = Integer.parseInt(o[1].toString());
                     int z = Integer.parseInt(o[2].toString());
@@ -304,7 +304,7 @@ public class DataStorage
                 }
                 catch (Exception e)
                 {
-                    MiniHUD.logger.warn("Failed to read the world spawn point from '{}'", text.getArgs(), e);
+                    MiniHUD.logger.warn("Failed to read the world spawn point from '{}'", text.getFormatArgs(), e);
                 }
             }
         }
@@ -314,7 +314,7 @@ public class DataStorage
     {
         // Carpet server sends the TPS and MSPT values via the player list footer data,
         // and for single player the data is grabbed directly from the integrated server.
-        if (this.carpetServer == false && this.mc.isInSingleplayer() == false)
+        if (this.carpetServer == false && this.mc.isSingleplayer() == false)
         {
             long currentTime = System.nanoTime();
 
@@ -337,9 +337,9 @@ public class DataStorage
 
     public void updateIntegratedServerTPS()
     {
-        if (this.mc != null && this.mc.player != null && this.mc.getServer() != null)
+        if (this.mc != null && this.mc.player != null && this.mc.getIntegratedServer() != null)
         {
-            this.serverMSPT = (double) MathHelper.average(this.mc.getServer().lastTickLengths) / 1000000D;
+            this.serverMSPT = (double) MathHelper.average(this.mc.getIntegratedServer().tickTimeArray) / 1000000D;
             this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
             this.serverTPSValid = true;
         }
@@ -375,7 +375,7 @@ public class DataStorage
     {
         if (this.mc != null && this.mc.world != null && this.mc.player != null)
         {
-            long currentTime = this.mc.world.getTime();
+            long currentTime = this.mc.world.getGameTime();
 
             if ((currentTime % 20) == 0)
             {
@@ -392,7 +392,7 @@ public class DataStorage
                 {
                     this.removeExpiredStructures(currentTime, this.structureDataTimeout);
                 }
-                else if (this.shouldRegisterStructureChannel && this.mc.getNetworkHandler() != null)
+                else if (this.shouldRegisterStructureChannel && this.mc.getConnection() != null)
                 {
                     if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
                     {
@@ -418,14 +418,14 @@ public class DataStorage
     private void updateStructureDataFromIntegratedServer(final BlockPos playerPos)
     {
         final DimensionType dimension = this.mc.player.dimension;
-        final ServerWorld world = this.mc.getServer().getWorld(dimension);
+        final ServerWorld world = this.mc.getIntegratedServer().getWorld(dimension);
 
         if (world != null)
         {
-            MinecraftServer server = this.mc.getServer();
-            final int maxChunkRange = this.mc.options.viewDistance + 2;
+            MinecraftServer server = this.mc.getIntegratedServer();
+            final int maxChunkRange = this.mc.gameSettings.renderDistanceChunks + 2;
 
-            server.method_18858(new ServerTask(server.getTicks(), () ->
+            server.enqueue(new TickDelayedTask(server.getTickCounter(), () ->
             {
                 synchronized (this.structures)
                 {
@@ -445,20 +445,20 @@ public class DataStorage
         this.structuresNeedUpdating = false;
     }
 
-    public void addOrUpdateStructuresFromServer(ListTag structures, int timeout)
+    public void addOrUpdateStructuresFromServer(ListNBT structures, int timeout)
     {
-        if (structures.getListType() == Constants.NBT.TAG_COMPOUND)
+        if (structures.getTagType() == Constants.NBT.TAG_COMPOUND)
         {
             this.structureDataTimeout = timeout;
 
-            long currentTime = this.mc.world.getTime();
+            long currentTime = this.mc.world.getGameTime();
             final int count = structures.size();
 
             this.removeExpiredStructures(currentTime, timeout);
 
             for (int i = 0; i < count; ++i)
             {
-                CompoundTag tag = structures.getCompoundTag(i);
+                CompoundNBT tag = structures.getCompound(i);
                 StructureData data = StructureData.fromStructureStartTag(tag, currentTime);
 
                 if (data != null)
@@ -520,7 +520,7 @@ public class DataStorage
                 for (int cx = minCX; cx <= maxCX; ++cx)
                 {
                     // Don't load the chunk
-                    Chunk chunk = world.getChunk(cx, cz, ChunkStatus.FULL, false);
+                    IChunk chunk = world.getChunk(cx, cz, ChunkStatus.FULL, false);
 
                     if (chunk != null)
                     {
@@ -546,11 +546,11 @@ public class DataStorage
         //MiniHUD.logger.info("Structure data updated from the integrated server");
     }
 
-    public void handleCarpetServerTPSData(Text textComponent)
+    public void handleCarpetServerTPSData(ITextComponent textComponent)
     {
-        if (textComponent.asFormattedString().isEmpty() == false)
+        if (textComponent.getFormattedText().isEmpty() == false)
         {
-            String text = Formatting.strip(textComponent.getString());
+            String text = TextFormatting.getTextWithoutFormattingCodes(textComponent.getString());
             String[] lines = text.split("\n");
 
             for (String line : lines)

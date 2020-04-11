@@ -11,14 +11,14 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.OverlayRendererBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 
 public abstract class ShapeBase extends OverlayRendererBase implements IRangeChangeListener
 {
     protected final ShapeTypes type;
     protected final LayerRange layerRange;
-    protected final MinecraftClient mc;
+    protected final Minecraft mc;
     protected Color4f color;
     protected boolean enabled;
     protected boolean needsUpdate;
@@ -28,7 +28,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
         this.type = type;
         this.color = color;
         this.layerRange = new LayerRange(this);
-        this.mc = MinecraftClient.getInstance();
+        this.mc = Minecraft.getInstance();
         this.needsUpdate = true;
     }
 
@@ -81,13 +81,13 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
     }
 
     @Override
-    public boolean shouldRender(MinecraftClient mc)
+    public boolean shouldRender(Minecraft mc)
     {
         return this.enabled && RendererToggle.SHAPE_RENDERER.getBooleanValue();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, MinecraftClient mc)
+    public boolean needsUpdate(Entity entity, Minecraft mc)
     {
         return this.needsUpdate;
     }

@@ -8,6 +8,13 @@ import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.BlockSnap;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -16,13 +23,6 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.RenderObjectBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager.ShapeTypes;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 
 public class ShapeDespawnSphere extends ShapeBase
 {
@@ -33,7 +33,7 @@ public class ShapeDespawnSphere extends ShapeBase
     protected final Vec3d[] quadrantCenters = new Vec3d[4];
     protected Vec3d lastUpdatePos = Vec3d.ZERO;
     protected BlockSnap snap = BlockSnap.NONE;
-    protected double margin = 0.5;
+    protected double margin = 1.5;
     protected long lastUpdateTime;
 
     public ShapeDespawnSphere()
@@ -42,7 +42,7 @@ public class ShapeDespawnSphere extends ShapeBase
 
         if (this.mc.player != null)
         {
-            this.setCenter(this.mc.player.getPos());
+            this.setCenter(this.mc.player.getPositionVec());
         }
         else
         {
@@ -118,12 +118,12 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Entity entity, Minecraft mc)
     {
         this.renderSphereBlock();
 
         this.needsUpdate = false;
-        this.lastUpdatePos = entity.getPos();
+        this.lastUpdatePos = entity.getPositionVec();
         this.lastUpdateTime = System.currentTimeMillis();
     }
 
@@ -211,36 +211,36 @@ public class ShapeDespawnSphere extends ShapeBase
     protected void renderSphereBlock()
     {
         RenderObjectBase renderQuads = this.renderObjects.get(0);
-        BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
+        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
         Color4f colorQuad = this.color;
         BlockPos posCenter = new BlockPos(this.effectiveCenter);
-        BlockPos.Mutable posMutable = new BlockPos.Mutable();
+        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
         HashSet<BlockPos> spherePositions = new HashSet<>();
 
         this.setPosition(posCenter);
 
         //long before = System.nanoTime();
-        posMutable.set(posCenter);
+        posMutable.setPos(posCenter);
         this.addPositionsOnRing(spherePositions, posMutable, Direction.EAST);
 
-        posMutable.set(posCenter);
+        posMutable.setPos(posCenter);
         this.addPositionsOnRing(spherePositions, posMutable, Direction.UP);
 
         for (int i = 1; i < 130; ++i)
         {
             // Horizontal rings
-            posMutable.set(posCenter.getX(), posCenter.getY() - i, posCenter.getZ());
+            posMutable.setPos(posCenter.getX(), posCenter.getY() - i, posCenter.getZ());
             this.addPositionsOnRing(spherePositions, posMutable, Direction.EAST);
 
-            posMutable.set(posCenter.getX(), posCenter.getY() + i, posCenter.getZ());
+            posMutable.setPos(posCenter.getX(), posCenter.getY() + i, posCenter.getZ());
             this.addPositionsOnRing(spherePositions, posMutable, Direction.EAST);
 
             // Vertical rings
-            posMutable.set(posCenter.getX() - i, posCenter.getY(), posCenter.getZ());
+            posMutable.setPos(posCenter.getX() - i, posCenter.getY(), posCenter.getZ());
             this.addPositionsOnRing(spherePositions, posMutable, Direction.UP);
 
-            posMutable.set(posCenter.getX() + i, posCenter.getY(), posCenter.getZ());
+            posMutable.setPos(posCenter.getX() + i, posCenter.getY(), posCenter.getZ());
             this.addPositionsOnRing(spherePositions, posMutable, Direction.UP);
         }
         //System.out.printf("time: %.6f s - margin: %.4f\n", (double) (System.nanoTime() - before) / 1000000000D, this.margin);
@@ -250,7 +250,7 @@ public class ShapeDespawnSphere extends ShapeBase
             for (int i = 0; i < 6; ++i)
             {
                 Direction side = FACING_ALL[i];
-                posMutable.set(pos).setOffset(side);
+                posMutable.setPos(pos).move(side);
 
                 if (this.layerRange.isPositionWithinRange(pos) &&
                     spherePositions.contains(posMutable) == false &&
@@ -264,12 +264,12 @@ public class ShapeDespawnSphere extends ShapeBase
         }
         //System.out.printf("rendered: %d\n", r);
 
-        BUFFER_1.end();
+        BUFFER_1.finishDrawing();
 
         renderQuads.uploadData(BUFFER_1);
     }
 
-    private void addPositionsOnRing(HashSet<BlockPos> positions, BlockPos.Mutable posMutable, Direction direction)
+    private void addPositionsOnRing(HashSet<BlockPos> positions, BlockPos.MutableBlockPos posMutable, Direction direction)
     {
         if (this.movePositionToRing(posMutable, direction))
         {
@@ -299,7 +299,7 @@ public class ShapeDespawnSphere extends ShapeBase
         }
     }
 
-    private boolean movePositionToRing(BlockPos.Mutable posMutable, Direction dir)
+    private boolean movePositionToRing(BlockPos.MutableBlockPos posMutable, Direction dir)
     {
         int x = posMutable.getX();
         int y = posMutable.getY();
@@ -315,15 +315,15 @@ public class ShapeDespawnSphere extends ShapeBase
             x = xNext;
             y = yNext;
             z = zNext;
-            xNext += dir.getOffsetX();
-            yNext += dir.getOffsetY();
-            zNext += dir.getOffsetZ();
+            xNext += dir.getXOffset();
+            yNext += dir.getYOffset();
+            zNext += dir.getZOffset();
         }
 
         // Successfully entered the loop at least once
         if (failsafe > 0)
         {
-            posMutable.set(x, y, z);
+            posMutable.setPos(x, y, z);
             return true;
         }
 
@@ -331,7 +331,7 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Nullable
-    private Direction getNextPositionOnRing(BlockPos.Mutable posMutable, Direction dir)
+    private Direction getNextPositionOnRing(BlockPos.MutableBlockPos posMutable, Direction dir)
     {
         Direction dirOut = dir;
         Direction ccw90 = getNextDirRotating(dir);
@@ -339,23 +339,23 @@ public class ShapeDespawnSphere extends ShapeBase
 
         for (int i = 0; i < 4; ++i)
         {
-            int x = posMutable.getX() + dir.getOffsetX();
-            int z = posMutable.getZ() + dir.getOffsetZ();
+            int x = posMutable.getX() + dir.getXOffset();
+            int z = posMutable.getZ() + dir.getZOffset();
 
             // First check the adjacent position
             if (this.isPositionWithinRange(x, y, z))
             {
-                posMutable.set(x, y, z);
+                posMutable.setPos(x, y, z);
                 return dirOut;
             }
 
             // Then check the diagonal position
-            x = posMutable.getX() + dir.getOffsetX() + ccw90.getOffsetX();
-            z = posMutable.getZ() + dir.getOffsetZ() + ccw90.getOffsetZ();
+            x = posMutable.getX() + dir.getXOffset() + ccw90.getXOffset();
+            z = posMutable.getZ() + dir.getZOffset() + ccw90.getZOffset();
 
             if (this.isPositionWithinRange(x, y, z))
             {
-                posMutable.set(x, y, z);
+                posMutable.setPos(x, y, z);
                 return dirOut;
             }
 
@@ -369,32 +369,32 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Nullable
-    private Direction getNextPositionOnRingVertical(BlockPos.Mutable posMutable, Direction dir)
+    private Direction getNextPositionOnRingVertical(BlockPos.MutableBlockPos posMutable, Direction dir)
     {
         Direction dirOut = dir;
         Direction ccw90 = getNextDirRotatingVertical(dir);
 
         for (int i = 0; i < 4; ++i)
         {
-            int x = posMutable.getX() + dir.getOffsetX();
-            int y = posMutable.getY() + dir.getOffsetY();
-            int z = posMutable.getZ() + dir.getOffsetZ();
+            int x = posMutable.getX() + dir.getXOffset();
+            int y = posMutable.getY() + dir.getYOffset();
+            int z = posMutable.getZ() + dir.getZOffset();
 
             // First check the adjacent position
             if (this.isPositionWithinRange(x, y, z))
             {
-                posMutable.set(x, y, z);
+                posMutable.setPos(x, y, z);
                 return dirOut;
             }
 
             // Then check the diagonal position
-            x = posMutable.getX() + dir.getOffsetX() + ccw90.getOffsetX();
-            y = posMutable.getY() + dir.getOffsetY() + ccw90.getOffsetY();
-            z = posMutable.getZ() + dir.getOffsetZ() + ccw90.getOffsetZ();
+            x = posMutable.getX() + dir.getXOffset() + ccw90.getXOffset();
+            y = posMutable.getY() + dir.getYOffset() + ccw90.getYOffset();
+            z = posMutable.getZ() + dir.getZOffset() + ccw90.getZOffset();
 
             if (this.isPositionWithinRange(x, y, z))
             {
-                posMutable.set(x, y, z);
+                posMutable.setPos(x, y, z);
                 return dirOut;
             }
 
@@ -415,18 +415,18 @@ public class ShapeDespawnSphere extends ShapeBase
         double dy = y + 1;
         double dz = z + 0.5;
 
-        return quadrantCenter.squaredDistanceTo(dx, dy, dz) < maxDistSq || this.effectiveCenter.squaredDistanceTo(dx, dy, dz) < maxDistSq;
+        return quadrantCenter.squareDistanceTo(dx, dy, dz) < maxDistSq || this.effectiveCenter.squareDistanceTo(dx, dy, dz) < maxDistSq;
     }
 
     private boolean isAdjacentPositionOutside(BlockPos pos, Direction dir)
     {
         final double maxDistSq = 128 * 128;
         Vec3d quadrantCenter = this.quadrantCenters[Quadrant.getQuadrant(pos.getX(), pos.getZ(), this.effectiveCenter).ordinal()];
-        double x = pos.getX() + dir.getOffsetX() + 0.5;
-        double y = pos.getY() + dir.getOffsetY() + 1;
-        double z = pos.getZ() + dir.getOffsetZ() + 0.5;
+        double x = pos.getX() + dir.getXOffset() + 0.5;
+        double y = pos.getY() + dir.getYOffset() + 1;
+        double z = pos.getZ() + dir.getZOffset() + 0.5;
 
-        return quadrantCenter.squaredDistanceTo(x, y, z) >= maxDistSq && this.effectiveCenter.squaredDistanceTo(x, y, z) >= maxDistSq;
+        return quadrantCenter.squareDistanceTo(x, y, z) >= maxDistSq && this.effectiveCenter.squareDistanceTo(x, y, z) >= maxDistSq;
     }
 
     /**
@@ -472,40 +472,40 @@ public class ShapeDespawnSphere extends ShapeBase
         switch (side)
         {
             case DOWN:
-                buffer.vertex(x    , y, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x    , y, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
             case UP:
-                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
             case NORTH:
-                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x    , y    , z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
             case SOUTH:
-                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
             case WEST:
-                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x    , y    , z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
             case EAST:
-                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
         }
     }
@@ -519,64 +519,64 @@ public class ShapeDespawnSphere extends ShapeBase
         switch (side)
         {
             case DOWN:
-                buffer.vertex(x    , y, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x    , y, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z    ).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
             case UP:
-                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
             case NORTH:
-                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x    , y    , z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y    , z    ).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
             case SOUTH:
-                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
             case WEST:
-                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x    , y    , z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y    , z    ).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
             case EAST:
-                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y + 1, z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
         }
     }

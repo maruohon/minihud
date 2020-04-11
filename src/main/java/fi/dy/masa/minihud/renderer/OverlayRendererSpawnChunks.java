@@ -2,14 +2,14 @@ package fi.dy.masa.minihud.renderer;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.util.DataStorage;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.OverworldDimension;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.util.DataStorage;
 
 public class OverlayRendererSpawnChunks extends OverlayRendererBase
 {
@@ -28,7 +28,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     }
 
     @Override
-    public boolean shouldRender(MinecraftClient mc)
+    public boolean shouldRender(Minecraft mc)
     {
         return this.toggle.getBooleanValue() &&
                 (this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ||
@@ -37,15 +37,15 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, MinecraftClient mc)
+    public boolean needsUpdate(Entity entity, Minecraft mc)
     {
         if (needsUpdate)
         {
             return true;
         }
 
-        int ex = (int) Math.floor(entity.x);
-        int ez = (int) Math.floor(entity.z);
+        int ex = (int) Math.floor(entity.posX);
+        int ez = (int) Math.floor(entity.posZ);
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -59,15 +59,15 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Entity entity, Minecraft mc)
     {
         DataStorage data = DataStorage.getInstance();
         BlockPos spawn = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ? new BlockPos(entity) : data.getWorldSpawn();
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
+        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
         final int colorEntity = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
                 Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getIntegerValue() :
@@ -79,7 +79,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
                 Configs.Colors.SPAWN_REAL_OUTER_OVERLAY_COLOR.getIntegerValue() :
                 Configs.Colors.SPAWN_PLAYER_OUTER_OVERLAY_COLOR.getIntegerValue();
 
-        int rangeH = (mc.options.viewDistance + 1) * 16;
+        int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
         Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 22);
         RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
                 rangeH, 256, 16, 16, entity, colorOuter);
@@ -92,8 +92,8 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
                 rangeH, 256, 16, 16, entity, colorEntity);
 
-        BUFFER_1.end();
-        BUFFER_2.end();
+        BUFFER_1.finishDrawing();
+        BUFFER_2.finishDrawing();
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);

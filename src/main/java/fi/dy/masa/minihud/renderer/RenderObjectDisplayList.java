@@ -2,13 +2,13 @@ package fi.dy.masa.minihud.renderer;
 
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.util.GlAllocationUtils;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.WorldVertexBufferUploader;
 
 public class RenderObjectDisplayList extends RenderObjectBase
 {
-    protected static final BufferRenderer VERTEX_UPLOADER = new BufferRenderer();
+    protected static final WorldVertexBufferUploader VERTEX_UPLOADER = new WorldVertexBufferUploader();
 
     protected final int baseDisplayList;
 
@@ -16,7 +16,7 @@ public class RenderObjectDisplayList extends RenderObjectBase
     {
         super(glMode);
 
-        this.baseDisplayList = GlAllocationUtils.genLists(1);
+        this.baseDisplayList = GLAllocation.generateDisplayLists(1);
     }
 
     @Override
@@ -42,6 +42,6 @@ public class RenderObjectDisplayList extends RenderObjectBase
     @Override
     public void deleteGlResources()
     {
-        GlAllocationUtils.deleteSingletonList(this.baseDisplayList);
+        GLAllocation.deleteDisplayLists(this.baseDisplayList);
     }
 }

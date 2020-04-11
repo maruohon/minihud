@@ -3,12 +3,12 @@ package fi.dy.masa.minihud.util;
 import java.util.HashMap;
 import java.util.Locale;
 import javax.annotation.Nullable;
-import fi.dy.masa.minihud.config.StructureToggle;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.StructureFeature;
+import net.minecraft.world.gen.feature.structure.Structure;
+import fi.dy.masa.minihud.config.StructureToggle;
 
 public class StructureTypes
 {
@@ -50,11 +50,12 @@ public class StructureTypes
             this.toggle = toggle;
             this.dimType = dimType;
 
-            StructureFeature<?> feature = Feature.STRUCTURES.get(structureName.toLowerCase(Locale.ROOT));
+            Structure<?> feature = Feature.STRUCTURES.get(structureName.toLowerCase(Locale.ROOT));
 
             if (feature != null)
             {
-                Identifier key = Registry.STRUCTURE_FEATURE.getId(feature);
+                @SuppressWarnings("deprecation")
+                ResourceLocation key = Registry.STRUCTURE_FEATURE.getKey(feature);
 
                 if (key != null)
                 {

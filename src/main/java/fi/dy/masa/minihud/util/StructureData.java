@@ -3,13 +3,13 @@ package fi.dy.masa.minihud.util;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.world.gen.feature.structure.StructurePiece;
+import net.minecraft.world.gen.feature.structure.StructureStart;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.minihud.util.StructureTypes.StructureType;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.structure.StructurePiece;
-import net.minecraft.structure.StructureStart;
 
 public class StructureData
 {
@@ -67,7 +67,7 @@ public class StructureData
     public static StructureData fromStructureStart(StructureType type, StructureStart structure)
     {
         ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
-        List<StructurePiece> components = structure.getChildren();
+        List<StructurePiece> components = structure.getComponents();
 
         for (StructurePiece component : components)
         {
@@ -78,20 +78,20 @@ public class StructureData
     }
 
     @Nullable
-    public static StructureData fromStructureStartTag(CompoundTag tag, long currentTime)
+    public static StructureData fromStructureStartTag(CompoundNBT tag, long currentTime)
     {
-        if (tag.containsKey("BB", Constants.NBT.TAG_INT_ARRAY) &&
-            tag.containsKey("Children", Constants.NBT.TAG_LIST))
+        if (tag.contains("BB", Constants.NBT.TAG_INT_ARRAY) &&
+            tag.contains("Children", Constants.NBT.TAG_LIST))
         {
             StructureType type = StructureTypes.byStructureId(tag.getString("id"));
 
             ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
-            ListTag pieces = tag.getList("Children", Constants.NBT.TAG_COMPOUND);
+            ListNBT pieces = tag.getList("Children", Constants.NBT.TAG_COMPOUND);
             final int count = pieces.size();
 
             for (int i = 0; i < count; ++i)
             {
-                CompoundTag pieceTag = pieces.getCompoundTag(i);
+                CompoundNBT pieceTag = pieces.getCompound(i);
                 builder.add(IntBoundingBox.fromArray(pieceTag.getIntArray("BB")));
             }
 

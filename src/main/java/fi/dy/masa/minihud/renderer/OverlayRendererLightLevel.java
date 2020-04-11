@@ -5,33 +5,33 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.LightType;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.spawner.WorldEntitySpawner;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
 import fi.dy.masa.minihud.util.LightLevelNumberMode;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.LightType;
-import net.minecraft.world.SpawnHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 
 public class OverlayRendererLightLevel
 {
-    private static final Identifier TEXTURE_NUMBERS = new Identifier(Reference.MOD_ID, "textures/misc/light_level_numbers.png");
+    private static final ResourceLocation TEXTURE_NUMBERS = new ResourceLocation(Reference.MOD_ID, "textures/misc/light_level_numbers.png");
     private static final List<LightLevelInfo> LIGHT_INFOS = new ArrayList<>();
-    private static final BlockPos.Mutable MUTABLE_POS = new BlockPos.Mutable();
+    private static final BlockPos.MutableBlockPos MUTABLE_POS = new BlockPos.MutableBlockPos();
 
     private static boolean needsUpdate;
     private static BlockPos lastUpdatePos = null;
@@ -41,12 +41,12 @@ public class OverlayRendererLightLevel
         needsUpdate = true;
     }
 
-    public static void render(double dx, double dy, double dz, Entity entity, MinecraftClient mc)
+    public static void render(double dx, double dy, double dz, Entity entity, Minecraft mc)
     {
         if (needsUpdate || lastUpdatePos == null ||
-            Math.abs(entity.x - lastUpdatePos.getX()) > 4 ||
-            Math.abs(entity.y - lastUpdatePos.getY()) > 4 ||
-            Math.abs(entity.z - lastUpdatePos.getZ()) > 4)
+            Math.abs(entity.posX - lastUpdatePos.getX()) > 4 ||
+            Math.abs(entity.posY - lastUpdatePos.getY()) > 4 ||
+            Math.abs(entity.posZ - lastUpdatePos.getZ()) > 4)
         {
             //long pre = System.nanoTime();
             updateLightLevels(mc.world, new BlockPos(entity));
@@ -56,7 +56,7 @@ public class OverlayRendererLightLevel
         renderLightLevels(dx, dy, dz, mc);
     }
 
-    private static void renderLightLevels(double dx, double dy, double dz, MinecraftClient mc)
+    private static void renderLightLevels(double dx, double dy, double dz, Minecraft mc)
     {
         final int count = LIGHT_INFOS.size();
 
@@ -71,7 +71,7 @@ public class OverlayRendererLightLevel
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
             Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBufferBuilder();
+            BufferBuilder buffer = tessellator.getBuffer();
             Direction numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? mc.player.getHorizontalFacing() : Direction.NORTH;
             LightLevelNumberMode numberMode = (LightLevelNumberMode) Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getOptionListValue();
             LightLevelMarkerMode markerMode = (LightLevelMarkerMode) Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
@@ -140,7 +140,7 @@ public class OverlayRendererLightLevel
 
                 GlStateManager.disableTexture();
 
-                buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+                buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
                 for (int i = 0; i < count; ++i)
                 {
@@ -168,7 +168,7 @@ public class OverlayRendererLightLevel
 
                 GlStateManager.disableTexture();
 
-                buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+                buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
                 for (int i = 0; i < count; ++i)
                 {
@@ -200,7 +200,7 @@ public class OverlayRendererLightLevel
 
         if (colorLit != null)
         {
-            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV_COLOR);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 
             for (int i = 0; i < count; ++i)
             {
@@ -216,7 +216,7 @@ public class OverlayRendererLightLevel
         }
         else
         {
-            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
             for (int i = 0; i < count; ++i)
             {
@@ -241,31 +241,31 @@ public class OverlayRendererLightLevel
         switch (facing)
         {
             case NORTH:
-                buffer.vertex(x    , y, z    ).texture(u       , v       ).next();
-                buffer.vertex(x    , y, z + 1).texture(u       , v + 0.25).next();
-                buffer.vertex(x + 1, y, z + 1).texture(u + 0.25, v + 0.25).next();
-                buffer.vertex(x + 1, y, z    ).texture(u + 0.25, v       ).next();
+                buffer.pos(x    , y, z    ).tex(u       , v       ).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u       , v + 0.25).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u + 0.25, v + 0.25).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u + 0.25, v       ).endVertex();
                 break;
 
             case SOUTH:
-                buffer.vertex(x + 1, y, z + 1).texture(u       , v       ).next();
-                buffer.vertex(x + 1, y, z    ).texture(u       , v + 0.25).next();
-                buffer.vertex(x    , y, z    ).texture(u + 0.25, v + 0.25).next();
-                buffer.vertex(x    , y, z + 1).texture(u + 0.25, v       ).next();
+                buffer.pos(x + 1, y, z + 1).tex(u       , v       ).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u       , v + 0.25).endVertex();
+                buffer.pos(x    , y, z    ).tex(u + 0.25, v + 0.25).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u + 0.25, v       ).endVertex();
                 break;
 
             case EAST:
-                buffer.vertex(x + 1, y, z    ).texture(u       , v       ).next();
-                buffer.vertex(x    , y, z    ).texture(u       , v + 0.25).next();
-                buffer.vertex(x    , y, z + 1).texture(u + 0.25, v + 0.25).next();
-                buffer.vertex(x + 1, y, z + 1).texture(u + 0.25, v       ).next();
+                buffer.pos(x + 1, y, z    ).tex(u       , v       ).endVertex();
+                buffer.pos(x    , y, z    ).tex(u       , v + 0.25).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u + 0.25, v + 0.25).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u + 0.25, v       ).endVertex();
                 break;
 
             case WEST:
-                buffer.vertex(x    , y, z + 1).texture(u       , v       ).next();
-                buffer.vertex(x + 1, y, z + 1).texture(u       , v + 0.25).next();
-                buffer.vertex(x + 1, y, z    ).texture(u + 0.25, v + 0.25).next();
-                buffer.vertex(x    , y, z    ).texture(u + 0.25, v       ).next();
+                buffer.pos(x    , y, z + 1).tex(u       , v       ).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u       , v + 0.25).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u + 0.25, v + 0.25).endVertex();
+                buffer.pos(x    , y, z    ).tex(u + 0.25, v       ).endVertex();
                 break;
 
             default:
@@ -281,31 +281,31 @@ public class OverlayRendererLightLevel
         switch (facing)
         {
             case NORTH:
-                buffer.vertex(x    , y, z    ).texture(u       , v       ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).texture(u       , v + 0.25).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).texture(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).texture(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x    , y, z    ).tex(u       , v       ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u       , v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
 
             case SOUTH:
-                buffer.vertex(x + 1, y, z + 1).texture(u       , v       ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).texture(u       , v + 0.25).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z    ).texture(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).texture(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x + 1, y, z + 1).tex(u       , v       ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u       , v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z    ).tex(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
 
             case EAST:
-                buffer.vertex(x + 1, y, z    ).texture(u       , v       ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z    ).texture(u       , v + 0.25).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).texture(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).texture(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x + 1, y, z    ).tex(u       , v       ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z    ).tex(u       , v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
 
             case WEST:
-                buffer.vertex(x    , y, z + 1).texture(u       , v       ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).texture(u       , v + 0.25).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).texture(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z    ).texture(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).next();
+                buffer.pos(x    , y, z + 1).tex(u       , v       ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u       , v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u + 0.25, v + 0.25).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z    ).tex(u + 0.25, v       ).color(color.r, color.g, color.b, color.a).endVertex();
                 break;
 
             default:
@@ -316,28 +316,28 @@ public class OverlayRendererLightLevel
     {
         y += 0.005;
 
-        buffer.vertex(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
-        buffer.vertex(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
+        buffer.pos(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.vertex(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
-        buffer.vertex(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
+        buffer.pos(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
     }
 
     private static void renderLightLevelSquare(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
     {
         y += 0.005;
 
-        buffer.vertex(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
-        buffer.vertex(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
+        buffer.pos(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.vertex(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
-        buffer.vertex(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
+        buffer.pos(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.vertex(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).next();
-        buffer.vertex(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
+        buffer.pos(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.vertex(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
-        buffer.vertex(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).next();
+        buffer.pos(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
     }
 
     private static void updateLightLevels(World world, BlockPos center)
@@ -372,16 +372,16 @@ public class OverlayRendererLightLevel
                     for (int z = startZ; z <= endZ; ++z)
                     {
                         final int startY = Math.max(minY, 0);
-                        final int endY   = Math.min(maxY, chunk.getHighestNonEmptySectionYOffset() + 15);
+                        final int endY   = Math.min(maxY, chunk.getTopFilledSegment() + 15);
 
                         for (int y = startY; y <= endY; ++y)
                         {
                             if (canSpawnAt(x, y, z, chunk, world))
                             {
-                                MUTABLE_POS.set(x, y, z);
+                                MUTABLE_POS.setPos(x, y, z);
 
-                                int block = chunk.getLightingProvider().get(LightType.BLOCK).getLightLevel(MUTABLE_POS);
-                                int sky = chunk.getLightingProvider().get(LightType.SKY).getLightLevel(MUTABLE_POS);
+                                int block = chunk.getWorldLightManager().getLightEngine(LightType.BLOCK).getLightFor(MUTABLE_POS);
+                                int sky = chunk.getWorldLightManager().getLightEngine(LightType.SKY).getLightFor(MUTABLE_POS);
 
                                 LIGHT_INFOS.add(new LightLevelInfo(new BlockPos(x, y, z), block, sky));
 
@@ -406,10 +406,10 @@ public class OverlayRendererLightLevel
      */
     public static boolean canSpawnAt(int x, int y, int z, Chunk chunk, World world)
     {
-        MUTABLE_POS.set(x, y - 1, z);
+        MUTABLE_POS.setPos(x, y - 1, z);
         BlockState state = chunk.getBlockState(MUTABLE_POS);
 
-        if (state.allowsSpawning(world, MUTABLE_POS, EntityType.SKELETON) == false)
+        if (state.canEntitySpawn(world, MUTABLE_POS, EntityType.SKELETON) == false)
         {
             return false;
         }
@@ -420,14 +420,14 @@ public class OverlayRendererLightLevel
 
             if (spawnable)
             {
-                MUTABLE_POS.set(x, y , z);
+                MUTABLE_POS.setPos(x, y , z);
                 state = chunk.getBlockState(MUTABLE_POS);
 
-                if (SpawnHelper.isClearForSpawn(world, MUTABLE_POS, state, state.getFluidState()))
+                if (WorldEntitySpawner.isSpawnableSpace(world, MUTABLE_POS, state, state.getFluidState()))
                 {
-                    MUTABLE_POS.set(x, y + 1, z);
+                    MUTABLE_POS.setPos(x, y + 1, z);
                     state = chunk.getBlockState(MUTABLE_POS);
-                    return SpawnHelper.isClearForSpawn(world, MUTABLE_POS, state, state.getFluidState());
+                    return WorldEntitySpawner.isSpawnableSpace(world, MUTABLE_POS, state, state.getFluidState());
                 }
             }
 
