@@ -186,29 +186,35 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
 
         if (handler != null)
         {
-            PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
-            buf.writeVarInt(updateType);
-            buf.writeVarInt(nodes.size());
-            int nodeCount = 0;
+            List<String> actionableNodes = new ArrayList<>();
 
             for (String node : nodes)
             {
                 if (updateType == PACKET_C2S_SUBSCRIBE && SUBSCRIPTIONS.contains(node) == false)
                 {
-                    buf.writeString(node);
+                    actionableNodes.add(node);
                     SUBSCRIPTIONS.add(node);
-                    ++nodeCount;
                 }
                 else if (updateType == PACKET_C2S_UNSUBSCRIBE && SUBSCRIPTIONS.contains(node))
                 {
-                    buf.writeString(node);
+                    actionableNodes.add(node);
                     SUBSCRIPTIONS.remove(node);
-                    ++nodeCount;
                 }
             }
 
+            final int nodeCount = actionableNodes.size();
+
             if (nodeCount > 0)
             {
+                PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
+                buf.writeVarInt(updateType);
+                buf.writeVarInt(nodeCount);
+
+                for (int i = 0; i < nodeCount; ++i)
+                {
+                    buf.writeString(actionableNodes.get(i));
+                }
+
                 PacketSplitter.send(handler, CHANNEL_NAME, buf);
             }
         }
