@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 
@@ -32,7 +33,7 @@ public interface IOverlayRenderer
      * @param y
      * @param z
      */
-    void draw(double x, double y, double z);
+    void draw(double x, double y, double z, MatrixStack matrixStack);
 
     /**
      * Allocates the OpenGL resources according to the current Video settings

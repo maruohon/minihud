@@ -19,7 +19,7 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
 {
     private static final Set<Long> DIRTY_CHUNKS = new HashSet<>();
 
-    private final BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+    private final BlockPos.Mutable posMutable = new BlockPos.Mutable();
     private long lastCheckTime;
 
     public static void markChunkChanged(int cx, int cz)
@@ -42,8 +42,8 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
-        int ex = (int) Math.floor(entity.posX);
-        int ez = (int) Math.floor(entity.posZ);
+        int ex = (int) Math.floor(entity.getPosX());
+        int ez = (int) Math.floor(entity.getPosZ());
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -55,10 +55,10 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
         if (System.currentTimeMillis() - this.lastCheckTime > 1000)
         {
             final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
-            final int xStart = (((int) entity.posX) >> 4) - radius;
-            final int zStart = (((int) entity.posZ) >> 4) - radius;
-            final int xEnd = (((int) entity.posX) >> 4) + radius;
-            final int zEnd = (((int) entity.posZ) >> 4) + radius;
+            final int xStart = (((int) entity.getPosX()) >> 4) - radius;
+            final int zStart = (((int) entity.getPosZ()) >> 4) - radius;
+            final int xEnd = (((int) entity.getPosX()) >> 4) + radius;
+            final int zEnd = (((int) entity.getPosZ()) >> 4) + radius;
 
             synchronized (DIRTY_CHUNKS)
             {
@@ -86,10 +86,10 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
         final Color4f color = Configs.Colors.SPAWNABLE_COLUMNS_OVERLAY_COLOR.getColor();
         final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
 
-        final int xStart = (int) entity.posX - radius;
-        final int zStart = (int) entity.posZ - radius;
-        final int xEnd = (int) entity.posX + radius;
-        final int zEnd = (int) entity.posZ + radius;
+        final int xStart = (int) entity.getPosX() - radius;
+        final int zStart = (int) entity.getPosZ() - radius;
+        final int xEnd = (int) entity.getPosX() + radius;
+        final int zEnd = (int) entity.getPosZ() + radius;
         final World world = mc.world;
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);

@@ -4,40 +4,50 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.platform.GLX;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.math.BlockPos;
 
 public abstract class OverlayRendererBase implements IOverlayRenderer
 {
     protected static final BufferBuilder BUFFER_1 = new BufferBuilder(2097152);
     protected static final BufferBuilder BUFFER_2 = new BufferBuilder(2097152);
-    protected static final BufferBuilder BUFFER_3 = new BufferBuilder(2097152);
+    //protected static final BufferBuilder BUFFER_3 = new BufferBuilder(2097152);
 
     protected final List<RenderObjectBase> renderObjects = new ArrayList<>();
     protected float glLineWidth = 1f;
     protected BlockPos lastUpdatePos = BlockPos.ZERO;
-    private BlockPos position = BlockPos.ZERO;
 
     protected void preRender(double x, double y, double z)
     {
-        GlStateManager.lineWidth(this.glLineWidth);
-        GlStateManager.translated(this.position.getX() - x, this.position.getY() - y, this.position.getZ() - z);
+        RenderSystem.lineWidth(this.glLineWidth);
+    }
+
+    protected void postRender(double x, double y, double z)
+    {
     }
 
     @Override
-    public void draw(double x, double y, double z)
+    public void draw(double x, double y, double z, MatrixStack matrixStack)
     {
-        GlStateManager.pushMatrix();
+        RenderSystem.pushMatrix();
         this.preRender(x, y, z);
+
+        matrixStack.push();
+        matrixStack.translate(-x, -y, -z);
 
         for (RenderObjectBase obj : this.renderObjects)
         {
-            obj.draw();
+            obj.draw(matrixStack);
         }
 
-        GlStateManager.popMatrix();
+        matrixStack.pop();
+        this.postRender(x, y, z);
+
+        RenderSystem.popMatrix();
     }
 
     @Override
@@ -51,15 +61,6 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         this.renderObjects.clear();
     }
 
-    protected void setPosition(BlockPos pos)
-    {
-        this.position = pos;
-
-        BUFFER_1.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
-        BUFFER_2.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
-        BUFFER_3.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
-    }
-
     /**
      * Allocates a new VBO or display list, adds it to the list, and returns it
      * @param glMode
@@ -67,19 +68,18 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
      */
     protected RenderObjectBase allocateBuffer(int glMode)
     {
-        RenderObjectBase obj;
+        return this.allocateBuffer(glMode, DefaultVertexFormats.POSITION_COLOR);
+    }
 
-        if (GLX.useVbo())
-        {
-            obj = new RenderObjectVbo(glMode);
-        }
-        else
-        {
-            obj = new RenderObjectDisplayList(glMode);
-        }
-
+    /**
+     * Allocates a new VBO or display list, adds it to the list, and returns it
+     * @param glMode
+     * @return
+     */
+    protected RenderObjectBase allocateBuffer(int glMode, VertexFormat format)
+    {
+        RenderObjectBase obj = new RenderObjectVbo(glMode, format);
         this.renderObjects.add(obj);
-
         return obj;
     }
 

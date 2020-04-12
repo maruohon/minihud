@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import com.google.common.collect.MapMaker;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.client.renderer.debug.NeighborsUpdateDebugRenderer;
 import net.minecraft.entity.Entity;
@@ -85,13 +87,13 @@ public class DebugInfoUtils
         // and paths will be the same. For example, a valid path (destination
         // in this case) to the the "meeting" POI can be up to 6 Manhattan
         // distance away from the target BlockPos; the actual POI.
-        BlockPos target = path.func_224770_k();
+        BlockPos target = path.getTarget();
 
         if (destination != null)
         {
             // Whether or not the destination is within the manhattan distance
             // of the target POI (the last param to PointOfInterestType::register)
-            buf.writeBoolean(path.func_224771_h());
+            buf.writeBoolean(path.reachesTarget());
             buf.writeInt(path.getCurrentPathIndex());
 
             // There is a hash set of class_4459 prefixed with its count here, which
@@ -223,7 +225,7 @@ public class DebugInfoUtils
         {
             PlayerEntity player = world.getPlayers().get(i);
 
-            double distSq = player.getDistanceSq(entity.posX, entity.posY, entity.posZ);
+            double distSq = player.getDistanceSq(entity.getPosX(), entity.getPosY(), entity.getPosZ());
 
             if (range < 0.0D || distSq < range * range)
             {
@@ -244,9 +246,18 @@ public class DebugInfoUtils
         {
             pathfindingEnabled = config.getBooleanValue();
         }
+        else if (config == RendererToggle.DEBUG_CHUNK_INFO)
+        {
+            Minecraft.getInstance().debugWireframe = config.getBooleanValue();
+        }
+        else if (config == RendererToggle.DEBUG_CHUNK_OCCLUSION)
+        {
+            Minecraft.getInstance().debugChunkPath = config.getBooleanValue();
+        }
     }
 
-    public static void renderVanillaDebug(long finishTime)
+    public static void renderVanillaDebug(MatrixStack matrixStack, IRenderTypeBuffer vtx,
+            double cameraX, double cameraY, double cameraZ)
     {
         if (Configs.Generic.ENABLED.getBooleanValue() == false)
         {
@@ -257,27 +268,27 @@ public class DebugInfoUtils
 
         if (RendererToggle.DEBUG_COLLISION_BOXES.getBooleanValue())
         {
-            renderer.collisionBox.render(finishTime);
+            renderer.collisionBox.render(matrixStack, vtx, cameraX, cameraY, cameraZ);
         }
 
         if (RendererToggle.DEBUG_NEIGHBOR_UPDATES.getBooleanValue())
         {
-            renderer.neighborsUpdate.render(finishTime);
+            renderer.neighborsUpdate.render(matrixStack, vtx, cameraX, cameraY, cameraZ);
         }
 
         if (RendererToggle.DEBUG_PATH_FINDING.getBooleanValue())
         {
-            renderer.pathfinding.render(finishTime);
+            renderer.pathfinding.render(matrixStack, vtx, cameraX, cameraY, cameraZ);
         }
 
         if (RendererToggle.DEBUG_SOLID_FACES.getBooleanValue())
         {
-            renderer.solidFace.render(finishTime);
+            renderer.solidFace.render(matrixStack, vtx, cameraX, cameraY, cameraZ);
         }
 
         if (RendererToggle.DEBUG_WATER.getBooleanValue())
         {
-            renderer.water.render(finishTime);
+            renderer.water.render(matrixStack, vtx, cameraX, cameraY, cameraZ);
         }
     }
 }

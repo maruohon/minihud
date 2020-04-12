@@ -46,7 +46,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             }
             else if (key == RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind())
             {
-                OverlayRendererSlimeChunks.overlayTopY = mc.player.posY;
+                OverlayRendererSlimeChunks.overlayTopY = mc.player.getPosY();
             }
             else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind())
             {

@@ -1,9 +1,16 @@
 package fi.dy.masa.minihud.util;
 
+import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
+import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 
 public class MiscUtils
@@ -64,5 +71,30 @@ public class MiscUtils
     {
         return bb1.minX == bb2.minX && bb1.minY == bb2.minY && bb1.minZ == bb2.minZ &&
                bb1.maxX == bb2.maxX && bb1.maxY == bb2.maxY && bb1.maxZ == bb2.maxZ;
+    }
+
+    @Nullable
+    public static void addBeeTooltip(ItemStack stack, List<ITextComponent> lines)
+    {
+        CompoundNBT tag = stack.getTag();
+
+        if (tag != null && tag.contains("BlockEntityTag", Constants.NBT.TAG_COMPOUND))
+        {
+            tag = tag.getCompound("BlockEntityTag");
+            ListNBT bees = tag.getList("Bees", Constants.NBT.TAG_COMPOUND);
+            int count = bees.size();
+
+            for (int i = 0; i < count; i++)
+            {
+                tag = bees.getCompound(i).getCompound("EntityData");
+                if (tag != null && tag.contains("CustomName", Constants.NBT.TAG_STRING))
+                {
+                    String beeName = tag.getString("CustomName");
+                    lines.add(Math.min(1, lines.size()), new TranslationTextComponent("minihud.label.bee_info.name", ITextComponent.Serializer.fromJson(beeName).getString()));
+                }
+            }
+
+            lines.add(Math.min(1, lines.size()), new TranslationTextComponent("minihud.label.bee_info.count", String.valueOf(count)));
+        }
     }
 }

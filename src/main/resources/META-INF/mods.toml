@@ -8,7 +8,7 @@
 modLoader="javafml" #mandatory
 
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[28,)" #mandatory (26 is current forge version)
+loaderVersion="[31,)" #mandatory (26 is current forge version)
 
 # A URL to refer people to when problems occur with this mod
 issueTrackerURL="https://github.com/maruohon/minihud/issues" #optional
@@ -50,7 +50,7 @@ issueTrackerURL="https://github.com/maruohon/minihud/issues" #optional
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[28,)" #mandatory
+    versionRange="[31,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
@@ -60,7 +60,7 @@ issueTrackerURL="https://github.com/maruohon/minihud/issues" #optional
 [[dependencies.minihud]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.14.4]"
+    versionRange="[1.15.2]"
     ordering="NONE"
     side="CLIENT"
 

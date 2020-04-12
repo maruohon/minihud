@@ -1,7 +1,7 @@
 package fi.dy.masa.minihud.gui.widgets;
 
 import java.util.List;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -90,12 +90,12 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name);
 
         RenderUtils.color(1f, 1f, 1f, 1f);
-        GlStateManager.disableBlend();
+        RenderSystem.disableBlend();
 
         super.render(mouseX, mouseY, selected);
 
-        RenderUtils.disableItemLighting();
-        GlStateManager.disableLighting();
+        RenderUtils.disableDiffuseLighting();
+        RenderSystem.disableLighting();
     }
 
     @Override

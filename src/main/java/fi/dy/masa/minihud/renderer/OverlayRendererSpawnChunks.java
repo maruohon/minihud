@@ -44,8 +44,8 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
             return true;
         }
 
-        int ex = (int) Math.floor(entity.posX);
-        int ez = (int) Math.floor(entity.posZ);
+        int ex = (int) Math.floor(entity.getPosX());
+        int ez = (int) Math.floor(entity.getPosZ());
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 

@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.BufferBuilder;
 
 public abstract class RenderObjectBase
@@ -18,7 +19,7 @@ public abstract class RenderObjectBase
 
     public abstract void uploadData(BufferBuilder buffer);
 
-    public abstract void draw();
+    public abstract void draw(MatrixStack matrixStack);
 
     public abstract void deleteGlResources();
 }

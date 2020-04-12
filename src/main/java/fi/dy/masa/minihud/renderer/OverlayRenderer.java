@@ -1,9 +1,8 @@
 package fi.dy.masa.minihud.renderer;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.minihud.config.RendererToggle;
 
 public class OverlayRenderer
 {
@@ -16,7 +15,7 @@ public class OverlayRenderer
         loginTime = System.currentTimeMillis();
     }
 
-    public static void renderOverlays(Minecraft mc, float partialTicks)
+    public static void renderOverlays(Minecraft mc, float partialTicks, MatrixStack matrixStack)
     {
         Entity entity = mc.getRenderViewEntity();
 
@@ -25,7 +24,7 @@ public class OverlayRenderer
             // Don't render before the player has been placed in the actual proper position,
             // otherwise some of the renderers mess up.
             // The magic 8.5, 65, 8.5 comes from the WorldClient constructor
-            if (System.currentTimeMillis() - loginTime >= 5000 || entity.posX != 8.5 || entity.posY != 65 || entity.posZ != 8.5)
+            if (System.currentTimeMillis() - loginTime >= 5000 || entity.getPosX() != 8.5 || entity.getPosY() != 65 || entity.getPosZ() != 8.5)
             {
                 canRender = true;
             }
@@ -35,12 +34,6 @@ public class OverlayRenderer
             }
         }
 
-        if (RendererToggle.OVERLAY_LIGHT_LEVEL.getBooleanValue())
-        {
-            Vec3d cameraPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
-            OverlayRendererLightLevel.render(cameraPos.x, cameraPos.y, cameraPos.z, entity, mc);
-        }
-
-        RenderContainer.INSTANCE.render(entity, mc, partialTicks);
+        RenderContainer.INSTANCE.render(entity, mc, partialTicks, matrixStack);
     }
 }

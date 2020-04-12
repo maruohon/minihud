@@ -29,9 +29,9 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
             return true;
         }
 
-        return Math.abs(entity.posX - this.lastUpdatePos.getX()) > 8 ||
-               Math.abs(entity.posY - this.lastUpdatePos.getY()) > 8 ||
-               Math.abs(entity.posZ - this.lastUpdatePos.getZ()) > 8;
+        return Math.abs(entity.getPosX() - this.lastUpdatePos.getX()) > 8 ||
+               Math.abs(entity.getPosY() - this.lastUpdatePos.getY()) > 8 ||
+               Math.abs(entity.getPosZ() - this.lastUpdatePos.getZ()) > 8;
     }
 
     @Override
@@ -112,7 +112,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         int endX = center.getX() + radius;
         int endY = center.getY() + radius;
         int endZ = center.getZ() + radius;
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+        BlockPos.Mutable posMutable = new BlockPos.Mutable();
 
         for (int x = startX; x <= endX; ++x)
         {
@@ -139,8 +139,8 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         int endX = center.getX() + radius;
         int endY = center.getY() + radius;
         int endZ = center.getZ() + radius;
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
-        BlockPos.MutableBlockPos posMutable2 = new BlockPos.MutableBlockPos();
+        BlockPos.Mutable posMutable  = new BlockPos.Mutable();
+        BlockPos.Mutable posMutable2 = new BlockPos.Mutable();
 
         for (int x = startX; x <= endX; ++x)
         {

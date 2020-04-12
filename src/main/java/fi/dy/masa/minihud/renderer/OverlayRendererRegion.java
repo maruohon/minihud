@@ -24,8 +24,8 @@ public class OverlayRendererRegion extends OverlayRendererBase
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
-        int ex = (int) Math.floor(entity.posX);
-        int ez = (int) Math.floor(entity.posZ);
+        int ex = (int) Math.floor(entity.getPosX());
+        int ez = (int) Math.floor(entity.getPosZ());
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -40,8 +40,8 @@ public class OverlayRendererRegion extends OverlayRendererBase
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        int rx = MathHelper.floor(entity.posX) & ~0x1FF;
-        int rz = MathHelper.floor(entity.posZ) & ~0x1FF;
+        int rx = MathHelper.floor(entity.getPosX()) & ~0x1FF;
+        int rz = MathHelper.floor(entity.getPosZ()) & ~0x1FF;
         BlockPos pos1 = new BlockPos(rx,         0, rz      );
         BlockPos pos2 = new BlockPos(rx + 511, 256, rz + 511);
         int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;

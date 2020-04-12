@@ -56,9 +56,9 @@ public class OverlayRendererStructures extends OverlayRendererBase
         int hysteresis = 16;
 
         return DataStorage.getInstance().structureRendererNeedsUpdate() ||
-               Math.abs(entity.posX - this.lastUpdatePos.getX()) > hysteresis ||
-               Math.abs(entity.posY - this.lastUpdatePos.getY()) > hysteresis ||
-               Math.abs(entity.posZ - this.lastUpdatePos.getZ()) > hysteresis;
+               Math.abs(entity.getPosX() - this.lastUpdatePos.getX()) > hysteresis ||
+               Math.abs(entity.getPosY() - this.lastUpdatePos.getY()) > hysteresis ||
+               Math.abs(entity.getPosZ() - this.lastUpdatePos.getZ()) > hysteresis;
     }
 
     @Override

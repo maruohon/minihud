@@ -22,8 +22,8 @@ public class RenderUtils
         int zMin = Math.min(posStart.getZ(), posEnd.getZ());
         int xMax = Math.max(posStart.getX(), posEnd.getX()) + 1;
         int zMax = Math.max(posStart.getZ(), posEnd.getZ()) + 1;
-        double posX = entity.posX;
-        double posZ = entity.posZ;
+        double posX = entity.getPosX();
+        double posZ = entity.getPosZ();
         float a = ((color >>> 24) & 0xFF) / 255f;
         float r = ((color >>> 16) & 0xFF) / 255f;
         float g = ((color >>>  8) & 0xFF) / 255f;
@@ -61,8 +61,8 @@ public class RenderUtils
         int zMin = Math.min(posStart.getZ(), posEnd.getZ());
         int xMax = Math.max(posStart.getX(), posEnd.getX());
         int zMax = Math.max(posStart.getZ(), posEnd.getZ());
-        double posX = entity.posX;
-        double posZ = entity.posZ;
+        double posX = entity.getPosX();
+        double posZ = entity.getPosZ();
         float a = ((color >>> 24) & 0xFF) / 255f;
         float r = ((color >>> 16) & 0xFF) / 255f;
         float g = ((color >>>  8) & 0xFF) / 255f;

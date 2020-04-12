@@ -7,7 +7,8 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -134,21 +135,26 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Override
-    public void draw(double x, double y, double z)
+    public void draw(double x, double y, double z, MatrixStack matrixStack)
     {
-        GlStateManager.pushMatrix();
+        RenderSystem.pushMatrix();
         this.preRender(x, y, z);
 
-        this.renderObjects.get(0).draw();
+        matrixStack.push();
+        matrixStack.translate(-x, -y, -z);
+
+        this.renderObjects.get(0).draw(matrixStack);
 
         // Render the lines as quads with glPolygonMode(GL_LINE)
-        GlStateManager.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
-        GlStateManager.disableBlend();
-        this.renderObjects.get(0).draw();
-        GlStateManager.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
-        GlStateManager.enableBlend();
+        RenderSystem.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+        RenderSystem.disableBlend();
+        this.renderObjects.get(0).draw(matrixStack);
+        RenderSystem.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+        RenderSystem.enableBlend();
 
-        GlStateManager.popMatrix();
+        matrixStack.pop();
+
+        RenderSystem.popMatrix();
     }
 
     @Override
@@ -215,10 +221,8 @@ public class ShapeDespawnSphere extends ShapeBase
 
         Color4f colorQuad = this.color;
         BlockPos posCenter = new BlockPos(this.effectiveCenter);
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+        BlockPos.Mutable posMutable = new BlockPos.Mutable();
         HashSet<BlockPos> spherePositions = new HashSet<>();
-
-        this.setPosition(posCenter);
 
         //long before = System.nanoTime();
         posMutable.setPos(posCenter);
@@ -269,7 +273,7 @@ public class ShapeDespawnSphere extends ShapeBase
         renderQuads.uploadData(BUFFER_1);
     }
 
-    private void addPositionsOnRing(HashSet<BlockPos> positions, BlockPos.MutableBlockPos posMutable, Direction direction)
+    private void addPositionsOnRing(HashSet<BlockPos> positions, BlockPos.Mutable posMutable, Direction direction)
     {
         if (this.movePositionToRing(posMutable, direction))
         {
@@ -299,7 +303,7 @@ public class ShapeDespawnSphere extends ShapeBase
         }
     }
 
-    private boolean movePositionToRing(BlockPos.MutableBlockPos posMutable, Direction dir)
+    private boolean movePositionToRing(BlockPos.Mutable posMutable, Direction dir)
     {
         int x = posMutable.getX();
         int y = posMutable.getY();
@@ -331,7 +335,7 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Nullable
-    private Direction getNextPositionOnRing(BlockPos.MutableBlockPos posMutable, Direction dir)
+    private Direction getNextPositionOnRing(BlockPos.Mutable posMutable, Direction dir)
     {
         Direction dirOut = dir;
         Direction ccw90 = getNextDirRotating(dir);
@@ -369,7 +373,7 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Nullable
-    private Direction getNextPositionOnRingVertical(BlockPos.MutableBlockPos posMutable, Direction dir)
+    private Direction getNextPositionOnRingVertical(BlockPos.Mutable posMutable, Direction dir)
     {
         Direction dirOut = dir;
         Direction ccw90 = getNextDirRotatingVertical(dir);

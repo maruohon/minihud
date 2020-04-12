@@ -45,7 +45,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
         // Player-following renderer
         else if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
         {
-            return entity.posX != this.pos.x || entity.posZ != this.pos.z;
+            return entity.getPosX() != this.pos.x || entity.getPosZ() != this.pos.z;
         }
 
         return false;
@@ -63,8 +63,6 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
             this.pos = newPos;
             newPos = null;
         }
-
-        this.setPosition(new BlockPos(this.pos));
 
         final int color = this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER ?
                 Configs.Colors.RANDOM_TICKS_PLAYER_OVERLAY_COLOR.getIntegerValue() :
