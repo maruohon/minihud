@@ -2,30 +2,28 @@ package fi.dy.masa.minihud.network;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.network.IPluginChannelHandler;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.minihud.util.DataStorage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
+import fi.dy.masa.malilib.network.IPluginChannelHandler;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.minihud.util.DataStorage;
 
-public class StructurePacketHandler implements IPluginChannelHandler
+public class StructurePacketHandlerCarpet implements IPluginChannelHandler
 {
     public static final List<Identifier> CHANNELS = ImmutableList.of(new Identifier("carpet:structures"));
     public static final int PACKET_S2C_DATA = 0;
     public static final int VERSION = 1;
 
-    public static final StructurePacketHandler INSTANCE = new StructurePacketHandler();
+    public static final StructurePacketHandlerCarpet INSTANCE = new StructurePacketHandlerCarpet();
 
     private boolean registered;
-    private boolean valid;
     private int timeout;
 
     public void reset()
     {
         this.registered = false;
-        this.valid = false;
     }
 
     @Override
@@ -46,22 +44,18 @@ public class StructurePacketHandler implements IPluginChannelHandler
             if (tag != null)
             {
                 // Normal structure data packet
-                if (this.registered && this.valid && tag.contains("Structures", Constants.NBT.TAG_LIST))
+                if (this.registered && tag.contains("Structures", Constants.NBT.TAG_LIST))
                 {
                     ListTag structures = tag.getList("Structures", Constants.NBT.TAG_COMPOUND);
                     DataStorage.getInstance().addOrUpdateStructuresFromServer(structures, this.timeout);
                 }
                 // Metadata packet upon channel registration
                 else if (tag.contains("Version", Constants.NBT.TAG_INT) &&
-                         tag.contains("Timeout", Constants.NBT.TAG_INT))
+                         tag.contains("Timeout", Constants.NBT.TAG_INT) &&
+                         tag.getInt("Version") == VERSION)
                 {
+                    this.timeout = tag.getInt("Timeout");
                     this.registered = true;
-
-                    if (tag.getInt("Version") == VERSION)
-                    {
-                        this.valid = true;
-                        this.timeout = tag.getInt("Timeout");
-                    }
                 }
             }
         }

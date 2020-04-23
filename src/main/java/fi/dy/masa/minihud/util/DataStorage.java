@@ -35,7 +35,8 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.network.StructurePacketHandler;
+import fi.dy.masa.minihud.network.StructurePacketHandlerCarpet;
+import fi.dy.masa.minihud.network.StructurePacketHandlerServux;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
@@ -58,7 +59,7 @@ public class DataStorage
     private boolean structureRendererNeedsUpdate;
     private boolean structuresNeedUpdating;
     private boolean shouldRegisterStructureChannel;
-    private int structureDataTimeout = 800;
+    private int structureDataTimeout = 30 * 20;
     private long worldSeed;
     private long lastServerTick;
     private long lastServerTimeUpdate;
@@ -84,15 +85,16 @@ public class DataStorage
         this.worldSpawnValid = false;
         this.structuresNeedUpdating = true;
         this.hasStructureDataFromServer = false;
-        this.structureRendererNeedsUpdate = false;
+        this.structureRendererNeedsUpdate = true;
 
         this.lastStructureUpdatePos = null;
         this.structures.clear();
-        this.structureDataTimeout = 800;
+        this.structureDataTimeout = 30 * 20;
         this.worldSeed = 0;
         this.worldSpawn = BlockPos.ORIGIN;
 
-        StructurePacketHandler.INSTANCE.reset();
+        StructurePacketHandlerCarpet.INSTANCE.reset();
+        StructurePacketHandlerServux.INSTANCE.reset();
         ShapeManager.INSTANCE.clear();
     }
 
@@ -438,8 +440,10 @@ public class DataStorage
                     if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
                     {
                         // (re-)register the structure packet handler
-                        ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandler.INSTANCE);
-                        ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandler.INSTANCE);
+                        ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
+                        ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
+                        ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
+                        ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
                     }
 
                     this.shouldRegisterStructureChannel = false;
@@ -490,12 +494,12 @@ public class DataStorage
     {
         if (structures.getElementType() == Constants.NBT.TAG_COMPOUND)
         {
-            this.structureDataTimeout = timeout;
+            this.structureDataTimeout = timeout + 200;
 
             long currentTime = this.mc.world.getTime();
             final int count = structures.size();
 
-            this.removeExpiredStructures(currentTime, timeout);
+            this.removeExpiredStructures(currentTime, this.structureDataTimeout);
 
             for (int i = 0; i < count; ++i)
             {
@@ -521,7 +525,7 @@ public class DataStorage
 
     private void removeExpiredStructures(long currentTime, int timeout)
     {
-        long maxAge = timeout + 200;
+        long maxAge = timeout;
         Iterator<StructureData> iter = this.structures.values().iterator();
 
         while (iter.hasNext())
