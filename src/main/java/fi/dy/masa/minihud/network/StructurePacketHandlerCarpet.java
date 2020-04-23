@@ -47,7 +47,7 @@ public class StructurePacketHandlerCarpet implements IPluginChannelHandler
                 if (this.registered && tag.containsKey("Structures", Constants.NBT.TAG_LIST))
                 {
                     ListTag structures = tag.getList("Structures", Constants.NBT.TAG_COMPOUND);
-                    DataStorage.getInstance().addOrUpdateStructuresFromServer(structures, this.timeout);
+                    DataStorage.getInstance().addOrUpdateStructuresFromServer(structures, this.timeout, false);
                 }
                 // Metadata packet upon channel registration
                 else if (tag.containsKey("Version", Constants.NBT.TAG_INT) &&
