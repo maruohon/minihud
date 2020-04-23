@@ -58,7 +58,7 @@ public class WorldLoadListener implements IWorldLoadListener
     public void onWorldLoadPost(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, MinecraftClient mc)
     {
         // Clear the cached data
-        DataStorage.getInstance().reset();
+        DataStorage.getInstance().reset(worldAfter == null);
 
         // Logging in to a world or changing dimensions or respawning
         if (worldAfter != null)

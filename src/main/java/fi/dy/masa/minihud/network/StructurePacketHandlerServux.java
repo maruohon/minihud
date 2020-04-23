@@ -46,7 +46,7 @@ public class StructurePacketHandlerServux implements IPluginChannelHandler
             if (tag != null)
             {
                 ListTag structures = tag.getList("Structures", Constants.NBT.TAG_COMPOUND);
-                DataStorage.getInstance().addOrUpdateStructuresFromServer(structures, this.timeout);
+                DataStorage.getInstance().addOrUpdateStructuresFromServer(structures, this.timeout, true);
             }
         }
         else if (id == PACKET_S2C_METADATA)
@@ -59,6 +59,7 @@ public class StructurePacketHandlerServux implements IPluginChannelHandler
             {
                 this.timeout = tag.getInt("timeout");
                 this.registered = true;
+                DataStorage.getInstance().setIsServuxServer();
             }
         }
     }

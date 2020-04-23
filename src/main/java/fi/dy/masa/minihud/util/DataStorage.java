@@ -54,6 +54,7 @@ public class DataStorage
     private boolean worldSeedValid;
     private boolean serverTPSValid;
     private boolean carpetServer;
+    private boolean servuxServer;
     private boolean worldSpawnValid;
     private boolean hasStructureDataFromServer;
     private boolean structureRendererNeedsUpdate;
@@ -77,7 +78,7 @@ public class DataStorage
         return INSTANCE;
     }
 
-    public void reset()
+    public void reset(boolean isLogout)
     {
         this.worldSeedValid = false;
         this.serverTPSValid = false;
@@ -89,13 +90,24 @@ public class DataStorage
 
         this.lastStructureUpdatePos = null;
         this.structures.clear();
-        this.structureDataTimeout = 30 * 20;
         this.worldSeed = 0;
         this.worldSpawn = BlockPos.ORIGIN;
 
         StructurePacketHandlerCarpet.INSTANCE.reset();
         StructurePacketHandlerServux.INSTANCE.reset();
         ShapeManager.INSTANCE.clear();
+
+        if (isLogout)
+        {
+            this.servuxServer = false;
+            this.structureDataTimeout = 30 * 20;
+        }
+    }
+
+    public void setIsServuxServer()
+    {
+        this.servuxServer = true;
+        ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
     }
 
     public void onWorldJoin()
@@ -439,16 +451,27 @@ public class DataStorage
                 {
                     if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
                     {
-                        // (re-)register the structure packet handler
+                        // (re-)register the structure packet handlers
                         ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
                         ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
-                        ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
-                        ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
+
+                        this.registerStructureChannel();
                     }
 
                     this.shouldRegisterStructureChannel = false;
                 }
             }
+        }
+    }
+
+    public void registerStructureChannel()
+    {
+        ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
+
+        // Don't register the Carpet structure channel if the server is known to have the Servux mod
+        if (this.servuxServer == false)
+        {
+            ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
         }
     }
 
@@ -490,8 +513,14 @@ public class DataStorage
         this.structuresNeedUpdating = false;
     }
 
-    public void addOrUpdateStructuresFromServer(ListTag structures, int timeout)
+    public void addOrUpdateStructuresFromServer(ListTag structures, int timeout, boolean isServux)
     {
+        // Ignore the data from QuickCarpet if the Servux mod is also present
+        if (this.servuxServer && isServux == false)
+        {
+            return;
+        }
+
         if (structures.getElementType() == Constants.NBT.TAG_COMPOUND)
         {
             this.structureDataTimeout = timeout + 200;

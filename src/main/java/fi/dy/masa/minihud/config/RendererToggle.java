@@ -84,8 +84,7 @@ public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfi
                     {
                         if (this.getBooleanValue())
                         {
-                            ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
-                            ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
+                            DataStorage.getInstance().registerStructureChannel();
                         }
                         else
                         {
