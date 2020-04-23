@@ -65,13 +65,15 @@ public class RenderContainer
         }
     }
 
-    public void render(Entity entity, MinecraftClient mc, float partialTicks, MatrixStack matrixStack)
+    public void render(Entity entity, MatrixStack matrixStack, MinecraftClient mc, float partialTicks)
     {
-        this.update(entity, mc);
-        this.draw(entity, mc, partialTicks, matrixStack);
+        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+
+        this.update(cameraPos, entity, mc);
+        this.draw(cameraPos, matrixStack, mc, partialTicks);
     }
 
-    protected void update(Entity entity, MinecraftClient mc)
+    protected void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
         this.allocateResourcesIfNeeded();
         this.countActive = 0;
@@ -84,8 +86,10 @@ public class RenderContainer
             {
                 if (renderer.needsUpdate(entity, mc))
                 {
+                    System.out.printf("plop needsUpdate RC 2\n");
                     renderer.lastUpdatePos = new BlockPos(entity);
-                    renderer.update(entity, mc);
+                    renderer.setUpdatePosition(cameraPos);
+                    renderer.update(cameraPos, entity, mc);
                 }
 
                 ++this.countActive;
@@ -93,7 +97,7 @@ public class RenderContainer
         }
     }
 
-    protected void draw(Entity entity, MinecraftClient mc, float partialTicks, MatrixStack matrixStack)
+    protected void draw(Vec3d cameraPos, MatrixStack matrixStack, MinecraftClient mc, float partialTicks)
     {
         if (this.resourcesAllocated && this.countActive > 0)
         {
@@ -107,13 +111,12 @@ public class RenderContainer
             RenderSystem.depthMask(false);
             RenderSystem.polygonOffset(-3f, -3f);
             RenderSystem.enablePolygonOffset();
+
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
             GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
             GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
-
-            Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
 
             for (int i = 0; i < this.renderers.size(); ++i)
             {
@@ -121,7 +124,13 @@ public class RenderContainer
 
                 if (renderer.shouldRender(mc))
                 {
-                    renderer.draw(cameraPos.x, cameraPos.y, cameraPos.z, matrixStack);
+                    Vec3d updatePos = renderer.getUpdatePosition();
+                    matrixStack.push();
+                    matrixStack.translate(updatePos.x - cameraPos.x, updatePos.y - cameraPos.y, updatePos.z - cameraPos.z);
+
+                    renderer.draw(matrixStack);
+
+                    matrixStack.pop();
                 }
             }
 

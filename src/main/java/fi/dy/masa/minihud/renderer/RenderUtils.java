@@ -85,7 +85,7 @@ public class RenderUtils
         }
     }
 
-    public static void renderVerticalWallsOfLinesIfWithinRange(
+    private static void renderVerticalWallsOfLinesIfWithinRange(
             BufferBuilder bufferQuads, BufferBuilder bufferLines,
             Direction.Axis axis,
             double edge, double posOnEdgeAxis, double posOnPerpAxis,

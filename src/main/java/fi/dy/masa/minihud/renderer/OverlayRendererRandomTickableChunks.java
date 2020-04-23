@@ -52,7 +52,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
         if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
         {
@@ -77,7 +77,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 
         for (ChunkPos pos : chunks)
         {
-            this.renderChunkEdgesIfApplicable(pos, chunks, entity, color);
+            this.renderChunkEdgesIfApplicable(cameraPos, pos, chunks, entity, color);
         }
 
         BUFFER_1.end();
@@ -112,7 +112,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
         return set;
     }
 
-    protected void renderChunkEdgesIfApplicable(ChunkPos pos, Set<ChunkPos> chunks, Entity entity, int color)
+    protected void renderChunkEdgesIfApplicable(Vec3d cameraPos, ChunkPos pos, Set<ChunkPos> chunks, Entity entity, int color)
     {
         for (Direction side : HORIZONTALS)
         {

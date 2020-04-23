@@ -10,6 +10,7 @@ public class RenderObjectVbo extends RenderObjectBase
 {
     protected final VertexBuffer vertexBuffer;
     protected final VertexFormat format;
+    protected final boolean hasTexture;
 
     public RenderObjectVbo(int glMode, VertexFormat format)
     {
@@ -17,6 +18,20 @@ public class RenderObjectVbo extends RenderObjectBase
 
         this.vertexBuffer = new VertexBuffer(format);
         this.format = format;
+
+        boolean hasTexture = false;
+
+        // This isn't really that nice and clean, but it'll do for now...
+        for (VertexFormatElement el : this.format.getElements())
+        {
+            if (el.getType() == VertexFormatElement.Type.UV)
+            {
+                hasTexture = true;
+                break;
+            }
+        }
+
+        this.hasTexture = hasTexture;
     }
 
     @Override
@@ -28,19 +43,11 @@ public class RenderObjectVbo extends RenderObjectBase
     @Override
     public void draw(net.minecraft.client.util.math.MatrixStack matrixStack)
     {
-        RenderSystem.pushMatrix();
+        //RenderSystem.pushMatrix();
 
-        boolean texture = false;
-
-        // This isn't really that nice and clean, but it'll do for now...
-        for (VertexFormatElement el : this.format.getElements())
+        if (this.hasTexture)
         {
-            if (el.getType() == VertexFormatElement.Type.UV)
-            {
-                RenderSystem.enableTexture();
-                texture = true;
-                break;
-            }
+            RenderSystem.enableTexture();
         }
 
         this.vertexBuffer.bind();
@@ -48,22 +55,14 @@ public class RenderObjectVbo extends RenderObjectBase
         this.vertexBuffer.draw(matrixStack.peek().getModel(), this.getGlMode());
         this.format.endDrawing();
 
-        if (texture)
+        if (this.hasTexture)
         {
             RenderSystem.disableTexture();
         }
 
         VertexBuffer.unbind();
-        RenderSystem.popMatrix();
+        //RenderSystem.popMatrix();
     }
-
-    /*
-    protected void setupArrayPointers()
-    {
-        GlStateManager.vertexPointer(3, GL11.GL_FLOAT, 16, 0);
-        GlStateManager.colorPointer(4, GL11.GL_UNSIGNED_BYTE, 16, 12);
-    }
-    */
 
     @Override
     public void deleteGlResources()

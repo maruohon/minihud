@@ -8,6 +8,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos.PooledMutable;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.Configs;
@@ -51,7 +52,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
         DataStorage data = DataStorage.getInstance();
         this.topY = overlayTopY;
@@ -90,7 +91,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
                     {
                         pos1.set( cx << 4,          0,  cz << 4);
                         pos2.set((cx << 4) + 15, topY, (cz << 4) + 15);
-                        fi.dy.masa.malilib.render.RenderUtils.drawBoxWithEdgesBatched(pos1, pos2, colorLines, colorSides, BUFFER_1, BUFFER_2);
+                        fi.dy.masa.malilib.render.RenderUtils.drawBoxWithEdgesBatched(pos1, pos2, cameraPos, colorLines, colorSides, BUFFER_1, BUFFER_2);
                     }
                 }
             }

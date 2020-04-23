@@ -11,6 +11,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -118,9 +119,9 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
-        this.renderSphereBlock();
+        this.renderSphereBlock(cameraPos);
 
         this.needsUpdate = false;
         this.lastUpdatePos = entity.getPos();
@@ -134,13 +135,9 @@ public class ShapeDespawnSphere extends ShapeBase
     }
 
     @Override
-    public void draw(double x, double y, double z, net.minecraft.client.util.math.MatrixStack matrixStack)
+    public void draw(MatrixStack matrixStack)
     {
-        RenderSystem.pushMatrix();
-        this.preRender(x, y, z);
-
-        matrixStack.push();
-        matrixStack.translate(-x, -y, -z);
+        this.preRender();
 
         this.renderObjects.get(0).draw(matrixStack);
 
@@ -150,10 +147,6 @@ public class ShapeDespawnSphere extends ShapeBase
         this.renderObjects.get(0).draw(matrixStack);
         RenderSystem.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
         RenderSystem.enableBlend();
-
-        matrixStack.pop();
-
-        RenderSystem.popMatrix();
     }
 
     @Override
@@ -213,7 +206,7 @@ public class ShapeDespawnSphere extends ShapeBase
         return lines;
     }
 
-    protected void renderSphereBlock()
+    protected void renderSphereBlock(Vec3d cameraPos)
     {
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
@@ -259,7 +252,7 @@ public class ShapeDespawnSphere extends ShapeBase
                     spherePositions.contains(posMutable) == false &&
                     this.isAdjacentPositionOutside(pos, side))
                 {
-                    renderBlockSideQuads(pos, side, BUFFER_1, colorQuad);
+                    renderBlockSideQuads(pos, side, BUFFER_1, colorQuad, cameraPos);
                     //renderBlockSideLines(pos, side, BUFFER_2, colorLine);
                     //r++;
                 }
@@ -466,19 +459,19 @@ public class ShapeDespawnSphere extends ShapeBase
         }
     }
 
-    public static void renderBlockSideQuads(BlockPos pos, Direction side, BufferBuilder buffer, Color4f color)
+    public static void renderBlockSideQuads(BlockPos pos, Direction side, BufferBuilder buffer, Color4f color, Vec3d cameraPos)
     {
-        double x = pos.getX();
-        double y = pos.getY();
-        double z = pos.getZ();
+        final double x = pos.getX() - cameraPos.x;
+        final double y = pos.getY() - cameraPos.y;
+        final double z = pos.getZ() - cameraPos.z;
 
         switch (side)
         {
             case DOWN:
-                buffer.vertex(x    , y, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z    ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x + 1, y, z + 1).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(x    , y, z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z    ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x + 1, y    , z + 1).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(x    , y    , z + 1).color(color.r, color.g, color.b, color.a).next();
                 break;
             case UP:
                 buffer.vertex(x    , y + 1, z    ).color(color.r, color.g, color.b, color.a).next();
@@ -513,11 +506,11 @@ public class ShapeDespawnSphere extends ShapeBase
         }
     }
 
-    public static void renderBlockSideLines(BlockPos pos, Direction side, BufferBuilder buffer, Color4f color)
+    public static void renderBlockSideLines(BlockPos pos, Direction side, BufferBuilder buffer, Color4f color, Vec3d cameraPos)
     {
-        double x = pos.getX();
-        double y = pos.getY();
-        double z = pos.getZ();
+        final double x = pos.getX() - cameraPos.x;
+        final double y = pos.getY() - cameraPos.y;
+        final double z = pos.getZ() - cameraPos.z;
 
         switch (side)
         {
