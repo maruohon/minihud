@@ -17,6 +17,7 @@ import net.minecraft.block.entity.BeehiveBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -106,7 +107,7 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderGameOverlayPost(float partialTicks)
+    public void onRenderGameOverlayPost(float partialTicks, MatrixStack matrixStack)
     {
         if (Configs.Generic.ENABLED.getBooleanValue() == false)
         {
@@ -141,7 +142,7 @@ public class RenderHandler implements IRenderer
             boolean useBackground = Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue();
             boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
 
-            RenderUtils.renderText(x, y, this.fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.lines);
+            RenderUtils.renderText(x, y, this.fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.lines, matrixStack);
         }
     }
 

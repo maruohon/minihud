@@ -1,6 +1,6 @@
 package fi.dy.masa.minihud.compat.modmenu;
 
-import java.util.function.Function;
+/*import java.util.function.Function;
 import net.minecraft.client.gui.screen.Screen;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.gui.GuiConfigs;
@@ -23,4 +23,4 @@ public class ModMenuImpl implements ModMenuApi
             return gui;
         };
     }
-}
+}*/

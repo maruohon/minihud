@@ -19,6 +19,7 @@ import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeDespawnSphere;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class GuiShapeEditor extends GuiRenderLayerEditBase
@@ -54,7 +55,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     }
 
     @Override
-    protected void drawContents(int mouseX, int mouseY, float partialTicks)
+    protected void drawContents(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         int x = 96;
         int y = this.colorY;
