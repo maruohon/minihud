@@ -16,7 +16,8 @@ import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
-import fi.dy.masa.minihud.network.StructurePacketHandler;
+import fi.dy.masa.minihud.network.StructurePacketHandlerCarpet;
+import fi.dy.masa.minihud.network.StructurePacketHandlerServux;
 import fi.dy.masa.minihud.util.DataStorage;
 
 public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfigBoolean>
@@ -81,11 +82,13 @@ public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfi
                     {
                         if (this.getBooleanValue())
                         {
-                            ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandler.INSTANCE);
+                            ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
+                            ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
                         }
                         else
                         {
-                            ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandler.INSTANCE);
+                            ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
+                            ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
                         }
                     }
                     else
