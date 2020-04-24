@@ -19,10 +19,16 @@ import fi.dy.masa.minihud.util.MiscUtils;
 public class OverlayRendererSlimeChunks extends OverlayRendererBase
 {
     public static double overlayTopY;
+    protected static boolean needsUpdate = true;
 
     protected boolean wasSeedKnown;
     protected long seed;
     protected double topY;
+
+    public static void setNeedsUpdate()
+    {
+        needsUpdate = true;
+    }
 
     @Override
     public boolean shouldRender(MinecraftClient mc)
@@ -35,6 +41,11 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     @Override
     public boolean needsUpdate(Entity entity, MinecraftClient mc)
     {
+        if (needsUpdate)
+        {
+            return true;
+        }
+
         boolean isSeedKnown = DataStorage.getInstance().isWorldSeedKnown(entity.dimension);
         long seed = DataStorage.getInstance().getWorldSeed(entity.dimension);
 
@@ -63,8 +74,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
         {
             final int centerX = ((int) MathHelper.floor(entity.getX())) >> 4;
             final int centerZ = ((int) MathHelper.floor(entity.getZ())) >> 4;
-            final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
-            final Color4f colorSides = Color4f.fromColor(colorLines, colorLines.a / 6);
+            final Color4f colorSides = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
+            final Color4f colorLines = Color4f.fromColor(colorSides, 1.0F);
             PooledMutable pos1 = PooledMutable.get();
             PooledMutable pos2 = PooledMutable.get();
             int r = MathHelper.clamp(Configs.Generic.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
@@ -89,7 +100,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
 
                     if (MiscUtils.canSlimeSpawnInChunk(cx, cz, this.seed))
                     {
-                        pos1.set( cx << 4,          0,  cz << 4);
+                        pos1.set( cx << 4,          0,  cz << 4      );
                         pos2.set((cx << 4) + 15, topY, (cz << 4) + 15);
                         fi.dy.masa.malilib.render.RenderUtils.drawBoxWithEdgesBatched(pos1, pos2, cameraPos, colorLines, colorSides, BUFFER_1, BUFFER_2);
                     }
@@ -105,6 +116,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
             renderQuads.uploadData(BUFFER_1);
             renderLines.uploadData(BUFFER_2);
         }
+
+        needsUpdate = false;
     }
 
     @Override

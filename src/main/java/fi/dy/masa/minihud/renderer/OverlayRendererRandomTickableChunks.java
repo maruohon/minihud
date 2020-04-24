@@ -8,21 +8,31 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 
 public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 {
+    protected static boolean needsUpdate = true;
     @Nullable public static Vec3d newPos;
     private static final Direction[] HORIZONTALS = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST };
 
     protected final RendererToggle toggle;
     protected Vec3d pos = Vec3d.ZERO;
+    protected double minX;
+    protected double minZ;
+    protected double maxX;
+    protected double maxZ;
+
+    public static void setNeedsUpdate()
+    {
+        needsUpdate = true;
+    }
 
     public OverlayRendererRandomTickableChunks(RendererToggle toggle)
     {
@@ -38,6 +48,11 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     @Override
     public boolean needsUpdate(Entity entity, MinecraftClient mc)
     {
+        if (needsUpdate)
+        {
+            return true;
+        }
+
         if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED)
         {
             return newPos != null;
@@ -64,9 +79,9 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
             newPos = null;
         }
 
-        final int color = this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER ?
-                Configs.Colors.RANDOM_TICKS_PLAYER_OVERLAY_COLOR.getIntegerValue() :
-                Configs.Colors.RANDOM_TICKS_FIXED_OVERLAY_COLOR.getIntegerValue();
+        final Color4f color = this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER ?
+                Configs.Colors.RANDOM_TICKS_PLAYER_OVERLAY_COLOR.getColor() :
+                Configs.Colors.RANDOM_TICKS_FIXED_OVERLAY_COLOR.getColor();
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
@@ -85,6 +100,8 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
+
+        needsUpdate = false;
     }
 
     protected Set<ChunkPos> getRandomTickableChunks(Vec3d posCenter)
@@ -112,47 +129,54 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
         return set;
     }
 
-    protected void renderChunkEdgesIfApplicable(Vec3d cameraPos, ChunkPos pos, Set<ChunkPos> chunks, Entity entity, int color)
+    protected void renderChunkEdgesIfApplicable(Vec3d cameraPos, ChunkPos pos, Set<ChunkPos> chunks, Entity entity, Color4f color)
     {
         for (Direction side : HORIZONTALS)
         {
-            ChunkPos posTmp = new ChunkPos(pos.x + side.getOffsetX(), pos.z + side.getOffsetZ());
+            ChunkPos posAdj = new ChunkPos(pos.x + side.getOffsetX(), pos.z + side.getOffsetZ());
 
-            if (chunks.contains(posTmp) == false)
+            if (chunks.contains(posAdj) == false)
             {
-                RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2,
-                        side.getAxis(), this.getStartPos(pos, side), this.getEndPos(pos, side),
-                        512, 256, 16, 16, entity, color);
+                this.renderChunkEdge(pos, side, cameraPos, color);
             }
         }
     }
 
-    protected BlockPos getStartPos(ChunkPos chunkPos, Direction side)
+    private void renderChunkEdge(ChunkPos pos, Direction side, Vec3d cameraPos, Color4f color)
     {
+        double minX, minZ, maxX, maxZ;
+
         switch (side)
         {
-            case NORTH:     return new BlockPos( chunkPos.x << 4      , 0,  chunkPos.z << 4      );
-            case SOUTH:     return new BlockPos( chunkPos.x << 4      , 0, (chunkPos.z << 4) + 16);
-            case WEST:      return new BlockPos( chunkPos.x << 4      , 0,  chunkPos.z << 4      );
-            case EAST:      return new BlockPos((chunkPos.x << 4) + 16, 0,  chunkPos.z << 4      );
+            case NORTH:
+                minX = (double) (pos.x << 4);
+                minZ = (double) (pos.z << 4);
+                maxX = (double) (pos.x << 4) + 16.0;
+                maxZ = (double) (pos.z << 4);
+                break;
+            case SOUTH:
+                minX = (double) (pos.x << 4);
+                minZ = (double) (pos.z << 4) + 16.0;
+                maxX = (double) (pos.x << 4) + 16.0;
+                maxZ = (double) (pos.z << 4) + 16.0;
+                break;
+            case WEST:
+                minX = (double) (pos.x << 4);
+                minZ = (double) (pos.z << 4);
+                maxX = (double) (pos.x << 4);
+                maxZ = (double) (pos.z << 4) + 16.0;
+                break;
+            case EAST:
+                minX = (double) (pos.x << 4) + 16.0;
+                minZ = (double) (pos.z << 4);
+                maxX = (double) (pos.x << 4) + 16.0;
+                maxZ = (double) (pos.z << 4) + 16.0;
+                break;
             default:
+                return;
         }
 
-        return BlockPos.ORIGIN;
-    }
-
-    protected BlockPos getEndPos(ChunkPos chunkPos, Direction side)
-    {
-        switch (side)
-        {
-            case NORTH:     return new BlockPos((chunkPos.x << 4) + 16, 256,  chunkPos.z << 4      );
-            case SOUTH:     return new BlockPos((chunkPos.x << 4) + 16, 256, (chunkPos.z << 4) + 16);
-            case WEST:      return new BlockPos( chunkPos.x << 4      , 256, (chunkPos.z << 4) + 16);
-            case EAST:      return new BlockPos((chunkPos.x << 4) + 16, 256, (chunkPos.z << 4) + 16);
-            default:
-        }
-
-        return BlockPos.ORIGIN;
+        RenderUtils.renderWallWithLines(minX, 0, minZ, maxX, 256, maxZ, 16, 16, true, cameraPos, color, BUFFER_1, BUFFER_2);
     }
 
     @Override

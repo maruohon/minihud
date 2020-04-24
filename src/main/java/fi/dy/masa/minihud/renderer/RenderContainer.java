@@ -86,7 +86,6 @@ public class RenderContainer
             {
                 if (renderer.needsUpdate(entity, mc))
                 {
-                    System.out.printf("plop needsUpdate RC 2\n");
                     renderer.lastUpdatePos = new BlockPos(entity);
                     renderer.setUpdatePosition(cameraPos);
                     renderer.update(cameraPos, entity, mc);

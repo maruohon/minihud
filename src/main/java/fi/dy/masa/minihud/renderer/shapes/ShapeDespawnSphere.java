@@ -34,7 +34,7 @@ public class ShapeDespawnSphere extends ShapeBase
     protected final Vec3d[] quadrantCenters = new Vec3d[4];
     protected Vec3d lastUpdatePos = Vec3d.ZERO;
     protected BlockSnap snap = BlockSnap.NONE;
-    protected double margin = 0.5;
+    protected double margin = 1.5;
     protected long lastUpdateTime;
 
     public ShapeDespawnSphere()
