@@ -7,6 +7,7 @@ import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
 import fi.dy.masa.malilib.config.IConfigInteger;
@@ -506,13 +507,13 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
 
         @Override
-        public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+        public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
         {
-            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of("Open Color Editor"));
+            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of("Open Color Editor"), matrixStack);
         }
 
         @Override
-        public void render(int mouseX, int mouseY, boolean selected)
+        public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
         {
             int x = this.getX();
             int y = this.getY();
