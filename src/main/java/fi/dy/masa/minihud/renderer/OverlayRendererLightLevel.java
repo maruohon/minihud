@@ -15,6 +15,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LightType;
 import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.World;
@@ -62,7 +63,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
         BlockPos pos = PositionUtils.getEntityBlockPos(entity);
         RenderObjectBase renderQuads = this.renderObjects.get(0);
@@ -73,7 +74,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         //long pre = System.nanoTime();
         this.updateLightLevels(mc.world, pos);
         //System.out.printf("LL markers: %d, time: %.3f s\n", LIGHT_INFOS.size(), (double) (System.nanoTime() - pre) / 1000000000D);
-        this.renderLightLevels(mc);
+        this.renderLightLevels(cameraPos, mc);
 
         BUFFER_1.end();
         BUFFER_2.end();
@@ -86,16 +87,16 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     }
 
     @Override
-    protected void preRender(double x, double y, double z)
+    protected void preRender()
     {
-        super.preRender(x, y, z);
+        super.preRender();
 
         fi.dy.masa.malilib.render.RenderUtils.bindTexture(TEXTURE_NUMBERS);
         RenderSystem.enableTexture();
     }
 
     @Override
-    protected void postRender(double x, double y, double z)
+    protected void postRender()
     {
         RenderSystem.disableTexture();
     }
@@ -107,7 +108,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         this.allocateBuffer(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
     }
 
-    private void renderLightLevels(MinecraftClient mc)
+    private void renderLightLevels(Vec3d cameraPos, MinecraftClient mc)
     {
         final int count = this.lightInfos.size();
 
@@ -123,7 +124,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
 
             if (numberMode == LightLevelNumberMode.BLOCK || numberMode == LightLevelNumberMode.BOTH)
             {
-                this.renderNumbers(LightLevelNumberMode.BLOCK,
+                this.renderNumbers(cameraPos, LightLevelNumberMode.BLOCK,
                         Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X,
                         Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_LIT,
@@ -133,7 +134,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
 
             if (numberMode == LightLevelNumberMode.SKY || numberMode == LightLevelNumberMode.BOTH)
             {
-                this.renderNumbers(LightLevelNumberMode.SKY,
+                this.renderNumbers(cameraPos, LightLevelNumberMode.SKY,
                         Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_X,
                         Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_LIT,
@@ -143,20 +144,19 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
 
             if (markerMode == LightLevelMarkerMode.SQUARE)
             {
-                this.renderMarkers(this::renderLightLevelSquare, lightThreshold, bufferLines);
+                this.renderMarkers(this::renderLightLevelSquare, cameraPos, lightThreshold, bufferLines);
             }
             else if (markerMode == LightLevelMarkerMode.CROSS)
             {
-                this.renderMarkers(this::renderLightLevelCross, lightThreshold, bufferLines);
+                this.renderMarkers(this::renderLightLevelCross, cameraPos, lightThreshold, bufferLines);
             }
         }
     }
 
-    private void renderNumbers(LightLevelNumberMode mode, IConfigDouble cfgOffX, IConfigDouble cfgOffZ,
+    private void renderNumbers(Vec3d cameraPos, LightLevelNumberMode mode, IConfigDouble cfgOffX, IConfigDouble cfgOffZ,
             ConfigColor cfgColorLit, ConfigColor cfgColorDark, boolean useColoredNumbers,
             int lightThreshold, Direction numberFacing, BufferBuilder buffer)
     {
-        double dx = 0, dy = 0, dz = 0;
         double ox = cfgOffX.getDoubleValue();
         double oz = cfgOffZ.getDoubleValue();
         double tmpX, tmpZ;
@@ -164,11 +164,11 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
 
         switch (numberFacing)
         {
-            case NORTH: tmpX = dx - ox; tmpZ = dz - oz; break;
-            case SOUTH: tmpX = dx + ox; tmpZ = dz + oz; break;
-            case WEST:  tmpX = dx - oz; tmpZ = dz + ox; break;
-            case EAST:  tmpX = dx + oz; tmpZ = dz - ox; break;
-            default:    tmpX = dx - ox; tmpZ = dz - oz; break;
+            case NORTH: tmpX = -ox; tmpZ = -oz; break;
+            case SOUTH: tmpX =  ox; tmpZ =  oz; break;
+            case WEST:  tmpX = -oz; tmpZ =  ox; break;
+            case EAST:  tmpX =  oz; tmpZ = -ox; break;
+            default:    tmpX = -ox; tmpZ = -oz; break;
         }
 
         if (useColoredNumbers)
@@ -182,10 +182,10 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             colorDark = Color4f.fromColor(0xFFFFFFFF);
         }
 
-        this.renderLightLevelNumbers(tmpX, dy, tmpZ, numberFacing, lightThreshold, mode, colorLit, colorDark, buffer);
+        this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y, tmpZ + cameraPos.z, numberFacing, lightThreshold, mode, colorLit, colorDark, buffer);
     }
 
-    private void renderMarkers(IMarkerRenderer renderer, int lightThreshold, BufferBuilder buffer)
+    private void renderMarkers(IMarkerRenderer renderer, Vec3d cameraPos, int lightThreshold, BufferBuilder buffer)
     {
         double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
         Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
@@ -202,14 +202,9 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             {
                 BlockPos pos = info.pos;
                 Color4f color = info.sky >= lightThreshold ? colorLit : colorDark;
-                renderer.render(pos.getX(), pos.getY(), pos.getZ(), color, offset1, offset2, buffer);
+                renderer.render(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z, color, offset1, offset2, buffer);
             }
         }
-    }
-
-    private interface IMarkerRenderer
-    {
-        void render(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer);
     }
 
     private void renderLightLevelNumbers(double dx, double dy, double dz, Direction facing,
@@ -223,11 +218,12 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             LightLevelInfo info = this.lightInfos.get(i);
             BlockPos pos = info.pos;
             double x = pos.getX() - dx;
+            double y = pos.getY() - dy;
             double z = pos.getZ() - dz;
             int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
             Color4f color = lightLevel >= lightThreshold ? colorLit : colorDark;
 
-            this.renderLightLevelTextureColor(x, pos.getY() - dy, z, facing, lightLevel, color, buffer);
+            this.renderLightLevelTextureColor(x, y, z, facing, lightLevel, color, buffer);
         }
     }
 
@@ -405,5 +401,10 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             this.block = block;
             this.sky = sky;
         }
+    }
+
+    private interface IMarkerRenderer
+    {
+        void render(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer);
     }
 }
