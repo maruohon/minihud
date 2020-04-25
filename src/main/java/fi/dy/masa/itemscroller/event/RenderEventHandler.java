@@ -9,6 +9,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.util.GlAllocationUtils;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.itemscroller.config.Configs;
@@ -45,7 +46,7 @@ public class RenderEventHandler
         return INSTANCE;
     }
 
-    public void onDrawBackgroundPost()
+    public void onDrawBackgroundPost(MatrixStack matrixStack)
     {
         if (GuiUtils.getCurrentScreen() instanceof HandledScreen && InputUtils.isRecipeViewOpen())
         {
@@ -62,7 +63,7 @@ public class RenderEventHandler
             RenderSystem.scaled(this.scale, this.scale, 1);
 
             String str = StringUtils.translate("itemscroller.gui.label.recipe_page", (first / countPerPage) + 1, recipes.getTotalRecipeCount() / countPerPage);
-            this.mc.textRenderer.draw(str, 16, -12, 0xC0C0C0C0);
+            this.mc.textRenderer.draw(matrixStack, str, 16, -12, 0xC0C0C0C0);
 
             for (int i = 0, recipeId = first; recipeId <= lastOnPage; ++i, ++recipeId)
             {
@@ -71,7 +72,7 @@ public class RenderEventHandler
                 int row = i % this.recipesPerColumn;
                 int column = i / this.recipesPerColumn;
 
-                this.renderStoredRecipeStack(stack, recipeId, row, column, gui, selected);
+                this.renderStoredRecipeStack(stack, recipeId, row, column, gui, selected, matrixStack);
             }
 
             if (Configs.Generic.CRAFTING_RENDER_RECIPE_ITEMS.getBooleanValue())
@@ -89,7 +90,7 @@ public class RenderEventHandler
         }
     }
 
-    public void onDrawScreenPost()
+    public void onDrawScreenPost(MatrixStack matrixStack)
     {
         if (GuiUtils.getCurrentScreen() instanceof HandledScreen && InputUtils.isRecipeViewOpen())
         {
@@ -107,7 +108,7 @@ public class RenderEventHandler
             if (recipeId >= 0)
             {
                 RecipePattern recipe = recipes.getRecipe(recipeId);
-                this.renderHoverTooltip(mouseX, mouseY, recipe, gui);
+                this.renderHoverTooltip(mouseX, mouseY, recipe, gui, matrixStack);
             }
             else if (Configs.Generic.CRAFTING_RENDER_RECIPE_ITEMS.getBooleanValue())
             {
@@ -116,7 +117,7 @@ public class RenderEventHandler
 
                 if (InventoryUtils.isStackEmpty(stack) == false)
                 {
-                    InventoryOverlay.renderStackToolTip(mouseX, mouseY, stack, this.mc);
+                    InventoryOverlay.renderStackToolTip(mouseX, mouseY, stack, this.mc, matrixStack);
                 }
             }
 
@@ -155,13 +156,13 @@ public class RenderEventHandler
         this.columnWidth = stackBaseHeight + this.numberTextWidth + this.gapColumn;
     }
 
-    private void renderHoverTooltip(int mouseX, int mouseY, RecipePattern recipe, HandledScreen<?> gui)
+    private void renderHoverTooltip(int mouseX, int mouseY, RecipePattern recipe, HandledScreen<?> gui, MatrixStack matrixStack)
     {
         ItemStack stack = recipe.getResult();
 
         if (InventoryUtils.isStackEmpty(stack) == false)
         {
-            InventoryOverlay.renderStackToolTip(mouseX, mouseY, stack, this.mc);
+            InventoryOverlay.renderStackToolTip(mouseX, mouseY, stack, this.mc, matrixStack);
         }
     }
 
@@ -194,7 +195,8 @@ public class RenderEventHandler
         return -1;
     }
 
-    private void renderStoredRecipeStack(ItemStack stack, int recipeId, int row, int column, HandledScreen<?> gui, boolean selected)
+    private void renderStoredRecipeStack(ItemStack stack, int recipeId, int row, int column, HandledScreen<?> gui,
+            boolean selected, MatrixStack matrixStack)
     {
         final TextRenderer font = this.mc.textRenderer;
         final String indexStr = String.valueOf(recipeId + 1);
@@ -211,7 +213,7 @@ public class RenderEventHandler
         RenderSystem.translatef(x, y, 0);
         RenderSystem.scaled(scale, scale, 0);
 
-        font.draw(indexStr, 0, 0, 0xC0C0C0);
+        font.draw(matrixStack, indexStr, 0, 0, 0xC0C0C0);
 
         RenderSystem.popMatrix();
     }
