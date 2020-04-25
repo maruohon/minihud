@@ -29,6 +29,7 @@ public class RenderEventHandler
     private static final Vec3d LIGHT0_POS = (new Vec3d( 0.2D, 1.0D, -0.7D)).normalize();
     private static final Vec3d LIGHT1_POS = (new Vec3d(-0.2D, 1.0D,  0.7D)).normalize();
     private static final FloatBuffer FLOAT_BUFFER = GlAllocationUtils.allocateFloatBuffer(4);
+    private static final MatrixStack FRESH_MATRIX_STACK = new MatrixStack();
 
     private final MinecraftClient mc = MinecraftClient.getInstance();
     private int recipeListX;
@@ -90,7 +91,7 @@ public class RenderEventHandler
         }
     }
 
-    public void onDrawScreenPost(MatrixStack matrixStack)
+    public void onDrawScreenPost()
     {
         if (GuiUtils.getCurrentScreen() instanceof HandledScreen && InputUtils.isRecipeViewOpen())
         {
@@ -108,7 +109,7 @@ public class RenderEventHandler
             if (recipeId >= 0)
             {
                 RecipePattern recipe = recipes.getRecipe(recipeId);
-                this.renderHoverTooltip(mouseX, mouseY, recipe, gui, matrixStack);
+                this.renderHoverTooltip(mouseX, mouseY, recipe, gui, FRESH_MATRIX_STACK);
             }
             else if (Configs.Generic.CRAFTING_RENDER_RECIPE_ITEMS.getBooleanValue())
             {
@@ -117,7 +118,7 @@ public class RenderEventHandler
 
                 if (InventoryUtils.isStackEmpty(stack) == false)
                 {
-                    InventoryOverlay.renderStackToolTip(mouseX, mouseY, stack, this.mc, matrixStack);
+                    InventoryOverlay.renderStackToolTip(mouseX, mouseY, stack, this.mc, FRESH_MATRIX_STACK);
                 }
             }
 
