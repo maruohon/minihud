@@ -172,7 +172,7 @@ public class RenderHandler implements IRenderer
     {
         if (Configs.Generic.ENABLED.getBooleanValue() && this.mc.world != null && this.mc.player != null)
         {
-            OverlayRenderer.renderOverlays(this.mc, partialTicks, matrixStack);
+            OverlayRenderer.renderOverlays(matrixStack, this.mc, partialTicks);
         }
     }
 

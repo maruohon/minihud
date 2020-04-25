@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.util.Color4f;
@@ -55,10 +56,10 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
         if (System.currentTimeMillis() - this.lastCheckTime > 1000)
         {
             final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
-            final int xStart = (((int) entity.getX()) >> 4) - radius;
-            final int zStart = (((int) entity.getZ()) >> 4) - radius;
-            final int xEnd = (((int) entity.getX()) >> 4) + radius;
-            final int zEnd = (((int) entity.getZ()) >> 4) + radius;
+            final int xStart = (((int) entity.getX() - radius) >> 4);
+            final int zStart = (((int) entity.getZ() - radius) >> 4);
+            final int xEnd = (((int) entity.getX() + radius) >> 4);
+            final int zEnd = (((int) entity.getZ() + radius) >> 4);
 
             synchronized (DIRTY_CHUNKS)
             {
@@ -81,7 +82,7 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
         final Color4f color = Configs.Colors.SPAWNABLE_COLUMNS_OVERLAY_COLOR.getColor();
         final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
@@ -99,16 +100,17 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
 
         for (int x = xStart; x <= xEnd; ++x)
         {
+            final double minX = x + 0.25 - cameraPos.x;
+            final double maxX = minX + 0.5;
+
             for (int z = zStart; z <= zEnd; ++z)
             {
                 // See WorldEntitySpawner.getRandomChunkPosition()
                 final int height = world.getWorldChunk(this.posMutable.set(x, 0, z)).sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z) + 1;
-                final double minY = height;
-                final double maxY = height + 0.09375;
-                final double minX = x + 0.25;
-                final double minZ = z + 0.25;
-                final double maxX = x + 0.75;
-                final double maxZ = z + 0.75;
+                final double minY = height - cameraPos.y;
+                final double maxY = minY + 0.09375;
+                final double minZ = z + 0.25 - cameraPos.z;
+                final double maxZ = minZ + 0.5;
 
                 fi.dy.masa.malilib.render.RenderUtils.drawBoxHorizontalSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color, BUFFER_1);
                 fi.dy.masa.malilib.render.RenderUtils.drawBoxTopBatchedQuads(minX, minZ, maxX, maxY, maxZ, color, BUFFER_1);
