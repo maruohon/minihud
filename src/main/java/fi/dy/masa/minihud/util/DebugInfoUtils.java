@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import com.google.common.collect.MapMaker;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.debug.DebugRenderer;
@@ -227,6 +228,14 @@ public class DebugInfoUtils
         {
             pathfindingEnabled = config.getBooleanValue();
         }
+        else if (config == RendererToggle.DEBUG_CHUNK_INFO)
+        {
+            MinecraftClient.getInstance().debugChunkInfo = config.getBooleanValue();
+        }
+        else if (config == RendererToggle.DEBUG_CHUNK_OCCLUSION)
+        {
+            MinecraftClient.getInstance().debugChunkOcculsion = config.getBooleanValue();
+        }
     }
 
     public static void renderVanillaDebug(MatrixStack matrixStack, VertexConsumerProvider.Immediate vtx,
@@ -251,6 +260,7 @@ public class DebugInfoUtils
 
         if (RendererToggle.DEBUG_SOLID_FACES.getBooleanValue())
         {
+            RenderSystem.enableDepthTest();
             renderer.blockOutlineDebugRenderer.render(matrixStack, vtx, cameraX, cameraY, cameraZ);
         }
 

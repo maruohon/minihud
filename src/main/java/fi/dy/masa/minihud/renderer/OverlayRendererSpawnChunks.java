@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.dimension.OverworldDimension;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.PositionUtils;
@@ -57,11 +58,13 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
             return ex != lx || ez != lz;
         }
 
-        return Math.abs(lx - ex) > 16 || Math.abs(lz - ez) > 16;
+        int range = mc.options.viewDistance * 16;
+
+        return Math.abs(lx - ex) > range || Math.abs(lz - ez) > range;
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
         DataStorage data = DataStorage.getInstance();
         BlockPos spawn = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ? PositionUtils.getEntityBlockPos(entity) : data.getWorldSpawn();
@@ -71,32 +74,27 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
 
-        Color4f colorEntity = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
+        final Color4f colorEntity = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
                 Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getColor() :
                 Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getColor();
-        final int colorIntEntity = colorEntity.intValue;
-        final int colorLazy = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
-                Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getIntegerValue() :
-                Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
-        final int colorOuter = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
-                Configs.Colors.SPAWN_REAL_OUTER_OVERLAY_COLOR.getIntegerValue() :
-                Configs.Colors.SPAWN_PLAYER_OUTER_OVERLAY_COLOR.getIntegerValue();
+        final Color4f colorLazy = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
+                Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getColor() :
+                Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getColor();
+        final Color4f colorOuter = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
+                Configs.Colors.SPAWN_REAL_OUTER_OVERLAY_COLOR.getColor() :
+                Configs.Colors.SPAWN_PLAYER_OUTER_OVERLAY_COLOR.getColor();
 
         fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(spawn, colorEntity, 0.001, BUFFER_2);
         fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxSidesBatchedQuads(spawn, colorEntity, 0.001, BUFFER_1);
 
-        int rangeH = (mc.options.viewDistance + 1) * 16;
         Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 22);
-        RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
-                rangeH, 256, 16, 16, entity, colorOuter);
+        RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorOuter, BUFFER_1, BUFFER_2);
 
         corners = this.getSpawnChunkCorners(spawn, 11);
-        RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
-                rangeH, 256, 16, 16, entity, colorLazy);
+        RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorLazy, BUFFER_1, BUFFER_2);
 
         corners = this.getSpawnChunkCorners(spawn, 9);
-        RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
-                rangeH, 256, 16, 16, entity, colorIntEntity);
+        RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorEntity, BUFFER_1, BUFFER_2);
 
         BUFFER_1.end();
         BUFFER_2.end();

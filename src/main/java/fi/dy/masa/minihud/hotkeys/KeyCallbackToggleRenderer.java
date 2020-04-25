@@ -14,6 +14,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
+import fi.dy.masa.minihud.renderer.OverlayRendererRegion;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnChunks;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -46,9 +47,22 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             {
                 OverlayRendererLightLevel.setNeedsUpdate();
             }
+            else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER.getKeybind())
+            {
+                OverlayRendererRandomTickableChunks.setNeedsUpdate();
+            }
+            else if (key == RendererToggle.OVERLAY_REGION_FILE.getKeybind())
+            {
+                OverlayRendererRegion.setNeedsUpdate();
+            }
             else if (key == RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind())
             {
                 OverlayRendererSlimeChunks.overlayTopY = entity.getY();
+                OverlayRendererSlimeChunks.setNeedsUpdate();
+            }
+            else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER.getKeybind())
+            {
+                OverlayRendererSpawnChunks.setNeedsUpdate();
             }
             else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeybind())
             {

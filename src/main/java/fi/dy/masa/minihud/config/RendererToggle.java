@@ -21,6 +21,8 @@ import fi.dy.masa.minihud.util.DataStorage;
 
 public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfigBoolean>
 {
+    DEBUG_CHUNK_INFO                    ("debugChunkInfo",              "", "Toggles the vanilla Chunk Info debug renderer", "Chunk Info"),
+    DEBUG_CHUNK_OCCLUSION               ("debugChunkOcclusion",         "", "Toggles the vanilla Chunk Occlusion debug renderer", "Chunk Occlusion"),
     DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled",    "", "Toggles the vanilla Block Collision Boxes debug renderer", "Block Collision Boxes"),
     DEBUG_NEIGHBOR_UPDATES              ("debugNeighborsUpdateEnabled", "", "Toggles the vanilla Block Neighbor Updates debug renderer", "Block Neighbor Updates"),
     DEBUG_PATH_FINDING                  ("debugPathfindingEnabled",     "", "Toggles the vanilla Pathfinding debug renderer", "Pathfinding"),

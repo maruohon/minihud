@@ -1,7 +1,9 @@
 package fi.dy.masa.minihud.renderer;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import fi.dy.masa.malilib.util.EntityUtils;
 
 public class OverlayRenderer
 {
@@ -14,9 +16,14 @@ public class OverlayRenderer
         loginTime = System.currentTimeMillis();
     }
 
-    public static void renderOverlays(MinecraftClient mc, float partialTicks, net.minecraft.client.util.math.MatrixStack matrixStack)
+    public static void renderOverlays(MatrixStack matrixStack, MinecraftClient mc, float partialTicks)
     {
-        Entity entity = mc.getCameraEntity();
+        Entity entity = EntityUtils.getCameraEntity();
+
+        if (entity == null)
+        {
+            return;
+        }
 
         if (canRender == false)
         {
@@ -33,6 +40,6 @@ public class OverlayRenderer
             }
         }
 
-        RenderContainer.INSTANCE.render(entity, mc, partialTicks, matrixStack);
+        RenderContainer.INSTANCE.render(entity, matrixStack, mc, partialTicks);
     }
 }

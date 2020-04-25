@@ -145,13 +145,9 @@ public abstract class ShapeCircleBase extends ShapeBase
     }
 
     @Override
-    public void draw(double x, double y, double z, MatrixStack matrixStack)
+    public void draw(MatrixStack matrixStack)
     {
-        RenderSystem.pushMatrix();
-        this.preRender(x, y, z);
-
-        matrixStack.push();
-        matrixStack.translate(-x, -y, -z);
+        this.preRender();
 
         this.renderObjects.get(0).draw(matrixStack);
 
@@ -161,11 +157,6 @@ public abstract class ShapeCircleBase extends ShapeBase
         this.renderObjects.get(0).draw(matrixStack);
         RenderSystem.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
         RenderSystem.enableBlend();
-
-        matrixStack.pop();
-        this.postRender(x, y, z);
-
-        RenderSystem.popMatrix();
     }
 
     @Override
@@ -244,7 +235,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         return lines;
     }
 
-    protected void renderPositions(HashSet<BlockPos> positions, Direction[] sides, Direction mainAxis, Color4f color)
+    protected void renderPositions(HashSet<BlockPos> positions, Direction[] sides, Direction mainAxis, Color4f color, Vec3d cameraPos)
     {
         boolean full = this.renderType == ShapeRenderType.FULL_BLOCK;
         boolean outer = this.renderType == ShapeRenderType.OUTER_EDGE;
@@ -273,7 +264,7 @@ public abstract class ShapeCircleBase extends ShapeBase
 
                         if (render)
                         {
-                            drawBlockSpaceSideBatchedQuads(pos, side, color, 0, BUFFER_1);
+                            drawBlockSpaceSideBatchedQuads(pos, side, color, 0, cameraPos, BUFFER_1);
                         }
                     }
                 }
@@ -528,14 +519,14 @@ public abstract class ShapeCircleBase extends ShapeBase
     /**
      * Assumes a BufferBuilder in GL_QUADS mode has been initialized
      */
-    public static void drawBlockSpaceSideBatchedQuads(BlockPos pos, Direction side, Color4f color, double expand, BufferBuilder buffer)
+    public static void drawBlockSpaceSideBatchedQuads(BlockPos pos, Direction side, Color4f color, double expand, Vec3d cameraPos, BufferBuilder buffer)
     {
-        double minX = pos.getX() - expand;
-        double minY = pos.getY() - expand;
-        double minZ = pos.getZ() - expand;
-        double maxX = pos.getX() + expand + 1;
-        double maxY = pos.getY() + expand + 1;
-        double maxZ = pos.getZ() + expand + 1;
+        double minX = pos.getX() - expand - cameraPos.x;
+        double minY = pos.getY() - expand - cameraPos.y;
+        double minZ = pos.getZ() - expand - cameraPos.z;
+        double maxX = pos.getX() + expand + 1 - cameraPos.x;
+        double maxY = pos.getY() + expand + 1 - cameraPos.y;
+        double maxZ = pos.getZ() + expand + 1 - cameraPos.z;
 
         switch (side)
         {

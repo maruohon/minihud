@@ -10,6 +10,7 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 public abstract class OverlayRendererBase implements IOverlayRenderer
 {
@@ -21,8 +22,21 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     protected boolean renderThrough = false;
     protected float glLineWidth = 1f;
     protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
+    private Vec3d updateCameraPos = Vec3d.ZERO;
 
-    protected void preRender(double x, double y, double z)
+    @Override
+    public final Vec3d getUpdatePosition()
+    {
+        return this.updateCameraPos;
+    }
+
+    @Override
+    public final void setUpdatePosition(Vec3d cameraPosition)
+    {
+        this.updateCameraPos = cameraPosition;
+    }
+
+    protected void preRender()
     {
         RenderSystem.lineWidth(this.glLineWidth);
 
@@ -33,7 +47,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         }
     }
 
-    protected void postRender(double x, double y, double z)
+    protected void postRender()
     {
         if (this.renderThrough)
         {
@@ -43,23 +57,16 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     }
 
     @Override
-    public void draw(double x, double y, double z, MatrixStack matrixStack)
+    public void draw(MatrixStack matrixStack)
     {
-        RenderSystem.pushMatrix();
-        this.preRender(x, y, z);
-
-        matrixStack.push();
-        matrixStack.translate(-x, -y, -z);
+        this.preRender();
 
         for (RenderObjectBase obj : this.renderObjects)
         {
             obj.draw(matrixStack);
         }
 
-        matrixStack.pop();
-        this.postRender(x, y, z);
-
-        RenderSystem.popMatrix();
+        this.postRender();
     }
 
     @Override

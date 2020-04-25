@@ -10,6 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -27,9 +28,9 @@ public class ShapeCircle extends ShapeCircleBase
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
-        this.renderCircleShape();
+        this.renderCircleShape(cameraPos);
         this.onPostUpdate(entity.getPos());
     }
 
@@ -44,7 +45,7 @@ public class ShapeCircle extends ShapeCircleBase
         this.setNeedsUpdate();
     }
 
-    protected void renderCircleShape()
+    protected void renderCircleShape(Vec3d cameraPos)
     {
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
@@ -90,7 +91,7 @@ public class ShapeCircle extends ShapeCircleBase
             }
         }
 
-        this.renderPositions(circlePositions, sides, mainAxis, this.color);
+        this.renderPositions(circlePositions, sides, mainAxis, this.color, cameraPos);
 
         BUFFER_1.end();
 

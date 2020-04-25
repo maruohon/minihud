@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.OverworldDimension;
 import fi.dy.masa.malilib.util.Color4f;
@@ -69,14 +70,14 @@ public class OverlayRendererStructures extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
 
-        this.updateStructures(mc.world.dimension.getType(), this.lastUpdatePos, mc);
+        this.updateStructures(mc.world.dimension.getType(), this.lastUpdatePos, cameraPos, mc);
 
         BUFFER_1.end();
         BUFFER_2.end();
@@ -92,7 +93,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
         this.allocateBuffer(GL11.GL_LINES);
     }
 
-    private void updateStructures(DimensionType dimensionType, BlockPos playerPos, MinecraftClient mc)
+    private void updateStructures(DimensionType dimensionType, BlockPos playerPos, Vec3d cameraPos, MinecraftClient mc)
     {
         ArrayListMultimap<StructureType, StructureData> structures = DataStorage.getInstance().getCopyOfStructureData();
         int maxRange = (mc.options.viewDistance + 4) * 16;
@@ -105,29 +106,29 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
                 if (structureData.isEmpty() == false)
                 {
-                    this.renderStructuresWithinRange(type, structureData, playerPos, maxRange);
+                    this.renderStructuresWithinRange(type, structureData, playerPos, cameraPos, maxRange);
                 }
             }
         }
     }
 
-    private void renderStructuresWithinRange(StructureType type, Collection<StructureData> structureData, BlockPos playerPos, int maxRange)
+    private void renderStructuresWithinRange(StructureType type, Collection<StructureData> structureData, BlockPos playerPos, Vec3d cameraPos, int maxRange)
     {
         for (StructureData structure : structureData)
         {
             if (MiscUtils.isStructureWithinRange(structure.getBoundingBox(), playerPos, maxRange))
             {
-                this.renderStructure(type, structure);
+                this.renderStructure(type, structure, cameraPos);
             }
         }
     }
 
-    private void renderStructure(StructureType type, StructureData structure)
+    private void renderStructure(StructureType type, StructureData structure, Vec3d cameraPos)
     {
         Color4f color = type.getToggle().getColorMain().getColor();
         ImmutableList<IntBoundingBox> components = structure.getComponents();
 
-        fi.dy.masa.malilib.render.RenderUtils.drawBox(structure.getBoundingBox(), color, BUFFER_1, BUFFER_2);
+        fi.dy.masa.malilib.render.RenderUtils.drawBox(structure.getBoundingBox(), cameraPos, color, BUFFER_1, BUFFER_2);
 
         if (components.isEmpty() == false)
         {
@@ -137,7 +138,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
                 for (IntBoundingBox bb : components)
                 {
-                    fi.dy.masa.malilib.render.RenderUtils.drawBox(bb, color, BUFFER_1, BUFFER_2);
+                    fi.dy.masa.malilib.render.RenderUtils.drawBox(bb, cameraPos, color, BUFFER_1, BUFFER_2);
                 }
             }
         }

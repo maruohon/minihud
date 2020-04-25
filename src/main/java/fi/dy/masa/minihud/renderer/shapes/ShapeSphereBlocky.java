@@ -6,6 +6,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.RenderObjectBase;
@@ -23,13 +24,13 @@ public class ShapeSphereBlocky extends ShapeCircleBase
     }
 
     @Override
-    public void update(Entity entity, MinecraftClient mc)
+    public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
-        this.renderSphereShape();
+        this.renderSphereShape(cameraPos);
         this.onPostUpdate(entity.getPos());
     }
 
-    protected void renderSphereShape()
+    protected void renderSphereShape(Vec3d cameraPos)
     {
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
@@ -68,7 +69,7 @@ public class ShapeSphereBlocky extends ShapeCircleBase
 
         Direction[] sides = FACING_ALL;
 
-        this.renderPositions(spherePositions, sides, this.mainAxis, this.color);
+        this.renderPositions(spherePositions, sides, this.mainAxis, this.color, cameraPos);
         //System.out.printf("rendered: %d\n", r);
 
         BUFFER_1.end();
