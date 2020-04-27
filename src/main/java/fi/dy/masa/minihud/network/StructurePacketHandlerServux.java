@@ -8,6 +8,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import fi.dy.masa.malilib.network.IPluginChannelHandler;
 import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.util.DataStorage;
 
 public class StructurePacketHandlerServux implements IPluginChannelHandler
@@ -38,6 +39,8 @@ public class StructurePacketHandlerServux implements IPluginChannelHandler
     public void onPacketReceived(PacketByteBuf buf)
     {
         int id = buf.readVarInt();
+
+        MiniHUD.printDebug("StructurePacketHandlerServux#onPacketReceived(): " + id);
 
         if (id == PACKET_S2C_STRUCTURE_DATA && this.registered)
         {
