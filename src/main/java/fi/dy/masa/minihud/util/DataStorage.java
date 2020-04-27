@@ -79,6 +79,15 @@ public class DataStorage
 
     public void reset(boolean isLogout)
     {
+        if (isLogout)
+        {
+            MiniHUD.printDebug("DataStorage#reset() - log-out");
+        }
+        else
+        {
+            MiniHUD.printDebug("DataStorage#reset() - dimension change or log-in");
+        }
+
         this.worldSeedValid = false;
         this.serverTPSValid = false;
         this.carpetServer = false;
@@ -105,12 +114,15 @@ public class DataStorage
 
     public void setIsServuxServer()
     {
+        MiniHUD.printDebug("DataStorage#setIsServuxServer()");
         this.servuxServer = true;
         ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
     }
 
     public void onWorldJoin()
     {
+        MiniHUD.printDebug("DataStorage#onWorldJoin()");
+
         if (this.mc.isIntegratedServerRunning() == false && RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
         {
             this.shouldRegisterStructureChannel = true;
@@ -422,6 +434,7 @@ public class DataStorage
                 {
                     if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
                     {
+                        MiniHUD.printDebug("DataStorage#updateStructureData(): Unregister channels");
                         // (re-)register the structure packet handlers
                         ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
                         ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
@@ -437,11 +450,13 @@ public class DataStorage
 
     public void registerStructureChannel()
     {
+        MiniHUD.printDebug("DataStorage#registerStructureChannel(): Servux");
         ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
 
         // Don't register the Carpet structure channel if the server is known to have the Servux mod
         if (this.servuxServer == false)
         {
+            MiniHUD.printDebug("DataStorage#registerStructureChannel(): Carpet");
             ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
         }
     }
@@ -486,6 +501,8 @@ public class DataStorage
 
     public void addOrUpdateStructuresFromServer(ListTag structures, int timeout, boolean isServux)
     {
+        MiniHUD.printDebug("DataStorage#addOrUpdateStructuresFromServer(): start");
+
         // Ignore the data from QuickCarpet if the Servux mod is also present
         if (this.servuxServer && isServux == false)
         {
@@ -494,6 +511,7 @@ public class DataStorage
 
         if (structures.getElementType() == Constants.NBT.TAG_COMPOUND)
         {
+            MiniHUD.printDebug("DataStorage#addOrUpdateStructuresFromServer(): count: " + structures.size());
             this.structureDataTimeout = timeout + 200;
 
             long currentTime = this.mc.world.getTime();
