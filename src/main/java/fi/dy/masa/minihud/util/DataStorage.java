@@ -562,7 +562,7 @@ public class DataStorage
 
     public void handleCarpetServerTPSData(Text textComponent)
     {
-        if (((class_5250)textComponent).asString().isEmpty() == false)
+        if (((class_5250)textComponent).getString().isEmpty() == false)
         {
             String text = Formatting.strip(textComponent.getString());
             String[] lines = text.split("\n");
