@@ -2,6 +2,8 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import net.minecraft.block.SnowBlock;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
@@ -197,11 +199,21 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         {
             LightLevelInfo info = this.lightInfos.get(i);
 
-            if (info.block < lightThreshold)
+            if (info.blockLightLevel < lightThreshold)
             {
                 BlockPos pos = info.pos;
-                Color4f color = info.sky >= lightThreshold ? colorLit : colorDark;
-                renderer.render(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z, color, offset1, offset2, buffer);
+                double y = pos.getY();
+
+                if (info.blockState.getBlock() == Blocks.SNOW)
+                {
+                    if (info.blockState.get(SnowBlock.LAYERS) == 1) y += 0.125D;
+                    else continue;
+                    // if there are more than 1 layers, it will not be spawnable and should not be rendered
+                }
+
+                Color4f color = info.skyLightLevel >= lightThreshold ? colorLit : colorDark;
+
+                renderer.render(pos.getX() - cameraPos.x, y - cameraPos.y, pos.getZ() - cameraPos.z, color, offset1, offset2, buffer);
             }
         }
     }
@@ -219,7 +231,15 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             double x = pos.getX() - dx;
             double y = pos.getY() - dy;
             double z = pos.getZ() - dz;
-            int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
+
+            if (info.blockState.getBlock() == Blocks.SNOW)
+            {
+                if (info.blockState.get(SnowBlock.LAYERS) == 1) y += 0.125D;
+                else continue;
+                // if there are more than 1 layers, it will not be spawnable and should not be rendered
+            }
+
+            int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.blockLightLevel : info.skyLightLevel;
             Color4f color = lightLevel >= lightThreshold ? colorLit : colorDark;
 
             this.renderLightLevelTextureColor(x, y, z, facing, lightLevel, color, buffer);
@@ -339,7 +359,9 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                                 int block = lightingProvider.get(LightType.BLOCK).getLightLevel(this.mutablePos);
                                 int sky = lightingProvider.get(LightType.SKY).getLightLevel(this.mutablePos);
 
-                                this.lightInfos.add(new LightLevelInfo(new BlockPos(x, y, z), block, sky));
+                                BlockState blockState = chunk.getBlockState(this.mutablePos);
+
+                                this.lightInfos.add(new LightLevelInfo(new BlockPos(x, y, z), blockState, block, sky));
 
                                 //y += 2; // if the spot is spawnable, that means the next spawnable spot can be the third block up
                             }
@@ -362,11 +384,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         this.mutablePos.set(x, y - 1, z);
         BlockState state = chunk.getBlockState(this.mutablePos);
 
-        if (state.allowsSpawning(world, this.mutablePos, EntityType.SKELETON) == false)
-        {
-            return false;
-        }
-        else
+        if (state.allowsSpawning(world, this.mutablePos, EntityType.SKELETON))
         {
             Block block = state.getBlock();
             boolean spawnable = block != Blocks.BEDROCK && block != Blocks.BARRIER;
@@ -383,22 +401,23 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                     return SpawnHelper.isClearForSpawn(world, this.mutablePos, state, state.getFluidState());
                 }
             }
-
-            return false;
         }
+        return false;
     }
 
     public static class LightLevelInfo
     {
         public final BlockPos pos;
-        public final int block;
-        public final int sky;
+        public final BlockState blockState;
+        public final int blockLightLevel;
+        public final int skyLightLevel;
 
-        public LightLevelInfo(BlockPos pos, int block, int sky)
+        public LightLevelInfo(BlockPos pos, BlockState blockState, int blockLightLevel, int skyLightLevel)
         {
             this.pos = pos;
-            this.block = block;
-            this.sky = sky;
+            this.blockState = blockState;
+            this.blockLightLevel = blockLightLevel;
+            this.skyLightLevel = skyLightLevel;
         }
     }
 
