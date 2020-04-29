@@ -10,7 +10,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.gson.JsonObject;
-import net.minecraft.class_5250;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -562,7 +561,7 @@ public class DataStorage
 
     public void handleCarpetServerTPSData(Text textComponent)
     {
-        if (((class_5250)textComponent).asString().isEmpty() == false)
+        if (textComponent.getString().isEmpty() == false)
         {
             String text = Formatting.strip(textComponent.getString());
             String[] lines = text.split("\n");
