@@ -207,7 +207,7 @@ public class RenderEventHandler
         this.renderStackAt(stack, x, y, selected);
 
         double scale = 0.75;
-        x = x - (int) (font.getStringWidth(indexStr) * scale) - 2;
+        x = x - (int) (font.getWidth(indexStr) * scale) - 2;
         y = row * this.entryHeight + this.entryHeight / 2 - font.fontHeight / 2;
 
         RenderSystem.pushMatrix();
