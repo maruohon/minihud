@@ -166,7 +166,7 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
 
     public static void unsubscribeAll()
     {
-        unsubscribe(NODE_TYPES.keySet());
+        unsubscribe(SUBSCRIPTIONS);
         SUBSCRIPTIONS.clear();
     }
 
