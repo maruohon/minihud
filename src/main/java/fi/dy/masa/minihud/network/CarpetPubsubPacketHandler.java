@@ -23,6 +23,7 @@ import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.IClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.IPluginChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
+import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -206,6 +207,12 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
 
             if (nodeCount > 0)
             {
+                if (Configs.Generic.DEBUG_MESSAGES.getBooleanValue())
+                {
+                    String action = updateType == PACKET_C2S_SUBSCRIBE ? "sub" : "unsub";
+                    LiteModMiniHud.logger.info("Action: '{}', nodes: '{}'", action, actionableNodes);
+                }
+
                 PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
                 buf.writeVarInt(updateType);
                 buf.writeVarInt(nodeCount);
