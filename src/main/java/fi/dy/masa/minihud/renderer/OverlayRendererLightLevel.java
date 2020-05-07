@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.tag.FluidTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -364,28 +363,32 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     private boolean canSpawnAt(int x, int y, int z, Chunk chunk, World world)
     {
         this.mutablePos.set(x, y - 1, z);
-        BlockState state = chunk.getBlockState(this.mutablePos);
+        BlockState stateDown = chunk.getBlockState(this.mutablePos);
 
-        if (state.allowsSpawning(world, this.mutablePos, EntityType.SKELETON) == false)
+        if (stateDown.allowsSpawning(world, this.mutablePos, EntityType.CREEPER) == false)
         {
             return false;
         }
         else
         {
-            Block block = state.getBlock();
-            boolean spawnable = block != Blocks.BEDROCK && block != Blocks.BARRIER;
+            this.mutablePos.set(x, y, z);
+            BlockState state = chunk.getBlockState(this.mutablePos);
 
-            if (spawnable)
+            if (SpawnHelper.isClearForSpawn(world, this.mutablePos, state, state.getFluidState()))
             {
-                this.mutablePos.set(x, y , z);
-                state = chunk.getBlockState(this.mutablePos);
+                this.mutablePos.set(x, y + 1, z);
+                BlockState stateUp1 = chunk.getBlockState(this.mutablePos);
 
-                if (SpawnHelper.isClearForSpawn(world, this.mutablePos, state, state.getFluidState()))
-                {
-                    this.mutablePos.set(x, y + 1, z);
-                    state = chunk.getBlockState(this.mutablePos);
-                    return SpawnHelper.isClearForSpawn(world, this.mutablePos, state, state.getFluidState());
-                }
+                return SpawnHelper.isClearForSpawn(world, this.mutablePos, stateUp1, state.getFluidState());
+            }
+
+            if (state.getFluidState().matches(FluidTags.WATER))
+            {
+                this.mutablePos.set(x, y + 1, z);
+                BlockState stateUp1 = chunk.getBlockState(this.mutablePos);
+
+                return stateUp1.getFluidState().matches(FluidTags.WATER) &&
+                       chunk.getBlockState(this.mutablePos.set(x, y + 2, z)).isSimpleFullBlock(world, this.mutablePos) == false;
             }
 
             return false;
