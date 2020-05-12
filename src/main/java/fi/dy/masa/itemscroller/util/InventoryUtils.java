@@ -540,6 +540,24 @@ public class InventoryUtils
         }
     }
 
+    public static void dropAllMatchingStacks(HandledScreen<? extends ScreenHandler> gui, ItemStack stackReference)
+    {
+        if (isStackEmpty(stackReference) == false)
+        {
+            ScreenHandler container = gui.getScreenHandler();
+            stackReference = stackReference.copy();
+
+            for (Slot slot : container.slots)
+            {
+                if (areStacksEqual(slot.getStack(), stackReference))
+                {
+                    // Drop the stack
+                    dropStack(gui, slot.id);
+                }
+            }
+        }
+    }
+
     public static boolean shiftDropItems(HandledScreen<? extends ScreenHandler> gui)
     {
         ItemStack stackReference = MinecraftClient.getInstance().player.inventory.getCursorStack();
@@ -1162,7 +1180,7 @@ public class InventoryUtils
                 // Failed to clear the slot
                 if (slotTmp.hasStack())
                 {
-                    return false;
+                    dropStack(gui, slotNum);
                 }
             }
         }
@@ -1419,6 +1437,30 @@ public class InventoryUtils
         if (slot != null && isStackEmpty(recipe.getResult()) == false)
         {
             dropStacks(gui, recipe.getResult(), slot, false);
+        }
+    }
+
+    public static void throwAllNonRecipeItemsToGround(RecipePattern recipe, HandledScreen<? extends ScreenHandler> gui)
+    {
+        Slot outputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
+
+        if (outputSlot != null && isStackEmpty(recipe.getResult()) == false)
+        {
+            SlotRange range = CraftingHandler.getCraftingGridSlots(gui, outputSlot);
+            ItemStack[] recipeItems = recipe.getRecipeItems();
+            final int invSlots = gui.getScreenHandler().slots.size();
+            final int rangeSlots = Math.min(range.getSlotCount(), recipeItems.length);
+
+            for (int i = 0, slotNum = range.getFirst(); i < rangeSlots && slotNum < invSlots; i++, slotNum++)
+            {
+                Slot slotTmp = gui.getScreenHandler().getSlot(slotNum);
+                ItemStack stack = slotTmp.getStack();
+
+                if (stack.isEmpty() == false && areStacksEqual(stack, recipeItems[i]) == false)
+                {
+                    dropAllMatchingStacks(gui, stack);
+                }
+            }
         }
     }
 

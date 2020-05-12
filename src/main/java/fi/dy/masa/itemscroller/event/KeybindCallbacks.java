@@ -200,8 +200,9 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
                         InventoryUtils.dropStacksWhileHasItem(gui, outputSlot.id, recipe.getResult());
                     }
 
-                    InventoryUtils.tryClearCursor(gui, mc);
+                    //InventoryUtils.tryClearCursor(gui, mc);
                     InventoryUtils.throwAllCraftingResultsToGround(recipe, gui);
+                    InventoryUtils.throwAllNonRecipeItemsToGround(recipe, gui);
                     InventoryUtils.tryMoveItemsToFirstCraftingGrid(recipe, gui, true);
                 }
             }
