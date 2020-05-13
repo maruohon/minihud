@@ -1,11 +1,12 @@
 package fi.dy.masa.itemscroller.event;
 
 import javax.annotation.Nullable;
-import fi.dy.masa.itemscroller.config.Configs;
-import fi.dy.masa.itemscroller.recipes.RecipeStorage;
-import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
+import fi.dy.masa.itemscroller.config.Configs;
+import fi.dy.masa.itemscroller.recipes.RecipeStorage;
+import fi.dy.masa.itemscroller.util.ClickPacketBuffer;
+import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 
 public class WorldLoadListener implements IWorldLoadListener
 {
@@ -26,6 +27,12 @@ public class WorldLoadListener implements IWorldLoadListener
         if (worldBefore == null && worldAfter != null)
         {
             this.readStoredData();
+        }
+
+        // Logging out
+        if (worldAfter == null)
+        {
+            ClickPacketBuffer.reset();
         }
     }
 

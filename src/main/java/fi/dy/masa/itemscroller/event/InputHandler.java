@@ -11,6 +11,7 @@ import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Hotkeys;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
+import fi.dy.masa.itemscroller.util.ClickPacketBuffer;
 import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.itemscroller.util.MoveAction;
@@ -102,6 +103,20 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     }
 
     private boolean handleInput(int keyCode, boolean keyState, double dWheel)
+    {
+        if (Configs.Generic.RATE_LIMIT_CLICK_PACKETS.getBooleanValue())
+        {
+            ClickPacketBuffer.setShouldBufferClickPackets(true);
+        }
+
+        boolean cancel = this.handleInputImpl(keyCode, keyState, dWheel);
+
+        ClickPacketBuffer.setShouldBufferClickPackets(false);
+
+        return cancel;
+    }
+
+    private boolean handleInputImpl(int keyCode, boolean keyState, double dWheel)
     {
         MoveAction action = InventoryUtils.getActiveMoveAction();
 
@@ -213,17 +228,25 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
     private boolean handleDragging(HandledScreen<?> gui, MinecraftClient mc, int mouseX, int mouseY, boolean isClick)
     {
+        boolean cancel = false;
         MoveAction action = InventoryUtils.getActiveMoveAction();
+
+        if (Configs.Generic.RATE_LIMIT_CLICK_PACKETS.getBooleanValue())
+        {
+            ClickPacketBuffer.setShouldBufferClickPackets(true);
+        }
 
         if (InputUtils.isActionKeyActive(action))
         {
-            return InventoryUtils.dragMoveItems(gui, mc, action, mouseX, mouseY, false);
+            cancel = InventoryUtils.dragMoveItems(gui, mc, action, mouseX, mouseY, false);
         }
         else if (action != MoveAction.NONE)
         {
             InventoryUtils.stopDragging();
         }
 
-        return false;
+        ClickPacketBuffer.setShouldBufferClickPackets(false);
+
+        return cancel;
     }
 }
