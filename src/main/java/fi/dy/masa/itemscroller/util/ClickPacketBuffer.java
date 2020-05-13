@@ -16,6 +16,11 @@ public class ClickPacketBuffer
         BUFFER.clear();
     }
 
+    public static int getBufferedActionsCount()
+    {
+        return BUFFER.size();
+    }
+
     public static boolean shouldBufferClickPackets()
     {
         return shouldBufferPackets;

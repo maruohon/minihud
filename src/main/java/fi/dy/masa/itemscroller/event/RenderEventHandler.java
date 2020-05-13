@@ -16,6 +16,7 @@ import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.recipes.RecipePattern;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
 import fi.dy.masa.itemscroller.util.AccessorUtils;
+import fi.dy.masa.itemscroller.util.ClickPacketBuffer;
 import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.malilib.render.InventoryOverlay;
@@ -91,11 +92,24 @@ public class RenderEventHandler
         }
     }
 
-    public void onDrawScreenPost()
+    public void onDrawScreenPost(MinecraftClient mc)
     {
-        if (GuiUtils.getCurrentScreen() instanceof HandledScreen && InputUtils.isRecipeViewOpen())
+        if (GuiUtils.getCurrentScreen() instanceof HandledScreen)
         {
             HandledScreen<?> gui = (HandledScreen<?>) this.mc.currentScreen;
+
+            int bufferedCount = ClickPacketBuffer.getBufferedActionsCount();
+
+            if (bufferedCount > 0)
+            {
+                mc.textRenderer.draw(FRESH_MATRIX_STACK, "Buffered slot clicks: " + bufferedCount, 10, 10, 0xFFD0D0D0);
+            }
+
+            if (InputUtils.isRecipeViewOpen() == false)
+            {
+                return;
+            }
+
             RecipeStorage recipes = RecipeStorage.getInstance();
 
             final int mouseX = fi.dy.masa.malilib.util.InputUtils.getMouseX();
