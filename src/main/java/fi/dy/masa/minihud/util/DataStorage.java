@@ -145,7 +145,7 @@ public class DataStorage
         if (this.worldSeedValid == false && this.mc.isIntegratedServerRunning())
         {
             MinecraftServer server = this.mc.getServer();
-            World worldTmp = server.getWorld(dimension);
+            ServerWorld worldTmp = server.getWorld(dimension);
 
             if (worldTmp != null)
             {

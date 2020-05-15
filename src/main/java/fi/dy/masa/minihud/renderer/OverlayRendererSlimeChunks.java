@@ -34,8 +34,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     public boolean shouldRender(MinecraftClient mc)
     {
         return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() &&
-                DataStorage.getInstance().isWorldSeedKnown(mc.world.dimension.getType()) &&
-                mc.world.dimension.hasVisibleSky();
+                DataStorage.getInstance().isWorldSeedKnown(mc.world.method_27983()) &&
+                mc.world.getDimension().hasVisibleSky();
     }
 
     @Override

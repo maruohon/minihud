@@ -444,7 +444,7 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.DIMENSION.getBooleanValue())
             {
-                int dimension = world.dimension.getType().getRawId();
+                int dimension = world.method_27983().getRawId();
                 str.append(String.format(String.format("%sDimType ID: %d", pre, dimension)));
             }
 
@@ -726,7 +726,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.SLIME_CHUNK)
         {
-            if (world.dimension.hasVisibleSky() == false)
+            if (world.getDimension().hasVisibleSky() == false)
             {
                 return;
             }
@@ -878,7 +878,7 @@ public class RenderHandler implements IRenderer
 
         if (server != null)
         {
-            ServerWorld world = server.getWorld(this.mc.world.dimension.getType());
+            ServerWorld world = server.getWorld(this.mc.world.method_27983());
 
             if (world != null)
             {

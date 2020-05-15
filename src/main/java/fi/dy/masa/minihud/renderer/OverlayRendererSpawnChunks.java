@@ -35,7 +35,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     {
         return this.toggle.getBooleanValue() &&
                 (this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ||
-                 (mc.world != null && mc.world.dimension instanceof OverworldDimension &&
+                 (mc.world != null && mc.world.getDimension() instanceof OverworldDimension &&
                   DataStorage.getInstance().isWorldSpawnKnown()));
     }
 
