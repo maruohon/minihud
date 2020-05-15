@@ -155,7 +155,7 @@ public class DebugInfoUtils
         if (pathfindingEnabled && mc.world != null && ++tickCounter >= 10)
         {
             tickCounter = 0;
-            ServerWorld world = server.getWorld(mc.world.dimension.getType());
+            ServerWorld world = server.getWorld(mc.world.method_27983());
 
             if (world != null)
             {

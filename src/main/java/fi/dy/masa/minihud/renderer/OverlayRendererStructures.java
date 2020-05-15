@@ -36,7 +36,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
             return false;
         }
 
-        if (mc.world.dimension instanceof OverworldDimension)
+        if (mc.world.getDimension() instanceof OverworldDimension)
         {
             for (StructureType type : StructureType.values())
             {
@@ -48,7 +48,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
             return false;
         }
-        else if (mc.world.dimension.isNether())
+        else if (mc.world.method_27983().method_27998())
         {
             return StructureType.NETHER_FORTRESS.isEnabled();
         }
@@ -77,7 +77,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
 
-        this.updateStructures(mc.world.dimension.getType(), this.lastUpdatePos, cameraPos, mc);
+        this.updateStructures(mc.world.method_27983(), this.lastUpdatePos, cameraPos, mc);
 
         BUFFER_1.end();
         BUFFER_2.end();

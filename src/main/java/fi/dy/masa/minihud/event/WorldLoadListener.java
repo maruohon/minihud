@@ -44,7 +44,7 @@ public class WorldLoadListener implements IWorldLoadListener
 
                 if (this.hasCachedSeed)
                 {
-                    this.cachedSeed = DataStorage.getInstance().getWorldSeed(worldAfter.dimension.getType());
+                    this.cachedSeed = DataStorage.getInstance().getWorldSeed(worldAfter.method_27983());
                 }
             }
         }

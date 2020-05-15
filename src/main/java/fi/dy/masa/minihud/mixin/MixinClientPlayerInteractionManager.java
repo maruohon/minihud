@@ -15,7 +15,7 @@ public abstract class MixinClientPlayerInteractionManager
 
     @Inject(method = "breakBlock", at = @At(value = "INVOKE",
                 target = "Lnet/minecraft/block/Block;onBroken(" +
-                         "Lnet/minecraft/world/IWorld;" +
+                         "Lnet/minecraft/world/WorldAccess;" +
                          "Lnet/minecraft/util/math/BlockPos;" +
                          "Lnet/minecraft/block/BlockState;)V"))
     private void countBlockBreakingSpeed(net.minecraft.util.math.BlockPos pos, CallbackInfoReturnable<Boolean> cir)
