@@ -352,10 +352,6 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
 
     /**
      * This method mimics the one from WorldEntitySpawner, but takes in the Chunk to avoid that lookup
-     * @param spawnPlacementTypeIn
-     * @param worldIn
-     * @param pos
-     * @return
      */
     private boolean canSpawnAt(int x, int y, int z, Chunk chunk, World world)
     {
@@ -371,12 +367,12 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             this.mutablePos.set(x, y, z);
             BlockState state = chunk.getBlockState(this.mutablePos);
 
-            if (SpawnHelper.isClearForSpawn(world, this.mutablePos, state, state.getFluidState()))
+            if (SpawnHelper.isClearForSpawn(world, this.mutablePos, state, state.getFluidState(), EntityType.WITHER_SKELETON))
             {
                 this.mutablePos.set(x, y + 1, z);
                 BlockState stateUp1 = chunk.getBlockState(this.mutablePos);
 
-                return SpawnHelper.isClearForSpawn(world, this.mutablePos, stateUp1, state.getFluidState());
+                return SpawnHelper.isClearForSpawn(world, this.mutablePos, stateUp1, state.getFluidState(), EntityType.WITHER_SKELETON);
             }
 
             if (state.getFluidState().matches(FluidTags.WATER))

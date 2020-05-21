@@ -7,7 +7,6 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.dimension.OverworldDimension;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.minihud.config.Configs;
@@ -35,7 +34,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     {
         return this.toggle.getBooleanValue() &&
                 (this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ||
-                 (mc.world != null && mc.world.getDimension() instanceof OverworldDimension &&
+                 (mc.world != null && mc.world.getDimension().isOverworld() && // FIXME
                   DataStorage.getInstance().isWorldSpawnKnown()));
     }
 
