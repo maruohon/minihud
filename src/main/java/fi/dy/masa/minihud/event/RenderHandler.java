@@ -36,6 +36,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.LightType;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
@@ -282,7 +283,9 @@ public class RenderHandler implements IRenderer
         MinecraftClient mc = this.mc;
         Entity entity = mc.getCameraEntity();
         World world = entity.getEntityWorld();
-        BlockPos pos = new BlockPos(entity.getX(), entity.getBoundingBox().y1, entity.getZ());
+        RegistryKey<DimensionType> dimId = world.method_27983();
+        double y = entity.getBoundingBox().minY;
+        BlockPos pos = new BlockPos(entity.getX(), y, entity.getZ());
         ChunkPos chunkPos = new ChunkPos(pos);
 
         if (type == InfoToggle.FPS)
@@ -425,7 +428,7 @@ public class RenderHandler implements IRenderer
                     try
                     {
                         str.append(String.format(Configs.Generic.COORDINATE_FORMAT_STRING.getStringValue(),
-                            entity.getX(), entity.getBoundingBox().y1, entity.getZ()));
+                            entity.getX(), y, entity.getZ()));
                     }
                     // Uh oh, someone done goofed their format string... :P
                     catch (Exception e)
@@ -436,7 +439,7 @@ public class RenderHandler implements IRenderer
                 else
                 {
                     str.append(String.format("XYZ: %.2f / %.4f / %.2f",
-                        entity.getX(), entity.getBoundingBox().y1, entity.getZ()));
+                        entity.getX(), y, entity.getZ()));
                 }
 
                 pre = " / ";
@@ -444,8 +447,8 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.DIMENSION.getBooleanValue())
             {
-                int dimension = world.method_27983().getRawId();
-                str.append(String.format(String.format("%sDimType ID: %d", pre, dimension)));
+                String dimName = dimId.getValueId().toString();
+                str.append(String.format(String.format("%sdim: %s", pre, dimName)));
             }
 
             this.addLine(str.toString());
@@ -726,17 +729,16 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.SLIME_CHUNK)
         {
-            if (world.getDimension().hasVisibleSky() == false)
+            if (world.getDimension().isOverworld() == false)
             {
                 return;
             }
 
             String result;
-            DimensionType dimension = entity.dimension;
 
-            if (this.data.isWorldSeedKnown(dimension))
+            if (this.data.isWorldSeedKnown(dimId))
             {
-                long seed = this.data.getWorldSeed(dimension);
+                long seed = this.data.getWorldSeed(dimId);
 
                 if (MiscUtils.canSlimeSpawnAt(pos.getX(), pos.getZ(), seed))
                 {

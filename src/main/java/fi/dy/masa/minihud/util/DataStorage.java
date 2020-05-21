@@ -25,6 +25,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -40,7 +41,6 @@ import fi.dy.masa.minihud.network.StructurePacketHandler;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
-import fi.dy.masa.minihud.util.StructureTypes.StructureType;
 
 public class DataStorage
 {
@@ -124,7 +124,7 @@ public class DataStorage
         }
     }
 
-    public boolean isWorldSeedKnown(DimensionType dimension)
+    public boolean isWorldSeedKnown(RegistryKey<DimensionType> dimension)
     {
         if (this.worldSeedValid)
         {
@@ -140,7 +140,7 @@ public class DataStorage
         return false;
     }
 
-    public long getWorldSeed(DimensionType dimension)
+    public long getWorldSeed(RegistryKey<DimensionType> dimension)
     {
         if (this.worldSeedValid == false && this.mc.isIntegratedServerRunning())
         {
@@ -430,8 +430,8 @@ public class DataStorage
 
     private void updateStructureDataFromIntegratedServer(final BlockPos playerPos)
     {
-        final DimensionType dimension = this.mc.player.dimension;
-        final ServerWorld world = this.mc.getServer().getWorld(dimension);
+        final RegistryKey<DimensionType> dimId = this.mc.player.getEntityWorld().method_27983();
+        final ServerWorld world = this.mc.getServer().getWorld(dimId);
 
         if (world != null)
         {
@@ -442,7 +442,7 @@ public class DataStorage
             {
                 synchronized (this.structures)
                 {
-                    this.addStructureDataFromGenerator(world, dimension, playerPos, maxChunkRange);
+                    this.addStructureDataFromGenerator(world, dimId, playerPos, maxChunkRange);
                 }
             }));
         }
@@ -507,7 +507,7 @@ public class DataStorage
         }
     }
 
-    private void addStructureDataFromGenerator(ServerWorld world, DimensionType dimensionType, BlockPos playerPos, int maxChunkRange)
+    private void addStructureDataFromGenerator(ServerWorld world, RegistryKey<DimensionType> dimId, BlockPos playerPos, int maxChunkRange)
     {
         this.structures.clear();
 
@@ -515,7 +515,7 @@ public class DataStorage
 
         for (StructureType type : StructureType.values())
         {
-            if (type.isEnabled() && type.existsInDimension(dimensionType))
+            if (type.isEnabled() && type.existsInDimension(dimId))
             {
                 enabledTypes.add(type);
             }

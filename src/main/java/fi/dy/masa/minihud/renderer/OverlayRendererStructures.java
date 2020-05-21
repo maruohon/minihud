@@ -9,15 +9,15 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.dimension.OverworldDimension;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 import fi.dy.masa.minihud.util.StructureData;
-import fi.dy.masa.minihud.util.StructureTypes.StructureType;
+import fi.dy.masa.minihud.util.StructureType;
 
 public class OverlayRendererStructures extends OverlayRendererBase
 {
@@ -29,11 +29,11 @@ public class OverlayRendererStructures extends OverlayRendererBase
             return false;
         }
 
-        if (mc.world.getDimension() instanceof OverworldDimension)
+        if (mc.world.getDimension().isOverworld())
         {
-            for (StructureType type : StructureType.values())
+            for (StructureType type : StructureType.VALUES)
             {
-                if (type.isEnabled() && type.existsInDimension(DimensionType.OVERWORLD))
+                if (type.isEnabled() && type.existsInDimension(DimensionType.OVERWORLD_REGISTRY_KEY))
                 {
                     return true;
                 }
@@ -41,9 +41,17 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
             return false;
         }
-        else if (mc.world.method_27983().method_27998())
+        else if (mc.world.getDimension().isNether())
         {
-            return StructureType.NETHER_FORTRESS.isEnabled();
+            for (StructureType type : StructureType.VALUES)
+            {
+                if (type.isEnabled() && type.existsInDimension(DimensionType.THE_NETHER_REGISTRY_KEY))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         else
         {
@@ -86,14 +94,14 @@ public class OverlayRendererStructures extends OverlayRendererBase
         this.allocateBuffer(GL11.GL_LINES);
     }
 
-    private void updateStructures(DimensionType dimensionType, BlockPos playerPos, Vec3d cameraPos, MinecraftClient mc)
+    private void updateStructures(RegistryKey<DimensionType> dimId, BlockPos playerPos, Vec3d cameraPos, MinecraftClient mc)
     {
         ArrayListMultimap<StructureType, StructureData> structures = DataStorage.getInstance().getCopyOfStructureData();
         int maxRange = (mc.options.viewDistance + 4) * 16;
 
-        for (StructureType type : StructureType.values())
+        for (StructureType type : StructureType.VALUES)
         {
-            if (type.isEnabled() && type.existsInDimension(dimensionType))
+            if (type.isEnabled() && type.existsInDimension(dimId))
             {
                 Collection<StructureData> structureData = structures.get(type);
 

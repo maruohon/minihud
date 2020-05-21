@@ -1,15 +1,14 @@
 package fi.dy.masa.minihud.util;
 
-import java.util.List;
 import javax.annotation.Nullable;
+import java.util.List;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.minihud.util.StructureTypes.StructureType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.structure.StructurePiece;
 import net.minecraft.structure.StructureStart;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 
 public class StructureData
 {
@@ -83,7 +82,7 @@ public class StructureData
         if (tag.contains("BB", Constants.NBT.TAG_INT_ARRAY) &&
             tag.contains("Children", Constants.NBT.TAG_LIST))
         {
-            StructureType type = StructureTypes.byStructureId(tag.getString("id"));
+            StructureType type = StructureType.byStructureId(tag.getString("id"));
 
             ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
             ListTag pieces = tag.getList("Children", Constants.NBT.TAG_COMPOUND);

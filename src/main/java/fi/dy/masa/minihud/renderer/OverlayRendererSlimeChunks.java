@@ -9,6 +9,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.Configs;
@@ -33,9 +35,9 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     @Override
     public boolean shouldRender(MinecraftClient mc)
     {
-        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() &&
+        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() && mc.world != null &&
                 DataStorage.getInstance().isWorldSeedKnown(mc.world.method_27983()) &&
-                mc.world.getDimension().hasVisibleSky();
+                mc.world.getDimension().isOverworld(); // FIXME
     }
 
     @Override
@@ -46,8 +48,9 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
             return true;
         }
 
-        boolean isSeedKnown = DataStorage.getInstance().isWorldSeedKnown(entity.dimension);
-        long seed = DataStorage.getInstance().getWorldSeed(entity.dimension);
+        RegistryKey<DimensionType> dimId = entity.getEntityWorld().method_27983();
+        boolean isSeedKnown = DataStorage.getInstance().isWorldSeedKnown(dimId);
+        long seed = DataStorage.getInstance().getWorldSeed(dimId);
 
         if (this.topY != overlayTopY || this.wasSeedKnown != isSeedKnown || this.seed != seed)
         {
@@ -66,14 +69,15 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
         DataStorage data = DataStorage.getInstance();
+        RegistryKey<DimensionType> dimId = entity.getEntityWorld().method_27983();
         this.topY = overlayTopY;
-        this.wasSeedKnown = data.isWorldSeedKnown(entity.dimension);
-        this.seed = data.getWorldSeed(entity.dimension);
+        this.wasSeedKnown = data.isWorldSeedKnown(dimId);
+        this.seed = data.getWorldSeed(dimId);
 
         if (this.wasSeedKnown)
         {
-            final int centerX = ((int) MathHelper.floor(entity.getX())) >> 4;
-            final int centerZ = ((int) MathHelper.floor(entity.getZ())) >> 4;
+            final int centerX = MathHelper.floor(entity.getX()) >> 4;
+            final int centerZ = MathHelper.floor(entity.getZ()) >> 4;
             final Color4f colorSides = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
             final Color4f colorLines = Color4f.fromColor(colorSides, 1.0F);
             BlockPos.Mutable pos1 = new BlockPos.Mutable();
