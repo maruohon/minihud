@@ -36,7 +36,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.LightType;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
@@ -44,7 +43,6 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
-import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
@@ -279,7 +277,6 @@ public class RenderHandler implements IRenderer
         MinecraftClient mc = this.mc;
         Entity entity = mc.getCameraEntity();
         World world = entity.getEntityWorld();
-        RegistryKey<DimensionType> dimId = world.method_27983();
         double y = entity.getBoundingBox().minY;
         BlockPos pos = new BlockPos(entity.getX(), y, entity.getZ());
         ChunkPos chunkPos = new ChunkPos(pos);
@@ -444,7 +441,7 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.DIMENSION.getBooleanValue())
             {
-                String dimName = dimId.getValueId().toString();
+                String dimName = world.method_29287().getValue().toString();
                 str.append(String.format(String.format("%sdim: %s", pre, dimName)));
             }
 
@@ -718,7 +715,7 @@ public class RenderHandler implements IRenderer
             {
                 World serverWorld = WorldUtils.getBestWorld(mc);
 
-                if (serverWorld != null && serverWorld instanceof ServerWorld)
+                if (serverWorld instanceof ServerWorld)
                 {
                     int countServer = ((IMixinServerWorld) serverWorld).getEntityList().size();
                     this.addLine(String.format("Entities - Client: %d, Server: %d", countClient, countServer));
@@ -737,9 +734,9 @@ public class RenderHandler implements IRenderer
 
             String result;
 
-            if (this.data.isWorldSeedKnown(dimId))
+            if (this.data.isWorldSeedKnown(world))
             {
-                long seed = this.data.getWorldSeed(dimId);
+                long seed = this.data.getWorldSeed(world);
 
                 if (MiscUtils.canSlimeSpawnAt(pos.getX(), pos.getZ(), seed))
                 {

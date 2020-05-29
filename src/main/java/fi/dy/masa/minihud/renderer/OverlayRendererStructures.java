@@ -85,7 +85,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
 
-        this.updateStructures(mc.world.method_27983(), this.lastUpdatePos, cameraPos, mc);
+        this.updateStructures(mc.world.method_29287(), this.lastUpdatePos, cameraPos, mc);
 
         BUFFER_1.end();
         BUFFER_2.end();

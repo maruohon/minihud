@@ -45,11 +45,9 @@ public enum StructureType
 
         for (StructureType type : VALUES)
         {
-            StructureFeature<?> feature = StructureFeature.field_24842.get(type.structureName.toLowerCase(Locale.ROOT));
-
-            if (feature != null)
+            if (type.feature != null)
             {
-                Identifier key = Registry.STRUCTURE_FEATURE.getId(feature);
+                Identifier key = Registry.STRUCTURE_FEATURE.getId(type.feature);
 
                 if (key != null)
                 {
@@ -67,12 +65,14 @@ public enum StructureType
 
     private final StructureToggle toggle;
     private final String structureName;
+    private final StructureFeature<?> feature;
     private final ImmutableSet<RegistryKey<DimensionType>> dimIds;
 
     StructureType(StructureToggle toggle, String structureName, RegistryKey<DimensionType>... dimIds)
     {
-        this.structureName = structureName;
         this.toggle = toggle;
+        this.structureName = structureName;
+        this.feature = StructureFeature.STRUCTURES.get(structureName.toLowerCase(Locale.ROOT));
         this.dimIds = ImmutableSet.copyOf(dimIds);
     }
 
@@ -84,6 +84,11 @@ public enum StructureType
     public String getStructureName()
     {
         return this.structureName;
+    }
+
+    public StructureFeature<?> getFeature()
+    {
+        return this.feature;
     }
 
     public StructureToggle getToggle()

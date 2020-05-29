@@ -150,7 +150,7 @@ public class DataStorage
         }
     }
 
-    public boolean isWorldSeedKnown(RegistryKey<DimensionType> dimension)
+    public boolean isWorldSeedKnown(World world)
     {
         if (this.worldSeedValid)
         {
@@ -159,7 +159,7 @@ public class DataStorage
         else if (this.mc.isIntegratedServerRunning())
         {
             MinecraftServer server = this.mc.getServer();
-            World worldTmp = server.getWorld(dimension);
+            World worldTmp = server.getWorld(world.method_27983());
             return worldTmp != null;
         }
 
@@ -171,12 +171,12 @@ public class DataStorage
         return this.worldSeedValid;
     }
 
-    public long getWorldSeed(RegistryKey<DimensionType> dimension)
+    public long getWorldSeed(World world)
     {
         if (this.worldSeedValid == false && this.mc.isIntegratedServerRunning())
         {
             MinecraftServer server = this.mc.getServer();
-            ServerWorld worldTmp = server.getWorld(dimension);
+            ServerWorld worldTmp = server.getWorld(world.method_27983());
 
             if (worldTmp != null)
             {
@@ -500,8 +500,9 @@ public class DataStorage
 
     private void updateStructureDataFromIntegratedServer(final BlockPos playerPos)
     {
-        final RegistryKey<DimensionType> dimId = this.mc.player.getEntityWorld().method_27983();
-        final ServerWorld world = this.mc.getServer().getWorld(dimId);
+        final RegistryKey<DimensionType> dimId = this.mc.player.getEntityWorld().method_29287();
+        final RegistryKey<World> worldId = this.mc.player.getEntityWorld().method_27983();
+        final ServerWorld world = this.mc.getServer().getWorld(worldId);
 
         if (world != null)
         {
@@ -618,7 +619,7 @@ public class DataStorage
                     {
                         for (StructureType type : enabledTypes)
                         {
-                            StructureStart start = chunk.getStructureStart(type.getStructureName());
+                            StructureStart start = chunk.getStructureStart(type.getFeature());
 
                             if (start != null)
                             {
