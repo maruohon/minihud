@@ -299,7 +299,7 @@ public class RenderEventHandler
             stack = stack.copy();
             InventoryUtils.setStackSize(stack, 1);
             this.mc.getItemRenderer().zOffset += 100;
-            this.mc.getItemRenderer().renderGuiItem(stack, x, y);
+            this.mc.getItemRenderer().renderInGui(stack, x, y);
             this.mc.getItemRenderer().zOffset -= 100;
         }
 
