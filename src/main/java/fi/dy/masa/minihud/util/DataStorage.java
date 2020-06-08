@@ -159,7 +159,7 @@ public class DataStorage
         else if (this.mc.isIntegratedServerRunning())
         {
             MinecraftServer server = this.mc.getServer();
-            World worldTmp = server.getWorld(world.method_27983());
+            World worldTmp = server.getWorld(world.getRegistryKey());
             return worldTmp != null;
         }
 
@@ -176,7 +176,7 @@ public class DataStorage
         if (this.worldSeedValid == false && this.mc.isIntegratedServerRunning())
         {
             MinecraftServer server = this.mc.getServer();
-            ServerWorld worldTmp = server.getWorld(world.method_27983());
+            ServerWorld worldTmp = server.getWorld(world.getRegistryKey());
 
             if (worldTmp != null)
             {
@@ -500,8 +500,8 @@ public class DataStorage
 
     private void updateStructureDataFromIntegratedServer(final BlockPos playerPos)
     {
-        final RegistryKey<DimensionType> dimId = this.mc.player.getEntityWorld().method_29287();
-        final RegistryKey<World> worldId = this.mc.player.getEntityWorld().method_27983();
+        final RegistryKey<DimensionType> dimId = this.mc.player.getEntityWorld().getDimensionRegistryKey();
+        final RegistryKey<World> worldId = this.mc.player.getEntityWorld().getRegistryKey();
         final ServerWorld world = this.mc.getServer().getWorld(worldId);
 
         if (world != null)

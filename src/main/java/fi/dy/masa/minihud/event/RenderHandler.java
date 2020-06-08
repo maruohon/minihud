@@ -441,7 +441,7 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.DIMENSION.getBooleanValue())
             {
-                String dimName = world.method_29287().getValue().toString();
+                String dimName = world.getRegistryKey().getValue().toString();
                 str.append(String.format(String.format("%sdim: %s", pre, dimName)));
             }
 
@@ -764,7 +764,7 @@ public class RenderHandler implements IRenderer
                 {
                     LivingEntity living = (LivingEntity) lookedEntity;
                     this.addLine(String.format("Entity: %s - HP: %.1f / %.1f",
-                            living.getName().getString(), living.getHealth(), living.getMaximumHealth()));
+                            living.getName().getString(), living.getHealth(), living.getMaxHealth()));
                 }
                 else
                 {
@@ -878,7 +878,7 @@ public class RenderHandler implements IRenderer
 
         if (server != null)
         {
-            ServerWorld world = server.getWorld(this.mc.world.method_27983());
+            ServerWorld world = server.getWorld(this.mc.world.getRegistryKey());
 
             if (world != null)
             {
