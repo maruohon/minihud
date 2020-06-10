@@ -727,7 +727,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.SLIME_CHUNK)
         {
-            if (world.getDimension().isOverworld() == false)
+            if (MiscUtils.isOverworld(world) == false)
             {
                 return;
             }

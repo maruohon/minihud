@@ -10,6 +10,8 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 
@@ -50,6 +52,11 @@ public class MiscUtils
         RAND.setSeed(rngSeed);
 
         return RAND.nextInt(10) == 0;
+    }
+
+    public static boolean isOverworld(World world)
+    {
+        return world.getDimension() == DimensionType.getOverworldDimensionType();
     }
 
     public static boolean isStructureWithinRange(@Nullable BlockBox bb, BlockPos playerPos, int maxRange)

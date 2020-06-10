@@ -36,7 +36,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     {
         return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() && mc.world != null &&
                 DataStorage.getInstance().isWorldSeedKnown(mc.world) &&
-                mc.world.getDimension().isOverworld(); // FIXME
+                MiscUtils.isOverworld(mc.world);
     }
 
     @Override

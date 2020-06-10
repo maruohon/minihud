@@ -10,6 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.IntBoundingBox;
@@ -22,10 +23,12 @@ import fi.dy.masa.minihud.util.StructureType;
 public class OverlayRendererStructures extends OverlayRendererBase
 {
     public static OverlayRendererStructures instance;
+    private final DimensionType nether;
 
     public OverlayRendererStructures()
     {
         instance = this;
+        this.nether = RegistryTracker.create().getDimensionTypeRegistry().get(DimensionType.THE_NETHER_REGISTRY_KEY);
     }
 
     @Override
@@ -36,7 +39,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
             return false;
         }
 
-        if (mc.world.getDimension().isOverworld())
+        if (MiscUtils.isOverworld(mc.world))
         {
             for (StructureType type : StructureType.VALUES)
             {
@@ -48,7 +51,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
             return false;
         }
-        else if (mc.world.getDimension().isNether())
+        else if (mc.world.getDimension() == this.nether)
         {
             for (StructureType type : StructureType.VALUES)
             {
