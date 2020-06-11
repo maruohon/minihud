@@ -152,6 +152,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
         return lines;
     }
 
+    @Override
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
@@ -166,6 +167,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
         return obj;
     }
 
+    @Override
     public void fromJson(JsonObject obj)
     {
         this.enabled = JsonUtils.getBoolean(obj, "enabled");

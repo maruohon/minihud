@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.RenderObjectBase;
+import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -53,7 +54,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
         {
@@ -65,11 +66,9 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
             newPos = null;
         }
 
-        this.setPosition(new BlockPos(this.pos));
-
-        final int color = this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER ?
-                Configs.Colors.RANDOM_TICKS_PLAYER_OVERLAY_COLOR.getIntegerValue() :
-                Configs.Colors.RANDOM_TICKS_FIXED_OVERLAY_COLOR.getIntegerValue();
+        final Color4f color = this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER ?
+                Configs.Colors.RANDOM_TICKS_PLAYER_OVERLAY_COLOR.getColor() :
+                Configs.Colors.RANDOM_TICKS_FIXED_OVERLAY_COLOR.getColor();
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
@@ -80,7 +79,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 
         for (ChunkPos pos : chunks)
         {
-            this.renderChunkEdgesIfApplicable(pos, chunks, entity, color);
+            this.renderChunkEdgesIfApplicable(pos, cameraPos, chunks, color);
         }
 
         BUFFER_1.finishDrawing();
@@ -115,7 +114,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
         return set;
     }
 
-    protected void renderChunkEdgesIfApplicable(ChunkPos pos, Set<ChunkPos> chunks, Entity entity, int color)
+    protected void renderChunkEdgesIfApplicable(ChunkPos pos, Vec3d cameraPos, Set<ChunkPos> chunks,Color4f color)
     {
         for (EnumFacing side : HORIZONTALS)
         {
@@ -123,39 +122,46 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 
             if (chunks.contains(posTmp) == false)
             {
-                RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2,
-                        side.getAxis(), this.getStartPos(pos, side), this.getEndPos(pos, side),
-                        512, 256, 16, 16, entity, color);
+                this.renderChunkEdge(pos, side, cameraPos, color);
             }
         }
     }
 
-    protected BlockPos getStartPos(ChunkPos chunkPos, EnumFacing side)
+    private void renderChunkEdge(ChunkPos pos, EnumFacing side, Vec3d cameraPos, Color4f color)
     {
+        double minX, minZ, maxX, maxZ;
+
         switch (side)
         {
-            case NORTH:     return new BlockPos( chunkPos.x << 4      , 0,  chunkPos.z << 4      );
-            case SOUTH:     return new BlockPos( chunkPos.x << 4      , 0, (chunkPos.z << 4) + 16);
-            case WEST:      return new BlockPos( chunkPos.x << 4      , 0,  chunkPos.z << 4      );
-            case EAST:      return new BlockPos((chunkPos.x << 4) + 16, 0,  chunkPos.z << 4      );
+            case NORTH:
+                minX = (pos.x << 4);
+                minZ = (pos.z << 4);
+                maxX = (pos.x << 4) + 16.0;
+                maxZ = (pos.z << 4);
+                break;
+            case SOUTH:
+                minX = (pos.x << 4);
+                minZ = (pos.z << 4) + 16.0;
+                maxX = (pos.x << 4) + 16.0;
+                maxZ = (pos.z << 4) + 16.0;
+                break;
+            case WEST:
+                minX = (pos.x << 4);
+                minZ = (pos.z << 4);
+                maxX = (pos.x << 4);
+                maxZ = (pos.z << 4) + 16.0;
+                break;
+            case EAST:
+                minX = (pos.x << 4) + 16.0;
+                minZ = (pos.z << 4);
+                maxX = (pos.x << 4) + 16.0;
+                maxZ = (pos.z << 4) + 16.0;
+                break;
             default:
+                return;
         }
 
-        return BlockPos.ORIGIN;
-    }
-
-    protected BlockPos getEndPos(ChunkPos chunkPos, EnumFacing side)
-    {
-        switch (side)
-        {
-            case NORTH:     return new BlockPos((chunkPos.x << 4) + 16, 256,  chunkPos.z << 4      );
-            case SOUTH:     return new BlockPos((chunkPos.x << 4) + 16, 256, (chunkPos.z << 4) + 16);
-            case WEST:      return new BlockPos( chunkPos.x << 4      , 256, (chunkPos.z << 4) + 16);
-            case EAST:      return new BlockPos((chunkPos.x << 4) + 16, 256, (chunkPos.z << 4) + 16);
-            default:
-        }
-
-        return BlockPos.ORIGIN;
+        RenderUtils.renderWallWithLines(minX, 0, minZ, maxX, 256, maxZ, 16, 16, true, cameraPos, color, BUFFER_1, BUFFER_2);
     }
 
     @Override

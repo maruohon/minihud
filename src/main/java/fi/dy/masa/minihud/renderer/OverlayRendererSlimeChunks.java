@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos.PooledMutableBlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.RenderObjectBase;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -53,7 +54,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         DataStorage data = DataStorage.getInstance();
         this.topY = overlayTopY;
@@ -62,8 +63,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
 
         if (this.wasSeedKnown)
         {
-            final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
-            final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
+            final int centerX = MathHelper.floor(entity.posX) >> 4;
+            final int centerZ = MathHelper.floor(entity.posZ) >> 4;
             final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
             final Color4f colorSides = Color4f.fromColor(colorLines, colorLines.a / 6);
             PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();
@@ -92,7 +93,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
                     {
                         pos1.setPos( cx << 4,          0,  cz << 4);
                         pos2.setPos((cx << 4) + 15, topY, (cz << 4) + 15);
-                        fi.dy.masa.malilib.render.RenderUtils.drawBoxWithEdgesBatched(pos1, pos2, colorLines, colorSides, BUFFER_1, BUFFER_2);
+                        fi.dy.masa.malilib.render.RenderUtils.drawBoxWithEdgesBatched(pos1, pos2, cameraPos, colorLines, colorSides, BUFFER_1, BUFFER_2);
                     }
                 }
             }

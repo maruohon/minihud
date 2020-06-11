@@ -143,10 +143,9 @@ public abstract class ShapeCircleBase extends ShapeBase
     }
 
     @Override
-    public void draw(double x, double y, double z)
+    public void draw()
     {
-        GlStateManager.pushMatrix();
-        this.preRender(x, y, z);
+        this.preRender();
 
         this.renderObjects.get(0).draw();
 
@@ -154,10 +153,9 @@ public abstract class ShapeCircleBase extends ShapeBase
         GlStateManager.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
         GlStateManager.disableBlend();
         this.renderObjects.get(0).draw();
+
         GlStateManager.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
         GlStateManager.enableBlend();
-
-        GlStateManager.popMatrix();
     }
 
     @Override
@@ -227,7 +225,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         return lines;
     }
 
-    protected void renderPositions(HashSet<BlockPos> positions, EnumFacing[] sides, EnumFacing mainAxis, Color4f color)
+    protected void renderPositions(HashSet<BlockPos> positions, EnumFacing[] sides, EnumFacing mainAxis, Color4f color, Vec3d cameraPos)
     {
         boolean full = this.renderType == ShapeRenderType.FULL_BLOCK;
         boolean outer = this.renderType == ShapeRenderType.OUTER_EDGE;
@@ -239,9 +237,8 @@ public abstract class ShapeCircleBase extends ShapeBase
         {
             if (range.isPositionWithinRange(pos))
             {
-                for (int i = 0; i < sides.length; ++i)
+                for (EnumFacing side : sides)
                 {
-                    EnumFacing side = sides[i];
                     posMutable.setPos(pos.getX() + side.getXOffset(), pos.getY() + side.getYOffset(), pos.getZ() + side.getZOffset());
 
                     if (positions.contains(posMutable) == false)
@@ -256,7 +253,7 @@ public abstract class ShapeCircleBase extends ShapeBase
 
                         if (render)
                         {
-                            fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceSideBatchedQuads(pos, side, color, 0, BUFFER_1);
+                            fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceSideBatchedQuads(pos, cameraPos, side, color, 0, BUFFER_1);
                         }
                     }
                 }
@@ -270,7 +267,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         {
             BlockPos posFirst = posMutable.toImmutable();
             positions.add(posFirst);
-            double r = (double) this.radius;
+            double r = this.radius;
             int failsafe = (int) (2.5 * Math.PI * r); // somewhat over double the circumference
 
             while (--failsafe > 0)
@@ -293,7 +290,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         {
             BlockPos posFirst = posMutable.toImmutable();
             positions.add(posFirst);
-            double r = (double) this.radius;
+            double r = this.radius;
             int failsafe = (int) (2.5 * Math.PI * r); // somewhat over double the circumference
 
             while (--failsafe > 0)
@@ -454,10 +451,10 @@ public abstract class ShapeCircleBase extends ShapeBase
     {
         switch (dirIn)
         {
-            case EAST:  return EnumFacing.NORTH;
             case NORTH: return EnumFacing.WEST;
             case WEST:  return EnumFacing.SOUTH;
             case SOUTH: return EnumFacing.EAST;
+            case EAST:
             default:    return EnumFacing.NORTH;
         }
     }
@@ -475,10 +472,10 @@ public abstract class ShapeCircleBase extends ShapeBase
             case DOWN:
                 switch (dirIn)
                 {
-                    case UP:    return EnumFacing.NORTH;
                     case NORTH: return EnumFacing.DOWN;
                     case DOWN:  return EnumFacing.SOUTH;
                     case SOUTH: return EnumFacing.UP;
+                    case UP:
                     default:    return EnumFacing.NORTH;
                 }
 
@@ -486,10 +483,10 @@ public abstract class ShapeCircleBase extends ShapeBase
             case SOUTH:
                 switch (dirIn)
                 {
-                    case UP:    return EnumFacing.EAST;
                     case EAST:  return EnumFacing.DOWN;
                     case DOWN:  return EnumFacing.WEST;
                     case WEST:  return EnumFacing.UP;
+                    case UP:
                     default:    return EnumFacing.EAST;
                 }
 
@@ -497,10 +494,10 @@ public abstract class ShapeCircleBase extends ShapeBase
             case EAST:
                 switch (dirIn)
                 {
-                    case UP:    return EnumFacing.SOUTH;
                     case SOUTH: return EnumFacing.DOWN;
                     case DOWN:  return EnumFacing.NORTH;
                     case NORTH: return EnumFacing.UP;
+                    case UP:
                     default:    return EnumFacing.SOUTH;
                 }
         }

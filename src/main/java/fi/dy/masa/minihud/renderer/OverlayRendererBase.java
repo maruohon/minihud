@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.RenderObjectBase;
 import fi.dy.masa.malilib.render.RenderObjectDisplayList;
 import fi.dy.masa.malilib.render.RenderObjectVbo;
@@ -22,12 +23,23 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     protected boolean renderThrough = false;
     protected float glLineWidth = 1f;
     protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
-    private BlockPos position = BlockPos.ORIGIN;
+    private Vec3d updateCameraPos = Vec3d.ZERO;
 
-    protected void preRender(double x, double y, double z)
+    @Override
+    public final Vec3d getUpdatePosition()
+    {
+        return this.updateCameraPos;
+    }
+
+    @Override
+    public final void setUpdatePosition(Vec3d cameraPosition)
+    {
+        this.updateCameraPos = cameraPosition;
+    }
+
+    protected void preRender()
     {
         GlStateManager.glLineWidth(this.glLineWidth);
-        GlStateManager.translate(this.position.getX() - x, this.position.getY() - y, this.position.getZ() - z);
 
         if (this.renderThrough)
         {
@@ -36,7 +48,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         }
     }
 
-    protected void postRender(double x, double y, double z)
+    protected void postRender()
     {
         if (this.renderThrough)
         {
@@ -46,18 +58,16 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     }
 
     @Override
-    public void draw(double x, double y, double z)
+    public void draw()
     {
-        GlStateManager.pushMatrix();
-        this.preRender(x, y, z);
+        this.preRender();
 
         for (RenderObjectBase obj : this.renderObjects)
         {
             obj.draw();
         }
 
-        this.postRender(x, y, z);
-        GlStateManager.popMatrix();
+        this.postRender();
     }
 
     @Override
@@ -69,15 +79,6 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
         }
 
         this.renderObjects.clear();
-    }
-
-    protected void setPosition(BlockPos pos)
-    {
-        this.position = pos;
-
-        BUFFER_1.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
-        BUFFER_2.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
-        BUFFER_3.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
     }
 
     /**

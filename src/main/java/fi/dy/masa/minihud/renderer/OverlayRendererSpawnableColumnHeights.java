@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.RenderObjectBase;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.Configs;
@@ -79,7 +80,7 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         final Color4f color = Configs.Colors.SPAWNABLE_COLUMNS_OVERLAY_COLOR.getColor();
         final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
@@ -97,6 +98,9 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
 
         for (int x = xStart; x <= xEnd; ++x)
         {
+            final double minX = x + 0.25 - cameraPos.x;
+            final double maxX = minX + 0.5;
+
             for (int z = zStart; z <= zEnd; ++z)
             {
                 // See WorldEntitySpawner.getRandomChunkPosition()
@@ -107,12 +111,10 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
                     height = world.getChunk(x << 4, z << 4).getTopFilledSegment() + 15;
                 }
 
-                final double minY = height;
-                final double maxY = height + 0.09375;
-                final double minX = x + 0.25;
-                final double minZ = z + 0.25;
-                final double maxX = x + 0.75;
-                final double maxZ = z + 0.75;
+                final double minY = height - cameraPos.y;
+                final double maxY = minY + 0.09375;
+                final double minZ = z + 0.25 - cameraPos.z;
+                final double maxZ = minZ + 0.5;
 
                 fi.dy.masa.malilib.render.RenderUtils.drawBoxHorizontalSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color, BUFFER_1);
                 fi.dy.masa.malilib.render.RenderUtils.drawBoxTopBatchedQuads(minX, minZ, maxX, maxY, maxZ, color, BUFFER_1);

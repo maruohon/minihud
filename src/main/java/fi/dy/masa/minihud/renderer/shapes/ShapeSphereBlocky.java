@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.RenderObjectBase;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.Configs;
@@ -23,13 +24,13 @@ public class ShapeSphereBlocky extends ShapeCircleBase
     }
 
     @Override
-    public void update(Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
-        this.renderSphereShape();
+        this.renderSphereShape(cameraPos);
         this.onPostUpdate(entity.getPositionVector());
     }
 
-    protected void renderSphereShape()
+    protected void renderSphereShape(Vec3d cameraPos)
     {
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
@@ -37,8 +38,6 @@ public class ShapeSphereBlocky extends ShapeCircleBase
         BlockPos posCenter = this.getCenterBlock();
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
         HashSet<BlockPos> spherePositions = new HashSet<>();
-
-        this.setPosition(posCenter);
 
         //long before = System.nanoTime();
         posMutable.setPos(posCenter);
@@ -70,7 +69,7 @@ public class ShapeSphereBlocky extends ShapeCircleBase
 
         EnumFacing[] sides = FACING_ALL;
 
-        this.renderPositions(spherePositions, sides, this.mainAxis, this.color);
+        this.renderPositions(spherePositions, sides, this.mainAxis, this.color, cameraPos);
         //System.out.printf("rendered: %d\n", r);
 
         BUFFER_1.finishDrawing();

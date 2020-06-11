@@ -6,7 +6,9 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.RenderObjectBase;
+import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 
@@ -34,7 +36,7 @@ public class OverlayRendererRegion extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
@@ -45,10 +47,9 @@ public class OverlayRendererRegion extends OverlayRendererBase
         int rz = MathHelper.floor(entity.posZ) & ~0x1FF;
         BlockPos pos1 = new BlockPos(rx,         0, rz      );
         BlockPos pos2 = new BlockPos(rx + 511, 256, rz + 511);
-        int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
-        int color = Configs.Colors.REGION_OVERLAY_COLOR.getIntegerValue();
+        Color4f color = Configs.Colors.REGION_OVERLAY_COLOR.getColor();
 
-        RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, pos1, pos2, rangeH, 256, 16, 16, entity, color);
+        RenderUtils.renderWallsWithLines(pos1, pos2, cameraPos, 16, 16, true, color, BUFFER_1, BUFFER_2);
 
         BUFFER_1.finishDrawing();
         BUFFER_2.finishDrawing();

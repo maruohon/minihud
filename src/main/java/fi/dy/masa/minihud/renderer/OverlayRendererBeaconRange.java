@@ -18,6 +18,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBeacon;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.render.RenderObjectBase;
@@ -93,7 +94,7 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         clear();
 
@@ -104,7 +105,7 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
 
         synchronized (BEACON_POSITIONS)
         {
-            this.renderBeaconRanges(entity.getEntityWorld(), BUFFER_1, BUFFER_2);
+            this.renderBeaconRanges(entity.getEntityWorld(), cameraPos, BUFFER_1, BUFFER_2);
         }
 
         BUFFER_1.finishDrawing();
@@ -133,7 +134,7 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
         }
     }
 
-    protected void renderBeaconRanges(World world, BufferBuilder bufferQuads, BufferBuilder bufferLines)
+    protected void renderBeaconRanges(World world, Vec3d cameraPos, BufferBuilder bufferQuads, BufferBuilder bufferLines)
     {
         for (TileEntity be : world.loadedTileEntityList)
         {
@@ -144,25 +145,25 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
 
                 if (level >= 1 && level <= 4)
                 {
-                    this.renderBeaconBox(world, pos, level, getColorForLevel(level), bufferQuads, bufferLines);
+                    this.renderBeaconBox(world, pos, cameraPos, level, getColorForLevel(level), bufferQuads, bufferLines);
                 }
             }
         }
     }
 
-    protected void renderBeaconBox(World world, BlockPos pos, int level, Color4f color, BufferBuilder bufferQuads, BufferBuilder bufferLines)
+    protected void renderBeaconBox(World world, BlockPos pos, Vec3d cameraPos, int level, Color4f color, BufferBuilder bufferQuads, BufferBuilder bufferLines)
     {
         double x = pos.getX();
         double y = pos.getY();
         double z = pos.getZ();
 
         int range = level * 10 + 10;
-        double minX = x - range;
-        double minY = y - range;
-        double minZ = z - range;
-        double maxX = x + range + 1;
-        double maxY = this.getMaxHeight(world, pos, range);
-        double maxZ = z + range + 1;
+        double minX = x - range - cameraPos.x;
+        double minY = y - range - cameraPos.y;
+        double minZ = z - range - cameraPos.z;
+        double maxX = x + range + 1 - cameraPos.x;
+        double maxY = this.getMaxHeight(world, pos, range) - cameraPos.y;
+        double maxZ = z + range + 1 -cameraPos.z;
 
         fi.dy.masa.malilib.render.RenderUtils.drawBoxAllSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color, bufferQuads);
         fi.dy.masa.malilib.render.RenderUtils.drawBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), bufferLines);

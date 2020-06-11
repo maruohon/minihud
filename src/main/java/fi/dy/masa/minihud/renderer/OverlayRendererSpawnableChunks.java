@@ -8,7 +8,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.RenderObjectBase;
+import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -59,7 +61,7 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         if (this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED)
         {
@@ -81,12 +83,11 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
         int centerX = this.posCenter.getX() >> 4;
         int centerZ = this.posCenter.getZ() >> 4;
         int r = 7;
-        final int color = this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED ?
-                Configs.Colors.SPAWNABLE_CHUNKS_FIXED.getIntegerValue() :
-                Configs.Colors.SPAWNABLE_CHUNKS_PLAYER.getIntegerValue();
+        final Color4f color = this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED ?
+                Configs.Colors.SPAWNABLE_CHUNKS_FIXED.getColor() :
+                Configs.Colors.SPAWNABLE_CHUNKS_PLAYER.getColor();
 
         this.lastUpdatePos = new BlockPos(centerX, 0, centerZ);
-        this.setPosition(this.lastUpdatePos);
         //this.topY = overlayTopY;
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
@@ -97,7 +98,7 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
         BlockPos pos1 = new BlockPos( (centerX - r    ) << 4,              0,  (centerZ - r    ) << 4     );
         BlockPos pos2 = new BlockPos(((centerX + r + 1) << 4) - 1, this.topY, ((centerZ + r + 1) << 4) - 1);
 
-        RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, pos1, pos2, 256, 256, 16, 16, entity, color);
+        RenderUtils.renderWallsWithLines(pos1, pos2, cameraPos, 16, 16, true, color, BUFFER_1, BUFFER_2);
 
         BUFFER_1.finishDrawing();
         BUFFER_2.finishDrawing();

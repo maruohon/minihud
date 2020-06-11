@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProviderSurface;
 import fi.dy.masa.malilib.render.RenderObjectBase;
 import fi.dy.masa.malilib.util.Color4f;
@@ -61,7 +62,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     }
 
     @Override
-    public void update(Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         DataStorage data = DataStorage.getInstance();
         BlockPos spawn = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ? new BlockPos(entity) : data.getWorldSpawn();
@@ -71,25 +72,21 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        Color4f colorEntity = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
-                Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getColor() :
-                Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getColor();
-        final int colorIntEntity = colorEntity.intValue;
-        final int colorLazy = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
-                Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getIntegerValue() :
-                Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getIntegerValue();
+        final Color4f colorEntity = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
+                                            Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getColor() :
+                                            Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getColor();
+        final Color4f colorLazy = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
+                                          Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getColor() :
+                                          Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getColor();
 
-        fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllOutlinesBatchedLines(spawn, colorEntity, 0.001, BUFFER_2);
-        fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllSidesBatchedQuads(spawn, colorEntity, 0.001, BUFFER_1);
+        fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllOutlinesBatchedLines(spawn, cameraPos, colorEntity, 0.001, BUFFER_2);
+        fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllSidesBatchedQuads(spawn, cameraPos, colorEntity, 0.001, BUFFER_1);
 
-        int rangeH = (mc.gameSettings.renderDistanceChunks + 1) * 16;
         Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 128);
-        RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
-                rangeH, 256, 16, 16, entity, colorLazy);
+        RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorLazy, BUFFER_1, BUFFER_2);
 
         corners = this.getSpawnChunkCorners(spawn, 128 - 32);
-        RenderUtils.renderVerticalWallsOfLinesWithinRange(BUFFER_1, BUFFER_2, corners.getLeft(), corners.getRight(),
-                rangeH, 256, 16, 16, entity, colorIntEntity);
+        RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorEntity, BUFFER_1, BUFFER_2);
 
         BUFFER_1.finishDrawing();
         BUFFER_2.finishDrawing();

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -22,7 +23,12 @@ public class OverlayRenderer
 
     public static void renderOverlays(Minecraft mc, float partialTicks)
     {
-        Entity entity = mc.getRenderViewEntity();
+        Entity entity = EntityUtils.getCameraEntity();
+
+        if (entity == null)
+        {
+            return;
+        }
 
         if (canRender == false)
         {

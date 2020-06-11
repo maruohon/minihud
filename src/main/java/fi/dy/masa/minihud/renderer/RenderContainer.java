@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
@@ -62,11 +63,16 @@ public class RenderContainer
 
     public void render(Entity entity, Minecraft mc, float partialTicks)
     {
-        this.update(entity, mc);
-        this.draw(entity, mc, partialTicks);
+        double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
+        double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
+        double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
+        Vec3d cameraPos = new Vec3d(x, y, z);
+
+        this.update(cameraPos, entity, mc);
+        this.draw(cameraPos, mc);
     }
 
-    protected void update(Entity entity, Minecraft mc)
+    protected void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         this.checkVideoSettings();
         this.countActive = 0;
@@ -80,9 +86,8 @@ public class RenderContainer
                 if (renderer.needsUpdate(entity, mc))
                 {
                     renderer.lastUpdatePos = new BlockPos(entity);
-                    renderer.setPosition(renderer.lastUpdatePos);
-
-                    renderer.update(entity, mc);
+                    renderer.setUpdatePosition(cameraPos);
+                    renderer.update(cameraPos, entity, mc);
                 }
 
                 ++this.countActive;
@@ -90,7 +95,7 @@ public class RenderContainer
         }
     }
 
-    protected void draw(Entity entity, Minecraft mc, float partialTicks)
+    protected void draw(Vec3d cameraPos, Minecraft mc)
     {
         if (this.resourcesAllocated && this.countActive > 0)
         {
@@ -112,17 +117,21 @@ public class RenderContainer
                 GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
             }
 
-            double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
-            double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
-            double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
+            double cx = cameraPos.x;
+            double cy = cameraPos.y;
+            double cz = cameraPos.z;
 
-            for (int i = 0; i < this.renderers.size(); ++i)
+            for (IOverlayRenderer renderer : this.renderers)
             {
-                IOverlayRenderer renderer = this.renderers.get(i);
-
                 if (renderer.shouldRender(mc))
                 {
-                    renderer.draw(x, y, z);
+                    Vec3d updatePos = renderer.getUpdatePosition();
+                    GlStateManager.pushMatrix();
+                    GlStateManager.translate(updatePos.x - cx, updatePos.y - cy, updatePos.z - cz);
+
+                    renderer.draw();
+
+                    GlStateManager.popMatrix();
                 }
             }
 
@@ -176,9 +185,9 @@ public class RenderContainer
     {
         if (this.resourcesAllocated == false)
         {
-            for (int i = 0; i < this.renderers.size(); ++i)
+            for (OverlayRendererBase renderer : this.renderers)
             {
-                this.renderers.get(i).allocateGlResources();
+                renderer.allocateGlResources();
             }
 
             this.resourcesAllocated = true;
@@ -189,9 +198,9 @@ public class RenderContainer
     {
         if (this.resourcesAllocated)
         {
-            for (int i = 0; i < this.renderers.size(); ++i)
+            for (OverlayRendererBase renderer : this.renderers)
             {
-                this.renderers.get(i).deleteGlResources();
+                renderer.deleteGlResources();
             }
 
             this.resourcesAllocated = false;
@@ -202,9 +211,8 @@ public class RenderContainer
     {
         JsonObject obj = new JsonObject();
 
-        for (int i = 0; i < this.renderers.size(); ++i)
+        for (OverlayRendererBase renderer : this.renderers)
         {
-            OverlayRendererBase renderer = this.renderers.get(i);
             String id = renderer.getSaveId();
 
             if (id.isEmpty() == false)
@@ -218,9 +226,8 @@ public class RenderContainer
 
     public void fromJson(JsonObject obj)
     {
-        for (int i = 0; i < this.renderers.size(); ++i)
+        for (OverlayRendererBase renderer : this.renderers)
         {
-            OverlayRendererBase renderer = this.renderers.get(i);
             String id = renderer.getSaveId();
 
             if (id.isEmpty() == false && JsonUtils.hasObject(obj, id))
