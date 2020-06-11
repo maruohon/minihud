@@ -351,7 +351,6 @@ public class OverlayRendererLightLevel
         final int minCZ = (minZ >> 4);
         final int maxCX = (maxX >> 4);
         final int maxCZ = (maxZ >> 4);
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
 
         for (int cx = minCX; cx <= maxCX; ++cx)
         {
@@ -379,12 +378,11 @@ public class OverlayRendererLightLevel
                         {
                             if (canSpawnAt(stateDown, state, stateUp, stateUp2))
                             {
-                                posMutable.setPos(x, y, z);
+                                BlockPos pos = new BlockPos(x, y, z);
+                                int block = y < 256 ? chunk.getLightFor(EnumSkyBlock.BLOCK, pos) : 0;
+                                int sky   = y < 256 ? chunk.getLightFor(EnumSkyBlock.SKY, pos) : 15;
 
-                                int block = chunk.getLightFor(EnumSkyBlock.BLOCK, posMutable);
-                                int sky = chunk.getLightFor(EnumSkyBlock.SKY, posMutable);
-
-                                LIGHT_INFOS.add(new LightLevelInfo(new BlockPos(x, y, z), block, sky));
+                                LIGHT_INFOS.add(new LightLevelInfo(pos, block, sky));
 
                                 //y += 2; // if the spot is spawnable, that means the next spawnable spot can be the third block up
                             }
@@ -406,9 +404,10 @@ public class OverlayRendererLightLevel
 
     /**
      * This method mimics the one from WorldEntitySpawner, but takes in the Chunk to avoid that lookup
-     * @param spawnPlacementTypeIn
-     * @param worldIn
-     * @param pos
+     * @param stateDown
+     * @param state
+     * @param stateUp
+     * @param stateUp2
      * @return
      */
     public static boolean canSpawnAt(IBlockState stateDown, IBlockState state, IBlockState stateUp, IBlockState stateUp2)
