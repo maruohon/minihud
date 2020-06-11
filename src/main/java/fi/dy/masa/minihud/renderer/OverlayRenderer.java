@@ -54,11 +54,6 @@ public class OverlayRenderer
             renderChunkUnloadBuckets(mc, entity, dx, dy, dz, chunkUnloadBucketOverlayY);
         }
 
-        if (RendererToggle.OVERLAY_LIGHT_LEVEL.getBooleanValue())
-        {
-            OverlayRendererLightLevel.render(dx, dy, dz, entity, mc);
-        }
-
         if (RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue())
         {
             OverlayRendererBeaconRange.renderBeaconBoxForPlayerIfHoldingItem(mc.player, dx, dy, dz, partialTicks);
@@ -69,8 +64,8 @@ public class OverlayRenderer
 
     private static void renderChunkUnloadBuckets(Minecraft mc, Entity entity, double dx, double dy, double dz, double chunkOverlayY)
     {
-        final int centerX = ((int) MathHelper.floor(entity.posX)) >> 4;
-        final int centerZ = ((int) MathHelper.floor(entity.posZ)) >> 4;
+        final int centerX = MathHelper.floor(entity.posX) >> 4;
+        final int centerZ = MathHelper.floor(entity.posZ) >> 4;
         final float y = (float) chunkOverlayY;
         final float scale = MathHelper.clamp((float) Configs.Generic.CHUNK_UNLOAD_BUCKET_FONT_SCALE.getDoubleValue(), 0.01f, 1f);
         int r = MathHelper.clamp(Configs.Generic.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue(), -1, 40);

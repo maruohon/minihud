@@ -7,6 +7,8 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.RenderObjectBase;
@@ -88,15 +90,27 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
      */
     protected RenderObjectBase allocateBuffer(int glMode)
     {
+        return this.allocateBuffer(glMode, DefaultVertexFormats.POSITION_COLOR, RenderObjectVbo::setupArrayPointersPosColor);
+    }
+
+    /**
+     * Allocates a new VBO or display list, adds it to the list, and returns it
+     * @param glMode
+     * @param vertexFormat
+     * @param func the function to set up the array pointers according to the used vertex format
+     * @return
+     */
+    protected RenderObjectBase allocateBuffer(int glMode, VertexFormat vertexFormat, RenderObjectVbo.IArrayPointerSetter func)
+    {
         RenderObjectBase obj;
 
         if (OpenGlHelper.useVbo())
         {
-            obj = new RenderObjectVbo(glMode);
+            obj = new RenderObjectVbo(glMode, vertexFormat, func);
         }
         else
         {
-            obj = new RenderObjectDisplayList(glMode);
+            obj = new RenderObjectDisplayList(glMode, vertexFormat);
         }
 
         this.renderObjects.add(obj);

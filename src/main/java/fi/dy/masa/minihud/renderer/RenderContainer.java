@@ -7,8 +7,6 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -27,21 +25,22 @@ public class RenderContainer
 
     private RenderContainer()
     {
-        this.renderers.add(new OverlayRendererBeaconRange());
-        this.renderers.add(new OverlayRendererBlockGrid());
-        this.renderers.add(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_FIXED));
-        this.renderers.add(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER));
-        this.renderers.add(new OverlayRendererRegion());
-        this.renderers.add(new OverlayRendererSlimeChunks());
-        this.renderers.add(new OverlayRendererSpawnableColumnHeights());
-        this.renderers.add(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED));
-        this.renderers.add(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER));
-        this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL));
-        this.renderers.add(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER));
-        this.renderers.add(new OverlayRendererStructures());
+        this.addRenderer(new OverlayRendererBeaconRange());
+        this.addRenderer(new OverlayRendererBlockGrid());
+        this.addRenderer(new OverlayRendererLightLevel());
+        this.addRenderer(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_FIXED));
+        this.addRenderer(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER));
+        this.addRenderer(new OverlayRendererRegion());
+        this.addRenderer(new OverlayRendererSlimeChunks());
+        this.addRenderer(new OverlayRendererSpawnableColumnHeights());
+        this.addRenderer(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED));
+        this.addRenderer(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER));
+        this.addRenderer(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL));
+        this.addRenderer(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER));
+        this.addRenderer(new OverlayRendererStructures());
     }
 
-    public void addShapeRenderer(ShapeBase renderer)
+    private void addRenderer(OverlayRendererBase renderer)
     {
         if (this.resourcesAllocated)
         {
@@ -51,7 +50,7 @@ public class RenderContainer
         this.renderers.add(renderer);
     }
 
-    public void removeShapeRenderer(ShapeBase renderer)
+    private void removeRenderer(OverlayRendererBase renderer)
     {
         this.renderers.remove(renderer);
 
@@ -59,6 +58,16 @@ public class RenderContainer
         {
             renderer.deleteGlResources();
         }
+    }
+
+    public void addShapeRenderer(ShapeBase renderer)
+    {
+        this.addRenderer(renderer);
+    }
+
+    public void removeShapeRenderer(ShapeBase renderer)
+    {
+        this.removeRenderer(renderer);
     }
 
     public void render(Entity entity, Minecraft mc, float partialTicks)
@@ -77,10 +86,8 @@ public class RenderContainer
         this.checkVideoSettings();
         this.countActive = 0;
 
-        for (int i = 0; i < this.renderers.size(); ++i)
+        for (OverlayRendererBase renderer : this.renderers)
         {
-            OverlayRendererBase renderer = this.renderers.get(i);
-
             if (renderer.shouldRender(mc))
             {
                 if (renderer.needsUpdate(entity, mc))
@@ -108,6 +115,7 @@ public class RenderContainer
             GlStateManager.depthMask(false);
             GlStateManager.doPolygonOffset(-3f, -3f);
             GlStateManager.enablePolygonOffset();
+
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -140,31 +148,20 @@ public class RenderContainer
                 OpenGlHelper.glBindBuffer(OpenGlHelper.GL_ARRAY_BUFFER, 0);
                 GlStateManager.resetColor();
 
-                for (VertexFormatElement element : DefaultVertexFormats.POSITION_COLOR.getElements())
-                {
-                    VertexFormatElement.EnumUsage usage = element.getUsage();
-
-                    switch (usage)
-                    {
-                        case POSITION:
-                            GlStateManager.glDisableClientState(GL11.GL_VERTEX_ARRAY);
-                            break;
-                        case COLOR:
-                            GlStateManager.glDisableClientState(GL11.GL_COLOR_ARRAY);
-                            GlStateManager.resetColor();
-                        default:
-                    }
-                }
+                GlStateManager.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+                GlStateManager.glDisableClientState(GL11.GL_COLOR_ARRAY);
             }
+
+            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
             GlStateManager.doPolygonOffset(0f, 0f);
             GlStateManager.disablePolygonOffset();
-            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
             GlStateManager.disableBlend();
             GlStateManager.enableDepth();
             GlStateManager.enableCull();
             GlStateManager.depthMask(true);
             GlStateManager.enableTexture2D();
+
             GlStateManager.popMatrix();
         }
     }
