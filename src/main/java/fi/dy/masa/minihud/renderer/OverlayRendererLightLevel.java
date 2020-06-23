@@ -358,11 +358,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         this.mutablePos.set(x, y - 1, z);
         BlockState stateDown = chunk.getBlockState(this.mutablePos);
 
-        if (stateDown.allowsSpawning(world, this.mutablePos, EntityType.CREEPER) == false)
-        {
-            return false;
-        }
-        else
+        if (stateDown.allowsSpawning(world, this.mutablePos, EntityType.CREEPER))
         {
             this.mutablePos.set(x, y, z);
             BlockState state = chunk.getBlockState(this.mutablePos);
@@ -375,17 +371,18 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                 return SpawnHelper.isClearForSpawn(world, this.mutablePos, stateUp1, state.getFluidState(), EntityType.WITHER_SKELETON);
             }
 
-            if (state.getFluidState().matches(FluidTags.WATER))
+            if (state.getFluidState().isIn(FluidTags.WATER))
             {
                 this.mutablePos.set(x, y + 1, z);
                 BlockState stateUp1 = chunk.getBlockState(this.mutablePos);
 
-                return stateUp1.getFluidState().matches(FluidTags.WATER) &&
+                return stateUp1.getFluidState().isIn(FluidTags.WATER) &&
                        chunk.getBlockState(this.mutablePos.set(x, y + 2, z)).isSolidBlock(world, this.mutablePos) == false;
             }
 
-            return false;
         }
+
+        return false;
     }
 
     public static class LightLevelInfo
