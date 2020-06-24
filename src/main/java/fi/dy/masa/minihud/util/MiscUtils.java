@@ -11,7 +11,6 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 
@@ -56,7 +55,7 @@ public class MiscUtils
 
     public static boolean isOverworld(World world)
     {
-        return world.getDimension() == DimensionType.getOverworldDimensionType();
+        return world.getDimension().isNatural();
     }
 
     public static boolean isStructureWithinRange(@Nullable BlockBox bb, BlockPos playerPos, int maxRange)

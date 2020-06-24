@@ -10,7 +10,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.IntBoundingBox;
@@ -23,12 +22,10 @@ import fi.dy.masa.minihud.util.StructureType;
 public class OverlayRendererStructures extends OverlayRendererBase
 {
     public static OverlayRendererStructures instance;
-    private final DimensionType nether;
 
     public OverlayRendererStructures()
     {
         instance = this;
-        this.nether = RegistryTracker.create().getDimensionTypeRegistry().get(DimensionType.THE_NETHER_REGISTRY_KEY);
     }
 
     @Override
@@ -39,34 +36,15 @@ public class OverlayRendererStructures extends OverlayRendererBase
             return false;
         }
 
-        if (MiscUtils.isOverworld(mc.world))
+        for (StructureType type : StructureType.VALUES)
         {
-            for (StructureType type : StructureType.VALUES)
+            if (type.isEnabled() && type.existsInDimension(mc.world.getDimensionRegistryKey()))
             {
-                if (type.isEnabled() && type.existsInDimension(DimensionType.OVERWORLD_REGISTRY_KEY))
-                {
-                    return true;
-                }
+                return true;
             }
+        }
 
-            return false;
-        }
-        else if (mc.world.getDimension() == this.nether)
-        {
-            for (StructureType type : StructureType.VALUES)
-            {
-                if (type.isEnabled() && type.existsInDimension(DimensionType.THE_NETHER_REGISTRY_KEY))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-        else
-        {
-            return StructureType.END_CITY.isEnabled();
-        }
+        return false;
     }
 
     @Override
