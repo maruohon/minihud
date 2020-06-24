@@ -311,6 +311,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         final int maxCX = (maxX >> 4);
         final int maxCZ = (maxZ >> 4);
         LightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
+        final int worldHeight = world.getHeight();
 
         for (int cx = minCX; cx <= maxCX; ++cx)
         {
@@ -328,18 +329,17 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                     for (int z = startZ; z <= endZ; ++z)
                     {
                         final int startY = Math.max(minY, 0);
-                        final int endY   = Math.min(maxY, chunk.getHighestNonEmptySectionYOffset() + 15);
+                        final int endY   = Math.min(maxY, chunk.getHighestNonEmptySectionYOffset() + 15 + 1);
 
                         for (int y = startY; y <= endY; ++y)
                         {
                             if (this.canSpawnAt(x, y, z, chunk, world))
                             {
-                                this.mutablePos.set(x, y, z);
+                                BlockPos pos = new BlockPos(x, y, z);
+                                int block = y < worldHeight ? lightingProvider.get(LightType.BLOCK).getLightLevel(pos) : 0;
+                                int sky   = y < worldHeight ? lightingProvider.get(LightType.SKY).getLightLevel(pos) : 15;
 
-                                int block = lightingProvider.get(LightType.BLOCK).getLightLevel(this.mutablePos);
-                                int sky = lightingProvider.get(LightType.SKY).getLightLevel(this.mutablePos);
-
-                                this.lightInfos.add(new LightLevelInfo(new BlockPos(x, y, z), block, sky));
+                                this.lightInfos.add(new LightLevelInfo(pos, block, sky));
 
                                 //y += 2; // if the spot is spawnable, that means the next spawnable spot can be the third block up
                             }
