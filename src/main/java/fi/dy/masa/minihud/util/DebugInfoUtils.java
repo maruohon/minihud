@@ -234,7 +234,7 @@ public class DebugInfoUtils
         }
         else if (config == RendererToggle.DEBUG_CHUNK_OCCLUSION)
         {
-            MinecraftClient.getInstance().debugChunkOcculsion = config.getBooleanValue();
+            MinecraftClient.getInstance().debugChunkOcclusion = config.getBooleanValue();
         }
     }
 
