@@ -265,8 +265,8 @@ public class DataStorage
     {
         if (mc.world != null)
         {
-            int tick = (int) mc.world.getTime();
-            this.blockBreakCounter[tick % this.blockBreakCounter.length] = 0;
+            int tick = (int) (mc.world.getTime() % this.blockBreakCounter.length);
+            this.blockBreakCounter[tick] = 0;
         }
     }
 
@@ -274,8 +274,8 @@ public class DataStorage
     {
         if (mc.world != null)
         {
-            int tick = (int) mc.world.getTime();
-            ++this.blockBreakCounter[tick % this.blockBreakCounter.length];
+            int tick = (int) (mc.world.getTime() % this.blockBreakCounter.length);
+            ++this.blockBreakCounter[tick];
         }
     }
 
