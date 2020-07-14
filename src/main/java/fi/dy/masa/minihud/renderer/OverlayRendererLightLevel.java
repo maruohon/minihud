@@ -22,7 +22,9 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import fi.dy.masa.malilib.config.IConfigDouble;
 import fi.dy.masa.malilib.config.options.ConfigColor;
+import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -38,6 +40,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     private final BlockPos.Mutable mutablePos = new BlockPos.Mutable();
     private Direction lastDirection = Direction.NORTH;
 
+    private static boolean tagsBroken;
     private static boolean needsUpdate;
 
     public static void setNeedsUpdate()
@@ -45,10 +48,15 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         needsUpdate = true;
     }
 
+    public static void reset()
+    {
+        tagsBroken = false;
+    }
+
     @Override
     public boolean shouldRender(MinecraftClient mc)
     {
-        return RendererToggle.OVERLAY_LIGHT_LEVEL.getBooleanValue();
+        return RendererToggle.OVERLAY_LIGHT_LEVEL.getBooleanValue() && tagsBroken == false;
     }
 
     @Override
@@ -333,7 +341,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
 
                         for (int y = startY; y <= endY; ++y)
                         {
-                            if (this.canSpawnAt(x, y, z, chunk, world))
+                            if (this.canSpawnAtWrapper(x, y, z, chunk, world))
                             {
                                 BlockPos pos = new BlockPos(x, y, z);
                                 int block = y < worldHeight ? lightingProvider.get(LightType.BLOCK).getLightLevel(pos) : 0;
@@ -348,6 +356,27 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                 }
             }
         }
+    }
+
+    private boolean canSpawnAtWrapper(int x, int y, int z, Chunk chunk, World world)
+    {
+        if (tagsBroken)
+        {
+            return false;
+        }
+
+        try
+        {
+            return this.canSpawnAt(x, y, z, chunk, world);
+        }
+        catch (Exception e)
+        {
+            InfoUtils.showGuiOrInGameMessage(Message.MessageType.WARNING, 8000, "This dimension seems to have missing block tag data, the light level will be non-functional in this dimension. This is known to happen on some Waterfall/BungeeCord/ViaVersion/whatever setups that have an older MC version at the back end.");
+            this.lightInfos.clear();
+            tagsBroken = true;
+        }
+
+        return false;
     }
 
     /**

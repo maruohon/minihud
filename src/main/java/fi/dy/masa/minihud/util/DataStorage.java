@@ -105,6 +105,7 @@ public class DataStorage
         StructurePacketHandlerCarpet.INSTANCE.reset();
         StructurePacketHandlerServux.INSTANCE.reset();
         ShapeManager.INSTANCE.clear();
+        OverlayRendererLightLevel.reset();
 
         if (isLogout)
         {
