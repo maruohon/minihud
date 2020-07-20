@@ -10,7 +10,7 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.GlBuffer;
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.VertexFormatElement;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
@@ -125,7 +125,7 @@ public class RenderContainer
 
             if (GLX.useVbo())
             {
-                GlBuffer.unbind();
+                VertexBuffer.unbind();
                 GlStateManager.clearCurrentColor();
 
                 for (VertexFormatElement element : VertexFormats.POSITION_COLOR.getElements())

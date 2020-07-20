@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 import com.google.common.collect.MapMaker;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.packet.CustomPayloadS2CPacket;
 import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.client.render.debug.NeighborUpdateDebugRenderer;
 import net.minecraft.entity.Entity;
@@ -15,6 +14,7 @@ import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.ai.pathing.PathNode;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.PacketByteBuf;
@@ -238,7 +238,7 @@ public class DebugInfoUtils
 
         if (RendererToggle.DEBUG_COLLISION_BOXES.getBooleanValue())
         {
-            renderer.voxelDebugRenderer.render(finishTime);
+            renderer.collisionDebugRenderer.render(finishTime);
         }
 
         if (RendererToggle.DEBUG_NEIGHBOR_UPDATES.getBooleanValue())

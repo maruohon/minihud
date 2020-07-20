@@ -276,7 +276,7 @@ public class RenderHandler implements IRenderer
         MinecraftClient mc = MinecraftClient.getInstance();
         Entity entity = mc.getCameraEntity();
         World world = entity.getEntityWorld();
-        BlockPos pos = new BlockPos(entity.x, entity.getBoundingBox().minY, entity.z);
+        BlockPos pos = new BlockPos(entity.x, entity.getBoundingBox().y1, entity.z);
         ChunkPos chunkPos = new ChunkPos(pos);
 
         if (Objects.equals(this.chunkPos, chunkPos) == false)
@@ -425,7 +425,7 @@ public class RenderHandler implements IRenderer
                     try
                     {
                         str.append(String.format(Configs.Generic.COORDINATE_FORMAT_STRING.getStringValue(),
-                            entity.x, entity.getBoundingBox().minY, entity.z));
+                            entity.x, entity.getBoundingBox().y1, entity.z));
                     }
                     // Uh oh, someone done goofed their format string... :P
                     catch (Exception e)
@@ -436,7 +436,7 @@ public class RenderHandler implements IRenderer
                 else
                 {
                     str.append(String.format("XYZ: %.2f / %.4f / %.2f",
-                        entity.x, entity.getBoundingBox().minY, entity.z));
+                        entity.x, entity.getBoundingBox().y1, entity.z));
                 }
 
                 pre = " / ";
@@ -576,9 +576,9 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.SPEED.getBooleanValue())
             {
-                double dx = entity.x - entity.prevRenderX;
-                double dy = entity.y - entity.prevRenderY;
-                double dz = entity.z - entity.prevRenderZ;
+                double dx = entity.x - entity.lastRenderX;
+                double dy = entity.y - entity.lastRenderY;
+                double dz = entity.z - entity.lastRenderZ;
                 double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
                 str.append(pre).append(String.format("speed: %.3f m/s", dist * 20));
             }
@@ -591,9 +591,9 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.SPEED_AXIS)
         {
-            double dx = entity.x - entity.prevRenderX;
-            double dy = entity.y - entity.prevRenderY;
-            double dz = entity.z - entity.prevRenderZ;
+            double dx = entity.x - entity.lastRenderX;
+            double dy = entity.y - entity.lastRenderY;
+            double dz = entity.z - entity.lastRenderZ;
             this.addLine(String.format("speed: x: %.3f y: %.3f z: %.3f m/s", dx * 20, dy * 20, dz * 20));
         }
         else if (type == InfoToggle.CHUNK_SECTIONS)
@@ -610,7 +610,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.LOADED_CHUNKS_COUNT)
         {
-            String chunksClient = mc.world.getChunkProviderStatus();
+            String chunksClient = mc.world.getDebugString();
             World worldServer = WorldUtils.getBestWorld(mc);
 
             if (worldServer != null && worldServer != mc.world)
@@ -743,15 +743,15 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.LOOKING_AT_ENTITY)
         {
-            if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.ENTITY)
+            if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.ENTITY)
             {
-                Entity lookedEntity = ((EntityHitResult) mc.hitResult).getEntity();
+                Entity lookedEntity = ((EntityHitResult) mc.crosshairTarget).getEntity();
 
                 if (lookedEntity instanceof LivingEntity)
                 {
                     LivingEntity living = (LivingEntity) lookedEntity;
                     this.addLine(String.format("Entity: %s - HP: %.1f / %.1f",
-                            living.getName().getString(), living.getHealth(), living.getHealthMaximum()));
+                            living.getName().getString(), living.getHealth(), living.getMaximumHealth()));
                 }
                 else
                 {
@@ -761,9 +761,9 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.ENTITY_REG_NAME)
         {
-            if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.ENTITY)
+            if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.ENTITY)
             {
-                Entity lookedEntity = ((EntityHitResult) mc.hitResult).getEntity();
+                Entity lookedEntity = ((EntityHitResult) mc.crosshairTarget).getEntity();
                 Identifier regName = EntityType.getId(lookedEntity.getType());
 
                 if (regName != null)
@@ -782,9 +782,9 @@ public class RenderHandler implements IRenderer
                 return;
             }
 
-            if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.BLOCK)
+            if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK)
             {
-                BlockPos lookPos = ((BlockHitResult) mc.hitResult).getBlockPos();
+                BlockPos lookPos = ((BlockHitResult) mc.crosshairTarget).getBlockPos();
                 String pre = "";
                 StringBuilder str = new StringBuilder(128);
 
@@ -815,9 +815,9 @@ public class RenderHandler implements IRenderer
 
     private <T extends Comparable<T>> void getBlockProperties(MinecraftClient mc)
     {
-        if (mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.BLOCK)
+        if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK)
         {
-            BlockPos posLooking = ((BlockHitResult) mc.hitResult).getBlockPos();
+            BlockPos posLooking = ((BlockHitResult) mc.crosshairTarget).getBlockPos();
             BlockState state = mc.world.getBlockState(posLooking);
             Identifier rl = Registry.BLOCK.getId(state.getBlock());
 
@@ -848,7 +848,7 @@ public class RenderHandler implements IRenderer
 
                 if (serverWorld_1 != null)
                 {
-                    this.chunkFuture = serverWorld_1.method_14178().getChunkFutureSyncOnMainThread(chunkPos.x, chunkPos.z, ChunkStatus.FULL, false).thenApply((either_1) -> {
+                    this.chunkFuture = serverWorld_1.getChunkManager().getChunkFutureSyncOnMainThread(chunkPos.x, chunkPos.z, ChunkStatus.FULL, false).thenApply((either_1) -> {
                         return (WorldChunk)either_1.map((chunk_1) -> {
                             return (WorldChunk)chunk_1;
                         }, (chunkHolder$Unloaded_1) -> {
@@ -873,7 +873,7 @@ public class RenderHandler implements IRenderer
     {
         if (this.cachedClientChunk == null)
         {
-            this.cachedClientChunk = this.mc.world.method_8497(chunkPos.x, chunkPos.z);
+            this.cachedClientChunk = this.mc.world.getChunk(chunkPos.x, chunkPos.z);
         }
 
         return this.cachedClientChunk;

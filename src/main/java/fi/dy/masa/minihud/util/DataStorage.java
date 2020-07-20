@@ -425,7 +425,7 @@ public class DataStorage
             MinecraftServer server = this.mc.getServer();
             final int maxChunkRange = this.mc.options.viewDistance + 2;
 
-            server.method_18858(new ServerTask(server.getTicks(), () ->
+            server.send(new ServerTask(server.getTicks(), () ->
             {
                 synchronized (this.structures)
                 {
@@ -447,7 +447,7 @@ public class DataStorage
 
     public void addOrUpdateStructuresFromServer(ListTag structures, int timeout)
     {
-        if (structures.getListType() == Constants.NBT.TAG_COMPOUND)
+        if (structures.getElementType() == Constants.NBT.TAG_COMPOUND)
         {
             this.structureDataTimeout = timeout;
 
@@ -458,7 +458,7 @@ public class DataStorage
 
             for (int i = 0; i < count; ++i)
             {
-                CompoundTag tag = structures.getCompoundTag(i);
+                CompoundTag tag = structures.getCompound(i);
                 StructureData data = StructureData.fromStructureStartTag(tag, currentTime);
 
                 if (data != null)

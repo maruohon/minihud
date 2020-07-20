@@ -71,7 +71,7 @@ public class OverlayRendererLightLevel
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
             Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBufferBuilder();
+            BufferBuilder buffer = tessellator.getBuffer();
             Direction numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? mc.player.getHorizontalFacing() : Direction.NORTH;
             LightLevelNumberMode numberMode = (LightLevelNumberMode) Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getOptionListValue();
             LightLevelMarkerMode markerMode = (LightLevelMarkerMode) Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
@@ -200,7 +200,7 @@ public class OverlayRendererLightLevel
 
         if (colorLit != null)
         {
-            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV_COLOR);
+            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 
             for (int i = 0; i < count; ++i)
             {
@@ -216,7 +216,7 @@ public class OverlayRendererLightLevel
         }
         else
         {
-            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV);
+            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
 
             for (int i = 0; i < count; ++i)
             {
