@@ -372,11 +372,15 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.PING)
         {
-            NetworkPlayerInfo info = mc.player.connection.getPlayerInfo(mc.player.getUniqueID());
-
-            if (info != null)
+            // The ping is useless in single player
+            if (mc.isSingleplayer() == false)
             {
-                this.addLine("Ping: " + info.getResponseTime() + " ms");
+                NetworkPlayerInfo info = mc.player.connection.getPlayerInfo(mc.player.getUniqueID());
+
+                if (info != null)
+                {
+                    this.addLine("Ping: " + info.getResponseTime() + " ms");
+                }
             }
         }
         else if (type == InfoToggle.COORDINATES ||

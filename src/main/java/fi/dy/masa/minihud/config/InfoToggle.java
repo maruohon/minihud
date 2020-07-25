@@ -46,7 +46,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
     MEMORY_USAGE            ("infoMemoryUsage",             false,  0, "", "Show the memory usage and allocation"),
     MOB_CAPS                ("infoMobCaps",                 false, 40, "", "Show the current mob counts and mob caps"),
     PARTICLE_COUNT          ("infoParticleCount",           false, 17, "", "Show the currently renderer particle count (P from F3)"),
-    PING                    ("infoPing",                    false, 36, "", "Show the current ping to the server"),
+    PING                    ("infoPing",                    false, 36, "", "Show the current ping to the server.\nDoes not show up in single player at all."),
     REGION_FILE             ("infoRegionFile",              false, 29, "", "Show the region file the player is currently within"),
     ROTATION_PITCH          ("infoRotationPitch",           false, 12, "", "Show the player's pitch rotation"),
     ROTATION_YAW            ("infoRotationYaw",             false, 11, "", "Show the player's yaw rotation"),
