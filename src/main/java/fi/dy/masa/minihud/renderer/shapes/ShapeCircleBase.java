@@ -12,12 +12,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.config.values.BlockSnap;
-import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.config.value.BlockSnap;
+import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
 public abstract class ShapeCircleBase extends ShapeBase
@@ -179,7 +180,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         // The snap value has to be set before the center
         if (JsonUtils.hasString(obj, "snap"))
         {
-            this.snap = BlockSnap.fromStringStatic(JsonUtils.getString(obj, "snap"));
+            this.snap = ConfigOptionListEntry.findValueByName(JsonUtils.getString(obj, "snap"), BlockSnap.VALUES);
         }
 
         if (JsonUtils.hasString(obj, "main_axis"))

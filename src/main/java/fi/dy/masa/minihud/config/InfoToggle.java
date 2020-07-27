@@ -4,15 +4,15 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.config.ConfigType;
-import fi.dy.masa.malilib.config.options.IConfigBoolean;
-import fi.dy.masa.malilib.config.options.IConfigInteger;
-import fi.dy.masa.malilib.config.options.IConfigNotifiable;
-import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.hotkeys.IKeybind;
-import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBoolean;
-import fi.dy.masa.malilib.hotkeys.KeybindMulti;
-import fi.dy.masa.malilib.hotkeys.KeybindSettings;
-import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
+import fi.dy.masa.malilib.config.option.IConfigBoolean;
+import fi.dy.masa.malilib.config.option.IConfigInteger;
+import fi.dy.masa.malilib.config.option.IConfigNotifiable;
+import fi.dy.masa.malilib.input.IHotkey;
+import fi.dy.masa.malilib.input.IKeyBind;
+import fi.dy.masa.malilib.input.KeyCallbackToggleBoolean;
+import fi.dy.masa.malilib.input.KeyBindMulti;
+import fi.dy.masa.malilib.input.KeyBindSettings;
+import fi.dy.masa.malilib.config.IValueChangeCallback;
 import fi.dy.masa.minihud.LiteModMiniHud;
 
 public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConfigNotifiable<Boolean>
@@ -27,7 +27,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
     CHUNK_POS               ("infoChunkPosition",           false,  7, "", "Show the Chunk the player is currently within"),
     CHUNK_SECTIONS          ("infoChunkSections",           false, 14, "", "Show the currently rendered number of\nChunk sections (the C value from F3)"),
     CHUNK_SECTIONS_FULL     ("infoChunkSectionsLine",       false, 15, "", "Show the entire line of the C value from the F3 screen"),
-    CHUNK_UNLOAD_ORDER      ("infoChunkUnloadOrder",        false, 30, "", "Show the \"unload order\" (HashSet bucket)\nof the current chunk (for vanilla <= 1.12.x Perma-Loaders)", KeybindSettings.INGAME_BOTH),
+    CHUNK_UNLOAD_ORDER      ("infoChunkUnloadOrder", false, 30, "", "Show the \"unload order\" (HashSet bucket)\nof the current chunk (for vanilla <= 1.12.x Perma-Loaders)", KeyBindSettings.INGAME_BOTH),
     CHUNK_UPDATES           ("infoChunkUpdates",            false, 16, "", "Show the current number of chunk updates per second"),
     COORDINATES             ("infoCoordinates",             true,   4, "", "Show the player's coordinates"),
     DIFFICULTY              ("infoDifficulty",              false, 18, "", "Show the local difficulty"),
@@ -65,7 +65,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
     private final String name;
     private final String prettyName;
     private final String comment;
-    private final KeybindMulti keybind;
+    private final KeyBindMulti keybind;
     private final boolean defaultValueBoolean;
     private final int defaultLinePosition;
     private String modName = "";
@@ -77,16 +77,16 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
 
     private InfoToggle(String name, boolean defaultValue, int linePosition, String defaultHotkey, String comment)
     {
-        this(name, defaultValue, linePosition, defaultHotkey, comment, KeybindSettings.DEFAULT);
+        this(name, defaultValue, linePosition, defaultHotkey, comment, KeyBindSettings.DEFAULT);
     }
 
-    private InfoToggle(String name, boolean defaultValue, int linePosition, String defaultHotkey, String comment, KeybindSettings settings)
+    private InfoToggle(String name, boolean defaultValue, int linePosition, String defaultHotkey, String comment, KeyBindSettings settings)
     {
         this.name = name;
         this.prettyName = name;
         this.valueBoolean = defaultValue;
         this.defaultValueBoolean = defaultValue;
-        this.keybind = KeybindMulti.fromStorageString(name, defaultHotkey, settings);
+        this.keybind = KeyBindMulti.fromStorageString(name, defaultHotkey, settings);
         this.keybind.setCallback(new KeyCallbackToggleBoolean(this));
         this.linePosition = linePosition;
         this.defaultLinePosition = linePosition;
@@ -214,7 +214,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
     }
 
     @Override
-    public IKeybind getKeybind()
+    public IKeyBind getKeyBind()
     {
         return this.keybind;
     }

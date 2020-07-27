@@ -6,16 +6,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import fi.dy.masa.malilib.interfaces.IRangeChangeListener;
-import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
+import fi.dy.masa.malilib.listener.ILayerRangeChangeListener;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.OverlayRendererBase;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
-public abstract class ShapeBase extends OverlayRendererBase implements IRangeChangeListener
+public abstract class ShapeBase extends OverlayRendererBase implements ILayerRangeChangeListener
 {
     protected final Minecraft mc;
     protected final ShapeType type;
@@ -184,7 +185,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
 
         if (JsonUtils.hasString(obj, "render_type"))
         {
-            ShapeRenderType type = ShapeRenderType.fromStringStatic(ShapeRenderType.VALUES, obj.get("render_type").getAsString());
+            ShapeRenderType type = ConfigOptionListEntry.findValueByName(obj.get("render_type").getAsString(), ShapeRenderType.VALUES);
 
             if (type != null)
             {

@@ -10,8 +10,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.util.StructureType;
 

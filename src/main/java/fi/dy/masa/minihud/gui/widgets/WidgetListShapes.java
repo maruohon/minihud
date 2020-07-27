@@ -3,7 +3,7 @@ package fi.dy.masa.minihud.gui.widgets;
 import java.util.Collection;
 import javax.annotation.Nullable;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
+import fi.dy.masa.malilib.gui.widget.WidgetListBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 

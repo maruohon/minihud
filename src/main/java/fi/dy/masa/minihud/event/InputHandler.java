@@ -4,12 +4,12 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
-import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
-import fi.dy.masa.malilib.hotkeys.KeyCallbackAdjustable;
-import fi.dy.masa.malilib.hotkeys.KeybindCategory;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.input.IHotkey;
+import fi.dy.masa.malilib.input.IKeyBindProvider;
+import fi.dy.masa.malilib.input.IMouseInputHandler;
+import fi.dy.masa.malilib.input.KeyCallbackAdjustable;
+import fi.dy.masa.malilib.input.KeyBindCategory;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
@@ -18,7 +18,7 @@ import fi.dy.masa.minihud.config.StructureToggle;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 
-public class InputHandler implements IKeybindProvider, IMouseInputHandler
+public class InputHandler implements IKeyBindProvider, IMouseInputHandler
 {
     private static final InputHandler INSTANCE = new InputHandler();
 
@@ -46,32 +46,32 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
     }
 
     @Override
-    public List<KeybindCategory> getHotkeyCategoriesForCombinedView()
+    public List<KeyBindCategory> getHotkeyCategoriesForCombinedView()
     {
         return ImmutableList.of(
-                new KeybindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST),
-                new KeybindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", ImmutableList.copyOf(InfoToggle.values())),
-                new KeybindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", ImmutableList.copyOf(RendererToggle.values())),
-                new KeybindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.structure_toggle_hotkeys", ImmutableList.copyOf(StructureToggle.getHotkeys()))
+                new KeyBindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST),
+                new KeyBindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", ImmutableList.copyOf(InfoToggle.values())),
+                new KeyBindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", ImmutableList.copyOf(RendererToggle.values())),
+                new KeyBindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.structure_toggle_hotkeys", ImmutableList.copyOf(StructureToggle.getHotkeys()))
         );
     }
 
     @Override
-    public boolean onMouseInput(int eventButton, int dWheel, boolean eventButtonState)
+    public boolean onMouseInput(int eventButton, int wheelDelta, boolean eventButtonState)
     {
         // Not in a GUI
-        if (GuiUtils.getCurrentScreen() == null && dWheel != 0)
+        if (GuiUtils.getCurrentScreen() == null && wheelDelta != 0)
         {
             if (Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue() &&
-                InfoToggle.CHUNK_UNLOAD_ORDER.getKeybind().isKeybindHeld())
+                InfoToggle.CHUNK_UNLOAD_ORDER.getKeyBind().isKeyBindHeld())
             {
                 int size = Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
 
                 if (size == 0)
                 {
-                    size = dWheel < 0 ? 1 : -1;
+                    size = wheelDelta < 0 ? 1 : -1;
                 }
-                else if (dWheel < 0)
+                else if (wheelDelta < 0)
                 {
                     size <<= 1;
                 }
@@ -88,21 +88,21 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
                 size = Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
                 String strValue = preGreen + size + rst;
 
-                InfoUtils.printActionbarMessage("minihud.message.dropped_chunks_hash_size_set_to", strValue);
+                MessageUtils.printActionbarMessage("minihud.message.dropped_chunks_hash_size_set_to", strValue);
 
                 return true;
             }
             else if (RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() &&
-                     RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind().isKeybindHeld())
+                     RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeyBind().isKeyBindHeld())
             {
-                OverlayRendererSlimeChunks.overlayTopY += (dWheel < 0 ? 1 : -1);
+                OverlayRendererSlimeChunks.overlayTopY += (wheelDelta < 0 ? 1 : -1);
                 KeyCallbackAdjustable.setValueChanged();
                 return true;
             }
             else if (RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getBooleanValue() &&
-                     RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeybind().isKeybindHeld())
+                     RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeyBind().isKeyBindHeld())
            {
-               OverlayRenderer.chunkUnloadBucketOverlayY += (dWheel < 0 ? 1 : -1);
+               OverlayRenderer.chunkUnloadBucketOverlayY += (wheelDelta < 0 ? 1 : -1);
                KeyCallbackAdjustable.setValueChanged();
                return true;
            }

@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.item.EnumDyeColor;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.util.DyeColorCode;
+import fi.dy.masa.malilib.util.data.DyeColorCode;
 import fi.dy.masa.minihud.config.Configs;
 
 public class WoolCounters

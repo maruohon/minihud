@@ -1,6 +1,8 @@
 package fi.dy.masa.minihud.util;
 
-import fi.dy.masa.malilib.config.IConfigOptionListEntry;
+import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
+import fi.dy.masa.malilib.config.value.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public enum BlockGridMode implements IConfigOptionListEntry<BlockGridMode>
@@ -9,13 +11,15 @@ public enum BlockGridMode implements IConfigOptionListEntry<BlockGridMode>
     NON_AIR     ("non_air",     "minihud.label.blockgridmode.non_air"),
     ADJACENT    ("adjacent",    "minihud.label.blockgridmode.adjacent");
 
-    private final String configString;
-    private final String unlocName;
+    public static final ImmutableList<BlockGridMode> VALUES = ImmutableList.copyOf(values());
 
-    private BlockGridMode(String configString, String unlocName)
+    private final String configString;
+    private final String translationKey;
+
+    BlockGridMode(String configString, String translationKey)
     {
         this.configString = configString;
-        this.unlocName = unlocName;
+        this.translationKey = translationKey;
     }
 
     @Override
@@ -27,49 +31,18 @@ public enum BlockGridMode implements IConfigOptionListEntry<BlockGridMode>
     @Override
     public String getDisplayName()
     {
-        return StringUtils.translate(this.unlocName);
+        return StringUtils.translate(this.translationKey);
     }
 
     @Override
     public BlockGridMode cycle(boolean forward)
     {
-        int id = this.ordinal();
-
-        if (forward)
-        {
-            if (++id >= values().length)
-            {
-                id = 0;
-            }
-        }
-        else
-        {
-            if (--id < 0)
-            {
-                id = values().length - 1;
-            }
-        }
-
-        return values()[id % values().length];
+        return ConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
     }
 
     @Override
     public BlockGridMode fromString(String name)
     {
-        return fromStringStatic(name);
+        return ConfigOptionListEntry.findValueByName(name, VALUES);
     }
-
-    public static BlockGridMode fromStringStatic(String name)
-    {
-        for (BlockGridMode aligment : BlockGridMode.values())
-        {
-            if (aligment.configString.equalsIgnoreCase(name))
-            {
-                return aligment;
-            }
-        }
-
-        return BlockGridMode.ADJACENT;
-    }
-
 }

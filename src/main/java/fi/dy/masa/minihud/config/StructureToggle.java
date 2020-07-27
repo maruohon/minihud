@@ -1,11 +1,11 @@
 package fi.dy.masa.minihud.config;
 
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.options.ConfigBoolean;
-import fi.dy.masa.malilib.config.options.ConfigColor;
-import fi.dy.masa.malilib.config.options.ConfigHotkey;
-import fi.dy.masa.malilib.config.options.IConfigBoolean;
-import fi.dy.masa.malilib.hotkeys.IHotkey;
+import fi.dy.masa.malilib.config.option.ConfigBoolean;
+import fi.dy.masa.malilib.config.option.ConfigColor;
+import fi.dy.masa.malilib.config.option.ConfigHotkey;
+import fi.dy.masa.malilib.config.option.IConfigBoolean;
+import fi.dy.masa.malilib.input.IHotkey;
 import fi.dy.masa.minihud.data.DataStorage;
 
 public enum StructureToggle
@@ -33,7 +33,7 @@ public enum StructureToggle
         this.colorComponents = new ConfigColor(name + " Components", colorComponents, prettyName + " components");
         this.hotkey          = new ConfigHotkey("Toggle " + name, defaultHotkey, comment);
 
-        this.hotkey.getKeybind().setCallback((action, key) -> { this.toggleOption.toggleBooleanValue(); return true; });
+        this.hotkey.getKeyBind().setCallback((action, key) -> { this.toggleOption.toggleBooleanValue(); return true; });
         this.toggleOption.setValueChangeCallback((newValue, oldValue) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
     }
 

@@ -11,9 +11,9 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.render.RenderObjectBase;
-import fi.dy.masa.malilib.render.RenderObjectDisplayList;
-import fi.dy.masa.malilib.render.RenderObjectVbo;
+import fi.dy.masa.malilib.render.overlay.RenderObjectBase;
+import fi.dy.masa.malilib.render.overlay.RenderObjectDisplayList;
+import fi.dy.masa.malilib.render.overlay.RenderObjectVbo;
 
 public abstract class OverlayRendererBase implements IOverlayRenderer
 {

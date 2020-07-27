@@ -1,6 +1,8 @@
 package fi.dy.masa.minihud.util;
 
-import fi.dy.masa.malilib.config.IConfigOptionListEntry;
+import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
+import fi.dy.masa.malilib.config.value.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public enum LightLevelNumberMode implements IConfigOptionListEntry<LightLevelNumberMode>
@@ -10,10 +12,12 @@ public enum LightLevelNumberMode implements IConfigOptionListEntry<LightLevelNum
     SKY     ("sky",     "minihud.label.light_level_number_mode.sky"),
     BOTH    ("both",    "minihud.label.light_level_number_mode.both");
 
+    public static final ImmutableList<LightLevelNumberMode> VALUES = ImmutableList.copyOf(values());
+
     private final String configString;
     private final String translationKey;
 
-    private LightLevelNumberMode(String configString, String translationKey)
+    LightLevelNumberMode(String configString, String translationKey)
     {
         this.configString = configString;
         this.translationKey = translationKey;
@@ -34,42 +38,12 @@ public enum LightLevelNumberMode implements IConfigOptionListEntry<LightLevelNum
     @Override
     public LightLevelNumberMode cycle(boolean forward)
     {
-        int id = this.ordinal();
-
-        if (forward)
-        {
-            if (++id >= values().length)
-            {
-                id = 0;
-            }
-        }
-        else
-        {
-            if (--id < 0)
-            {
-                id = values().length - 1;
-            }
-        }
-
-        return values()[id % values().length];
+        return ConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
     }
 
     @Override
     public LightLevelNumberMode fromString(String name)
     {
-        return fromStringStatic(name);
-    }
-
-    public static LightLevelNumberMode fromStringStatic(String name)
-    {
-        for (LightLevelNumberMode val : LightLevelNumberMode.values())
-        {
-            if (val.configString.equalsIgnoreCase(name))
-            {
-                return val;
-            }
-        }
-
-        return LightLevelNumberMode.NONE;
+        return ConfigOptionListEntry.findValueByName(name, VALUES);
     }
 }

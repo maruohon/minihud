@@ -9,8 +9,8 @@ import java.util.function.Supplier;
 import org.lwjgl.input.Keyboard;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
-import fi.dy.masa.malilib.config.options.ConfigOptionList;
-import fi.dy.masa.malilib.config.values.BlockSnap;
+import fi.dy.masa.malilib.config.option.ConfigOptionList;
+import fi.dy.masa.malilib.config.value.BlockSnap;
 import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ConfigButtonOptionList;
@@ -18,16 +18,16 @@ import fi.dy.masa.malilib.gui.listener.ButtonListenerDoubleModifier;
 import fi.dy.masa.malilib.gui.listener.ButtonListenerIntModifier;
 import fi.dy.masa.malilib.gui.listener.TextFieldListenerDouble;
 import fi.dy.masa.malilib.gui.listener.TextFieldListenerInteger;
-import fi.dy.masa.malilib.gui.util.GuiIconBase;
+import fi.dy.masa.malilib.gui.util.BaseGuiIcon;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widgets.WidgetColorIndicator;
-import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldDouble;
-import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldInteger;
-import fi.dy.masa.malilib.interfaces.ICoordinateValueModifier;
-import fi.dy.masa.malilib.util.DualDoubleConsumer;
-import fi.dy.masa.malilib.util.DualIntConsumer;
-import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.gui.widget.WidgetColorIndicator;
+import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
+import fi.dy.masa.malilib.gui.widget.WidgetTextFieldDouble;
+import fi.dy.masa.malilib.gui.widget.WidgetTextFieldInteger;
+import fi.dy.masa.malilib.util.position.ICoordinateValueModifier;
+import fi.dy.masa.malilib.util.consumer.DualDoubleConsumer;
+import fi.dy.masa.malilib.util.consumer.DualIntConsumer;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -183,7 +183,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            ButtonGeneric button = new ButtonGeneric(x + 54, y - 1, GuiIconBase.BTN_PLUSMINUS_16, hover);
+            ButtonGeneric button = new ButtonGeneric(x + 54, y - 1, BaseGuiIcon.BTN_PLUSMINUS_16, hover);
             this.addButton(button, new ButtonListenerDoubleModifier(supplier, new DualDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
         }
     }
@@ -201,7 +201,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            ButtonGeneric button = new ButtonGeneric(x + 54, y - 1, GuiIconBase.BTN_PLUSMINUS_16, hover);
+            ButtonGeneric button = new ButtonGeneric(x + 54, y - 1, BaseGuiIcon.BTN_PLUSMINUS_16, hover);
             this.addButton(button, new ButtonListenerIntModifier(supplier, new DualIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
         }
     }

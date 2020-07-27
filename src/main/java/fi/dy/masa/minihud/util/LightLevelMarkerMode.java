@@ -1,6 +1,8 @@
 package fi.dy.masa.minihud.util;
 
-import fi.dy.masa.malilib.config.IConfigOptionListEntry;
+import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
+import fi.dy.masa.malilib.config.value.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public enum LightLevelMarkerMode implements IConfigOptionListEntry<LightLevelMarkerMode>
@@ -9,10 +11,12 @@ public enum LightLevelMarkerMode implements IConfigOptionListEntry<LightLevelMar
     CROSS   ("cross",   "minihud.label.light_level_marker_mode.cross"),
     SQUARE  ("square",  "minihud.label.light_level_marker_mode.square");
 
+    public static final ImmutableList<LightLevelMarkerMode> VALUES = ImmutableList.copyOf(values());
+
     private final String configString;
     private final String translationKey;
 
-    private LightLevelMarkerMode(String configString, String translationKey)
+    LightLevelMarkerMode(String configString, String translationKey)
     {
         this.configString = configString;
         this.translationKey = translationKey;
@@ -33,42 +37,12 @@ public enum LightLevelMarkerMode implements IConfigOptionListEntry<LightLevelMar
     @Override
     public LightLevelMarkerMode cycle(boolean forward)
     {
-        int id = this.ordinal();
-
-        if (forward)
-        {
-            if (++id >= values().length)
-            {
-                id = 0;
-            }
-        }
-        else
-        {
-            if (--id < 0)
-            {
-                id = values().length - 1;
-            }
-        }
-
-        return values()[id % values().length];
+        return ConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
     }
 
     @Override
     public LightLevelMarkerMode fromString(String name)
     {
-        return fromStringStatic(name);
-    }
-
-    public static LightLevelMarkerMode fromStringStatic(String name)
-    {
-        for (LightLevelMarkerMode val : LightLevelMarkerMode.values())
-        {
-            if (val.configString.equalsIgnoreCase(name))
-            {
-                return val;
-            }
-        }
-
-        return LightLevelMarkerMode.NONE;
+        return ConfigOptionListEntry.findValueByName(name, VALUES);
     }
 }

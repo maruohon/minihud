@@ -10,9 +10,9 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IConfigGuiTab;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetDropDownList;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.gui.widget.WidgetDropDownList;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.gui.widgets.WidgetListShapes;
 import fi.dy.masa.minihud.gui.widgets.WidgetShapeEntry;
@@ -32,7 +32,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         this.title = StringUtils.translate("minihud.gui.title.shape_manager");
 
         // The position will get updated later
-        this.widgetDropDown = new WidgetDropDownList<ShapeType>(0, 0, 160, 20, 200, 10, ImmutableList.copyOf(ShapeType.values()), (type) -> type.getDisplayName());
+        this.widgetDropDown = new WidgetDropDownList<>(0, 0, 160, 20, 200, 10, ImmutableList.copyOf(ShapeType.values()), ShapeType::getDisplayName);
         this.widgetDropDown.setZLevel((int) this.zLevel + 2);
     }
 
@@ -149,7 +149,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
                 }
                 else
                 {
-                    InfoUtils.showGuiMessage(MessageType.ERROR, "minihud.message.error.shapes.select_shape_from_dropdown");
+                    MessageUtils.showGuiMessage(MessageType.ERROR, "minihud.message.error.shapes.select_shape_from_dropdown");
                 }
             }
         }
@@ -160,7 +160,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
 
             private final String translationKey;
 
-            private Type(String translationKey)
+            Type(String translationKey)
             {
                 this.translationKey = translationKey;
             }

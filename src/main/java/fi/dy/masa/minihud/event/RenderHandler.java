@@ -32,9 +32,11 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
-import fi.dy.masa.malilib.config.values.HudAlignment;
+import fi.dy.masa.malilib.config.value.HudAlignment;
+import fi.dy.masa.malilib.event.IPostGameOverlayRenderer;
+import fi.dy.masa.malilib.event.IPostItemTooltipRenderer;
+import fi.dy.masa.malilib.event.IPostWorldRenderer;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -50,7 +52,7 @@ import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.MiscUtils;
 
-public class RenderHandler implements IRenderer
+public class RenderHandler implements IPostGameOverlayRenderer, IPostItemTooltipRenderer, IPostWorldRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
     private final Date date;
@@ -84,7 +86,7 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderGameOverlayPost(float partialTicks)
+    public void onPostGameOverlayRender(float partialTicks)
     {
         Minecraft mc = Minecraft.getMinecraft();
 
@@ -92,7 +94,7 @@ public class RenderHandler implements IRenderer
             mc.gameSettings.showDebugInfo == false &&
             mc.player != null && mc.gameSettings.hideGUI == false &&
             (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
-            Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld())
+            Configs.Generic.REQUIRED_KEY.getKeyBind().isKeyBindHeld())
         {
             if (InfoToggle.FPS.getBooleanValue())
             {
@@ -121,7 +123,7 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderTooltipLast(ItemStack stack, int x, int y)
+    public void onPostRenderItemTooltip(ItemStack stack, int x, int y)
     {
         if (stack.getItem() instanceof ItemMap)
         {
@@ -142,7 +144,7 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLast(float partialTicks)
+    public void onPostWorldRender(float partialTicks)
     {
         Minecraft mc = Minecraft.getMinecraft();
 

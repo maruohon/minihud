@@ -4,13 +4,13 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.config.ConfigType;
-import fi.dy.masa.malilib.config.options.IConfigBoolean;
-import fi.dy.masa.malilib.config.options.IConfigNotifiable;
-import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.hotkeys.IKeybind;
-import fi.dy.masa.malilib.hotkeys.KeybindMulti;
-import fi.dy.masa.malilib.hotkeys.KeybindSettings;
-import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
+import fi.dy.masa.malilib.config.option.IConfigBoolean;
+import fi.dy.masa.malilib.config.option.IConfigNotifiable;
+import fi.dy.masa.malilib.input.IHotkey;
+import fi.dy.masa.malilib.input.IKeyBind;
+import fi.dy.masa.malilib.input.KeyBindMulti;
+import fi.dy.masa.malilib.input.KeyBindSettings;
+import fi.dy.masa.malilib.config.IValueChangeCallback;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
@@ -27,12 +27,12 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
 
     OVERLAY_BEACON_RANGE                ("overlayBeaconRange",          "", "Toggle the Beacon Range overlay renderer", "Beacon Range overlay"),
     OVERLAY_BLOCK_GRID                  ("overlayBlockGrid",            "", "Toggle the Block Grid overlay renderer", "Block Grid overlay"),
-    OVERLAY_CHUNK_UNLOAD_BUCKET         ("overlayChunkUnloadBucket",    "", KeybindSettings.INGAME_BOTH, "Toggle the Chunk unload bucket/priority renderer", "Chunk Unload Priority overlay"),
+    OVERLAY_CHUNK_UNLOAD_BUCKET         ("overlayChunkUnloadBucket", "", KeyBindSettings.INGAME_BOTH, "Toggle the Chunk unload bucket/priority renderer", "Chunk Unload Priority overlay"),
     OVERLAY_LIGHT_LEVEL                 ("overlayLightLevel",           "", "Toggle the Light Level overlay renderer", "Light Level overlay"),
     OVERLAY_RANDOM_TICKS_FIXED          ("overlayRandomTicksFixed",     "", "Toggle the fixed-point random ticked chunks overlay renderer", "Random Ticked Chunks (fixed) overlay"),
     OVERLAY_RANDOM_TICKS_PLAYER         ("overlayRandomTicksPlayer",    "", "Toggle the player-following random ticked chunks overlay renderer", "Random Ticked Chunks (player-following) overlay"),
     OVERLAY_REGION_FILE                 ("overlayRegionFile",           "", "Toggle the region file border overlay renderer", "Region File Border overlay"),
-    OVERLAY_SLIME_CHUNKS_OVERLAY        ("overlaySlimeChunks",          "", KeybindSettings.INGAME_BOTH, "Toggle the Slime Chunk overlay renderer", "Slime Chunks overlay"),
+    OVERLAY_SLIME_CHUNKS_OVERLAY        ("overlaySlimeChunks", "", KeyBindSettings.INGAME_BOTH, "Toggle the Slime Chunk overlay renderer", "Slime Chunks overlay"),
     OVERLAY_SPAWNABLE_CHUNKS_FIXED      ("overlaySpawnableChunksFixed", "", "Toggle the location-fixed spawnable chunks overlay renderer", "Spawnable Chunks (fixed) overlay"),
     OVERLAY_SPAWNABLE_CHUNKS_PLAYER     ("overlaySpawnableChunksPlayer","", "Toggle the player-following spawnable chunks overlay renderer", "Spawnable Chunks (player-following) overlay"),
     OVERLAY_SPAWNABLE_COLUMN_HEIGHTS    ("overlaySpawnableColumnHeights","", "Toggle the spawnable column heights overlay renderer", "Spawnable column heights overlay"),
@@ -44,7 +44,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
     private final String name;
     private final String prettyName;
     private final String comment;
-    private final KeybindMulti keybind;
+    private final KeyBindMulti keybind;
     private final boolean defaultValueBoolean;
     private String modName = "";
     private boolean valueBoolean;
@@ -53,16 +53,16 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
 
     RendererToggle(String name, String defaultHotkey, String comment, String prettyName)
     {
-        this(name, defaultHotkey, KeybindSettings.DEFAULT, comment, prettyName);
+        this(name, defaultHotkey, KeyBindSettings.DEFAULT, comment, prettyName);
     }
 
-    RendererToggle(String name, String defaultHotkey, KeybindSettings settings, String comment, String prettyName)
+    RendererToggle(String name, String defaultHotkey, KeyBindSettings settings, String comment, String prettyName)
     {
         this.name = name;
         this.prettyName = prettyName;
         this.comment = comment;
         this.defaultValueBoolean = false;
-        this.keybind = KeybindMulti.fromStorageString(name, defaultHotkey, settings);
+        this.keybind = KeyBindMulti.fromStorageString(name, defaultHotkey, settings);
 
         if (name.startsWith("debug"))
         {
@@ -170,7 +170,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
     }
 
     @Override
-    public IKeybind getKeybind()
+    public IKeyBind getKeyBind()
     {
         return this.keybind;
     }

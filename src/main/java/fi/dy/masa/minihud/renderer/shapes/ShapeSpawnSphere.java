@@ -6,9 +6,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.Quadrant;
+import fi.dy.masa.malilib.util.position.Quadrant;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class ShapeSpawnSphere extends ShapeSphereBlocky
