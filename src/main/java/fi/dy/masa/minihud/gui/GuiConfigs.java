@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.gui.config.ConfigGuiTabBase;
-import fi.dy.masa.malilib.config.option.IConfigBase;
+import fi.dy.masa.malilib.config.option.ConfigOption;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.config.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.interfaces.IConfigGuiTab;
@@ -42,9 +42,9 @@ public class GuiConfigs extends GuiConfigsBase
 
     public static IConfigGuiTab tab = INFO_TOGGLES;
 
-    private static List<IConfigBase> getStructureConfigs()
+    private static List<ConfigOption> getStructureConfigs()
     {
-        List<IConfigBase> list = new ArrayList<>();
+        List<ConfigOption> list = new ArrayList<>();
         list.addAll(StructureToggle.getToggleConfigs());
         list.addAll(StructureToggle.getHotkeys());
         list.addAll(StructureToggle.getColorConfigs());

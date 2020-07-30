@@ -7,7 +7,7 @@ import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.gui.config.GuiModConfigs;
 import fi.dy.masa.malilib.gui.config.liteloader.ConfigPanelBase;
-import fi.dy.masa.malilib.config.option.IConfigBase;
+import fi.dy.masa.malilib.config.option.ConfigOption;
 import fi.dy.masa.malilib.config.option.IConfigValue;
 import fi.dy.masa.malilib.gui.util.ConfigInfoProviderSimple;
 import fi.dy.masa.minihud.Reference;
@@ -44,7 +44,7 @@ public class MiniHudConfigPanel extends ConfigPanelBase
         provider = new ConfigInfoProviderSimple("Hotkey to toggle the '", "' info line");
         this.addSubPanel((new GuiModConfigs(modId, configs, "minihud.gui.button.config_gui.info_hotkeys")).setHoverInfoProvider(provider));
 
-        List<IConfigBase> list = new ArrayList<>();
+        List<ConfigOption> list = new ArrayList<>();
         list.addAll(StructureToggle.getToggleConfigs());
         list.addAll(StructureToggle.getHotkeys());
         list.addAll(StructureToggle.getColorConfigs());

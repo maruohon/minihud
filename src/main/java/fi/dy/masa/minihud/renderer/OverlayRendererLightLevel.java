@@ -18,8 +18,8 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.chunk.Chunk;
-import fi.dy.masa.malilib.config.option.ConfigColor;
-import fi.dy.masa.malilib.config.option.IConfigDouble;
+import fi.dy.masa.malilib.config.option.ColorConfig;
+import fi.dy.masa.malilib.config.option.DoubleConfig;
 import fi.dy.masa.malilib.render.overlay.RenderObjectBase;
 import fi.dy.masa.malilib.render.overlay.RenderObjectVbo;
 import fi.dy.masa.malilib.util.data.Color4f;
@@ -142,8 +142,8 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         }
     }
 
-    private void renderNumbers(Vec3d cameraPos, LightLevelNumberMode mode, IConfigDouble cfgOffX, IConfigDouble cfgOffZ,
-                               ConfigColor cfgColorLit, ConfigColor cfgColorDark, boolean useColoredNumbers,
+    private void renderNumbers(Vec3d cameraPos, LightLevelNumberMode mode, DoubleConfig cfgOffX, DoubleConfig cfgOffZ,
+                               ColorConfig cfgColorLit, ColorConfig cfgColorDark, boolean useColoredNumbers,
                                int lightThreshold, EnumFacing numberFacing, BufferBuilder buffer)
     {
         double ox = cfgOffX.getDoubleValue();

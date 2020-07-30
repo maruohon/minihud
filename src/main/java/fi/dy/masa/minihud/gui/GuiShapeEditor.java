@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 import org.lwjgl.input.Keyboard;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
-import fi.dy.masa.malilib.config.option.ConfigOptionList;
+import fi.dy.masa.malilib.config.option.OptionListConfig;
 import fi.dy.masa.malilib.config.value.BlockSnap;
 import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -40,14 +40,14 @@ import fi.dy.masa.minihud.util.ShapeRenderType;
 public class GuiShapeEditor extends GuiRenderLayerEditBase
 {
     private final ShapeBase shape;
-    private ConfigOptionList<BlockSnap> configBlockSnap;
+    private OptionListConfig<BlockSnap> configBlockSnap;
     private int colorY;
 
     public GuiShapeEditor(ShapeBase shape)
     {
         this.shape = shape;
         this.title = StringUtils.translate("minihud.gui.title.shape_editor");
-        this.configBlockSnap = new ConfigOptionList<BlockSnap>("blockSnap", BlockSnap.NONE, "");
+        this.configBlockSnap = new OptionListConfig<BlockSnap>("blockSnap", BlockSnap.NONE, "");
     }
 
     @Override

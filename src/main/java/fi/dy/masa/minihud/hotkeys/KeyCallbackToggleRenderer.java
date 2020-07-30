@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.config.option.IConfigBoolean;
+import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.input.IKeyBind;
 import fi.dy.masa.malilib.input.KeyAction;
@@ -23,7 +23,7 @@ import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableChunks;
 
 public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWithMessage
 {
-    public KeyCallbackToggleRenderer(IConfigBoolean config)
+    public KeyCallbackToggleRenderer(BooleanConfig config)
     {
         super(config);
     }
