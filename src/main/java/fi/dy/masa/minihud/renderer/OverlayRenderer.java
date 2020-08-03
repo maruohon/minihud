@@ -40,6 +40,11 @@ public class OverlayRenderer
             Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
             OverlayRendererLightLevel.render(cameraPos.x, cameraPos.y, cameraPos.z, entity, mc);
         }
+        else if (RendererToggle.OVERLAY_HARVEST_LEVEL.getBooleanValue()) 
+        {
+        	Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        	OverlayRendererHarvestLevel.render(cameraPos.x, cameraPos.y, cameraPos.z, entity, mc);
+        }
 
         RenderContainer.INSTANCE.render(entity, mc, partialTicks);
     }

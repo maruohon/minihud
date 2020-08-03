@@ -35,6 +35,7 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.network.StructurePacketHandler;
+import fi.dy.masa.minihud.renderer.OverlayRendererHarvestLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
@@ -215,6 +216,7 @@ public class DataStorage
     {
         OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
         OverlayRendererLightLevel.setNeedsUpdate();
+        OverlayRendererHarvestLevel.setNeedsUpdate();
     }
 
     public boolean onSendChatMessage(PlayerEntity player, String message)

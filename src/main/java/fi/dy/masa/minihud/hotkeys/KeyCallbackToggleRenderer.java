@@ -8,6 +8,7 @@ import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.renderer.OverlayRendererHarvestLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
@@ -43,6 +44,10 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             if (key == RendererToggle.OVERLAY_LIGHT_LEVEL.getKeybind())
             {
                 OverlayRendererLightLevel.setNeedsUpdate();
+            }
+            else if (key == RendererToggle.OVERLAY_HARVEST_LEVEL.getKeybind())
+            {
+            	OverlayRendererHarvestLevel.setNeedsUpdate();
             }
             else if (key == RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind())
             {
