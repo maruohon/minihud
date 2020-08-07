@@ -11,7 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.render.overlay.RenderObjectBase;
+import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.Configs;
@@ -69,8 +69,8 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
                 Configs.Colors.RANDOM_TICKS_PLAYER_OVERLAY_COLOR.getColor() :
                 Configs.Colors.RANDOM_TICKS_FIXED_OVERLAY_COLOR.getColor();
 
-        RenderObjectBase renderQuads = this.renderObjects.get(0);
-        RenderObjectBase renderLines = this.renderObjects.get(1);
+        BaseRenderObject renderQuads = this.renderObjects.get(0);
+        BaseRenderObject renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 

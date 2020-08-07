@@ -1,11 +1,11 @@
 package fi.dy.masa.minihud.util;
 
 import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
 import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
-import fi.dy.masa.malilib.config.value.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum ShapeRenderType implements IConfigOptionListEntry<ShapeRenderType>
+public enum ShapeRenderType implements ConfigOptionListEntry<ShapeRenderType>
 {
     FULL_BLOCK ("full_block", "minihud.label.shape_render_type.full_block"),
     INNER_EDGE ("inner_edge", "minihud.label.shape_render_type.inner_edge"),
@@ -37,12 +37,12 @@ public enum ShapeRenderType implements IConfigOptionListEntry<ShapeRenderType>
     @Override
     public ShapeRenderType cycle(boolean forward)
     {
-        return ConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
+        return BaseConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
     }
 
     @Override
     public ShapeRenderType fromString(String name)
     {
-        return ConfigOptionListEntry.findValueByName(name, VALUES);
+        return BaseConfigOptionListEntry.findValueByName(name, VALUES);
     }
 }

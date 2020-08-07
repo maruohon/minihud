@@ -20,8 +20,8 @@ import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.config.option.ColorConfig;
 import fi.dy.masa.malilib.config.option.DoubleConfig;
-import fi.dy.masa.malilib.render.overlay.RenderObjectBase;
-import fi.dy.masa.malilib.render.overlay.RenderObjectVbo;
+import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
+import fi.dy.masa.malilib.render.overlay.VboRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -64,8 +64,8 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         BlockPos pos = new BlockPos(entity);
-        RenderObjectBase renderQuads = this.renderObjects.get(0);
-        RenderObjectBase renderLines = this.renderObjects.get(1);
+        BaseRenderObject renderQuads = this.renderObjects.get(0);
+        BaseRenderObject renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), renderQuads.getVertexFormat());
         BUFFER_2.begin(renderLines.getGlMode(), renderLines.getVertexFormat());
 
@@ -95,7 +95,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     @Override
     public void allocateGlResources()
     {
-        this.allocateBuffer(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR, RenderObjectVbo::setupArrayPointersPosUvColor);
+        this.allocateBuffer(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR, VboRenderObject::setupArrayPointersPosUvColor);
         this.allocateBuffer(GL11.GL_LINES);
     }
 

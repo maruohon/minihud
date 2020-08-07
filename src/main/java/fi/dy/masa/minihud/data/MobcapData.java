@@ -11,7 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.util.MathUtils;
 import fi.dy.masa.minihud.util.MiscUtils;
 
@@ -322,18 +322,18 @@ public class MobcapData
         }
 
         return String.format("Mob caps: Ho: %s Pa: %s Wa: %s Am: %s",
-                this.getCapString(data.getCap(EnumCreatureType.MONSTER), GuiBase.TXT_RED),
-                this.getCapString(data.getCap(EnumCreatureType.CREATURE), GuiBase.TXT_GREEN),
-                this.getCapString(data.getCap(EnumCreatureType.WATER_CREATURE), GuiBase.TXT_BLUE),
-                this.getCapString(data.getCap(EnumCreatureType.AMBIENT), GuiBase.TXT_GRAY));
+                this.getCapString(data.getCap(EnumCreatureType.MONSTER), BaseScreen.TXT_RED),
+                this.getCapString(data.getCap(EnumCreatureType.CREATURE), BaseScreen.TXT_GREEN),
+                this.getCapString(data.getCap(EnumCreatureType.WATER_CREATURE), BaseScreen.TXT_BLUE),
+                this.getCapString(data.getCap(EnumCreatureType.AMBIENT), BaseScreen.TXT_GRAY));
     }
 
     private String getCapString(Cap cap, String color)
     {
         int current = cap.getCurrent();
         int mobcap = cap.getCap();
-        String rst = GuiBase.TXT_RST;
-        String pre = current >= mobcap ? color + GuiBase.TXT_BOLD : color;
+        String rst = BaseScreen.TXT_RST;
+        String pre = current >= mobcap ? color + BaseScreen.TXT_BOLD : color;
 
         return String.format("%s%d%s / %d%s", pre, current, color, mobcap, rst);
     }

@@ -11,9 +11,9 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.render.overlay.RenderObjectBase;
-import fi.dy.masa.malilib.render.overlay.RenderObjectDisplayList;
-import fi.dy.masa.malilib.render.overlay.RenderObjectVbo;
+import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
+import fi.dy.masa.malilib.render.overlay.DisplayListRenderObject;
+import fi.dy.masa.malilib.render.overlay.VboRenderObject;
 
 public abstract class OverlayRendererBase implements IOverlayRenderer
 {
@@ -21,7 +21,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     protected static final BufferBuilder BUFFER_2 = new BufferBuilder(2097152);
     protected static final BufferBuilder BUFFER_3 = new BufferBuilder(2097152);
 
-    protected final List<RenderObjectBase> renderObjects = new ArrayList<>();
+    protected final List<BaseRenderObject> renderObjects = new ArrayList<>();
     protected boolean renderThrough = false;
     protected float glLineWidth = 1f;
     protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
@@ -64,7 +64,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     {
         this.preRender();
 
-        for (RenderObjectBase obj : this.renderObjects)
+        for (BaseRenderObject obj : this.renderObjects)
         {
             obj.draw();
         }
@@ -75,7 +75,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     @Override
     public void deleteGlResources()
     {
-        for (RenderObjectBase obj : this.renderObjects)
+        for (BaseRenderObject obj : this.renderObjects)
         {
             obj.deleteGlResources();
         }
@@ -88,9 +88,9 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
      * @param glMode
      * @return
      */
-    protected RenderObjectBase allocateBuffer(int glMode)
+    protected BaseRenderObject allocateBuffer(int glMode)
     {
-        return this.allocateBuffer(glMode, DefaultVertexFormats.POSITION_COLOR, RenderObjectVbo::setupArrayPointersPosColor);
+        return this.allocateBuffer(glMode, DefaultVertexFormats.POSITION_COLOR, VboRenderObject::setupArrayPointersPosColor);
     }
 
     /**
@@ -100,17 +100,17 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
      * @param func the function to set up the array pointers according to the used vertex format
      * @return
      */
-    protected RenderObjectBase allocateBuffer(int glMode, VertexFormat vertexFormat, RenderObjectVbo.IArrayPointerSetter func)
+    protected BaseRenderObject allocateBuffer(int glMode, VertexFormat vertexFormat, VboRenderObject.IArrayPointerSetter func)
     {
-        RenderObjectBase obj;
+        BaseRenderObject obj;
 
         if (OpenGlHelper.useVbo())
         {
-            obj = new RenderObjectVbo(glMode, vertexFormat, func);
+            obj = new VboRenderObject(glMode, vertexFormat, func);
         }
         else
         {
-            obj = new RenderObjectDisplayList(glMode, vertexFormat);
+            obj = new DisplayListRenderObject(glMode, vertexFormat);
         }
 
         this.renderObjects.add(obj);

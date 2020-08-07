@@ -11,7 +11,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.render.overlay.RenderObjectBase;
+import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
@@ -46,7 +46,7 @@ public class ShapeCircle extends ShapeCircleBase
 
     protected void renderCircleShape(Vec3d cameraPos)
     {
-        RenderObjectBase renderQuads = this.renderObjects.get(0);
+        BaseRenderObject renderQuads = this.renderObjects.get(0);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
         BlockPos posCenter = this.getCenterBlock();

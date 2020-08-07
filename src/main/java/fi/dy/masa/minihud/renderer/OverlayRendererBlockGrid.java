@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import fi.dy.masa.malilib.render.overlay.RenderObjectBase;
+import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.minihud.config.Configs;
@@ -45,7 +45,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         Color4f color = Configs.Colors.BLOCK_GRID_OVERLAY_COLOR.getColor();
         int radius = Configs.Generic.BLOCK_GRID_OVERLAY_RADIUS.getIntegerValue();
 
-        RenderObjectBase renderLines = this.renderObjects.get(0);
+        BaseRenderObject renderLines = this.renderObjects.get(0);
         BUFFER_1.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BlockGridMode mode = Configs.Generic.BLOCK_GRID_OVERLAY_MODE.getOptionListValue();
 

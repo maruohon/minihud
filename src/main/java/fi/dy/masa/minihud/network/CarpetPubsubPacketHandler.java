@@ -20,8 +20,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
-import fi.dy.masa.malilib.network.IClientPacketChannelHandler;
-import fi.dy.masa.malilib.network.IPluginChannelHandler;
+import fi.dy.masa.malilib.network.PluginChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
@@ -32,7 +31,7 @@ import fi.dy.masa.minihud.data.MobcapData;
 import fi.dy.masa.minihud.data.WoolCounters;
 import io.netty.buffer.Unpooled;
 
-public class CarpetPubsubPacketHandler implements IPluginChannelHandler
+public class CarpetPubsubPacketHandler implements PluginChannelHandler
 {
     public static final ResourceLocation CHANNEL_NAME = new ResourceLocation("carpet:pubsub");
     public static final List<ResourceLocation> CHANNELS = ImmutableList.of(CHANNEL_NAME);
@@ -233,7 +232,7 @@ public class CarpetPubsubPacketHandler implements IPluginChannelHandler
 
         if (world != null)
         {
-            IClientPacketChannelHandler handler = ClientPacketChannelHandler.getInstance();
+            ClientPacketChannelHandler handler = ClientPacketChannelHandler.INSTANCE;
             Set<String> unsubs = new HashSet<>();
             Set<String> newsubs = new HashSet<>();
             DimensionType dimType = world.provider.getDimensionType();

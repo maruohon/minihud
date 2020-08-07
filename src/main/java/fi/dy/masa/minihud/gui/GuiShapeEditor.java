@@ -11,9 +11,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import fi.dy.masa.malilib.config.option.OptionListConfig;
 import fi.dy.masa.malilib.config.value.BlockSnap;
-import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ConfigButtonOptionList;
+import fi.dy.masa.malilib.gui.BaseRenderLayerEditScreen;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.OptionListConfigButton;
 import fi.dy.masa.malilib.gui.listener.ButtonListenerDoubleModifier;
 import fi.dy.masa.malilib.gui.listener.ButtonListenerIntModifier;
 import fi.dy.masa.malilib.gui.listener.TextFieldListenerDouble;
@@ -24,7 +24,7 @@ import fi.dy.masa.malilib.gui.widget.WidgetColorIndicator;
 import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
 import fi.dy.masa.malilib.gui.widget.WidgetTextFieldDouble;
 import fi.dy.masa.malilib.gui.widget.WidgetTextFieldInteger;
-import fi.dy.masa.malilib.util.position.ICoordinateValueModifier;
+import fi.dy.masa.malilib.util.position.CoordinateValueModifier;
 import fi.dy.masa.malilib.util.consumer.DualDoubleConsumer;
 import fi.dy.masa.malilib.util.consumer.DualIntConsumer;
 import fi.dy.masa.malilib.util.position.LayerRange;
@@ -37,7 +37,7 @@ import fi.dy.masa.minihud.renderer.shapes.ShapeCircleBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeSpawnSphere;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
-public class GuiShapeEditor extends GuiRenderLayerEditBase
+public class GuiShapeEditor extends BaseRenderLayerEditScreen
 {
     private final ShapeBase shape;
     private OptionListConfig<BlockSnap> configBlockSnap;
@@ -60,8 +60,8 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
         this.createShapeEditorElements(x, y);
 
-        ButtonGeneric button = new ButtonGeneric(x, this.height - 24, -1, 20, GuiConfigs.SHAPES.getDisplayName());
-        this.addButton(button, new GuiShapeManager.ButtonListenerTab(GuiConfigs.SHAPES));
+        GenericButton button = new GenericButton(x, this.height - 24, -1, 20, ConfigScreen.SHAPES.getDisplayName());
+        this.addButton(button, new GuiShapeManager.ButtonListenerTab(ConfigScreen.SHAPES));
 
         this.createLayerEditControls(146, 142, this.getLayerRange());
 
@@ -147,7 +147,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         x += 11;
         y += 54;
 
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, false, "malilib.gui.button.render_layers_gui.set_to_player");
+        GenericButton button = new GenericButton(x, y, -1, false, "malilib.gui.button.render_layers_gui.set_to_player");
         this.addButton(button, (btn, mbtn) -> {
             Entity entity = this.mc.getRenderViewEntity();
 
@@ -159,7 +159,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         });
 
         this.configBlockSnap.setOptionListValue(shape.getBlockSnap());
-        ConfigButtonOptionList buttonSnap = new ConfigButtonOptionList(x + button.getWidth() + 4, y, -1, 20, this.configBlockSnap, "minihud.gui.label.shape.block_snap");
+        OptionListConfigButton buttonSnap = new OptionListConfigButton(x + button.getWidth() + 4, y, -1, 20, this.configBlockSnap, "minihud.gui.label.shape.block_snap");
         this.addButton(buttonSnap, (btn, mbtn) -> {
             shape.setBlockSnap(this.configBlockSnap.getOptionListValue());
             this.initGui();
@@ -183,7 +183,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            ButtonGeneric button = new ButtonGeneric(x + 54, y - 1, BaseGuiIcon.BTN_PLUSMINUS_16, hover);
+            GenericButton button = new GenericButton(x + 54, y - 1, BaseGuiIcon.BTN_PLUSMINUS_16, hover);
             this.addButton(button, new ButtonListenerDoubleModifier(supplier, new DualDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
         }
     }
@@ -201,7 +201,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            ButtonGeneric button = new ButtonGeneric(x + 54, y - 1, BaseGuiIcon.BTN_PLUSMINUS_16, hover);
+            GenericButton button = new GenericButton(x + 54, y - 1, BaseGuiIcon.BTN_PLUSMINUS_16, hover);
             this.addButton(button, new ButtonListenerIntModifier(supplier, new DualIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
         }
     }
@@ -211,7 +211,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.addLabel(x, y, 0xFFFFFFFF, translationKey);
         y += 10;
 
-        ButtonGeneric button = new ButtonGeneric(x, y, 50, 20, org.apache.commons.lang3.StringUtils.capitalize(supplier.get().toString().toLowerCase()));
+        GenericButton button = new GenericButton(x, y, 50, 20, org.apache.commons.lang3.StringUtils.capitalize(supplier.get().toString().toLowerCase()));
         this.addButton(button, (btn, mouseBtn) -> { consumer.accept(PositionUtils.cycleDirection(supplier.get(), mouseBtn == 1)); this.initGui(); } );
     }
 
@@ -220,11 +220,11 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.addLabel(x, y, 0xFFFFFFFF, translationKey);
         y += 10;
 
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, 20, supplier.get().getDisplayName());
+        GenericButton button = new GenericButton(x, y, -1, 20, supplier.get().getDisplayName());
         this.addButton(button, (btn, mouseBtn) -> { consumer.accept(supplier.get().cycle(mouseBtn == 0)); this.initGui(); } );
     }
 
-    private static class SphereEditor implements ICoordinateValueModifier
+    private static class SphereEditor implements CoordinateValueModifier
     {
         private final GuiShapeEditor gui;
         private final ShapeCircleBase shape;

@@ -6,17 +6,17 @@ import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.option.IConfigBoolean;
 import fi.dy.masa.malilib.config.option.IConfigNotifiable;
-import fi.dy.masa.malilib.input.IHotkey;
-import fi.dy.masa.malilib.input.IKeyBind;
-import fi.dy.masa.malilib.input.KeyBindMulti;
+import fi.dy.masa.malilib.input.Hotkey;
+import fi.dy.masa.malilib.input.KeyBind;
+import fi.dy.masa.malilib.input.KeyBindImpl;
 import fi.dy.masa.malilib.input.KeyBindSettings;
-import fi.dy.masa.malilib.config.IValueChangeCallback;
+import fi.dy.masa.malilib.config.ValueChangeCallback;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
-import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
+import fi.dy.masa.minihud.hotkeys.RendererToggleKeyCallback;
 
-public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable<Boolean>
+public enum RendererToggle implements IConfigBoolean, Hotkey, IConfigNotifiable<Boolean>
 {
     DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled",    "", "Toggles the vanilla Block Collision Boxes debug renderer", "Block Collision Boxes"),
     DEBUG_HEIGHT_MAP                    ("debugHeightMapEnabled",       "", "Toggles the vanilla Height Map debug renderer", "Height Map"),
@@ -44,12 +44,12 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
     private final String name;
     private final String prettyName;
     private final String comment;
-    private final KeyBindMulti keybind;
+    private final KeyBindImpl keybind;
     private final boolean defaultValueBoolean;
     private String modName = "";
     private boolean valueBoolean;
     private boolean lastSavedValueBoolean;
-    @Nullable private IValueChangeCallback<Boolean> callback;
+    @Nullable private ValueChangeCallback<Boolean> callback;
 
     RendererToggle(String name, String defaultHotkey, String comment, String prettyName)
     {
@@ -62,7 +62,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
         this.prettyName = prettyName;
         this.comment = comment;
         this.defaultValueBoolean = false;
-        this.keybind = KeyBindMulti.fromStorageString(name, defaultHotkey, settings);
+        this.keybind = KeyBindImpl.fromStorageString(name, defaultHotkey, settings);
 
         if (name.startsWith("debug"))
         {
@@ -70,7 +70,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
         }
         else
         {
-            this.keybind.setCallback(new KeyCallbackToggleRenderer(this));
+            this.keybind.setCallback(new RendererToggleKeyCallback(this));
         }
 
         if (name.equals("overlayStructureMainToggle"))
@@ -127,7 +127,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
     public void setModName(String modName)
     {
         this.modName = modName;
-        this.keybind.setModName(modName);
+        this.keybind.setModId(modName);
     }
 
     @Override
@@ -155,7 +155,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
     }
 
     @Override
-    public void setValueChangeCallback(IValueChangeCallback<Boolean> callback)
+    public void setValueChangeCallback(ValueChangeCallback<Boolean> callback)
     {
         this.callback = callback;
     }
@@ -170,7 +170,7 @@ public enum RendererToggle implements IConfigBoolean, IHotkey, IConfigNotifiable
     }
 
     @Override
-    public IKeyBind getKeyBind()
+    public KeyBind getKeyBind()
     {
         return this.keybind;
     }

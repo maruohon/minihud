@@ -1,11 +1,11 @@
 package fi.dy.masa.minihud.util;
 
 import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
 import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
-import fi.dy.masa.malilib.config.value.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum BlockGridMode implements IConfigOptionListEntry<BlockGridMode>
+public enum BlockGridMode implements ConfigOptionListEntry<BlockGridMode>
 {
     ALL         ("all",         "minihud.label.blockgridmode.all"),
     NON_AIR     ("non_air",     "minihud.label.blockgridmode.non_air"),
@@ -37,12 +37,12 @@ public enum BlockGridMode implements IConfigOptionListEntry<BlockGridMode>
     @Override
     public BlockGridMode cycle(boolean forward)
     {
-        return ConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
+        return BaseConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
     }
 
     @Override
     public BlockGridMode fromString(String name)
     {
-        return ConfigOptionListEntry.findValueByName(name, VALUES);
+        return BaseConfigOptionListEntry.findValueByName(name, VALUES);
     }
 }

@@ -18,11 +18,11 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.nbt.NbtStringifierPretty;
-import fi.dy.masa.malilib.util.nbt.NbtStringifierSimple;
+import fi.dy.masa.malilib.util.nbt.PrettyNbtStringifier;
+import fi.dy.masa.malilib.util.nbt.SimpleNbtStringifier;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.data.DataStorage;
@@ -192,11 +192,11 @@ public class MiscUtils
                 lines.add(StringUtils.translate("item.durability", stack.getMaxDamage() - stack.getItemDamage(), stack.getMaxDamage()));
             }
 
-            lines.add(GuiBase.TXT_DARK_GRAY + Item.REGISTRY.getNameForObject(stack.getItem()).toString());
+            lines.add(BaseScreen.TXT_DARK_GRAY + Item.REGISTRY.getNameForObject(stack.getItem()).toString());
 
             if (stack.hasTagCompound())
             {
-                lines.add(GuiBase.TXT_DARK_GRAY + StringUtils.translate("item.nbt_tags", stack.getTagCompound().getKeySet().size()));
+                lines.add(BaseScreen.TXT_DARK_GRAY + StringUtils.translate("item.nbt_tags", stack.getTagCompound().getKeySet().size()));
             }
         }
 
@@ -206,12 +206,12 @@ public class MiscUtils
         {
             if (showPretty)
             {
-                lines.addAll((new NbtStringifierPretty(true, GuiBase.TXT_GRAY).getNbtLines(tag)));
+                lines.addAll((new PrettyNbtStringifier(true, BaseScreen.TXT_GRAY).getNbtLines(tag)));
             }
 
             if (showString)
             {
-                String str = (new NbtStringifierSimple(true, GuiBase.TXT_GRAY)).getNbtString(tag);
+                String str = (new SimpleNbtStringifier(true, BaseScreen.TXT_GRAY)).getNbtString(tag);
                 StringUtils.splitTextToLines(lines, str, 240);
             }
         }

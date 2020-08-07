@@ -5,10 +5,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.input.IKeyBind;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyAction;
-import fi.dy.masa.malilib.input.KeyCallbackToggleBooleanConfigWithMessage;
+import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -21,15 +21,15 @@ import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableChunks;
 
-public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWithMessage
+public class RendererToggleKeyCallback extends ToggleBooleanWithMessageKeyCallback
 {
-    public KeyCallbackToggleRenderer(BooleanConfig config)
+    public RendererToggleKeyCallback(BooleanConfig config)
     {
         super(config);
     }
 
     @Override
-    public boolean onKeyAction(KeyAction action, IKeyBind key)
+    public boolean onKeyAction(KeyAction action, KeyBind key)
     {
         Minecraft mc = Minecraft.getMinecraft();
 
@@ -41,8 +41,8 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             }
 
             Entity entity = mc.getRenderViewEntity() != null ? mc.getRenderViewEntity() : mc.player;
-            String green = GuiBase.TXT_GREEN;
-            String rst = GuiBase.TXT_RST;
+            String green = BaseScreen.TXT_GREEN;
+            String rst = BaseScreen.TXT_RST;
             String strStatus = green + StringUtils.translate("malilib.message.value.on") + rst;
 
             if (key == RendererToggle.OVERLAY_BEACON_RANGE.getKeyBind())

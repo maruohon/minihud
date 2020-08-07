@@ -1,11 +1,11 @@
 package fi.dy.masa.minihud.util;
 
 import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
 import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
-import fi.dy.masa.malilib.config.value.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum LightLevelNumberMode implements IConfigOptionListEntry<LightLevelNumberMode>
+public enum LightLevelNumberMode implements ConfigOptionListEntry<LightLevelNumberMode>
 {
     NONE    ("none",    "minihud.label.light_level_number_mode.none"),
     BLOCK   ("block",   "minihud.label.light_level_number_mode.block"),
@@ -38,12 +38,12 @@ public enum LightLevelNumberMode implements IConfigOptionListEntry<LightLevelNum
     @Override
     public LightLevelNumberMode cycle(boolean forward)
     {
-        return ConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
+        return BaseConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
     }
 
     @Override
     public LightLevelNumberMode fromString(String name)
     {
-        return ConfigOptionListEntry.findValueByName(name, VALUES);
+        return BaseConfigOptionListEntry.findValueByName(name, VALUES);
     }
 }

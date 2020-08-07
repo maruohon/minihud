@@ -2,12 +2,12 @@ package fi.dy.masa.minihud.event;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.input.IHotkey;
-import fi.dy.masa.malilib.input.IKeyBindProvider;
-import fi.dy.masa.malilib.input.IMouseInputHandler;
-import fi.dy.masa.malilib.input.KeyCallbackAdjustable;
+import fi.dy.masa.malilib.input.Hotkey;
+import fi.dy.masa.malilib.input.KeyBindProvider;
+import fi.dy.masa.malilib.input.MouseInputHandler;
+import fi.dy.masa.malilib.input.callback.AdjustableKeyCallback;
 import fi.dy.masa.malilib.input.KeyBindCategory;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.minihud.Reference;
@@ -18,7 +18,7 @@ import fi.dy.masa.minihud.config.StructureToggle;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 
-public class InputHandler implements IKeyBindProvider, IMouseInputHandler
+public class InputHandler implements KeyBindProvider, MouseInputHandler
 {
     private static final InputHandler INSTANCE = new InputHandler();
 
@@ -33,9 +33,9 @@ public class InputHandler implements IKeyBindProvider, IMouseInputHandler
     }
 
     @Override
-    public List<? extends IHotkey> getAllHotkeys()
+    public List<? extends Hotkey> getAllHotkeys()
     {
-        ImmutableList.Builder<IHotkey> builder = ImmutableList.builder();
+        ImmutableList.Builder<Hotkey> builder = ImmutableList.builder();
 
         builder.add(InfoToggle.values());
         builder.add(RendererToggle.values());
@@ -80,10 +80,10 @@ public class InputHandler implements IKeyBindProvider, IMouseInputHandler
                     size >>>= 1;
                 }
 
-                KeyCallbackAdjustable.setValueChanged();
+                AdjustableKeyCallback.setValueChanged();
 
-                String preGreen = GuiBase.TXT_GREEN;
-                String rst = GuiBase.TXT_RST;
+                String preGreen = BaseScreen.TXT_GREEN;
+                String rst = BaseScreen.TXT_RST;
                 Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.setIntegerValue(size);
                 size = Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
                 String strValue = preGreen + size + rst;
@@ -96,14 +96,14 @@ public class InputHandler implements IKeyBindProvider, IMouseInputHandler
                      RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeyBind().isKeyBindHeld())
             {
                 OverlayRendererSlimeChunks.overlayTopY += (wheelDelta < 0 ? 1 : -1);
-                KeyCallbackAdjustable.setValueChanged();
+                AdjustableKeyCallback.setValueChanged();
                 return true;
             }
             else if (RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getBooleanValue() &&
                      RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeyBind().isKeyBindHeld())
            {
                OverlayRenderer.chunkUnloadBucketOverlayY += (wheelDelta < 0 ? 1 : -1);
-               KeyCallbackAdjustable.setValueChanged();
+               AdjustableKeyCallback.setValueChanged();
                return true;
            }
         }

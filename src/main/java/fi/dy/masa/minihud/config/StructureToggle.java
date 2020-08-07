@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ColorConfig;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
-import fi.dy.masa.malilib.input.IHotkey;
+import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.minihud.data.DataStorage;
 
 public enum StructureToggle
@@ -23,7 +23,7 @@ public enum StructureToggle
     private final BooleanConfig toggleOption;
     private final ColorConfig colorMain;
     private final ColorConfig colorComponents;
-    private final IHotkey hotkey;
+    private final Hotkey hotkey;
 
     StructureToggle(String name, String defaultHotkey, String colorMain, String colorComponents, String comment, String prettyName)
     {
@@ -51,7 +51,7 @@ public enum StructureToggle
         return this.colorComponents;
     }
 
-    public IHotkey getHotkey()
+    public Hotkey getHotkey()
     {
         return this.hotkey;
     }
@@ -81,9 +81,9 @@ public enum StructureToggle
         return builder.build();
     }
 
-    public static ImmutableList<IHotkey> getHotkeys()
+    public static ImmutableList<Hotkey> getHotkeys()
     {
-        ImmutableList.Builder<IHotkey> builder = ImmutableList.builder();
+        ImmutableList.Builder<Hotkey> builder = ImmutableList.builder();
 
         for (StructureToggle toggle : values())
         {

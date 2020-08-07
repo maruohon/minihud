@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
+import com.mumfrey.liteloader.core.ClientPluginChannels;
+import com.mumfrey.liteloader.core.PluginChannels.ChannelPolicy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -28,13 +30,11 @@ import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
-import com.mumfrey.liteloader.core.ClientPluginChannels;
-import com.mumfrey.liteloader.core.PluginChannels.ChannelPolicy;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
-import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -167,7 +167,7 @@ public class StructureStorage
             {
                 if (enabled)
                 {
-                    ClientPacketChannelHandler.getInstance().registerClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
+                    ClientPacketChannelHandler.INSTANCE.registerClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
 
                     // Request the data using both the old and the new protocol/channel name
                     PacketBuffer data = new PacketBuffer(Unpooled.buffer());
@@ -182,7 +182,7 @@ public class StructureStorage
                 }
                 else
                 {
-                    ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
+                    ClientPacketChannelHandler.INSTANCE.unregisterClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
                 }
             }
             else if (enabled)

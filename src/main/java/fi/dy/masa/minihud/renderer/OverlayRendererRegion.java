@@ -7,7 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.render.overlay.RenderObjectBase;
+import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -38,8 +38,8 @@ public class OverlayRendererRegion extends OverlayRendererBase
     @Override
     public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
-        RenderObjectBase renderQuads = this.renderObjects.get(0);
-        RenderObjectBase renderLines = this.renderObjects.get(1);
+        BaseRenderObject renderQuads = this.renderObjects.get(0);
+        BaseRenderObject renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 

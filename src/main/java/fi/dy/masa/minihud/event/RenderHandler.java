@@ -33,10 +33,10 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.config.value.HudAlignment;
-import fi.dy.masa.malilib.event.IPostGameOverlayRenderer;
-import fi.dy.masa.malilib.event.IPostItemTooltipRenderer;
-import fi.dy.masa.malilib.event.IPostWorldRenderer;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.event.PostGameOverlayRenderer;
+import fi.dy.masa.malilib.event.PostItemTooltipRenderer;
+import fi.dy.masa.malilib.event.PostWorldRenderer;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -52,7 +52,7 @@ import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.MiscUtils;
 
-public class RenderHandler implements IPostGameOverlayRenderer, IPostItemTooltipRenderer, IPostWorldRenderer
+public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRenderer, PostWorldRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
     private final Date date;
@@ -134,7 +134,7 @@ public class RenderHandler implements IPostGameOverlayRenderer, IPostItemTooltip
         }
         else if (Configs.Generic.SHULKER_BOX_PREVIEW.getBooleanValue())
         {
-            boolean render = Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown();
+            boolean render = Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || BaseScreen.isShiftDown();
 
             if (render)
             {
@@ -721,11 +721,11 @@ public class RenderHandler implements IPostGameOverlayRenderer, IPostItemTooltip
 
                 if (MiscUtils.canSlimeSpawnAt(pos.getX(), pos.getZ(), seed))
                 {
-                    result = GuiBase.TXT_GREEN + "YES" + GuiBase.TXT_RST;
+                    result = BaseScreen.TXT_GREEN + "YES" + BaseScreen.TXT_RST;
                 }
                 else
                 {
-                    result = GuiBase.TXT_RED + "NO" + GuiBase.TXT_RST;
+                    result = BaseScreen.TXT_RED + "NO" + BaseScreen.TXT_RST;
                 }
             }
             else

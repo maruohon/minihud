@@ -1,20 +1,20 @@
 package fi.dy.masa.minihud.gui.widgets;
 
 import net.minecraft.client.renderer.GlStateManager;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonOnOff;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.OnOffButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.WidgetListEntryBase;
+import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 
-public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
+public class WidgetShapeEntry extends BaseListEntryWidget<ShapeBase>
 {
     private final WidgetListShapes parent;
     private final ShapeBase shape;
@@ -44,7 +44,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
 
     protected int addButton(int x, int y, ButtonListener.Type type)
     {
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, true, type.getDisplayName());
+        GenericButton button = new GenericButton(x, y, -1, true, type.getDisplayName());
         this.addButton(button, new ButtonListener(type, this));
 
         return button.getWidth() + 1;
@@ -52,16 +52,16 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
 
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
+        OnOffButton button = new OnOffButton(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this));
 
         return button.getWidth() + 2;
     }
 
     @Override
-    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    public boolean canHoverAt(int mouseX, int mouseY, int mouseButton)
     {
-        return super.canSelectAt(mouseX, mouseY, mouseButton) && mouseX < this.buttonsStartX;
+        return super.canHoverAt(mouseX, mouseY, mouseButton) && mouseX < this.buttonsStartX;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         RenderUtils.color(1f, 1f, 1f, 1f);
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final Type type;
         private final WidgetShapeEntry widget;
@@ -122,13 +122,13 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == Type.CONFIGURE)
             {
                 GuiShapeEditor gui = new GuiShapeEditor(this.widget.shape);
                 gui.setParent(GuiUtils.getCurrentScreen());
-                GuiBase.openGui(gui);
+                BaseScreen.openGui(gui);
             }
             else if (this.type == Type.ENABLED)
             {

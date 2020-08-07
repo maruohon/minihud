@@ -1,12 +1,12 @@
 package fi.dy.masa.minihud.hotkeys;
 
-import fi.dy.masa.malilib.input.IKeyBind;
+import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyAction;
-import fi.dy.masa.malilib.input.KeyCallbackToggleBooleanConfigWithMessage;
+import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
 
-public class KeyCallbackToggleDebugRenderer extends KeyCallbackToggleBooleanConfigWithMessage
+public class KeyCallbackToggleDebugRenderer extends ToggleBooleanWithMessageKeyCallback
 {
     protected final RendererToggle rendererConfig;
 
@@ -18,7 +18,7 @@ public class KeyCallbackToggleDebugRenderer extends KeyCallbackToggleBooleanConf
     }
 
     @Override
-    public boolean onKeyAction(KeyAction action, IKeyBind key)
+    public boolean onKeyAction(KeyAction action, KeyBind key)
     {
         super.onKeyAction(action, key);
         DebugInfoUtils.toggleDebugRenderer(this.rendererConfig);

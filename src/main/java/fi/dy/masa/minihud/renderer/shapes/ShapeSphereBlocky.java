@@ -7,7 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.render.overlay.RenderObjectBase;
+import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 
@@ -32,7 +32,7 @@ public class ShapeSphereBlocky extends ShapeCircleBase
 
     protected void renderSphereShape(Vec3d cameraPos)
     {
-        RenderObjectBase renderQuads = this.renderObjects.get(0);
+        BaseRenderObject renderQuads = this.renderObjects.get(0);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
         BlockPos posCenter = this.getCenterBlock();

@@ -3,12 +3,12 @@ package fi.dy.masa.minihud.gui;
 import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.IConfigGuiTab;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widget.WidgetDropDownList;
 import fi.dy.masa.malilib.message.MessageType;
@@ -20,7 +20,7 @@ import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.renderer.shapes.ShapeType;
 
-public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, WidgetListShapes>
+public class GuiShapeManager extends BaseListScreen<ShapeBase, WidgetShapeEntry, WidgetListShapes>
                              implements ISelectionListener<ShapeBase>
 {
     protected final WidgetDropDownList<ShapeType> widgetDropDown;
@@ -37,13 +37,13 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
     }
 
     @Override
-    protected int getBrowserWidth()
+    protected int getListWidth()
     {
         return this.width - 20;
     }
 
     @Override
-    protected int getBrowserHeight()
+    protected int getListHeight()
     {
         return this.height - this.getListY() - 6;
     }
@@ -51,7 +51,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
     @Override
     public void initGui()
     {
-        GuiConfigs.tab = GuiConfigs.SHAPES;
+        ConfigScreen.tab = ConfigScreen.SHAPES;
 
         super.initGui();
 
@@ -68,7 +68,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         int y = 26;
         int rows = 1;
 
-        for (IConfigGuiTab tab : GuiConfigs.TABS)
+        for (ConfigTab tab : ConfigScreen.TABS)
         {
             int width = this.getStringWidth(tab.getDisplayName()) + 10;
 
@@ -95,10 +95,10 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         this.addWidget(this.widgetDropDown);
     }
 
-    protected int createTabButton(int x, int y, int width, IConfigGuiTab tab)
+    protected int createTabButton(int x, int y, int width, ConfigTab tab)
     {
-        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, tab.getDisplayName());
-        button.setEnabled(GuiConfigs.tab != tab);
+        GenericButton button = new GenericButton(x, y, width, 20, tab.getDisplayName());
+        button.setEnabled(ConfigScreen.tab != tab);
         this.addButton(button, new ButtonListenerTab(tab));
 
         return button.getWidth() + 2;
@@ -106,7 +106,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
 
     protected int addButton(int x, int y, ButtonListener.Type type)
     {
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, true, type.getDisplayName());
+        GenericButton button = new GenericButton(x, y, -1, true, type.getDisplayName());
         this.addButton(button, new ButtonListener(ButtonListener.Type.ADD_SHAPE, this));
         return button.getWidth();
     }
@@ -121,10 +121,10 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
     @Override
     protected WidgetListShapes createListWidget(int listX, int listY)
     {
-        return new WidgetListShapes(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this.zLevel, this);
+        return new WidgetListShapes(listX, listY, this.getListWidth(), this.getListHeight(), this.zLevel, this);
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final Type type;
         private final GuiShapeManager gui;
@@ -136,7 +136,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == Type.ADD_SHAPE)
             {
@@ -172,20 +172,20 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         }
     }
 
-    public static class ButtonListenerTab implements IButtonActionListener
+    public static class ButtonListenerTab implements ButtonActionListener
     {
-        private final IConfigGuiTab tab;
+        private final ConfigTab tab;
 
-        public ButtonListenerTab(IConfigGuiTab tab)
+        public ButtonListenerTab(ConfigTab tab)
         {
             this.tab = tab;
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
-            GuiConfigs.tab = this.tab;
-            GuiBase.openGui(new GuiConfigs());
+            ConfigScreen.tab = this.tab;
+            BaseScreen.openGui(new ConfigScreen());
         }
     }
 }

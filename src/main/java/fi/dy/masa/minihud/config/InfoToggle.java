@@ -7,15 +7,15 @@ import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.option.IConfigBoolean;
 import fi.dy.masa.malilib.config.option.IConfigInteger;
 import fi.dy.masa.malilib.config.option.IConfigNotifiable;
-import fi.dy.masa.malilib.input.IHotkey;
-import fi.dy.masa.malilib.input.IKeyBind;
-import fi.dy.masa.malilib.input.KeyCallbackToggleBoolean;
-import fi.dy.masa.malilib.input.KeyBindMulti;
+import fi.dy.masa.malilib.input.Hotkey;
+import fi.dy.masa.malilib.input.KeyBind;
+import fi.dy.masa.malilib.input.callback.ToggleBooleanKeyCallback;
+import fi.dy.masa.malilib.input.KeyBindImpl;
 import fi.dy.masa.malilib.input.KeyBindSettings;
-import fi.dy.masa.malilib.config.IValueChangeCallback;
+import fi.dy.masa.malilib.config.ValueChangeCallback;
 import fi.dy.masa.minihud.LiteModMiniHud;
 
-public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConfigNotifiable<Boolean>
+public enum InfoToggle implements IConfigInteger, IConfigBoolean, Hotkey, IConfigNotifiable<Boolean>
 {
     BIOME                   ("infoBiome",                   false, 19, "", "Show the name of the current biome"),
     BIOME_REG_NAME          ("infoBiomeRegistryName",       false, 20, "", "Show the registry name of the current biome"),
@@ -65,7 +65,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
     private final String name;
     private final String prettyName;
     private final String comment;
-    private final KeyBindMulti keybind;
+    private final KeyBindImpl keybind;
     private final boolean defaultValueBoolean;
     private final int defaultLinePosition;
     private String modName = "";
@@ -73,7 +73,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
     private boolean lastSavedValueBoolean;
     private int linePosition;
     private int lastSavedLinePosition;
-    @Nullable private IValueChangeCallback<Boolean> callback;
+    @Nullable private ValueChangeCallback<Boolean> callback;
 
     private InfoToggle(String name, boolean defaultValue, int linePosition, String defaultHotkey, String comment)
     {
@@ -86,8 +86,8 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
         this.prettyName = name;
         this.valueBoolean = defaultValue;
         this.defaultValueBoolean = defaultValue;
-        this.keybind = KeyBindMulti.fromStorageString(name, defaultHotkey, settings);
-        this.keybind.setCallback(new KeyCallbackToggleBoolean(this));
+        this.keybind = KeyBindImpl.fromStorageString(name, defaultHotkey, settings);
+        this.keybind.setCallback(new ToggleBooleanKeyCallback(this));
         this.linePosition = linePosition;
         this.defaultLinePosition = linePosition;
         this.comment = comment;
@@ -141,7 +141,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
     public void setModName(String modName)
     {
         this.modName = modName;
-        this.keybind.setModName(modName);
+        this.keybind.setModId(modName);
     }
 
     @Override
@@ -169,7 +169,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
     }
 
     @Override
-    public void setValueChangeCallback(IValueChangeCallback<Boolean> callback)
+    public void setValueChangeCallback(ValueChangeCallback<Boolean> callback)
     {
         this.callback = callback;
     }
@@ -214,7 +214,7 @@ public enum InfoToggle implements IConfigInteger, IConfigBoolean, IHotkey, IConf
     }
 
     @Override
-    public IKeyBind getKeyBind()
+    public KeyBind getKeyBind()
     {
         return this.keybind;
     }

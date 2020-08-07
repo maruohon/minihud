@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.item.EnumDyeColor;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.util.data.DyeColorCode;
 import fi.dy.masa.minihud.config.Configs;
 
@@ -46,8 +46,8 @@ public class WoolCounters
                 EnumDyeColor color = EnumDyeColor.byMetadata(meta);
 
                 lines.add(String.format("Wool Counter [ %s%s%s ]: %s%d%s",
-                        DyeColorCode.getByMeta(meta).getTextColor().toString(), color.getName(), GuiBase.TXT_RST,
-                        GuiBase.TXT_AQUA, value, GuiBase.TXT_RST));
+                                        DyeColorCode.getByMeta(meta).getTextColor().toString(), color.getName(), BaseScreen.TXT_RST,
+                                        BaseScreen.TXT_AQUA, value, BaseScreen.TXT_RST));
             }
         }
 

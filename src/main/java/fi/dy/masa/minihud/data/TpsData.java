@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 
 public class TpsData
 {
@@ -210,24 +210,24 @@ public class TpsData
         boolean isSynced = this.hasSyncedTpsData;
         double tps = isSynced ? this.syncedServerTps : this.calculatedServerTps;
         double mspt = isSynced ? this.syncedServerMspt : this.calculatedServerMspt;
-        String rst = GuiBase.TXT_RST;
-        String preTps = tps >= 20.0D ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
+        String rst = BaseScreen.TXT_RST;
+        String preTps = tps >= 20.0D ? BaseScreen.TXT_GREEN : BaseScreen.TXT_RED;
         String preMspt;
 
         // Carpet server and integrated server have actual meaningful MSPT data available
         if (isSynced)
         {
-            if      (mspt <= 40) { preMspt = GuiBase.TXT_GREEN; }
-            else if (mspt <= 45) { preMspt = GuiBase.TXT_YELLOW; }
-            else if (mspt <= 50) { preMspt = GuiBase.TXT_GOLD; }
-            else                 { preMspt = GuiBase.TXT_RED; }
+            if      (mspt <= 40) { preMspt = BaseScreen.TXT_GREEN; }
+            else if (mspt <= 45) { preMspt = BaseScreen.TXT_YELLOW; }
+            else if (mspt <= 50) { preMspt = BaseScreen.TXT_GOLD; }
+            else                 { preMspt = BaseScreen.TXT_RED; }
 
             return String.format("Server TPS: %s%.1f%s MSPT: %s%.1f%s", preTps, tps, rst, preMspt, mspt, rst);
         }
         else
         {
-            if (mspt <= 51) { preMspt = GuiBase.TXT_GREEN; }
-            else            { preMspt = GuiBase.TXT_RED; }
+            if (mspt <= 51) { preMspt = BaseScreen.TXT_GREEN; }
+            else            { preMspt = BaseScreen.TXT_RED; }
 
             return String.format("Server TPS: %s%.1f%s (MSPT [est]: %s%.1f%s)", preTps, tps, rst, preMspt, mspt, rst);
         }

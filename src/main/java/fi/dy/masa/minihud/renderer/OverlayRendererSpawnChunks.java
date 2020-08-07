@@ -8,7 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProviderSurface;
-import fi.dy.masa.malilib.render.overlay.RenderObjectBase;
+import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -67,8 +67,8 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         DataStorage data = DataStorage.getInstance();
         BlockPos spawn = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ? new BlockPos(entity) : data.getWorldSpawn();
 
-        RenderObjectBase renderQuads = this.renderObjects.get(0);
-        RenderObjectBase renderLines = this.renderObjects.get(1);
+        BaseRenderObject renderQuads = this.renderObjects.get(0);
+        BaseRenderObject renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 

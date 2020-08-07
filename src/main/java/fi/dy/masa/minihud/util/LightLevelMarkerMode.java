@@ -1,11 +1,11 @@
 package fi.dy.masa.minihud.util;
 
 import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
 import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
-import fi.dy.masa.malilib.config.value.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum LightLevelMarkerMode implements IConfigOptionListEntry<LightLevelMarkerMode>
+public enum LightLevelMarkerMode implements ConfigOptionListEntry<LightLevelMarkerMode>
 {
     NONE    ("none",    "minihud.label.light_level_marker_mode.none"),
     CROSS   ("cross",   "minihud.label.light_level_marker_mode.cross"),
@@ -37,12 +37,12 @@ public enum LightLevelMarkerMode implements IConfigOptionListEntry<LightLevelMar
     @Override
     public LightLevelMarkerMode cycle(boolean forward)
     {
-        return ConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
+        return BaseConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
     }
 
     @Override
     public LightLevelMarkerMode fromString(String name)
     {
-        return ConfigOptionListEntry.findValueByName(name, VALUES);
+        return BaseConfigOptionListEntry.findValueByName(name, VALUES);
     }
 }

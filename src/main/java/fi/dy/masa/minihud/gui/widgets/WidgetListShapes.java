@@ -3,18 +3,18 @@ package fi.dy.masa.minihud.gui.widgets;
 import java.util.Collection;
 import javax.annotation.Nullable;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widget.WidgetListBase;
+import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 
-public class WidgetListShapes extends WidgetListBase<ShapeBase, WidgetShapeEntry>
+public class WidgetListShapes extends BaseListWidget<ShapeBase, WidgetShapeEntry>
 {
     public WidgetListShapes(int x, int y, int width, int height, float zLevel,
             @Nullable ISelectionListener<ShapeBase> selectionListener)
     {
         super(x, y, width, height, selectionListener);
 
-        this.browserEntryHeight = 22;
+        this.entryWidgetFixedHeight = 22;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class WidgetListShapes extends WidgetListBase<ShapeBase, WidgetShapeEntry
     @Override
     protected WidgetShapeEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, ShapeBase entry)
     {
-        return new WidgetShapeEntry(x, y, this.browserEntryWidth,
+        return new WidgetShapeEntry(x, y, this.entryWidgetWidth,
                 this.getBrowserEntryHeightFor(entry), isOdd, entry, listIndex, this);
     }
 }

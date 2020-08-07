@@ -6,8 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
-import fi.dy.masa.malilib.listener.ILayerRangeChangeListener;
+import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
+import fi.dy.masa.malilib.listener.LayerRangeChangeListener;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
@@ -16,7 +16,7 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.OverlayRendererBase;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
-public abstract class ShapeBase extends OverlayRendererBase implements ILayerRangeChangeListener
+public abstract class ShapeBase extends OverlayRendererBase implements LayerRangeChangeListener
 {
     protected final Minecraft mc;
     protected final ShapeType type;
@@ -185,7 +185,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements ILayerRan
 
         if (JsonUtils.hasString(obj, "render_type"))
         {
-            ShapeRenderType type = ConfigOptionListEntry.findValueByName(obj.get("render_type").getAsString(), ShapeRenderType.VALUES);
+            ShapeRenderType type = BaseConfigOptionListEntry.findValueByName(obj.get("render_type").getAsString(), ShapeRenderType.VALUES);
 
             if (type != null)
             {
