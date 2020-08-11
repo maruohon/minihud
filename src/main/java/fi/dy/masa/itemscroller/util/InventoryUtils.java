@@ -243,7 +243,7 @@ public class InventoryUtils
                 tryMoveSingleItemToOtherInventory(slot, gui);
             }
             // Scrolling items from the other inventory into this slot/inventory
-            else if (getStackSize(stack) < slot.getMaxStackAmount(stack))
+            else if (getStackSize(stack) < slot.getMaxItemCount(stack))
             {
                 tryMoveSingleItemToThisInventory(slot, gui);
             }
@@ -2196,7 +2196,7 @@ public class InventoryUtils
                     ItemStack stackTmp = slotTmp.getStack();
 
                     if ((isStackEmpty(stackTmp) && slotTmp.canInsert(stackSlot)) ||
-                        (areStacksEqual(stackTmp, stackSlot)) && slotTmp.getMaxStackAmount(stackTmp) > getStackSize(stackTmp))
+                        (areStacksEqual(stackTmp, stackSlot)) && slotTmp.getMaxItemCount(stackTmp) > getStackSize(stackTmp))
                     {
                         slotNumbers.add(slotTmp.id);
                     }
