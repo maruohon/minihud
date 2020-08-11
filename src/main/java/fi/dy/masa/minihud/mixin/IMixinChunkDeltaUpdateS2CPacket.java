@@ -6,6 +6,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket.class)
 public interface IMixinChunkDeltaUpdateS2CPacket
 {
-    @Accessor("chunkPos")
-    net.minecraft.util.math.ChunkPos getChunkPos();
+    @Accessor("sectionPos")
+    net.minecraft.util.math.ChunkSectionPos minihud_getChunkSectionPos();
 }

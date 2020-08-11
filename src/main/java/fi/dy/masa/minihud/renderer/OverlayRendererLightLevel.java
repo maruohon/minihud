@@ -409,7 +409,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         return false;
     }
 
-    public static boolean isClearForSpawnWrapper(BlockView blockView, BlockPos pos, BlockState state, FluidState fluidState, EntityType entityType)
+    public static boolean isClearForSpawnWrapper(BlockView blockView, BlockPos pos, BlockState state, FluidState fluidState, EntityType<?> entityType)
     {
         return tagsBroken ? isClearForSpawnStripped(blockView, pos, state, fluidState, entityType) : SpawnHelper.isClearForSpawn(blockView, pos, state, fluidState, entityType);
     }
@@ -420,7 +420,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
      * ViaVersion servers that have old 1.12.2 worlds.
      * (or possibly newer versions as well, but older than 1.16 or 1.15 or whenever the tag syncing was added)
      */
-    public static boolean isClearForSpawnStripped(BlockView blockView, BlockPos pos, BlockState state, FluidState fluidState, EntityType entityType)
+    public static boolean isClearForSpawnStripped(BlockView blockView, BlockPos pos, BlockState state, FluidState fluidState, EntityType<?> entityType)
     {
         if (state.isFullCube(blockView, pos) || state.emitsRedstonePower() || fluidState.isEmpty() == false)
         {

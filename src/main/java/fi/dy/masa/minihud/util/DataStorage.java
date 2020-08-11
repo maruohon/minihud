@@ -501,7 +501,7 @@ public class DataStorage
 
     private void updateStructureDataFromIntegratedServer(final BlockPos playerPos)
     {
-        final RegistryKey<DimensionType> dimId = this.mc.player.getEntityWorld().getDimensionRegistryKey();
+        final DimensionType dimId = this.mc.player.getEntityWorld().getDimension();
         final RegistryKey<World> worldId = this.mc.player.getEntityWorld().getRegistryKey();
         final ServerWorld world = this.mc.getServer().getWorld(worldId);
 
@@ -588,7 +588,7 @@ public class DataStorage
         }
     }
 
-    private void addStructureDataFromGenerator(ServerWorld world, RegistryKey<DimensionType> dimId, BlockPos playerPos, int maxChunkRange)
+    private void addStructureDataFromGenerator(ServerWorld world, DimensionType dimId, BlockPos playerPos, int maxChunkRange)
     {
         this.structures.clear();
 
@@ -620,7 +620,7 @@ public class DataStorage
                     {
                         for (StructureType type : enabledTypes)
                         {
-                            StructureStart start = chunk.getStructureStart(type.getFeature());
+                            StructureStart<?> start = chunk.getStructureStart(type.getFeature());
 
                             if (start != null)
                             {

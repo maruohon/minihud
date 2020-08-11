@@ -1,7 +1,7 @@
 package fi.dy.masa.minihud.util;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -63,7 +63,7 @@ public class StructureData
         return this.refreshTime;
     }
 
-    public static StructureData fromStructureStart(StructureType type, StructureStart structure)
+    public static StructureData fromStructureStart(StructureType type, StructureStart<?> structure)
     {
         ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
         List<StructurePiece> components = structure.getChildren();

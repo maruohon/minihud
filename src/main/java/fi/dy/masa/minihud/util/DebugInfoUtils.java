@@ -1,7 +1,6 @@
 package fi.dy.masa.minihud.util;
 
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import com.google.common.collect.MapMaker;
@@ -34,7 +33,7 @@ public class DebugInfoUtils
     private static boolean neighborUpdateEnabled;
     private static boolean pathfindingEnabled;
     private static int tickCounter;
-    private static final Map<Entity, Path> OLD_PATHS = new MapMaker().weakKeys().weakValues().<Entity, Path>makeMap();
+    private static final Map<Entity, Path> OLD_PATHS = new MapMaker().weakKeys().weakValues().makeMap();
 
     public static void sendPacketDebugPath(MinecraftServer server, int entityId, Path path, float maxDistance)
     {
@@ -100,13 +99,15 @@ public class DebugInfoUtils
 
             writeBlockPosToBuffer(buf, target);
 
-            List<PathNode> nodes = path.getNodes();
             PathNode[] openSet = path.method_22880();
             PathNode[] closedSet = path.method_22881();
+            int length = path.getLength();
 
-            buf.writeInt(nodes.size());
-            for (PathNode point : nodes)
+            buf.writeInt(length);
+
+            for (int i = 0; i < length; ++i)
             {
+                PathNode point = path.getNode(i);
                 writePathPointToBuffer(buf, point);
             }
 
@@ -134,14 +135,10 @@ public class DebugInfoUtils
         {
             final long time = world.getTime();
 
-            MinecraftClient.getInstance().execute(new Runnable()
-            {
-                public void run()
+            MinecraftClient.getInstance().execute(() -> {
+                for (Direction side : notifiedSides)
                 {
-                    for (Direction side : notifiedSides)
-                    {
-                        ((NeighborUpdateDebugRenderer) MinecraftClient.getInstance().debugRenderer.neighborUpdateDebugRenderer).addNeighborUpdate(time, pos.offset(side));
-                    }
+                    ((NeighborUpdateDebugRenderer) MinecraftClient.getInstance().debugRenderer.neighborUpdateDebugRenderer).addNeighborUpdate(time, pos.offset(side));
                 }
             });
         }
@@ -159,9 +156,9 @@ public class DebugInfoUtils
 
             if (world != null)
             {
-                Predicate<Entity> predicate = (entity) -> { return (entity instanceof MobEntity) && entity.isAlive(); };
+                Predicate<Entity> predicate = (entity) -> (entity instanceof MobEntity) && entity.isAlive();
 
-                for (Entity entity : world.getEntities(null, predicate))
+                for (Entity entity : world.getEntitiesByType(null, predicate))
                 {
                     EntityNavigation navigator = ((MobEntity) entity).getNavigation();
 
@@ -190,7 +187,7 @@ public class DebugInfoUtils
                                 PacketByteBuf buf = DebugInfoUtils.writePathTobuffer(path);
                                 OLD_PATHS.put(entity, Path.fromBuffer(buf));
                             }
-                            else if (old != null)
+                            else
                             {
                                 old.setCurrentNodeIndex(path.getCurrentNodeIndex());
                             }

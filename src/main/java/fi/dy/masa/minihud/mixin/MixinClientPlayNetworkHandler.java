@@ -24,8 +24,8 @@ public abstract class MixinClientPlayNetworkHandler
     @Inject(method = "onChunkDeltaUpdate", at = @At("RETURN"))
     private void markChunkChangedMultiBlockChange(net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket packet, CallbackInfo ci)
     {
-        net.minecraft.util.math.ChunkPos pos = ((IMixinChunkDeltaUpdateS2CPacket) packet).getChunkPos();
-        DataStorage.getInstance().markChunkForHeightmapCheck(pos.x, pos.z);
+        net.minecraft.util.math.ChunkSectionPos pos = ((IMixinChunkDeltaUpdateS2CPacket) packet).minihud_getChunkSectionPos();
+        DataStorage.getInstance().markChunkForHeightmapCheck(pos.getX(), pos.getZ());
     }
 
     @Inject(method = "onGameMessage", at = @At("RETURN"))

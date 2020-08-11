@@ -9,7 +9,6 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.IntBoundingBox;
@@ -38,7 +37,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
         for (StructureType type : StructureType.VALUES)
         {
-            if (type.isEnabled() && type.existsInDimension(mc.world.getDimensionRegistryKey()))
+            if (type.isEnabled() && type.existsInDimension(mc.world.getDimension()))
             {
                 return true;
             }
@@ -66,7 +65,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
 
-        this.updateStructures(mc.world.getDimensionRegistryKey(), this.lastUpdatePos, cameraPos, mc);
+        this.updateStructures(mc.world.getDimension(), this.lastUpdatePos, cameraPos, mc);
 
         BUFFER_1.end();
         BUFFER_2.end();
@@ -82,7 +81,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
         this.allocateBuffer(GL11.GL_LINES);
     }
 
-    private void updateStructures(RegistryKey<DimensionType> dimId, BlockPos playerPos, Vec3d cameraPos, MinecraftClient mc)
+    private void updateStructures(DimensionType dimId, BlockPos playerPos, Vec3d cameraPos, MinecraftClient mc)
     {
         ArrayListMultimap<StructureType, StructureData> structures = DataStorage.getInstance().getCopyOfStructureData();
         int maxRange = (mc.options.viewDistance + 4) * 16;
