@@ -49,12 +49,12 @@ public class OverlayRenderer
         double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
         double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
 
-        if (RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getBooleanValue())
+        if (RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.isRendererEnabled())
         {
             renderChunkUnloadBuckets(mc, entity, dx, dy, dz, chunkUnloadBucketOverlayY);
         }
 
-        if (RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue())
+        if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled())
         {
             OverlayRendererBeaconRange.renderBeaconBoxForPlayerIfHoldingItem(mc.player, dx, dy, dz, partialTicks);
         }

@@ -1,44 +1,79 @@
 package fi.dy.masa.minihud.config;
 
+import java.util.Locale;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ColorConfig;
+import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
-import fi.dy.masa.malilib.input.Hotkey;
+import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.minihud.data.DataStorage;
 
-public enum StructureToggle
+public enum StructureToggle implements ConfigInfo
 {
-    OVERLAY_STRUCTURE_DESERT_PYRAMID    ("Desert Pyramid",  "", "#30FFFF00", "#30FFFF00", "Toggle Desert Pyramid structure bounding boxes rendering", "Desert Pyramid"),
-    OVERLAY_STRUCTURE_END_CITY          ("End City",        "", "#30EB07EB", "#30EB07EB", "Toggle End City structure bounding boxes rendering", "End City"),
-    OVERLAY_STRUCTURE_IGLOO             ("Igloo",           "", "#300FAFE4", "#300FAFE4", "Toggle Igloo structure bounding boxes rendering", "Igloo structures"),
-    OVERLAY_STRUCTURE_JUNGLE_TEMPLE     ("Jungle Temple",   "", "#3099FF00", "#3099FF00", "Toggle Jungle Temple structure bounding boxes rendering", "Jungle Temple"),
-    OVERLAY_STRUCTURE_MANSION           ("Mansion",         "", "#30FF6500", "#30FF6500", "Toggle Mansion structure bounding boxes rendering", "Mansion structures"),
-    OVERLAY_STRUCTURE_NETHER_FORTRESS   ("Nether Fortress", "", "#30FC381D", "#30FC381D", "Toggle Nether Fortress structure bounding boxes rendering", "Nether Fortress"),
-    OVERLAY_STRUCTURE_OCEAN_MONUMENT    ("Ocean Monument",  "", "#3029E6EF", "#3029E6EF", "Toggle Ocean Monument structure bounding boxes rendering", "Ocean Monument"),
-    OVERLAY_STRUCTURE_STRONGHOLD        ("Stronghold",      "", "#30009999", "#30009999", "Toggle Stronghold structure bounding boxes rendering", "Stronghold"),
-    OVERLAY_STRUCTURE_VILLAGE           ("Village",         "", "#3054CB4E", "#3054CB4E", "Toggle Village structure bounding boxes rendering\nNOTE: This is the Village world gen structures!\nThis is not the Village data you use for iron farms etc.!", "Village"),
-    OVERLAY_STRUCTURE_WITCH_HUT         ("Witch Hut",       "", "#30BE1DFC", "#300099FF", "Toggle Witch Hut structure bounding boxes rendering", "Witch Hut");
+    OVERLAY_STRUCTURE_DESERT_PYRAMID    ("desertPyramid",   "#30FFFF00", "#30FFFF00"),
+    OVERLAY_STRUCTURE_END_CITY          ("endCity",         "#30EB07EB", "#30EB07EB"),
+    OVERLAY_STRUCTURE_IGLOO             ("igloo",           "#300FAFE4", "#300FAFE4"),
+    OVERLAY_STRUCTURE_JUNGLE_TEMPLE     ("jungleTemple",    "#3099FF00", "#3099FF00"),
+    OVERLAY_STRUCTURE_MANSION           ("mansion",         "#30FF6500", "#30FF6500"),
+    OVERLAY_STRUCTURE_NETHER_FORTRESS   ("netherFortress",  "#30FC381D", "#30FC381D"),
+    OVERLAY_STRUCTURE_OCEAN_MONUMENT    ("oceanMonument",   "#3029E6EF", "#3029E6EF"),
+    OVERLAY_STRUCTURE_STRONGHOLD        ("stronghold",      "#30009999", "#30009999"),
+    OVERLAY_STRUCTURE_VILLAGE           ("village",         "#3054CB4E", "#3054CB4E"),
+    OVERLAY_STRUCTURE_WITCH_HUT         ("witchHut",        "#30BE1DFC", "#300099FF");
 
-    private final BooleanConfig toggleOption;
+    public static final ImmutableList<StructureToggle> VALUES = ImmutableList.copyOf(values());
+    public static final ImmutableList<ColorConfig> COLOR_CONFIGS = getColorConfigs();
+    public static final ImmutableList<BooleanConfig> TOGGLE_CONFIGS = ImmutableList.copyOf(VALUES.stream().map(StructureToggle::getToggleOption).collect(Collectors.toList()));
+    public static final ImmutableList<HotkeyConfig> TOGGLE_HOTKEYS = ImmutableList.copyOf(VALUES.stream().map(StructureToggle::getHotkeyConfig).collect(Collectors.toList()));
+
+    private final BooleanConfig toggleStatus;
+    private final HotkeyConfig toggleHotkey;
     private final ColorConfig colorMain;
     private final ColorConfig colorComponents;
-    private final Hotkey hotkey;
 
-    StructureToggle(String name, String defaultHotkey, String colorMain, String colorComponents, String comment, String prettyName)
+    StructureToggle(String name, String colorMain, String colorComponents)
     {
-        this.toggleOption    = new BooleanConfig(name, false, comment, prettyName);
-        this.colorMain       = new ColorConfig(name +  " Main", colorMain, prettyName + " full box");
-        this.colorComponents = new ColorConfig(name + " Components", colorComponents, prettyName + " components");
-        this.hotkey          = new HotkeyConfig("Toggle " + name, defaultHotkey, comment);
+        this.toggleStatus = new BooleanConfig(name, false);
+        this.toggleHotkey = new HotkeyConfig(name, "");
+        this.colorMain       = new ColorConfig(name +  " Main", colorMain);
+        this.colorComponents = new ColorConfig(name + " Components", colorComponents);
 
-        this.hotkey.getKeyBind().setCallback((action, key) -> { this.toggleOption.toggleBooleanValue(); return true; });
-        this.toggleOption.setValueChangeCallback((newValue, oldValue) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
+        String nameLower = name.toLowerCase(Locale.ROOT);
+        String nameKey = "minihud.structure_toggle.name." + nameLower;
+        String colorMainKey = "minihud.structure_toggle.color.main." + nameLower;
+        String colorComponentsKey = "minihud.structure_toggle.color.components." + nameLower;
+
+        this.toggleStatus.setNameTranslationKey(nameKey).setPrettyNameTranslationKey(nameKey);
+        this.toggleStatus.setCommentTranslationKey("minihud.structure_toggle.comment." + nameLower);
+
+        this.colorMain.setNameTranslationKey(colorMainKey).setPrettyNameTranslationKey(colorMainKey);
+        this.colorComponents.setNameTranslationKey(colorComponentsKey).setPrettyNameTranslationKey(colorComponentsKey);
+
+        this.toggleHotkey.getKeyBind().setCallback((action, key) -> { this.toggleStatus.toggleBooleanValue(); return true; });
+        this.toggleStatus.setValueChangeCallback((newValue, oldValue) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
+    }
+
+    public boolean isEnabled()
+    {
+        return this.toggleStatus.getBooleanValue();
     }
 
     public BooleanConfig getToggleOption()
     {
-        return this.toggleOption;
+        return this.toggleStatus;
+    }
+
+    public HotkeyConfig getHotkeyConfig()
+    {
+        return this.toggleHotkey;
+    }
+
+    public KeyBind getKeyBind()
+    {
+        return this.toggleHotkey.getKeyBind();
     }
 
     public ColorConfig getColorMain()
@@ -51,16 +86,11 @@ public enum StructureToggle
         return this.colorComponents;
     }
 
-    public Hotkey getHotkey()
-    {
-        return this.hotkey;
-    }
-
-    public static ImmutableList<ColorConfig> getColorConfigs()
+    private static ImmutableList<ColorConfig> getColorConfigs()
     {
         ImmutableList.Builder<ColorConfig> builder = ImmutableList.builder();
 
-        for (StructureToggle toggle : values())
+        for (StructureToggle toggle : VALUES)
         {
             builder.add(toggle.getColorMain());
             builder.add(toggle.getColorComponents());
@@ -69,27 +99,40 @@ public enum StructureToggle
         return builder.build();
     }
 
-    public static ImmutableList<BooleanConfig> getToggleConfigs()
+    @Override
+    public String getName()
     {
-        ImmutableList.Builder<BooleanConfig> builder = ImmutableList.builder();
-
-        for (StructureToggle toggle : values())
-        {
-            builder.add(toggle.getToggleOption());
-        }
-
-        return builder.build();
+        return this.toggleStatus.getName();
     }
 
-    public static ImmutableList<Hotkey> getHotkeys()
+    @Override
+    public String getConfigNameTranslationKey()
     {
-        ImmutableList.Builder<Hotkey> builder = ImmutableList.builder();
+        return this.toggleStatus.getConfigNameTranslationKey();
+    }
 
-        for (StructureToggle toggle : values())
-        {
-            builder.add(toggle.getHotkey());
-        }
+    @Nullable
+    @Override
+    public String getCommentTranslationKey()
+    {
+        return this.toggleStatus.getCommentTranslationKey();
+    }
 
-        return builder.build();
+    @Override
+    public boolean isModified()
+    {
+        return this.toggleStatus.isModified() ||
+               this.toggleHotkey.isModified() ||
+               this.colorMain.isModified() ||
+               this.colorComponents.isModified();
+    }
+
+    @Override
+    public void resetToDefault()
+    {
+        this.toggleStatus.resetToDefault();
+        this.toggleHotkey.resetToDefault();
+        this.colorMain.resetToDefault();
+        this.colorComponents.resetToDefault();
     }
 }

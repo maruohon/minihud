@@ -46,7 +46,6 @@ import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
 import fi.dy.masa.minihud.mixin.IMixinMapGenStructure;
 import fi.dy.masa.minihud.network.CarpetStructurePacketHandler;
 import fi.dy.masa.minihud.util.MiscUtils;
-import fi.dy.masa.minihud.util.StructureType;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
@@ -161,7 +160,7 @@ public class StructureStorage
 
         if (mc.world != null)
         {
-            boolean enabled = RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue();
+            boolean enabled = RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.isRendererEnabled();
 
             if (mc.isSingleplayer() == false)
             {

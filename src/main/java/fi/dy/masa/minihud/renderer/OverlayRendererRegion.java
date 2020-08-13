@@ -21,7 +21,7 @@ public class OverlayRendererRegion extends OverlayRendererBase
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return RendererToggle.OVERLAY_REGION_FILE.getBooleanValue();
+        return RendererToggle.OVERLAY_REGION_FILE.isRendererEnabled();
     }
 
     @Override

@@ -23,7 +23,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return RendererToggle.OVERLAY_BLOCK_GRID.getBooleanValue();
+        return RendererToggle.OVERLAY_BLOCK_GRID.isRendererEnabled();
     }
 
     @Override

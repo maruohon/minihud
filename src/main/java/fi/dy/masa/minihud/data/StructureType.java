@@ -1,10 +1,10 @@
-package fi.dy.masa.minihud.util;
+package fi.dy.masa.minihud.data;
 
 import javax.annotation.Nullable;
-import fi.dy.masa.minihud.config.StructureToggle;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldProviderEnd;
+import fi.dy.masa.minihud.config.StructureToggle;
 
 public enum StructureType
 {
@@ -27,7 +27,7 @@ public enum StructureType
     private final DimensionType dimType;
     private final boolean isTemple;
 
-    private StructureType(DimensionType dimType, String structureName, String componentId, StructureToggle toggle)
+    StructureType(DimensionType dimType, String structureName, String componentId, StructureToggle toggle)
     {
         this.structureName = structureName;
         this.componentId = componentId;
@@ -59,11 +59,6 @@ public enum StructureType
         return this.structureName;
     }
 
-    public String getComponentId()
-    {
-        return this.componentId;
-    }
-
     public boolean isTemple()
     {
         return this.isTemple;
@@ -76,7 +71,7 @@ public enum StructureType
 
     public boolean isEnabled()
     {
-        return this.toggle.getToggleOption().getBooleanValue();
+        return this.toggle.isEnabled();
     }
 
     @Nullable

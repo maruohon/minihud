@@ -3,36 +3,37 @@ package fi.dy.masa.minihud.gui;
 import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.button.BooleanConfigButton;
 import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widget.WidgetDropDownList;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.gui.widget.DropDownListWidget;
+import fi.dy.masa.malilib.gui.widget.LabelWidget;
+import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
+import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntrySelectionHandler;
+import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.minihud.gui.widgets.WidgetListShapes;
-import fi.dy.masa.minihud.gui.widgets.WidgetShapeEntry;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.gui.widget.WidgetShapeEntry;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.renderer.shapes.ShapeType;
 
-public class GuiShapeManager extends BaseListScreen<ShapeBase, WidgetShapeEntry, WidgetListShapes>
-                             implements ISelectionListener<ShapeBase>
+public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
 {
-    protected final WidgetDropDownList<ShapeType> widgetDropDown;
+    protected final DropDownListWidget<ShapeType> widgetDropDown;
 
     public GuiShapeManager()
     {
-        super(10, 64);
+        super(10, 68);
 
         this.title = StringUtils.translate("minihud.gui.title.shape_manager");
 
         // The position will get updated later
-        this.widgetDropDown = new WidgetDropDownList<>(0, 0, 160, 20, 200, 10, ImmutableList.copyOf(ShapeType.values()), ShapeType::getDisplayName);
+        this.widgetDropDown = new DropDownListWidget<>(0, 0, 160, 20, 200, 10, ImmutableList.copyOf(ShapeType.values()), ShapeType::getDisplayName);
         this.widgetDropDown.setZLevel((int) this.zLevel + 2);
     }
 
@@ -51,13 +52,34 @@ public class GuiShapeManager extends BaseListScreen<ShapeBase, WidgetShapeEntry,
     @Override
     public void initGui()
     {
-        ConfigScreen.tab = ConfigScreen.SHAPES;
-
         super.initGui();
 
         this.clearWidgets();
         this.clearButtons();
         this.createTabButtons();
+
+        int x = this.width - 10;
+        int y = 48;
+        x -= this.addShapeAddButton(x, y);
+
+        this.widgetDropDown.setPosition(x - this.widgetDropDown.getWidth() - 4, y);
+        this.addWidget(this.widgetDropDown);
+
+        x = 12;
+        LabelWidget label = new LabelWidget(x, y + 7, -1, -1, 0xFFB0B0B0, "minihud.gui.button.shapes.main_rendering");
+        this.addWidget(label);
+
+        x += label.getWidth() + 2;
+        GenericButton button = new BooleanConfigButton(x, y, -1, 20, Configs.Generic.MAIN_RENDERING_TOGGLE);
+        this.addWidget(button);
+
+        x += button.getWidth() + 10;
+        label = new LabelWidget(x, y + 7, -1, -1, 0xFFB0B0B0, "minihud.gui.button.shapes.shape_renderer");
+        this.addWidget(label);
+
+        x += label.getWidth() + 2;
+        button = new BooleanConfigButton(x, y, -1, 20, RendererToggle.SHAPE_RENDERER.getBooleanConfig());
+        this.addWidget(button);
 
         Keyboard.enableRepeatEvents(true);
     }
@@ -82,36 +104,42 @@ public class GuiShapeManager extends BaseListScreen<ShapeBase, WidgetShapeEntry,
             x += this.createTabButton(x, y, width, tab);
         }
 
-        this.updateListPosition(this.getListX(), 68 + (rows - 1) * 22);
-        //this.reCreateListWidget();
-
-        y += 24;
-
-        x = this.width - 10;
-        x -= this.addButton(x, y, ButtonListener.Type.ADD_SHAPE);
-
-        this.widgetDropDown.setPosition(x - this.widgetDropDown.getWidth() - 4, y);
-
-        this.addWidget(this.widgetDropDown);
+        if (rows > 1)
+        {
+            this.updateListPosition(this.getListX(), 68 + (rows - 1) * 22);
+            //this.reCreateListWidget();
+        }
     }
 
-    protected int createTabButton(int x, int y, int width, ConfigTab tab)
+    protected int createTabButton(int x, int y, int width, final ConfigTab tab)
     {
         GenericButton button = new GenericButton(x, y, width, 20, tab.getDisplayName());
-        button.setEnabled(ConfigScreen.tab != tab);
-        this.addButton(button, new ButtonListenerTab(tab));
+        button.setEnabled(tab != ConfigScreen.SHAPES);
+        this.addButton(button, (btn, mbtn) -> BaseScreen.openGui(ConfigScreen.createOnTab(tab)));
 
         return button.getWidth() + 2;
     }
 
-    protected int addButton(int x, int y, ButtonListener.Type type)
+    protected int addShapeAddButton(int x, int y)
     {
-        GenericButton button = new GenericButton(x, y, -1, true, type.getDisplayName());
-        this.addButton(button, new ButtonListener(ButtonListener.Type.ADD_SHAPE, this));
+        GenericButton button = new GenericButton(x, y, -1, true, "minihud.gui.button.add_shape");
+        this.addButton(button, (btn, mbtn) -> {
+            ShapeType type = this.widgetDropDown.getSelectedEntry();
+
+            if (type != null)
+            {
+                ShapeManager.INSTANCE.addShape(type.createShape());
+                this.getListWidget().refreshEntries();
+            }
+            else
+            {
+                MessageUtils.showGuiMessage(MessageType.ERROR, "minihud.message.error.shapes.select_shape_from_dropdown");
+            }
+        });
+
         return button.getWidth();
     }
 
-    @Override
     public void onSelectionChange(@Nullable ShapeBase entry)
     {
         ShapeBase old = ShapeManager.INSTANCE.getSelectedShape();
@@ -119,73 +147,16 @@ public class GuiShapeManager extends BaseListScreen<ShapeBase, WidgetShapeEntry,
     }
 
     @Override
-    protected WidgetListShapes createListWidget(int listX, int listY)
+    protected DataListWidget<ShapeBase> createListWidget(int listX, int listY, int listWidth, int listHeight)
     {
-        return new WidgetListShapes(listX, listY, this.getListWidth(), this.getListHeight(), this.zLevel, this);
-    }
+        DataListWidget<ShapeBase> listWidget = new DataListWidget<>(listX, listY, listWidth, listHeight, ShapeManager.INSTANCE::getAllShapes);
+        listWidget.setEntryWidgetFactory(WidgetShapeEntry::new);
+        listWidget.setContentsAreDynamic(true);
 
-    private static class ButtonListener implements ButtonActionListener
-    {
-        private final Type type;
-        private final GuiShapeManager gui;
+        DataListEntrySelectionHandler<ShapeBase> handler = new DataListEntrySelectionHandler<>(listWidget::getFilteredEntries);
+        handler.setSelectionListener(this::onSelectionChange);
+        listWidget.setEntrySelectionHandler(handler);
 
-        public ButtonListener(Type type, GuiShapeManager gui)
-        {
-            this.type = type;
-            this.gui = gui;
-        }
-
-        @Override
-        public void actionPerformedWithButton(BaseButton button, int mouseButton)
-        {
-            if (this.type == Type.ADD_SHAPE)
-            {
-                ShapeType type = this.gui.widgetDropDown.getSelectedEntry();
-
-                if (type != null)
-                {
-                    ShapeManager.INSTANCE.addShape(type.createShape());
-                    this.gui.getListWidget().refreshEntries();
-                }
-                else
-                {
-                    MessageUtils.showGuiMessage(MessageType.ERROR, "minihud.message.error.shapes.select_shape_from_dropdown");
-                }
-            }
-        }
-
-        public enum Type
-        {
-            ADD_SHAPE   ("minihud.gui.button.add_shape");
-
-            private final String translationKey;
-
-            Type(String translationKey)
-            {
-                this.translationKey = translationKey;
-            }
-
-            public String getDisplayName()
-            {
-                return StringUtils.translate(this.translationKey);
-            }
-        }
-    }
-
-    public static class ButtonListenerTab implements ButtonActionListener
-    {
-        private final ConfigTab tab;
-
-        public ButtonListenerTab(ConfigTab tab)
-        {
-            this.tab = tab;
-        }
-
-        @Override
-        public void actionPerformedWithButton(BaseButton button, int mouseButton)
-        {
-            ConfigScreen.tab = this.tab;
-            BaseScreen.openGui(new ConfigScreen());
-        }
+        return listWidget;
     }
 }

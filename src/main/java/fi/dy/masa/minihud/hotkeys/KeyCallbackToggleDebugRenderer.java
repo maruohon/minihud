@@ -1,7 +1,7 @@
 package fi.dy.masa.minihud.hotkeys;
 
-import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyAction;
+import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
@@ -12,7 +12,7 @@ public class KeyCallbackToggleDebugRenderer extends ToggleBooleanWithMessageKeyC
 
     public KeyCallbackToggleDebugRenderer(RendererToggle config)
     {
-        super(config);
+        super(config.getBooleanConfig());
 
         this.rendererConfig = config;
     }

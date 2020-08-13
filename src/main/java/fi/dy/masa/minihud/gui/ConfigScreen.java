@@ -1,82 +1,79 @@
 package fi.dy.masa.minihud.gui;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.ConfigType;
-import fi.dy.masa.malilib.config.ConfigUtils;
-import fi.dy.masa.malilib.gui.config.BaseConfigTab;
-import fi.dy.masa.malilib.config.option.ConfigOption;
+import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
+import fi.dy.masa.malilib.gui.config.BaseConfigTab;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.config.StructureToggle;
 
-public class ConfigScreen extends BaseConfigScreen
+public class ConfigScreen
 {
-    private static final BaseConfigTab GENERIC           = new BaseConfigTab("minihud.gui.button.config_gui.generic", 120, false, Configs.Generic.OPTIONS);
-    private static final BaseConfigTab COLORS            = new BaseConfigTab("minihud.gui.button.config_gui.colors", 100, false, Configs.Colors.OPTIONS);
-    private static final BaseConfigTab INFO_TOGGLES      = new BaseConfigTab("minihud.gui.button.config_gui.info_toggles", 100, false, ConfigUtils.createConfigWrapperForType(ConfigType.BOOLEAN, ImmutableList.copyOf(InfoToggle.values())));
-    private static final BaseConfigTab INFO_LINE_ORDER   = new BaseConfigTab("minihud.gui.button.config_gui.info_line_order", 100, false, ConfigUtils.createConfigWrapperForType(ConfigType.INTEGER, ImmutableList.copyOf(InfoToggle.values())));
-    private static final BaseConfigTab INFO_HOTKEYS      = new BaseConfigTab("minihud.gui.button.config_gui.info_hotkeys", 204, true, ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(InfoToggle.values())));
-    private static final BaseConfigTab STRUCTURES        = new BaseConfigTab("minihud.gui.button.config_gui.structures", 160, false, getStructureConfigs());
-    private static final BaseConfigTab RENDERER_HOTKEYS  = new BaseConfigTab("minihud.gui.button.config_gui.renderer_hotkeys", 204, true, ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(RendererToggle.values())));
-    public  static final BaseConfigTab SHAPES            = new BaseConfigTab("minihud.gui.button.config_gui.shapes", 204, false, Collections.emptyList(),
-                                                                             (tab, gui) -> (button, mouseButton) -> { BaseScreen.openGui(new GuiShapeManager()); });
+    private static final BaseConfigTab GENERIC              = new BaseConfigTab("minihud.gui.button.config_gui.generic",            Reference.MOD_NAME, 160, Configs.Generic.OPTIONS);
+    private static final BaseConfigTab COLORS               = new BaseConfigTab("minihud.gui.button.config_gui.colors",             Reference.MOD_NAME, 100, Configs.Colors.OPTIONS);
+    private static final BaseConfigTab INFO_LINES           = new BaseConfigTab("minihud.gui.button.config_gui.info_lines",         Reference.MOD_NAME, 200, InfoLine.VALUES);
+    private static final BaseConfigTab OVERLAY_RENDERERS    = new BaseConfigTab("minihud.gui.button.config_gui.overlay_renderers",  Reference.MOD_NAME, 200, getRendererOptions());
+    private static final BaseConfigTab STRUCTURES           = new BaseConfigTab("minihud.gui.button.config_gui.structures",         Reference.MOD_NAME, 200, getStructureOptions());
+    public  static final BaseConfigTab SHAPES               = new BaseConfigTab("minihud.gui.button.config_gui.shapes",             Reference.MOD_NAME, 200, Collections.emptyList(),
+                                                                                (tab, gui) -> (button, mouseButton) -> openShapeEditor(gui));
 
     public static final ImmutableList<ConfigTab> TABS = ImmutableList.of(
             GENERIC,
             COLORS,
-            INFO_TOGGLES,
-            INFO_LINE_ORDER,
-            INFO_HOTKEYS,
+            INFO_LINES,
+            OVERLAY_RENDERERS,
             STRUCTURES,
-            RENDERER_HOTKEYS,
             SHAPES
     );
 
-    public static ConfigTab tab = INFO_TOGGLES;
-
-    private static List<ConfigOption> getStructureConfigs()
+    public static BaseConfigScreen create()
     {
-        List<ConfigOption> list = new ArrayList<>();
-        list.addAll(StructureToggle.getToggleConfigs());
-        list.addAll(StructureToggle.getHotkeys());
-        list.addAll(StructureToggle.getColorConfigs());
-        return list;
+        return new BaseConfigScreen(10, 50, Reference.MOD_ID, null, TABS, INFO_LINES, "minihud.gui.title.configs");
     }
 
-    public ConfigScreen()
+    public static BaseConfigScreen createOnTab(ConfigTab tab)
     {
-        super(10, 50, Reference.MOD_ID, null, TABS, "minihud.gui.title.configs");
+        BaseConfigScreen screen = new BaseConfigScreen(10, 50, Reference.MOD_ID, null, TABS, INFO_LINES, "minihud.gui.title.configs");
+        screen.setCurrentTab(tab);
+        return screen;
     }
 
-    @Override
-    public ConfigTab getCurrentTab()
+    public static ImmutableList<ConfigTab> getConfigTabs()
     {
-        return tab;
+        return TABS;
     }
 
-    @Override
-    public void setCurrentTab(ConfigTab tab)
+    private static ImmutableList<ConfigInfo> getRendererOptions()
     {
-        ConfigScreen.tab = tab;
+        ImmutableList.Builder<ConfigInfo> builder = ImmutableList.builder();
+
+        builder.add(Configs.Generic.MAIN_RENDERING_TOGGLE);
+        builder.addAll(RendererToggle.VALUES);
+
+        return builder.build();
     }
 
-    @Override
-    public void initGui()
+    private static ImmutableList<ConfigInfo> getStructureOptions()
     {
-        if (ConfigScreen.tab == SHAPES)
-        {
-            BaseScreen.openGui(new GuiShapeManager());
-            return;
-        }
+        ImmutableList.Builder<ConfigInfo> builder = ImmutableList.builder();
 
-        super.initGui();
+        builder.add(Configs.Generic.MAIN_RENDERING_TOGGLE);
+        builder.add(RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE);
+        builder.addAll(StructureToggle.VALUES);
+
+        return builder.build();
+    }
+
+    private static boolean openShapeEditor(BaseConfigScreen screen)
+    {
+        screen.setCurrentTab(SHAPES);
+        BaseScreen.openGui(new GuiShapeManager());
+        return true;
     }
 }

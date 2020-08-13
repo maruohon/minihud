@@ -13,7 +13,6 @@ import net.minecraft.world.gen.structure.StructureStart;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.minihud.LiteModMiniHud;
-import fi.dy.masa.minihud.util.StructureType;
 
 public class StructureData
 {

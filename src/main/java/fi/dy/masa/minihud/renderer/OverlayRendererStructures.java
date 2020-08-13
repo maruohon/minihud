@@ -17,7 +17,7 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.StructureData;
 import fi.dy.masa.minihud.util.MiscUtils;
-import fi.dy.masa.minihud.util.StructureType;
+import fi.dy.masa.minihud.data.StructureType;
 
 public class OverlayRendererStructures extends OverlayRendererBase
 {
@@ -31,7 +31,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue() == false)
+        if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.isRendererEnabled() == false)
         {
             return false;
         }

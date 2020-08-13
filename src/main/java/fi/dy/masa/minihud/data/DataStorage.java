@@ -17,7 +17,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
@@ -187,11 +188,13 @@ public class DataStorage
         return this.distanceReferencePoint;
     }
 
-    public void setDistanceReferencePoint(Vec3d pos)
+    public boolean setDistanceReferencePoint()
     {
+        Vec3d pos = EntityUtils.getCameraEntity().getPositionVector();
         this.distanceReferencePoint = pos;
         String str = String.format("x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
         MessageUtils.printActionbarMessage("minihud.message.distance_reference_point_set", str);
+        return true;
     }
 
     public void markChunkForHeightmapCheck(int chunkX, int chunkZ)

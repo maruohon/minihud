@@ -44,7 +44,7 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
 
     public static void setNeedsUpdate()
     {
-        if (RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue() == false)
+        if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled() == false)
         {
             clear();
         }
@@ -56,7 +56,7 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
     {
         synchronized (BEACON_POSITIONS)
         {
-            if (RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue() &&
+            if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled() &&
                 (state.getBlock() == Blocks.BEACON || BEACON_POSITIONS.contains(pos)))
             {
                 setNeedsUpdate();
@@ -68,7 +68,7 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
     {
         synchronized (BEACON_POSITIONS)
         {
-            if (RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue() &&
+            if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled() &&
                 BEACON_CHUNKS.contains(chunkPos))
             {
                 setNeedsUpdate();
@@ -79,7 +79,7 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue();
+        return RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled();
     }
 
     @Override

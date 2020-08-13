@@ -1,249 +1,135 @@
 package fi.dy.masa.minihud.config;
 
+import java.util.Locale;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import fi.dy.masa.malilib.config.ConfigType;
-import fi.dy.masa.malilib.config.option.IConfigBoolean;
-import fi.dy.masa.malilib.config.option.IConfigNotifiable;
-import fi.dy.masa.malilib.input.Hotkey;
-import fi.dy.masa.malilib.input.KeyBind;
-import fi.dy.masa.malilib.input.KeyBindImpl;
-import fi.dy.masa.malilib.input.KeyBindSettings;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.ValueChangeCallback;
-import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.malilib.config.option.BooleanConfig;
+import fi.dy.masa.malilib.config.option.ConfigInfo;
+import fi.dy.masa.malilib.config.option.HotkeyConfig;
+import fi.dy.masa.malilib.input.KeyBind;
+import fi.dy.masa.malilib.input.KeyBindSettings;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.RendererToggleKeyCallback;
 
-public enum RendererToggle implements IConfigBoolean, Hotkey, IConfigNotifiable<Boolean>
+public enum RendererToggle implements ConfigInfo
 {
-    DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled",    "", "Toggles the vanilla Block Collision Boxes debug renderer", "Block Collision Boxes"),
-    DEBUG_HEIGHT_MAP                    ("debugHeightMapEnabled",       "", "Toggles the vanilla Height Map debug renderer", "Height Map"),
-    DEBUG_NEIGHBOR_UPDATES              ("debugNeighborsUpdateEnabled", "", "Toggles the vanilla Block Neighbor Updates debug renderer", "Block Neighbor Updates"),
-    DEBUG_PATH_FINDING                  ("debugPathfindingEnabled",     "", "Toggles the vanilla Pathfinding debug renderer", "Pathfinding"),
-    DEBUG_SOLID_FACES                   ("debugSolidFaceEnabled",       "", "Toggles the vanilla Block Solid Faces debug renderer", "Block Solid Faces"),
-    DEBUG_WATER                         ("debugWaterEnabled",           "", "Toggles the vanilla Water debug renderer", "Water"),
+    DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled"),
+    DEBUG_HEIGHT_MAP                    ("debugHeightMapEnabled"),
+    DEBUG_NEIGHBOR_UPDATES              ("debugNeighborsUpdateEnabled"),
+    DEBUG_PATH_FINDING                  ("debugPathfindingEnabled"),
+    DEBUG_SOLID_FACES                   ("debugSolidFaceEnabled"),
+    DEBUG_WATER                         ("debugWaterEnabled"),
 
-    OVERLAY_BEACON_RANGE                ("overlayBeaconRange",          "", "Toggle the Beacon Range overlay renderer", "Beacon Range overlay"),
-    OVERLAY_BLOCK_GRID                  ("overlayBlockGrid",            "", "Toggle the Block Grid overlay renderer", "Block Grid overlay"),
-    OVERLAY_CHUNK_UNLOAD_BUCKET         ("overlayChunkUnloadBucket", "", KeyBindSettings.INGAME_BOTH, "Toggle the Chunk unload bucket/priority renderer", "Chunk Unload Priority overlay"),
-    OVERLAY_LIGHT_LEVEL                 ("overlayLightLevel",           "", "Toggle the Light Level overlay renderer", "Light Level overlay"),
-    OVERLAY_RANDOM_TICKS_FIXED          ("overlayRandomTicksFixed",     "", "Toggle the fixed-point random ticked chunks overlay renderer", "Random Ticked Chunks (fixed) overlay"),
-    OVERLAY_RANDOM_TICKS_PLAYER         ("overlayRandomTicksPlayer",    "", "Toggle the player-following random ticked chunks overlay renderer", "Random Ticked Chunks (player-following) overlay"),
-    OVERLAY_REGION_FILE                 ("overlayRegionFile",           "", "Toggle the region file border overlay renderer", "Region File Border overlay"),
-    OVERLAY_SLIME_CHUNKS_OVERLAY        ("overlaySlimeChunks", "", KeyBindSettings.INGAME_BOTH, "Toggle the Slime Chunk overlay renderer", "Slime Chunks overlay"),
-    OVERLAY_SPAWNABLE_CHUNKS_FIXED      ("overlaySpawnableChunksFixed", "", "Toggle the location-fixed spawnable chunks overlay renderer", "Spawnable Chunks (fixed) overlay"),
-    OVERLAY_SPAWNABLE_CHUNKS_PLAYER     ("overlaySpawnableChunksPlayer","", "Toggle the player-following spawnable chunks overlay renderer", "Spawnable Chunks (player-following) overlay"),
-    OVERLAY_SPAWNABLE_COLUMN_HEIGHTS    ("overlaySpawnableColumnHeights","", "Toggle the spawnable column heights overlay renderer", "Spawnable column heights overlay"),
-    OVERLAY_SPAWN_CHUNK_OVERLAY_REAL    ("overlaySpawnChunkReal",       "", "Toggle the spawn chunks overlay renderer", "Spawn Chunks (real) overlay"),
-    OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER  ("overlaySpawnChunkPlayer",     "", "Toggle the pseudo (player-following) spawn chunks overlay renderer", "Spawn Chunks (player-following, would-be) overlay"),
-    OVERLAY_STRUCTURE_MAIN_TOGGLE       ("overlayStructureMainToggle",  "", "Main toggle for all structure bounding boxes", "Structure Bounding Boxes main"),
-    SHAPE_RENDERER                      ("shapeRenderer",               "", "The main toggle for the shape renderer", "Shape Renderer");
+    OVERLAY_BEACON_RANGE                ("overlayBeaconRange"),
+    OVERLAY_BLOCK_GRID                  ("overlayBlockGrid"),
+    OVERLAY_CHUNK_UNLOAD_BUCKET         ("overlayChunkUnloadBucket", KeyBindSettings.INGAME_BOTH),
+    OVERLAY_LIGHT_LEVEL                 ("overlayLightLevel"),
+    OVERLAY_RANDOM_TICKS_FIXED          ("overlayRandomTicksFixed"),
+    OVERLAY_RANDOM_TICKS_PLAYER         ("overlayRandomTicksPlayer"),
+    OVERLAY_REGION_FILE                 ("overlayRegionFile"),
+    OVERLAY_SLIME_CHUNKS_OVERLAY        ("overlaySlimeChunks", KeyBindSettings.INGAME_BOTH),
+    OVERLAY_SPAWNABLE_CHUNKS_FIXED      ("overlaySpawnableChunksFixed"),
+    OVERLAY_SPAWNABLE_CHUNKS_PLAYER     ("overlaySpawnableChunksPlayer"),
+    OVERLAY_SPAWNABLE_COLUMN_HEIGHTS    ("overlaySpawnableColumnHeights"),
+    OVERLAY_SPAWN_CHUNK_OVERLAY_REAL    ("overlaySpawnChunkReal"),
+    OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER  ("overlaySpawnChunkPlayer"),
+    OVERLAY_STRUCTURE_MAIN_TOGGLE       ("overlayStructureMainToggle"),
+    SHAPE_RENDERER                      ("shapeRenderer");
 
-    private final String name;
-    private final String prettyName;
-    private final String comment;
-    private final KeyBindImpl keybind;
-    private final boolean defaultValueBoolean;
-    private String modName = "";
-    private boolean valueBoolean;
-    private boolean lastSavedValueBoolean;
-    @Nullable private ValueChangeCallback<Boolean> callback;
+    public static final ImmutableList<RendererToggle> VALUES = ImmutableList.copyOf(values());
+    public static final ImmutableList<BooleanConfig> TOGGLE_CONFIGS = ImmutableList.copyOf(VALUES.stream().map(RendererToggle::getBooleanConfig).collect(Collectors.toList()));
+    public static final ImmutableList<HotkeyConfig> TOGGLE_HOTKEYS = ImmutableList.copyOf(VALUES.stream().map(RendererToggle::getHotkeyConfig).collect(Collectors.toList()));
 
-    RendererToggle(String name, String defaultHotkey, String comment, String prettyName)
+    private final BooleanConfig toggleStatus;
+    private final HotkeyConfig toggleHotkey;
+
+    RendererToggle(String name)
     {
-        this(name, defaultHotkey, KeyBindSettings.DEFAULT, comment, prettyName);
+        this(name, KeyBindSettings.DEFAULT);
     }
 
-    RendererToggle(String name, String defaultHotkey, KeyBindSettings settings, String comment, String prettyName)
+    RendererToggle(String name, KeyBindSettings settings)
     {
-        this.name = name;
-        this.prettyName = prettyName;
-        this.comment = comment;
-        this.defaultValueBoolean = false;
-        this.keybind = KeyBindImpl.fromStorageString(name, defaultHotkey, settings);
+        this.toggleStatus = new BooleanConfig(name, false);
+        this.toggleHotkey = new HotkeyConfig(name, "", settings);
 
         if (name.startsWith("debug"))
         {
-            this.keybind.setCallback(new KeyCallbackToggleDebugRenderer(this));
+            this.toggleHotkey.getKeyBind().setCallback(new KeyCallbackToggleDebugRenderer(this));
         }
         else
         {
-            this.keybind.setCallback(new RendererToggleKeyCallback(this));
+            this.toggleHotkey.getKeyBind().setCallback(new RendererToggleKeyCallback(this.toggleStatus));
         }
 
         if (name.equals("overlayStructureMainToggle"))
         {
-            this.setValueChangeCallback((newValue, oldValue) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
+            this.toggleStatus.setValueChangeCallback((newValue, oldValue) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
         }
 
-        this.cacheSavedValue();
+        String nameLower = name.toLowerCase(Locale.ROOT);
+        String nameKey = "minihud.renderer_toggle.name." + nameLower;
+        this.toggleStatus.setNameTranslationKey(nameKey).setPrettyNameTranslationKey(nameKey);
+        this.toggleStatus.setCommentTranslationKey("minihud.renderer_toggle.comment." + nameLower);
     }
 
-    @Override
-    public ConfigType getType()
+    public boolean isRendererEnabled()
     {
-        return ConfigType.HOTKEY;
+        return this.toggleStatus.getBooleanValue();
+    }
+
+    public void setValueChangeCallback(ValueChangeCallback<Boolean> callback)
+    {
+        this.toggleStatus.setValueChangeCallback(callback);
+    }
+
+    public BooleanConfig getBooleanConfig()
+    {
+        return this.toggleStatus;
+    }
+
+    public HotkeyConfig getHotkeyConfig()
+    {
+        return this.toggleHotkey;
+    }
+
+    public KeyBind getKeyBind()
+    {
+        return this.toggleHotkey.getKeyBind();
     }
 
     @Override
     public String getName()
     {
-        return this.name;
+        return this.toggleStatus.getName();
     }
 
     @Override
-    public String getPrettyName()
+    public String getConfigNameTranslationKey()
     {
-        return this.prettyName;
+        return this.toggleStatus.getConfigNameTranslationKey();
     }
 
+    @Nullable
     @Override
-    public String getStringValue()
+    public String getCommentTranslationKey()
     {
-        return String.valueOf(this.valueBoolean);
-    }
-
-    @Override
-    public String getDefaultStringValue()
-    {
-        return String.valueOf(this.defaultValueBoolean);
-    }
-
-    @Override
-    public String getComment()
-    {
-        return comment != null ? this.comment : "";
-    }
-
-    @Override
-    public String getModName()
-    {
-        return this.modName;
-    }
-
-    @Override
-    public void setModName(String modName)
-    {
-        this.modName = modName;
-        this.keybind.setModId(modName);
-    }
-
-    @Override
-    public boolean getBooleanValue()
-    {
-        return this.valueBoolean;
-    }
-
-    @Override
-    public boolean getDefaultBooleanValue()
-    {
-        return this.defaultValueBoolean;
-    }
-
-    @Override
-    public void setBooleanValue(boolean value)
-    {
-        boolean oldValue = this.valueBoolean;
-        this.valueBoolean = value;
-
-        if (oldValue != this.valueBoolean)
-        {
-            this.onValueChanged(value, oldValue);
-        }
-    }
-
-    @Override
-    public void setValueChangeCallback(ValueChangeCallback<Boolean> callback)
-    {
-        this.callback = callback;
-    }
-
-    @Override
-    public void onValueChanged(Boolean newValue, Boolean oldValue)
-    {
-        if (this.callback != null)
-        {
-            this.callback.onValueChanged(newValue, oldValue);
-        }
-    }
-
-    @Override
-    public KeyBind getKeyBind()
-    {
-        return this.keybind;
+        return this.toggleStatus.getCommentTranslationKey();
     }
 
     @Override
     public boolean isModified()
     {
-        return this.valueBoolean != this.defaultValueBoolean;
-    }
-
-    @Override
-    public boolean isModified(String newValue)
-    {
-        return String.valueOf(this.defaultValueBoolean).equals(newValue) == false;
-    }
-
-    @Override
-    public boolean isDirty()
-    {
-        return this.lastSavedValueBoolean != this.valueBoolean || this.keybind.isDirty();
-    }
-
-    @Override
-    public void cacheSavedValue()
-    {
-        this.lastSavedValueBoolean = this.valueBoolean;
-        this.keybind.cacheSavedValue();
+        return this.toggleStatus.isModified() || this.toggleHotkey.isModified();
     }
 
     @Override
     public void resetToDefault()
     {
-        this.setBooleanValue(this.defaultValueBoolean);
-    }
-
-    @Override
-    public void setValueFromString(String value)
-    {
-        try
-        {
-            this.valueBoolean = Boolean.parseBoolean(value);
-        }
-        catch (Exception e)
-        {
-            LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", this.getName(), e);
-        }
-    }
-
-    @Override
-    public void setValueFromJsonElement(JsonElement element, String configName)
-    {
-        try
-        {
-            if (element.isJsonPrimitive())
-            {
-                this.valueBoolean = element.getAsBoolean();
-            }
-            else
-            {
-                LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", configName);
-            }
-        }
-        catch (Exception e)
-        {
-            LiteModMiniHud.logger.warn("Failed to read config value for {} from the JSON config", configName, e);
-        }
-
-        this.cacheSavedValue();
-    }
-
-    @Override
-    public JsonElement getAsJsonElement()
-    {
-        return new JsonPrimitive(this.valueBoolean);
+        this.toggleStatus.resetToDefault();
+        this.toggleHotkey.resetToDefault();
     }
 }

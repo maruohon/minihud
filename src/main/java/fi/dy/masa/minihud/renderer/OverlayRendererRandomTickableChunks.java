@@ -33,7 +33,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return this.toggle.getBooleanValue();
+        return this.toggle.isRendererEnabled();
     }
 
     @Override

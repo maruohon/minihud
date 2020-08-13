@@ -12,25 +12,26 @@ import net.minecraft.util.EnumFacing;
 import fi.dy.masa.malilib.config.option.OptionListConfig;
 import fi.dy.masa.malilib.config.value.BlockSnap;
 import fi.dy.masa.malilib.gui.BaseRenderLayerEditScreen;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.button.GenericButton;
 import fi.dy.masa.malilib.gui.button.OptionListConfigButton;
-import fi.dy.masa.malilib.gui.listener.ButtonListenerDoubleModifier;
-import fi.dy.masa.malilib.gui.listener.ButtonListenerIntModifier;
-import fi.dy.masa.malilib.gui.listener.TextFieldListenerDouble;
-import fi.dy.masa.malilib.gui.listener.TextFieldListenerInteger;
-import fi.dy.masa.malilib.gui.util.BaseGuiIcon;
+import fi.dy.masa.malilib.gui.icon.BaseIcon;
+import fi.dy.masa.malilib.gui.listener.DoubleModifierButtonListener;
+import fi.dy.masa.malilib.gui.listener.DoubleTextFieldListener;
+import fi.dy.masa.malilib.gui.listener.IntegerModifierButtonListener;
+import fi.dy.masa.malilib.gui.listener.IntegerTextFieldListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.WidgetColorIndicator;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldDouble;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldInteger;
-import fi.dy.masa.malilib.util.position.CoordinateValueModifier;
-import fi.dy.masa.malilib.util.consumer.DualDoubleConsumer;
-import fi.dy.masa.malilib.util.consumer.DualIntConsumer;
-import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
+import fi.dy.masa.malilib.gui.widget.ColorIndicatorWidget;
+import fi.dy.masa.malilib.gui.widget.DoubleTextFieldWidget;
+import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.consumer.DualDoubleConsumer;
+import fi.dy.masa.malilib.util.consumer.DualIntConsumer;
+import fi.dy.masa.malilib.util.position.CoordinateValueModifier;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircleBase;
@@ -40,14 +41,13 @@ import fi.dy.masa.minihud.util.ShapeRenderType;
 public class GuiShapeEditor extends BaseRenderLayerEditScreen
 {
     private final ShapeBase shape;
-    private OptionListConfig<BlockSnap> configBlockSnap;
-    private int colorY;
+    private final OptionListConfig<BlockSnap> configBlockSnap;
 
     public GuiShapeEditor(ShapeBase shape)
     {
         this.shape = shape;
         this.title = StringUtils.translate("minihud.gui.title.shape_editor");
-        this.configBlockSnap = new OptionListConfig<BlockSnap>("blockSnap", BlockSnap.NONE, "");
+        this.configBlockSnap = new OptionListConfig<>("blockSnap", BlockSnap.NONE, "");
     }
 
     @Override
@@ -61,7 +61,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.createShapeEditorElements(x, y);
 
         GenericButton button = new GenericButton(x, this.height - 24, -1, 20, ConfigScreen.SHAPES.getDisplayName());
-        this.addButton(button, new GuiShapeManager.ButtonListenerTab(ConfigScreen.SHAPES));
+        this.addButton(button, (btn, mbtn) -> BaseScreen.openGui(ConfigScreen.createOnTab(ConfigScreen.SHAPES)));
 
         this.createLayerEditControls(146, 142, this.getLayerRange());
 
@@ -79,14 +79,13 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.color"));
         y += 12;
 
-        WidgetTextFieldBase txtField = new WidgetTextFieldBase(x, y, 70, 17, String.format("#%08X", this.shape.getColor().intValue));
-        txtField.setTextValidator(WidgetTextFieldBase.VALIDATOR_HEX_COLOR_8);
-        txtField.setListener((txt) -> this.shape.setColorFromString(txt));
+        BaseTextFieldWidget txtField = new BaseTextFieldWidget(x, y, 70, 17, String.format("#%08X", this.shape.getColor().intValue));
+        txtField.setTextValidator(BaseTextFieldWidget.VALIDATOR_HEX_COLOR_8);
+        txtField.setListener(this.shape::setColorFromString);
         this.addWidget(txtField);
         this.nextY = y + 20;
-        this.colorY = y - 1;
 
-        this.addWidget(new WidgetColorIndicator(x + 74, this.colorY, 19, 19, this.shape.getColor(), (val) -> this.shape.setColor(val) ));
+        this.addWidget(new ColorIndicatorWidget(x + 74, y - 1, 19, 19, this.shape.getColor(), this.shape::setColor));
     }
 
     private void createShapeEditorElements(int x, int y)
@@ -94,8 +93,8 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.display_name_colon"));
         y += 12;
 
-        WidgetTextFieldBase textField = new WidgetTextFieldBase(x, y, 240, 17, this.shape.getDisplayName());
-        textField.setListener((txt) -> this.shape.setDisplayName(txt));
+        BaseTextFieldWidget textField = new BaseTextFieldWidget(x, y, 240, 17, this.shape.getDisplayName());
+        textField.setListener(this.shape::setDisplayName);
         this.addWidget(textField);
         y += 20;
 
@@ -110,7 +109,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
             {
                 ShapeSpawnSphere shape = (ShapeSpawnSphere) this.shape;
                 this.createShapeEditorElementsSphereBase(x, y, false);
-                this.createShapeEditorElementDoubleField(x + 150, y + 2, () -> shape.getMargin(), (val) -> shape.setMargin(val), "minihud.gui.label.margin_colon", false);
+                this.createShapeEditorElementDoubleField(x + 150, y + 2, shape::getMargin, shape::setMargin, "minihud.gui.label.margin_colon", false);
                 break;
             }
 
@@ -118,15 +117,15 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
             {
                 ShapeCircle shape = (ShapeCircle) this.shape;
                 this.createShapeEditorElementsSphereBase(x, y, true);
-                this.createShapeEditorElementIntField(x + 150, y + 36, () -> shape.getHeight(), (val) -> shape.setHeight(val), "minihud.gui.label.height_colon", true);
-                this.createDirectionButton(x + 230, y + 36, () -> shape.getMainAxis(), (val) -> shape.setMainAxis(val), "minihud.gui.label.circle.main_axis_colon");
-                this.createRenderTypeButton(renderTypeX, renderTypeY, () -> this.shape.getRenderType(), (val) -> this.shape.setRenderType(val), "minihud.gui.label.render_type_colon");
+                this.createShapeEditorElementIntField(x + 150, y + 36, shape::getHeight, shape::setHeight, "minihud.gui.label.height_colon", true);
+                this.createDirectionButton(x + 230, y + 36, shape::getMainAxis, shape::setMainAxis, "minihud.gui.label.circle.main_axis_colon");
+                this.createRenderTypeButton(renderTypeX, renderTypeY, this.shape::getRenderType, this.shape::setRenderType, "minihud.gui.label.render_type_colon");
                 break;
             }
 
             case SPHERE_BLOCKY:
                 this.createShapeEditorElementsSphereBase(x, y, true);
-                this.createRenderTypeButton(renderTypeX, renderTypeY, () -> this.shape.getRenderType(), (val) -> this.shape.setRenderType(val), "minihud.gui.label.render_type_colon");
+                this.createRenderTypeButton(renderTypeX, renderTypeY, this.shape::getRenderType, this.shape::setRenderType, "minihud.gui.label.render_type_colon");
                 break;
         }
     }
@@ -139,7 +138,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
 
         if (addRadiusInput)
         {
-            this.createShapeEditorElementDoubleField(x + 150, y + 2, () -> shape.getRadius(), (val) -> shape.setRadius(val), "minihud.gui.label.radius_colon", true);
+            this.createShapeEditorElementDoubleField(x + 150, y + 2, shape::getRadius, shape::setRadius, "minihud.gui.label.radius_colon", true);
         }
 
         y += 12;
@@ -175,16 +174,17 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.addLabel(x + 12, y, 0xFFFFFFFF, translationKey);
         y += 11;
 
-        WidgetTextFieldDouble txtField = new WidgetTextFieldDouble(x + 12, y, 40, 14, supplier.getAsDouble());
-        txtField.setListener(new TextFieldListenerDouble(consumer));
+        DoubleTextFieldWidget txtField = new DoubleTextFieldWidget(x + 12, y, 40, 14, supplier.getAsDouble());
+        txtField.setListener(new DoubleTextFieldListener(consumer));
         txtField.setUpdateListenerAlways(true);
         this.addWidget(txtField);
 
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            GenericButton button = new GenericButton(x + 54, y - 1, BaseGuiIcon.BTN_PLUSMINUS_16, hover);
-            this.addButton(button, new ButtonListenerDoubleModifier(supplier, new DualDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
+            GenericButton button = new GenericButton(x + 54, y - 1, BaseIcon.BTN_PLUSMINUS_16, hover);
+            button.setCanScrollToClick(true);
+            this.addButton(button, new DoubleModifierButtonListener(supplier, new DualDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
         }
     }
 
@@ -193,16 +193,17 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.addLabel(x + 12, y, 0xFFFFFFFF, translationKey);
         y += 11;
 
-        WidgetTextFieldInteger txtField = new WidgetTextFieldInteger(x + 12, y, 40, 14, supplier.getAsInt());
-        txtField.setListener(new TextFieldListenerInteger(consumer));
+        IntegerTextFieldWidget txtField = new IntegerTextFieldWidget(x + 12, y, 40, 14, supplier.getAsInt());
+        txtField.setListener(new IntegerTextFieldListener(consumer));
         txtField.setUpdateListenerAlways(true);
         this.addWidget(txtField);
 
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            GenericButton button = new GenericButton(x + 54, y - 1, BaseGuiIcon.BTN_PLUSMINUS_16, hover);
-            this.addButton(button, new ButtonListenerIntModifier(supplier, new DualIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
+            GenericButton button = new GenericButton(x + 54, y - 1, BaseIcon.BTN_PLUSMINUS_16, hover);
+            button.setCanScrollToClick(true);
+            this.addButton(button, new IntegerModifierButtonListener(supplier, new DualIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
         }
     }
 

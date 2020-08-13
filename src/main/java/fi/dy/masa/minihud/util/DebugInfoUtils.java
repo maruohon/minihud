@@ -5,12 +5,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import com.google.common.collect.MapMaker;
-import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.mixin.IMixinDebugRenderer;
-import fi.dy.masa.minihud.mixin.IMixinPathNavigate;
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.debug.DebugRendererNeighborsUpdate;
 import net.minecraft.entity.Entity;
@@ -25,13 +19,19 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.mixin.IMixinDebugRenderer;
+import fi.dy.masa.minihud.mixin.IMixinPathNavigate;
+import io.netty.buffer.Unpooled;
 
 public class DebugInfoUtils
 {
     private static boolean neighborUpdateEnabled;
-    private static boolean pathfindingEnabled;
+    private static boolean pathFindingEnabled;
     private static int tickCounter;
-    private static final Map<Entity, Path> OLD_PATHS = new MapMaker().weakKeys().weakValues().<Entity, Path>makeMap();
+    private static final Map<Entity, Path> OLD_PATHS = new MapMaker().weakKeys().weakValues().makeMap();
 
     public static void sendPacketDebugPath(MinecraftServer server, int entityId, Path path, float maxDistance)
     {
@@ -76,9 +76,9 @@ public class DebugInfoUtils
             writePathPointToBuffer(buf, target);
 
             int countTotal = path.getCurrentPathLength();
-            List<PathPoint> openSet = new ArrayList<PathPoint>();
-            List<PathPoint> closedSet = new ArrayList<PathPoint>();
-            List<PathPoint> allSet = new ArrayList<PathPoint>();
+            List<PathPoint> openSet = new ArrayList<>();
+            List<PathPoint> closedSet = new ArrayList<>();
+            List<PathPoint> allSet = new ArrayList<>();
 
             for (int i = 0; i < countTotal; i++)
             {
@@ -127,14 +127,10 @@ public class DebugInfoUtils
         {
             final long time = world.getTotalWorldTime();
 
-            Minecraft.getMinecraft().addScheduledTask(new Runnable()
-            {
-                public void run()
+            Minecraft.getMinecraft().addScheduledTask(() -> {
+                for (EnumFacing side : notifiedSides)
                 {
-                    for (EnumFacing side : notifiedSides)
-                    {
-                        ((DebugRendererNeighborsUpdate) Minecraft.getMinecraft().debugRenderer.neighborsUpdate).addUpdate(time, pos.offset(side));
-                    }
+                    ((DebugRendererNeighborsUpdate) Minecraft.getMinecraft().debugRenderer.neighborsUpdate).addUpdate(time, pos.offset(side));
                 }
             });
         }
@@ -145,7 +141,7 @@ public class DebugInfoUtils
         Minecraft mc = Minecraft.getMinecraft();
 
         // Send the custom packet with the Path data, if that debug renderer is enabled
-        if (pathfindingEnabled && mc.world != null && ++tickCounter >= 10)
+        if (pathFindingEnabled && mc.world != null && ++tickCounter >= 10)
         {
             tickCounter = 0;
             World world = server.getWorld(WorldUtils.getDimensionId(mc.world));
@@ -212,7 +208,7 @@ public class DebugInfoUtils
     public static void toggleDebugRenderer(RendererToggle config)
     {
         Minecraft mc = Minecraft.getMinecraft();
-        boolean enabled = config.getBooleanValue();
+        boolean enabled = config.isRendererEnabled();
 
         if (config == RendererToggle.DEBUG_COLLISION_BOXES)
         {
@@ -230,7 +226,7 @@ public class DebugInfoUtils
         else if (config == RendererToggle.DEBUG_PATH_FINDING)
         {
             ((IMixinDebugRenderer) mc.debugRenderer).setPathfindingEnabled(enabled);
-            pathfindingEnabled = enabled;
+            pathFindingEnabled = enabled;
         }
         else if (config == RendererToggle.DEBUG_SOLID_FACES)
         {

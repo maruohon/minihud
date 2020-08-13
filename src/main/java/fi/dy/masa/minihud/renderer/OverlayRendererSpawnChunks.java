@@ -33,7 +33,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return this.toggle.getBooleanValue() &&
+        return this.toggle.isRendererEnabled() &&
                 (this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ||
                  (mc.world != null && mc.world.provider instanceof WorldProviderSurface &&
                   DataStorage.getInstance().isWorldSpawnKnown()));

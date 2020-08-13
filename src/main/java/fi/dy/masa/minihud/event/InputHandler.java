@@ -5,14 +5,14 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.input.Hotkey;
+import fi.dy.masa.malilib.input.KeyBindCategory;
 import fi.dy.masa.malilib.input.KeyBindProvider;
 import fi.dy.masa.malilib.input.MouseInputHandler;
 import fi.dy.masa.malilib.input.callback.AdjustableKeyCallback;
-import fi.dy.masa.malilib.input.KeyBindCategory;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.config.StructureToggle;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
@@ -37,9 +37,9 @@ public class InputHandler implements KeyBindProvider, MouseInputHandler
     {
         ImmutableList.Builder<Hotkey> builder = ImmutableList.builder();
 
-        builder.add(InfoToggle.values());
-        builder.add(RendererToggle.values());
-        builder.addAll(StructureToggle.getHotkeys());
+        builder.addAll(InfoLine.TOGGLE_HOTKEYS);
+        builder.addAll(RendererToggle.TOGGLE_HOTKEYS);
+        builder.addAll(StructureToggle.TOGGLE_HOTKEYS);
         builder.addAll(Configs.Generic.HOTKEY_LIST);
 
         return builder.build();
@@ -49,10 +49,10 @@ public class InputHandler implements KeyBindProvider, MouseInputHandler
     public List<KeyBindCategory> getHotkeyCategoriesForCombinedView()
     {
         return ImmutableList.of(
-                new KeyBindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST),
-                new KeyBindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", ImmutableList.copyOf(InfoToggle.values())),
-                new KeyBindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", ImmutableList.copyOf(RendererToggle.values())),
-                new KeyBindCategory(Reference.MOD_NAME, "minihud.hotkeys.category.structure_toggle_hotkeys", ImmutableList.copyOf(StructureToggle.getHotkeys()))
+                new KeyBindCategory(Reference.MOD_ID, Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST),
+                new KeyBindCategory(Reference.MOD_ID, Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", InfoLine.TOGGLE_HOTKEYS),
+                new KeyBindCategory(Reference.MOD_ID, Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", RendererToggle.TOGGLE_HOTKEYS),
+                new KeyBindCategory(Reference.MOD_ID, Reference.MOD_NAME, "minihud.hotkeys.category.structure_toggle_hotkeys", StructureToggle.TOGGLE_HOTKEYS)
         );
     }
 
@@ -63,7 +63,7 @@ public class InputHandler implements KeyBindProvider, MouseInputHandler
         if (GuiUtils.getCurrentScreen() == null && wheelDelta != 0)
         {
             if (Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue() &&
-                InfoToggle.CHUNK_UNLOAD_ORDER.getKeyBind().isKeyBindHeld())
+                InfoLine.CHUNK_UNLOAD_ORDER.getHotkeyConfig().getKeyBind().isKeyBindHeld())
             {
                 int size = Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
 
@@ -92,15 +92,15 @@ public class InputHandler implements KeyBindProvider, MouseInputHandler
 
                 return true;
             }
-            else if (RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanValue() &&
-                     RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeyBind().isKeyBindHeld())
+            else if (RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.isRendererEnabled() &&
+                     RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getHotkeyConfig().getKeyBind().isKeyBindHeld())
             {
                 OverlayRendererSlimeChunks.overlayTopY += (wheelDelta < 0 ? 1 : -1);
                 AdjustableKeyCallback.setValueChanged();
                 return true;
             }
-            else if (RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getBooleanValue() &&
-                     RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeyBind().isKeyBindHeld())
+            else if (RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.isRendererEnabled() &&
+                     RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getHotkeyConfig().getKeyBind().isKeyBindHeld())
            {
                OverlayRenderer.chunkUnloadBucketOverlayY += (wheelDelta < 0 ? 1 : -1);
                AdjustableKeyCallback.setValueChanged();

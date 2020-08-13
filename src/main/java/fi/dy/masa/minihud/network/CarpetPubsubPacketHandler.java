@@ -24,7 +24,7 @@ import fi.dy.masa.malilib.network.PluginChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.InfoToggle;
+import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.MobcapData;
@@ -241,7 +241,7 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
             unsubs.addAll(PER_DIMENSION_SUBSCRIPTIONS);
             PER_DIMENSION_SUBSCRIPTIONS.clear();
 
-            if (InfoToggle.SERVER_TPS.getBooleanValue())
+            if (InfoLine.SERVER_TPS.getBooleanValue())
             {
                 newsubs.add(NODE_SERVER_TPS);
                 newsubs.add(NODE_SERVER_MSPT);
@@ -252,7 +252,7 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
                 unsubs.add(NODE_SERVER_MSPT);
             }
 
-            if (InfoToggle.CARPET_WOOL_COUNTERS.getBooleanValue())
+            if (InfoLine.CARPET_WOOL_COUNTERS.getBooleanValue())
             {
                 newsubs.addAll(getWoolCounterNodeNames(true));
             }
@@ -261,14 +261,14 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
                 unsubs.addAll(getWoolCounterNodeNames(false));
             }
 
-            if (InfoToggle.MOB_CAPS.getBooleanValue())
+            if (InfoLine.MOB_CAPS.getBooleanValue())
             {
                 List<String> mobCaps = getMobcapNodeNames(dimType);
                 addPerDimensionSubs(mobCaps, newsubs, unsubs);
             }
 
-            if ((InfoToggle.CHUNK_UNLOAD_ORDER.getBooleanValue()
-                 || RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getBooleanValue()
+            if ((InfoLine.CHUNK_UNLOAD_ORDER.getBooleanValue()
+                 || RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.isRendererEnabled()
                 )
                 && Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue())
             {

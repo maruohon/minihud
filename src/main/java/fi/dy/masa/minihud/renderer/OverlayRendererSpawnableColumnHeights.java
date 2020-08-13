@@ -23,7 +23,7 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
 
     public static void markChunkChanged(int cx, int cz)
     {
-        if (RendererToggle.OVERLAY_SPAWNABLE_COLUMN_HEIGHTS.getBooleanValue())
+        if (RendererToggle.OVERLAY_SPAWNABLE_COLUMN_HEIGHTS.isRendererEnabled())
         {
             synchronized (DIRTY_CHUNKS)
             {
@@ -35,7 +35,7 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return RendererToggle.OVERLAY_SPAWNABLE_COLUMN_HEIGHTS.getBooleanValue();
+        return RendererToggle.OVERLAY_SPAWNABLE_COLUMN_HEIGHTS.isRendererEnabled();
     }
 
     @Override

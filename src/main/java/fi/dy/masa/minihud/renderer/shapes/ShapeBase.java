@@ -111,7 +111,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements LayerRang
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return this.enabled && RendererToggle.SHAPE_RENDERER.getBooleanValue();
+        return this.enabled && RendererToggle.SHAPE_RENDERER.isRendererEnabled();
     }
 
     @Override

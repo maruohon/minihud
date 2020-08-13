@@ -46,7 +46,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return RendererToggle.OVERLAY_LIGHT_LEVEL.getBooleanValue();
+        return RendererToggle.OVERLAY_LIGHT_LEVEL.isRendererEnabled();
     }
 
     @Override
