@@ -13,6 +13,7 @@ import fi.dy.masa.malilib.config.option.OptionListConfig;
 import fi.dy.masa.malilib.config.value.BlockSnap;
 import fi.dy.masa.malilib.gui.BaseRenderLayerEditScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OptionListConfigButton;
 import fi.dy.masa.malilib.gui.icon.BaseIcon;
@@ -32,6 +33,7 @@ import fi.dy.masa.malilib.util.consumer.DualDoubleConsumer;
 import fi.dy.masa.malilib.util.consumer.DualIntConsumer;
 import fi.dy.masa.malilib.util.position.CoordinateValueModifier;
 import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircleBase;
@@ -61,7 +63,10 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.createShapeEditorElements(x, y);
 
         GenericButton button = new GenericButton(x, this.height - 24, -1, 20, ConfigScreen.SHAPES.getDisplayName());
-        this.addButton(button, (btn, mbtn) -> BaseScreen.openGui(ConfigScreen.createOnTab(ConfigScreen.SHAPES)));
+        this.addButton(button, (btn, mbtn) -> {
+            BaseConfigScreen.setCurrentTab(Reference.MOD_ID, ConfigScreen.SHAPES);
+            BaseScreen.openGui(new GuiShapeManager());
+        });
 
         this.createLayerEditControls(146, 142, this.getLayerRange());
 
