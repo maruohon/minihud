@@ -36,9 +36,9 @@ public class InitHandler implements InitializationHandler
         ConfigTypeRegistry.INSTANCE.registerWidgetFactory(RendererToggle.class, RendererToggleConfigWidget::new);
         ConfigTypeRegistry.INSTANCE.registerWidgetFactory(StructureToggle.class, StructureToggleConfigWidget::new);
 
-        ConfigTypeRegistry.INSTANCE.registerConfigSearchInfo(InfoLine.class, new ConfigSearchInfo<InfoLine>(true, true).setToggleOptionGetter(InfoLine::getBooleanValue).setKeyBindGetter(InfoLine::getKeyBind));
-        ConfigTypeRegistry.INSTANCE.registerConfigSearchInfo(RendererToggle.class, new ConfigSearchInfo<RendererToggle>(true, true).setToggleOptionGetter(RendererToggle::isRendererEnabled).setKeyBindGetter(RendererToggle::getKeyBind));
-        ConfigTypeRegistry.INSTANCE.registerConfigSearchInfo(StructureToggle.class, new ConfigSearchInfo<StructureToggle>(true, true).setToggleOptionGetter(StructureToggle::isEnabled).setKeyBindGetter(StructureToggle::getKeyBind));
+        ConfigTypeRegistry.INSTANCE.registerConfigSearchInfo(InfoLine.class, new ConfigSearchInfo<InfoLine>(true, true).setBooleanConfigGetter(InfoLine::getBooleanConfig).setKeyBindGetter(InfoLine::getKeyBind));
+        ConfigTypeRegistry.INSTANCE.registerConfigSearchInfo(RendererToggle.class, new ConfigSearchInfo<RendererToggle>(true, true).setBooleanConfigGetter(RendererToggle::getBooleanConfig).setKeyBindGetter(RendererToggle::getKeyBind));
+        ConfigTypeRegistry.INSTANCE.registerConfigSearchInfo(StructureToggle.class, new ConfigSearchInfo<StructureToggle>(true, true).setBooleanConfigGetter(StructureToggle::getBooleanConfig).setKeyBindGetter(StructureToggle::getKeyBind));
 
         KeyBindManager.INSTANCE.registerKeyBindProvider(InputHandler.getInstance());
         InputDispatcher.INSTANCE.registerMouseInputHandler(InputHandler.getInstance());

@@ -33,7 +33,7 @@ public class StructureToggleConfigWidget extends BaseConfigOptionWidget<Structur
         this.initialComponentColor = config.getColorComponents().getIntegerValue();
         this.initialHotkeyValue = config.getKeyBind().getKeys();
 
-        this.booleanButton = new BooleanConfigButton(x, y + 1, 40, 20, config.getToggleOption());
+        this.booleanButton = new BooleanConfigButton(x, y + 1, 40, 20, config.getBooleanConfig());
         this.booleanButton.setActionListener((btn, mbtn) -> this.resetButton.setEnabled(this.config.isModified()));
 
         this.hotkeyButton = new KeyBindConfigButton(x, y + 1, 120, 20, config.getKeyBind(), ctx.gui);

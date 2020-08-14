@@ -26,7 +26,7 @@ public enum StructureToggle implements ConfigInfo
 
     public static final ImmutableList<StructureToggle> VALUES = ImmutableList.copyOf(values());
     public static final ImmutableList<ColorConfig> COLOR_CONFIGS = getColorConfigs();
-    public static final ImmutableList<BooleanConfig> TOGGLE_CONFIGS = ImmutableList.copyOf(VALUES.stream().map(StructureToggle::getToggleOption).collect(Collectors.toList()));
+    public static final ImmutableList<BooleanConfig> TOGGLE_CONFIGS = ImmutableList.copyOf(VALUES.stream().map(StructureToggle::getBooleanConfig).collect(Collectors.toList()));
     public static final ImmutableList<HotkeyConfig> TOGGLE_HOTKEYS = ImmutableList.copyOf(VALUES.stream().map(StructureToggle::getHotkeyConfig).collect(Collectors.toList()));
 
     private final BooleanConfig toggleStatus;
@@ -61,7 +61,7 @@ public enum StructureToggle implements ConfigInfo
         return this.toggleStatus.getBooleanValue();
     }
 
-    public BooleanConfig getToggleOption()
+    public BooleanConfig getBooleanConfig()
     {
         return this.toggleStatus;
     }
