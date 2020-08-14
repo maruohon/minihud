@@ -42,7 +42,7 @@ public class InfoLineConfigWidget extends BaseConfigOptionWidget<InfoLine>
             this.resetButton.setEnabled(this.config.isModified());
         });
 
-        this.booleanButton = new BooleanConfigButton(x, y + 1, 40, 20, config.getBooleanConfig());
+        this.booleanButton = new BooleanConfigButton(x, y + 1, -1, 20, config.getBooleanConfig());
         this.booleanButton.setActionListener((btn, mbtn) -> this.resetButton.setEnabled(this.config.isModified()));
 
         this.hotkeyButton = new KeyBindConfigButton(x, y + 1, 120, 20, config.getKeyBind(), ctx.gui);

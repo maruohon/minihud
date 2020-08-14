@@ -11,7 +11,7 @@ import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.config.option.IntegerConfig;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyBindSettings;
-import fi.dy.masa.malilib.input.callback.ToggleBooleanKeyCallback;
+import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 
 public enum InfoLine implements ConfigInfo
 {
@@ -79,7 +79,7 @@ public enum InfoLine implements ConfigInfo
         this.toggleStatus = new BooleanConfig(name, defaultValue);
         this.toggleHotkey = new HotkeyConfig(name, "", settings);
         this.lineOrder = new IntegerConfig(name, lineOrder);
-        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanKeyCallback(this.toggleStatus));
+        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.toggleStatus));
 
         String nameLower = name.toLowerCase(Locale.ROOT);
         String nameKey = "minihud.info_line.name." + nameLower;

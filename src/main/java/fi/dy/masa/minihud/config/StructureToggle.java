@@ -9,6 +9,7 @@ import fi.dy.masa.malilib.config.option.ColorConfig;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.input.KeyBind;
+import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import fi.dy.masa.minihud.data.DataStorage;
 
 public enum StructureToggle implements ConfigInfo
@@ -52,7 +53,7 @@ public enum StructureToggle implements ConfigInfo
         this.colorMain.setNameTranslationKey(colorMainKey).setPrettyNameTranslationKey(colorMainKey);
         this.colorComponents.setNameTranslationKey(colorComponentsKey).setPrettyNameTranslationKey(colorComponentsKey);
 
-        this.toggleHotkey.getKeyBind().setCallback((action, key) -> { this.toggleStatus.toggleBooleanValue(); return true; });
+        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.toggleStatus));
         this.toggleStatus.setValueChangeCallback((newValue, oldValue) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
     }
 
