@@ -1,8 +1,8 @@
 package fi.dy.masa.minihud.gui.widget;
 
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.gui.button.BooleanConfigButton;
-import fi.dy.masa.malilib.gui.button.KeyBindConfigButton;
+import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
+import fi.dy.masa.malilib.gui.widget.button.KeyBindConfigButton;
 import fi.dy.masa.malilib.gui.config.ConfigWidgetContext;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
