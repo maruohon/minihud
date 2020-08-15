@@ -20,11 +20,10 @@ import fi.dy.masa.minihud.util.StructureType;
 
 public class OverlayRendererStructures extends OverlayRendererBase
 {
-    public static OverlayRendererStructures instance;
+    public static final OverlayRendererStructures INSTANCE = new OverlayRendererStructures();
 
-    public OverlayRendererStructures()
+    private OverlayRendererStructures()
     {
-        instance = this;
     }
 
     @Override
