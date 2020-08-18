@@ -126,15 +126,17 @@ public class MiscUtils
         {
             tag = tag.getCompound("BlockStateTag");
             String honeyLevel = "0";
+
             if (tag != null && tag.contains("honey_level", Constants.NBT.TAG_STRING))
             {
                 honeyLevel = tag.getString("honey_level");
             }
             else if (tag != null && tag.contains("honey_level", Constants.NBT.TAG_INT))
             {
-                honeyLevel = Integer.toString(tag.getString("honey_level"));
+                honeyLevel = String.valueOf(tag.getInt("honey_level"));
             }
-            lines.add(Math.min(1, lines.size()), new TranslatableText("minihud.label.honey_info.level", String.valueOf(beeName)));
+
+            lines.add(Math.min(1, lines.size()), new TranslatableText("minihud.label.honey_info.level", honeyLevel));
         }
     }
 }

@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BeehiveBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
@@ -563,12 +564,11 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.HONEY_LEVEL)
         {
-            World bestWorld = WorldUtils.getBestWorld(mc);
-            BlockEntity be = this.getTargetedBlockEntity(bestWorld, mc);
+            BlockState state = this.getTargetedBlock(mc);
 
-            if (be instanceof BeehiveBlockEntity)
+            if (state != null && state.getBlock() instanceof BeehiveBlock)
             {
-                this.addLine("Honey: " + GuiBase.TXT_AQUA + ((BeehiveBlockEntity) be).getHoneyLevel());
+                this.addLine("Honey: " + GuiBase.TXT_AQUA + BeehiveBlockEntity.getHoneyLevel(state));
             }
         }
         else if (type == InfoToggle.ROTATION_YAW ||
@@ -848,6 +848,18 @@ public class RenderHandler implements IRenderer
 
             // The method in World now checks that the caller is from the same thread...
             return chunk != null ? chunk.getBlockEntity(posLooking) : null;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    private BlockState getTargetedBlock(MinecraftClient mc)
+    {
+        if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK)
+        {
+            BlockPos posLooking = ((BlockHitResult) mc.crosshairTarget).getBlockPos();
+            return mc.world.getBlockState(posLooking);
         }
 
         return null;
