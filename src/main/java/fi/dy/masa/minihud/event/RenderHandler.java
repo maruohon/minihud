@@ -561,6 +561,16 @@ public class RenderHandler implements IRenderer
                 this.addLine("Bees: " + GuiBase.TXT_AQUA + ((BeehiveBlockEntity) be).getBeeCount());
             }
         }
+        else if (type == InfoToggle.HONEY_LEVEL)
+        {
+            World bestWorld = WorldUtils.getBestWorld(mc);
+            BlockEntity be = this.getTargetedBlockEntity(bestWorld, mc);
+
+            if (be instanceof BeehiveBlockEntity)
+            {
+                this.addLine("Honey: " + GuiBase.TXT_AQUA + ((BeehiveBlockEntity) be).getHoneyLevel());
+            }
+        }
         else if (type == InfoToggle.ROTATION_YAW ||
                  type == InfoToggle.ROTATION_PITCH ||
                  type == InfoToggle.SPEED)

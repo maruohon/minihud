@@ -116,4 +116,25 @@ public class MiscUtils
             lines.add(Math.min(1, lines.size()), new TranslatableText("minihud.label.bee_info.count", String.valueOf(count)));
         }
     }
+
+    @Nullable
+    public static void addHoneyTooltip(ItemStack stack, List<Text> lines)
+    {
+        CompoundTag tag = stack.getTag();
+
+        if (tag != null && tag.contains("BlockStateTag", Constants.NBT.TAG_COMPOUND))
+        {
+            tag = tag.getCompound("BlockStateTag");
+            String honeyLevel = "0";
+            if (tag != null && tag.contains("honey_level", Constants.NBT.TAG_STRING))
+            {
+                honeyLevel = tag.getString("honey_level");
+            }
+            else if (tag != null && tag.contains("honey_level", Constants.NBT.TAG_INT))
+            {
+                honeyLevel = Integer.toString(tag.getString("honey_level"));
+            }
+            lines.add(Math.min(1, lines.size()), new TranslatableText("minihud.label.honey_info.level", String.valueOf(beeName)));
+        }
+    }
 }

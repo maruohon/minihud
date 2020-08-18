@@ -49,6 +49,8 @@
     "minihud.label.bee_info.count": "§7Contains §b%s§7 bee(s)",
     "minihud.label.bee_info.name": "§7- %s",
 
+    "minihud.label.honey_info.level": "§7Honey level is §b%s§7/5",
+
     "minihud.label.blockgridmode.all": "All",
     "minihud.label.blockgridmode.non_air": "Non-air",
     "minihud.label.blockgridmode.adjacent": "Adjacent to non-air",
