@@ -313,8 +313,8 @@ minihud.renderer_toggle.name.overlayspawnablechunksplayer=Spawnable Chunks (play
 minihud.renderer_toggle.name.overlayspawnablecolumnheights=Spawnable column heights overlay
 minihud.renderer_toggle.name.overlayspawnchunkreal=Spawn Chunks (real) overlay
 minihud.renderer_toggle.name.overlayspawnchunkplayer=Spawn Chunks (fake player-following)
-minihud.renderer_toggle.name.overlaystructuremaintoggle=Structure Bounding Boxes
-minihud.renderer_toggle.name.shaperenderer=Shape Renderer
+minihud.renderer_toggle.name.overlaystructuremaintoggle=§eStructure Bounding Boxes
+minihud.renderer_toggle.name.shaperenderer=§eShape Renderer
 
 
 minihud.structure_toggle.comment.desertpyramid=Enable Desert Pyramid structure bounding boxes rendering

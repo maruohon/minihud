@@ -66,7 +66,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         this.addWidget(this.widgetDropDown);
 
         x = 12;
-        LabelWidget label = new LabelWidget(x, y + 7, -1, -1, 0xFFB0B0B0, "minihud.gui.button.shapes.main_rendering");
+        LabelWidget label = new LabelWidget(x, y + 6, -1, -1, 0xFFB0B0B0, "minihud.gui.button.shapes.main_rendering");
         this.addWidget(label);
 
         x += label.getWidth() + 2;
@@ -74,7 +74,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         this.addWidget(button);
 
         x += button.getWidth() + 10;
-        label = new LabelWidget(x, y + 7, -1, -1, 0xFFB0B0B0, "minihud.gui.button.shapes.shape_renderer");
+        label = new LabelWidget(x, y + 6, -1, -1, 0xFFB0B0B0, "minihud.gui.button.shapes.shape_renderer");
         this.addWidget(label);
 
         x += label.getWidth() + 2;

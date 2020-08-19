@@ -2,9 +2,10 @@ package fi.dy.masa.minihud.gui.widget;
 
 import net.minecraft.client.renderer.GlStateManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
+import fi.dy.masa.malilib.gui.widget.button.OnOffStyle;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
@@ -30,7 +31,8 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
         this.parent = parent;
 
         this.configureButton = new GenericButton(x, y + 1, -1, true, "minihud.gui.button.configure");
-        this.toggleButton = new OnOffButton(x, y + 1, -1, true, "minihud.gui.button.shape_entry.enabled", this.shape.isEnabled());
+        this.toggleButton = new OnOffButton(x, y + 1, -1, 20, OnOffStyle.SLIDER_ON_OFF, this.shape::isEnabled, null);
+        this.toggleButton.setRightAlign(true, x, true);
         this.removeButton = new GenericButton(x, y + 1, -1, true, "minihud.gui.button.remove");
 
         this.configureButton.setActionListener((btn, mbtn) -> {
