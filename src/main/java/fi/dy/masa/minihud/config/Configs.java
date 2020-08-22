@@ -34,8 +34,7 @@ public class Configs implements ModConfig
         public static final IntegerConfig CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS    = new IntegerConfig("chunkUnloadBucketOverlayChunkRadius", -1);
         public static final BooleanConfig CHUNK_UNLOAD_BUCKET_HASH_SIZE         = new BooleanConfig("chunkUnloadBucketHashSize", true);
         public static final StringConfig COORDINATE_FORMAT_STRING               = new StringConfig("coordinateFormat", "x: %.1f y: %.1f z: %.1f");
-        public static final StringConfig DATE_FORMAT_REAL                       = new StringConfig("dateFormatReal", "yyyy-MM-dd HH:mm:ss");
-        public static final StringConfig DATE_FORMAT_MINECRAFT                  = new StringConfig("dateFormatMinecraft", "MC time: (day {DAY}) {HOUR}:{MIN}:xx");
+        public static final BooleanConfig COORDINATE_FORMAT_CUSTOMIZED          = new BooleanConfig("coordinateFormatCustomized", false);
         public static final BooleanConfig DEBUG_RENDERER_PATH_MAX_DIST          = new BooleanConfig("debugRendererPathFindingEnablePointWidth", true);
         public static final BooleanConfig DONT_RESET_SEED_ON_DIMENSION_CHANGE   = new BooleanConfig("dontResetSeedOnDimensionChange", false);
         public static final BooleanConfig FIX_VANILLA_DEBUG_RENDERERS           = new BooleanConfig("enableVanillaDebugRendererFix", true);
@@ -58,7 +57,9 @@ public class Configs implements ModConfig
         public static final HotkeyedBooleanConfig MAIN_RENDERING_TOGGLE         = new HotkeyedBooleanConfig("mainRenderingToggle", true, "", KeyBindSettings.RELEASE_EXCLUSIVE);
         public static final BooleanConfig MAP_PREVIEW                           = new BooleanConfig("mapPreview", false);
         public static final IntegerConfig MAP_PREVIEW_SIZE                      = new IntegerConfig("mapPreviewSize", 160, 16, 512);
+        public static final StringConfig MC_TIME_FORMAT                         = new StringConfig("mcTimeFormat", "MC time: (day {DAY}) {HOUR}:{MIN}:xx");
         public static final HotkeyConfig OPEN_CONFIG_GUI                        = new HotkeyConfig("openConfigGui", "H,C");
+        public static final StringConfig REAL_TIME_FORMAT                       = new StringConfig("realTimeFormat", "yyyy-MM-dd HH:mm:ss");
         public static final BooleanConfig REQUIRE_SNEAK                         = new BooleanConfig("requireSneak", false);
         public static final HotkeyConfig REQUIRED_KEY                           = new HotkeyConfig("requiredKey", "", KeyBindSettings.MODIFIER_INGAME_EMPTY);
         public static final HotkeyConfig SET_DISTANCE_REFERENCE_POINT           = new HotkeyConfig("setDistanceReferencePoint", "");
@@ -75,35 +76,54 @@ public class Configs implements ModConfig
         public static final BooleanConfig STRUCTURES_RENDER_THROUGH             = new BooleanConfig("structuresRenderThrough", false);
         public static final IntegerConfig TIME_DAY_DIVISOR                      = new IntegerConfig("timeDayDivisor", 24000, 1, Integer.MAX_VALUE);
         public static final IntegerConfig TIME_TOTAL_DIVISOR                    = new IntegerConfig("timeTotalDivisor", 24000, 1, Integer.MAX_VALUE);
-        public static final BooleanConfig USE_CUSTOMIZED_COORDINATES            = new BooleanConfig("useCustomizedCoordinateFormat", true);
         public static final BooleanConfig USE_FONT_SHADOW                       = new BooleanConfig("useFontShadow", false);
         public static final BooleanConfig USE_TEXT_BACKGROUND                   = new BooleanConfig("useTextBackground", true);
         public static final BooleanConfig WOOL_COUNTER_ENABLE_ALL               = new BooleanConfig("woolCounterEnableAll", true);
         public static final StringConfig WOOL_COUNTER_TYPES                     = new StringConfig("woolCounterTypes", "0-15");
 
         public static final OptionListConfig<BlockGridMode> BLOCK_GRID_OVERLAY_MODE         = new OptionListConfig<>("blockGridOverlayMode", BlockGridMode.ALL);
-        public static final OptionListConfig<HudAlignment> HUD_ALIGNMENT                    = new OptionListConfig<>("hudAlignment", HudAlignment.TOP_LEFT);
+        public static final OptionListConfig<HudAlignment> INFO_LINES_ALIGNMENT             = new OptionListConfig<>("infoLinesHudAlignment", HudAlignment.TOP_LEFT);
         public static final OptionListConfig<LightLevelMarkerMode> LIGHT_LEVEL_MARKER_MODE  = new OptionListConfig<>("lightLevelMarkers", LightLevelMarkerMode.SQUARE);
         public static final OptionListConfig<LightLevelNumberMode> LIGHT_LEVEL_NUMBER_MODE  = new OptionListConfig<>("lightLevelNumbers", LightLevelNumberMode.BLOCK);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 BEACON_RANGE_AUTO_UPDATE,
                 BLOCK_GRID_OVERLAY_MODE,
+                BLOCK_GRID_OVERLAY_RADIUS,
+                CHUNK_UNLOAD_BUCKET_FONT_SCALE,
                 CHUNK_UNLOAD_BUCKET_HASH_SIZE,
+                CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS,
+                COORDINATE_FORMAT_STRING,
+                COORDINATE_FORMAT_CUSTOMIZED,
+                REAL_TIME_FORMAT,
                 DEBUG_MESSAGES,
                 DEBUG_RENDERER_PATH_MAX_DIST,
                 DONT_RESET_SEED_ON_DIMENSION_CHANGE,
+                DROPPED_CHUNKS_HASH_SIZE,
                 FIX_VANILLA_DEBUG_RENDERERS,
-                HUD_ALIGNMENT,
+                HUD_FONT_SCALE,
+                HUD_TEXT_POS_X,
+                HUD_TEXT_POS_Y,
+                INFO_LINES_ALIGNMENT,
                 ITEM_NBT_ENABLED,
                 ITEM_NBT_KEY_PRETTY,
                 ITEM_NBT_KEY_STRING,
                 LIGHT_LEVEL_COLORED_NUMBERS,
                 LIGHT_LEVEL_MARKER_MODE,
+                LIGHT_LEVEL_MARKER_SIZE,
                 LIGHT_LEVEL_NUMBER_MODE,
+                LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X,
+                LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y,
+                LIGHT_LEVEL_NUMBER_OFFSET_SKY_X,
+                LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
                 LIGHT_LEVEL_NUMBER_ROTATION,
+                LIGHT_LEVEL_RANGE,
+                LIGHT_LEVEL_THRESHOLD,
+                LIGHT_LEVEL_Z_OFFSET,
                 MAIN_RENDERING_TOGGLE,
                 MAP_PREVIEW,
+                MAP_PREVIEW_SIZE,
+                MC_TIME_FORMAT,
                 OPEN_CONFIG_GUI,
                 REQUIRE_SNEAK,
                 REQUIRED_KEY,
@@ -112,41 +132,19 @@ public class Configs implements ModConfig
                 SHULKER_BOX_PREVIEW,
                 SHULKER_DISPLAY_BACKGROUND_COLOR,
                 SHULKER_DISPLAY_REQUIRE_SHIFT,
+                SLIME_CHUNK_OVERLAY_RADIUS,
                 SORT_LINES_BY_LENGTH,
                 SORT_LINES_REVERSED,
-                STRUCTURES_RENDER_THROUGH,
-                USE_CUSTOMIZED_COORDINATES,
-                USE_FONT_SHADOW,
-                USE_TEXT_BACKGROUND,
-                WOOL_COUNTER_ENABLE_ALL,
-
-                COORDINATE_FORMAT_STRING,
-                DATE_FORMAT_MINECRAFT,
-                DATE_FORMAT_REAL,
-                WOOL_COUNTER_TYPES,
-
-                BLOCK_GRID_OVERLAY_RADIUS,
-                CHUNK_UNLOAD_BUCKET_FONT_SCALE,
-                CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS,
-                DROPPED_CHUNKS_HASH_SIZE,
-                HUD_FONT_SCALE,
-                HUD_TEXT_POS_X,
-                HUD_TEXT_POS_Y,
-                LIGHT_LEVEL_MARKER_SIZE,
-                LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X,
-                LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y,
-                LIGHT_LEVEL_NUMBER_OFFSET_SKY_X,
-                LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
-                LIGHT_LEVEL_RANGE,
-                LIGHT_LEVEL_THRESHOLD,
-                LIGHT_LEVEL_Z_OFFSET,
-                MAP_PREVIEW_SIZE,
-                SLIME_CHUNK_OVERLAY_RADIUS,
                 SPAWNABLE_COLUMNS_OVERLAY_RADIUS,
                 SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL,
                 SPAWNABLE_SUB_CHUNKS_OVERLAY_RADIUS,
+                STRUCTURES_RENDER_THROUGH,
                 TIME_DAY_DIVISOR,
-                TIME_TOTAL_DIVISOR
+                TIME_TOTAL_DIVISOR,
+                USE_FONT_SHADOW,
+                USE_TEXT_BACKGROUND,
+                WOOL_COUNTER_ENABLE_ALL,
+                WOOL_COUNTER_TYPES
         );
 
         public static final List<Hotkey> HOTKEY_LIST = ImmutableList.of(

@@ -34,12 +34,12 @@ public class ConfigScreen
 
     public static BaseConfigScreen create()
     {
-        return new BaseConfigScreen(10, 50, Reference.MOD_ID, null, TABS, INFO_LINES, "minihud.gui.title.configs");
+        return new BaseConfigScreen(Reference.MOD_ID, null, TABS, INFO_LINES, "minihud.gui.title.configs");
     }
 
     public static BaseConfigScreen createOnTab(ConfigTab tab)
     {
-        BaseConfigScreen screen = new BaseConfigScreen(10, 50, Reference.MOD_ID, null, TABS, INFO_LINES, "minihud.gui.title.configs");
+        BaseConfigScreen screen = new BaseConfigScreen(Reference.MOD_ID, null, TABS, INFO_LINES, "minihud.gui.title.configs");
         screen.setCurrentTab(tab);
         return screen;
     }

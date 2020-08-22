@@ -35,25 +35,13 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
 
     public GuiShapeManager()
     {
-        super(10, 90);
+        super(10, 82, 20, 88);
 
         this.title = StringUtils.translate("minihud.gui.title.shape_manager");
 
         // The position will get updated later
-        this.widgetDropDown = new DropDownListWidget<>(0, 0, 160, 20, 200, 10, ImmutableList.copyOf(ShapeType.values()), ShapeType::getDisplayName);
+        this.widgetDropDown = new DropDownListWidget<>(0, 0, 160, 16, 200, 10, ImmutableList.copyOf(ShapeType.values()), ShapeType::getDisplayName);
         this.widgetDropDown.setZLevel((int) this.zLevel + 2);
-    }
-
-    @Override
-    protected int getListWidth()
-    {
-        return this.width - 20;
-    }
-
-    @Override
-    protected int getListHeight()
-    {
-        return this.height - this.getListY() - 6;
     }
 
     @Override
@@ -66,26 +54,28 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         this.createTabButtonWidget();
 
         int x = 12;
-        int y = 48;
+        int y = 44;
+        int lw = StringUtils.getMaxStringRenderWidth(StringUtils.translate("minihud.gui.button.shapes.main_rendering"),
+                                                     StringUtils.translate("minihud.gui.button.shapes.shape_renderer"));
 
-        LabelWidget label = new LabelWidget(x, y + 6, -1, -1, 0xFFB0B0B0, "minihud.gui.button.shapes.main_rendering");
+        LabelWidget label = new LabelWidget(x, y + 5, lw, -1, 0xFFFFF040, "minihud.gui.button.shapes.main_rendering");
         this.addWidget(label);
 
-        x += label.getWidth() + 2;
-        GenericButton button = new BooleanConfigButton(x, y, -1, 20, Configs.Generic.MAIN_RENDERING_TOGGLE);
+        x += label.getWidth() + 4;
+        GenericButton button = new BooleanConfigButton(x, y, -1, 18, Configs.Generic.MAIN_RENDERING_TOGGLE);
         this.addWidget(button);
 
         this.widgetDropDown.setPosition(this.width - 10, y);
         this.widgetDropDown.setRightAlign(true, this.width - 10, true);
         this.addWidget(this.widgetDropDown);
 
-        y += 22;
+        y += 18;
         x = 12;
-        label = new LabelWidget(x, y + 6, -1, -1, 0xFFB0B0B0, "minihud.gui.button.shapes.shape_renderer");
+        label = new LabelWidget(x, y + 6, lw, -1, 0xFFFFF040, "minihud.gui.button.shapes.shape_renderer");
         this.addWidget(label);
 
-        x += label.getWidth() + 2;
-        button = new BooleanConfigButton(x, y, -1, 20, RendererToggle.SHAPE_RENDERER.getBooleanConfig());
+        x += label.getWidth() + 4;
+        button = new BooleanConfigButton(x, y + 1, -1, 18, RendererToggle.SHAPE_RENDERER.getBooleanConfig());
         this.addWidget(button);
 
         button = new GenericButton(this.width - 10, y, -1, true, "minihud.gui.button.add_shape");
@@ -119,7 +109,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
 
     protected void createTabButtonWidget()
     {
-        this.tabButtonContainerWidget = new CyclableContainerWidget(10, 26, this.width - 20, 20, this.createTabButtons());
+        this.tabButtonContainerWidget = new CyclableContainerWidget(10, 22, this.width - 20, 20, this.createTabButtons());
         this.tabButtonContainerWidget.setStartIndex(BaseConfigScreen.getTabState(Reference.MOD_ID).currentTabStartIndex);
         this.addWidget(this.tabButtonContainerWidget);
     }

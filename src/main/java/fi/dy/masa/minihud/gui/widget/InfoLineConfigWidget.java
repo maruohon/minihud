@@ -45,11 +45,11 @@ public class InfoLineConfigWidget extends BaseConfigOptionWidget<InfoLine>
         this.booleanButton = new BooleanConfigButton(x, y + 1, -1, 20, config.getBooleanConfig());
         this.booleanButton.setActionListener((btn, mbtn) -> this.resetButton.setEnabled(this.config.isModified()));
 
-        this.hotkeyButton = new KeyBindConfigButton(x, y + 1, 120, 20, config.getKeyBind(), ctx.gui);
+        this.hotkeyButton = new KeyBindConfigButton(x, y + 1, 120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
         this.hotkeyButton.setValueChangeListener(() -> this.resetButton.setEnabled(this.config.isModified()));
 
         this.settingsWidget = new KeybindSettingsWidget(x, y, 20, 20, config.getKeyBind(),
-                                                        config.getDisplayName(), ctx.gui.getDialogHandler());
+                                                        config.getDisplayName(), ctx.getDialogHandler());
 
         this.resetButton.setActionListener((btn, mbtn) -> {
             this.config.resetToDefault();

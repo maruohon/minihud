@@ -114,7 +114,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             int y = Configs.Generic.HUD_TEXT_POS_Y.getIntegerValue();
             int textColor = Configs.Colors.HUD_TEXT.getIntegerValue();
             int bgColor = Configs.Colors.HUD_TEXT_BACKGROUND.getIntegerValue();
-            HudAlignment alignment = Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
+            HudAlignment alignment = Configs.Generic.INFO_LINES_ALIGNMENT.getOptionListValue();
             boolean useBackground = Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue();
             boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
 
@@ -157,7 +157,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
     public int getSubtitleOffset()
     {
-        HudAlignment align = Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
+        HudAlignment align = Configs.Generic.INFO_LINES_ALIGNMENT.getOptionListValue();
 
         if (align == HudAlignment.BOTTOM_RIGHT)
         {
@@ -291,7 +291,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         {
             try
             {
-                SimpleDateFormat sdf = new SimpleDateFormat(Configs.Generic.DATE_FORMAT_REAL.getStringValue());
+                SimpleDateFormat sdf = new SimpleDateFormat(Configs.Generic.REAL_TIME_FORMAT.getStringValue());
                 this.date.setTime(System.currentTimeMillis());
                 this.addLine(sdf.format(this.date));
             }
@@ -318,7 +318,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 int min = (int) (dayTicks / 16.666666) % 60;
                 int sec = (int) (dayTicks / 0.277777) % 60;
 
-                String str = Configs.Generic.DATE_FORMAT_MINECRAFT.getStringValue();
+                String str = Configs.Generic.MC_TIME_FORMAT.getStringValue();
                 str = str.replace("{DAY}",  String.format("%d", day));
                 str = str.replace("{DAY_1}",String.format("%d", day + 1));
                 str = str.replace("{HOUR}", String.format("%02d", hour));
@@ -399,7 +399,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             if (InfoLine.COORDINATES.getBooleanValue())
             {
-                if (Configs.Generic.USE_CUSTOMIZED_COORDINATES.getBooleanValue())
+                if (Configs.Generic.COORDINATE_FORMAT_CUSTOMIZED.getBooleanValue())
                 {
                     try
                     {
@@ -414,7 +414,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 }
                 else
                 {
-                    str.append(String.format("XYZ: %.2f / %.4f / %.2f",
+                    str.append(String.format("x: %.1f y: %.1f z: %.1f",
                         entity.posX, entity.getEntityBoundingBox().minY, entity.posZ));
                 }
 
@@ -487,7 +487,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             this.addLine(String.format("Distance: %.2f (x: %.2f y: %.2f z: %.2f) [to x: %.2f y: %.2f z: %.2f]",
                     dist, entity.posX - ref.x, entity.posY - ref.y, entity.posZ - ref.z, ref.x, ref.y, ref.z));
         }
-        else if (type == InfoLine.FACING)
+        else if (type == InfoLine.PLAYER_FACING)
         {
             EnumFacing facing = entity.getHorizontalFacing();
             String str = "Invalid";
@@ -519,13 +519,13 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 }
             }
         }
-        else if (type == InfoLine.ROTATION_YAW ||
-                 type == InfoLine.ROTATION_PITCH ||
+        else if (type == InfoLine.PLAYER_YAW_ROTATION ||
+                 type == InfoLine.PLAYER_PITCH_ROTATION ||
                  type == InfoLine.SPEED)
         {
             // Don't add the same line multiple times
-            if (this.addedTypes.contains(InfoLine.ROTATION_YAW) ||
-                this.addedTypes.contains(InfoLine.ROTATION_PITCH) ||
+            if (this.addedTypes.contains(InfoLine.PLAYER_YAW_ROTATION) ||
+                this.addedTypes.contains(InfoLine.PLAYER_PITCH_ROTATION) ||
                 this.addedTypes.contains(InfoLine.SPEED))
             {
                 return;
@@ -534,13 +534,13 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             String pre = "";
             StringBuilder str = new StringBuilder(128);
 
-            if (InfoLine.ROTATION_YAW.getBooleanValue())
+            if (InfoLine.PLAYER_YAW_ROTATION.getBooleanValue())
             {
                 str.append(String.format("yaw: %.1f", MathHelper.wrapDegrees(entity.rotationYaw)));
                 pre = " / ";
             }
 
-            if (InfoLine.ROTATION_PITCH.getBooleanValue())
+            if (InfoLine.PLAYER_PITCH_ROTATION.getBooleanValue())
             {
                 str.append(pre).append(String.format("pitch: %.1f", MathHelper.wrapDegrees(entity.rotationPitch)));
                 pre = " / ";
@@ -557,8 +557,8 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             this.addLine(str.toString());
 
-            this.addedTypes.add(InfoLine.ROTATION_YAW);
-            this.addedTypes.add(InfoLine.ROTATION_PITCH);
+            this.addedTypes.add(InfoLine.PLAYER_YAW_ROTATION);
+            this.addedTypes.add(InfoLine.PLAYER_PITCH_ROTATION);
             this.addedTypes.add(InfoLine.SPEED);
         }
         else if (type == InfoLine.SPEED_AXIS)
