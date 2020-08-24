@@ -59,6 +59,11 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
+        if (mc.player == null || mc.world == null)
+        {
+            return false;
+        }
+
         if (key == Hotkeys.KEY_MAIN_TOGGLE.getKeybind())
         {
             this.disabled = ! this.disabled;
@@ -80,7 +85,7 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
             return true;
         }
 
-        if (this.disabled || mc == null || mc.player == null || (GuiUtils.getCurrentScreen() instanceof HandledScreen) == false)
+        if (this.disabled || (GuiUtils.getCurrentScreen() instanceof HandledScreen) == false)
         {
             return false;
         }
