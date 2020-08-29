@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
+import org.omg.CORBA.StringHolder;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.BlockState;
@@ -674,17 +675,17 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.BIOME)
         {
             // Prevent a crash when outside of world
-            /* TODO 1.16.2+
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isChunkLoaded(pos))
             {
                 WorldChunk clientChunk = this.getClientChunk(chunkPos);
 
                 if (clientChunk.isEmpty() == false)
                 {
-                    this.addLine("Biome: " + mc.world.getBiome(pos).getName().getString());
+                    Biome biome = mc.world.getBiome(pos);
+                    Identifier id = mc.world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
+                    this.addLine("Biome: " + StringUtils.translate("biome." + id.toString().replace(":", ".")));
                 }
             }
-            */
         }
         else if (type == InfoToggle.BIOME_REG_NAME)
         {
