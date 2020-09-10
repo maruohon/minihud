@@ -226,9 +226,9 @@ public class Configs implements ModConfig
     private static final List<ConfigOptionCategory> CATEGORIES = ImmutableList.of(
             BaseConfigOptionCategory.normal("Generic",          Configs.Generic.OPTIONS),
             BaseConfigOptionCategory.normal("Colors",           Configs.Colors.OPTIONS),
-            BaseConfigOptionCategory.normal("InfoTypeToggles", InfoLine.TOGGLE_CONFIGS),
-            BaseConfigOptionCategory.normal("InfoLineOrders", InfoLine.LINE_ORDER_CONFIGS),
-            BaseConfigOptionCategory.normal("InfoHotkeys", InfoLine.TOGGLE_HOTKEYS),
+            BaseConfigOptionCategory.normal("InfoTypeToggles",  InfoLine.TOGGLE_CONFIGS),
+            BaseConfigOptionCategory.normal("InfoLineOrders",   InfoLine.LINE_ORDER_CONFIGS),
+            BaseConfigOptionCategory.normal("InfoHotkeys",      InfoLine.TOGGLE_HOTKEYS),
             BaseConfigOptionCategory.normal("RendererToggles",  RendererToggle.TOGGLE_CONFIGS),
             BaseConfigOptionCategory.normal("RendererHotkeys",  RendererToggle.TOGGLE_HOTKEYS),
             BaseConfigOptionCategory.normal("StructureToggles", StructureToggle.TOGGLE_CONFIGS),

@@ -89,14 +89,11 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean isActiveGui, boolean hovered)
+    public void renderAt(int x, int y, float z, int mouseX, int mouseY, boolean isActiveGui, boolean hovered)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
         boolean shapeSelected = ShapeManager.INSTANCE.getSelectedShape() == this.data;
-        int x = this.getX();
-        int y = this.getY();
-        int z = this.getZLevel();
         int width = this.getWidth();
         int height = this.getHeight();
 
@@ -121,12 +118,12 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
         }
 
         String name = this.shape.getDisplayName();
-        this.drawString(x + 4, y + this.getCenteredTextOffsetY(), 0xFFFFFFFF, name);
+        this.drawString(x + 4, y + this.getCenteredTextOffsetY(), z, 0xFFFFFFFF, name);
 
         RenderUtils.color(1f, 1f, 1f, 1f);
         GlStateManager.disableBlend();
 
-        super.render(mouseX, mouseY, isActiveGui, hovered);
+        super.renderAt(x, y, z, mouseX, mouseY, isActiveGui, hovered);
 
         RenderUtils.disableItemLighting();
         GlStateManager.disableLighting();

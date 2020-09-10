@@ -40,7 +40,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         this.title = StringUtils.translate("minihud.gui.title.shape_manager");
 
         // The position will get updated later
-        this.widgetDropDown = new DropDownListWidget<>(0, 0, 160, 16, 200, 10, ImmutableList.copyOf(ShapeType.values()), ShapeType::getDisplayName);
+        this.widgetDropDown = new DropDownListWidget<>(0, 0, 160, 16, 200, 10, ImmutableList.copyOf(ShapeType.values()), ShapeType::getDisplayName, null);
         this.widgetDropDown.setZLevel((int) this.zLevel + 2);
     }
 
