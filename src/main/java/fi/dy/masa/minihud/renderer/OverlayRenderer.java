@@ -83,7 +83,7 @@ public class OverlayRenderer
                 int cz = centerZ + zOff;
                 int bucket = MiscUtils.getChunkUnloadBucket(cx, cz);
                 String str = String.valueOf(bucket);
-                fi.dy.masa.malilib.render.RenderUtils.drawTextPlate(Arrays.asList(str), (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale);
+                fi.dy.masa.malilib.render.RenderUtils.renderTextPlate(Arrays.asList(str), (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale);
             }
         }
     }

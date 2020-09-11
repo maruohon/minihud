@@ -254,7 +254,7 @@ public abstract class ShapeCircleBase extends ShapeBase
 
                         if (render)
                         {
-                            fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceSideBatchedQuads(pos, cameraPos, side, color, 0, BUFFER_1);
+                            fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceSideBatchedQuads(pos, cameraPos, side, color, 0, BUFFER_1);
                         }
                     }
                 }

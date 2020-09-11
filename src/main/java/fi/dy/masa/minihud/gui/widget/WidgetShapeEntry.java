@@ -100,21 +100,21 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
         // Draw a lighter background for the hovered and the selected entry
         if (shapeSelected || hovered)
         {
-            RenderUtils.drawRect(x, y, width, height, 0x70FFFFFF, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0x70FFFFFF, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(x, y, width, height, 0x20FFFFFF, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0x20FFFFFF, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(x, y, width, height, 0x50FFFFFF, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0x50FFFFFF, z);
         }
 
         if (shapeSelected)
         {
-            RenderUtils.drawOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
+            RenderUtils.renderOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
         }
 
         String name = this.shape.getDisplayName();

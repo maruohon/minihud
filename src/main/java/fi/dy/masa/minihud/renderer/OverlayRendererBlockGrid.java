@@ -149,7 +149,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
 
                     if (chunk.getBlockState(x, y, z).getMaterial() != Material.AIR)
                     {
-                        fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllOutlinesBatchedLines(posMutable, cameraPos, color, 0.001, buffer);
+                        fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllOutlinesBatchedLines(posMutable, cameraPos, color, 0.001, buffer);
                     }
                 }
             }
@@ -199,7 +199,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
 
                             if (chunk.getBlockState(posMutable2).getMaterial() != Material.AIR)
                             {
-                                fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllOutlinesBatchedLines(posMutable, cameraPos, color, 0.001, buffer);
+                                fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllOutlinesBatchedLines(posMutable, cameraPos, color, 0.001, buffer);
                                 break;
                             }
                         }
@@ -213,7 +213,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
 
                             if (world.getBlockState(posMutable2).getMaterial() != Material.AIR)
                             {
-                                fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllOutlinesBatchedLines(posMutable, cameraPos, color, 0.001, buffer);
+                                fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllOutlinesBatchedLines(posMutable, cameraPos, color, 0.001, buffer);
                                 break;
                             }
                         }

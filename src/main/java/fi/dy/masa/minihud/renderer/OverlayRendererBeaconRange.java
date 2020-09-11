@@ -165,8 +165,8 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
         double maxY = this.getMaxHeight(world, pos, range) - cameraPos.y;
         double maxZ = z + range + 1 -cameraPos.z;
 
-        fi.dy.masa.malilib.render.RenderUtils.drawBoxAllSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color, bufferQuads);
-        fi.dy.masa.malilib.render.RenderUtils.drawBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), bufferLines);
+        fi.dy.masa.malilib.render.RenderUtils.renderBoxAllSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color, bufferQuads);
+        fi.dy.masa.malilib.render.RenderUtils.renderBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), bufferLines);
 
         BEACON_POSITIONS.add(pos);
         BEACON_CHUNKS.add(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4));
@@ -265,12 +265,12 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
         BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
-        fi.dy.masa.malilib.render.RenderUtils.drawBoxAllSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(0.3f), buffer);
+        fi.dy.masa.malilib.render.RenderUtils.renderBoxAllSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(0.3f), buffer);
 
         tessellator.draw();
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
-        fi.dy.masa.malilib.render.RenderUtils.drawBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), buffer);
+        fi.dy.masa.malilib.render.RenderUtils.renderBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), buffer);
 
         tessellator.draw();
 

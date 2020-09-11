@@ -79,8 +79,8 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
                                           Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getColor() :
                                           Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getColor();
 
-        fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllOutlinesBatchedLines(spawn, cameraPos, colorEntity, 0.001, BUFFER_2);
-        fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllSidesBatchedQuads(spawn, cameraPos, colorEntity, 0.001, BUFFER_1);
+        fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllOutlinesBatchedLines(spawn, cameraPos, colorEntity, 0.001, BUFFER_2);
+        fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllSidesBatchedQuads(spawn, cameraPos, colorEntity, 0.001, BUFFER_1);
 
         Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 128);
         RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorLazy, BUFFER_1, BUFFER_2);

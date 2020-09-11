@@ -127,7 +127,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
         Color4f color = type.getToggle().getColorMain().getColor();
         ImmutableList<IntBoundingBox> components = structure.getComponents();
 
-        fi.dy.masa.malilib.render.RenderUtils.drawBox(structure.getBoundingBox(), cameraPos, color, BUFFER_1, BUFFER_2);
+        fi.dy.masa.malilib.render.RenderUtils.renderBox(structure.getBoundingBox(), cameraPos, color, BUFFER_1, BUFFER_2);
 
         if (components.isEmpty() == false)
         {
@@ -137,7 +137,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
                 for (IntBoundingBox bb : components)
                 {
-                    fi.dy.masa.malilib.render.RenderUtils.drawBox(bb, cameraPos, color, BUFFER_1, BUFFER_2);
+                    fi.dy.masa.malilib.render.RenderUtils.renderBox(bb, cameraPos, color, BUFFER_1, BUFFER_2);
                 }
             }
         }

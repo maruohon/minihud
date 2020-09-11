@@ -116,10 +116,10 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
                 final double minZ = z + 0.25 - cameraPos.z;
                 final double maxZ = minZ + 0.5;
 
-                fi.dy.masa.malilib.render.RenderUtils.drawBoxHorizontalSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color, BUFFER_1);
-                fi.dy.masa.malilib.render.RenderUtils.drawBoxTopBatchedQuads(minX, minZ, maxX, maxY, maxZ, color, BUFFER_1);
+                fi.dy.masa.malilib.render.RenderUtils.renderBoxHorizontalSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color, BUFFER_1);
+                fi.dy.masa.malilib.render.RenderUtils.renderBoxTopBatchedQuads(minX, minZ, maxX, maxY, maxZ, color, BUFFER_1);
 
-                fi.dy.masa.malilib.render.RenderUtils.drawBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color, BUFFER_2);
+                fi.dy.masa.malilib.render.RenderUtils.renderBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color, BUFFER_2);
             }
         }
 
