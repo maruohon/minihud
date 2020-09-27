@@ -84,13 +84,13 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.color"));
         y += 12;
 
-        BaseTextFieldWidget txtField = new BaseTextFieldWidget(x, y, 70, 17, String.format("#%08X", this.shape.getColor().intValue));
+        BaseTextFieldWidget txtField = new BaseTextFieldWidget(x, y, 70, 16, String.format("#%08X", this.shape.getColor().intValue));
         txtField.setTextValidator(BaseTextFieldWidget.VALIDATOR_HEX_COLOR_8);
         txtField.setListener(this.shape::setColorFromString);
         this.addWidget(txtField);
         this.nextY = y + 20;
 
-        this.addWidget(new ColorIndicatorWidget(x + 74, y - 1, 19, 19, this.shape.getColor(), this.shape::setColor));
+        this.addWidget(new ColorIndicatorWidget(x + 74, y - 1, 18, 18, this.shape.getColor(), this.shape::setColor));
     }
 
     private void createShapeEditorElements(int x, int y)
@@ -98,7 +98,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.display_name_colon"));
         y += 12;
 
-        BaseTextFieldWidget textField = new BaseTextFieldWidget(x, y, 240, 17, this.shape.getDisplayName());
+        BaseTextFieldWidget textField = new BaseTextFieldWidget(x, y, 240, 16, this.shape.getDisplayName());
         textField.setListener(this.shape::setDisplayName);
         this.addWidget(textField);
         y += 20;
@@ -177,9 +177,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     private void createShapeEditorElementDoubleField(int x, int y, DoubleSupplier supplier, DoubleConsumer consumer, String translationKey, boolean addButton)
     {
         this.addLabel(x + 12, y, 0xFFFFFFFF, translationKey);
-        y += 11;
+        y += 10;
 
-        DoubleTextFieldWidget txtField = new DoubleTextFieldWidget(x + 12, y, 40, 14, supplier.getAsDouble());
+        DoubleTextFieldWidget txtField = new DoubleTextFieldWidget(x + 12, y, 40, 16, supplier.getAsDouble());
         txtField.setListener(new DoubleTextFieldListener(consumer));
         txtField.setUpdateListenerAlways(true);
         this.addWidget(txtField);
@@ -187,7 +187,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            GenericButton button = new GenericButton(x + 54, y - 1, BaseIcon.BTN_PLUSMINUS_16, hover);
+            GenericButton button = new GenericButton(x + 54, y, BaseIcon.BTN_PLUSMINUS_16, hover);
             button.setCanScrollToClick(true);
             this.addButton(button, new DoubleModifierButtonListener(supplier, new DualDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
         }
@@ -196,9 +196,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     private void createShapeEditorElementIntField(int x, int y, IntSupplier supplier, IntConsumer consumer, String translationKey, boolean addButton)
     {
         this.addLabel(x + 12, y, 0xFFFFFFFF, translationKey);
-        y += 11;
+        y += 10;
 
-        IntegerTextFieldWidget txtField = new IntegerTextFieldWidget(x + 12, y, 40, 14, supplier.getAsInt());
+        IntegerTextFieldWidget txtField = new IntegerTextFieldWidget(x + 12, y, 40, 16, supplier.getAsInt());
         txtField.setListener(new IntegerTextFieldListener(consumer));
         txtField.setUpdateListenerAlways(true);
         this.addWidget(txtField);
@@ -206,7 +206,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            GenericButton button = new GenericButton(x + 54, y - 1, BaseIcon.BTN_PLUSMINUS_16, hover);
+            GenericButton button = new GenericButton(x + 54, y, BaseIcon.BTN_PLUSMINUS_16, hover);
             button.setCanScrollToClick(true);
             this.addButton(button, new IntegerModifierButtonListener(supplier, new DualIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
         }
