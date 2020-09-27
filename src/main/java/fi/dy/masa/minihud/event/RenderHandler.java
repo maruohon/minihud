@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -56,6 +57,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
     private final Date date;
+    private final Supplier<String> profilerSectionSupplier = () -> "MiniHUD_RenderHandler";
     private int fps;
     private int fpsCounter;
     private long fpsUpdateTime = Minecraft.getSystemTime();
@@ -86,10 +88,14 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     }
 
     @Override
-    public void onPostGameOverlayRender(float partialTicks)
+    public Supplier<String> getProfilerSectionSupplier()
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        return this.profilerSectionSupplier;
+    }
 
+    @Override
+    public void onPostGameOverlayRender(Minecraft mc, float partialTicks)
+    {
         if (Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
             mc.gameSettings.showDebugInfo == false &&
             mc.player != null && mc.gameSettings.hideGUI == false &&
@@ -114,7 +120,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             int y = Configs.Generic.HUD_TEXT_POS_Y.getIntegerValue();
             int textColor = Configs.Colors.HUD_TEXT.getIntegerValue();
             int bgColor = Configs.Colors.HUD_TEXT_BACKGROUND.getIntegerValue();
-            HudAlignment alignment = Configs.Generic.INFO_LINES_ALIGNMENT.getOptionListValue();
+            HudAlignment alignment = Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
             boolean useBackground = Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue();
             boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
 
@@ -123,7 +129,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     }
 
     @Override
-    public void onPostRenderItemTooltip(ItemStack stack, int x, int y)
+    public void onPostRenderItemTooltip(ItemStack stack, int x, int y, Minecraft mc)
     {
         if (stack.getItem() instanceof ItemMap)
         {
@@ -144,10 +150,8 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     }
 
     @Override
-    public void onPostWorldRender(float partialTicks)
+    public void onPostWorldRender(Minecraft mc, float partialTicks)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-
         if (Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
             mc.world != null && mc.player != null)
         {
@@ -157,7 +161,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
     public int getSubtitleOffset()
     {
-        HudAlignment align = Configs.Generic.INFO_LINES_ALIGNMENT.getOptionListValue();
+        HudAlignment align = Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
 
         if (align == HudAlignment.BOTTOM_RIGHT)
         {

@@ -7,9 +7,6 @@ public class ClientTickHandler implements fi.dy.masa.malilib.event.ClientTickHan
     @Override
     public void onClientTick(Minecraft mc)
     {
-        if (mc.world != null && mc.player != null)
-        {
-            RenderHandler.getInstance().updateData(mc);
-        }
+        RenderHandler.getInstance().updateData(mc);
     }
 }

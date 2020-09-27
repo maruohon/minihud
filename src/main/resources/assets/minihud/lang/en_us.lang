@@ -17,8 +17,6 @@ minihud.config.comment.hudtextposx=Info line HUD text X position from the screen
 minihud.config.comment.hudtextposy=Info line HUD text Y position from the screen edge (default: 4)
 minihud.config.comment.infolineshudalignment=The alignment of the info lines HUD
 minihud.config.comment.itemnbtenabled=Enables showing the item NBT data in the tooltip,\nif one of the activation keys is held.
-minihud.hotkey.comment.itemnbtkeypretty=When held, the hovered item's NBT data\nis shown in a "pretty" formatted
-minihud.hotkey.comment.itemnbtkeystring=When held, the hovered item's NBT data is shown in a "stringified" format
 minihud.config.comment.lightlevelcolorednumbers=Whether to use colored or white numbers\nfor the Light Level overlay numbers
 minihud.config.comment.lightlevelmarkers=Which type of colored marker to use in the\nLight Level overlay, if any
 minihud.config.comment.lightlevelmarkersize=The size of the light level colored marker.\nRange: 0.0 - 1.0
@@ -35,12 +33,8 @@ minihud.config.comment.mainrenderingtoggle=The MiniHUD main rendering toggle tha
 minihud.config.comment.mappreview=Enables rendering a preview of a map,\nwhen you hold shift while hovering over a map item
 minihud.config.comment.mappreviewsize=The size of the rendered map previews
 minihud.config.comment.mctimeformat=The format string for the Minecraft time.\nThe supported placeholders are: {DAY_1}, {DAY}, {HOUR}, {MIN}, {SEC}.\n{DAY_1} starts the day counter from 1, {DAY} starts from 0.
-minihud.hotkey.comment.openconfiggui=The hotkey to open the in-game config screen
 minihud.config.comment.realtimeformat=The format string for real time, see the the Java SimpleDateFormat\nclass documentation for the format patterns, if needed:\nhttps://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
 minihud.config.comment.requiresneak=Require the player to be sneaking to render the info lines HUD
-minihud.hotkey.comment.requiredkey=If set, the player needs to be holding this key to render the HUD
-minihud.hotkey.comment.setdistancereferencepoint=The hotkey to store the player's current position\nas the reference point for the distance info line type
-minihud.hotkey.comment.shapeeditor=The hotkey to open the Shape Editor screen for the\ncurrently selected shape, if any, otherwise opens the Shapes menu.
 minihud.config.comment.shulkerboxpreview=Enables rendering a preview of the Shulker Box contents,\nwhen you hold shift while hovering over a Shulker Box item
 minihud.config.comment.shulkerdisplaybgcolor=Enables tinting/coloring the Shulker Box display\nbackground texture with the dye color of the box
 minihud.config.comment.shulkerdisplayrequireshift=If enabled, then holding shift is required for the Shulker Box preview
@@ -57,6 +51,15 @@ minihud.config.comment.usefontshadow=Use a font shadow for the info line HUD tex
 minihud.config.comment.usetextbackground=Use a solid background color behind the text\nfor the info line HUD text
 minihud.config.comment.woolcounterenableall=This overrides the 'Wool Counter Types' config, and enables all the colors.\nIt's meant for quickly seeing all of them,\nwithout having to change the other config all the time.
 minihud.config.comment.woolcountertypes=This defines which wool counter colors are enabled\nfor the Carpet Wool Counters info lines.\nAccepted values are individual metadata values like 0,1,2,\nmetadata ranges like 4-6,8-11 and dye names like purple,blue,white.\nDifferent values should be separated by commas, without spaces.
+
+
+minihud.hotkey.comment.itemnbtkeypretty=When held, the hovered item's NBT data\nis shown in a "pretty" formatted
+minihud.hotkey.comment.itemnbtkeystring=When held, the hovered item's NBT data is shown in a "stringified" format
+minihud.hotkey.comment.openconfiggui=The hotkey to open the in-game config screen
+minihud.hotkey.comment.requiredkey=If set, the player needs to be holding this key to render the HUD
+minihud.hotkey.comment.setdistancereferencepoint=The hotkey to store the player's current position\nas the reference point for the distance info line type
+minihud.hotkey.comment.shapeeditor=The hotkey to open the Shape Editor screen for the\ncurrently selected shape, if any, otherwise opens the Shapes menu.
+
 
 minihud.config.comment.beaconrangelvl1=Color for the Beacon Range lvl 1 overlay
 minihud.config.comment.beaconrangelvl2=Color for the Beacon Range lvl 2 overlay
@@ -102,13 +105,11 @@ minihud.config.name.coordinateformatcustomized=Coordinate Format Customized
 minihud.config.name.debugrendererpathfindingenablepointwidth=Debug: Path Finding Point Width
 minihud.config.name.dontresetseedondimensionchange=Don't Reset Seed On Dim Change
 minihud.config.name.enablevanilladebugrendererfix=Enable Vanilla Debug Renderer Fixes
-minihud.config.name.hudfontscale=HUD Font Scale
-minihud.config.name.hudtextposx=HUD Text X
-minihud.config.name.hudtextposy=HUD Text Y
+minihud.config.name.hudfontscale=Info Lines HUD Font Scale
+minihud.config.name.hudtextposx=Info Lines HUD Text X
+minihud.config.name.hudtextposy=Info Lines HUD Text Y
 minihud.config.name.infolineshudalignment=Info Lines HUD Alignment
 minihud.config.name.itemnbtenabled=Item NBT
-minihud.hotkey.name.itemnbtkeypretty=Item NBT key (pretty)
-minihud.hotkey.name.itemnbtkeystring=Item NBT key (stringified)
 minihud.config.name.lightlevelcolorednumbers=Light Level Colored Numbers
 minihud.config.name.lightlevelmarkers=Light Level Markers Mode
 minihud.config.name.lightlevelmarkersize=Light Level Marker Size
@@ -125,15 +126,11 @@ minihud.config.name.mainrenderingtoggle=§eMain Rendering Toggle
 minihud.config.name.mappreview=Map Preview
 minihud.config.name.mappreviewsize=Map Preview Size
 minihud.config.name.mctimeformat=MC time format
-minihud.hotkey.name.openconfiggui=Open Config Screen
 minihud.config.name.realtimeformat=Real Time date/time Format
 minihud.config.name.requiresneak=Require Sneak
-minihud.hotkey.name.requiredkey=Required Key
-minihud.hotkey.name.setdistancereferencepoint=Set Distance Reference Point
-minihud.hotkey.name.shapeeditor=Shape Editor
-minihud.config.name.shulkerboxpreview=Shulker Box Preview
-minihud.config.name.shulkerdisplaybgcolor=Shulker Display BG Color
-minihud.config.name.shulkerdisplayrequireshift=Shulker Sisplay Require Shift
+minihud.config.name.shulkerboxpreview=Shulker Box Display
+minihud.config.name.shulkerdisplaybgcolor=Shulker Box Display BG Color
+minihud.config.name.shulkerdisplayrequireshift=Shulker Box Display Require Shift
 minihud.config.name.slimechunkoverlayradius=Slime Chunk Overlay Radius
 minihud.config.name.sortlinesbylength=Sort Lines by Length
 minihud.config.name.sortlinesreversed=Sort Lines Reversed
@@ -147,6 +144,17 @@ minihud.config.name.usefontshadow=Use Font Shadow
 minihud.config.name.usetextbackground=Use Text Background
 minihud.config.name.woolcounterenableall=Wool Counter Enable All
 minihud.config.name.woolcountertypes=Wool Counter Types
+
+minihud.config_group.name.light_level=Light Level Overlay Options
+minihud.config_group.comment.light_level=All Light Level Overlay related config options.\nNote: The colors are also in the Colors category.
+
+
+minihud.hotkey.name.itemnbtkeypretty=Item NBT key (pretty)
+minihud.hotkey.name.itemnbtkeystring=Item NBT key (stringified)
+minihud.hotkey.name.openconfiggui=Open Config Screen
+minihud.hotkey.name.requiredkey=Required Key
+minihud.hotkey.name.setdistancereferencepoint=Set Distance Reference Point
+minihud.hotkey.name.shapeeditor=Shape Editor
 
 
 minihud.config.name.beaconrangelvl1=Beacon Range lvl 1

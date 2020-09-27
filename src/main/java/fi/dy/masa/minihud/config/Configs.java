@@ -82,7 +82,7 @@ public class Configs implements ModConfig
         public static final StringConfig WOOL_COUNTER_TYPES                     = new StringConfig("woolCounterTypes", "0-15");
 
         public static final OptionListConfig<BlockGridMode> BLOCK_GRID_OVERLAY_MODE         = new OptionListConfig<>("blockGridOverlayMode", BlockGridMode.ALL);
-        public static final OptionListConfig<HudAlignment> INFO_LINES_ALIGNMENT             = new OptionListConfig<>("infoLinesHudAlignment", HudAlignment.TOP_LEFT);
+        public static final OptionListConfig<HudAlignment> HUD_ALIGNMENT                    = new OptionListConfig<>("infoLinesHudAlignment", HudAlignment.TOP_LEFT);
         public static final OptionListConfig<LightLevelMarkerMode> LIGHT_LEVEL_MARKER_MODE  = new OptionListConfig<>("lightLevelMarkers", LightLevelMarkerMode.SQUARE);
         public static final OptionListConfig<LightLevelNumberMode> LIGHT_LEVEL_NUMBER_MODE  = new OptionListConfig<>("lightLevelNumbers", LightLevelNumberMode.BLOCK);
 
@@ -101,10 +101,10 @@ public class Configs implements ModConfig
                 DONT_RESET_SEED_ON_DIMENSION_CHANGE,
                 DROPPED_CHUNKS_HASH_SIZE,
                 FIX_VANILLA_DEBUG_RENDERERS,
+                HUD_ALIGNMENT,
                 HUD_FONT_SCALE,
                 HUD_TEXT_POS_X,
                 HUD_TEXT_POS_Y,
-                INFO_LINES_ALIGNMENT,
                 ITEM_NBT_ENABLED,
                 ITEM_NBT_KEY_PRETTY,
                 ITEM_NBT_KEY_STRING,

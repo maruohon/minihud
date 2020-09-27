@@ -65,7 +65,7 @@ public class InfoLineConfigWidget extends BaseConfigOptionWidget<InfoLine>
     {
         super.reAddSubWidgets();
 
-        int x = this.getX() + this.getMaxLabelWidth() + 10;
+        int x = this.getElementsStartPosition();
         int y = this.getY();
         int elementWidth = this.getElementWidth();
 

@@ -103,14 +103,14 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
 
         if (this.tabButtonContainerWidget != null)
         {
-            BaseConfigScreen.getTabState(Reference.MOD_ID).currentTabStartIndex = this.tabButtonContainerWidget.getStartIndex();
+            BaseConfigScreen.getTabState(Reference.MOD_ID).visibleTabsStartIndex = this.tabButtonContainerWidget.getStartIndex();
         }
     }
 
     protected void createTabButtonWidget()
     {
         this.tabButtonContainerWidget = new CyclableContainerWidget(10, 22, this.width - 20, 20, this.createTabButtons());
-        this.tabButtonContainerWidget.setStartIndex(BaseConfigScreen.getTabState(Reference.MOD_ID).currentTabStartIndex);
+        this.tabButtonContainerWidget.setStartIndex(BaseConfigScreen.getTabState(Reference.MOD_ID).visibleTabsStartIndex);
         this.addWidget(this.tabButtonContainerWidget);
     }
 
