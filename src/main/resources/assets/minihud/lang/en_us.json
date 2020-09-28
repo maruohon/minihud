@@ -47,6 +47,7 @@
     "minihud.gui.title.shape_manager": "Shape Manager",
 
     "minihud.label.bee_info.count": "§7Contains §b%s§7 bee(s)",
+    "minihud.label.bee_info.count_babies": "§7Contains §b%s§7 bee(s), (§b%s§7 babies)",
     "minihud.label.bee_info.name": "§7- %s",
 
     "minihud.label.honey_info.level": "§7Honey level is §b%s§7/5",
