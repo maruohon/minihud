@@ -1,0 +1,100 @@
+{
+    "malilib.gui.button.render_layers_gui.set_to_player": "Buraya Ayarla",
+
+    "minihud.gui.button.config_gui.colors": "Renkler",
+    "minihud.gui.button.config_gui.generic": "Genel",
+    "minihud.gui.button.config_gui.info_toggles": "Bilgi Aç/Kapa",
+    "minihud.gui.button.config_gui.info_line_order": "Bilgi Satır Sırası",
+    "minihud.gui.button.config_gui.info_hotkeys": "Bilgi Kısayolları",
+    "minihud.gui.button.config_gui.renderer_hotkeys": "Görüntüleme Kısayolları",
+    "minihud.gui.button.config_gui.shapes": "Şekiller",
+    "minihud.gui.button.config_gui.structures": "Yapılar",
+
+    "minihud.gui.button.add_shape": "Şekil ekle",
+    "minihud.gui.button.configure": "Ayarla",
+    "minihud.gui.button.remove": "Kaldır",
+    "minihud.gui.button.shape_entry.enabled": "Etkin: %s",
+
+    "minihud.gui.label.block_snap": "Blok yaslaması: %s",
+    "minihud.gui.label.center_colon": "Merkez:",
+    "minihud.gui.label.center_value": "Merkez: %s",
+    "minihud.gui.label.circle.main_axis_colon": "Eksen:",
+    "minihud.gui.label.circle.main_axis_value": "Eksen: %s",
+    "minihud.gui.label.color": "Renk:",
+    "minihud.gui.label.display_name_colon": "Ekran ismi:",
+    "minihud.gui.label.effective_center_value": "Etkili merkez: %s",
+    "minihud.gui.label.height_colon": "Yükseklik:",
+    "minihud.gui.label.height_value": "Yükseklik: %s",
+    "minihud.gui.label.margin_colon": "Kenar boşluğu:",
+    "minihud.gui.label.margin_value": "Kenar boşluğu: %s",
+    "minihud.gui.label.radius_colon": "Yarıçap:",
+    "minihud.gui.label.radius_value": "Yarıçap: %s",
+    "minihud.gui.label.render_type_colon": "Görüntüleme Türü:",
+    "minihud.gui.label.shape.block_snap": "Blok yaslaması: %s",
+    "minihud.gui.label.shape.type_value": "Tür: %s",
+
+    "minihud.gui.label.hover.shape.block_snap": "§7Blok yaslaması: §b%s",
+    "minihud.gui.label.hover.shape.center_value": "§7Merkez - x: §9%s§7, y: §9%s§7, z: §9%s",
+    "minihud.gui.label.hover.shape.circle.main_axis_value": "§7Eksen: §b%s",
+    "minihud.gui.label.hover.shape.effective_center_value": "§7Etkili merkez - x: §9%s§7, y: §9%s§7, z: §9%s",
+    "minihud.gui.label.hover.shape.height_value": "§7Yükseklik: §6%s",
+    "minihud.gui.label.hover.shape.margin_value": "§7Kenar boşluğu: §6%s",
+    "minihud.gui.label.hover.shape.radius_value": "§7Yarıçap: §6%s",
+    "minihud.gui.label.hover.shape.type_value": "§7Tür: §b%s",
+
+    "minihud.gui.title.configs": "MiniHUD Ayarları",
+    "minihud.gui.title.shape_editor": "Şekil Düzenleyicisi",
+    "minihud.gui.title.shape_manager": "Şekil Yöneticisi",
+
+    "minihud.label.bee_info.count": "§7 §b%s§7 arı dahil",
+    "minihud.label.bee_info.name": "§7- %s",
+
+    "minihud.label.honey_info.level": "§7Bal seviyesi: §b%s§7/5",
+
+    "minihud.label.blockgridmode.all": "Hepsi",
+    "minihud.label.blockgridmode.non_air": "Hava Olmayan",
+    "minihud.label.blockgridmode.adjacent": "Hava Olmayana Bitişik",
+
+    "minihud.label.light_level_marker_mode.cross": "Haç",
+    "minihud.label.light_level_marker_mode.none": "Yok",
+    "minihud.label.light_level_marker_mode.square": "Kare",
+
+    "minihud.label.light_level_number_mode.none": "Yok",
+    "minihud.label.light_level_number_mode.block": "Blok",
+    "minihud.label.light_level_number_mode.both": "Her İkisi",
+    "minihud.label.light_level_number_mode.sky": "Gökyüzü",
+
+    "minihud.label.shape_render_type.full_block": "Bloğun Tamamı",
+    "minihud.label.shape_render_type.inner_edge": "İç Kenar",
+    "minihud.label.shape_render_type.outer_edge": "Dış Kenar",
+
+    "minihud.label.shapes.can_spawn_sphere": "İçinde Doğulabilir Küre ( > 24)",
+    "minihud.label.shapes.can_despawn_sphere": "İçinde Yokolabilir Küre ( > 32)",
+    "minihud.label.shapes.circle": "Daire / Silindir",
+    "minihud.label.shapes.despawn_sphere": "Yokolunan Küre ( > 128)",
+    "minihud.label.shapes.sphere_blocky": "Küre (blok bazlı)",
+
+    "minihud.hotkeys.category.generic_hotkeys": "Genel Kısayollar",
+    "minihud.hotkeys.category.info_toggle_hotkeys": "Bilgi Aç/Kapa için kısayollar",
+    "minihud.hotkeys.category.renderer_toggle_hotkeys": "Görüntüleme Aç/Kapa için kısayollar",
+    "minihud.hotkeys.category.structure_toggle_hotkeys": "Yapı Aç/Kapa için kısayollar",
+
+    "minihud.message.toggled_debug_mode.collisions": "Çarpışma Kutuları'nın hata ayıklama görüntüsünü aç/kapa: %s",
+    "minihud.message.toggled_debug_mode.height_map": "Yükseklik Haritası'nın hata ayıklama görüntüsünü aç/kapa: %s",
+    "minihud.message.toggled_debug_mode.neighbor_updates": "Komşu Güncellemesi'nin hata ayıklama görüntüsünü aç/kapa: %s",
+    "minihud.message.toggled_debug_mode.pathfinding": "Yolbulucu'nun hata ayıklama görüntüsünü aç/kapa: %s",
+    "minihud.message.toggled_debug_mode.solid_faces": "Katı Yüzeyleri'n hata ayıklama görüntüsünü aç/kapa: %s",
+    "minihud.message.toggled_debug_mode.water": "Su hata ayıklama görüntüsünü aç/kapa: %s",
+
+    "minihud.message.toggled_using_center_position": "%s %s Aç/Kapa yapıldı (%s merkez koordinatı kullanılarak)",
+    "minihud.message.toggled_using_position": "%s %s Aç/Kapa yapıldı (%s koordinatı kullanılarak)",
+    "minihud.message.toggled_using_world_spawn": "%s %s Aç/Kapa yapıldı (%s dünya spawn'ı kullanılarak)",
+
+    "minihud.message.error.invalid_dropped_chunks_hash_size": "Sohbetteki HashSet boyuna ait bırakılan chunkların çözümlenmesi başarısız",
+    "minihud.message.error.invalid_seed": "Sohbetteki dünya seed'inin çözümlenmesi başarısız",
+    "minihud.message.error.shapes.select_shape_from_dropdown": "Yaratılacak şekil türünü açılabilir menüden seçin",
+
+    "minihud.message.distance_reference_point_set": "Uzaklık referans noktasını %s olarak ayarla",
+    "minihud.message.seed_set": "MiniHUD: Dünya seed'ini '%s' olarak ayarla",
+    "minihud.message.spawn_set": "MiniHUD: Dünya spawn'ını %s olarak ayarla"
+}
