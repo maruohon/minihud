@@ -169,6 +169,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         double ox = cfgOffX.getDoubleValue();
         double oz = cfgOffZ.getDoubleValue();
         double tmpX, tmpZ;
+        double offsetY = Configs.Generic.LIGHT_LEVEL_Z_OFFSET.getDoubleValue();
         Color4f colorLit, colorDark;
 
         switch (numberFacing)
@@ -191,7 +192,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             colorDark = Color4f.fromColor(0xFFFFFFFF);
         }
 
-        this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y, tmpZ + cameraPos.z, numberFacing, lightThreshold, mode, colorLit, colorDark, buffer);
+        this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y - offsetY, tmpZ + cameraPos.z, numberFacing, lightThreshold, mode, colorLit, colorDark, buffer);
     }
 
     private void renderMarkers(IMarkerRenderer renderer, Vec3d cameraPos, int lightThreshold, BufferBuilder buffer)
@@ -199,6 +200,9 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
         Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
         Color4f colorDark = Configs.Colors.LIGHT_LEVEL_MARKER_DARK.getColor();
+        double offsetX = cameraPos.x;
+        double offsetY = cameraPos.y - Configs.Generic.LIGHT_LEVEL_Z_OFFSET.getDoubleValue();
+        double offsetZ = cameraPos.z;
         double offset1 = (1.0 - markerSize) / 2.0;
         double offset2 = (1.0 - offset1);
         final int count = this.lightInfos.size();
@@ -211,7 +215,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             {
                 BlockPos pos = info.pos;
                 Color4f color = info.sky >= lightThreshold ? colorLit : colorDark;
-                renderer.render(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z, color, offset1, offset2, buffer);
+                renderer.render(pos.getX() - offsetX, pos.getY() - offsetY, pos.getZ() - offsetZ, color, offset1, offset2, buffer);
             }
         }
     }
