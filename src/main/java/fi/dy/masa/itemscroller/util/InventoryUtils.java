@@ -33,7 +33,7 @@ import net.minecraft.screen.slot.TradeOutputSlot;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.village.TradeOffer;
-import net.minecraft.village.TraderOfferList;
+import net.minecraft.village.TradeOfferList;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import fi.dy.masa.itemscroller.ItemScroller;
@@ -64,7 +64,7 @@ public class InventoryUtils
             world.isClient && (world instanceof ClientWorld) && player instanceof ClientPlayerEntity)
         {
             ItemStack stack = ItemStack.EMPTY;
-            Optional<CraftingRecipe> optional = ((ClientWorld) world).getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftMatrix, world);
+            Optional<CraftingRecipe> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftMatrix, world);
 
             if (optional.isPresent())
             {
@@ -917,7 +917,7 @@ public class InventoryUtils
 
     private static void tryMoveItemsToMerchantBuySlots(MerchantScreen gui, boolean fillStacks)
     {
-        TraderOfferList list = gui.getScreenHandler().getRecipes();
+        TradeOfferList list = gui.getScreenHandler().getRecipes();
         int index = AccessorUtils.getSelectedMerchantRecipe(gui);
 
         if (list == null || list.size() <= index)
