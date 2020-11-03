@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
-import org.omg.CORBA.StringHolder;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.BlockState;
