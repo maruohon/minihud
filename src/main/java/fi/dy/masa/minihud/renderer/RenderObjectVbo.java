@@ -12,11 +12,11 @@ public class RenderObjectVbo extends RenderObjectBase
     protected final VertexFormat format;
     protected final boolean hasTexture;
 
-    public RenderObjectVbo(int glMode, VertexFormat format)
+    public RenderObjectVbo(VertexFormat.class_5596 glMode, VertexFormat format)
     {
         super(glMode);
 
-        this.vertexBuffer = new VertexBuffer(format);
+        this.vertexBuffer = new VertexBuffer();
         this.format = format;
 
         boolean hasTexture = false;
@@ -52,7 +52,7 @@ public class RenderObjectVbo extends RenderObjectBase
 
         this.vertexBuffer.bind();
         this.format.startDrawing(0L);
-        this.vertexBuffer.draw(matrixStack.peek().getModel(), this.getGlMode());
+        this.vertexBuffer.draw(matrixStack.peek().getModel());
         this.format.endDrawing();
 
         if (this.hasTexture)

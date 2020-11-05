@@ -1,7 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
 import java.util.Collection;
-import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.MinecraftClient;
@@ -71,13 +70,6 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
-    }
-
-    @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
     }
 
     private void updateStructures(DimensionType dimId, BlockPos playerPos, Vec3d cameraPos, MinecraftClient mc)

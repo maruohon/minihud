@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -141,7 +142,7 @@ public abstract class ShapeCircleBase extends ShapeBase
     @Override
     public void allocateGlResources()
     {
-        this.allocateBuffer(GL11.GL_QUADS);
+        this.allocateBuffer(VertexFormat.class_5596.field_27382); // QUADS
     }
 
     @Override

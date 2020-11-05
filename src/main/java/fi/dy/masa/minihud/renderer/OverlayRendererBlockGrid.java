@@ -1,8 +1,8 @@
 package fi.dy.masa.minihud.renderer;
 
-import org.lwjgl.opengl.GL11;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -68,7 +68,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
     @Override
     public void allocateGlResources()
     {
-        this.allocateBuffer(GL11.GL_LINES);
+        this.allocateBuffer(VertexFormat.class_5596.field_27377); // LINES
     }
 
     protected void renderLinesAll(Vec3d cameraPos, BlockPos center, int radius, Color4f color, BufferBuilder buffer)

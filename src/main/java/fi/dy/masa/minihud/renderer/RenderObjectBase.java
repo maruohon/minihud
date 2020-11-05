@@ -1,17 +1,18 @@
 package fi.dy.masa.minihud.renderer;
 
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexFormat;
 
 public abstract class RenderObjectBase
 {
-    protected final int glMode;
+    protected final VertexFormat.class_5596 glMode;
 
-    public RenderObjectBase(int glMode)
+    public RenderObjectBase(VertexFormat.class_5596 glMode)
     {
         this.glMode = glMode;
     }
 
-    public int getGlMode()
+    public VertexFormat.class_5596 getGlMode()
     {
         return this.glMode;
     }

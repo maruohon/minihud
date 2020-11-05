@@ -54,7 +54,6 @@ import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.mixin.IMixinServerWorld;
 import fi.dy.masa.minihud.mixin.IMixinWorldRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -634,7 +633,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.LOADED_CHUNKS_COUNT)
         {
-            String chunksClient = mc.world.getDebugString();
+            String chunksClient = mc.world.method_32120();
             World worldServer = WorldUtils.getBestWorld(mc);
 
             if (worldServer != null && worldServer != mc.world)
@@ -717,7 +716,8 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.TILE_ENTITIES)
         {
-            this.addLine(String.format("Client world TE - L: %d, T: %d", mc.world.blockEntities.size(), mc.world.tickingBlockEntities.size()));
+            // TODO 1.17
+            //this.addLine(String.format("Client world TE - L: %d, T: %d", mc.world.blockEntities.size(), mc.world.tickingBlockEntities.size()));
         }
         else if (type == InfoToggle.ENTITIES_CLIENT_WORLD)
         {
@@ -729,8 +729,10 @@ public class RenderHandler implements IRenderer
 
                 if (serverWorld instanceof ServerWorld)
                 {
-                    int countServer = ((IMixinServerWorld) serverWorld).getEntityList().size();
-                    this.addLine(String.format("Entities - Client: %d, Server: %d", countClient, countServer));
+                    // TODO 1.17
+                    //int countServer = ((IMixinServerWorld) serverWorld).getEntityList().size();
+                    //this.addLine(String.format("Entities - Client: %d, Server: %d", countClient, countServer));
+                    this.addLine(String.format("Entities - Client: TODO 1.17, Server: TODO 1.17"));
                     return;
                 }
             }

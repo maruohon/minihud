@@ -3,7 +3,6 @@ package fi.dy.masa.minihud.renderer;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
@@ -177,13 +176,6 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
         }
 
         RenderUtils.renderWallWithLines(minX, 0, minZ, maxX, 256, maxZ, 16, 16, true, cameraPos, color, BUFFER_1, BUFFER_2);
-    }
-
-    @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
     }
 
     @Override

@@ -2,7 +2,6 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.lwjgl.opengl.GL11;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
@@ -131,12 +130,5 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
         {
             DIRTY_CHUNKS.clear();
         }
-    }
-
-    @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
     }
 }

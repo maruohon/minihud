@@ -2,11 +2,11 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -113,8 +113,8 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     @Override
     public void allocateGlResources()
     {
-        this.allocateBuffer(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        this.allocateBuffer(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+        this.allocateBuffer(VertexFormat.class_5596.field_27382, VertexFormats.POSITION_TEXTURE_COLOR); // QUADS
+        this.allocateBuffer(VertexFormat.class_5596.field_27377); // LINES
     }
 
     private void renderLightLevels(Vec3d cameraPos, MinecraftClient mc)
@@ -325,7 +325,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         final int maxCX = (maxX >> 4);
         final int maxCZ = (maxZ >> 4);
         LightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
-        final int worldHeight = world.getHeight();
+        final int worldHeight = world.method_31598(); // getHeight()
 
         for (int cx = minCX; cx <= maxCX; ++cx)
         {
@@ -342,7 +342,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                 {
                     for (int z = startZ; z <= endZ; ++z)
                     {
-                        final int startY = Math.max(minY, 0);
+                        final int startY = Math.max(minY, world.method_31599()); // TODO 1.17 minHeight
                         final int endY   = Math.min(maxY, chunk.getHighestNonEmptySectionYOffset() + 15 + 1);
 
                         for (int y = startY; y <= endY; ++y)

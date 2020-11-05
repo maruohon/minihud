@@ -1,6 +1,5 @@
 package fi.dy.masa.minihud.renderer;
 
-import org.lwjgl.opengl.GL11;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
@@ -69,12 +68,5 @@ public class OverlayRendererRegion extends OverlayRendererBase
         renderLines.uploadData(BUFFER_2);
 
         needsUpdate = false;
-    }
-
-    @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
     }
 }
