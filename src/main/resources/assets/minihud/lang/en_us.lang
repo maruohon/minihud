@@ -44,6 +44,7 @@ minihud.config.comment.sortlinesreversed=Reverse the info line sorting order
 minihud.config.comment.spawnablecolumnheightsoverlayradius=The radius (in blocks) to render the spawnable\ncolumn heights overlay in. Valid range: 0 ... 128
 minihud.config.comment.spawnablesubchunkcheckinterval=The interval in game ticks for the spawnable sub-chunk heightmap checks
 minihud.config.comment.spawnablesubchunksoverlayradius=The radius of chunks to render the spawnable sub-chunks\noverlay in. Valid range: -1 ... 40, where -1 = render distance
+minihud.config.comment.spawnerpositionprint=Whether or not to print spawner generation attempts\nto the game console, and which ones.\nThese are only printed if the Spawner Positions renderer is enabled.
 minihud.config.comment.structuresrenderthrough=If enabled, then the Structure Bounding Boxes\nwill be rendered through blocks
 minihud.config.comment.timedaydivisor=The divisor value for the modulo of the day time,\nused for 'Time Modulo (day time)' info line
 minihud.config.comment.timetotaldivisor=The divisor value for the modulo of the total world time,\nused for 'Time Modulo (total time)' info line
@@ -90,6 +91,7 @@ minihud.config.comment.spawnchunksreallazy=Color for the non-entity-processing (
 minihud.config.comment.spawnablechunkfixed=Color for the fixed-position spawnable chunks overlay
 minihud.config.comment.spawnablechunksplayer=Color for the player-following spawnable chunks overlay
 minihud.config.comment.spawnablecolumnheights=Color for the spawnable sub-chunks overlay
+minihud.config.comment.spawnerpositions=Color for the possible spawner positions overlay
 
 
 minihud.config.name.beaconrangeautoupdate=Beacon Range Auto-Update
@@ -137,6 +139,7 @@ minihud.config.name.sortlinesreversed=Sort Lines Reversed
 minihud.config.name.spawnablecolumnheightsoverlayradius=Spawnable Column Heights Radius
 minihud.config.name.spawnablesubchunkcheckinterval=Spawnable Sub-Chunk Check Interval
 minihud.config.name.spawnablesubchunksoverlayradius=Spawnable Sub-Chunks Radius
+minihud.config.name.spawnerpositionprint=Spawner Position Print
 minihud.config.name.structuresrenderthrough=Structures Render Through
 minihud.config.name.timedaydivisor=Time Modulo (day time)
 minihud.config.name.timetotaldivisor=Time Modulo (total time)
@@ -186,6 +189,7 @@ minihud.config.name.spawnchunksreallazy=Spawn Chunks Real (lazy)
 minihud.config.name.spawnablechunkfixed=Spawnable Chunks (fixed-position)
 minihud.config.name.spawnablechunksplayer=Spawnable Chunks (player-following)
 minihud.config.name.spawnablecolumnheights=Spawnable Column Heights
+minihud.config.name.spawnerpositions=Spawner Positions (attempts)
 
 minihud.info_line.comment.infobiome=Show the name of the current biome
 minihud.info_line.comment.infobiomeregistryname=Show the registry name of the current biome
@@ -298,6 +302,7 @@ minihud.renderer_toggle.comment.overlayspawnablechunksplayer=Enables the player-
 minihud.renderer_toggle.comment.overlayspawnablecolumnheights=Enables the spawnable column heights overlay renderer
 minihud.renderer_toggle.comment.overlayspawnchunkreal=Enables the real spawn chunks overlay renderer
 minihud.renderer_toggle.comment.overlayspawnchunkplayer=Enables the pseudo (player-following) spawn chunks overlay renderer.\nThis is only useful if you want to move your world spawn point\nand plan where the spawn chunks would be.
+minihud.renderer_toggle.comment.overlayspawnerpositions=Enables the Spawner Positions (generation attempts) overlay.\nThe positions are only recorded from the actual generation code,\nso this only works in single player, and only for newly generated chunks.\nThe recorded positions are cleared when logging out.\nThere is an option in Generic category for whether or not\nto also print the positions to the game console.
 minihud.renderer_toggle.comment.overlaystructuremaintoggle=Main toggle option for the Structure Bounding Boxes Renderer
 minihud.renderer_toggle.comment.shaperenderer=The main toggle option for the Shape Renderer
 
@@ -321,6 +326,7 @@ minihud.renderer_toggle.name.overlayspawnablechunksplayer=Spawnable Chunks (play
 minihud.renderer_toggle.name.overlayspawnablecolumnheights=Spawnable Heights
 minihud.renderer_toggle.name.overlayspawnchunkreal=Spawn Chunks (real)
 minihud.renderer_toggle.name.overlayspawnchunkplayer=Spawn Chunks (fake)
+minihud.renderer_toggle.name.overlayspawnerpositions=Spawner Positions (attempts)
 minihud.renderer_toggle.name.overlaystructuremaintoggle=§eStructure Bounding Boxes
 minihud.renderer_toggle.name.shaperenderer=§eShape Renderer
 
@@ -423,6 +429,11 @@ minihud.label.light_level_number_mode.none=None
 minihud.label.light_level_number_mode.block=Block
 minihud.label.light_level_number_mode.both=Both
 minihud.label.light_level_number_mode.sky=Sky
+
+minihud.label.print_mode.both=Both
+minihud.label.print_mode.fail=On Fail
+minihud.label.print_mode.none=None
+minihud.label.print_mode.success=On Success
 
 minihud.label.shape_render_type.full_block=Full Block
 minihud.label.shape_render_type.inner_edge=Inner Edge

@@ -1,6 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
-import java.util.Arrays;
+import java.util.Collections;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
@@ -59,6 +59,11 @@ public class OverlayRenderer
             OverlayRendererBeaconRange.renderBeaconBoxForPlayerIfHoldingItem(mc.player, dx, dy, dz, partialTicks);
         }
 
+        if (RendererToggle.OVERLAY_SPAWNER_POSITIONS.isRendererEnabled())
+        {
+            OverlayRendererSpawnerPositions.renderPositionText(dx, dy, dz);
+        }
+
         RenderContainer.INSTANCE.render(entity, mc, partialTicks);
     }
 
@@ -67,8 +72,8 @@ public class OverlayRenderer
         final int centerX = MathHelper.floor(entity.posX) >> 4;
         final int centerZ = MathHelper.floor(entity.posZ) >> 4;
         final float y = (float) chunkOverlayY;
-        final float scale = MathHelper.clamp((float) Configs.Generic.CHUNK_UNLOAD_BUCKET_FONT_SCALE.getDoubleValue(), 0.01f, 1f);
-        int r = MathHelper.clamp(Configs.Generic.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
+        final float scale = Configs.Generic.CHUNK_UNLOAD_BUCKET_FONT_SCALE.getFloatValue();
+        int r = Configs.Generic.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue();
 
         if (r == -1)
         {
@@ -83,7 +88,7 @@ public class OverlayRenderer
                 int cz = centerZ + zOff;
                 int bucket = MiscUtils.getChunkUnloadBucket(cx, cz);
                 String str = String.valueOf(bucket);
-                fi.dy.masa.malilib.render.RenderUtils.renderTextPlate(Arrays.asList(str), (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale);
+                fi.dy.masa.malilib.render.RenderUtils.renderTextPlate(Collections.singletonList(str), (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale);
             }
         }
     }

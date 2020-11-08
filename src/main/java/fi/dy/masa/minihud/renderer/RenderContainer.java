@@ -37,6 +37,7 @@ public class RenderContainer
         this.addRenderer(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER));
         this.addRenderer(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL));
         this.addRenderer(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER));
+        this.addRenderer(new OverlayRendererSpawnerPositions());
         this.addRenderer(new OverlayRendererStructures());
     }
 

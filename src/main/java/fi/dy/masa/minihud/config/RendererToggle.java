@@ -34,6 +34,7 @@ public enum RendererToggle implements ConfigInfo
     OVERLAY_SPAWNABLE_CHUNKS_FIXED      ("overlaySpawnableChunksFixed"),
     OVERLAY_SPAWNABLE_CHUNKS_PLAYER     ("overlaySpawnableChunksPlayer"),
     OVERLAY_SPAWNABLE_COLUMN_HEIGHTS    ("overlaySpawnableColumnHeights"),
+    OVERLAY_SPAWNER_POSITIONS           ("overlaySpawnerPositions"),
     OVERLAY_SPAWN_CHUNK_OVERLAY_REAL    ("overlaySpawnChunkReal"),
     OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER  ("overlaySpawnChunkPlayer"),
     OVERLAY_STRUCTURE_MAIN_TOGGLE       ("overlayStructureMainToggle"),

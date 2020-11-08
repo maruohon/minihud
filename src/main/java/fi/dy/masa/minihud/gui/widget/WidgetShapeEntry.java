@@ -15,7 +15,6 @@ import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 
 public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
 {
-    private final DataListWidget<ShapeBase> parent;
     private final ShapeBase shape;
     private final GenericButton configureButton;
     private final GenericButton toggleButton;
@@ -23,12 +22,11 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
     private final int buttonsStartX;
 
     public WidgetShapeEntry(int x, int y, int width, int height, int listIndex,
-                            int originalListIndex, ShapeBase shape, DataListWidget<ShapeBase> parent)
+                            int originalListIndex, ShapeBase shape, DataListWidget<ShapeBase> listWidget)
     {
-        super(x, y, width, height, listIndex, originalListIndex, shape);
+        super(x, y, width, height, listIndex, originalListIndex, shape, listWidget);
 
         this.shape = shape;
-        this.parent = parent;
 
         this.configureButton = new GenericButton(x, y + 1, -1, true, "minihud.gui.button.configure");
         this.toggleButton = new OnOffButton(x, y + 1, -1, 20, OnOffStyle.SLIDER_ON_OFF, this.shape::isEnabled, null);
@@ -43,12 +41,12 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
 
         this.toggleButton.setActionListener((btn, mbtn) -> {
             this.shape.toggleEnabled();
-            this.parent.refreshEntries();
+            this.listWidget.refreshEntries();
         });
 
         this.removeButton.setActionListener((btn, mbtn) -> {
             ShapeManager.INSTANCE.removeShape(this.shape);
-            this.parent.refreshEntries();
+            this.listWidget.refreshEntries();
         });
 
         this.buttonsStartX = x + width - this.configureButton.getWidth() - this.toggleButton.getWidth() - this.removeButton.getWidth() - 6;

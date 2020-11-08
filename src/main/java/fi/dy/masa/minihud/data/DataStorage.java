@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
@@ -28,6 +29,7 @@ import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.util.MiscUtils;
+import fi.dy.masa.minihud.util.PrintMode;
 
 public class DataStorage
 {
@@ -42,6 +44,7 @@ public class DataStorage
 
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
+    private final ArrayListMultimap<Long, BlockPos> spawnerPositions = ArrayListMultimap.create();
     private BlockPos worldSpawn = BlockPos.ORIGIN;
     private Vec3d distanceReferencePoint = Vec3d.ZERO;
     private int[] blockBreakCounter = new int[100];
@@ -50,6 +53,7 @@ public class DataStorage
     private boolean worldSeedValid;
     private boolean worldSpawnValid;
     private boolean hasServerDroppedChunksHashSize;
+    private boolean spawnerPositionsDirty;
 
     public static DataStorage getInstance()
     {
@@ -99,6 +103,7 @@ public class DataStorage
         }
         else
         {
+            this.spawnerPositions.clear();
             CarpetPubsubPacketHandler.unsubscribeAll();
         }
     }
@@ -186,6 +191,45 @@ public class DataStorage
     public Vec3d getDistanceReferencePoint()
     {
         return this.distanceReferencePoint;
+    }
+
+    public boolean areSpawnerPositionsDirty()
+    {
+        return this.spawnerPositionsDirty;
+    }
+
+    public void addDungeonSpawnerPosition(BlockPos pos, boolean success)
+    {
+        int cx = pos.getX() >> 4;
+        int cz = pos.getZ() >> 4;
+        long cp = (long) cz << 32 | (((long) cx) & 0xFFFFFFFFL);
+
+        synchronized (this.spawnerPositions)
+        {
+            this.spawnerPositions.put(cp, pos.toImmutable());
+            this.spawnerPositionsDirty = true;
+        }
+
+        PrintMode mode = Configs.Generic.SPAWNER_POSITION_PRINT.getOptionListValue();
+
+        if (mode == PrintMode.BOTH || (mode == PrintMode.FAIL && success == false) || (mode == PrintMode.SUCCESS && success))
+        {
+            LiteModMiniHud.logger.info(String.format("Spawner gen attempt: Chunk: [%4d, %4d] pos: [%d, %d, %d] - %s",
+                                                     cx, cz, pos.getX(), pos.getY(), pos.getZ(), success ? "SUCCESS" : "FAIL"));
+        }
+    }
+
+    public ArrayListMultimap<Long, BlockPos> getSpawnerPositions()
+    {
+        ArrayListMultimap<Long, BlockPos> map = ArrayListMultimap.create();
+
+        synchronized (this.spawnerPositions)
+        {
+            map.putAll(this.spawnerPositions);
+            this.spawnerPositionsDirty = false;
+        }
+
+        return map;
     }
 
     public boolean setDistanceReferencePoint()

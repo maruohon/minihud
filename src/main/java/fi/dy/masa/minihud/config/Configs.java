@@ -21,6 +21,7 @@ import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.util.BlockGridMode;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
 import fi.dy.masa.minihud.util.LightLevelNumberMode;
+import fi.dy.masa.minihud.util.PrintMode;
 
 public class Configs implements ModConfig
 {
@@ -28,10 +29,10 @@ public class Configs implements ModConfig
     {
         public static final BooleanConfig BEACON_RANGE_AUTO_UPDATE              = new BooleanConfig("beaconRangeAutoUpdate", false);
         public static final IntegerConfig BLOCK_GRID_OVERLAY_RADIUS             = new IntegerConfig("blockGridOverlayRadius", 32);
-        public static final DoubleConfig CHUNK_UNLOAD_BUCKET_FONT_SCALE         = new DoubleConfig("chunkUnloadBucketOverlayFontScale", 0.1625);
+        public static final DoubleConfig CHUNK_UNLOAD_BUCKET_FONT_SCALE         = new DoubleConfig("chunkUnloadBucketOverlayFontScale", 0.1625, 0.0, 1.0);
         public static final BooleanConfig DEBUG_MESSAGES                        = new BooleanConfig("debugMessages", false);
         public static final IntegerConfig DROPPED_CHUNKS_HASH_SIZE              = new IntegerConfig("droppedChunksHashSize", -1, -1, Integer.MAX_VALUE);
-        public static final IntegerConfig CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS    = new IntegerConfig("chunkUnloadBucketOverlayChunkRadius", -1);
+        public static final IntegerConfig CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS    = new IntegerConfig("chunkUnloadBucketOverlayChunkRadius", -1, -1, 40);
         public static final BooleanConfig CHUNK_UNLOAD_BUCKET_HASH_SIZE         = new BooleanConfig("chunkUnloadBucketHashSize", true);
         public static final StringConfig COORDINATE_FORMAT_STRING               = new StringConfig("coordinateFormat", "x: %.1f y: %.1f z: %.1f");
         public static final BooleanConfig COORDINATE_FORMAT_CUSTOMIZED          = new BooleanConfig("coordinateFormatCustomized", false);
@@ -85,6 +86,7 @@ public class Configs implements ModConfig
         public static final OptionListConfig<HudAlignment> HUD_ALIGNMENT                    = new OptionListConfig<>("infoLinesHudAlignment", HudAlignment.TOP_LEFT);
         public static final OptionListConfig<LightLevelMarkerMode> LIGHT_LEVEL_MARKER_MODE  = new OptionListConfig<>("lightLevelMarkers", LightLevelMarkerMode.SQUARE);
         public static final OptionListConfig<LightLevelNumberMode> LIGHT_LEVEL_NUMBER_MODE  = new OptionListConfig<>("lightLevelNumbers", LightLevelNumberMode.BLOCK);
+        public static final OptionListConfig<PrintMode> SPAWNER_POSITION_PRINT              = new OptionListConfig<>("spawnerPositionPrint", PrintMode.SUCCESS);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 BEACON_RANGE_AUTO_UPDATE,
@@ -138,6 +140,7 @@ public class Configs implements ModConfig
                 SPAWNABLE_COLUMNS_OVERLAY_RADIUS,
                 SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL,
                 SPAWNABLE_SUB_CHUNKS_OVERLAY_RADIUS,
+                SPAWNER_POSITION_PRINT,
                 STRUCTURES_RENDER_THROUGH,
                 TIME_DAY_DIVISOR,
                 TIME_TOTAL_DIVISOR,
@@ -189,6 +192,7 @@ public class Configs implements ModConfig
         public static final ColorConfig SPAWNABLE_CHUNKS_FIXED              = new ColorConfig("spawnableChunkFixed", "0x40FF2090");
         public static final ColorConfig SPAWNABLE_CHUNKS_PLAYER             = new ColorConfig("spawnableChunksPlayer", "0x40FF3030");
         public static final ColorConfig SPAWNABLE_COLUMNS_OVERLAY_COLOR     = new ColorConfig("spawnableColumnHeights", "0xA0FF00FF");
+        public static final ColorConfig SPAWNER_POSITIONS_OVERLAY_COLOR     = new ColorConfig("spawnerPositions", "#40FF8019");
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 BEACON_RANGE_LVL1_OVERLAY_COLOR,
@@ -219,7 +223,8 @@ public class Configs implements ModConfig
                 SPAWN_REAL_LAZY_OVERLAY_COLOR,
                 SPAWNABLE_CHUNKS_FIXED,
                 SPAWNABLE_CHUNKS_PLAYER,
-                SPAWNABLE_COLUMNS_OVERLAY_COLOR
+                SPAWNABLE_COLUMNS_OVERLAY_COLOR,
+                SPAWNER_POSITIONS_OVERLAY_COLOR
         );
     }
 
