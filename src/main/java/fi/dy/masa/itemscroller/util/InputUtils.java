@@ -21,7 +21,7 @@ public class InputUtils
 
     public static boolean canShiftDropItems(HandledScreen<?> gui, MinecraftClient mc, int mouseX, int mouseY)
     {
-        if (InventoryUtils.isStackEmpty(mc.player.method_31548().getCursorStack()) == false)
+        if (InventoryUtils.isStackEmpty(mc.player.getInventory().getCursorStack()) == false)
         {
             int left = AccessorUtils.getGuiLeft(gui);
             int top = AccessorUtils.getGuiTop(gui);
