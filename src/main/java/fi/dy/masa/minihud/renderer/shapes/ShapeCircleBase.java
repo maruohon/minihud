@@ -142,7 +142,7 @@ public abstract class ShapeCircleBase extends ShapeBase
     @Override
     public void allocateGlResources()
     {
-        this.allocateBuffer(VertexFormat.class_5596.field_27382); // QUADS
+        this.allocateBuffer(VertexFormat.DrawMode.QUADS);
     }
 
     @Override

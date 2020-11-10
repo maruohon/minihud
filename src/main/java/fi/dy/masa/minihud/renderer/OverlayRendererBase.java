@@ -85,7 +85,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
      * @param glMode
      * @return
      */
-    protected RenderObjectBase allocateBuffer(VertexFormat.class_5596 glMode)
+    protected RenderObjectBase allocateBuffer(VertexFormat.DrawMode glMode)
     {
         return this.allocateBuffer(glMode, VertexFormats.POSITION_COLOR);
     }
@@ -95,7 +95,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
      * @param glMode
      * @return
      */
-    protected RenderObjectBase allocateBuffer(VertexFormat.class_5596 glMode, VertexFormat format)
+    protected RenderObjectBase allocateBuffer(VertexFormat.DrawMode glMode, VertexFormat format)
     {
         RenderObjectBase obj = new RenderObjectVbo(glMode, format);
         this.renderObjects.add(obj);
@@ -105,8 +105,8 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     @Override
     public void allocateGlResources()
     {
-        this.allocateBuffer(VertexFormat.class_5596.field_27382); // QUADS
-        this.allocateBuffer(VertexFormat.class_5596.field_27377); // LINES
+        this.allocateBuffer(VertexFormat.DrawMode.QUADS);
+        this.allocateBuffer(VertexFormat.DrawMode.LINES);
     }
 
     public void setRenderThrough(boolean renderThrough)

@@ -12,7 +12,7 @@ public class RenderObjectVbo extends RenderObjectBase
     protected final VertexFormat format;
     protected final boolean hasTexture;
 
-    public RenderObjectVbo(VertexFormat.class_5596 glMode, VertexFormat format)
+    public RenderObjectVbo(VertexFormat.DrawMode glMode, VertexFormat format)
     {
         super(glMode);
 

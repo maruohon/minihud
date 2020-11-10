@@ -5,14 +5,14 @@ import net.minecraft.client.render.VertexFormat;
 
 public abstract class RenderObjectBase
 {
-    protected final VertexFormat.class_5596 glMode;
+    protected final VertexFormat.DrawMode glMode;
 
-    public RenderObjectBase(VertexFormat.class_5596 glMode)
+    public RenderObjectBase(VertexFormat.DrawMode glMode)
     {
         this.glMode = glMode;
     }
 
-    public VertexFormat.class_5596 getGlMode()
+    public VertexFormat.DrawMode getGlMode()
     {
         return this.glMode;
     }

@@ -633,7 +633,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.LOADED_CHUNKS_COUNT)
         {
-            String chunksClient = mc.world.method_32120();
+            String chunksClient = mc.world.asString();
             World worldServer = WorldUtils.getBestWorld(mc);
 
             if (worldServer != null && worldServer != mc.world)
