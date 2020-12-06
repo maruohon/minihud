@@ -342,7 +342,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                 {
                     for (int z = startZ; z <= endZ; ++z)
                     {
-                        final int startY = Math.max(minY, world.getBottomHeightLimit());
+                        final int startY = Math.max(minY, world.getBottomSectionLimit()); // TODO 1.17 check if this gets renamed again
                         final int endY   = Math.min(maxY, chunk.getHighestNonEmptySectionYOffset() + 15 + 1);
 
                         for (int y = startY; y <= endY; ++y)
