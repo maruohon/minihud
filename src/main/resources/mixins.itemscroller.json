@@ -11,6 +11,8 @@
         "MixinClientPlayerInteractionManager",
         "MixinCraftingScreenHandler",
         "MixinGameRenderer",
+        "MixinMerchantScreen",
+        "MixinMerchantScreenHandler",
         "MixinScreen"
     ],
     "injectors": {

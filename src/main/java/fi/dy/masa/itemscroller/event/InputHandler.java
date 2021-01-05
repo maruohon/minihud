@@ -4,7 +4,10 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.itemscroller.Reference;
 import fi.dy.masa.itemscroller.config.Configs;
@@ -15,6 +18,7 @@ import fi.dy.masa.itemscroller.util.ClickPacketBuffer;
 import fi.dy.masa.itemscroller.util.InputUtils;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
 import fi.dy.masa.itemscroller.util.MoveAction;
+import fi.dy.masa.itemscroller.villager.VillagerDataStorage;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybindManager;
@@ -136,6 +140,18 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             final boolean isAttackUseOrPick = isAttack || isUse || isPickBlock;
             final int mouseX = fi.dy.masa.malilib.util.InputUtils.getMouseX();
             final int mouseY = fi.dy.masa.malilib.util.InputUtils.getMouseY();
+
+            if (Configs.Toggles.VILLAGER_TRADE_FEATURES.getBooleanValue())
+            {
+                VillagerDataStorage storage = VillagerDataStorage.getInstance();
+
+                if (GuiUtils.getCurrentScreen() == null && mc.crosshairTarget != null &&
+                    mc.crosshairTarget.getType() == HitResult.Type.ENTITY &&
+                    ((EntityHitResult) mc.crosshairTarget).getEntity() instanceof VillagerEntity)
+                {
+                    storage.setLastInteractedUUID(((EntityHitResult) mc.crosshairTarget).getEntity().getUuid());
+                }
+            }
 
             if (GuiUtils.getCurrentScreen() instanceof HandledScreen &&
                 (GuiUtils.getCurrentScreen() instanceof CreativeInventoryScreen) == false &&

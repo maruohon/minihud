@@ -167,6 +167,10 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
                 return true;
             }
         }
+        else if (key == Hotkeys.KEY_VILLAGER_TRADE_FAVORITES.getKeybind())
+        {
+            return InventoryUtils.villagerTradeEverythingPossibleWithAllFavoritedTrades();
+        }
         else if (key == Hotkeys.KEY_SLOT_DEBUG.getKeybind())
         {
             if (slot != null)

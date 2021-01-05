@@ -43,6 +43,10 @@ import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
 import fi.dy.masa.itemscroller.recipes.RecipePattern;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
+import fi.dy.masa.itemscroller.villager.VillagerData;
+import fi.dy.masa.itemscroller.villager.VillagerDataStorage;
+import fi.dy.masa.itemscroller.villager.VillagerUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
 
 public class InventoryUtils
 {
@@ -663,6 +667,81 @@ public class InventoryUtils
             {
                 moveOneSetOfItemsFromSlotToPlayerInventory(gui, slot);
             }
+        }
+
+        return false;
+    }
+
+    public static void villagerClearTradeInputSlots()
+    {
+        if (GuiUtils.getCurrentScreen() instanceof MerchantScreen)
+        {
+            MerchantScreen merchantGui = (MerchantScreen) GuiUtils.getCurrentScreen();
+            Slot slot = merchantGui.getScreenHandler().getSlot(0);
+
+            if (slot.hasStack())
+            {
+                shiftClickSlot(merchantGui, slot.id);
+            }
+
+            slot = merchantGui.getScreenHandler().getSlot(1);
+
+            if (slot.hasStack())
+            {
+                shiftClickSlot(merchantGui, slot.id);
+            }
+        }
+    }
+
+    public static void villagerTradeEverythingPossibleWithTrade(int visibleIndex)
+    {
+        if (GuiUtils.getCurrentScreen() instanceof MerchantScreen)
+        {
+            MerchantScreen merchantGui = (MerchantScreen) GuiUtils.getCurrentScreen();
+            Slot slot = merchantGui.getScreenHandler().getSlot(2);
+
+            while (true)
+            {
+                VillagerUtils.switchToTradeByVisibleIndex(visibleIndex);
+                //tryMoveItemsToMerchantBuySlots(merchantGui, true);
+
+                // Not a valid recipe
+                if (slot.hasStack() == false)
+                {
+                    break;
+                }
+
+                shiftClickSlot(merchantGui, slot.id);
+
+                // No room in player inventory
+                if (slot.hasStack())
+                {
+                    break;
+                }
+            }
+
+            villagerClearTradeInputSlots();
+        }
+    }
+
+    public static boolean villagerTradeEverythingPossibleWithAllFavoritedTrades()
+    {
+        if (GuiUtils.getCurrentScreen() instanceof MerchantScreen)
+        {
+            VillagerData data = VillagerDataStorage.getInstance().getDataForLastInteractionTarget();
+
+            if (data != null && data.getFavorites().isEmpty() == false)
+            {
+                for (int index = 0; index < data.getFavorites().size(); ++index)
+                {
+                    VillagerUtils.switchToTradeByVisibleIndex(index);
+                    villagerTradeEverythingPossibleWithTrade(index);
+                }
+            }
+
+            villagerClearTradeInputSlots();
+
+            return true;
         }
 
         return false;
