@@ -4,9 +4,9 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.ConfigInfo;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ColorConfig;
-import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
@@ -107,16 +107,16 @@ public enum StructureToggle implements ConfigInfo
     }
 
     @Override
-    public String getConfigNameTranslationKey()
+    public String getDisplayName()
     {
-        return this.toggleStatus.getConfigNameTranslationKey();
+        return this.toggleStatus.getDisplayName();
     }
 
     @Nullable
     @Override
-    public String getCommentTranslationKey()
+    public String getComment()
     {
-        return this.toggleStatus.getCommentTranslationKey();
+        return this.toggleStatus.getComment();
     }
 
     @Override

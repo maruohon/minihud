@@ -2,12 +2,12 @@ package fi.dy.masa.minihud.config;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.BaseConfigOptionCategory;
-import fi.dy.masa.malilib.config.ConfigOptionCategory;
+import fi.dy.masa.malilib.config.category.BaseConfigOptionCategory;
+import fi.dy.masa.malilib.config.category.ConfigOptionCategory;
 import fi.dy.masa.malilib.config.ModConfig;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ColorConfig;
-import fi.dy.masa.malilib.config.option.ConfigOption;
+import fi.dy.masa.malilib.config.ConfigOption;
 import fi.dy.masa.malilib.config.option.DoubleConfig;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.config.option.HotkeyedBooleanConfig;
