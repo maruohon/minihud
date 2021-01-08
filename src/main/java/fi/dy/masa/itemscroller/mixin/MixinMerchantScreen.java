@@ -1,5 +1,6 @@
 package fi.dy.masa.itemscroller.mixin;
 
+import javax.annotation.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,13 +13,17 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.MerchantScreenHandler;
 import net.minecraft.text.Text;
+import net.minecraft.village.TradeOffer;
 import fi.dy.masa.itemscroller.config.Configs;
+import fi.dy.masa.itemscroller.config.Hotkeys;
 import fi.dy.masa.itemscroller.gui.ItemScrollerIcons;
 import fi.dy.masa.itemscroller.util.InventoryUtils;
+import fi.dy.masa.itemscroller.villager.FavoriteData;
 import fi.dy.masa.itemscroller.villager.IMerchantScreenHandler;
 import fi.dy.masa.itemscroller.villager.VillagerData;
 import fi.dy.masa.itemscroller.villager.VillagerDataStorage;
 import fi.dy.masa.itemscroller.villager.VillagerUtils;
+import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.render.RenderUtils;
 
 @Mixin(MerchantScreen.class)
@@ -27,6 +32,7 @@ public abstract class MixinMerchantScreen extends HandledScreen<MerchantScreenHa
     @Shadow private int selectedIndex;
     @Shadow private int indexStartOffset;
 
+    @Nullable private FavoriteData favoriteData;
     private int indexStartOffsetLast = -1;
 
     private MixinMerchantScreen(MerchantScreenHandler handler, PlayerInventory inventory, Text title)
@@ -92,9 +98,19 @@ public abstract class MixinMerchantScreen extends HandledScreen<MerchantScreenHa
                 // Middle click, toggle trade favorite
                 else if (button == 2)
                 {
-                    VillagerDataStorage.getInstance().toggleFavorite(realIndex);
+                    if (Hotkeys.MODIFIER_TOGGLE_VILLAGER_GLOBAL_FAVORITE.getKeybind().isKeybindHeld())
+                    {
+                        TradeOffer trade = this.handler.getRecipes().get(visibleIndex);
+                        VillagerDataStorage.getInstance().toggleGlobalFavorite(trade);
+                    }
+                    else
+                    {
+                        VillagerDataStorage.getInstance().toggleFavorite(realIndex);
+                    }
 
-                    // Rebuild the custom list based on the new favorites
+                    this.favoriteData = null; // Force a re-build of the list
+
+                    // Rebuild the custom list based on the new favorites (See the Mixin for MerchantScreenHandler#setOffers())
                     this.handler.setOffers(((IMerchantScreenHandler) this.handler).getOriginalList());
 
                     cir.setReturnValue(true);
@@ -122,11 +138,17 @@ public abstract class MixinMerchantScreen extends HandledScreen<MerchantScreenHa
     {
         if (Configs.Toggles.VILLAGER_TRADE_FEATURES.getBooleanValue())
         {
-            VillagerData data = VillagerDataStorage.getInstance().getDataForLastInteractionTarget();
+            FavoriteData favoriteData = this.favoriteData;
 
-            if (data != null)
+            if (favoriteData == null)
             {
-                int numFavorites = data.getFavorites().size();
+                favoriteData = VillagerDataStorage.getInstance().getFavoritesForCurrentVillager(this.handler);
+                this.favoriteData = favoriteData;
+            }
+
+            if (favoriteData.favorites.isEmpty() == false)
+            {
+                int numFavorites = favoriteData.favorites.size();
 
                 if (this.indexStartOffset < numFavorites)
                 {
@@ -137,11 +159,12 @@ public abstract class MixinMerchantScreen extends HandledScreen<MerchantScreenHa
                     int x = buttonsStartX + 89 - 8;
                     int y = buttonsStartY + 2;
                     float z = this.getZOffset() + 300;
+                    IGuiIcon icon = favoriteData.isGlobal ? ItemScrollerIcons.STAR_5_PURPLE : ItemScrollerIcons.STAR_5_YELLOW;
 
                     for (int i = 0; i < (numFavorites - this.indexStartOffset); ++i)
                     {
-                        RenderUtils.bindTexture(ItemScrollerIcons.STAR_5.getTexture());
-                        ItemScrollerIcons.STAR_5.renderAt(x, y, z, false, false);
+                        RenderUtils.bindTexture(icon.getTexture());
+                        icon.renderAt(x, y, z, false, false);
                         y += 20;
                     }
                 }

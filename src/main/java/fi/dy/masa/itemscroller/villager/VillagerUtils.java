@@ -1,6 +1,10 @@
 package fi.dy.masa.itemscroller.villager;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
@@ -70,43 +74,78 @@ public class VillagerUtils
 
     public static TradeOfferList buildCustomTradeList(TradeOfferList originalList)
     {
-        VillagerData data = VillagerDataStorage.getInstance().getDataForLastInteractionTarget();
+        FavoriteData data = VillagerDataStorage.getInstance().getFavoritesForCurrentVillager(originalList);
+        List<Integer> favorites = data.favorites;
 
-        if (data != null)
+        //System.out.printf("build - fav: %s (%s), or: %d\n", favorites, data.isGlobal, originalList.size());
+
+        // Some favorites defined
+        if (favorites.isEmpty() == false)
         {
             TradeOfferList list = new TradeOfferList();
-            List<Integer> favorites = data.getFavorites();
             int originalListSize = originalList.size();
 
-            // Some favorites defined
-            if (favorites.isEmpty() == false)
+            // First pick all the favorited recipes, in the order they are in the favorites list
+            for (int index : favorites)
             {
-                // First pick all the favorited recipes, in the order they are in the favorites list
-                for (int index : favorites)
+                if (index >= 0 && index < originalListSize)
                 {
-                    if (index >= 0 && index < originalListSize)
-                    {
-                        list.add(originalList.get(index));
-                    }
-                }
-
-                // Then add the rest of the recipes in their original order
-                for (int i = 0; i < originalListSize; ++i)
-                {
-                    if (favorites.contains(i) == false)
-                    {
-                        list.add(originalList.get(i));
-                    }
+                    list.add(originalList.get(index));
                 }
             }
-            else
+
+            // Then add the rest of the recipes in their original order
+            for (int i = 0; i < originalListSize; ++i)
             {
-                list.addAll(originalList);
+                if (favorites.contains(i) == false)
+                {
+                    list.add(originalList.get(i));
+                }
             }
 
             return list;
         }
 
         return originalList;
+    }
+
+    public static List<Integer> getGlobalFavoritesFor(TradeOfferList originalTrades, Collection<TradeType> globalFavorites)
+    {
+        List<Integer> favorites = new ArrayList<>();
+        Map<TradeType, Integer> trades = new HashMap<>();
+        final int size = originalTrades.size();
+
+        // Build a map from the trade types to the indices in the current villager's trade list
+        for (int i = 0; i < size; ++i)
+        {
+            TradeOffer trade = originalTrades.get(i);
+            trades.put(TradeType.of(trade), i);
+        }
+
+        // Pick the trade list indices that are in the global favorites, in the order that they were global favorited
+        for (TradeType type : globalFavorites)
+        {
+            Integer index = trades.get(type);
+
+            if (index != null)
+            {
+                favorites.add(index);
+            }
+        }
+
+        /* This is a version that is not sorted based on the order of the global favorites
+        for (int i = 0; i < size; ++i)
+        {
+            TradeType type = TradeType.of(originalTrades.get(i));
+
+            if (globalFavorites.contains(type))
+            {
+                favorites.add(i);
+            }
+        }
+        */
+        //System.out.printf("getGlobalFavoritesFor - list: %s - or: %d | global: %s\n", favorites, originalTrades.size(), globalFavorites);
+
+        return favorites;
     }
 }

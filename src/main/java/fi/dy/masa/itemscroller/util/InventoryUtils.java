@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -26,6 +27,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.screen.MerchantScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -43,7 +45,6 @@ import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
 import fi.dy.masa.itemscroller.recipes.RecipePattern;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
-import fi.dy.masa.itemscroller.villager.VillagerData;
 import fi.dy.masa.itemscroller.villager.VillagerDataStorage;
 import fi.dy.masa.itemscroller.villager.VillagerUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
@@ -726,17 +727,17 @@ public class InventoryUtils
 
     public static boolean villagerTradeEverythingPossibleWithAllFavoritedTrades()
     {
-        if (GuiUtils.getCurrentScreen() instanceof MerchantScreen)
-        {
-            VillagerData data = VillagerDataStorage.getInstance().getDataForLastInteractionTarget();
+        Screen screen = GuiUtils.getCurrentScreen();
 
-            if (data != null && data.getFavorites().isEmpty() == false)
+        if (screen instanceof MerchantScreen)
+        {
+            MerchantScreenHandler handler = ((MerchantScreen) screen).getScreenHandler();
+            List<Integer> favorites = VillagerDataStorage.getInstance().getFavoritesForCurrentVillager(handler).favorites;
+
+            for (int index = 0; index < favorites.size(); ++index)
             {
-                for (int index = 0; index < data.getFavorites().size(); ++index)
-                {
-                    VillagerUtils.switchToTradeByVisibleIndex(index);
-                    villagerTradeEverythingPossibleWithTrade(index);
-                }
+                VillagerUtils.switchToTradeByVisibleIndex(index);
+                villagerTradeEverythingPossibleWithTrade(index);
             }
 
             villagerClearTradeInputSlots();

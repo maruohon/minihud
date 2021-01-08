@@ -10,7 +10,8 @@ public enum ItemScrollerIcons implements IGuiIcon
     TRADE_ARROW_AVAILABLE   (112,   0, 10,   9),
     TRADE_ARROW_LOCKED      (112,   9, 10,   9),
     SCROLL_BAR_6            (106,   0,  6, 167),
-    STAR_5                  (112,  18,  5,   5);
+    STAR_5_YELLOW           (112, 18, 5, 5),
+    STAR_5_PURPLE           (117, 18, 5, 5);
 
     public static final Identifier TEXTURE = new Identifier(Reference.MOD_ID, "textures/gui/gui_widgets.png");
 

@@ -47,7 +47,7 @@ public class VillagerData
         }
     }
 
-    public List<Integer> getFavorites()
+    List<Integer> getFavorites()
     {
         return this.favorites;
     }

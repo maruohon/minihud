@@ -3,7 +3,10 @@ package fi.dy.masa.itemscroller.villager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -11,8 +14,12 @@ import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.screen.MerchantScreenHandler;
+import net.minecraft.village.TradeOffer;
+import net.minecraft.village.TradeOfferList;
 import fi.dy.masa.itemscroller.ItemScroller;
 import fi.dy.masa.itemscroller.Reference;
+import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.util.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -22,6 +29,7 @@ public class VillagerDataStorage
     private static final VillagerDataStorage INSTANCE = new VillagerDataStorage();
 
     private final Map<UUID, VillagerData> data = new HashMap<>();
+    private final List<TradeType> globalFavorites = new ArrayList<>();
     private UUID lastInteractedUUID;
     private boolean dirty;
 
@@ -78,6 +86,45 @@ public class VillagerDataStorage
         }
     }
 
+    public void toggleGlobalFavorite(TradeOffer trade)
+    {
+        TradeType type = TradeType.of(trade);
+
+        if (this.globalFavorites.contains(type))
+        {
+            this.globalFavorites.remove(type);
+        }
+        else
+        {
+            this.globalFavorites.add(type);
+        }
+
+        this.dirty = true;
+    }
+
+    public FavoriteData getFavoritesForCurrentVillager(MerchantScreenHandler handler)
+    {
+        return this.getFavoritesForCurrentVillager(((IMerchantScreenHandler) handler).getOriginalList());
+    }
+
+    public FavoriteData getFavoritesForCurrentVillager(TradeOfferList originalTrades)
+    {
+        VillagerData data = this.getDataFor(this.lastInteractedUUID, false);
+        List<Integer> favorites = data != null ? data.getFavorites() : null;
+
+        if (favorites != null && favorites.isEmpty() == false)
+        {
+            return new FavoriteData(favorites, false);
+        }
+
+        if (Configs.Generic.VILLAGER_TRADE_USE_GLOBAL_FAVORITES.getBooleanValue() && this.lastInteractedUUID != null)
+        {
+            return new FavoriteData(VillagerUtils.getGlobalFavoritesFor(originalTrades, this.globalFavorites), true);
+        }
+
+        return new FavoriteData(Collections.emptyList(), favorites == null);
+    }
+
     private void readFromNBT(CompoundTag nbt)
     {
         if (nbt == null || nbt.contains("VillagerData", Constants.NBT.TAG_LIST) == false)
@@ -86,7 +133,7 @@ public class VillagerDataStorage
         }
 
         ListTag tagList = nbt.getList("VillagerData", Constants.NBT.TAG_COMPOUND);
-        final int count = tagList.size();
+        int count = tagList.size();
 
         for (int i = 0; i < count; i++)
         {
@@ -98,18 +145,39 @@ public class VillagerDataStorage
                 this.data.put(data.getUUID(), data);
             }
         }
+
+        tagList = nbt.getList("GlobalFavorites", Constants.NBT.TAG_COMPOUND);
+        count = tagList.size();
+
+        for (int i = 0; i < count; i++)
+        {
+            CompoundTag tag = tagList.getCompound(i);
+            TradeType type = TradeType.fromTag(tag);
+
+            if (type != null)
+            {
+                this.globalFavorites.add(type);
+            }
+        }
     }
 
     private CompoundTag writeToNBT(@Nonnull CompoundTag nbt)
     {
-        ListTag tagList = new ListTag();
+        ListTag favoriteListData = new ListTag();
+        ListTag globalFavoriteData = new ListTag();
 
         for (VillagerData data : this.data.values())
         {
-            tagList.add(data.toNBT());
+            favoriteListData.add(data.toNBT());
         }
 
-        nbt.put("VillagerData", tagList);
+        for (TradeType type : this.globalFavorites)
+        {
+            globalFavoriteData.add(type.toTag());
+        }
+
+        nbt.put("VillagerData", favoriteListData);
+        nbt.put("GlobalFavorites", globalFavoriteData);
 
         this.dirty = false;
 
@@ -136,6 +204,7 @@ public class VillagerDataStorage
     public void readFromDisk()
     {
         this.data.clear();
+        this.globalFavorites.clear();
 
         try
         {
