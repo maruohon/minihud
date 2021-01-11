@@ -4,7 +4,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -147,7 +147,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
                 if (GuiUtils.getCurrentScreen() == null && mc.crosshairTarget != null &&
                     mc.crosshairTarget.getType() == HitResult.Type.ENTITY &&
-                    ((EntityHitResult) mc.crosshairTarget).getEntity() instanceof VillagerEntity)
+                    ((EntityHitResult) mc.crosshairTarget).getEntity() instanceof MerchantEntity)
                 {
                     storage.setLastInteractedUUID(((EntityHitResult) mc.crosshairTarget).getEntity().getUuid());
                 }
