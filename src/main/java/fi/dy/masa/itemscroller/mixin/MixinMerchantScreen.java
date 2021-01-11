@@ -146,27 +146,24 @@ public abstract class MixinMerchantScreen extends HandledScreen<MerchantScreenHa
                 this.favoriteData = favoriteData;
             }
 
-            if (favoriteData.favorites.isEmpty() == false)
+            int numFavorites = favoriteData.favorites.size();
+
+            if (numFavorites > 0 && this.indexStartOffset < numFavorites)
             {
-                int numFavorites = favoriteData.favorites.size();
+                int screenX = (this.width - this.backgroundWidth) / 2;
+                int screenY = (this.height - this.backgroundHeight) / 2;
+                int buttonsStartX = screenX + 5;
+                int buttonsStartY = screenY + 16 + 2;
+                int x = buttonsStartX + 89 - 8;
+                int y = buttonsStartY + 2;
+                float z = this.getZOffset() + 300;
+                IGuiIcon icon = favoriteData.isGlobal ? ItemScrollerIcons.STAR_5_PURPLE : ItemScrollerIcons.STAR_5_YELLOW;
 
-                if (this.indexStartOffset < numFavorites)
+                for (int i = 0; i < (numFavorites - this.indexStartOffset); ++i)
                 {
-                    int screenX = (this.width - this.backgroundWidth) / 2;
-                    int screenY = (this.height - this.backgroundHeight) / 2;
-                    int buttonsStartX = screenX + 5;
-                    int buttonsStartY = screenY + 16 + 2;
-                    int x = buttonsStartX + 89 - 8;
-                    int y = buttonsStartY + 2;
-                    float z = this.getZOffset() + 300;
-                    IGuiIcon icon = favoriteData.isGlobal ? ItemScrollerIcons.STAR_5_PURPLE : ItemScrollerIcons.STAR_5_YELLOW;
-
-                    for (int i = 0; i < (numFavorites - this.indexStartOffset); ++i)
-                    {
-                        RenderUtils.bindTexture(icon.getTexture());
-                        icon.renderAt(x, y, z, false, false);
-                        y += 20;
-                    }
+                    RenderUtils.bindTexture(icon.getTexture());
+                    icon.renderAt(x, y, z, false, false);
+                    y += 20;
                 }
             }
         }
