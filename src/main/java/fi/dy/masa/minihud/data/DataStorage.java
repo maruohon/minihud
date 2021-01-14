@@ -210,7 +210,7 @@ public class DataStorage
             this.spawnerPositionsDirty = true;
         }
 
-        PrintMode mode = Configs.Generic.SPAWNER_POSITION_PRINT.getOptionListValue();
+        PrintMode mode = Configs.Generic.SPAWNER_POSITION_PRINT.getValue();
 
         if (mode == PrintMode.BOTH || (mode == PrintMode.FAIL && success == false) || (mode == PrintMode.SUCCESS && success))
         {
@@ -408,7 +408,7 @@ public class DataStorage
                 try
                 {
                     int size = Integer.parseInt(parts[1]);
-                    Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.setIntegerValue(size);
+                    Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.setValue(size);
                     // Fetch it again from the config, to take the bounds clamping into account
                     MessageUtils.printActionbarMessage("minihud.message.dropped_chunks_hash_size_set_to", Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue());
                 }

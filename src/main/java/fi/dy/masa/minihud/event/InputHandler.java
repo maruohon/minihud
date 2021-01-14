@@ -84,7 +84,7 @@ public class InputHandler implements KeyBindProvider, MouseInputHandler
 
                 String preGreen = BaseScreen.TXT_GREEN;
                 String rst = BaseScreen.TXT_RST;
-                Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.setIntegerValue(size);
+                Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.setValue(size);
                 size = Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
                 String strValue = preGreen + size + rst;
 

@@ -106,8 +106,8 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         if (count > 0)
         {
             EnumFacing numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? mc.player.getHorizontalFacing() : EnumFacing.NORTH;
-            LightLevelNumberMode numberMode = Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getOptionListValue();
-            LightLevelMarkerMode markerMode = Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
+            LightLevelNumberMode numberMode = Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getValue();
+            LightLevelMarkerMode markerMode = Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getValue();
             boolean useColoredNumbers = Configs.Generic.LIGHT_LEVEL_COLORED_NUMBERS.getBooleanValue();
             int lightThreshold = Configs.Generic.LIGHT_LEVEL_THRESHOLD.getIntegerValue();
 

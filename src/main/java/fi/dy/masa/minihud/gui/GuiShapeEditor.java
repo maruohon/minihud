@@ -14,9 +14,9 @@ import fi.dy.masa.malilib.config.value.BlockSnap;
 import fi.dy.masa.malilib.gui.BaseRenderLayerEditScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
+import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OptionListConfigButton;
-import fi.dy.masa.malilib.gui.icon.BaseIcon;
 import fi.dy.masa.malilib.gui.listener.DoubleModifierButtonListener;
 import fi.dy.masa.malilib.gui.listener.DoubleTextFieldListener;
 import fi.dy.masa.malilib.gui.listener.IntegerModifierButtonListener;
@@ -162,10 +162,10 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
             }
         });
 
-        this.configBlockSnap.setOptionListValue(shape.getBlockSnap());
+        this.configBlockSnap.setValue(shape.getBlockSnap());
         OptionListConfigButton buttonSnap = new OptionListConfigButton(x + button.getWidth() + 4, y, -1, 20, this.configBlockSnap, "minihud.gui.label.shape.block_snap");
         this.addButton(buttonSnap, (btn, mbtn) -> {
-            shape.setBlockSnap(this.configBlockSnap.getOptionListValue());
+            shape.setBlockSnap(this.configBlockSnap.getValue());
             this.initGui();
         });
 
@@ -187,7 +187,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            GenericButton button = new GenericButton(x + 54, y, BaseIcon.BTN_PLUSMINUS_16, hover);
+            GenericButton button = new GenericButton(x + 54, y, DefaultIcons.BTN_PLUSMINUS_16, hover);
             button.setCanScrollToClick(true);
             this.addButton(button, new DoubleModifierButtonListener(supplier, new DualDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
         }
@@ -206,7 +206,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            GenericButton button = new GenericButton(x + 54, y, BaseIcon.BTN_PLUSMINUS_16, hover);
+            GenericButton button = new GenericButton(x + 54, y, DefaultIcons.BTN_PLUSMINUS_16, hover);
             button.setCanScrollToClick(true);
             this.addButton(button, new IntegerModifierButtonListener(supplier, new DualIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
         }

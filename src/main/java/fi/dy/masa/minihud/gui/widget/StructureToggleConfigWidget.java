@@ -6,10 +6,10 @@ import fi.dy.masa.malilib.gui.widget.button.KeyBindConfigButton;
 import fi.dy.masa.malilib.gui.config.ConfigWidgetContext;
 import fi.dy.masa.malilib.gui.widget.ColorIndicatorWidget;
 import fi.dy.masa.malilib.gui.widget.KeybindSettingsWidget;
-import fi.dy.masa.malilib.gui.widget.list.entry.config.BaseConfigOptionWidget;
+import fi.dy.masa.malilib.gui.widget.list.entry.config.BaseConfigWidget;
 import fi.dy.masa.minihud.config.StructureToggle;
 
-public class StructureToggleConfigWidget extends BaseConfigOptionWidget<StructureToggle>
+public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggle>
 {
     protected final StructureToggle config;
     protected final ImmutableList<Integer> initialHotkeyValue;
@@ -43,13 +43,13 @@ public class StructureToggleConfigWidget extends BaseConfigOptionWidget<Structur
                                                         config.getDisplayName(), ctx.getDialogHandler());
 
         this.colorIndicatorWidgetMain = new ColorIndicatorWidget(x, y, 18, 18, this.config.getColorMain(), (newValue) -> {
-            this.config.getColorMain().setIntegerValue(newValue);
+            this.config.getColorMain().setValue(newValue);
             this.reAddSubWidgets();
         });
         this.colorIndicatorWidgetMain.addHoverString("minihud.gui.label.hover.structures_color_main");
 
         this.colorIndicatorWidgetComponents = new ColorIndicatorWidget(x, y, 18, 18, this.config.getColorComponents(), (newValue) -> {
-            this.config.getColorComponents().setIntegerValue(newValue);
+            this.config.getColorComponents().setValue(newValue);
             this.reAddSubWidgets();
         });
         this.colorIndicatorWidgetComponents.addHoverString("minihud.gui.label.hover.structures_color_components");
@@ -89,7 +89,7 @@ public class StructureToggleConfigWidget extends BaseConfigOptionWidget<Structur
         this.colorIndicatorWidgetComponents.setPosition(x, y + 2);
 
         x += 21;
-        this.updateResetButton(x, y, this.config);
+        this.updateResetButton(x, y);
 
         this.addWidget(this.booleanButton);
         this.addWidget(this.hotkeyButton);

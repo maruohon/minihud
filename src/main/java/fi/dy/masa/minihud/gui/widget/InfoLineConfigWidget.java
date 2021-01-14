@@ -7,10 +7,10 @@ import fi.dy.masa.malilib.gui.config.ConfigWidgetContext;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.KeybindSettingsWidget;
-import fi.dy.masa.malilib.gui.widget.list.entry.config.BaseConfigOptionWidget;
+import fi.dy.masa.malilib.gui.widget.list.entry.config.BaseConfigWidget;
 import fi.dy.masa.minihud.config.InfoLine;
 
-public class InfoLineConfigWidget extends BaseConfigOptionWidget<InfoLine>
+public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
 {
     protected final InfoLine config;
     protected final BaseTextFieldWidget textField;
@@ -88,7 +88,7 @@ public class InfoLineConfigWidget extends BaseConfigOptionWidget<InfoLine>
         this.settingsWidget.setPosition(x, y);
 
         x += this.settingsWidget.getWidth() + 4;
-        this.updateResetButton(x, y, this.config);
+        this.updateResetButton(x, y);
 
         this.addWidget(this.textField);
         this.addWidget(this.booleanButton);

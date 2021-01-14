@@ -120,7 +120,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             int y = Configs.Generic.HUD_TEXT_POS_Y.getIntegerValue();
             int textColor = Configs.Colors.HUD_TEXT.getIntegerValue();
             int bgColor = Configs.Colors.HUD_TEXT_BACKGROUND.getIntegerValue();
-            HudAlignment alignment = Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
+            HudAlignment alignment = Configs.Generic.HUD_ALIGNMENT.getValue();
             boolean useBackground = Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue();
             boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
 
@@ -161,7 +161,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
     public int getSubtitleOffset()
     {
-        HudAlignment align = Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
+        HudAlignment align = Configs.Generic.HUD_ALIGNMENT.getValue();
 
         if (align == HudAlignment.BOTTOM_RIGHT)
         {
