@@ -176,7 +176,7 @@ public class DebugInfoUtils
 
                         if (old == null || isSamepath == false || old.getCurrentNodeIndex() != path.getCurrentNodeIndex())
                         {
-                            final int id = entity.getEntityId();
+                            final int id = entity.getId();
                             final float maxDistance = Configs.Generic.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? ((IMixinEntityNavigation) navigator).getMaxDistanceToWaypoint() : 0F;
 
                             DebugInfoUtils.sendPacketDebugPath(server, id, path, maxDistance);
