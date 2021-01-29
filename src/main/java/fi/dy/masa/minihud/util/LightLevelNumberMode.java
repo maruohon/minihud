@@ -1,49 +1,19 @@
 package fi.dy.masa.minihud.util;
 
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
-import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 
-public enum LightLevelNumberMode implements ConfigOptionListEntry<LightLevelNumberMode>
+public class LightLevelNumberMode extends BaseOptionListConfigValue
 {
-    NONE    ("none",    "minihud.label.light_level_number_mode.none"),
-    BLOCK   ("block",   "minihud.label.light_level_number_mode.block"),
-    SKY     ("sky",     "minihud.label.light_level_number_mode.sky"),
-    BOTH    ("both",    "minihud.label.light_level_number_mode.both");
+    public static final LightLevelNumberMode NONE  = new LightLevelNumberMode("none",    "minihud.label.light_level_number_mode.none");
+    public static final LightLevelNumberMode BLOCK = new LightLevelNumberMode("block",   "minihud.label.light_level_number_mode.block");
+    public static final LightLevelNumberMode SKY   = new LightLevelNumberMode("sky",     "minihud.label.light_level_number_mode.sky");
+    public static final LightLevelNumberMode BOTH  = new LightLevelNumberMode("both",    "minihud.label.light_level_number_mode.both");
 
-    public static final ImmutableList<LightLevelNumberMode> VALUES = ImmutableList.copyOf(values());
+    public static final ImmutableList<LightLevelNumberMode> VALUES = ImmutableList.of(BLOCK, SKY, BOTH, NONE);
 
-    private final String configString;
-    private final String translationKey;
-
-    LightLevelNumberMode(String configString, String translationKey)
+    private LightLevelNumberMode(String name, String translationKey)
     {
-        this.configString = configString;
-        this.translationKey = translationKey;
-    }
-
-    @Override
-    public String getStringValue()
-    {
-        return this.configString;
-    }
-
-    @Override
-    public String getDisplayName()
-    {
-        return StringUtils.translate(this.translationKey);
-    }
-
-    @Override
-    public LightLevelNumberMode cycle(boolean forward)
-    {
-        return BaseConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
-    }
-
-    @Override
-    public LightLevelNumberMode fromString(String name)
-    {
-        return BaseConfigOptionListEntry.findValueByName(name, VALUES);
+        super(name, translationKey);
     }
 }

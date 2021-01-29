@@ -13,7 +13,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.value.BlockSnap;
-import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
+import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -166,7 +166,7 @@ public abstract class ShapeCircleBase extends ShapeBase
 
         obj.add("center", JsonUtils.vec3dToJson(this.center));
         obj.add("main_axis", new JsonPrimitive(this.mainAxis.name()));
-        obj.add("snap", new JsonPrimitive(this.snap.getStringValue()));
+        obj.add("snap", new JsonPrimitive(this.snap.getName()));
         obj.add("radius", new JsonPrimitive(this.radius));
 
         return obj;
@@ -180,7 +180,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         // The snap value has to be set before the center
         if (JsonUtils.hasString(obj, "snap"))
         {
-            this.snap = BaseConfigOptionListEntry.findValueByName(JsonUtils.getString(obj, "snap"), BlockSnap.VALUES);
+            this.snap = BaseOptionListConfigValue.findValueByName(JsonUtils.getString(obj, "snap"), BlockSnap.VALUES);
         }
 
         if (JsonUtils.hasString(obj, "main_axis"))

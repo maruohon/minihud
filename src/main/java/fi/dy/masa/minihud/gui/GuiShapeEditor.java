@@ -26,6 +26,7 @@ import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.ColorIndicatorWidget;
 import fi.dy.masa.malilib.gui.widget.DoubleTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
+import fi.dy.masa.malilib.util.ListUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -49,7 +50,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     {
         this.shape = shape;
         this.title = StringUtils.translate("minihud.gui.title.shape_editor");
-        this.configBlockSnap = new OptionListConfig<>("blockSnap", BlockSnap.NONE, "");
+        this.configBlockSnap = new OptionListConfig<>("blockSnap", BlockSnap.NONE, BlockSnap.VALUES, "");
     }
 
     @Override
@@ -227,7 +228,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         y += 10;
 
         GenericButton button = new GenericButton(x, y, -1, 20, supplier.get().getDisplayName());
-        this.addButton(button, (btn, mouseBtn) -> { consumer.accept(supplier.get().cycle(mouseBtn == 0)); this.initGui(); } );
+        this.addButton(button, (btn, mouseBtn) -> { consumer.accept(ListUtils.getNextEntry(ShapeRenderType.VALUES, supplier.get(), mouseBtn != 0)); this.initGui(); } );
     }
 
     private static class SphereEditor implements CoordinateValueModifier
@@ -257,7 +258,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
                 this.shape.setCenter(PositionUtils.setValue(type, this.shape.getCenter(), Double.parseDouble(newValue)));
                 return true;
             }
-            catch (Exception e) {}
+            catch (Exception ignore) {}
 
             return false;
         }

@@ -49,17 +49,17 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
         BUFFER_1.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BlockGridMode mode = Configs.Generic.BLOCK_GRID_OVERLAY_MODE.getValue();
 
-        switch (mode)
+        if (mode == BlockGridMode.ALL)
         {
-            case ALL:
-                this.renderLinesAll(cameraPos, this.lastUpdatePos, radius, color, BUFFER_1);
-                break;
-            case NON_AIR:
-                this.renderLinesNonAir(cameraPos, entity.getEntityWorld(), this.lastUpdatePos, radius, color, BUFFER_1);
-                break;
-            case ADJACENT:
-                this.renderLinesAdjacentToNonAir(cameraPos, entity.getEntityWorld(), this.lastUpdatePos, radius, color, BUFFER_1);
-                break;
+            this.renderLinesAll(cameraPos, this.lastUpdatePos, radius, color, BUFFER_1);
+        }
+        else if (mode == BlockGridMode.NON_AIR)
+        {
+            this.renderLinesNonAir(cameraPos, entity.getEntityWorld(), this.lastUpdatePos, radius, color, BUFFER_1);
+        }
+        else if (mode == BlockGridMode.ADJACENT)
+        {
+            this.renderLinesAdjacentToNonAir(cameraPos, entity.getEntityWorld(), this.lastUpdatePos, radius, color, BUFFER_1);
         }
 
         BUFFER_1.finishDrawing();

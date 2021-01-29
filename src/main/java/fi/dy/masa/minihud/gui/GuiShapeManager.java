@@ -56,7 +56,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         int x = 12;
         int y = 44;
         int lw = StringUtils.getMaxStringRenderWidth(StringUtils.translate("minihud.gui.button.shapes.main_rendering"),
-                                                     StringUtils.translate("minihud.gui.button.shapes.shape_renderer"));
+                                                     StringUtils.translate("minihud.gui.button.shapes.shape_renderer")) + 8;
 
         LabelWidget label = new LabelWidget(x, y + 5, lw, -1, 0xFFFFF040, "minihud.gui.button.shapes.main_rendering");
         this.addWidget(label);

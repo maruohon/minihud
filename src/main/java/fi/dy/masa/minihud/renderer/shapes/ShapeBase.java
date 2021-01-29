@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
+import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 import fi.dy.masa.malilib.listener.LayerRangeChangeListener;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -162,7 +162,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements LayerRang
         obj.add("color", new JsonPrimitive(this.color.intValue));
         obj.add("enabled", new JsonPrimitive(this.enabled));
         obj.add("display_name", new JsonPrimitive(this.displayName));
-        obj.add("render_type", new JsonPrimitive(this.renderType.getStringValue()));
+        obj.add("render_type", new JsonPrimitive(this.renderType.getName()));
         obj.add("layers", this.layerRange.toJson());
 
         return obj;
@@ -185,7 +185,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements LayerRang
 
         if (JsonUtils.hasString(obj, "render_type"))
         {
-            ShapeRenderType type = BaseConfigOptionListEntry.findValueByName(obj.get("render_type").getAsString(), ShapeRenderType.VALUES);
+            ShapeRenderType type = BaseOptionListConfigValue.findValueByName(obj.get("render_type").getAsString(), ShapeRenderType.VALUES);
 
             if (type != null)
             {

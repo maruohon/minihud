@@ -1,48 +1,18 @@
 package fi.dy.masa.minihud.util;
 
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
-import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 
-public enum ShapeRenderType implements ConfigOptionListEntry<ShapeRenderType>
+public class ShapeRenderType extends BaseOptionListConfigValue
 {
-    FULL_BLOCK ("full_block", "minihud.label.shape_render_type.full_block"),
-    INNER_EDGE ("inner_edge", "minihud.label.shape_render_type.inner_edge"),
-    OUTER_EDGE ("outer_edge", "minihud.label.shape_render_type.outer_edge");
+    public static final ShapeRenderType FULL_BLOCK = new ShapeRenderType("full_block", "minihud.label.shape_render_type.full_block");
+    public static final ShapeRenderType INNER_EDGE = new ShapeRenderType("inner_edge", "minihud.label.shape_render_type.inner_edge");
+    public static final ShapeRenderType OUTER_EDGE = new ShapeRenderType("outer_edge", "minihud.label.shape_render_type.outer_edge");
 
-    public static final ImmutableList<ShapeRenderType> VALUES = ImmutableList.copyOf(values());
+    public static final ImmutableList<ShapeRenderType> VALUES = ImmutableList.of(FULL_BLOCK, INNER_EDGE, OUTER_EDGE);
 
-    private final String configString;
-    private final String translationKey;
-
-    ShapeRenderType(String configString, String translationKey)
+    private ShapeRenderType(String name, String translationKey)
     {
-        this.configString = configString;
-        this.translationKey = translationKey;
-    }
-
-    @Override
-    public String getStringValue()
-    {
-        return this.configString;
-    }
-
-    @Override
-    public String getDisplayName()
-    {
-        return StringUtils.translate(this.translationKey);
-    }
-
-    @Override
-    public ShapeRenderType cycle(boolean forward)
-    {
-        return BaseConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
-    }
-
-    @Override
-    public ShapeRenderType fromString(String name)
-    {
-        return BaseConfigOptionListEntry.findValueByName(name, VALUES);
+        super(name, translationKey);
     }
 }

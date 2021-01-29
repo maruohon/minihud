@@ -1,48 +1,18 @@
 package fi.dy.masa.minihud.util;
 
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
-import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 
-public enum BlockGridMode implements ConfigOptionListEntry<BlockGridMode>
+public class BlockGridMode extends BaseOptionListConfigValue
 {
-    ALL         ("all",         "minihud.label.blockgridmode.all"),
-    NON_AIR     ("non_air",     "minihud.label.blockgridmode.non_air"),
-    ADJACENT    ("adjacent",    "minihud.label.blockgridmode.adjacent");
+    public static final BlockGridMode NON_AIR  = new BlockGridMode("non_air",     "minihud.label.blockgridmode.non_air");
+    public static final BlockGridMode ADJACENT = new BlockGridMode("adjacent",    "minihud.label.blockgridmode.adjacent");
+    public static final BlockGridMode ALL      = new BlockGridMode("all",         "minihud.label.blockgridmode.all");
 
-    public static final ImmutableList<BlockGridMode> VALUES = ImmutableList.copyOf(values());
+    public static final ImmutableList<BlockGridMode> VALUES = ImmutableList.of(NON_AIR, ADJACENT, ALL);
 
-    private final String configString;
-    private final String translationKey;
-
-    BlockGridMode(String configString, String translationKey)
+    private BlockGridMode(String name, String translationKey)
     {
-        this.configString = configString;
-        this.translationKey = translationKey;
-    }
-
-    @Override
-    public String getStringValue()
-    {
-        return this.configString;
-    }
-
-    @Override
-    public String getDisplayName()
-    {
-        return StringUtils.translate(this.translationKey);
-    }
-
-    @Override
-    public BlockGridMode cycle(boolean forward)
-    {
-        return BaseConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
-    }
-
-    @Override
-    public BlockGridMode fromString(String name)
-    {
-        return BaseConfigOptionListEntry.findValueByName(name, VALUES);
+        super(name, translationKey);
     }
 }
