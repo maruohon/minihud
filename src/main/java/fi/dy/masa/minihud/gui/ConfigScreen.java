@@ -2,7 +2,7 @@ package fi.dy.masa.minihud.gui;
 
 import java.util.Collections;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.ConfigInfo;
+import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigTab;

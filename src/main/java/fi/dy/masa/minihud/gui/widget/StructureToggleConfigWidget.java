@@ -34,10 +34,13 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
         this.initialHotkeyValue = config.getKeyBind().getKeys();
 
         this.booleanButton = new BooleanConfigButton(x, y + 1, -1, 20, config.getBooleanConfig());
-        this.booleanButton.setActionListener((btn, mbtn) -> this.resetButton.setEnabled(this.config.isModified()));
+        this.booleanButton.setActionListener((btn, mbtn) -> {
+            this.config.getBooleanConfig().toggleBooleanValue();
+            this.updateButtonStates();
+        });
 
         this.hotkeyButton = new KeyBindConfigButton(x, y + 1, 120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
-        this.hotkeyButton.setValueChangeListener(() -> this.resetButton.setEnabled(this.config.isModified()));
+        this.hotkeyButton.setValueChangeListener(this::updateButtonStates);
 
         this.settingsWidget = new KeybindSettingsWidget(x, y, 20, 20, config.getKeyBind(),
                                                         config.getDisplayName(), ctx.getDialogHandler());
@@ -56,9 +59,7 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
 
         this.resetButton.setActionListener((btn, mbtn) -> {
             this.config.resetToDefault();
-            this.resetButton.setEnabled(this.config.isModified());
-            this.booleanButton.updateDisplayString();
-            this.hotkeyButton.updateDisplayString();
+            this.updateButtonStates();
         });
     }
 
@@ -90,6 +91,7 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
 
         x += 21;
         this.updateResetButton(x, y);
+        this.updateButtonStates();
 
         this.addWidget(this.booleanButton);
         this.addWidget(this.hotkeyButton);
@@ -106,5 +108,15 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
                this.config.getColorMain().getIntegerValue() != this.initialMainColor ||
                this.config.getColorComponents().getIntegerValue() != this.initialComponentColor ||
                this.config.getKeyBind().getKeys().equals(this.initialHotkeyValue) == false;
+    }
+
+    protected void updateButtonStates()
+    {
+        this.booleanButton.setEnabled(this.config.getBooleanConfig().isLocked() == false);
+        this.booleanButton.updateDisplayString();
+        this.booleanButton.updateHoverStrings();
+        this.hotkeyButton.updateDisplayString();
+        this.hotkeyButton.updateHoverStrings();
+        this.resetButton.setEnabled(this.config.isModified() && this.config.getBooleanConfig().isLocked() == false);
     }
 }
