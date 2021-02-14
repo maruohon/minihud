@@ -10,7 +10,8 @@ public enum ShapeType
     SPHERE_BLOCKY       ("sphere_blocky",       "minihud.label.shapes.sphere_blocky",       ShapeSphereBlocky::new),
     CAN_SPAWN_SPHERE    ("can_spawn_sphere",    "minihud.label.shapes.can_spawn_sphere",    ShapeCanSpawnSphere::new),
     CAN_DESPAWN_SPHERE  ("can_despawn_sphere",  "minihud.label.shapes.can_despawn_sphere",  ShapeCanDespawnSphere::new),
-    DESPAWN_SPHERE      ("despawn_sphere",      "minihud.label.shapes.despawn_sphere",      ShapeDespawnSphere::new);
+    DESPAWN_SPHERE      ("despawn_sphere",      "minihud.label.shapes.despawn_sphere",      ShapeDespawnSphere::new),
+    NAVIGATION_LINE     ("navigation_line",     "minihud.label.shapes.navigation_line",     ShapeNavigationLine::new);
 
     private final String id;
     private final String translationKey;

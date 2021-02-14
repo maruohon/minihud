@@ -39,6 +39,7 @@ import fi.dy.masa.minihud.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircleBase;
+import fi.dy.masa.minihud.renderer.shapes.ShapeNavigationLine;
 import fi.dy.masa.minihud.renderer.shapes.ShapeSpawnSphere;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
@@ -131,6 +132,10 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
                 this.createShapeEditorElementsSphereBase(x, y, true);
                 this.createRenderTypeButton(renderTypeX, renderTypeY, () -> this.shape.getRenderType(), (val) -> this.shape.setRenderType(val), "minihud.gui.label.render_type_colon");
                 break;
+
+            case NAVIGATION_LINE:
+                this.createShapeEditorElementsNavigationLine(x, y);
+                break;
         }
     }
 
@@ -160,6 +165,21 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.addButton(buttonSnap, new ButtonListenerSphereBlockSnap(shape, this));
 
         y += 34;
+
+        this.createColorInput(x, y);
+    }
+
+    private void createShapeEditorElementsNavigationLine(int x, int y)
+    {
+        this.addLabel(x, y, 60, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.destination_colon"));
+        y += 12;
+        ShapeNavigationLine shape = (ShapeNavigationLine) this.shape;
+        GuiUtils.createVec3dInputsVertical(x, y, 120, shape.getDestination(), new NavigationLineEditor(shape, this), true, this);
+        y += 54;
+
+        ButtonGeneric button = new ButtonGeneric(x + 11, y, -1, false, "malilib.gui.button.render_layers_gui.set_to_player");
+        this.addButton(button, new ButtonListenerNavigationLine(shape, this));
+        y += 24;
 
         this.createColorInput(x, y);
     }
@@ -286,6 +306,63 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
                 this.shape.setCenter(entity.getPos());
                 this.gui.initGui();
             }
+        }
+    }
+
+    private static class ButtonListenerNavigationLine implements IButtonActionListener
+    {
+        private final GuiShapeEditor gui;
+        private final ShapeNavigationLine shape;
+
+        private ButtonListenerNavigationLine(ShapeNavigationLine shape, GuiShapeEditor gui)
+        {
+            this.shape = shape;
+            this.gui = gui;
+        }
+
+        @Override
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        {
+            Entity entity = this.gui.mc.getCameraEntity();
+
+            if (entity != null)
+            {
+                this.shape.setDestination(entity.getPos());
+                this.gui.initGui();
+            }
+        }
+    }
+
+    private static class NavigationLineEditor implements ICoordinateValueModifier
+    {
+        private final GuiShapeEditor gui;
+        private final ShapeNavigationLine shape;
+
+        private NavigationLineEditor(ShapeNavigationLine shape, GuiShapeEditor gui)
+        {
+            this.shape = shape;
+            this.gui = gui;
+        }
+
+        @Override
+        public boolean modifyValue(CoordinateType type, int amount)
+        {
+            this.shape.setDestination(PositionUtils.modifyValue(type, this.shape.getDestination(), amount));
+            this.gui.initGui();
+            return true;
+        }
+
+        @Override
+        public boolean setValueFromString(CoordinateType type, String newValue)
+        {
+            try
+            {
+                this.shape.setDestination(PositionUtils.setValue(type, this.shape.getDestination(), Double.parseDouble(newValue)));
+                return true;
+            }
+            catch (Exception e) {}
+
+            return false;
         }
     }
 
