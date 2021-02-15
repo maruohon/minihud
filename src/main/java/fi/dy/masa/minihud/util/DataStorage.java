@@ -53,6 +53,7 @@ public class DataStorage
 
     private boolean worldSeedValid;
     private boolean serverTPSValid;
+    private boolean hasSyncedTime;
     private boolean carpetServer;
     private boolean servuxServer;
     private boolean worldSpawnValid;
@@ -91,6 +92,7 @@ public class DataStorage
 
         this.worldSeedValid = false;
         this.serverTPSValid = false;
+        this.hasSyncedTime = false;
         this.carpetServer = false;
         this.worldSpawnValid = false;
         this.structuresNeedUpdating = true;
@@ -198,7 +200,7 @@ public class DataStorage
         return this.worldSpawn;
     }
 
-    public boolean isServerTPSValid()
+    public boolean hasTPSData()
     {
         return this.serverTPSValid;
     }
@@ -386,7 +388,7 @@ public class DataStorage
         {
             long currentTime = System.nanoTime();
 
-            if (this.serverTPSValid)
+            if (this.hasSyncedTime)
             {
                 long elapsedTicks = totalWorldTime - this.lastServerTick;
 
@@ -394,12 +396,13 @@ public class DataStorage
                 {
                     this.serverMSPT = ((double) (currentTime - this.lastServerTimeUpdate) / (double) elapsedTicks) / 1000000D;
                     this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
+                    this.serverTPSValid = true;
                 }
             }
 
             this.lastServerTick = totalWorldTime;
             this.lastServerTimeUpdate = currentTime;
-            this.serverTPSValid = true;
+            this.hasSyncedTime = true;
         }
     }
 
@@ -407,7 +410,7 @@ public class DataStorage
     {
         if (this.mc != null && this.mc.player != null && this.mc.getServer() != null)
         {
-            this.serverMSPT = (double) MathHelper.average(this.mc.getServer().lastTickLengths) / 1000000D;
+            this.serverMSPT = MathHelper.average(this.mc.getServer().lastTickLengths) / 1000000D;
             this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
             this.serverTPSValid = true;
         }
@@ -415,7 +418,6 @@ public class DataStorage
 
     /**
      * Gets a copy of the structure data map, and clears the dirty flag
-     * @return
      */
     public ArrayListMultimap<StructureType, StructureData> getCopyOfStructureData()
     {
@@ -661,14 +663,12 @@ public class DataStorage
                         this.carpetServer = true;
                         return;
                     }
-                    catch (NumberFormatException e)
+                    catch (NumberFormatException ignore)
                     {
                     }
                 }
             }
         }
-
-        this.serverTPSValid = false;
     }
 
     public JsonObject toJson()

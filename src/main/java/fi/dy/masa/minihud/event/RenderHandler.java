@@ -364,7 +364,7 @@ public class RenderHandler implements IRenderer
                 this.data.updateIntegratedServerTPS();
             }
 
-            if (this.data.isServerTPSValid())
+            if (this.data.hasTPSData())
             {
                 double tps = this.data.getServerTPS();
                 double mspt = this.data.getServerMSPT();
@@ -387,7 +387,7 @@ public class RenderHandler implements IRenderer
                     if (mspt <= 51) { preMspt = GuiBase.TXT_GREEN; }
                     else            { preMspt = GuiBase.TXT_RED; }
 
-                    this.addLine(String.format("Server TPS: %s%.1f%s (MSPT*: %s%.1f%s)", preTps, tps, rst, preMspt, mspt, rst));
+                    this.addLine(String.format("Server TPS: %s%.1f%s (MSPT [est]: %s%.1f%s)", preTps, tps, rst, preMspt, mspt, rst));
                 }
             }
             else
