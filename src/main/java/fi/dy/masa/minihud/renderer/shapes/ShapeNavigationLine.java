@@ -69,7 +69,7 @@ public class ShapeNavigationLine extends ShapeBase
     @Override
     public void allocateGlResources()
     {
-        this.allocateBuffer(GL11.GL_LINES);
+        this.allocateBuffer(GL11.GL_QUADS);
     }
 
     @Override
