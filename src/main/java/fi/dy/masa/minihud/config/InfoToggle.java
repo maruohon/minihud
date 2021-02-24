@@ -34,6 +34,8 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     FACING                  ("infoFacing",                  true,   8, "", "Show the player's current facing"),
     FPS                     ("infoFPS",                     false,  0, "", "Show the current FPS"),
     HONEY_LEVEL             ("infoHoneyLevel",              false, 37, "", "Show the honey level the targeted Hive or Nest.\nNote: This only works in single player without server-side support."),
+    HORSE_SPEED             ("infoHorseSpeed",              false, 36, "", "Show the speed (m/s) of the horse being ridden."),
+    HORSE_JUMP             ("infoHorseJump",                false, 37, "", "Show the jump height of the horse being ridden."),
     LIGHT_LEVEL             ("infoLightLevel",              false, 10, "", "Show the current light level"),
     LOOKING_AT_BLOCK        ("infoLookingAtBlock",          false, 25, "", "Show which block the player is currently looking at"),
     LOOKING_AT_BLOCK_CHUNK  ("infoLookingAtBlockInChunk",   false, 26, "", "Show which block within its containing chunk\nthe player is currently looking at"),
