@@ -32,6 +32,8 @@
     "minihud.gui.label.render_type_colon": "Render Type:",
     "minihud.gui.label.shape.block_snap": "Block snap: %s",
     "minihud.gui.label.shape.type_value": "Type: %s",
+    "minihud.gui.label.destination_colon": "Destination:",
+    "minihud.gui.label.destination_value": "Destination: %s",
 
     "minihud.gui.label.hover.shape.block_snap": "§7Block snap: §b%s",
     "minihud.gui.label.hover.shape.center_value": "§7Center - x: §9%s§7, y: §9%s§7, z: §9%s",
@@ -74,6 +76,7 @@
     "minihud.label.shapes.circle": "Circle / Cylinder",
     "minihud.label.shapes.despawn_sphere": "Despawn Sphere ( > 128)",
     "minihud.label.shapes.sphere_blocky": "Sphere (block-based)",
+    "minihud.label.shapes.navigation_line": "Navigation Line",
 
     "minihud.hotkeys.category.generic_hotkeys": "Generic hotkeys",
     "minihud.hotkeys.category.info_toggle_hotkeys": "Info Toggle hotkeys",
