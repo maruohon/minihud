@@ -6,6 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -53,10 +54,13 @@ public class OverlayRendererRegion extends OverlayRendererBase
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
 
+        World world = entity.getEntityWorld();
+        int minY = world != null ? world.getBottomY() : -64;
+        int maxY = world != null ? world.getTopY() : 320;
         int rx = MathHelper.floor(entity.getX()) & ~0x1FF;
         int rz = MathHelper.floor(entity.getZ()) & ~0x1FF;
-        BlockPos pos1 = new BlockPos(rx,         0, rz      );
-        BlockPos pos2 = new BlockPos(rx + 511, 256, rz + 511);
+        BlockPos pos1 = new BlockPos(rx,       minY, rz      );
+        BlockPos pos2 = new BlockPos(rx + 511, maxY, rz + 511);
         Color4f color = Configs.Colors.REGION_OVERLAY_COLOR.getColor();
 
         RenderUtils.renderWallsWithLines(pos1, pos2, cameraPos, 16, 16, true, color, BUFFER_1, BUFFER_2);

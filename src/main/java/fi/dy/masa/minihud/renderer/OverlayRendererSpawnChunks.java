@@ -6,6 +6,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.minihud.config.Configs;
@@ -86,13 +87,13 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(spawn, colorEntity, 0.001, BUFFER_2);
         fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxSidesBatchedQuads(spawn, colorEntity, 0.001, BUFFER_1);
 
-        Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 22);
+        Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 22, mc.world);
         RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorOuter, BUFFER_1, BUFFER_2);
 
-        corners = this.getSpawnChunkCorners(spawn, 11);
+        corners = this.getSpawnChunkCorners(spawn, 11, mc.world);
         RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorLazy, BUFFER_1, BUFFER_2);
 
-        corners = this.getSpawnChunkCorners(spawn, 9);
+        corners = this.getSpawnChunkCorners(spawn, 9, mc.world);
         RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorEntity, BUFFER_1, BUFFER_2);
 
         BUFFER_1.end();
@@ -104,13 +105,15 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         needsUpdate = false;
     }
 
-    protected Pair<BlockPos, BlockPos> getSpawnChunkCorners(BlockPos worldSpawn, int chunkRange)
+    protected Pair<BlockPos, BlockPos> getSpawnChunkCorners(BlockPos worldSpawn, int chunkRange, World world)
     {
         int cx = (worldSpawn.getX() >> 4);
         int cz = (worldSpawn.getZ() >> 4);
 
-        BlockPos pos1 = new BlockPos( (cx - chunkRange) << 4      ,   0,  (cz - chunkRange) << 4);
-        BlockPos pos2 = new BlockPos(((cx + chunkRange) << 4) + 15, 256, ((cz + chunkRange) << 4) + 15);
+        int minY = world != null ? world.getBottomY() : -64;
+        int maxY = world != null ? world.getTopY() : 320;
+        BlockPos pos1 = new BlockPos( (cx - chunkRange) << 4      , minY,  (cz - chunkRange) << 4);
+        BlockPos pos2 = new BlockPos(((cx + chunkRange) << 4) + 15, maxY, ((cz + chunkRange) << 4) + 15);
 
         return Pair.of(pos1, pos2);
     }

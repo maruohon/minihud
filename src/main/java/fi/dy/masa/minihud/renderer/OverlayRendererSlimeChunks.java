@@ -91,6 +91,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
             RenderObjectBase renderLines = this.renderObjects.get(1);
             BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
             BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
+            int minY = world != null ? world.getBottomY() : -64;
             int topY = (int) Math.floor(this.topY);
 
             for (int xOff = -r; xOff <= r; xOff++)
@@ -102,7 +103,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
 
                     if (MiscUtils.canSlimeSpawnInChunk(cx, cz, this.seed))
                     {
-                        pos1.set( cx << 4,          0,  cz << 4      );
+                        pos1.set( cx << 4,       minY,  cz << 4      );
                         pos2.set((cx << 4) + 15, topY, (cz << 4) + 15);
                         fi.dy.masa.malilib.render.RenderUtils.drawBoxWithEdgesBatched(pos1, pos2, cameraPos, colorLines, colorSides, BUFFER_1, BUFFER_2);
                     }
