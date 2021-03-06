@@ -325,7 +325,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         final int maxCX = (maxX >> 4);
         final int maxCZ = (maxZ >> 4);
         LightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
-        final int worldTopHeight = world.getTopHeightLimit();
+        final int worldTopHeight = world.getTopY();
 
         for (int cx = minCX; cx <= maxCX; ++cx)
         {
@@ -342,7 +342,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                 {
                     for (int z = startZ; z <= endZ; ++z)
                     {
-                        final int startY = Math.max(minY, world.getBottomSectionLimit());
+                        final int startY = Math.max(minY, world.getBottomY());
                         final int endY   = Math.min(maxY, chunk.getHighestNonEmptySectionYOffset() + 15 + 1);
 
                         for (int y = startY; y <= endY; ++y)
