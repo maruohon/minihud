@@ -108,11 +108,11 @@ public class RecipePattern
 
                 if (slot >= 0 && slot < this.recipe.length)
                 {
-                    this.recipe[slot] = ItemStack.fromTag(tag);
+                    this.recipe[slot] = ItemStack.fromNbt(tag);
                 }
             }
 
-            this.result = ItemStack.fromTag(nbt.getCompound("Result"));
+            this.result = ItemStack.fromNbt(nbt.getCompound("Result"));
         }
     }
 
@@ -122,7 +122,7 @@ public class RecipePattern
         if (this.isValid())
         {
             CompoundTag tag = new CompoundTag();
-            this.result.toTag(tag);
+            this.result.writeNbt(tag);
 
             nbt.putInt("Length", this.recipe.length);
             nbt.put("Result", tag);
@@ -135,7 +135,7 @@ public class RecipePattern
                 {
                     tag = new CompoundTag();
                     tag.putInt("Slot", i);
-                    this.recipe[i].toTag(tag);
+                    this.recipe[i].writeNbt(tag);
                     tagIngredients.add(tag);
                 }
             }
