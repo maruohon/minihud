@@ -100,7 +100,9 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
             return true;
         }
 
-        if (this.disabled || (GuiUtils.getCurrentScreen() instanceof HandledScreen) == false)
+        if (this.disabled ||
+            (GuiUtils.getCurrentScreen() instanceof HandledScreen) == false ||
+            Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()))
         {
             return false;
         }
