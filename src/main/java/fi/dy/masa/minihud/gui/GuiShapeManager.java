@@ -17,8 +17,8 @@ import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntrySelectionHandler;
-import fi.dy.masa.malilib.render.message.MessageType;
-import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -45,9 +45,9 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         this.clearWidgets();
         this.clearButtons();
@@ -65,8 +65,8 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         GenericButton button = new BooleanConfigButton(x, y, -1, 18, Configs.Generic.MAIN_RENDERING_TOGGLE);
         this.addWidget(button);
 
-        this.widgetDropDown.setPosition(this.width - 10, y);
-        this.widgetDropDown.setRightAlign(true, this.width - 10, true);
+        this.widgetDropDown.setPosition(this.screenWidth - 10, y);
+        this.widgetDropDown.setRightAlign(true, this.screenWidth - 10, true);
         this.addWidget(this.widgetDropDown);
 
         y += 18;
@@ -78,7 +78,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         button = new BooleanConfigButton(x, y + 1, -1, 18, RendererToggle.SHAPE_RENDERER.getBooleanConfig());
         this.addWidget(button);
 
-        button = new GenericButton(this.width - 10, y, -1, true, "minihud.gui.button.add_shape");
+        button = new GenericButton(this.screenWidth - 10, y, -1, true, "minihud.gui.button.add_shape");
         this.addButton(button, (btn, mbtn) -> {
             ShapeType type = this.widgetDropDown.getSelectedEntry();
 
@@ -109,7 +109,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
 
     protected void createTabButtonWidget()
     {
-        this.tabButtonContainerWidget = new CyclableContainerWidget(10, 22, this.width - 20, 20, this.createTabButtons());
+        this.tabButtonContainerWidget = new CyclableContainerWidget(10, 22, this.screenWidth - 20, 20, this.createTabButtons());
         this.tabButtonContainerWidget.setStartIndex(BaseConfigScreen.getTabState(Reference.MOD_ID).visibleTabsStartIndex);
         this.addWidget(this.tabButtonContainerWidget);
     }

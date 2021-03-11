@@ -71,7 +71,7 @@ public enum InfoLine implements ConfigInfo
 
     InfoLine(String name, boolean defaultValue, int lineOrder)
     {
-        this(name, defaultValue, lineOrder, KeyBindSettings.DEFAULT);
+        this(name, defaultValue, lineOrder, KeyBindSettings.INGAME_DEFAULT);
     }
 
     InfoLine(String name, boolean defaultValue, int lineOrder, KeyBindSettings settings)

@@ -11,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.PositionUtils;
@@ -149,7 +150,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
 
                     if (chunk.getBlockState(x, y, z).getMaterial() != Material.AIR)
                     {
-                        fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllOutlinesBatchedLines(posMutable, cameraPos, color, 0.001, buffer);
+                        ShapeRenderUtils.renderBlockPosEdgeLines(posMutable, 0.001, color, buffer, cameraPos);
                     }
                 }
             }
@@ -199,7 +200,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
 
                             if (chunk.getBlockState(posMutable2).getMaterial() != Material.AIR)
                             {
-                                fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllOutlinesBatchedLines(posMutable, cameraPos, color, 0.001, buffer);
+                                ShapeRenderUtils.renderBlockPosEdgeLines(posMutable, 0.001, color, buffer, cameraPos);
                                 break;
                             }
                         }
@@ -213,7 +214,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
 
                             if (world.getBlockState(posMutable2).getMaterial() != Material.AIR)
                             {
-                                fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllOutlinesBatchedLines(posMutable, cameraPos, color, 0.001, buffer);
+                                ShapeRenderUtils.renderBlockPosEdgeLines(posMutable, 0.001, color, buffer, cameraPos);
                                 break;
                             }
                         }

@@ -21,6 +21,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
@@ -165,8 +166,8 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
         double maxY = this.getMaxHeight(world, pos, range) - cameraPos.y;
         double maxZ = z + range + 1 -cameraPos.z;
 
-        fi.dy.masa.malilib.render.RenderUtils.renderBoxAllSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color, bufferQuads);
-        fi.dy.masa.malilib.render.RenderUtils.renderBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), bufferLines);
+        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, bufferQuads);
+        ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), bufferLines);
 
         BEACON_POSITIONS.add(pos);
         BEACON_CHUNKS.add(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4));
@@ -265,12 +266,12 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
         BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
-        fi.dy.masa.malilib.render.RenderUtils.renderBoxAllSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(0.3f), buffer);
+        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(0.3f), buffer);
 
         tessellator.draw();
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
-        fi.dy.masa.malilib.render.RenderUtils.renderBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), buffer);
+        ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), buffer);
 
         tessellator.draw();
 

@@ -49,7 +49,7 @@ public enum RendererToggle implements ConfigInfo
 
     RendererToggle(String name)
     {
-        this(name, KeyBindSettings.DEFAULT);
+        this(name, KeyBindSettings.INGAME_DEFAULT);
     }
 
     RendererToggle(String name, KeyBindSettings settings)

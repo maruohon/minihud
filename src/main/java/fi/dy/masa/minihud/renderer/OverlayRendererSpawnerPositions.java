@@ -11,6 +11,8 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
@@ -105,8 +107,8 @@ public class OverlayRendererSpawnerPositions extends OverlayRendererBase
     {
         for (BlockPos pos : positions)
         {
-            fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllSidesBatchedQuads(pos, cameraPos, colorQuads, 0.001, BUFFER_1);
-            fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllOutlinesBatchedLines(pos, cameraPos, colorLines, 0.001, BUFFER_2);
+            ShapeRenderUtils.renderBlockPosSideQuads(pos, 0.001, colorQuads, BUFFER_1, cameraPos);
+            ShapeRenderUtils.renderBlockPosEdgeLines(pos, 0.001, colorLines, BUFFER_2, cameraPos);
         }
     }
 
@@ -120,7 +122,7 @@ public class OverlayRendererSpawnerPositions extends OverlayRendererBase
             double x = pos.getX() + 0.5;
             double y = pos.getY() + 1.5;
             double z = pos.getZ() + 0.5;
-            fi.dy.masa.malilib.render.RenderUtils.renderTextPlate(Arrays.asList(str), x - dx, y - dy, z - dz, scale);
+            TextRenderUtils.renderTextPlate(Arrays.asList(str), x - dx, y - dy, z - dz, scale);
         }
     }
 }

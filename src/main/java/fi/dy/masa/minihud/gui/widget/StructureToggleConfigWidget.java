@@ -49,13 +49,13 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
             this.config.getColorMain().setValue(newValue);
             this.reAddSubWidgets();
         });
-        this.colorIndicatorWidgetMain.addHoverString("minihud.gui.label.hover.structures_color_main");
+        this.colorIndicatorWidgetMain.translateAndAddHoverString("minihud.gui.label.hover.structures_color_main");
 
         this.colorIndicatorWidgetComponents = new ColorIndicatorWidget(x, y, 18, 18, this.config.getColorComponents(), (newValue) -> {
             this.config.getColorComponents().setValue(newValue);
             this.reAddSubWidgets();
         });
-        this.colorIndicatorWidgetComponents.addHoverString("minihud.gui.label.hover.structures_color_components");
+        this.colorIndicatorWidgetComponents.translateAndAddHoverString("minihud.gui.label.hover.structures_color_components");
 
         this.resetButton.setActionListener((btn, mbtn) -> {
             this.config.resetToDefault();

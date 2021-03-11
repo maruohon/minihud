@@ -4,6 +4,7 @@ import java.util.Collections;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -88,7 +89,7 @@ public class OverlayRenderer
                 int cz = centerZ + zOff;
                 int bucket = MiscUtils.getChunkUnloadBucket(cx, cz);
                 String str = String.valueOf(bucket);
-                fi.dy.masa.malilib.render.RenderUtils.renderTextPlate(Collections.singletonList(str), (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale);
+                TextRenderUtils.renderTextPlate(Collections.singletonList(str), (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale);
             }
         }
     }

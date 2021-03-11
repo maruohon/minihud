@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.value.BlockSnap;
 import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -254,7 +255,7 @@ public abstract class ShapeCircleBase extends ShapeBase
 
                         if (render)
                         {
-                            fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceSideBatchedQuads(pos, cameraPos, side, color, 0, BUFFER_1);
+                            ShapeRenderUtils.renderBlockPosSideQuad(pos, side, 0, color, BUFFER_1, cameraPos);
                         }
                     }
                 }

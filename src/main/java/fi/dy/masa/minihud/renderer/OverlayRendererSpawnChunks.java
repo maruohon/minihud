@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProviderSurface;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
@@ -79,8 +80,8 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
                                           Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getColor() :
                                           Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getColor();
 
-        fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllOutlinesBatchedLines(spawn, cameraPos, colorEntity, 0.001, BUFFER_2);
-        fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllSidesBatchedQuads(spawn, cameraPos, colorEntity, 0.001, BUFFER_1);
+        ShapeRenderUtils.renderBlockPosEdgeLines(spawn, 0.001, colorEntity, BUFFER_2, cameraPos);
+        ShapeRenderUtils.renderBlockPosSideQuads(spawn, 0.001, colorEntity, BUFFER_1, cameraPos);
 
         Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 128);
         RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorLazy, BUFFER_1, BUFFER_2);

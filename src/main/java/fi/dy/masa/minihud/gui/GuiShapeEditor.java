@@ -54,9 +54,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         int x = 10;
         int y = 20;

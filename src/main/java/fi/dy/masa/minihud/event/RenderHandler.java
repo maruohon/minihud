@@ -33,15 +33,19 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
-import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.event.PostGameOverlayRenderer;
 import fi.dy.masa.malilib.event.PostItemTooltipRenderer;
 import fi.dy.masa.malilib.event.PostWorldRenderer;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.gui.position.EdgeInt;
+import fi.dy.masa.malilib.gui.position.ScreenLocation;
+import fi.dy.masa.malilib.message.InfoOverlay;
+import fi.dy.masa.malilib.message.StringListRendererWidget;
+import fi.dy.masa.malilib.render.text.TextRenderSettings;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -56,13 +60,15 @@ import fi.dy.masa.minihud.util.MiscUtils;
 public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRenderer, PostWorldRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
-    private final Date date;
     private final Supplier<String> profilerSectionSupplier = () -> "MiniHUD_RenderHandler";
+    private final Set<InfoLine> addedTypes = new HashSet<>();
+    private final Date date;
+    private StringListRendererWidget stringListRenderer;
+    private ScreenLocation hudLocation;
     private int fps;
     private int fpsCounter;
     private long fpsUpdateTime = Minecraft.getSystemTime();
     private long infoUpdateTime;
-    private Set<InfoLine> addedTypes = new HashSet<>();
 
     private final List<StringHolder> lineWrappers = new ArrayList<>();
     private final List<String> lines = new ArrayList<>();
@@ -75,6 +81,46 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     public static RenderHandler getInstance()
     {
         return INSTANCE;
+    }
+
+    private StringListRendererWidget getLineRenderer()
+    {
+        ScreenLocation location = Configs.Generic.HUD_ALIGNMENT.getValue();
+
+        if (this.stringListRenderer == null || this.hudLocation != location)
+        {
+            if (this.stringListRenderer != null)
+            {
+                this.stringListRenderer.removeStringListProvider(Reference.MOD_ID);
+            }
+
+            this.stringListRenderer = InfoOverlay.getTextHud(location);
+            this.stringListRenderer.setStringListProvider(Reference.MOD_ID, () -> this.lines, 99);
+            this.hudLocation = location;
+            this.updateHudSettings();
+        }
+
+        return this.stringListRenderer;
+    }
+
+    public void updateHudSettings()
+    {
+        if (this.stringListRenderer != null)
+        {
+            TextRenderSettings settings = new TextRenderSettings();
+            settings.setTextColor(Configs.Colors.HUD_TEXT.getIntegerValue());
+            settings.setBackgroundColor(Configs.Colors.HUD_TEXT_BACKGROUND.getIntegerValue());
+            settings.setUseTextShadow(Configs.Generic.USE_FONT_SHADOW.getBooleanValue());
+            settings.setUseBackground(Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue());
+
+            EdgeInt offset = new EdgeInt();
+            offset.setLeftRight(Configs.Generic.HUD_TEXT_POS_X.getIntegerValue());
+            offset.setTopBottom(Configs.Generic.HUD_TEXT_POS_Y.getIntegerValue());
+
+            this.stringListRenderer.setTextSettings(settings);
+            this.stringListRenderer.setPadding(offset);
+            this.stringListRenderer.setScale(Configs.Generic.HUD_FONT_SCALE.getDoubleValue());
+        }
     }
 
     public static void fixDebugRendererState()
@@ -96,6 +142,13 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     @Override
     public void onPostGameOverlayRender(Minecraft mc, float partialTicks)
     {
+        if (Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue() == false &&
+            this.stringListRenderer != null)
+        {
+            this.stringListRenderer.removeStringListProvider(Reference.MOD_ID);
+            this.stringListRenderer = null;
+        }
+
         if (Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
             mc.gameSettings.showDebugInfo == false &&
             mc.player != null && mc.gameSettings.hideGUI == false &&
@@ -116,6 +169,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 this.infoUpdateTime = currentTime;
             }
 
+            /*
             int x = Configs.Generic.HUD_TEXT_POS_X.getIntegerValue();
             int y = Configs.Generic.HUD_TEXT_POS_Y.getIntegerValue();
             int textColor = Configs.Colors.HUD_TEXT.getIntegerValue();
@@ -125,6 +179,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
 
             RenderUtils.renderText(x, y, 0, Configs.Generic.HUD_FONT_SCALE.getDoubleValue(), textColor, bgColor, alignment, useBackground, useShadow, this.lines);
+            */
         }
     }
 
@@ -161,9 +216,9 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
     public int getSubtitleOffset()
     {
-        HudAlignment align = Configs.Generic.HUD_ALIGNMENT.getValue();
+        ScreenLocation location = Configs.Generic.HUD_ALIGNMENT.getValue();
 
-        if (align == HudAlignment.BOTTOM_RIGHT)
+        if (location == ScreenLocation.BOTTOM_RIGHT)
         {
             int offset = (int) (this.lineWrappers.size() * (StringUtils.getFontHeight() + 2) * Configs.Generic.HUD_FONT_SCALE.getDoubleValue());
 
@@ -218,7 +273,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         this.addedTypes.clear();
 
         // Get the info line order based on the configs
-        List<LinePos> positions = new ArrayList<LinePos>();
+        List<LinePos> positions = new ArrayList<>();
 
         for (InfoLine toggle : InfoLine.values())
         {
@@ -258,6 +313,8 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         {
             this.lines.add(holder.str);
         }
+
+        this.getLineRenderer().markDirty();
     }
 
     private void addLine(String text)
@@ -318,7 +375,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 long day = (int) (timeDay / 24000);
                 // 1 tick = 3.6 seconds in MC (0.2777... seconds IRL)
                 int dayTicks = (int) (timeDay % 24000);
-                int hour = (int) ((dayTicks / 1000) + 6) % 24;
+                int hour = ((dayTicks / 1000) + 6) % 24;
                 int min = (int) (dayTicks / 16.666666) % 60;
                 int sec = (int) (dayTicks / 0.277777) % 60;
 
@@ -374,7 +431,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             if (mobcapData.getHasValidData())
             {
                 this.addLine(mobcapData.getFormattedInfoLine());
-            }
+            }   
         }
         else if (type == InfoLine.PING)
         {
@@ -428,7 +485,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             if (InfoLine.DIMENSION.getBooleanValue())
             {
                 int dimension = WorldUtils.getDimensionId(world);
-                str.append(String.format(String.format("%sDimType ID: %d", pre, dimension)));
+                str.append(String.format("%sDimType ID: %d", pre, dimension));
             }
 
             this.addLine(str.toString());
@@ -699,7 +756,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             {
                 World serverWorld = WorldUtils.getBestWorld(mc);
 
-                if (serverWorld != null && serverWorld instanceof WorldServer)
+                if (serverWorld instanceof WorldServer)
                 {
                     int countServer = serverWorld.loadedEntityList.size();
                     this.addLine(String.format("Entities - Client: %d, Server: %d", countClient, countServer));
@@ -824,12 +881,12 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             }
             else
             {
-                this.addLine(String.format("Spawnable sub-chunks: <no data>"));
+                this.addLine("Spawnable sub-chunks: <no data>");
             }
         }
     }
 
-    private <T extends Comparable<T>> void getBlockProperties(Minecraft mc)
+    private void getBlockProperties(Minecraft mc)
     {
         if (mc.objectMouseOver != null &&
             mc.objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK &&
@@ -852,7 +909,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
     }
 
-    private class StringHolder implements Comparable<StringHolder>
+    private static class StringHolder implements Comparable<StringHolder>
     {
         public final String str;
 
@@ -899,7 +956,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 return -1;
             }
 
-            return this.position < other.position ? -1 : (this.position > other.position ? 1 : 0);
+            return Integer.compare(this.position, other.position);
         }
     }
 }

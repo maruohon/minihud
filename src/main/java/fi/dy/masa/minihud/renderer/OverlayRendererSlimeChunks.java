@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos.PooledMutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -93,7 +94,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
                     {
                         pos1.setPos( cx << 4,          0,  cz << 4);
                         pos2.setPos((cx << 4) + 15, topY, (cz << 4) + 15);
-                        fi.dy.masa.malilib.render.RenderUtils.renderBoxWithEdgesBatched(pos1, pos2, cameraPos, colorLines, colorSides, BUFFER_1, BUFFER_2);
+                        ShapeRenderUtils.renderBoxSidesAndEdges(pos1, pos2, colorLines, colorSides, BUFFER_1, BUFFER_2, cameraPos);
                     }
                 }
             }

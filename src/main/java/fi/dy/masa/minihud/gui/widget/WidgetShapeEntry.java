@@ -9,6 +9,8 @@ import fi.dy.masa.malilib.gui.widget.button.OnOffStyle;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
+import fi.dy.masa.malilib.render.text.StyledTextLine;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
@@ -19,6 +21,7 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
     private final GenericButton configureButton;
     private final GenericButton toggleButton;
     private final GenericButton removeButton;
+    private final StyledTextLine nameText;
     private final int buttonsStartX;
 
     public WidgetShapeEntry(int x, int y, int width, int height, int listIndex,
@@ -28,6 +31,7 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
 
         this.shape = shape;
 
+        this.nameText = StyledTextLine.of(shape.getDisplayName());
         this.configureButton = new GenericButton(x, y + 1, -1, true, "minihud.gui.button.configure");
         this.toggleButton = new OnOffButton(x, y + 1, -1, 20, OnOffStyle.SLIDER_ON_OFF, this.shape::isEnabled, null);
         this.toggleButton.setRightAlign(true, x, true);
@@ -98,25 +102,24 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
         // Draw a lighter background for the hovered and the selected entry
         if (shapeSelected || hovered)
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0x70FFFFFF, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0x70FFFFFF);
         }
         else if (this.isOdd)
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0x20FFFFFF, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0x20FFFFFF);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0x50FFFFFF, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0x50FFFFFF);
         }
 
         if (shapeSelected)
         {
-            RenderUtils.renderOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
+            ShapeRenderUtils.renderOutline(x, y, z, width, height, 1, 0xFFE0E0E0);
         }
 
-        String name = this.shape.getDisplayName();
-        this.drawString(x + 4, y + this.getCenteredTextOffsetY(), z, 0xFFFFFFFF, name);
+        this.renderTextLine(x + 4, y + this.getCenteredTextOffsetY(), z, 0xFFFFFFFF, false, this.nameText);
 
         RenderUtils.color(1f, 1f, 1f, 1f);
         GlStateManager.disableBlend();

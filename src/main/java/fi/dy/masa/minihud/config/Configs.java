@@ -2,18 +2,18 @@ package fi.dy.masa.minihud.config;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.option.ConfigOption;
 import fi.dy.masa.malilib.config.category.BaseConfigOptionCategory;
 import fi.dy.masa.malilib.config.category.ConfigOptionCategory;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ColorConfig;
+import fi.dy.masa.malilib.config.option.ConfigOption;
 import fi.dy.masa.malilib.config.option.DoubleConfig;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.config.option.HotkeyedBooleanConfig;
 import fi.dy.masa.malilib.config.option.IntegerConfig;
 import fi.dy.masa.malilib.config.option.OptionListConfig;
 import fi.dy.masa.malilib.config.option.StringConfig;
-import fi.dy.masa.malilib.config.value.HudAlignment;
+import fi.dy.masa.malilib.gui.position.ScreenLocation;
 import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.input.KeyBindSettings;
 import fi.dy.masa.minihud.util.BlockGridMode;
@@ -26,7 +26,7 @@ public class Configs
     public static class Generic
     {
         public static final BooleanConfig BEACON_RANGE_AUTO_UPDATE              = new BooleanConfig("beaconRangeAutoUpdate", false);
-        public static final IntegerConfig BLOCK_GRID_OVERLAY_RADIUS             = new IntegerConfig("blockGridOverlayRadius", 32);
+        public static final IntegerConfig BLOCK_GRID_OVERLAY_RADIUS             = new IntegerConfig("blockGridOverlayRadius", 16, 0, 64);
         public static final DoubleConfig CHUNK_UNLOAD_BUCKET_FONT_SCALE         = new DoubleConfig("chunkUnloadBucketOverlayFontScale", 0.1625, 0.0, 1.0);
         public static final BooleanConfig DEBUG_MESSAGES                        = new BooleanConfig("debugMessages", false);
         public static final IntegerConfig DROPPED_CHUNKS_HASH_SIZE              = new IntegerConfig("droppedChunksHashSize", -1, -1, Integer.MAX_VALUE);
@@ -41,8 +41,8 @@ public class Configs
         public static final IntegerConfig HUD_TEXT_POS_X                        = new IntegerConfig("hudTextPosX", 4, -4096, 4096);
         public static final IntegerConfig HUD_TEXT_POS_Y                        = new IntegerConfig("hudTextPosY", 4, -4096, 4096);
         public static final BooleanConfig ITEM_NBT_ENABLED                      = new BooleanConfig("itemNbtEnabled", false);
-        public static final HotkeyConfig ITEM_NBT_KEY_PRETTY                    = new HotkeyConfig("itemNbtKeyPretty", "", KeyBindSettings.MODIFIER_GUI);
-        public static final HotkeyConfig ITEM_NBT_KEY_STRING                    = new HotkeyConfig("itemNbtKeyString", "", KeyBindSettings.MODIFIER_GUI);
+        public static final HotkeyConfig ITEM_NBT_KEY_PRETTY                    = new HotkeyConfig("itemNbtKeyPretty", "", KeyBindSettings.GUI_MODIFIER);
+        public static final HotkeyConfig ITEM_NBT_KEY_STRING                    = new HotkeyConfig("itemNbtKeyString", "", KeyBindSettings.GUI_MODIFIER);
         public static final BooleanConfig LIGHT_LEVEL_COLORED_NUMBERS           = new BooleanConfig("lightLevelColoredNumbers", true);
         public static final DoubleConfig LIGHT_LEVEL_MARKER_SIZE                = new DoubleConfig("lightLevelMarkerSize", 0.84, 0.0, 1.0);
         public static final DoubleConfig LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X      = new DoubleConfig("lightLevelNumberOffsetBlockX", 0.09, 0.0, 1.0);
@@ -53,14 +53,14 @@ public class Configs
         public static final IntegerConfig LIGHT_LEVEL_RANGE                     = new IntegerConfig("lightLevelRange", 24, 1, 64);
         public static final IntegerConfig LIGHT_LEVEL_THRESHOLD                 = new IntegerConfig("lightLevelThreshold", 8, 0, 15);
         public static final DoubleConfig LIGHT_LEVEL_Z_OFFSET                   = new DoubleConfig("lightLevelZOffset", 0.005, 0.0, 1.0);
-        public static final HotkeyedBooleanConfig MAIN_RENDERING_TOGGLE         = new HotkeyedBooleanConfig("mainRenderingToggle", true, "", KeyBindSettings.RELEASE_EXCLUSIVE);
+        public static final HotkeyedBooleanConfig MAIN_RENDERING_TOGGLE         = new HotkeyedBooleanConfig("mainRenderingToggle", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
         public static final BooleanConfig MAP_PREVIEW                           = new BooleanConfig("mapPreview", false);
         public static final IntegerConfig MAP_PREVIEW_SIZE                      = new IntegerConfig("mapPreviewSize", 160, 16, 512);
         public static final StringConfig MC_TIME_FORMAT                         = new StringConfig("mcTimeFormat", "MC time: (day {DAY}) {HOUR}:{MIN}:xx");
         public static final HotkeyConfig OPEN_CONFIG_GUI                        = new HotkeyConfig("openConfigGui", "H,C");
         public static final StringConfig REAL_TIME_FORMAT                       = new StringConfig("realTimeFormat", "yyyy-MM-dd HH:mm:ss");
         public static final BooleanConfig REQUIRE_SNEAK                         = new BooleanConfig("requireSneak", false);
-        public static final HotkeyConfig REQUIRED_KEY                           = new HotkeyConfig("requiredKey", "", KeyBindSettings.MODIFIER_INGAME_EMPTY);
+        public static final HotkeyConfig REQUIRED_KEY                           = new HotkeyConfig("requiredKey", "", KeyBindSettings.INGAME_MODIFIER_EMPTY);
         public static final HotkeyConfig SET_DISTANCE_REFERENCE_POINT           = new HotkeyConfig("setDistanceReferencePoint", "");
         public static final HotkeyConfig SHAPE_EDITOR                           = new HotkeyConfig("shapeEditor", "");
         public static final BooleanConfig SHULKER_BOX_PREVIEW                   = new BooleanConfig("shulkerBoxPreview", false);
@@ -81,7 +81,7 @@ public class Configs
         public static final StringConfig WOOL_COUNTER_TYPES                     = new StringConfig("woolCounterTypes", "0-15");
 
         public static final OptionListConfig<BlockGridMode> BLOCK_GRID_OVERLAY_MODE         = new OptionListConfig<>("blockGridOverlayMode", BlockGridMode.ALL, BlockGridMode.VALUES);
-        public static final OptionListConfig<HudAlignment> HUD_ALIGNMENT                    = new OptionListConfig<>("infoLinesHudAlignment", HudAlignment.TOP_LEFT, HudAlignment.VALUES);
+        public static final OptionListConfig<ScreenLocation> HUD_ALIGNMENT                  = new OptionListConfig<>("infoLinesHudAlignment", ScreenLocation.TOP_LEFT, ScreenLocation.VALUES);
         public static final OptionListConfig<LightLevelMarkerMode> LIGHT_LEVEL_MARKER_MODE  = new OptionListConfig<>("lightLevelMarkers", LightLevelMarkerMode.SQUARE, LightLevelMarkerMode.VALUES);
         public static final OptionListConfig<LightLevelNumberMode> LIGHT_LEVEL_NUMBER_MODE  = new OptionListConfig<>("lightLevelNumbers", LightLevelNumberMode.BLOCK, LightLevelNumberMode.VALUES);
         public static final OptionListConfig<PrintMode> SPAWNER_POSITION_PRINT              = new OptionListConfig<>("spawnerPositionPrint", PrintMode.SUCCESS, PrintMode.VALUES);

@@ -10,6 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProvider;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
@@ -127,7 +128,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
         Color4f color = type.getToggle().getColorMain().getColor();
         ImmutableList<IntBoundingBox> components = structure.getComponents();
 
-        fi.dy.masa.malilib.render.RenderUtils.renderBox(structure.getBoundingBox(), cameraPos, color, BUFFER_1, BUFFER_2);
+        ShapeRenderUtils.renderBoxSidesAndEdges(structure.getBoundingBox(), color, BUFFER_1, BUFFER_2, cameraPos);
 
         if (components.isEmpty() == false)
         {
@@ -137,7 +138,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
                 for (IntBoundingBox bb : components)
                 {
-                    fi.dy.masa.malilib.render.RenderUtils.renderBox(bb, cameraPos, color, BUFFER_1, BUFFER_2);
+                    ShapeRenderUtils.renderBoxSidesAndEdges(bb, color, BUFFER_1, BUFFER_2, cameraPos);
                 }
             }
         }
