@@ -589,6 +589,7 @@ public class RenderHandler implements IRenderer
             }
 
             HorseBaseEntity horse = (HorseBaseEntity) vehicle;
+            if (!horse.isSaddled()) return;
 
 
             if (InfoToggle.HORSE_SPEED.getBooleanValue()) {
