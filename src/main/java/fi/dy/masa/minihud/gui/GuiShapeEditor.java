@@ -66,7 +66,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         GenericButton button = new GenericButton(x, this.height - 24, -1, 20, ConfigScreen.SHAPES.getDisplayName());
         this.addButton(button, (btn, mbtn) -> {
             BaseConfigScreen.setCurrentTab(Reference.MOD_ID, ConfigScreen.SHAPES);
-            BaseScreen.openGui(new GuiShapeManager());
+            BaseScreen.openScreen(new GuiShapeManager());
         });
 
         this.createLayerEditControls(146, 142, this.getLayerRange());

@@ -40,7 +40,7 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
         this.configureButton.setActionListener((btn, mbtn) -> {
             GuiShapeEditor gui = new GuiShapeEditor(this.shape);
             gui.setParent(GuiUtils.getCurrentScreen());
-            BaseScreen.openGui(gui);
+            BaseScreen.openScreen(gui);
         });
 
         this.toggleButton.setActionListener((btn, mbtn) -> {

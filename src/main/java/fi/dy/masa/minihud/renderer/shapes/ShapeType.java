@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.renderer.shapes;
 
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public enum ShapeType
@@ -12,11 +13,13 @@ public enum ShapeType
     CAN_DESPAWN_SPHERE  ("can_despawn_sphere",  "minihud.label.shapes.can_despawn_sphere",  ShapeCanDespawnSphere::new),
     DESPAWN_SPHERE      ("despawn_sphere",      "minihud.label.shapes.despawn_sphere",      ShapeDespawnSphere::new);
 
+    public static final ImmutableList<ShapeType> VALUES = ImmutableList.copyOf(values());
+
     private final String id;
     private final String translationKey;
     private final Supplier<ShapeBase> shapeFactory;
 
-    private ShapeType(String id, String translationKey, Supplier<ShapeBase> shapeFactory)
+    ShapeType(String id, String translationKey, Supplier<ShapeBase> shapeFactory)
     {
         this.id = id;
         this.translationKey = translationKey;
@@ -41,7 +44,7 @@ public enum ShapeType
     @Nullable
     public static ShapeType fromString(String id)
     {
-        for (ShapeType type : ShapeType.values())
+        for (ShapeType type : VALUES)
         {
             if (type.getId().equalsIgnoreCase(id))
             {

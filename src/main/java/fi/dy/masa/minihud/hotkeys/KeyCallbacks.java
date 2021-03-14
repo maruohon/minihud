@@ -23,8 +23,8 @@ public class KeyCallbacks
     public static void init()
     {
         Configs.Generic.OPEN_CONFIG_GUI.getKeyBind().setCallback((a, k) -> {
-            BaseScreen screen = BaseConfigScreen.getCurrentTab(Reference.MOD_ID) == ConfigScreen.SHAPES ? new GuiShapeManager() : ConfigScreen.create();
-            BaseScreen.openGui(screen);
+            BaseScreen screen = BaseConfigScreen.getCurrentTab(Reference.MOD_ID) == ConfigScreen.SHAPES ? new GuiShapeManager() : ConfigScreen.create(null);
+            BaseScreen.openScreen(screen);
             return true;
         });
 
@@ -32,8 +32,8 @@ public class KeyCallbacks
 
         Configs.Generic.SHAPE_EDITOR.getKeyBind().setCallback((a, k) -> {
             ShapeBase shape = ShapeManager.INSTANCE.getSelectedShape();
-            if (shape != null) { BaseScreen.openGui(new GuiShapeEditor(shape)); }
-            else { BaseScreen.openGui(new GuiShapeManager()); }
+            if (shape != null) { BaseScreen.openScreen(new GuiShapeEditor(shape)); }
+            else { BaseScreen.openScreen(new GuiShapeManager()); }
             return true;
         });
 

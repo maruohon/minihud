@@ -1,18 +1,9 @@
 package fi.dy.masa.minihud.gui;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Nullable;
-import org.lwjgl.input.Keyboard;
-import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
-import fi.dy.masa.malilib.gui.config.ConfigTab;
-import fi.dy.masa.malilib.gui.widget.CyclableContainerWidget;
 import fi.dy.masa.malilib.gui.widget.DropDownListWidget;
 import fi.dy.masa.malilib.gui.widget.LabelWidget;
-import fi.dy.masa.malilib.gui.widget.button.BaseButton;
 import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
@@ -20,7 +11,6 @@ import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntrySelectionHandler;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.gui.widget.WidgetShapeEntry;
@@ -31,16 +21,15 @@ import fi.dy.masa.minihud.renderer.shapes.ShapeType;
 public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
 {
     protected final DropDownListWidget<ShapeType> widgetDropDown;
-    @Nullable protected CyclableContainerWidget tabButtonContainerWidget;
 
     public GuiShapeManager()
     {
-        super(10, 82, 20, 88);
+        super(10, 82, 20, 88, "minihud", ConfigScreen.ALL_TABS, ConfigScreen.SHAPES);
 
         this.title = StringUtils.translate("minihud.gui.title.shape_manager");
 
         // The position will get updated later
-        this.widgetDropDown = new DropDownListWidget<>(0, 0, 160, 16, 200, 10, ImmutableList.copyOf(ShapeType.values()), ShapeType::getDisplayName, null);
+        this.widgetDropDown = new DropDownListWidget<>(0, 0, 160, 16, 200, 10, ShapeType.VALUES, ShapeType::getDisplayName, null);
         this.widgetDropDown.setZLevel((int) this.zLevel + 2);
     }
 
@@ -51,7 +40,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
 
         this.clearWidgets();
         this.clearButtons();
-        this.createTabButtonWidget();
+        this.createTabButtonContainerWidget();
 
         int x = 12;
         int y = 44;
@@ -92,46 +81,12 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
                 MessageUtils.showGuiMessage(MessageType.ERROR, "minihud.message.error.shapes.select_shape_from_dropdown");
             }
         });
-
-        Keyboard.enableRepeatEvents(true);
     }
 
     @Override
     public void onGuiClosed()
     {
         super.onGuiClosed();
-
-        if (this.tabButtonContainerWidget != null)
-        {
-            BaseConfigScreen.getTabState(Reference.MOD_ID).visibleTabsStartIndex = this.tabButtonContainerWidget.getStartIndex();
-        }
-    }
-
-    protected void createTabButtonWidget()
-    {
-        this.tabButtonContainerWidget = new CyclableContainerWidget(10, 22, this.screenWidth - 20, 20, this.createTabButtons());
-        this.tabButtonContainerWidget.setStartIndex(BaseConfigScreen.getTabState(Reference.MOD_ID).visibleTabsStartIndex);
-        this.addWidget(this.tabButtonContainerWidget);
-    }
-
-    protected List<BaseButton> createTabButtons()
-    {
-        List<BaseButton> buttons = new ArrayList<>();
-
-        for (ConfigTab tab : ConfigScreen.TABS)
-        {
-            buttons.add(this.createTabButton(tab));
-        }
-
-        return buttons;
-    }
-
-    protected GenericButton createTabButton(ConfigTab tab)
-    {
-        GenericButton button = new GenericButton(0, 0, -1, 20, tab.getDisplayName());
-        button.setEnabled(ConfigScreen.SHAPES != tab);
-        button.setActionListener((btn, mbtn) -> BaseScreen.openGui(ConfigScreen.createOnTab(tab)));
-        return button;
     }
 
     public void onSelectionChange(@Nullable ShapeBase entry)
