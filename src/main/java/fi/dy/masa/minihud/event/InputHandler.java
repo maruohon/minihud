@@ -5,8 +5,8 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.input.Hotkey;
-import fi.dy.masa.malilib.input.KeyBindCategory;
-import fi.dy.masa.malilib.input.KeyBindProvider;
+import fi.dy.masa.malilib.input.HotkeyCategory;
+import fi.dy.masa.malilib.input.HotkeyProvider;
 import fi.dy.masa.malilib.input.MouseInputHandler;
 import fi.dy.masa.malilib.input.callback.AdjustableKeyCallback;
 import fi.dy.masa.malilib.message.MessageUtils;
@@ -18,7 +18,7 @@ import fi.dy.masa.minihud.config.StructureToggle;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 
-public class InputHandler implements KeyBindProvider, MouseInputHandler
+public class InputHandler implements HotkeyProvider, MouseInputHandler
 {
     private static final InputHandler INSTANCE = new InputHandler();
 
@@ -46,13 +46,13 @@ public class InputHandler implements KeyBindProvider, MouseInputHandler
     }
 
     @Override
-    public List<KeyBindCategory> getHotkeyCategoriesForCombinedView()
+    public List<HotkeyCategory> getHotkeysByCategories()
     {
         return ImmutableList.of(
-                new KeyBindCategory(Reference.MOD_ID, Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST),
-                new KeyBindCategory(Reference.MOD_ID, Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", InfoLine.TOGGLE_HOTKEYS),
-                new KeyBindCategory(Reference.MOD_ID, Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", RendererToggle.TOGGLE_HOTKEYS),
-                new KeyBindCategory(Reference.MOD_ID, Reference.MOD_NAME, "minihud.hotkeys.category.structure_toggle_hotkeys", StructureToggle.TOGGLE_HOTKEYS)
+                new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST),
+                new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.info_toggle_hotkeys", InfoLine.TOGGLE_HOTKEYS),
+                new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.renderer_toggle_hotkeys", RendererToggle.TOGGLE_HOTKEYS),
+                new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.structure_toggle_hotkeys", StructureToggle.TOGGLE_HOTKEYS)
         );
     }
 

@@ -15,8 +15,6 @@ import fi.dy.masa.malilib.gui.BaseRenderLayerEditScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.icon.DefaultIcons;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.button.OptionListConfigButton;
 import fi.dy.masa.malilib.gui.listener.DoubleModifierButtonListener;
 import fi.dy.masa.malilib.gui.listener.DoubleTextFieldListener;
 import fi.dy.masa.malilib.gui.listener.IntegerModifierButtonListener;
@@ -26,6 +24,8 @@ import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.ColorIndicatorWidget;
 import fi.dy.masa.malilib.gui.widget.DoubleTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.OptionListConfigButton;
 import fi.dy.masa.malilib.util.ListUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
@@ -86,7 +86,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         y += 12;
 
         BaseTextFieldWidget txtField = new BaseTextFieldWidget(x, y, 70, 16, String.format("#%08X", this.shape.getColor().intValue));
-        txtField.setTextValidator(BaseTextFieldWidget.VALIDATOR_HEX_COLOR_8);
+        txtField.setTextValidator(BaseTextFieldWidget.VALIDATOR_HEX_COLOR_8_6_4_3);
         txtField.setListener(this.shape::setColorFromString);
         this.addWidget(txtField);
         this.nextY = y + 20;
@@ -188,8 +188,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            GenericButton button = new GenericButton(x + 54, y, DefaultIcons.BTN_PLUSMINUS_16, hover);
+            GenericButton button = GenericButton.createIconOnly(x + 54, y, () -> DefaultIcons.BTN_PLUSMINUS_16);
             button.setCanScrollToClick(true);
+            button.addHoverStrings(hover);
             this.addButton(button, new DoubleModifierButtonListener(supplier, new DualDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
         }
     }
@@ -207,8 +208,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            GenericButton button = new GenericButton(x + 54, y, DefaultIcons.BTN_PLUSMINUS_16, hover);
+            GenericButton button = GenericButton.createIconOnly(x + 54, y, () -> DefaultIcons.BTN_PLUSMINUS_16);
             button.setCanScrollToClick(true);
+            button.addHoverStrings(hover);
             this.addButton(button, new IntegerModifierButtonListener(supplier, new DualIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
         }
     }

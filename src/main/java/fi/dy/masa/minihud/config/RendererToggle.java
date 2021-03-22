@@ -4,12 +4,14 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.ValueChangeCallback;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
+import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyBindSettings;
+import fi.dy.masa.malilib.util.data.ModInfo;
+import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.RendererToggleKeyCallback;
@@ -100,6 +102,12 @@ public enum RendererToggle implements ConfigInfo
     public KeyBind getKeyBind()
     {
         return this.toggleHotkey.getKeyBind();
+    }
+
+    @Override
+    public ModInfo getModInfo()
+    {
+        return Reference.MOD_INFO;
     }
 
     @Override

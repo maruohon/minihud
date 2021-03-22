@@ -4,14 +4,16 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.ValueChangeCallback;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
+import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.config.option.IntegerConfig;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyBindSettings;
 import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
+import fi.dy.masa.malilib.util.data.ModInfo;
+import fi.dy.masa.minihud.Reference;
 
 public enum InfoLine implements ConfigInfo
 {
@@ -120,6 +122,12 @@ public enum InfoLine implements ConfigInfo
     public IntegerConfig getLineOrderConfig()
     {
         return this.lineOrder;
+    }
+
+    @Override
+    public ModInfo getModInfo()
+    {
+        return Reference.MOD_INFO;
     }
 
     @Override

@@ -376,13 +376,6 @@ minihud.structure_toggle.color.components.stronghold=Stronghold Components
 minihud.structure_toggle.color.components.village=Village Generation Components
 minihud.structure_toggle.color.components.witchhut=Witch Hut Components
 
-minihud.gui.button.config_gui.colors=Colors
-minihud.gui.button.config_gui.generic=Generic
-minihud.gui.button.config_gui.info_lines=Info Lines
-minihud.gui.button.config_gui.overlay_renderers=Renderers
-minihud.gui.button.config_gui.shapes=Shapes
-minihud.gui.button.config_gui.structures=Structures
-
 minihud.gui.button.add_shape=Add shape
 minihud.gui.button.configure=Configure
 minihud.gui.button.remove=Remove
@@ -420,6 +413,12 @@ minihud.label.blockgridmode.all=All
 minihud.label.blockgridmode.non_air=Non-air
 minihud.label.blockgridmode.adjacent=Adjacent to non-air
 
+minihud.label.config_tab.colors=Colors
+minihud.label.config_tab.generic=Generic
+minihud.label.config_tab.info_lines=Info Lines
+minihud.label.config_tab.renderers=Renderers
+minihud.label.config_tab.shapes=Shapes
+minihud.label.config_tab.structures=Structures
 
 minihud.label.light_level_marker_mode.cross=Cross
 minihud.label.light_level_marker_mode.none=None

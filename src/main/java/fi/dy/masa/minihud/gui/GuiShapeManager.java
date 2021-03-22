@@ -1,13 +1,13 @@
 package fi.dy.masa.minihud.gui;
 
 import javax.annotation.Nullable;
+import net.minecraft.client.gui.GuiScreen;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.widget.DropDownListWidget;
 import fi.dy.masa.malilib.gui.widget.LabelWidget;
 import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
-import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntrySelectionHandler;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -100,12 +100,22 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
     {
         DataListWidget<ShapeBase> listWidget = new DataListWidget<>(listX, listY, listWidth, listHeight, ShapeManager.INSTANCE::getAllShapes);
         listWidget.setEntryWidgetFactory(WidgetShapeEntry::new);
-        listWidget.setContentsAreDynamic(true);
-
-        DataListEntrySelectionHandler<ShapeBase> handler = new DataListEntrySelectionHandler<>(listWidget::getFilteredEntries);
-        handler.setSelectionListener(this::onSelectionChange);
-        listWidget.setEntrySelectionHandler(handler);
+        listWidget.setFetchFromSupplierOnRefresh(true);
+        listWidget.setAllowSelection(true);
+        listWidget.getEntrySelectionHandler().setSelectionListener(this::onSelectionChange);
 
         return listWidget;
+    }
+
+    public static boolean screenValidator(@Nullable GuiScreen currentScreen)
+    {
+        return currentScreen instanceof GuiShapeManager;
+    }
+
+    public static GuiShapeManager openShapeManager(@Nullable GuiScreen currentScreen)
+    {
+        GuiShapeManager gui = new GuiShapeManager();
+        gui.setCurrentTab(ConfigScreen.SHAPES);
+        return gui;
     }
 }

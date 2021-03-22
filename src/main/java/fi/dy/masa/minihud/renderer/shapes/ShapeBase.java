@@ -85,7 +85,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements LayerRang
 
     public void setColorFromString(String newValue)
     {
-        this.setColor(StringUtils.getColor(newValue, 0));
+        this.setColor(Color4f.getColorFromString(newValue, 0));
     }
 
     public boolean isEnabled()

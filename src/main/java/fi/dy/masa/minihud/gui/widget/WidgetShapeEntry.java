@@ -45,7 +45,7 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
 
         this.toggleButton.setActionListener((btn, mbtn) -> {
             this.shape.toggleEnabled();
-            this.listWidget.refreshEntries();
+            this.listWidget.reCreateListEntryWidgets();
         });
 
         this.removeButton.setActionListener((btn, mbtn) -> {

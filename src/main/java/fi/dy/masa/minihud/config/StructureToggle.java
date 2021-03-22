@@ -4,12 +4,14 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ColorConfig;
+import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
+import fi.dy.masa.malilib.util.data.ModInfo;
+import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.data.DataStorage;
 
 public enum StructureToggle implements ConfigInfo
@@ -98,6 +100,12 @@ public enum StructureToggle implements ConfigInfo
         }
 
         return builder.build();
+    }
+
+    @Override
+    public ModInfo getModInfo()
+    {
+        return Reference.MOD_INFO;
     }
 
     @Override
