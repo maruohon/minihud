@@ -1,14 +1,18 @@
 package fi.dy.masa.minihud.gui;
 
+import java.util.ArrayList;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.gui.GuiScreen;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
+import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.gui.BaseScreenTab;
 import fi.dy.masa.malilib.gui.ScreenTab;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigTab;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
+import fi.dy.masa.malilib.gui.config.ExpandableConfigGroup;
+import fi.dy.masa.malilib.util.ListUtils;
 import fi.dy.masa.malilib.util.data.ModInfo;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -20,7 +24,7 @@ public class ConfigScreen
 {
     public static final ModInfo MOD_INFO = Reference.MOD_INFO;
 
-    private static final BaseConfigTab GENERIC              = new BaseConfigTab(MOD_INFO, "generic",    160, Configs.Generic.OPTIONS, ConfigScreen::create);
+    private static final BaseConfigTab GENERIC              = new BaseConfigTab(MOD_INFO, "generic",    160, getGenericOptions(),     ConfigScreen::create);
     private static final BaseConfigTab COLORS               = new BaseConfigTab(MOD_INFO, "colors",     100, Configs.Colors.OPTIONS,  ConfigScreen::create);
     private static final BaseConfigTab INFO_LINES           = new BaseConfigTab(MOD_INFO, "info_lines", 200, InfoLine.VALUES,         ConfigScreen::create);
     private static final BaseConfigTab OVERLAY_RENDERERS    = new BaseConfigTab(MOD_INFO, "renderers",  200, getRendererOptions(),    ConfigScreen::create);
@@ -52,6 +56,21 @@ public class ConfigScreen
     public static ImmutableList<ConfigTab> getConfigTabs()
     {
         return CONFIG_TABS;
+    }
+
+    private static ImmutableList<ConfigInfo> getGenericOptions()
+    {
+        ArrayList<ConfigInfo> genericOptions = new ArrayList<>(Configs.Generic.OPTIONS);
+        ArrayList<ConfigInfo> colorOptions = new ArrayList<>(Configs.Generic.OPTIONS);
+        ArrayList<ConfigInfo> lightOptions = new ArrayList<>();
+
+        ListUtils.extractEntriesToSecondList(genericOptions, lightOptions, (c) -> c.getName().startsWith("lightLevel"), true);
+        ListUtils.extractEntriesToSecondList(colorOptions,   lightOptions, (c) -> c.getName().startsWith("lightLevel"), false);
+
+        genericOptions.add(new ExpandableConfigGroup(MOD_INFO, "light_level", lightOptions));
+        ConfigUtils.sortConfigsByDisplayName(genericOptions);
+
+        return ImmutableList.copyOf(genericOptions);
     }
 
     private static ImmutableList<ConfigInfo> getRendererOptions()
