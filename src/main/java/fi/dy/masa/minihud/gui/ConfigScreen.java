@@ -5,13 +5,19 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.gui.GuiScreen;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
+import fi.dy.masa.malilib.config.option.GenericButtonConfig;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.BaseScreenTab;
 import fi.dy.masa.malilib.gui.ScreenTab;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigTab;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.config.ExpandableConfigGroup;
+import fi.dy.masa.malilib.gui.config.StringListRendererWidgetEditScreen;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
 import fi.dy.masa.malilib.util.ListUtils;
 import fi.dy.masa.malilib.util.data.ModInfo;
 import fi.dy.masa.minihud.Reference;
@@ -19,6 +25,7 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.config.StructureToggle;
+import fi.dy.masa.minihud.event.RenderHandler;
 
 public class ConfigScreen
 {
@@ -67,6 +74,7 @@ public class ConfigScreen
         ListUtils.extractEntriesToSecondList(genericOptions, lightOptions, (c) -> c.getName().startsWith("lightLevel"), true);
         ListUtils.extractEntriesToSecondList(colorOptions,   lightOptions, (c) -> c.getName().startsWith("lightLevel"), false);
 
+        genericOptions.add(new GenericButtonConfig("minihud.config.name.info_lines_hud_settings", "minihud.gui.button.open_info_lines_hud_settings", ConfigScreen::openHudSettingScreen, "minihud.config.comment.info_lines_hud_settings"));
         genericOptions.add(new ExpandableConfigGroup(MOD_INFO, "light_level", lightOptions));
         ConfigUtils.sortConfigsByDisplayName(genericOptions);
 
@@ -92,5 +100,17 @@ public class ConfigScreen
         builder.addAll(StructureToggle.VALUES);
 
         return builder.build();
+    }
+
+    private static void openHudSettingScreen(BaseButton button, int mouseButton)
+    {
+        StringListRendererWidget widget = RenderHandler.INSTANCE.getStringListRenderer();
+
+        if (widget != null)
+        {
+            StringListRendererWidgetEditScreen screen = new StringListRendererWidgetEditScreen(widget);
+            screen.setParent(GuiUtils.getCurrentScreen());
+            BaseScreen.openScreen(screen);
+        }
     }
 }

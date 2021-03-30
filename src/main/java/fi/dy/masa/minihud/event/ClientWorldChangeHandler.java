@@ -81,6 +81,8 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
 
             DataStorage.getInstance().onWorldLoad(worldAfter);
         }
+
+        RenderHandler.INSTANCE.setReady(worldAfter != null);
     }
 
     private void writeDataPerDimension()

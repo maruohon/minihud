@@ -49,11 +49,14 @@ public enum StructureToggle implements ConfigInfo
         String colorMainKey = "minihud.structure_toggle.color.main." + nameLower;
         String colorComponentsKey = "minihud.structure_toggle.color.components." + nameLower;
 
-        this.toggleStatus.setNameTranslationKey(nameKey).setPrettyNameTranslationKey(nameKey);
+        this.toggleStatus.setNameTranslationKey(nameKey);
+        this.toggleStatus.setPrettyNameTranslationKey(nameKey);
         this.toggleStatus.setCommentTranslationKey("minihud.structure_toggle.comment." + nameLower);
 
-        this.colorMain.setNameTranslationKey(colorMainKey).setPrettyNameTranslationKey(colorMainKey);
-        this.colorComponents.setNameTranslationKey(colorComponentsKey).setPrettyNameTranslationKey(colorComponentsKey);
+        this.colorMain.setNameTranslationKey(colorMainKey);
+        this.colorMain.setPrettyNameTranslationKey(colorMainKey);
+        this.colorComponents.setNameTranslationKey(colorComponentsKey);
+        this.colorComponents.setPrettyNameTranslationKey(colorComponentsKey);
 
         this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.toggleStatus));
         this.toggleStatus.setValueChangeCallback((newValue, oldValue) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());

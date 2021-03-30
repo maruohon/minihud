@@ -75,7 +75,8 @@ public enum RendererToggle implements ConfigInfo
 
         String nameLower = name.toLowerCase(Locale.ROOT);
         String nameKey = "minihud.renderer_toggle.name." + nameLower;
-        this.toggleStatus.setNameTranslationKey(nameKey).setPrettyNameTranslationKey(nameKey);
+        this.toggleStatus.setNameTranslationKey(nameKey);
+        this.toggleStatus.setPrettyNameTranslationKey(nameKey);
         this.toggleStatus.setCommentTranslationKey("minihud.renderer_toggle.comment." + nameLower);
     }
 

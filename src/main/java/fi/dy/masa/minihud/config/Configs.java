@@ -37,9 +37,6 @@ public class Configs
         public static final BooleanConfig DEBUG_RENDERER_PATH_MAX_DIST          = new BooleanConfig("debugRendererPathFindingEnablePointWidth", true);
         public static final BooleanConfig DONT_RESET_SEED_ON_DIMENSION_CHANGE   = new BooleanConfig("dontResetSeedOnDimensionChange", false);
         public static final BooleanConfig FIX_VANILLA_DEBUG_RENDERERS           = new BooleanConfig("enableVanillaDebugRendererFix", true);
-        public static final DoubleConfig HUD_FONT_SCALE                         = new DoubleConfig("hudFontScale", 0.5, 0.0, 100.0);
-        public static final IntegerConfig HUD_TEXT_POS_X                        = new IntegerConfig("hudTextPosX", 4, -4096, 4096);
-        public static final IntegerConfig HUD_TEXT_POS_Y                        = new IntegerConfig("hudTextPosY", 4, -4096, 4096);
         public static final BooleanConfig ITEM_NBT_ENABLED                      = new BooleanConfig("itemNbtEnabled", false);
         public static final HotkeyConfig ITEM_NBT_KEY_PRETTY                    = new HotkeyConfig("itemNbtKeyPretty", "", KeyBindSettings.GUI_MODIFIER);
         public static final HotkeyConfig ITEM_NBT_KEY_STRING                    = new HotkeyConfig("itemNbtKeyString", "", KeyBindSettings.GUI_MODIFIER);
@@ -75,13 +72,10 @@ public class Configs
         public static final BooleanConfig STRUCTURES_RENDER_THROUGH             = new BooleanConfig("structuresRenderThrough", false);
         public static final IntegerConfig TIME_DAY_DIVISOR                      = new IntegerConfig("timeDayDivisor", 24000, 1, Integer.MAX_VALUE);
         public static final IntegerConfig TIME_TOTAL_DIVISOR                    = new IntegerConfig("timeTotalDivisor", 24000, 1, Integer.MAX_VALUE);
-        public static final BooleanConfig USE_FONT_SHADOW                       = new BooleanConfig("useFontShadow", false);
-        public static final BooleanConfig USE_TEXT_BACKGROUND                   = new BooleanConfig("useTextBackground", true);
         public static final BooleanConfig WOOL_COUNTER_ENABLE_ALL               = new BooleanConfig("woolCounterEnableAll", true);
         public static final StringConfig WOOL_COUNTER_TYPES                     = new StringConfig("woolCounterTypes", "0-15");
 
         public static final OptionListConfig<BlockGridMode> BLOCK_GRID_OVERLAY_MODE         = new OptionListConfig<>("blockGridOverlayMode", BlockGridMode.ALL, BlockGridMode.VALUES);
-        public static final OptionListConfig<ScreenLocation> HUD_ALIGNMENT                  = new OptionListConfig<>("infoLinesHudAlignment", ScreenLocation.TOP_LEFT, ScreenLocation.VALUES);
         public static final OptionListConfig<LightLevelMarkerMode> LIGHT_LEVEL_MARKER_MODE  = new OptionListConfig<>("lightLevelMarkers", LightLevelMarkerMode.SQUARE, LightLevelMarkerMode.VALUES);
         public static final OptionListConfig<LightLevelNumberMode> LIGHT_LEVEL_NUMBER_MODE  = new OptionListConfig<>("lightLevelNumbers", LightLevelNumberMode.BLOCK, LightLevelNumberMode.VALUES);
         public static final OptionListConfig<PrintMode> SPAWNER_POSITION_PRINT              = new OptionListConfig<>("spawnerPositionPrint", PrintMode.SUCCESS, PrintMode.VALUES);
@@ -101,10 +95,6 @@ public class Configs
                 DONT_RESET_SEED_ON_DIMENSION_CHANGE,
                 DROPPED_CHUNKS_HASH_SIZE,
                 FIX_VANILLA_DEBUG_RENDERERS,
-                HUD_ALIGNMENT,
-                HUD_FONT_SCALE,
-                HUD_TEXT_POS_X,
-                HUD_TEXT_POS_Y,
                 ITEM_NBT_ENABLED,
                 ITEM_NBT_KEY_PRETTY,
                 ITEM_NBT_KEY_STRING,
@@ -142,8 +132,6 @@ public class Configs
                 STRUCTURES_RENDER_THROUGH,
                 TIME_DAY_DIVISOR,
                 TIME_TOTAL_DIVISOR,
-                USE_FONT_SHADOW,
-                USE_TEXT_BACKGROUND,
                 WOOL_COUNTER_ENABLE_ALL,
                 WOOL_COUNTER_TYPES
         );
@@ -166,8 +154,6 @@ public class Configs
         public static final ColorConfig BEACON_RANGE_LVL3_OVERLAY_COLOR     = new ColorConfig("beaconRangeLvl3", "0x20FFF040");
         public static final ColorConfig BEACON_RANGE_LVL4_OVERLAY_COLOR     = new ColorConfig("beaconRangeLvl4", "0x2060FF40");
         public static final ColorConfig BLOCK_GRID_OVERLAY_COLOR            = new ColorConfig("blockGrid", "0x80FFFFFF");
-        public static final ColorConfig HUD_TEXT_BACKGROUND                 = new ColorConfig("hudTextBackground", "0xA0505050");
-        public static final ColorConfig HUD_TEXT                            = new ColorConfig("hudText", "0xFFE0E0E0");
         public static final ColorConfig LIGHT_LEVEL_MARKER_DARK             = new ColorConfig("lightLevelMarkerDark", "0xFFFF4848");
         public static final ColorConfig LIGHT_LEVEL_MARKER_LIT              = new ColorConfig("lightLevelMarkerLit", "0xFFFFFF33");
         public static final ColorConfig LIGHT_LEVEL_NUMBER_BLOCK_DARK       = new ColorConfig("lightLevelNumberBlockDark", "0xFFC03030");
@@ -198,8 +184,6 @@ public class Configs
                 BEACON_RANGE_LVL3_OVERLAY_COLOR,
                 BEACON_RANGE_LVL4_OVERLAY_COLOR,
                 BLOCK_GRID_OVERLAY_COLOR,
-                HUD_TEXT,
-                HUD_TEXT_BACKGROUND,
                 LIGHT_LEVEL_MARKER_DARK,
                 LIGHT_LEVEL_MARKER_LIT,
                 LIGHT_LEVEL_NUMBER_BLOCK_DARK,
@@ -226,12 +210,24 @@ public class Configs
         );
     }
 
+    public static class Internal
+    {
+        public static final OptionListConfig<ScreenLocation> HUD_LOCATION   = new OptionListConfig<>("infoLinesHudLocation", ScreenLocation.TOP_LEFT, ScreenLocation.VALUES);
+        public static final StringConfig HUD_MARKER                         = new StringConfig("hudMarker", "");
+
+        public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
+                HUD_LOCATION,
+                HUD_MARKER
+        );
+    }
+
     public static final List<ConfigOptionCategory> CATEGORIES = ImmutableList.of(
             BaseConfigOptionCategory.normal("Generic",          Configs.Generic.OPTIONS),
             BaseConfigOptionCategory.normal("Colors",           Configs.Colors.OPTIONS),
             BaseConfigOptionCategory.normal("InfoTypeToggles",  InfoLine.TOGGLE_CONFIGS),
             BaseConfigOptionCategory.normal("InfoLineOrders",   InfoLine.LINE_ORDER_CONFIGS),
             BaseConfigOptionCategory.normal("InfoHotkeys",      InfoLine.TOGGLE_HOTKEYS),
+            BaseConfigOptionCategory.normal("Internal",         Internal.OPTIONS),
             BaseConfigOptionCategory.normal("RendererToggles",  RendererToggle.TOGGLE_CONFIGS),
             BaseConfigOptionCategory.normal("RendererHotkeys",  RendererToggle.TOGGLE_HOTKEYS),
             BaseConfigOptionCategory.normal("StructureToggles", StructureToggle.TOGGLE_CONFIGS),

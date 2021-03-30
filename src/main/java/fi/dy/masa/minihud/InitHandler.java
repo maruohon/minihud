@@ -44,7 +44,7 @@ public class InitHandler implements InitializationHandler
         HotkeyManager.INSTANCE.registerHotkeyProvider(InputHandler.getInstance());
         InputDispatcher.INSTANCE.registerMouseInputHandler(InputHandler.getInstance());
 
-        RenderHandler renderer = RenderHandler.getInstance();
+        RenderHandler renderer = RenderHandler.INSTANCE;
         RenderEventDispatcher.INSTANCE.registerGameOverlayRenderer(renderer);
         RenderEventDispatcher.INSTANCE.registerTooltipPostRenderer(renderer);
         RenderEventDispatcher.INSTANCE.registerWorldPostRenderer(renderer);

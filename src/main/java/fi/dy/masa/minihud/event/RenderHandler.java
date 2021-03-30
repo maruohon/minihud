@@ -7,7 +7,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -37,11 +39,11 @@ import fi.dy.masa.malilib.event.PostGameOverlayRenderer;
 import fi.dy.masa.malilib.event.PostItemTooltipRenderer;
 import fi.dy.masa.malilib.event.PostWorldRenderer;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.position.EdgeInt;
 import fi.dy.masa.malilib.gui.position.ScreenLocation;
+import fi.dy.masa.malilib.overlay.InfoArea;
 import fi.dy.masa.malilib.overlay.InfoOverlay;
+import fi.dy.masa.malilib.overlay.InfoWidgetManager;
 import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
-import fi.dy.masa.malilib.render.text.TextRenderSettings;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
@@ -59,50 +61,79 @@ import fi.dy.masa.minihud.util.MiscUtils;
 
 public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRenderer, PostWorldRenderer
 {
-    private static final RenderHandler INSTANCE = new RenderHandler();
+    public static final RenderHandler INSTANCE = new RenderHandler();
     private final Supplier<String> profilerSectionSupplier = () -> "MiniHUD_RenderHandler";
     private final Set<InfoLine> addedTypes = new HashSet<>();
-    private final Date date;
+    private final Date date = new Date();
     private StringListRendererWidget stringListRenderer;
-    private ScreenLocation hudLocation;
     private int fps;
     private int fpsCounter;
     private long fpsUpdateTime = Minecraft.getSystemTime();
     private long infoUpdateTime;
+    private boolean enabled;
+    private boolean ready;
 
     private final List<StringHolder> lineWrappers = new ArrayList<>();
     private final List<String> lines = new ArrayList<>();
 
-    public RenderHandler()
+    private RenderHandler()
     {
-        this.date = new Date();
     }
 
-    public static RenderHandler getInstance()
+    @Nullable
+    public StringListRendererWidget getStringListRenderer()
     {
-        return INSTANCE;
-    }
-
-    private StringListRendererWidget getLineRenderer()
-    {
-        ScreenLocation location = Configs.Generic.HUD_ALIGNMENT.getValue();
-
-        if (this.stringListRenderer == null || this.hudLocation != location)
+        // The ready flag will be set from the world load event handler.
+        // That event is fired after malilib has loaded the InfoWidgetManager contents from the save file
+        // (see: ClientWorldChangeEventDispatcherImpl#onWorldLoadPost()).
+        // Thus we will not try to create a new StringListRendererWidget before malilib has had the
+        // chance to load the existing ones from file.
+        if (this.stringListRenderer == null && this.ready)
         {
-            if (this.stringListRenderer != null)
-            {
-                this.stringListRenderer.removeStringListProvider(Reference.MOD_ID);
-            }
-
-            this.stringListRenderer = InfoOverlay.getTextHud(location);
-            this.stringListRenderer.setStringListProvider(Reference.MOD_ID, () -> this.lines, 99);
-            this.hudLocation = location;
-            this.updateHudSettings();
+            this.stringListRenderer = this.createStringListRenderer();
         }
 
         return this.stringListRenderer;
     }
 
+    private StringListRendererWidget createStringListRenderer()
+    {
+        ScreenLocation location = Configs.Internal.HUD_LOCATION.getValue();
+        String markerStr = Configs.Internal.HUD_MARKER.getStringValue();
+        StringListRendererWidget widget = null;
+
+        if (markerStr.isEmpty() == false)
+        {
+            try
+            {
+                UUID marker = UUID.fromString(markerStr);
+                InfoArea area = InfoOverlay.INSTANCE.getOrCreateInfoArea(location);
+                widget = area.findWidget(StringListRendererWidget.class, (w) -> w.hasMarker(marker));
+            }
+            catch (IllegalArgumentException ignore) {}
+        }
+
+        if (widget == null)
+        {
+            UUID marker = UUID.randomUUID();
+            widget = new StringListRendererWidget();
+            widget.addMarker(marker);
+            Configs.Internal.HUD_MARKER.setValue(marker.toString());
+            InfoWidgetManager.INSTANCE.addWidget(widget);
+        }
+
+        widget.addLocationChangeListener(Configs.Internal.HUD_LOCATION::setValue);
+        widget.setStringListProvider(Reference.MOD_ID, this::getInfoLines, 99);
+
+        return widget;
+    }
+
+    private List<String> getInfoLines()
+    {
+        return this.enabled ? this.lines : Collections.emptyList();
+    }
+
+    /*
     public void updateHudSettings()
     {
         if (this.stringListRenderer != null)
@@ -120,6 +151,17 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             this.stringListRenderer.setTextSettings(settings);
             this.stringListRenderer.setPadding(offset);
             this.stringListRenderer.setScale(Configs.Generic.HUD_FONT_SCALE.getDoubleValue());
+        }
+    }
+    */
+
+    public void setReady(boolean ready)
+    {
+        this.ready = ready;
+
+        if (ready == false)
+        {
+            this.stringListRenderer = null;
         }
     }
 
@@ -142,18 +184,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     @Override
     public void onPostGameOverlayRender(Minecraft mc, float partialTicks)
     {
-        if (Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue() == false &&
-            this.stringListRenderer != null)
-        {
-            this.stringListRenderer.removeStringListProvider(Reference.MOD_ID);
-            this.stringListRenderer = null;
-        }
-
-        if (Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
-            mc.gameSettings.showDebugInfo == false &&
-            mc.player != null && mc.gameSettings.hideGUI == false &&
-            (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
-            Configs.Generic.REQUIRED_KEY.getKeyBind().isKeyBindHeld())
+        if (this.enabled)
         {
             if (InfoLine.FPS.getBooleanValue())
             {
@@ -168,18 +199,6 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 this.updateLines();
                 this.infoUpdateTime = currentTime;
             }
-
-            /*
-            int x = Configs.Generic.HUD_TEXT_POS_X.getIntegerValue();
-            int y = Configs.Generic.HUD_TEXT_POS_Y.getIntegerValue();
-            int textColor = Configs.Colors.HUD_TEXT.getIntegerValue();
-            int bgColor = Configs.Colors.HUD_TEXT_BACKGROUND.getIntegerValue();
-            HudAlignment alignment = Configs.Generic.HUD_ALIGNMENT.getValue();
-            boolean useBackground = Configs.Generic.USE_TEXT_BACKGROUND.getBooleanValue();
-            boolean useShadow = Configs.Generic.USE_FONT_SHADOW.getBooleanValue();
-
-            RenderUtils.renderText(x, y, 0, Configs.Generic.HUD_FONT_SCALE.getDoubleValue(), textColor, bgColor, alignment, useBackground, useShadow, this.lines);
-            */
         }
     }
 
@@ -216,11 +235,10 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
     public int getSubtitleOffset()
     {
-        ScreenLocation location = Configs.Generic.HUD_ALIGNMENT.getValue();
-
-        if (location == ScreenLocation.BOTTOM_RIGHT)
+        if (this.stringListRenderer != null && this.stringListRenderer.getScreenLocation() == ScreenLocation.BOTTOM_RIGHT)
         {
-            int offset = (int) (this.lineWrappers.size() * (StringUtils.getFontHeight() + 2) * Configs.Generic.HUD_FONT_SCALE.getDoubleValue());
+            double scale = this.stringListRenderer.getTextScale();
+            int offset = (int) (this.lineWrappers.size() * (StringUtils.getFontHeight() + 2) * scale);
 
             return -(offset - 16);
         }
@@ -230,18 +248,34 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
     private void updateFps()
     {
-        this.fpsCounter++;
+        ++this.fpsCounter;
 
-        if (Minecraft.getSystemTime() >= (this.fpsUpdateTime + 1000L))
+        long currentTime = Minecraft.getSystemTime();
+
+        if (currentTime >= (this.fpsUpdateTime + 1000L))
         {
-            this.fpsUpdateTime = Minecraft.getSystemTime();
+            this.fpsUpdateTime = currentTime;
             this.fps = this.fpsCounter;
             this.fpsCounter = 0;
         }
     }
 
-    public void updateData(Minecraft mc)
+    public void onClientTick(Minecraft mc)
     {
+        boolean wasEnabled = this.enabled;
+
+        this.enabled = Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
+                       mc.gameSettings.showDebugInfo == false &&
+                       mc.player != null && mc.world != null && mc.gameSettings.hideGUI == false &&
+                       (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
+                        Configs.Generic.REQUIRED_KEY.getKeyBind().isKeyBindHeld();
+
+        // Update the string list renderer to remove MiniHUD's info lines when the HUD is disabled
+        if (wasEnabled && this.enabled == false && this.stringListRenderer != null)
+        {
+            this.stringListRenderer.markDirty();
+        }
+
         if (mc.world != null)
         {
             long worldTick = mc.world.getTotalWorldTime();
@@ -269,6 +303,13 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
     private void updateLines()
     {
+        StringListRendererWidget widget = this.getStringListRenderer();
+
+        if (widget == null)
+        {
+            return;
+        }
+
         this.lineWrappers.clear();
         this.addedTypes.clear();
 
@@ -314,7 +355,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             this.lines.add(holder.str);
         }
 
-        this.getLineRenderer().markDirty();
+        widget.markDirty();
     }
 
     private void addLine(String text)

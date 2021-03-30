@@ -85,7 +85,8 @@ public enum InfoLine implements ConfigInfo
 
         String nameLower = name.toLowerCase(Locale.ROOT);
         String nameKey = "minihud.info_line.name." + nameLower;
-        this.toggleStatus.setNameTranslationKey(nameKey).setPrettyNameTranslationKey(nameKey);
+        this.toggleStatus.setNameTranslationKey(nameKey);
+        this.toggleStatus.setPrettyNameTranslationKey(nameKey);
         this.toggleStatus.setCommentTranslationKey("minihud.info_line.comment." + nameLower);
     }
 
