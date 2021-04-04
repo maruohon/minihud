@@ -165,11 +165,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                         }
                     }
 
-                    InventoryUtils.checkForItemPickup(mc);
+                    InventoryUtils.checkForItemPickup(gui);
 
                     if (keyState && (isAttack || isUse))
                     {
-                        InventoryUtils.storeSourceSlotCandidate(slot, mc);
+                        InventoryUtils.storeSourceSlotCandidate(slot, gui);
                     }
 
                     if (Configs.Toggles.RIGHT_CLICK_CRAFT_STACK.getBooleanValue() &&

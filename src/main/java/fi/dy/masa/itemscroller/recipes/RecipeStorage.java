@@ -5,9 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import javax.annotation.Nonnull;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.screen.slot.Slot;
 import fi.dy.masa.itemscroller.ItemScroller;
 import fi.dy.masa.itemscroller.Reference;
@@ -120,7 +120,7 @@ public class RecipeStorage
         this.dirty = true;
     }
 
-    private void readFromNBT(CompoundTag nbt)
+    private void readFromNBT(NbtCompound nbt)
     {
         if (nbt == null || nbt.contains("Recipes", Constants.NBT.TAG_LIST) == false)
         {
@@ -132,12 +132,12 @@ public class RecipeStorage
             this.recipes[i].clearRecipe();
         }
 
-        ListTag tagList = nbt.getList("Recipes", Constants.NBT.TAG_COMPOUND);
+        NbtList tagList = nbt.getList("Recipes", Constants.NBT.TAG_COMPOUND);
         int count = tagList.size();
 
         for (int i = 0; i < count; i++)
         {
-            CompoundTag tag = tagList.getCompound(i);
+            NbtCompound tag = tagList.getCompound(i);
 
             int index = tag.getByte("RecipeIndex");
 
@@ -150,15 +150,15 @@ public class RecipeStorage
         this.changeSelectedRecipe(nbt.getByte("Selected"));
     }
 
-    private CompoundTag writeToNBT(@Nonnull CompoundTag nbt)
+    private NbtCompound writeToNBT(@Nonnull NbtCompound nbt)
     {
-        ListTag tagRecipes = new ListTag();
+        NbtList tagRecipes = new NbtList();
 
         for (int i = 0; i < this.recipes.length; i++)
         {
             if (this.recipes[i].isValid())
             {
-                CompoundTag tag = new CompoundTag();
+                NbtCompound tag = new NbtCompound();
                 tag.putByte("RecipeIndex", (byte) i);
                 this.recipes[i].writeToNBT(tag);
                 tagRecipes.add(tag);
@@ -224,11 +224,6 @@ public class RecipeStorage
             {
                 File saveDir = this.getSaveDir();
 
-                if (saveDir == null)
-                {
-                    return;
-                }
-
                 if (saveDir.exists() == false)
                 {
                     if (saveDir.mkdirs() == false)
@@ -241,7 +236,7 @@ public class RecipeStorage
                 File fileTmp  = new File(saveDir, this.getFileName() + ".tmp");
                 File fileReal = new File(saveDir, this.getFileName());
                 FileOutputStream os = new FileOutputStream(fileTmp);
-                NbtIo.writeCompressed(this.writeToNBT(new CompoundTag()), os);
+                NbtIo.writeCompressed(this.writeToNBT(new NbtCompound()), os);
                 os.close();
 
                 if (fileReal.exists())

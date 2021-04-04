@@ -1,17 +1,12 @@
 package fi.dy.masa.itemscroller.event;
 
-import java.nio.FloatBuffer;
-import org.lwjgl.opengl.GL11;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.util.GlAllocationUtils;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.recipes.RecipePattern;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
@@ -26,9 +21,6 @@ import fi.dy.masa.malilib.util.StringUtils;
 public class RenderEventHandler
 {
     private static final RenderEventHandler INSTANCE = new RenderEventHandler();
-    private static final Vec3d LIGHT0_POS = (new Vec3d( 0.2D, 1.0D, -0.7D)).normalize();
-    private static final Vec3d LIGHT1_POS = (new Vec3d(-0.2D, 1.0D,  0.7D)).normalize();
-    private static final FloatBuffer FLOAT_BUFFER = GlAllocationUtils.allocateFloatBuffer(4);
     private static final MatrixStack FRESH_MATRIX_STACK = new MatrixStack();
 
     private final MinecraftClient mc = MinecraftClient.getInstance();
@@ -59,9 +51,11 @@ public class RenderEventHandler
 
             this.calculateRecipePositions(gui);
 
-            RenderSystem.pushMatrix();
-            RenderSystem.translatef(this.recipeListX, this.recipeListY, 0);
-            RenderSystem.scaled(this.scale, this.scale, 1);
+            matrixStack = RenderSystem.getModelViewStack();
+            matrixStack.push();
+            matrixStack.translate(this.recipeListX, this.recipeListY, 0);
+            matrixStack.scale((float) this.scale, (float) this.scale, 1);
+            RenderSystem.applyModelViewMatrix();
 
             String str = StringUtils.translate("itemscroller.gui.label.recipe_page", (first / countPerPage) + 1, recipes.getTotalRecipeCount() / countPerPage);
             this.mc.textRenderer.draw(matrixStack, str, 16, -12, 0xC0C0C0C0);
@@ -86,7 +80,8 @@ public class RenderEventHandler
                 this.renderRecipeItems(recipe, recipes.getRecipeCountPerPage(), gui);
             }
 
-            RenderSystem.popMatrix();
+            matrixStack.pop();
+            RenderSystem.applyModelViewMatrix();
             RenderSystem.enableBlend(); // Fixes the crafting book icon rendering
         }
     }
@@ -103,8 +98,9 @@ public class RenderEventHandler
             final int recipeId = this.getHoveredRecipeId(mouseX, mouseY, recipes, gui);
 
             float offset = 300f;
-            RenderSystem.pushMatrix();
-            RenderSystem.translatef(0f, 0f, offset);
+            MatrixStack matrixStack = RenderSystem.getModelViewStack();
+            matrixStack.push();
+            matrixStack.translate(0, 0, offset);
 
             if (recipeId >= 0)
             {
@@ -122,7 +118,8 @@ public class RenderEventHandler
                 }
             }
 
-            RenderSystem.popMatrix();
+            matrixStack.pop();
+            RenderSystem.applyModelViewMatrix();
         }
     }
 
@@ -206,17 +203,18 @@ public class RenderEventHandler
         int y = row * this.entryHeight;
         this.renderStackAt(stack, x, y, selected);
 
-        double scale = 0.75;
+        float scale = 0.75F;
         x = x - (int) (font.getWidth(indexStr) * scale) - 2;
         y = row * this.entryHeight + this.entryHeight / 2 - font.fontHeight / 2;
 
-        RenderSystem.pushMatrix();
-        RenderSystem.translatef(x, y, 0);
-        RenderSystem.scaled(scale, scale, 0);
+        matrixStack = FRESH_MATRIX_STACK;
+        matrixStack.push();
+        matrixStack.translate(x, y, 0);
+        matrixStack.scale(scale, scale, 1);
 
-        font.draw(matrixStack, indexStr, 0, 0, 0xC0C0C0);
+        font.draw(matrixStack, indexStr, 0, 0, 0xFFC0C0C0);
 
-        RenderSystem.popMatrix();
+        matrixStack.pop();
     }
 
     private void renderRecipeItems(RecipePattern recipe, int recipeCountPerPage, HandledScreen<?> gui)
@@ -272,25 +270,15 @@ public class RenderEventHandler
 
     private void renderStackAt(ItemStack stack, int x, int y, boolean border)
     {
-        RenderSystem.pushMatrix();
-
         final int w = 16;
 
         if (border)
         {
             // Draw a light/white border around the stack
-            RenderUtils.drawRect(x - 1, y - 1, w + 1, 1    , 0xFFFFFFFF);
-            RenderUtils.drawRect(x - 1, y    , 1    , w + 1, 0xFFFFFFFF);
-            RenderUtils.drawRect(x + w, y - 1, 1    , w + 1, 0xFFFFFFFF);
-            RenderUtils.drawRect(x    , y + w, w + 1, 1    , 0xFFFFFFFF);
-
-            RenderUtils.drawRect(x, y, w, w, 0x20FFFFFF); // light background for the item
-
+            RenderUtils.drawOutline(x - 1, y - 1, w + 2, w + 2, 0xFFFFFFFF);
         }
-        else
-        {
-            RenderUtils.drawRect(x, y, w, w, 0x20FFFFFF); // light background for the item
-        }
+
+        RenderUtils.drawRect(x, y, w, w, 0x20FFFFFF); // light background for the item
 
         if (InventoryUtils.isStackEmpty(stack) == false)
         {
@@ -302,10 +290,9 @@ public class RenderEventHandler
             this.mc.getItemRenderer().renderInGui(stack, x, y);
             this.mc.getItemRenderer().zOffset -= 100;
         }
-
-        RenderSystem.popMatrix();
     }
 
+    /*
     public static void enableGUIStandardItemLighting(float scale)
     {
         RenderSystem.pushMatrix();
@@ -351,4 +338,5 @@ public class RenderEventHandler
 
         return FLOAT_BUFFER;
     }
+    */
 }

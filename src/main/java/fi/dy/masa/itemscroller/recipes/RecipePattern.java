@@ -1,10 +1,11 @@
 package fi.dy.masa.itemscroller.recipes;
 
+import java.util.Arrays;
 import javax.annotation.Nonnull;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
@@ -31,11 +32,7 @@ public class RecipePattern
 
     public void clearRecipe()
     {
-        for (int i = 0; i < this.recipe.length; i++)
-        {
-            this.recipe[i] = InventoryUtils.EMPTY_STACK;
-        }
-
+        Arrays.fill(this.recipe, InventoryUtils.EMPTY_STACK);
         this.result = InventoryUtils.EMPTY_STACK;
     }
 
@@ -88,11 +85,11 @@ public class RecipePattern
         this.result = InventoryUtils.isStackEmpty(other.getResult()) == false ? other.getResult().copy() : InventoryUtils.EMPTY_STACK;
     }
 
-    public void readFromNBT(@Nonnull CompoundTag nbt)
+    public void readFromNBT(@Nonnull NbtCompound nbt)
     {
         if (nbt.contains("Result", Constants.NBT.TAG_COMPOUND) && nbt.contains("Ingredients", Constants.NBT.TAG_LIST))
         {
-            ListTag tagIngredients = nbt.getList("Ingredients", Constants.NBT.TAG_COMPOUND);
+            NbtList tagIngredients = nbt.getList("Ingredients", Constants.NBT.TAG_COMPOUND);
             int count = tagIngredients.size();
             int length = nbt.getInt("Length");
 
@@ -103,7 +100,7 @@ public class RecipePattern
 
             for (int i = 0; i < count; i++)
             {
-                CompoundTag tag = tagIngredients.getCompound(i);
+                NbtCompound tag = tagIngredients.getCompound(i);
                 int slot = tag.getInt("Slot");
 
                 if (slot >= 0 && slot < this.recipe.length)
@@ -117,23 +114,23 @@ public class RecipePattern
     }
 
     @Nonnull
-    public CompoundTag writeToNBT(@Nonnull CompoundTag nbt)
+    public NbtCompound writeToNBT(@Nonnull NbtCompound nbt)
     {
         if (this.isValid())
         {
-            CompoundTag tag = new CompoundTag();
+            NbtCompound tag = new NbtCompound();
             this.result.writeNbt(tag);
 
             nbt.putInt("Length", this.recipe.length);
             nbt.put("Result", tag);
 
-            ListTag tagIngredients = new ListTag();
+            NbtList tagIngredients = new NbtList();
 
             for (int i = 0; i < this.recipe.length; i++)
             {
                 if (InventoryUtils.isStackEmpty(this.recipe[i]) == false)
                 {
-                    tag = new CompoundTag();
+                    tag = new NbtCompound();
                     tag.putInt("Slot", i);
                     this.recipe[i].writeNbt(tag);
                     tagIngredients.add(tag);
