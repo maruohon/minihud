@@ -1,9 +1,14 @@
 .gradle
-.settings
+
 bin/
 build/
-eclipse/
+run/
 logs/
+
+eclipse/
 .classpath
-.project
 build.number
+.settings
+.project
+
+.vscode/
