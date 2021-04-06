@@ -8,7 +8,6 @@ import fi.dy.masa.malilib.gui.widget.LabelWidget;
 import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
-import fi.dy.masa.malilib.overlay.message.MessageType;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
@@ -78,7 +77,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
             }
             else
             {
-                MessageUtils.showGuiMessage(MessageType.ERROR, "minihud.message.error.shapes.select_shape_from_dropdown");
+                MessageUtils.error("minihud.message.error.shapes.select_shape_from_dropdown");
             }
         });
     }

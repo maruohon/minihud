@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
@@ -99,26 +98,15 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     private StringListRendererWidget createStringListRenderer()
     {
         ScreenLocation location = Configs.Internal.HUD_LOCATION.getValue();
-        String markerStr = Configs.Internal.HUD_MARKER.getStringValue();
-        StringListRendererWidget widget = null;
-
-        if (markerStr.isEmpty() == false)
-        {
-            try
-            {
-                UUID marker = UUID.fromString(markerStr);
-                InfoArea area = InfoOverlay.INSTANCE.getOrCreateInfoArea(location);
-                widget = area.findWidget(StringListRendererWidget.class, (w) -> w.hasMarker(marker));
-            }
-            catch (IllegalArgumentException ignore) {}
-        }
+        InfoArea area = InfoOverlay.INSTANCE.getOrCreateInfoArea(location);
+        String marker = Reference.MOD_ID;
+        StringListRendererWidget widget = area.findWidget(StringListRendererWidget.class, (w) -> w.hasMarker(marker));
 
         if (widget == null)
         {
-            UUID marker = UUID.randomUUID();
             widget = new StringListRendererWidget();
             widget.addMarker(marker);
-            Configs.Internal.HUD_MARKER.setValue(marker.toString());
+            widget.setSortIndex(90);
             InfoWidgetManager.INSTANCE.addWidget(widget);
         }
 
@@ -237,7 +225,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     {
         if (this.stringListRenderer != null && this.stringListRenderer.getScreenLocation() == ScreenLocation.BOTTOM_RIGHT)
         {
-            double scale = this.stringListRenderer.getTextScale();
+            double scale = this.stringListRenderer.getScale();
             int offset = (int) (this.lineWrappers.size() * (StringUtils.getFontHeight() + 2) * scale);
 
             return -(offset - 16);

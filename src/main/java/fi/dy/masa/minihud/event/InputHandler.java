@@ -88,7 +88,7 @@ public class InputHandler implements HotkeyProvider, MouseInputHandler
                 size = Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
                 String strValue = preGreen + size + rst;
 
-                MessageUtils.printActionbarMessage("minihud.message.dropped_chunks_hash_size_set_to", strValue);
+                MessageUtils.printCustomActionbarMessage("minihud.message.dropped_chunks_hash_size_set_to", strValue);
 
                 return true;
             }

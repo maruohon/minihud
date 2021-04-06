@@ -14,7 +14,7 @@ import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigTab;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.config.ExpandableConfigGroup;
-import fi.dy.masa.malilib.gui.config.StringListRendererWidgetEditScreen;
+import fi.dy.masa.malilib.gui.StringListRendererWidgetEditScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.button.BaseButton;
 import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;

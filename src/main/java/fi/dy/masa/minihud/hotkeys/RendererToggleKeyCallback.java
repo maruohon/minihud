@@ -69,7 +69,7 @@ public class RendererToggleKeyCallback extends ToggleBooleanWithMessageKeyCallba
                 String strPos = String.format("x: %d, y: %d, z: %d", spawn.getX(), spawn.getY(), spawn.getZ());
                 String message = StringUtils.translate("minihud.message.toggled_using_world_spawn", this.config.getPrettyName(), strStatus, strPos);
 
-                MessageUtils.printActionbarMessage(message);
+                MessageUtils.printCustomActionbarMessage(message);
             }
             else if (key == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getHotkeyConfig().getKeyBind())
             {
@@ -78,7 +78,7 @@ public class RendererToggleKeyCallback extends ToggleBooleanWithMessageKeyCallba
                 String strPos = String.format("x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
                 String message = StringUtils.translate("minihud.message.toggled_using_position", this.config.getPrettyName(), strStatus, strPos);
 
-                MessageUtils.printActionbarMessage(message);
+                MessageUtils.printCustomActionbarMessage(message);
             }
             else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.getHotkeyConfig().getKeyBind())
             {
@@ -92,7 +92,7 @@ public class RendererToggleKeyCallback extends ToggleBooleanWithMessageKeyCallba
                 String strPos = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                 String message = StringUtils.translate("minihud.message.toggled_using_position", this.config.getPrettyName(), strStatus, strPos);
 
-                MessageUtils.printActionbarMessage(message);
+                MessageUtils.printCustomActionbarMessage(message);
             }
 
             return true;

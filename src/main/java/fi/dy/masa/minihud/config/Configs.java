@@ -213,11 +213,9 @@ public class Configs
     public static class Internal
     {
         public static final OptionListConfig<ScreenLocation> HUD_LOCATION   = new OptionListConfig<>("infoLinesHudLocation", ScreenLocation.TOP_LEFT, ScreenLocation.VALUES);
-        public static final StringConfig HUD_MARKER                         = new StringConfig("hudMarker", "");
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
-                HUD_LOCATION,
-                HUD_MARKER
+                HUD_LOCATION
         );
     }
 
