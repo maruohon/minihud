@@ -1,14 +1,14 @@
+# Build related
 .gradle
-
 bin/
 build/
-run/
+build.number
 logs/
 
+# IDE related
 eclipse/
-.classpath
-build.number
 .settings
+.classpath
 .project
 
 .vscode/
