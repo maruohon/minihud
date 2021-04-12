@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.hotkeys;
 
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
+import fi.dy.masa.malilib.input.ActionResult;
 import fi.dy.masa.malilib.input.callback.AdjustableKeyCallback;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -25,16 +26,16 @@ public class KeyCallbacks
         Configs.Generic.OPEN_CONFIG_GUI.getKeyBind().setCallback((a, k) -> {
             BaseScreen screen = BaseConfigScreen.getCurrentTab(Reference.MOD_ID) == ConfigScreen.SHAPES ? new GuiShapeManager() : ConfigScreen.create(null);
             BaseScreen.openScreen(screen);
-            return true;
+            return ActionResult.SUCCESS;
         });
 
-        Configs.Generic.SET_DISTANCE_REFERENCE_POINT.getKeyBind().setCallback((a, k) -> DataStorage.getInstance().setDistanceReferencePoint());
+        Configs.Generic.SET_DISTANCE_REFERENCE_POINT.getKeyBind().setCallback((a, k) -> { DataStorage.getInstance().setDistanceReferencePoint(); return ActionResult.SUCCESS; });
 
         Configs.Generic.SHAPE_EDITOR.getKeyBind().setCallback((a, k) -> {
             ShapeBase shape = ShapeManager.INSTANCE.getSelectedShape();
             if (shape != null) { BaseScreen.openScreen(new GuiShapeEditor(shape)); }
             else { BaseScreen.openScreen(new GuiShapeManager()); }
-            return true;
+            return ActionResult.SUCCESS;
         });
 
         Configs.Generic.WOOL_COUNTER_TYPES.setValueChangeCallback((newValue, oldValue) -> DataStorage.getInstance().getWoolCounters().updateEnabledCounters(newValue));

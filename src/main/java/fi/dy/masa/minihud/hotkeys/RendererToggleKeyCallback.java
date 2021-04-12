@@ -6,6 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.input.ActionResult;
 import fi.dy.masa.malilib.input.KeyAction;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
@@ -29,15 +30,15 @@ public class RendererToggleKeyCallback extends ToggleBooleanWithMessageKeyCallba
     }
 
     @Override
-    public boolean onKeyAction(KeyAction action, KeyBind key)
+    public ActionResult onKeyAction(KeyAction action, KeyBind key)
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (mc != null && mc.player != null && super.onKeyAction(action, key))
+        if (mc != null && mc.player != null && super.onKeyAction(action, key) == ActionResult.SUCCESS)
         {
             if (this.config.getBooleanValue() == false)
             {
-                return true;
+                return ActionResult.SUCCESS;
             }
 
             Entity entity = mc.getRenderViewEntity() != null ? mc.getRenderViewEntity() : mc.player;
@@ -95,9 +96,9 @@ public class RendererToggleKeyCallback extends ToggleBooleanWithMessageKeyCallba
                 MessageUtils.printCustomActionbarMessage(message);
             }
 
-            return true;
+            return ActionResult.SUCCESS;
         }
 
-        return false;
+        return ActionResult.PASS;
     }
 }
