@@ -7,15 +7,12 @@ import net.minecraft.client.gui.GuiScreen;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.GenericButtonConfig;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
-import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.BaseScreenTab;
 import fi.dy.masa.malilib.gui.ScreenTab;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigTab;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.config.ExpandableConfigGroup;
-import fi.dy.masa.malilib.gui.StringListRendererWidgetEditScreen;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.button.BaseButton;
 import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
 import fi.dy.masa.malilib.util.ListUtils;
@@ -108,9 +105,7 @@ public class ConfigScreen
 
         if (widget != null)
         {
-            StringListRendererWidgetEditScreen screen = new StringListRendererWidgetEditScreen(widget);
-            screen.setParent(GuiUtils.getCurrentScreen());
-            BaseScreen.openScreen(screen);
+            widget.openEditScreen();
         }
     }
 }

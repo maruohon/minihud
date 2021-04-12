@@ -106,7 +106,14 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         {
             widget = new StringListRendererWidget();
             widget.addMarker(marker);
+            widget.setName(Reference.MOD_NAME);
             widget.setSortIndex(90);
+            widget.setScale(0.5);
+            widget.getTextSettings().setTextColor(0xFFFFFFFF);
+            widget.getTextSettings().setBackgroundColor(0x80505050);
+            widget.getTextSettings().setUseBackground(true);
+            widget.getMargin().setAll(1, 0, 0, 1);
+            widget.getPadding().setAll(2, 2, 0, 2);
             InfoWidgetManager.INSTANCE.addWidget(widget);
         }
 
