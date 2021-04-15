@@ -103,11 +103,6 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
         RenderUtils.color(1f, 1f, 1f, 1f);
         ShapeRenderUtils.renderRectangle(x, y, z, width, height, backgroundColor);
 
-        if (shapeSelected)
-        {
-            ShapeRenderUtils.renderOutline(x, y, z, width, height, 1, 0xFFE0E0E0);
-        }
-
         this.renderTextLine(x + 4, y + this.getCenteredTextOffsetY(), z, 0xFFFFFFFF, false, this.nameText);
 
         super.renderAt(x, y, z, mouseX, mouseY, isActiveGui, hovered);

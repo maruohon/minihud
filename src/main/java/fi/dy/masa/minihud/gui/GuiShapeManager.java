@@ -101,6 +101,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         listWidget.setEntryWidgetFactory(WidgetShapeEntry::new);
         listWidget.setFetchFromSupplierOnRefresh(true);
         listWidget.setAllowSelection(true);
+        listWidget.getEntrySelectionHandler().setLastSelectedEntry(ShapeManager.INSTANCE.getAllShapes().indexOf(ShapeManager.INSTANCE.getSelectedShape()));
         listWidget.getEntrySelectionHandler().setSelectionListener(this::onSelectionChange);
 
         return listWidget;
