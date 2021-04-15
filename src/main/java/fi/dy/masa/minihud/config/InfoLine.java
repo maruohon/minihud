@@ -4,7 +4,6 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.ValueChangeCallback;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
@@ -12,6 +11,7 @@ import fi.dy.masa.malilib.config.option.IntegerConfig;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyBindSettings;
 import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
+import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.malilib.util.data.ModInfo;
 import fi.dy.masa.minihud.Reference;
 
@@ -78,21 +78,27 @@ public enum InfoLine implements ConfigInfo
 
     InfoLine(String name, boolean defaultValue, int lineOrder, KeyBindSettings settings)
     {
+        String nameLower = name.toLowerCase(Locale.ROOT);
+        String nameKey = "minihud.info_line.name." + nameLower;
+        String commentKey = "minihud.info_line.comment." + nameLower;
+
         this.toggleStatus = new BooleanConfig(name, defaultValue);
         this.toggleHotkey = new HotkeyConfig(name, "", settings);
         this.lineOrder = new IntegerConfig(name, lineOrder);
-        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.toggleStatus));
 
-        String nameLower = name.toLowerCase(Locale.ROOT);
-        String nameKey = "minihud.info_line.name." + nameLower;
         this.toggleStatus.setNameTranslationKey(nameKey);
         this.toggleStatus.setPrettyNameTranslationKey(nameKey);
-        this.toggleStatus.setCommentTranslationKey("minihud.info_line.comment." + nameLower);
+        this.toggleStatus.setCommentTranslationKey(commentKey);
+
+        this.toggleHotkey.setNameTranslationKey(nameKey);
+        this.toggleHotkey.setPrettyNameTranslationKey(nameKey);
+        this.toggleHotkey.setCommentTranslationKey(commentKey);
+        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.toggleStatus));
     }
 
-    public void setValueChangeCallback(ValueChangeCallback<Boolean> callback)
+    public void addValueChangeListener(EventListener listener)
     {
-        this.toggleStatus.setValueChangeCallback(callback);
+        this.toggleStatus.addValueChangeListener(listener);
     }
 
     public boolean getBooleanValue()

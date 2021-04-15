@@ -21,8 +21,8 @@ import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.ClientWorldChangeHandler
 {
     private boolean hasCachedSeed;
-    private long cachedSeed;
     private boolean renderersRead;
+    private long cachedSeed;
 
     @Override
     public void onPreClientWorldChange(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter, Minecraft mc)
@@ -141,6 +141,7 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
             if (this.renderersRead == false && JsonUtils.hasObject(root, "renderers"))
             {
                 RenderContainer.INSTANCE.fromJson(JsonUtils.getNestedObject(root, "renderers", false));
+                this.renderersRead = true;
             }
         }
     }

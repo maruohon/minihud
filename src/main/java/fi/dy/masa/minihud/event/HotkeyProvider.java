@@ -1,0 +1,40 @@
+package fi.dy.masa.minihud.event;
+
+import java.util.List;
+import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.input.Hotkey;
+import fi.dy.masa.malilib.input.HotkeyCategory;
+import fi.dy.masa.minihud.Reference;
+import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.InfoLine;
+import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.config.StructureToggle;
+
+public class HotkeyProvider implements fi.dy.masa.malilib.input.HotkeyProvider
+{
+    public static final HotkeyProvider INSTANCE = new HotkeyProvider();
+
+    @Override
+    public List<? extends Hotkey> getAllHotkeys()
+    {
+        ImmutableList.Builder<Hotkey> builder = ImmutableList.builder();
+
+        builder.addAll(InfoLine.TOGGLE_HOTKEYS);
+        builder.addAll(RendererToggle.TOGGLE_HOTKEYS);
+        builder.addAll(StructureToggle.TOGGLE_HOTKEYS);
+        builder.addAll(Configs.Generic.HOTKEY_LIST);
+
+        return builder.build();
+    }
+
+    @Override
+    public List<HotkeyCategory> getHotkeysByCategories()
+    {
+        return ImmutableList.of(
+                new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST),
+                new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.info_toggle_hotkeys", InfoLine.TOGGLE_HOTKEYS),
+                new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.renderer_toggle_hotkeys", RendererToggle.TOGGLE_HOTKEYS),
+                new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.structure_toggle_hotkeys", StructureToggle.TOGGLE_HOTKEYS)
+        );
+    }
+}

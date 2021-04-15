@@ -7,11 +7,11 @@ import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
 
-public class KeyCallbackToggleDebugRenderer extends ToggleBooleanWithMessageKeyCallback
+public class DebugRendererHotkeyCallback extends ToggleBooleanWithMessageKeyCallback
 {
     protected final RendererToggle rendererConfig;
 
-    public KeyCallbackToggleDebugRenderer(RendererToggle config)
+    public DebugRendererHotkeyCallback(RendererToggle config)
     {
         super(config.getBooleanConfig());
 

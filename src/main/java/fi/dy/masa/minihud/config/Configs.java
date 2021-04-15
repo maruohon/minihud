@@ -23,6 +23,8 @@ import fi.dy.masa.minihud.util.PrintMode;
 
 public class Configs
 {
+    public static final int CONFIG_VERSION = 1;
+
     public static class Generic
     {
         public static final BooleanConfig BEACON_RANGE_AUTO_UPDATE              = new BooleanConfig("beaconRangeAutoUpdate", false);
@@ -50,7 +52,8 @@ public class Configs
         public static final IntegerConfig LIGHT_LEVEL_RANGE                     = new IntegerConfig("lightLevelRange", 24, 1, 64);
         public static final IntegerConfig LIGHT_LEVEL_THRESHOLD                 = new IntegerConfig("lightLevelThreshold", 8, 0, 15);
         public static final DoubleConfig LIGHT_LEVEL_Z_OFFSET                   = new DoubleConfig("lightLevelZOffset", 0.005, 0.0, 1.0);
-        public static final HotkeyedBooleanConfig MAIN_RENDERING_TOGGLE         = new HotkeyedBooleanConfig("mainRenderingToggle", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
+        public static final HotkeyedBooleanConfig INFO_LINES_RENDERING_TOGGLE   = new HotkeyedBooleanConfig("infoLinesRenderingToggle", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
+        public static final HotkeyedBooleanConfig OVERLAYS_RENDERING_TOGGLE     = new HotkeyedBooleanConfig("overlaysRenderingToggle", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
         public static final BooleanConfig MAP_PREVIEW                           = new BooleanConfig("mapPreview", false);
         public static final IntegerConfig MAP_PREVIEW_SIZE                      = new IntegerConfig("mapPreviewSize", 160, 16, 512);
         public static final StringConfig MC_TIME_FORMAT                         = new StringConfig("mcTimeFormat", "MC time: (day {DAY}) {HOUR}:{MIN}:xx");
@@ -59,7 +62,7 @@ public class Configs
         public static final BooleanConfig REQUIRE_SNEAK                         = new BooleanConfig("requireSneak", false);
         public static final HotkeyConfig REQUIRED_KEY                           = new HotkeyConfig("requiredKey", "", KeyBindSettings.INGAME_MODIFIER_EMPTY);
         public static final HotkeyConfig SET_DISTANCE_REFERENCE_POINT           = new HotkeyConfig("setDistanceReferencePoint", "");
-        public static final HotkeyConfig SHAPE_EDITOR                           = new HotkeyConfig("shapeEditor", "");
+        public static final HotkeyConfig OPEN_SHAPE_EDITOR                      = new HotkeyConfig("openShapeEditor", "");
         public static final BooleanConfig SHULKER_BOX_PREVIEW                   = new BooleanConfig("shulkerBoxPreview", false);
         public static final BooleanConfig SHULKER_DISPLAY_BACKGROUND_COLOR      = new BooleanConfig("shulkerDisplayBgColor", true);
         public static final BooleanConfig SHULKER_DISPLAY_REQUIRE_SHIFT         = new BooleanConfig("shulkerDisplayRequireShift", true);
@@ -110,7 +113,8 @@ public class Configs
                 LIGHT_LEVEL_RANGE,
                 LIGHT_LEVEL_THRESHOLD,
                 LIGHT_LEVEL_Z_OFFSET,
-                MAIN_RENDERING_TOGGLE,
+                INFO_LINES_RENDERING_TOGGLE,
+                OVERLAYS_RENDERING_TOGGLE,
                 MAP_PREVIEW,
                 MAP_PREVIEW_SIZE,
                 MC_TIME_FORMAT,
@@ -118,7 +122,7 @@ public class Configs
                 REQUIRE_SNEAK,
                 REQUIRED_KEY,
                 SET_DISTANCE_REFERENCE_POINT,
-                SHAPE_EDITOR,
+                OPEN_SHAPE_EDITOR,
                 SHULKER_BOX_PREVIEW,
                 SHULKER_DISPLAY_BACKGROUND_COLOR,
                 SHULKER_DISPLAY_REQUIRE_SHIFT,
@@ -139,11 +143,12 @@ public class Configs
         public static final List<Hotkey> HOTKEY_LIST = ImmutableList.of(
                 ITEM_NBT_KEY_PRETTY,
                 ITEM_NBT_KEY_STRING,
-                MAIN_RENDERING_TOGGLE,
+                INFO_LINES_RENDERING_TOGGLE,
+                OVERLAYS_RENDERING_TOGGLE,
                 REQUIRED_KEY,
                 OPEN_CONFIG_GUI,
                 SET_DISTANCE_REFERENCE_POINT,
-                SHAPE_EDITOR
+                OPEN_SHAPE_EDITOR
         );
     }
 
@@ -213,9 +218,13 @@ public class Configs
     public static class Internal
     {
         public static final OptionListConfig<ScreenLocation> HUD_LOCATION   = new OptionListConfig<>("infoLinesHudLocation", ScreenLocation.TOP_LEFT, ScreenLocation.VALUES);
+        public static final DoubleConfig CHUNK_UNLOAD_BUCKET_OVERLAY_Y      = new DoubleConfig("chunkUnloadBucketOverlayY", 80);
+        public static final DoubleConfig SLIME_CHUNKS_OVERLAY_TOP_Y         = new DoubleConfig("slimeChunksOverlayTopY", 80);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
-                HUD_LOCATION
+                CHUNK_UNLOAD_BUCKET_OVERLAY_Y,
+                HUD_LOCATION,
+                SLIME_CHUNKS_OVERLAY_TOP_Y
         );
     }
 

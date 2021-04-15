@@ -43,14 +43,14 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
 
         int x = 12;
         int y = 44;
-        int lw = StringUtils.getMaxStringRenderWidth(StringUtils.translate("minihud.gui.button.shapes.main_rendering"),
+        int lw = StringUtils.getMaxStringRenderWidth(StringUtils.translate("minihud.gui.button.shapes.overlay_rendering"),
                                                      StringUtils.translate("minihud.gui.button.shapes.shape_renderer")) + 8;
 
-        LabelWidget label = new LabelWidget(x, y + 5, lw, -1, 0xFFFFF040, "minihud.gui.button.shapes.main_rendering");
+        LabelWidget label = new LabelWidget(x, y + 5, lw, -1, 0xFFFFF040, "minihud.gui.button.shapes.overlay_rendering");
         this.addWidget(label);
 
         x += label.getWidth() + 4;
-        GenericButton button = new BooleanConfigButton(x, y, -1, 18, Configs.Generic.MAIN_RENDERING_TOGGLE);
+        GenericButton button = new BooleanConfigButton(x, y, -1, 18, Configs.Generic.OVERLAYS_RENDERING_TOGGLE);
         this.addWidget(button);
 
         this.widgetDropDown.setPosition(this.screenWidth - 10, y);

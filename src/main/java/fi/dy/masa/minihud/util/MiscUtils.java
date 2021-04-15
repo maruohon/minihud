@@ -39,12 +39,11 @@ public class MiscUtils
 
     public static double intAverage(int[] values)
     {
-        final int size = values.length;
         long sum = 0L;
 
-        for (int i = 0; i < size; ++i)
+        for (int value : values)
         {
-            sum += values[i];
+            sum += value;
         }
 
         return (double) sum / (double) values.length;
@@ -219,27 +218,17 @@ public class MiscUtils
 
     public static boolean isStructureWithinRange(IntBoundingBox bb, BlockPos playerPos, int maxRange)
     {
-        if (playerPos.getX() < (bb.minX - maxRange) ||
-            playerPos.getX() > (bb.maxX + maxRange) ||
-            playerPos.getZ() < (bb.minZ - maxRange) ||
-            playerPos.getZ() > (bb.maxZ + maxRange))
-        {
-            return false;
-        }
-
-        return true;
+        return playerPos.getX() >= (bb.minX - maxRange) &&
+               playerPos.getX() <= (bb.maxX + maxRange) &&
+               playerPos.getZ() >= (bb.minZ - maxRange) &&
+               playerPos.getZ() <= (bb.maxZ + maxRange);
     }
 
     public static boolean isStructureWithinRange(StructureBoundingBox bb, BlockPos playerPos, int maxRange)
     {
-        if (playerPos.getX() < (bb.minX - maxRange) ||
-            playerPos.getX() > (bb.maxX + maxRange) ||
-            playerPos.getZ() < (bb.minZ - maxRange) ||
-            playerPos.getZ() > (bb.maxZ + maxRange))
-        {
-            return false;
-        }
-
-        return true;
+        return playerPos.getX() >= (bb.minX - maxRange) &&
+               playerPos.getX() <= (bb.maxX + maxRange) &&
+               playerPos.getZ() >= (bb.minZ - maxRange) &&
+               playerPos.getZ() <= (bb.maxZ + maxRange);
     }
 }

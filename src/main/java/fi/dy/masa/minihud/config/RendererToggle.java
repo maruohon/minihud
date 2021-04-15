@@ -4,17 +4,17 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.ValueChangeCallback;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyBindSettings;
+import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.malilib.util.data.ModInfo;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.data.DataStorage;
-import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
-import fi.dy.masa.minihud.hotkeys.RendererToggleKeyCallback;
+import fi.dy.masa.minihud.hotkeys.DebugRendererHotkeyCallback;
+import fi.dy.masa.minihud.hotkeys.RendererToggleHotkeyCallback;
 
 public enum RendererToggle implements ConfigInfo
 {
@@ -59,13 +59,17 @@ public enum RendererToggle implements ConfigInfo
         this.toggleStatus = new BooleanConfig(name, false);
         this.toggleHotkey = new HotkeyConfig(name, "", settings);
 
+        String nameLower = name.toLowerCase(Locale.ROOT);
+        String nameKey = "minihud.renderer_toggle.name." + nameLower;
+        String commentKey = "minihud.renderer_toggle.comment." + nameLower;
+
         if (name.startsWith("debug"))
         {
-            this.toggleHotkey.getKeyBind().setCallback(new KeyCallbackToggleDebugRenderer(this));
+            this.toggleHotkey.getKeyBind().setCallback(new DebugRendererHotkeyCallback(this));
         }
         else
         {
-            this.toggleHotkey.getKeyBind().setCallback(new RendererToggleKeyCallback(this.toggleStatus));
+            this.toggleHotkey.getKeyBind().setCallback(new RendererToggleHotkeyCallback(this.toggleStatus));
         }
 
         if (name.equals("overlayStructureMainToggle"))
@@ -73,11 +77,13 @@ public enum RendererToggle implements ConfigInfo
             this.toggleStatus.setValueChangeCallback((newValue, oldValue) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
         }
 
-        String nameLower = name.toLowerCase(Locale.ROOT);
-        String nameKey = "minihud.renderer_toggle.name." + nameLower;
         this.toggleStatus.setNameTranslationKey(nameKey);
         this.toggleStatus.setPrettyNameTranslationKey(nameKey);
-        this.toggleStatus.setCommentTranslationKey("minihud.renderer_toggle.comment." + nameLower);
+        this.toggleStatus.setCommentTranslationKey(commentKey);
+
+        this.toggleHotkey.setNameTranslationKey(nameKey);
+        this.toggleHotkey.setPrettyNameTranslationKey(nameKey);
+        this.toggleHotkey.setCommentTranslationKey(commentKey);
     }
 
     public boolean isRendererEnabled()
@@ -85,9 +91,9 @@ public enum RendererToggle implements ConfigInfo
         return this.toggleStatus.getBooleanValue();
     }
 
-    public void setValueChangeCallback(ValueChangeCallback<Boolean> callback)
+    public void addValueChangeListener(EventListener listener)
     {
-        this.toggleStatus.setValueChangeCallback(callback);
+        this.toggleStatus.addValueChangeListener(listener);
     }
 
     public BooleanConfig getBooleanConfig()

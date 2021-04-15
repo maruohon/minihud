@@ -12,7 +12,6 @@ import fi.dy.masa.minihud.util.MiscUtils;
 
 public class OverlayRenderer
 {
-    public static double chunkUnloadBucketOverlayY;
     private static long loginTime;
     private static boolean canRender;
 
@@ -52,7 +51,7 @@ public class OverlayRenderer
 
         if (RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.isRendererEnabled())
         {
-            renderChunkUnloadBuckets(mc, entity, dx, dy, dz, chunkUnloadBucketOverlayY);
+            renderChunkUnloadBuckets(mc, entity, dx, dy, dz, Configs.Internal.CHUNK_UNLOAD_BUCKET_OVERLAY_Y.getDoubleValue());
         }
 
         if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled())

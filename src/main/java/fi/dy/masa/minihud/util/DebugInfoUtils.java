@@ -58,7 +58,7 @@ public class DebugInfoUtils
         buf.writeFloat(point.distanceToTarget);
     }
 
-    public static PacketBuffer writePathTobuffer(Path path)
+    public static PacketBuffer writePathToBuffer(Path path)
     {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         writePathToBuffer(buffer, path);
@@ -174,7 +174,7 @@ public class DebugInfoUtils
                             if (isSamepath == false)
                             {
                                 // Make a copy via a PacketBuffer... :/
-                                PacketBuffer buf = DebugInfoUtils.writePathTobuffer(path);
+                                PacketBuffer buf = DebugInfoUtils.writePathToBuffer(path);
                                 OLD_PATHS.put(entity, Path.read(buf));
                             }
                             else if (old != null)

@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiScreen;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.GenericButtonConfig;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.BaseScreenTab;
 import fi.dy.masa.malilib.gui.ScreenTab;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
@@ -30,7 +31,7 @@ public class ConfigScreen
 
     private static final BaseConfigTab GENERIC              = new BaseConfigTab(MOD_INFO, "generic",    160, getGenericOptions(),     ConfigScreen::create);
     private static final BaseConfigTab COLORS               = new BaseConfigTab(MOD_INFO, "colors",     100, Configs.Colors.OPTIONS,  ConfigScreen::create);
-    private static final BaseConfigTab INFO_LINES           = new BaseConfigTab(MOD_INFO, "info_lines", 200, InfoLine.VALUES,         ConfigScreen::create);
+    private static final BaseConfigTab INFO_LINES           = new BaseConfigTab(MOD_INFO, "info_lines", 200, getInfoLinesOptions(),   ConfigScreen::create);
     private static final BaseConfigTab OVERLAY_RENDERERS    = new BaseConfigTab(MOD_INFO, "renderers",  200, getRendererOptions(),    ConfigScreen::create);
     private static final BaseConfigTab STRUCTURES           = new BaseConfigTab(MOD_INFO, "structures", 200, getStructureOptions(),   ConfigScreen::create);
     public  static final BaseScreenTab SHAPES               = new BaseScreenTab(MOD_INFO, "shapes", GuiShapeManager::screenValidator, GuiShapeManager::openShapeManager);
@@ -52,9 +53,14 @@ public class ConfigScreen
             SHAPES
     );
 
+    public static void open()
+    {
+        BaseScreen.openScreen(create(null));
+    }
+
     public static BaseConfigScreen create(@Nullable GuiScreen currentScreen)
     {
-        return new BaseConfigScreen(MOD_INFO, null, ALL_TABS, INFO_LINES, "minihud.gui.title.configs");
+        return new BaseConfigScreen(MOD_INFO, currentScreen, ALL_TABS, INFO_LINES, "minihud.gui.title.configs");
     }
 
     public static ImmutableList<ConfigTab> getConfigTabs()
@@ -78,11 +84,21 @@ public class ConfigScreen
         return ImmutableList.copyOf(genericOptions);
     }
 
+    private static ImmutableList<ConfigInfo> getInfoLinesOptions()
+    {
+        ImmutableList.Builder<ConfigInfo> builder = ImmutableList.builder();
+
+        builder.add(Configs.Generic.INFO_LINES_RENDERING_TOGGLE);
+        builder.addAll(InfoLine.VALUES);
+
+        return builder.build();
+    }
+
     private static ImmutableList<ConfigInfo> getRendererOptions()
     {
         ImmutableList.Builder<ConfigInfo> builder = ImmutableList.builder();
 
-        builder.add(Configs.Generic.MAIN_RENDERING_TOGGLE);
+        builder.add(Configs.Generic.OVERLAYS_RENDERING_TOGGLE);
         builder.addAll(RendererToggle.VALUES);
 
         return builder.build();
@@ -92,7 +108,7 @@ public class ConfigScreen
     {
         ImmutableList.Builder<ConfigInfo> builder = ImmutableList.builder();
 
-        builder.add(Configs.Generic.MAIN_RENDERING_TOGGLE);
+        builder.add(Configs.Generic.OVERLAYS_RENDERING_TOGGLE);
         builder.add(RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE);
         builder.addAll(StructureToggle.VALUES);
 

@@ -1,6 +1,5 @@
 package fi.dy.masa.minihud.gui.widget;
 
-import net.minecraft.client.renderer.GlStateManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
@@ -87,32 +86,22 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
     @Override
     public boolean canHoverAt(int mouseX, int mouseY, int mouseButton)
     {
-        return super.canHoverAt(mouseX, mouseY, mouseButton) && mouseX < this.buttonsStartX;
+        return mouseX < this.buttonsStartX && super.canHoverAt(mouseX, mouseY, mouseButton);
     }
 
     @Override
     public void renderAt(int x, int y, float z, int mouseX, int mouseY, boolean isActiveGui, boolean hovered)
     {
-        RenderUtils.color(1f, 1f, 1f, 1f);
-
         boolean shapeSelected = ShapeManager.INSTANCE.getSelectedShape() == this.data;
         int width = this.getWidth();
         int height = this.getHeight();
 
         // Draw a lighter background for the hovered and the selected entry
-        if (shapeSelected || hovered)
-        {
-            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0x70FFFFFF);
-        }
-        else if (this.isOdd)
-        {
-            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0x20FFFFFF);
-        }
         // Draw a slightly lighter background for even entries
-        else
-        {
-            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0x50FFFFFF);
-        }
+        int backgroundColor = (shapeSelected || hovered) ? 0x70FFFFFF : (this.isOdd ? 0x20FFFFFF : 0x50FFFFFF);
+
+        RenderUtils.color(1f, 1f, 1f, 1f);
+        ShapeRenderUtils.renderRectangle(x, y, z, width, height, backgroundColor);
 
         if (shapeSelected)
         {
@@ -121,14 +110,6 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
 
         this.renderTextLine(x + 4, y + this.getCenteredTextOffsetY(), z, 0xFFFFFFFF, false, this.nameText);
 
-        RenderUtils.color(1f, 1f, 1f, 1f);
-        GlStateManager.disableBlend();
-
         super.renderAt(x, y, z, mouseX, mouseY, isActiveGui, hovered);
-
-        RenderUtils.disableItemLighting();
-        GlStateManager.disableLighting();
-
-        RenderUtils.color(1f, 1f, 1f, 1f);
     }
 }

@@ -21,8 +21,6 @@ import fi.dy.masa.minihud.util.MiscUtils;
 
 public class OverlayRendererSlimeChunks extends OverlayRendererBase
 {
-    public static double overlayTopY;
-
     protected boolean wasSeedKnown;
     protected long seed;
     protected double topY;
@@ -41,7 +39,8 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
         boolean isSeedKnown = DataStorage.getInstance().isWorldSeedKnown(entity.dimension);
         long seed = DataStorage.getInstance().getWorldSeed(entity.dimension);
 
-        if (this.topY != overlayTopY || this.wasSeedKnown != isSeedKnown || this.seed != seed)
+        if (this.topY != Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y.getDoubleValue() ||
+            this.wasSeedKnown != isSeedKnown || this.seed != seed)
         {
             return true;
         }
@@ -58,7 +57,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         DataStorage data = DataStorage.getInstance();
-        this.topY = overlayTopY;
+        this.topY = Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y.getDoubleValue();
         this.wasSeedKnown = data.isWorldSeedKnown(entity.dimension);
         this.seed = data.getWorldSeed(entity.dimension);
 
@@ -127,13 +126,13 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
-        obj.add("y_top", new JsonPrimitive(overlayTopY));
+        obj.add("y_top", new JsonPrimitive(Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y.getDoubleValue()));
         return obj;
     }
 
     @Override
     public void fromJson(JsonObject obj)
     {
-        overlayTopY = JsonUtils.getFloat(obj, "y_top");
+        Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y.setDoubleValue(JsonUtils.getFloatOrDefault(obj, "y_top", 80F));
     }
 }

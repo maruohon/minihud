@@ -221,7 +221,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     @Override
     public void onPostWorldRender(Minecraft mc, float partialTicks)
     {
-        if (Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
+        if (Configs.Generic.OVERLAYS_RENDERING_TOGGLE.getBooleanValue() &&
             mc.world != null && mc.player != null)
         {
             OverlayRenderer.renderOverlays(mc, partialTicks);
@@ -259,7 +259,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     {
         boolean wasEnabled = this.enabled;
 
-        this.enabled = Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
+        this.enabled = Configs.Generic.INFO_LINES_RENDERING_TOGGLE.getBooleanValue() &&
                        mc.gameSettings.showDebugInfo == false &&
                        mc.player != null && mc.world != null && mc.gameSettings.hideGUI == false &&
                        (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
