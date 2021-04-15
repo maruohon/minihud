@@ -60,7 +60,9 @@ public class ConfigScreen
 
     public static BaseConfigScreen create(@Nullable GuiScreen currentScreen)
     {
-        return new BaseConfigScreen(MOD_INFO, currentScreen, ALL_TABS, INFO_LINES, "minihud.gui.title.configs");
+        // The parent screen should not be set here, to prevent infinite recursion via
+        // the call to the parent's setWorldAndResolution -> initScreen -> switch tab -> etc.
+        return new BaseConfigScreen(MOD_INFO, null, ALL_TABS, INFO_LINES, "minihud.gui.title.configs");
     }
 
     public static ImmutableList<ConfigTab> getConfigTabs()

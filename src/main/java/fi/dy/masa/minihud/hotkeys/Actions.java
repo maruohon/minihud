@@ -21,7 +21,7 @@ public class Actions
     public static final NamedAction OPEN_CONFIG_SCREEN              = register("openConfigScreen",      ConfigScreen::open);
     public static final NamedAction OPEN_SHAPE_EDITOR               = register("openShapeEditor",       () -> {
         ShapeBase shape = ShapeManager.INSTANCE.getSelectedShape();
-        BaseScreen.openScreen(shape != null ? new GuiShapeEditor(shape) : new GuiShapeManager());
+        BaseScreen.openScreen(shape != null ? new GuiShapeEditor(shape) : GuiShapeManager.openShapeManager(null));
     });
     public static final NamedAction SET_DISTANCE_REFERENCE_POINT    = register("setDistanceReferencePoint", DataStorage.getInstance()::setDistanceReferencePoint);
 
