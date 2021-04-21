@@ -101,7 +101,7 @@ minihud.config.name.coordinateformatcustomized=Coordinate Format Customized
 minihud.config.name.debugrendererpathfindingenablepointwidth=Debug: Path Finding Point Width
 minihud.config.name.dontresetseedondimensionchange=Don't Reset Seed On Dim Change
 minihud.config.name.enablevanilladebugrendererfix=Enable Vanilla Debug Renderer Fixes
-minihud.config.name.infolinesrenderingtoggle=§eInfo Lines Toggle
+minihud.config.name.infolinesrenderingtoggle=§eInfo Lines Rendering Toggle
 minihud.config.name.info_lines_hud_settings=Info HUD Settings
 minihud.config.name.itemnbtenabled=Item NBT
 minihud.config.name.lightlevelcolorednumbers=Light Level Colored Numbers
@@ -119,7 +119,7 @@ minihud.config.name.lightlevelzoffset=Light Level Z-Offset
 minihud.config.name.mappreview=Map Preview
 minihud.config.name.mappreviewsize=Map Preview Size
 minihud.config.name.mctimeformat=MC time format
-minihud.config.name.overlaysrenderingtoggle=§eOverlays Main Toggle
+minihud.config.name.overlaysrenderingtoggle=§eOverlays Rendering Main Toggle
 minihud.config.name.realtimeformat=Real Time date/time Format
 minihud.config.name.requiresneak=Require Sneak
 minihud.config.name.shulkerboxpreview=Shulker Box Display
@@ -452,7 +452,7 @@ minihud.message.error.invalid_dropped_chunks_hash_size=Failed to parse the dropp
 minihud.message.error.invalid_seed=Failed to parse the world seed from chat
 minihud.message.error.shapes.select_shape_from_dropdown=Select the Shape type to create from the dropdown widget
 
-minihud.message.distance_reference_point_set=Set distance reference point to %s
+minihud.message.distance_reference_point_set=Distance ref. point set: x = §a%s§r, y = §a%s§r, z = §a%s§r
 minihud.message.dropped_chunks_hash_size_get=Dropped chunks hash size is currently reported as %s
 minihud.message.dropped_chunks_hash_size_set_to=Dropped chunks hash size config set to §a%s
 minihud.message.seed_set=MiniHUD: Set the world seed to '%s'

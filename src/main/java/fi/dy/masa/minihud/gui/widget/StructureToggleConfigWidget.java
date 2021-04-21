@@ -34,7 +34,7 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
         this.initialHotkeyValue = config.getKeyBind().getKeys();
 
         this.booleanButton = new BooleanConfigButton(x, y + 1, -1, 20, config.getBooleanConfig());
-        this.booleanButton.setActionListener((btn, mbtn) -> {
+        this.booleanButton.setActionListener(() -> {
             this.config.getBooleanConfig().toggleBooleanValue();
             this.updateButtonStates();
         });
@@ -57,7 +57,7 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
         });
         this.colorIndicatorWidgetComponents.translateAndAddHoverString("minihud.gui.label.hover.structures_color_components");
 
-        this.resetButton.setActionListener((btn, mbtn) -> {
+        this.resetButton.setActionListener(() -> {
             this.config.resetToDefault();
             this.updateButtonStates();
         });

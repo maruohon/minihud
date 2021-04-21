@@ -6,7 +6,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
-import org.lwjgl.input.Keyboard;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import fi.dy.masa.malilib.config.option.OptionListConfig;
@@ -70,8 +69,6 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         });
 
         this.createLayerEditControls(146, 142, this.getLayerRange());
-
-        Keyboard.enableRepeatEvents(true);
     }
 
     @Override

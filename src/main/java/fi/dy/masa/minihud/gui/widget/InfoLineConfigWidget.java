@@ -43,7 +43,7 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
         });
 
         this.booleanButton = new BooleanConfigButton(x, y + 1, -1, 20, config.getBooleanConfig());
-        this.booleanButton.setActionListener((btn, mbtn) -> {
+        this.booleanButton.setActionListener(() -> {
             this.config.getBooleanConfig().toggleBooleanValue();
             this.updateButtonStates();
         });
@@ -54,7 +54,7 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
         this.settingsWidget = new KeybindSettingsWidget(x, y, 20, 20, config.getKeyBind(),
                                                         config.getDisplayName(), ctx.getDialogHandler());
 
-        this.resetButton.setActionListener((btn, mbtn) -> {
+        this.resetButton.setActionListener(() -> {
             this.config.resetToDefault();
             this.textField.setText(String.valueOf(this.config.getLineOrderConfig().getIntegerValue()));
             this.updateButtonStates();

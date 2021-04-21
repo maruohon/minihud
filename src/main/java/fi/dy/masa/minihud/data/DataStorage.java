@@ -234,10 +234,12 @@ public class DataStorage
 
     public boolean setDistanceReferencePoint()
     {
-        Vec3d pos = EntityUtils.getCameraEntity().getPositionVector();
+        Vec3d pos = EntityUtils.getCameraEntityPosition();
         this.distanceReferencePoint = pos;
-        String str = String.format("x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
-        MessageUtils.printCustomActionbarMessage("minihud.message.distance_reference_point_set", str);
+        String x = String.format("%.2f", pos.x);
+        String y = String.format("%.2f", pos.y);
+        String z = String.format("%.2f", pos.z);
+        MessageUtils.printCustomActionbarMessage("minihud.message.distance_reference_point_set", x, y, z);
         return true;
     }
 
