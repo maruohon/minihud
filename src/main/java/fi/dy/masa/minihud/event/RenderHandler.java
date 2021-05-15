@@ -43,6 +43,7 @@ import fi.dy.masa.malilib.overlay.InfoArea;
 import fi.dy.masa.malilib.overlay.InfoOverlay;
 import fi.dy.masa.malilib.overlay.InfoWidgetManager;
 import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
+import fi.dy.masa.malilib.render.inventory.InventoryRenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
@@ -213,7 +214,10 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             if (render)
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderShulkerBoxPreview(stack, x, y, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
+                boolean background = Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue();
+                x += 8;
+                y -= 10;
+                InventoryRenderUtils.renderItemInventoryPreview(stack, x, y, 300, background);
             }
         }
     }

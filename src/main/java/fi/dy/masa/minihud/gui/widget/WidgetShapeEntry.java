@@ -53,7 +53,7 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
         this.buttonsStartX = x + width - this.configureButton.getWidth() - this.toggleButton.getWidth() - this.removeButton.getWidth() - 6;
 
         this.setHoverStringProvider("shape_info", shape::getWidgetHoverLines);
-        this.setRenderBackground(true);
+        this.setRenderNormalBackground(true);
     }
 
     @Override

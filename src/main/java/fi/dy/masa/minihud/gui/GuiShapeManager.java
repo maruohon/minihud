@@ -25,7 +25,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
     {
         super(10, 82, 20, 88, "minihud", ConfigScreen.ALL_TABS, ConfigScreen.SHAPES);
 
-        this.title = StringUtils.translate("minihud.gui.title.shape_manager");
+        this.setTitle("minihud.gui.title.shape_manager");
 
         // The position will get updated later
         this.widgetDropDown = new DropDownListWidget<>(0, 0, 160, 16, 200, 10, ShapeType.VALUES, ShapeType::getDisplayName, null);
@@ -38,7 +38,6 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         super.initScreen();
 
         this.clearWidgets();
-        this.clearButtons();
         this.createTabButtonContainerWidget();
 
         int x = 12;
@@ -67,31 +66,29 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         this.addWidget(button);
 
         button = new GenericButton(this.screenWidth - 10, y, -1, true, "minihud.gui.button.add_shape");
-        this.addButton(button, (btn, mbtn) -> {
-            ShapeType type = this.widgetDropDown.getSelectedEntry();
-
-            if (type != null)
-            {
-                ShapeManager.INSTANCE.addShape(type.createShape());
-                this.getListWidget().refreshEntries();
-            }
-            else
-            {
-                MessageUtils.error("minihud.message.error.shapes.select_shape_from_dropdown");
-            }
-        });
-    }
-
-    @Override
-    public void onGuiClosed()
-    {
-        super.onGuiClosed();
+        button.setActionListener(this::addShape);
+        this.addWidget(button);
     }
 
     public void onSelectionChange(@Nullable ShapeBase entry)
     {
         ShapeBase old = ShapeManager.INSTANCE.getSelectedShape();
         ShapeManager.INSTANCE.setSelectedShape(old == entry ? null : entry);
+    }
+
+    protected void addShape()
+    {
+        ShapeType type = this.widgetDropDown.getSelectedEntry();
+
+        if (type != null)
+        {
+            ShapeManager.INSTANCE.addShape(type.createShape());
+            this.getListWidget().refreshEntries();
+        }
+        else
+        {
+            MessageUtils.error("minihud.message.error.shapes.select_shape_from_dropdown");
+        }
     }
 
     @Override

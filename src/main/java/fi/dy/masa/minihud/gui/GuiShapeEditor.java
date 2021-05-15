@@ -48,7 +48,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     public GuiShapeEditor(ShapeBase shape)
     {
         this.shape = shape;
-        this.title = StringUtils.translate("minihud.gui.title.shape_editor");
+        this.setTitle("minihud.gui.title.shape_editor");
         this.configBlockSnap = new OptionListConfig<>("blockSnap", BlockSnap.NONE, BlockSnap.VALUES, "");
     }
 
@@ -63,10 +63,11 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.createShapeEditorElements(x, y);
 
         GenericButton button = new GenericButton(x, this.height - 24, -1, 20, ConfigScreen.SHAPES.getDisplayName());
-        this.addButton(button, (btn, mbtn) -> {
+        button.setActionListener(() -> {
             BaseConfigScreen.setCurrentTab(Reference.MOD_ID, ConfigScreen.SHAPES);
             BaseScreen.openScreen(new GuiShapeManager());
         });
+        this.addWidget(button);
 
         this.createLayerEditControls(146, 142, this.getLayerRange());
     }
@@ -150,7 +151,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         y += 54;
 
         GenericButton button = new GenericButton(x, y, -1, false, "malilib.gui.button.render_layers_gui.set_to_player");
-        this.addButton(button, (btn, mbtn) -> {
+        button.setActionListener(() -> {
             Entity entity = this.mc.getRenderViewEntity();
 
             if (entity != null)
@@ -159,13 +160,15 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
                 this.initGui();
             }
         });
+        this.addWidget(button);
 
         this.configBlockSnap.setValue(shape.getBlockSnap());
         OptionListConfigButton buttonSnap = new OptionListConfigButton(x + button.getWidth() + 4, y, -1, 20, this.configBlockSnap, "minihud.gui.label.shape.block_snap");
-        this.addButton(buttonSnap, (btn, mbtn) -> {
+        buttonSnap.setActionListener(() -> {
             shape.setBlockSnap(this.configBlockSnap.getValue());
             this.initGui();
         });
+        this.addWidget(buttonSnap);
 
         y += 24;
 
@@ -186,9 +189,10 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
             GenericButton button = GenericButton.createIconOnly(x + 54, y, () -> DefaultIcons.BTN_PLUSMINUS_16);
+            button.setActionListener(new DoubleModifierButtonListener(supplier, new DualDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
             button.setCanScrollToClick(true);
             button.addHoverStrings(hover);
-            this.addButton(button, new DoubleModifierButtonListener(supplier, new DualDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
+            this.addWidget(button);
         }
     }
 
@@ -206,9 +210,10 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
             GenericButton button = GenericButton.createIconOnly(x + 54, y, () -> DefaultIcons.BTN_PLUSMINUS_16);
+            button.setActionListener(new IntegerModifierButtonListener(supplier, new DualIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
             button.setCanScrollToClick(true);
             button.addHoverStrings(hover);
-            this.addButton(button, new IntegerModifierButtonListener(supplier, new DualIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
+            this.addWidget(button);
         }
     }
 
@@ -218,7 +223,8 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         y += 10;
 
         GenericButton button = new GenericButton(x, y, 50, 20, org.apache.commons.lang3.StringUtils.capitalize(supplier.get().toString().toLowerCase()));
-        this.addButton(button, (btn, mouseBtn) -> { consumer.accept(PositionUtils.cycleDirection(supplier.get(), mouseBtn == 1)); this.initGui(); } );
+        button.setActionListener((btn, mouseBtn) -> { consumer.accept(PositionUtils.cycleDirection(supplier.get(), mouseBtn == 1)); this.initGui(); });
+        this.addWidget(button);
     }
 
     private void createRenderTypeButton(int x, int y, Supplier<ShapeRenderType> supplier, Consumer<ShapeRenderType> consumer, String translationKey)
@@ -227,7 +233,8 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         y += 10;
 
         GenericButton button = new GenericButton(x, y, -1, 20, supplier.get().getDisplayName());
-        this.addButton(button, (btn, mouseBtn) -> { consumer.accept(ListUtils.getNextEntry(ShapeRenderType.VALUES, supplier.get(), mouseBtn != 0)); this.initGui(); } );
+        button.setActionListener((btn, mouseBtn) -> { consumer.accept(ListUtils.getNextEntry(ShapeRenderType.VALUES, supplier.get(), mouseBtn != 0)); this.initGui(); });
+        this.addWidget(button);
     }
 
     private static class SphereEditor implements CoordinateValueModifier
