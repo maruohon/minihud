@@ -37,7 +37,7 @@ public class DataStorage
 
     private final Minecraft mc = Minecraft.getMinecraft();
 
-    private final MobcapData mobcapData = new MobcapData();
+    private final MobCapDataHolder mobcapData = new MobCapDataHolder();
     private final StructureStorage structureStorage = new StructureStorage();
     private final TpsData tpsData = new TpsData();
     private final WoolCounters woolCounters = new WoolCounters();
@@ -60,7 +60,7 @@ public class DataStorage
         return INSTANCE;
     }
 
-    public MobcapData getMobcapData()
+    public MobCapDataHolder getMobcapData()
     {
         return this.mobcapData;
     }

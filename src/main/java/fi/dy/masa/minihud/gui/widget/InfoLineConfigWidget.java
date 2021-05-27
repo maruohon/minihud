@@ -34,7 +34,7 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
         this.initialLineOrderStringValue = String.valueOf(this.initialLineOrder);
         this.initialHotkeyValue = this.config.getKeyBind().getKeys();
 
-        this.textField = new BaseTextFieldWidget(x, y, 32, 16);
+        this.textField = new BaseTextFieldWidget(32, 16);
         this.textField.setTextValidator(new IntegerTextFieldWidget.IntValidator(this.config.getLineOrderConfig().getMinIntegerValue(),
                                                                                 this.config.getLineOrderConfig().getMaxIntegerValue()));
         this.textField.setListener((str) -> {
@@ -42,16 +42,16 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
             this.updateButtonStates();
         });
 
-        this.booleanButton = new BooleanConfigButton(x, y + 1, -1, 20, config.getBooleanConfig());
+        this.booleanButton = new BooleanConfigButton(-1, 20, config.getBooleanConfig());
         this.booleanButton.setActionListener(() -> {
             this.config.getBooleanConfig().toggleBooleanValue();
             this.updateButtonStates();
         });
 
-        this.hotkeyButton = new KeyBindConfigButton(x, y + 1, 120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
+        this.hotkeyButton = new KeyBindConfigButton(120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
         this.hotkeyButton.setValueChangeListener(this::updateButtonStates);
 
-        this.settingsWidget = new KeybindSettingsWidget(x, y, 20, 20, config.getKeyBind(),
+        this.settingsWidget = new KeybindSettingsWidget(config.getKeyBind(),
                                                         config.getDisplayName(), ctx.getDialogHandler());
 
         this.resetButton.setActionListener(() -> {

@@ -33,25 +33,25 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
         this.initialComponentColor = config.getColorComponents().getIntegerValue();
         this.initialHotkeyValue = config.getKeyBind().getKeys();
 
-        this.booleanButton = new BooleanConfigButton(x, y + 1, -1, 20, config.getBooleanConfig());
+        this.booleanButton = new BooleanConfigButton(-1, 20, config.getBooleanConfig());
         this.booleanButton.setActionListener(() -> {
             this.config.getBooleanConfig().toggleBooleanValue();
             this.updateButtonStates();
         });
 
-        this.hotkeyButton = new KeyBindConfigButton(x, y + 1, 120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
+        this.hotkeyButton = new KeyBindConfigButton(120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
         this.hotkeyButton.setValueChangeListener(this::updateButtonStates);
 
-        this.settingsWidget = new KeybindSettingsWidget(x, y, 20, 20, config.getKeyBind(),
+        this.settingsWidget = new KeybindSettingsWidget(config.getKeyBind(),
                                                         config.getDisplayName(), ctx.getDialogHandler());
 
-        this.colorIndicatorWidgetMain = new ColorIndicatorWidget(x, y, 18, 18, this.config.getColorMain(), (newValue) -> {
+        this.colorIndicatorWidgetMain = new ColorIndicatorWidget(18, 18, this.config.getColorMain(), (newValue) -> {
             this.config.getColorMain().setValue(newValue);
             this.reAddSubWidgets();
         });
         this.colorIndicatorWidgetMain.translateAndAddHoverString("minihud.gui.label.hover.structures_color_main");
 
-        this.colorIndicatorWidgetComponents = new ColorIndicatorWidget(x, y, 18, 18, this.config.getColorComponents(), (newValue) -> {
+        this.colorIndicatorWidgetComponents = new ColorIndicatorWidget(18, 18, this.config.getColorComponents(), (newValue) -> {
             this.config.getColorComponents().setValue(newValue);
             this.reAddSubWidgets();
         });

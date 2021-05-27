@@ -4,7 +4,6 @@ import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
-import fi.dy.masa.malilib.gui.widget.button.OnOffStyle;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
 import fi.dy.masa.malilib.render.text.StyledTextLine;
@@ -29,20 +28,15 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
 
         this.setText(StyledTextLine.of(shape.getDisplayName()));
 
-        this.configureButton = new GenericButton(x, y + 1, -1, true, "minihud.gui.button.configure");
-        this.toggleButton = new OnOffButton(x, y + 1, -1, 20, OnOffStyle.SLIDER_ON_OFF, this.shape::isEnabled, null);
+        this.configureButton = new GenericButton(-1, true, "minihud.gui.button.configure");
+        this.toggleButton = OnOffButton.simpleSlider(20, this.shape::isEnabled, this::toggleShapeEnabled);
         this.toggleButton.setRightAlign(true, x, true);
-        this.removeButton = new GenericButton(x, y + 1, -1, true, "minihud.gui.button.remove");
+        this.removeButton = new GenericButton(-1, true, "minihud.gui.button.remove");
 
         this.configureButton.setActionListener(() -> {
             GuiShapeEditor gui = new GuiShapeEditor(this.shape);
             gui.setParent(GuiUtils.getCurrentScreen());
             BaseScreen.openScreen(gui);
-        });
-
-        this.toggleButton.setActionListener(() -> {
-            this.shape.toggleEnabled();
-            this.listWidget.reCreateListEntryWidgets();
         });
 
         this.removeButton.setActionListener(() -> {
@@ -62,13 +56,17 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
         super.updateSubWidgetsToGeometryChanges();
 
         int x = this.getX() + this.getWidth() - 2;
+        int y = this.getY() + 1;
 
+        this.removeButton.setY(y);
         this.removeButton.setRightX(x);
         x = this.removeButton.getX() - 2;
 
+        this.toggleButton.setY(y);
         this.toggleButton.setRightX(x);
         x = this.toggleButton.getX() - 2;
 
+        this.configureButton.setY(y);
         this.configureButton.setRightX(x);
     }
 
@@ -92,5 +90,11 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
     protected boolean isSelected()
     {
         return ShapeManager.INSTANCE.getSelectedShape() == this.data;
+    }
+
+    protected void toggleShapeEnabled()
+    {
+        this.shape.toggleEnabled();
+        this.listWidget.reCreateListEntryWidgets();
     }
 }

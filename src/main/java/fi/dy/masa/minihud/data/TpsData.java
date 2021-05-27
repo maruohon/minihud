@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class TpsData
 {
@@ -166,7 +166,7 @@ public class TpsData
     {
         if (this.mc.getIntegratedServer() != null && this.mc.world != null)
         {
-            double mspt = (double) MathHelper.average(this.mc.getIntegratedServer().tickTimeArray) / 1000000D;
+            double mspt = MathHelper.average(this.mc.getIntegratedServer().tickTimeArray) / 1000000D;
             double tps = mspt <= 50 ? 20D : (1000D / mspt);
             this.setIntegratedServerData(tps, mspt, this.mc.world.getTotalWorldTime());
         }
@@ -192,7 +192,7 @@ public class TpsData
                                 Double.parseDouble(matcher.group("mspt")),
                                 this.lastServerTick);
                     }
-                    catch (NumberFormatException e)
+                    catch (NumberFormatException ignore)
                     {
                     }
                 }
@@ -210,26 +210,29 @@ public class TpsData
         boolean isSynced = this.hasSyncedTpsData;
         double tps = isSynced ? this.syncedServerTps : this.calculatedServerTps;
         double mspt = isSynced ? this.syncedServerMspt : this.calculatedServerMspt;
-        String rst = BaseScreen.TXT_RST;
-        String preTps = tps >= 20.0D ? BaseScreen.TXT_GREEN : BaseScreen.TXT_RED;
+        String tpsStr = String.format("%.1f", tps);
+        String msptStr = String.format("%.1f", mspt);
+        String preTps = StringUtils.translate(tps >= 20.0D ? "minihud.info_line.tps.color.tps20" : "minihud.info_line.tps.color.tps_not20");
         String preMspt;
 
         // Carpet server and integrated server have actual meaningful MSPT data available
         if (isSynced)
         {
-            if      (mspt <= 40) { preMspt = BaseScreen.TXT_GREEN; }
-            else if (mspt <= 45) { preMspt = BaseScreen.TXT_YELLOW; }
-            else if (mspt <= 50) { preMspt = BaseScreen.TXT_GOLD; }
-            else                 { preMspt = BaseScreen.TXT_RED; }
+            if      (mspt <= 40) { preMspt = "minihud.info_line.tps.color.mspt_below40"; }
+            else if (mspt <= 45) { preMspt = "minihud.info_line.tps.color.mspt_below45"; }
+            else if (mspt <= 50) { preMspt = "minihud.info_line.tps.color.mspt_below50"; }
+            else                 { preMspt = "minihud.info_line.tps.color.mspt_over50"; }
 
-            return String.format("Server TPS: %s%.1f%s MSPT: %s%.1f%s", preTps, tps, rst, preMspt, mspt, rst);
+            preMspt = StringUtils.translate(preMspt);
+            return StringUtils.translate("minihud.info_line.tps.data_real", preTps, tpsStr, preMspt, msptStr);
         }
         else
         {
-            if (mspt <= 51) { preMspt = BaseScreen.TXT_GREEN; }
-            else            { preMspt = BaseScreen.TXT_RED; }
+            if (mspt <= 51) { preMspt = "minihud.info_line.tps.color.mspt_below40"; }
+            else            { preMspt = "minihud.info_line.tps.color.mspt_over50"; }
 
-            return String.format("Server TPS: %s%.1f%s (MSPT [est]: %s%.1f%s)", preTps, tps, rst, preMspt, mspt, rst);
+            preMspt = StringUtils.translate(preMspt);
+            return StringUtils.translate("minihud.info_line.tps.data_estimate", preTps, tpsStr, preMspt, msptStr);
         }
     }
 }

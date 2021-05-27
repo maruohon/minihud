@@ -18,9 +18,8 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.malilib.util.nbt.PrettyNbtStringifier;
 import fi.dy.masa.malilib.util.nbt.SimpleNbtStringifier;
 import fi.dy.masa.minihud.LiteModMiniHud;
@@ -58,8 +57,10 @@ public class MiscUtils
     {
         long slimeSeed = 987234911L;
         long rngSeed = worldSeed +
-                       (long) (chunkX * chunkX *  4987142) + (long) (chunkX * 5947611) +
-                       (long) (chunkZ * chunkZ) * 4392871L + (long) (chunkZ * 389711) ^ slimeSeed;
+                       (long) (chunkX * chunkX *  4987142) +
+                       (long) (chunkX * 5947611) +
+                       (long) (chunkZ * chunkZ) * 4392871L +
+                       (long) (chunkZ * 389711) ^ slimeSeed;
 
         RAND.setSeed(rngSeed);
 
@@ -85,7 +86,7 @@ public class MiscUtils
      */
     public static int getCurrentHashSize(WorldServer server)
     {
-        IMixinChunkProviderServer provider = (IMixinChunkProviderServer) (Object) server.getChunkProvider();
+        IMixinChunkProviderServer provider = (IMixinChunkProviderServer) server.getChunkProvider();
 
         try
         {
@@ -191,11 +192,12 @@ public class MiscUtils
                 lines.add(StringUtils.translate("item.durability", stack.getMaxDamage() - stack.getItemDamage(), stack.getMaxDamage()));
             }
 
-            lines.add(BaseScreen.TXT_DARK_GRAY + Item.REGISTRY.getNameForObject(stack.getItem()).toString());
+            String regName = Item.REGISTRY.getNameForObject(stack.getItem()).toString();
+            lines.add(StringUtils.translate("minihud.tooltip.item.registry_name", regName));
 
             if (stack.hasTagCompound())
             {
-                lines.add(BaseScreen.TXT_DARK_GRAY + StringUtils.translate("item.nbt_tags", stack.getTagCompound().getKeySet().size()));
+                lines.add(StringUtils.translate("minihud.tooltip.item.nbt", stack.getTagCompound().getKeySet().size()));
             }
         }
 
@@ -203,14 +205,16 @@ public class MiscUtils
 
         if (tag != null)
         {
+            String color = StringUtils.translate("minihud.tooltip.item.stringified_nbt_base_color");
+
             if (showPretty)
             {
-                lines.addAll((new PrettyNbtStringifier(true, BaseScreen.TXT_GRAY).getNbtLines(tag)));
+                lines.addAll((new PrettyNbtStringifier(color).getNbtLines(tag)));
             }
 
             if (showString)
             {
-                String str = (new SimpleNbtStringifier(true, BaseScreen.TXT_GRAY)).getNbtString(tag);
+                String str = (new SimpleNbtStringifier(color)).getNbtString(tag);
                 StringUtils.splitTextToLines(lines, str, 240);
             }
         }

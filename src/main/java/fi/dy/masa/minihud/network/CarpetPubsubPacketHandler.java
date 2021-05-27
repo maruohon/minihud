@@ -27,7 +27,7 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
-import fi.dy.masa.minihud.data.MobcapData;
+import fi.dy.masa.minihud.data.MobCapDataHolder;
 import fi.dy.masa.minihud.data.WoolCounters;
 import io.netty.buffer.Unpooled;
 
@@ -93,7 +93,7 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
             builder.put("carpet.counter." + color.getName(), NodeType.create(TYPE_LONG, buf -> data.getWoolCounters().setValue(color, buf.readLong())));
         }
 
-        MobcapData mobcapData = data.getMobcapData();
+        MobCapDataHolder mobcapData = data.getMobcapData();
 
         for (DimensionType dim : DimensionType.values())
         {

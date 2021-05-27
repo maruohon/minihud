@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.item.EnumDyeColor;
-import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.DyeColorCode;
 import fi.dy.masa.minihud.config.Configs;
 
@@ -34,7 +34,7 @@ public class WoolCounters
 
     public List<String> getInfoLines()
     {
-        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
 
         for (int meta = 0; meta < this.counters.length; ++meta)
         {
@@ -43,11 +43,9 @@ public class WoolCounters
             if (value != -1 && (this.enabledCounters[meta]
                 || Configs.Generic.WOOL_COUNTER_ENABLE_ALL.getBooleanValue()))
             {
-                EnumDyeColor color = EnumDyeColor.byMetadata(meta);
-
-                lines.add(String.format("Wool Counter [ %s%s%s ]: %s%d%s",
-                                        DyeColorCode.getByMeta(meta).getTextColor().toString(), color.getName(), BaseScreen.TXT_RST,
-                                        BaseScreen.TXT_AQUA, value, BaseScreen.TXT_RST));
+                DyeColorCode dyeColor = DyeColorCode.getByMeta(meta);
+                lines.add(StringUtils.translate("minihud.info_line.wool_counter",
+                                                dyeColor.getTextColorCode(), dyeColor.getName(), value));
             }
         }
 
@@ -109,7 +107,7 @@ public class WoolCounters
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception ignore)
             {
             }
         }

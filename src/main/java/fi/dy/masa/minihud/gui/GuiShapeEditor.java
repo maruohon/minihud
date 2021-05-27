@@ -62,7 +62,8 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
 
         this.createShapeEditorElements(x, y);
 
-        GenericButton button = new GenericButton(x, this.height - 24, -1, 20, ConfigScreen.SHAPES.getDisplayName());
+        GenericButton button = new GenericButton(ConfigScreen.SHAPES.getDisplayName());
+        button.setPosition(x, this.height - 24);
         button.setActionListener(() -> {
             BaseConfigScreen.setCurrentTab(Reference.MOD_ID, ConfigScreen.SHAPES);
             BaseScreen.openScreen(new GuiShapeManager());
@@ -83,13 +84,16 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.color"));
         y += 12;
 
-        BaseTextFieldWidget txtField = new BaseTextFieldWidget(x, y, 70, 16, String.format("#%08X", this.shape.getColor().intValue));
+        BaseTextFieldWidget txtField = new BaseTextFieldWidget(70, 16, String.format("#%08X", this.shape.getColor().intValue));
+        txtField.setPosition(x, y);
         txtField.setTextValidator(BaseTextFieldWidget.VALIDATOR_HEX_COLOR_8_6_4_3);
         txtField.setListener(this.shape::setColorFromString);
         this.addWidget(txtField);
         this.nextY = y + 20;
 
-        this.addWidget(new ColorIndicatorWidget(x + 74, y - 1, 18, 18, this.shape.getColor(), this.shape::setColor));
+        ColorIndicatorWidget ci = new ColorIndicatorWidget(18, 18, this.shape.getColor().intValue, this.shape::setColor);
+        ci.setPosition(x + 74, y - 1);
+        this.addWidget(ci);
     }
 
     private void createShapeEditorElements(int x, int y)
@@ -97,7 +101,8 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.display_name_colon"));
         y += 12;
 
-        BaseTextFieldWidget textField = new BaseTextFieldWidget(x, y, 240, 16, this.shape.getDisplayName());
+        BaseTextFieldWidget textField = new BaseTextFieldWidget(240, 16, this.shape.getDisplayName());
+        textField.setPosition(x, y);
         textField.setListener(this.shape::setDisplayName);
         this.addWidget(textField);
         y += 20;
@@ -150,7 +155,8 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         x += 11;
         y += 54;
 
-        GenericButton button = new GenericButton(x, y, -1, false, "malilib.gui.button.render_layers_gui.set_to_player");
+        GenericButton button = new GenericButton(-1, false, "malilib.gui.button.render_layers_gui.set_to_player");
+        button.setPosition(x, y);
         button.setActionListener(() -> {
             Entity entity = this.mc.getRenderViewEntity();
 
@@ -163,7 +169,10 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.addWidget(button);
 
         this.configBlockSnap.setValue(shape.getBlockSnap());
-        OptionListConfigButton buttonSnap = new OptionListConfigButton(x + button.getWidth() + 4, y, -1, 20, this.configBlockSnap, "minihud.gui.label.shape.block_snap");
+        int bx = x + button.getWidth() + 4;
+
+        OptionListConfigButton buttonSnap = new OptionListConfigButton(-1, 20, this.configBlockSnap, "minihud.gui.label.shape.block_snap");
+        buttonSnap.setPosition(bx, y);
         buttonSnap.setActionListener(() -> {
             shape.setBlockSnap(this.configBlockSnap.getValue());
             this.initGui();
@@ -175,12 +184,14 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.createColorInput(x, y);
     }
 
-    private void createShapeEditorElementDoubleField(int x, int y, DoubleSupplier supplier, DoubleConsumer consumer, String translationKey, boolean addButton)
+    private void createShapeEditorElementDoubleField(int x, int y, DoubleSupplier supplier,
+                                                     DoubleConsumer consumer, String translationKey, boolean addButton)
     {
         this.addLabel(x + 12, y, 0xFFFFFFFF, translationKey);
         y += 10;
 
-        DoubleTextFieldWidget txtField = new DoubleTextFieldWidget(x + 12, y, 40, 16, supplier.getAsDouble());
+        DoubleTextFieldWidget txtField = new DoubleTextFieldWidget(40, 16, supplier.getAsDouble());
+        txtField.setPosition(x + 12, y);
         txtField.setListener(new DoubleTextFieldListener(consumer));
         txtField.setUpdateListenerAlways(true);
         this.addWidget(txtField);
@@ -188,7 +199,8 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            GenericButton button = GenericButton.createIconOnly(x + 54, y, () -> DefaultIcons.BTN_PLUSMINUS_16);
+            GenericButton button = GenericButton.createIconOnly(() -> DefaultIcons.BTN_PLUSMINUS_16);
+            button.setPosition(x + 54, y);
             button.setActionListener(new DoubleModifierButtonListener(supplier, new DualDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
             button.setCanScrollToClick(true);
             button.addHoverStrings(hover);
@@ -196,12 +208,14 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         }
     }
 
-    private void createShapeEditorElementIntField(int x, int y, IntSupplier supplier, IntConsumer consumer, String translationKey, boolean addButton)
+    private void createShapeEditorElementIntField(int x, int y, IntSupplier supplier, IntConsumer consumer,
+                                                  String translationKey, boolean addButton)
     {
         this.addLabel(x + 12, y, 0xFFFFFFFF, translationKey);
         y += 10;
 
-        IntegerTextFieldWidget txtField = new IntegerTextFieldWidget(x + 12, y, 40, 16, supplier.getAsInt());
+        IntegerTextFieldWidget txtField = new IntegerTextFieldWidget(40, 16, supplier.getAsInt());
+        txtField.setPosition(x + 12, y);
         txtField.setListener(new IntegerTextFieldListener(consumer));
         txtField.setUpdateListenerAlways(true);
         this.addWidget(txtField);
@@ -209,7 +223,8 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         if (addButton)
         {
             String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            GenericButton button = GenericButton.createIconOnly(x + 54, y, () -> DefaultIcons.BTN_PLUSMINUS_16);
+            GenericButton button = GenericButton.createIconOnly(() -> DefaultIcons.BTN_PLUSMINUS_16);
+            button.setPosition(x + 54, y);
             button.setActionListener(new IntegerModifierButtonListener(supplier, new DualIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
             button.setCanScrollToClick(true);
             button.addHoverStrings(hover);
@@ -217,23 +232,28 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         }
     }
 
-    private void createDirectionButton(int x, int y, Supplier<EnumFacing> supplier, Consumer<EnumFacing> consumer, String translationKey)
+    private void createDirectionButton(int x, int y, Supplier<EnumFacing> supplier,
+                                       Consumer<EnumFacing> consumer, String translationKey)
     {
         this.addLabel(x, y, 0xFFFFFFFF, translationKey);
         y += 10;
 
-        GenericButton button = new GenericButton(x, y, 50, 20, org.apache.commons.lang3.StringUtils.capitalize(supplier.get().toString().toLowerCase()));
-        button.setActionListener((btn, mouseBtn) -> { consumer.accept(PositionUtils.cycleDirection(supplier.get(), mouseBtn == 1)); this.initGui(); });
+        String name = org.apache.commons.lang3.StringUtils.capitalize(supplier.get().toString().toLowerCase());
+        GenericButton button = new GenericButton(50, 20, name);
+        button.setPosition(x, y);
+        button.setActionListener((btn) -> { consumer.accept(PositionUtils.cycleDirection(supplier.get(), btn == 1)); this.initGui(); return true; });
         this.addWidget(button);
     }
 
-    private void createRenderTypeButton(int x, int y, Supplier<ShapeRenderType> supplier, Consumer<ShapeRenderType> consumer, String translationKey)
+    private void createRenderTypeButton(int x, int y, Supplier<ShapeRenderType> supplier,
+                                        Consumer<ShapeRenderType> consumer, String translationKey)
     {
         this.addLabel(x, y, 0xFFFFFFFF, translationKey);
         y += 10;
 
-        GenericButton button = new GenericButton(x, y, -1, 20, supplier.get().getDisplayName());
-        button.setActionListener((btn, mouseBtn) -> { consumer.accept(ListUtils.getNextEntry(ShapeRenderType.VALUES, supplier.get(), mouseBtn != 0)); this.initGui(); });
+        GenericButton button = new GenericButton(supplier.get().getDisplayName());
+        button.setPosition(x, y);
+        button.setActionListener((btn) -> { consumer.accept(ListUtils.getNextEntry(ShapeRenderType.VALUES, supplier.get(), btn != 0)); this.initGui(); return true; });
         this.addWidget(button);
     }
 

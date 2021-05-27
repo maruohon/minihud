@@ -28,7 +28,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         this.setTitle("minihud.gui.title.shape_manager");
 
         // The position will get updated later
-        this.widgetDropDown = new DropDownListWidget<>(0, 0, 160, 16, 200, 10, ShapeType.VALUES, ShapeType::getDisplayName, null);
+        this.widgetDropDown = new DropDownListWidget<>(160, 16, 200, 10, ShapeType.VALUES, ShapeType::getDisplayName);
         this.widgetDropDown.setZLevel((int) this.zLevel + 2);
     }
 
@@ -37,19 +37,21 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
     {
         super.initScreen();
 
-        this.clearWidgets();
-        this.createTabButtonContainerWidget();
+        //this.clearWidgets();
+        //this.createTabButtonContainerWidget();
 
         int x = 12;
         int y = 44;
         int lw = StringUtils.getMaxStringRenderWidth(StringUtils.translate("minihud.gui.button.shapes.overlay_rendering"),
                                                      StringUtils.translate("minihud.gui.button.shapes.shape_renderer")) + 8;
 
-        LabelWidget label = new LabelWidget(x, y + 5, lw, -1, 0xFFFFF040, "minihud.gui.button.shapes.overlay_rendering");
+        LabelWidget label = new LabelWidget(0xFFFFF040, "minihud.gui.button.shapes.overlay_rendering");
+        label.setPosition(x, y + 5);
         this.addWidget(label);
 
-        x += label.getWidth() + 4;
-        GenericButton button = new BooleanConfigButton(x, y, -1, 18, Configs.Generic.OVERLAYS_RENDERING_TOGGLE);
+        x += lw + 4;
+        GenericButton button = new BooleanConfigButton(-1, 18, Configs.Generic.OVERLAYS_RENDERING_TOGGLE);
+        button.setPosition(x, y);
         this.addWidget(button);
 
         this.widgetDropDown.setPosition(this.screenWidth - 10, y);
@@ -58,14 +60,17 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
 
         y += 18;
         x = 12;
-        label = new LabelWidget(x, y + 6, lw, -1, 0xFFFFF040, "minihud.gui.button.shapes.shape_renderer");
+        label = new LabelWidget(0xFFFFF040, "minihud.gui.button.shapes.shape_renderer");
+        label.setPosition(x, y + 6);
         this.addWidget(label);
 
-        x += label.getWidth() + 4;
-        button = new BooleanConfigButton(x, y + 1, -1, 18, RendererToggle.SHAPE_RENDERER.getBooleanConfig());
+        x += lw + 4;
+        button = new BooleanConfigButton(-1, 18, RendererToggle.SHAPE_RENDERER.getBooleanConfig());
+        button.setPosition(x, y + 1);
         this.addWidget(button);
 
-        button = new GenericButton(this.screenWidth - 10, y, -1, true, "minihud.gui.button.add_shape");
+        button = new GenericButton(-1, true, "minihud.gui.button.add_shape");
+        button.setPosition(this.x + this.screenWidth - button.getWidth() - 10, y);
         button.setActionListener(this::addShape);
         this.addWidget(button);
     }

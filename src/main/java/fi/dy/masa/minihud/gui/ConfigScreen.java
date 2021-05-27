@@ -14,7 +14,6 @@ import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigTab;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.config.ExpandableConfigGroup;
-import fi.dy.masa.malilib.gui.widget.button.BaseButton;
 import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
 import fi.dy.masa.malilib.util.ListUtils;
 import fi.dy.masa.malilib.util.data.ModInfo;
@@ -79,7 +78,10 @@ public class ConfigScreen
         ListUtils.extractEntriesToSecondList(genericOptions, lightOptions, (c) -> c.getName().startsWith("lightLevel"), true);
         ListUtils.extractEntriesToSecondList(colorOptions,   lightOptions, (c) -> c.getName().startsWith("lightLevel"), false);
 
-        genericOptions.add(new GenericButtonConfig("minihud.config.name.info_lines_hud_settings", "minihud.gui.button.open_info_lines_hud_settings", ConfigScreen::openHudSettingScreen, "minihud.config.comment.info_lines_hud_settings"));
+        genericOptions.add(new GenericButtonConfig("minihud.config.name.info_lines_hud_settings",
+                                                   "minihud.gui.button.open_info_lines_hud_settings",
+                                                   ConfigScreen::openHudSettingScreen,
+                                                   "minihud.config.comment.info_lines_hud_settings"));
         genericOptions.add(new ExpandableConfigGroup(MOD_INFO, "light_level", lightOptions));
         ConfigUtils.sortConfigsByDisplayName(genericOptions);
 
@@ -117,7 +119,7 @@ public class ConfigScreen
         return builder.build();
     }
 
-    private static void openHudSettingScreen(BaseButton button, int mouseButton)
+    private static boolean openHudSettingScreen(int mouseButton)
     {
         StringListRendererWidget widget = RenderHandler.INSTANCE.getStringListRenderer();
 
@@ -125,5 +127,7 @@ public class ConfigScreen
         {
             widget.openEditScreen();
         }
+
+        return true;
     }
 }

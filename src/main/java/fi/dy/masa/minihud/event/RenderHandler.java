@@ -53,7 +53,7 @@ import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.DataStorage.HashSizeType;
-import fi.dy.masa.minihud.data.MobcapData;
+import fi.dy.masa.minihud.data.MobCapDataHolder;
 import fi.dy.masa.minihud.data.TpsData;
 import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
@@ -289,7 +289,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             {
                 if (InfoLine.MOB_CAPS.getBooleanValue())
                 {
-                    DataStorage.getInstance().getMobcapData().updateIntegratedServerMobcaps();
+                    DataStorage.getInstance().getMobcapData().updateIntegratedServerMobCaps();
                 }
 
                 if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.isRendererEnabled())
@@ -461,11 +461,11 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
         else if (type == InfoLine.MOB_CAPS)
         {
-            MobcapData mobcapData = data.getMobcapData();
+            MobCapDataHolder mobcapData = data.getMobcapData();
 
             if (mc.isSingleplayer() && (mc.getIntegratedServer().getTickCounter() % 100) == 0)
             {
-                mobcapData.updateIntegratedServerMobcaps();
+                mobcapData.updateIntegratedServerMobCaps();
             }
 
             if (mobcapData.getHasValidData())
@@ -822,19 +822,19 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
                 if (MiscUtils.canSlimeSpawnAt(pos.getX(), pos.getZ(), seed))
                 {
-                    result = BaseScreen.TXT_GREEN + "YES" + BaseScreen.TXT_RST;
+                    result = "minihud.info_line.slime_chunk.yes";
                 }
                 else
                 {
-                    result = BaseScreen.TXT_RED + "NO" + BaseScreen.TXT_RST;
+                    result = "minihud.info_line.slime_chunk.no";
                 }
             }
             else
             {
-                result = "<world seed not known>";
+                result = "minihud.info_line.slime_chunk.no_seed";
             }
 
-            this.addLine("Slime chunk: " + result);
+            this.addLine(StringUtils.translate(result));
         }
         else if (type == InfoLine.LOOKING_AT_ENTITY)
         {

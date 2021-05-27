@@ -398,6 +398,33 @@ minihud.gui.title.configs=MiniHUD Configs
 minihud.gui.title.shape_editor=Shape Editor
 minihud.gui.title.shape_manager=Shape Manager
 
+minihud.info_line.mobcap.data=Mob caps: Ho: %s Pa: %s Wa: %s Am: %s
+minihud.info_line.mobcap.no_data=Mob caps: <no valid data>
+minihud.info_line.mobcap.cap.ambient.full=§7§l%d§r§7 / %s§r
+minihud.info_line.mobcap.cap.ambient.nonfull=§7%d / %s§r
+minihud.info_line.mobcap.cap.creature.full=§a§l%d§r§a / %s§r
+minihud.info_line.mobcap.cap.creature.nonfull=§a%d / %s§r
+minihud.info_line.mobcap.cap.monster.full=§c§l%d§r§c / %s§r
+minihud.info_line.mobcap.cap.monster.nonfull=§c%d / %s§r
+minihud.info_line.mobcap.cap.water.full=§9§l%d§r§9 / %s§r
+minihud.info_line.mobcap.cap.water.nonfull=§9%d / %s§r
+
+minihud.info_line.slime_chunk.no=Slime chunk: §cNO
+minihud.info_line.slime_chunk.yes=Slime chunk: §aYES
+minihud.info_line.slime_chunk.no_seed=Slime chunk: <world seed not known>
+
+minihud.info_line.tps.no_data=Server TPS: <no valid data>
+minihud.info_line.tps.data_estimate=Server TPS: %s%s§r (MSPT [est]: %s%s§r)
+minihud.info_line.tps.data_real=Server TPS: %s%s§r MSPT: %s%s§r
+minihud.info_line.tps.color.mspt_below40=§a
+minihud.info_line.tps.color.mspt_below45=§e
+minihud.info_line.tps.color.mspt_below50=§6
+minihud.info_line.tps.color.mspt_over50=§c
+minihud.info_line.tps.color.tps20=§a
+minihud.info_line.tps.color.tps_not20=§c
+
+minihud.info_line.wool_counter=Wool Counter [ %s%s§r ]: §b%d§r
+
 minihud.label.blockgridmode.all=All
 minihud.label.blockgridmode.non_air=Non-air
 minihud.label.blockgridmode.adjacent=Adjacent to non-air
@@ -458,3 +485,6 @@ minihud.message.dropped_chunks_hash_size_set_to=Dropped chunks hash size config 
 minihud.message.seed_set=MiniHUD: Set the world seed to '%s'
 minihud.message.spawn_set=MiniHUD: Set the world spawn to %s
 
+minihud.tooltip.item.nbt=§8NBT: %s tag(s)
+minihud.tooltip.item.registry_name=§8%s
+minihud.tooltip.item.stringified_nbt_base_color=§8
