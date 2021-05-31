@@ -487,4 +487,4 @@ minihud.message.spawn_set=MiniHUD: Set the world spawn to %s
 
 minihud.tooltip.item.nbt=§8NBT: %s tag(s)
 minihud.tooltip.item.registry_name=§8%s
-minihud.tooltip.item.stringified_nbt_base_color=§8
+minihud.tooltip.item.stringified_nbt_base_color=§7

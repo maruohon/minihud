@@ -116,15 +116,8 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
         {
             JsonObject root = element.getAsJsonObject();
 
-            if (JsonUtils.hasObject(root, "shapes"))
-            {
-                ShapeManager.INSTANCE.fromJson(JsonUtils.getNestedObject(root, "shapes", false));
-            }
-
-            if (JsonUtils.hasObject(root, "data_storage"))
-            {
-                DataStorage.getInstance().fromJson(JsonUtils.getNestedObject(root, "data_storage", false));
-            }
+            JsonUtils.readObjectIfPresent(root, "shapes", ShapeManager.INSTANCE::fromJson);
+            JsonUtils.readObjectIfPresent(root, "data_storage", DataStorage.getInstance()::fromJson);
         }
     }
 

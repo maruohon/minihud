@@ -92,41 +92,31 @@ public class ShapeManager
     {
         this.clear();
 
-        if (JsonUtils.hasArray(obj, "shapes"))
+        JsonUtils.readArrayElementsIfPresent(obj, "shapes", this::readAndAddShape);
+        int selected = JsonUtils.getIntegerOrDefault(obj, "selected", -1);
+
+        if (selected >= 0 && selected < this.shapes.size())
         {
-            JsonArray arr = obj.get("shapes").getAsJsonArray();
+            this.selectedShape = this.shapes.get(selected);
+        }
+    }
 
-            for (int i = 0; i < arr.size(); ++i)
-            {
-                JsonElement el = arr.get(i);
+    protected void readAndAddShape(JsonElement el)
+    {
+        if (el.isJsonObject() == false)
+        {
+            return;
+        }
 
-                if (el.isJsonObject())
-                {
-                    JsonObject o = el.getAsJsonObject();
+        JsonObject o = el.getAsJsonObject();
+        String typeName = JsonUtils.getStringOrDefault(o, "type", "");
+        ShapeType type = ShapeType.fromString(typeName);
 
-                    if (JsonUtils.hasString(o, "type"))
-                    {
-                        ShapeType type = ShapeType.fromString(JsonUtils.getString(o, "type"));
-
-                        if (type != null)
-                        {
-                            ShapeBase shape = type.createShape();
-                            shape.fromJson(o);
-                            this.addShape(shape);
-                        }
-                    }
-                }
-            }
-
-            if (JsonUtils.hasInteger(obj, "selected"))
-            {
-                int selected = JsonUtils.getInteger(obj, "selected");
-
-                if (selected >= 0 && selected < this.shapes.size())
-                {
-                    this.selectedShape = this.shapes.get(selected);
-                }
-            }
+        if (type != null)
+        {
+            ShapeBase shape = type.createShape();
+            shape.fromJson(o);
+            this.addShape(shape);
         }
     }
 }
