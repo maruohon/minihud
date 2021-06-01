@@ -53,19 +53,12 @@ public class RenderObjectVbo extends RenderObjectBase
         }
 
         RenderSystem.setShader(this.getShader());
-        //this.vertexBuffer.bind();
-        //this.format.startDrawing();
-        //this.vertexBuffer.draw(matrixStack.peek().getModel());
-        //this.vertexBuffer.method_34432();
-        this.vertexBuffer.method_34427(matrixStack.peek().getModel(), projMatrix, this.getShader().get());
-        //this.format.endDrawing();
+        this.vertexBuffer.setShader(matrixStack.peek().getModel(), projMatrix, this.getShader().get());
 
         if (this.hasTexture)
         {
             RenderSystem.disableTexture();
         }
-
-        //VertexBuffer.unbind();
     }
 
     @Override

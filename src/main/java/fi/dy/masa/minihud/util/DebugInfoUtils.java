@@ -99,8 +99,8 @@ public class DebugInfoUtils
 
             writeBlockPosToBuffer(buf, target);
 
-            PathNode[] openSet = path.method_22880();
-            PathNode[] closedSet = path.method_22881();
+            PathNode[] openSet = path.getDebugNodes();
+            PathNode[] closedSet = path.getDebugSecondNodes();
             int length = path.getLength();
 
             buf.writeInt(length);

@@ -110,7 +110,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     public void allocateGlResources()
     {
         this.allocateBuffer(VertexFormat.DrawMode.QUADS);
-        this.allocateBuffer(VertexFormat.DrawMode.LINES);
+        this.allocateBuffer(VertexFormat.DrawMode.DEBUG_LINES);
     }
 
     public void setRenderThrough(boolean renderThrough)

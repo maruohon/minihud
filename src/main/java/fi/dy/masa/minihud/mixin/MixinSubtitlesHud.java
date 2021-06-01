@@ -13,7 +13,7 @@ import fi.dy.masa.minihud.event.RenderHandler;
 public abstract class MixinSubtitlesHud
 {
     @Inject(method = "render", at = @At(
-            value = "INVOKE",
+            value = "INVOKE", remap = false,
             target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V",
             shift = Shift.AFTER, ordinal = 1))
     private void nudgeSubtitleOverlay(MatrixStack matrices, CallbackInfo ci)

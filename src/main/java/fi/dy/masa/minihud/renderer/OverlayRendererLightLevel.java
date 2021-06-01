@@ -115,7 +115,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     public void allocateGlResources()
     {
         this.allocateBuffer(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR, GameRenderer::getPositionTexColorShader);
-        this.allocateBuffer(VertexFormat.DrawMode.LINES);
+        this.allocateBuffer(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR, GameRenderer::getPositionColorShader);
     }
 
     private void renderLightLevels(Vec3d cameraPos, MinecraftClient mc)

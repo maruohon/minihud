@@ -68,7 +68,7 @@ public class OverlayRendererBlockGrid extends OverlayRendererBase
     @Override
     public void allocateGlResources()
     {
-        this.allocateBuffer(VertexFormat.DrawMode.LINES);
+        this.allocateBuffer(VertexFormat.DrawMode.DEBUG_LINES);
     }
 
     protected void renderLinesAll(Vec3d cameraPos, BlockPos center, int radius, Color4f color, BufferBuilder buffer)
