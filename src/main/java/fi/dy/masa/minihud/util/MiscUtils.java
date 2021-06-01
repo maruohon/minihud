@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockBox;
@@ -61,10 +61,10 @@ public class MiscUtils
     public static boolean isStructureWithinRange(@Nullable BlockBox bb, BlockPos playerPos, int maxRange)
     {
         if (bb == null ||
-            playerPos.getX() < (bb.minX - maxRange) ||
-            playerPos.getX() > (bb.maxX + maxRange) ||
-            playerPos.getZ() < (bb.minZ - maxRange) ||
-            playerPos.getZ() > (bb.maxZ + maxRange))
+            playerPos.getX() < (bb.getMinX() - maxRange) ||
+            playerPos.getX() > (bb.getMaxX() + maxRange) ||
+            playerPos.getZ() < (bb.getMinZ() - maxRange) ||
+            playerPos.getZ() > (bb.getMaxZ() + maxRange))
         {
             return false;
         }
@@ -94,12 +94,12 @@ public class MiscUtils
 
     public static void addBeeTooltip(ItemStack stack, List<Text> lines)
     {
-        CompoundTag tag = stack.getTag();
+        NbtCompound tag = stack.getTag();
 
         if (tag != null && tag.contains("BlockEntityTag", Constants.NBT.TAG_COMPOUND))
         {
             tag = tag.getCompound("BlockEntityTag");
-            ListTag bees = tag.getList("Bees", Constants.NBT.TAG_COMPOUND);
+            NbtList bees = tag.getList("Bees", Constants.NBT.TAG_COMPOUND);
             int count = bees.size();
             int babyCount = 0;
 
@@ -139,7 +139,7 @@ public class MiscUtils
 
     public static void addHoneyTooltip(ItemStack stack, List<Text> lines)
     {
-        CompoundTag tag = stack.getTag();
+        NbtCompound tag = stack.getTag();
 
         if (tag != null && tag.contains("BlockStateTag", Constants.NBT.TAG_COMPOUND))
         {

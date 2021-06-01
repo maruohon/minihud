@@ -2,14 +2,18 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 
 public abstract class OverlayRendererBase implements IOverlayRenderer
@@ -57,13 +61,13 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     }
 
     @Override
-    public void draw(MatrixStack matrixStack)
+    public void draw(MatrixStack matrixStack, Matrix4f projMatrix)
     {
         this.preRender();
 
         for (RenderObjectBase obj : this.renderObjects)
         {
-            obj.draw(matrixStack);
+            obj.draw(matrixStack, projMatrix);
         }
 
         this.postRender();
@@ -87,7 +91,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
      */
     protected RenderObjectBase allocateBuffer(VertexFormat.DrawMode glMode)
     {
-        return this.allocateBuffer(glMode, VertexFormats.POSITION_COLOR);
+        return this.allocateBuffer(glMode, VertexFormats.POSITION_COLOR, GameRenderer::getPositionColorShader);
     }
 
     /**
@@ -95,9 +99,9 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
      * @param glMode
      * @return
      */
-    protected RenderObjectBase allocateBuffer(VertexFormat.DrawMode glMode, VertexFormat format)
+    protected RenderObjectBase allocateBuffer(VertexFormat.DrawMode glMode, VertexFormat format, Supplier<Shader> shader)
     {
-        RenderObjectBase obj = new RenderObjectVbo(glMode, format);
+        RenderObjectBase obj = new RenderObjectVbo(glMode, format, shader);
         this.renderObjects.add(obj);
         return obj;
     }

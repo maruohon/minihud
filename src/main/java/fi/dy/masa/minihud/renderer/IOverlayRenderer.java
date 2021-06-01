@@ -3,33 +3,28 @@ package fi.dy.masa.minihud.renderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 
 public interface IOverlayRenderer
 {
     /**
      * Returns the camera position when the renderer was last updated
-     * @return
      */
     Vec3d getUpdatePosition();
 
     /**
      * Sets the camera position when the renderer was last updated
-     * @param cameraPosition
      */
     void setUpdatePosition(Vec3d cameraPosition);
 
     /**
      * Should this renderer draw anything at the moment, ie. is it enabled for example
-     * @return
      */
     boolean shouldRender(MinecraftClient mc);
 
     /**
      * Return true, if this renderer should get re-drawn/updated
-     * @param entity
-     * @param mc
-     * @return
      */
     boolean needsUpdate(Entity entity, MinecraftClient mc);
 
@@ -41,17 +36,13 @@ public interface IOverlayRenderer
      * minus the difference between the camera position during the update() call,
      * and the camera position during the draw() call.
      * @param entity The current camera entity
-     * @param mc
      */
     void update(Vec3d cameraPos, Entity entity, MinecraftClient mc);
 
     /**
      * Draw the buffer contents to screen
-     * @param x
-     * @param y
-     * @param z
      */
-    void draw(MatrixStack matrixStack);
+    void draw(MatrixStack matrixStack, Matrix4f projMatrix);
 
     /**
      * Allocates the OpenGL resources according to the current Video settings

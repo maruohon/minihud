@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BeehiveBlockEntity;
@@ -35,6 +34,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.LightType;
@@ -98,14 +98,14 @@ public class RenderHandler implements IRenderer
     {
         if (Configs.Generic.FIX_VANILLA_DEBUG_RENDERERS.getBooleanValue())
         {
-            RenderSystem.disableLighting();
+            //RenderSystem.disableLighting();
             //RenderUtils.color(1, 1, 1, 1);
             //OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f);
         }
     }
 
     @Override
-    public void onRenderGameOverlayPost(float partialTicks, MatrixStack matrixStack)
+    public void onRenderGameOverlayPost(MatrixStack matrixStack)
     {
         if (Configs.Generic.ENABLED.getBooleanValue() == false)
         {
@@ -167,12 +167,12 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLast(float partialTicks, net.minecraft.client.util.math.MatrixStack matrixStack)
+    public void onRenderWorldLast(MatrixStack matrixStack, Matrix4f projMatrix)
     {
         if (Configs.Generic.ENABLED.getBooleanValue() &&
             this.mc.world != null && this.mc.player != null && this.mc.options.hudHidden == false)
         {
-            OverlayRenderer.renderOverlays(matrixStack, this.mc, partialTicks);
+            OverlayRenderer.renderOverlays(matrixStack, projMatrix, this.mc);
         }
     }
 

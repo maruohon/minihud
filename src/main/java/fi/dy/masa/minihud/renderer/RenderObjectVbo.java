@@ -1,10 +1,14 @@
 package fi.dy.masa.minihud.renderer;
 
+import java.util.function.Supplier;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormatElement;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Matrix4f;
 
 public class RenderObjectVbo extends RenderObjectBase
 {
@@ -12,9 +16,9 @@ public class RenderObjectVbo extends RenderObjectBase
     protected final VertexFormat format;
     protected final boolean hasTexture;
 
-    public RenderObjectVbo(VertexFormat.DrawMode glMode, VertexFormat format)
+    public RenderObjectVbo(VertexFormat.DrawMode glMode, VertexFormat format, Supplier<Shader> shader)
     {
-        super(glMode);
+        super(glMode, shader);
 
         this.vertexBuffer = new VertexBuffer();
         this.format = format;
@@ -41,27 +45,27 @@ public class RenderObjectVbo extends RenderObjectBase
     }
 
     @Override
-    public void draw(net.minecraft.client.util.math.MatrixStack matrixStack)
+    public void draw(MatrixStack matrixStack, Matrix4f projMatrix)
     {
-        //RenderSystem.pushMatrix();
-
         if (this.hasTexture)
         {
             RenderSystem.enableTexture();
         }
 
-        this.vertexBuffer.bind();
-        this.format.startDrawing(0L);
-        this.vertexBuffer.draw(matrixStack.peek().getModel());
-        this.format.endDrawing();
+        RenderSystem.setShader(this.getShader());
+        //this.vertexBuffer.bind();
+        //this.format.startDrawing();
+        //this.vertexBuffer.draw(matrixStack.peek().getModel());
+        //this.vertexBuffer.method_34432();
+        this.vertexBuffer.method_34427(matrixStack.peek().getModel(), projMatrix, this.getShader().get());
+        //this.format.endDrawing();
 
         if (this.hasTexture)
         {
             RenderSystem.disableTexture();
         }
 
-        VertexBuffer.unbind();
-        //RenderSystem.popMatrix();
+        //VertexBuffer.unbind();
     }
 
     @Override

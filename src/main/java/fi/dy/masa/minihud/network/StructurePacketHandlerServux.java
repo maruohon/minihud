@@ -2,8 +2,8 @@ package fi.dy.masa.minihud.network;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import fi.dy.masa.malilib.network.IPluginChannelHandler;
@@ -44,17 +44,17 @@ public class StructurePacketHandlerServux implements IPluginChannelHandler
 
         if (id == PACKET_S2C_STRUCTURE_DATA && this.registered)
         {
-            CompoundTag tag = buf.readCompoundTag();
+            NbtCompound tag = buf.readNbt();
 
             if (tag != null)
             {
-                ListTag structures = tag.getList("Structures", Constants.NBT.TAG_COMPOUND);
+                NbtList structures = tag.getList("Structures", Constants.NBT.TAG_COMPOUND);
                 DataStorage.getInstance().addOrUpdateStructuresFromServer(structures, this.timeout, true);
             }
         }
         else if (id == PACKET_S2C_METADATA)
         {
-            CompoundTag tag = buf.readCompoundTag();
+            NbtCompound tag = buf.readNbt();
 
             if (tag != null &&
                 tag.getInt("version") == PROTOCOL_VERSION &&

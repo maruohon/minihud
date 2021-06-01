@@ -2,16 +2,13 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.VertexFormatElement;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
@@ -65,12 +62,12 @@ public class RenderContainer
         }
     }
 
-    public void render(Entity entity, MatrixStack matrixStack, MinecraftClient mc, float partialTicks)
+    public void render(Entity entity, MatrixStack matrixStack, Matrix4f projMatrix, MinecraftClient mc)
     {
         Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
 
         this.update(cameraPos, entity, mc);
-        this.draw(cameraPos, matrixStack, mc, partialTicks);
+        this.draw(cameraPos, matrixStack, projMatrix, mc);
     }
 
     protected void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
@@ -96,17 +93,13 @@ public class RenderContainer
         }
     }
 
-    protected void draw(Vec3d cameraPos, MatrixStack matrixStack, MinecraftClient mc, float partialTicks)
+    protected void draw(Vec3d cameraPos, MatrixStack matrixStack, Matrix4f projMatrix, MinecraftClient mc)
     {
         if (this.resourcesAllocated && this.countActive > 0)
         {
-            RenderSystem.pushMatrix();
-
             RenderSystem.disableTexture();
-            RenderSystem.alphaFunc(GL11.GL_GREATER, 0.01F);
             RenderSystem.disableCull();
             RenderSystem.enableDepthTest();
-            RenderSystem.disableLighting();
             RenderSystem.depthMask(false);
             RenderSystem.polygonOffset(-3f, -3f);
             RenderSystem.enablePolygonOffset();
@@ -114,43 +107,22 @@ public class RenderContainer
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
-            GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
-            GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
-
-            for (int i = 0; i < this.renderers.size(); ++i)
+            for (IOverlayRenderer renderer : this.renderers)
             {
-                IOverlayRenderer renderer = this.renderers.get(i);
-
                 if (renderer.shouldRender(mc))
                 {
                     Vec3d updatePos = renderer.getUpdatePosition();
                     matrixStack.push();
                     matrixStack.translate(updatePos.x - cameraPos.x, updatePos.y - cameraPos.y, updatePos.z - cameraPos.z);
 
-                    renderer.draw(matrixStack);
+                    renderer.draw(matrixStack, projMatrix);
 
                     matrixStack.pop();
                 }
             }
 
             VertexBuffer.unbind();
-            RenderSystem.clearCurrentColor();
-
-            for (VertexFormatElement element : VertexFormats.POSITION_COLOR.getElements())
-            {
-                VertexFormatElement.Type usage = element.getType();
-
-                switch (usage)
-                {
-                    case POSITION:
-                        GlStateManager.disableClientState(GL11.GL_VERTEX_ARRAY);
-                        break;
-                    case COLOR:
-                        GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
-                        RenderSystem.clearCurrentColor();
-                    default:
-                }
-            }
+            VertexBuffer.method_34430();
 
             RenderSystem.polygonOffset(0f, 0f);
             RenderSystem.disablePolygonOffset();
@@ -160,7 +132,6 @@ public class RenderContainer
             RenderSystem.enableCull();
             RenderSystem.depthMask(true);
             RenderSystem.enableTexture();
-            RenderSystem.popMatrix();
         }
     }
 
