@@ -11,9 +11,9 @@ import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.screen.MerchantScreenHandler;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOfferList;
@@ -125,19 +125,19 @@ public class VillagerDataStorage
         return new FavoriteData(Collections.emptyList(), favorites == null);
     }
 
-    private void readFromNBT(CompoundTag nbt)
+    private void readFromNBT(NbtCompound nbt)
     {
         if (nbt == null || nbt.contains("VillagerData", Constants.NBT.TAG_LIST) == false)
         {
             return;
         }
 
-        ListTag tagList = nbt.getList("VillagerData", Constants.NBT.TAG_COMPOUND);
+        NbtList tagList = nbt.getList("VillagerData", Constants.NBT.TAG_COMPOUND);
         int count = tagList.size();
 
         for (int i = 0; i < count; i++)
         {
-            CompoundTag tag = tagList.getCompound(i);
+            NbtCompound tag = tagList.getCompound(i);
             VillagerData data = VillagerData.fromNBT(tag);
 
             if (data != null)
@@ -151,7 +151,7 @@ public class VillagerDataStorage
 
         for (int i = 0; i < count; i++)
         {
-            CompoundTag tag = tagList.getCompound(i);
+            NbtCompound tag = tagList.getCompound(i);
             TradeType type = TradeType.fromTag(tag);
 
             if (type != null)
@@ -161,10 +161,10 @@ public class VillagerDataStorage
         }
     }
 
-    private CompoundTag writeToNBT(@Nonnull CompoundTag nbt)
+    private NbtCompound writeToNBT(@Nonnull NbtCompound nbt)
     {
-        ListTag favoriteListData = new ListTag();
-        ListTag globalFavoriteData = new ListTag();
+        NbtList favoriteListData = new NbtList();
+        NbtList globalFavoriteData = new NbtList();
 
         for (VillagerData data : this.data.values())
         {
@@ -241,7 +241,7 @@ public class VillagerDataStorage
                 File fileTmp  = new File(saveDir, this.getFileName() + ".tmp");
                 File fileReal = new File(saveDir, this.getFileName());
                 FileOutputStream os = new FileOutputStream(fileTmp);
-                NbtIo.writeCompressed(this.writeToNBT(new CompoundTag()), os);
+                NbtIo.writeCompressed(this.writeToNBT(new NbtCompound()), os);
                 os.close();
 
                 if (fileReal.exists())

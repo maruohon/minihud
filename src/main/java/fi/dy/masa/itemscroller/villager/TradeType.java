@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.village.TradeOffer;
@@ -34,9 +34,9 @@ public class TradeType
         return this.buyItem1 == buyItem1 && this.buyItem2 == buyItem2 && this.sellItem == sellItem;
     }
 
-    public CompoundTag toTag()
+    public NbtCompound toTag()
     {
-        CompoundTag tag = new CompoundTag();
+        NbtCompound tag = new NbtCompound();
 
         tag.putString("Buy1", Registry.ITEM.getId(this.buyItem1).toString());
         tag.putString("Buy2", Registry.ITEM.getId(this.buyItem2).toString());
@@ -46,7 +46,7 @@ public class TradeType
     }
 
     @Nullable
-    public static TradeType fromTag(CompoundTag tag)
+    public static TradeType fromTag(NbtCompound tag)
     {
         Item buy1 = getItemForName(tag.getString("Buy1"));
         Item buy2 = getItemForName(tag.getString("Buy2"));

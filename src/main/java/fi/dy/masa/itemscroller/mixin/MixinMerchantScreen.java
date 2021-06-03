@@ -132,8 +132,8 @@ public abstract class MixinMerchantScreen extends HandledScreen<MerchantScreenHa
         }
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/systems/RenderSystem;popMatrix()V"))
+    @Inject(method = "render", at = @At(value = "FIELD",
+            target = "Lnet/minecraft/client/gui/screen/ingame/MerchantScreen;offers:[Lnet/minecraft/client/gui/screen/ingame/MerchantScreen$WidgetButtonPage;"))
     private void renderFavoriteMarker(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci)
     {
         if (Configs.Toggles.VILLAGER_TRADE_FEATURES.getBooleanValue())
