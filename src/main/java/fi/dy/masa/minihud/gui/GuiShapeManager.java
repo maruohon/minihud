@@ -80,7 +80,8 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         }
 
         this.setListPosition(this.getListX(), 68 + (rows - 1) * 22);
-        this.reCreateListWidget();
+        this.getListWidget().setSize(this.getBrowserWidth(), this.getBrowserHeight());
+        this.getListWidget().initGui();
 
         y += 24;
 

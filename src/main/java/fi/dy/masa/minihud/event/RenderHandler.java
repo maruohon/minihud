@@ -501,7 +501,7 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.DISTANCE)
         {
             Vec3d ref = DataStorage.getInstance().getDistanceReferencePoint();
-            double dist = MathHelper.sqrt(ref.squaredDistanceTo(entity.getX(), entity.getY(), entity.getZ()));
+            double dist = Math.sqrt(ref.squaredDistanceTo(entity.getX(), entity.getY(), entity.getZ()));
             this.addLine(String.format("Distance: %.2f (x: %.2f y: %.2f z: %.2f) [to x: %.2f y: %.2f z: %.2f]",
                     dist, entity.getX() - ref.x, entity.getY() - ref.y, entity.getZ() - ref.z, ref.x, ref.y, ref.z));
         }
