@@ -16,10 +16,10 @@ public interface IMixinScreenWithHandler
     @Accessor("focusedSlot")
     net.minecraft.screen.slot.Slot getHoveredSlot();
 
-    @Accessor("field_2776") // x
+    @Accessor("x")
     int getGuiLeft();
 
-    @Accessor("field_2800") // y
+    @Accessor("y")
     int getGuiTop();
 
     @Accessor("backgroundWidth")
