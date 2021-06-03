@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -26,6 +27,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.screen.MerchantScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -43,6 +45,9 @@ import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
 import fi.dy.masa.itemscroller.recipes.RecipePattern;
 import fi.dy.masa.itemscroller.recipes.RecipeStorage;
+import fi.dy.masa.itemscroller.villager.VillagerDataStorage;
+import fi.dy.masa.itemscroller.villager.VillagerUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
 
 public class InventoryUtils
 {
@@ -538,6 +543,24 @@ public class InventoryUtils
         }
     }
 
+    public static void dropAllMatchingStacks(HandledScreen<? extends ScreenHandler> gui, ItemStack stackReference)
+    {
+        if (isStackEmpty(stackReference) == false)
+        {
+            ScreenHandler container = gui.getScreenHandler();
+            stackReference = stackReference.copy();
+
+            for (Slot slot : container.slots)
+            {
+                if (areStacksEqual(slot.getStack(), stackReference))
+                {
+                    // Drop the stack
+                    dropStack(gui, slot.id);
+                }
+            }
+        }
+    }
+
     public static boolean shiftDropItems(HandledScreen<? extends ScreenHandler> gui)
     {
         ItemStack stackReference = gui.getScreenHandler().getCursorStack();
@@ -643,6 +666,81 @@ public class InventoryUtils
             {
                 moveOneSetOfItemsFromSlotToPlayerInventory(gui, slot);
             }
+        }
+
+        return false;
+    }
+
+    public static void villagerClearTradeInputSlots()
+    {
+        if (GuiUtils.getCurrentScreen() instanceof MerchantScreen)
+        {
+            MerchantScreen merchantGui = (MerchantScreen) GuiUtils.getCurrentScreen();
+            Slot slot = merchantGui.getScreenHandler().getSlot(0);
+
+            if (slot.hasStack())
+            {
+                shiftClickSlot(merchantGui, slot.id);
+            }
+
+            slot = merchantGui.getScreenHandler().getSlot(1);
+
+            if (slot.hasStack())
+            {
+                shiftClickSlot(merchantGui, slot.id);
+            }
+        }
+    }
+
+    public static void villagerTradeEverythingPossibleWithTrade(int visibleIndex)
+    {
+        if (GuiUtils.getCurrentScreen() instanceof MerchantScreen)
+        {
+            MerchantScreen merchantGui = (MerchantScreen) GuiUtils.getCurrentScreen();
+            Slot slot = merchantGui.getScreenHandler().getSlot(2);
+
+            while (true)
+            {
+                VillagerUtils.switchToTradeByVisibleIndex(visibleIndex);
+                //tryMoveItemsToMerchantBuySlots(merchantGui, true);
+
+                // Not a valid recipe
+                if (slot.hasStack() == false)
+                {
+                    break;
+                }
+
+                shiftClickSlot(merchantGui, slot.id);
+
+                // No room in player inventory
+                if (slot.hasStack())
+                {
+                    break;
+                }
+            }
+
+            villagerClearTradeInputSlots();
+        }
+    }
+
+    public static boolean villagerTradeEverythingPossibleWithAllFavoritedTrades()
+    {
+        Screen screen = GuiUtils.getCurrentScreen();
+
+        if (screen instanceof MerchantScreen)
+        {
+            MerchantScreenHandler handler = ((MerchantScreen) screen).getScreenHandler();
+            List<Integer> favorites = VillagerDataStorage.getInstance().getFavoritesForCurrentVillager(handler).favorites;
+
+            for (int index = 0; index < favorites.size(); ++index)
+            {
+                VillagerUtils.switchToTradeByVisibleIndex(index);
+                villagerTradeEverythingPossibleWithTrade(index);
+            }
+
+            villagerClearTradeInputSlots();
+
+            return true;
         }
 
         return false;
@@ -1160,7 +1258,7 @@ public class InventoryUtils
                 // Failed to clear the slot
                 if (slotTmp.hasStack())
                 {
-                    return false;
+                    dropStack(gui, slotNum);
                 }
             }
         }
@@ -1413,6 +1511,30 @@ public class InventoryUtils
         if (slot != null && isStackEmpty(recipe.getResult()) == false)
         {
             dropStacks(gui, recipe.getResult(), slot, false);
+        }
+    }
+
+    public static void throwAllNonRecipeItemsToGround(RecipePattern recipe, HandledScreen<? extends ScreenHandler> gui)
+    {
+        Slot outputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
+
+        if (outputSlot != null && isStackEmpty(recipe.getResult()) == false)
+        {
+            SlotRange range = CraftingHandler.getCraftingGridSlots(gui, outputSlot);
+            ItemStack[] recipeItems = recipe.getRecipeItems();
+            final int invSlots = gui.getScreenHandler().slots.size();
+            final int rangeSlots = Math.min(range.getSlotCount(), recipeItems.length);
+
+            for (int i = 0, slotNum = range.getFirst(); i < rangeSlots && slotNum < invSlots; i++, slotNum++)
+            {
+                Slot slotTmp = gui.getScreenHandler().getSlot(slotNum);
+                ItemStack stack = slotTmp.getStack();
+
+                if (stack.isEmpty() == false && areStacksEqual(stack, recipeItems[i]) == false)
+                {
+                    dropAllMatchingStacks(gui, stack);
+                }
+            }
         }
     }
 
