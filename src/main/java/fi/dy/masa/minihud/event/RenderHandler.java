@@ -54,9 +54,11 @@ import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.mixin.IMixinServerWorld;
 import fi.dy.masa.minihud.mixin.IMixinWorldRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.DataStorage;
+import fi.dy.masa.minihud.util.IServerEntityManager;
 import fi.dy.masa.minihud.util.MiscUtils;
 
 public class RenderHandler implements IRenderer
@@ -718,6 +720,7 @@ public class RenderHandler implements IRenderer
         {
             // TODO 1.17
             //this.addLine(String.format("Client world TE - L: %d, T: %d", mc.world.blockEntities.size(), mc.world.tickingBlockEntities.size()));
+            this.addLine("Client world TE - L: ?, T: ? - TODO 1.17");
         }
         else if (type == InfoToggle.ENTITIES_CLIENT_WORLD)
         {
@@ -729,10 +732,9 @@ public class RenderHandler implements IRenderer
 
                 if (serverWorld instanceof ServerWorld)
                 {
-                    // TODO 1.17
-                    //int countServer = ((IMixinServerWorld) serverWorld).getEntityList().size();
-                    //this.addLine(String.format("Entities - Client: %d, Server: %d", countClient, countServer));
-                    this.addLine(String.format("Entities - Client: TODO 1.17, Server: TODO 1.17"));
+                    IServerEntityManager manager = (IServerEntityManager) ((IMixinServerWorld) serverWorld).minihud_getEntityManager();
+                    int indexSize = manager.getIndexSize();
+                    this.addLine(String.format("Entities - Client: %d - Server: %d", countClient, indexSize));
                     return;
                 }
             }

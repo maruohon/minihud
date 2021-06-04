@@ -19,6 +19,7 @@
         "MixinMinecraftServer",
         "MixinNeighborUpdateDebugRenderer",
         "MixinScreen",
+        "MixinServerEntityManager",
         "MixinSubtitlesHud",
         "MixinWorld"
     ],
