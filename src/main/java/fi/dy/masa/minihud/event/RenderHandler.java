@@ -525,8 +525,7 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.LIGHT_LEVEL)
         {
-            // Prevent a crash when outside of world
-            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isChunkLoaded(pos))
+            if (mc.world.isChunkLoaded(pos))
             {
                 WorldChunk clientChunk = this.getClientChunk(chunkPos);
 
@@ -675,7 +674,7 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.BIOME)
         {
             // Prevent a crash when outside of world
-            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isChunkLoaded(pos))
+            if (mc.world.isChunkLoaded(pos))
             {
                 WorldChunk clientChunk = this.getClientChunk(chunkPos);
 
@@ -690,7 +689,7 @@ public class RenderHandler implements IRenderer
         else if (type == InfoToggle.BIOME_REG_NAME)
         {
             // Prevent a crash when outside of world
-            if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isChunkLoaded(pos))
+            if (mc.world.isChunkLoaded(pos))
             {
                 WorldChunk clientChunk = this.getClientChunk(chunkPos);
 
