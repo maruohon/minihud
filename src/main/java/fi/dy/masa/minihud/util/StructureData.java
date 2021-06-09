@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.util;
 
+import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
@@ -12,34 +13,22 @@ import fi.dy.masa.malilib.util.IntBoundingBox;
 
 public class StructureData
 {
-    public static final int CARPET_STRUCTURE_ID_OUTER_BOUNDING_BOX = 0;
-    public static final int CARPET_STRUCTURE_ID_END_CITY = 1;
-    public static final int CARPET_STRUCTURE_ID_FORTRESS = 2;
-    public static final int CARPET_STRUCTURE_ID_TEMPLE = 3;
-    public static final int CARPET_STRUCTURE_ID_VILLAGE = 4;
-    public static final int CARPET_STRUCTURE_ID_STRONGHOLD = 5;
-    public static final int CARPET_STRUCTURE_ID_MINESHAFT = 6;
-    public static final int CARPET_STRUCTURE_ID_MONUMENT = 7;
-    public static final int CARPET_STRUCTURE_ID_MANSION = 8;
-
-    //private static final CarpetBoxReader CARPET_BOX_READER = new CarpetBoxReader();
-
     private final StructureType type;
     private final IntBoundingBox mainBox;
     private final ImmutableList<IntBoundingBox> componentBoxes;
     private long refreshTime;
 
-    private StructureData(StructureType type, IntBoundingBox mainBox, ImmutableList<IntBoundingBox> componentBoxes, long refreshTime)
+    private StructureData(StructureType type, ImmutableList<IntBoundingBox> componentBoxes, long refreshTime)
     {
-        this(type, mainBox, componentBoxes);
+        this(type, componentBoxes);
 
         this.refreshTime = refreshTime;
     }
 
-    private StructureData(StructureType type, IntBoundingBox mainBox, ImmutableList<IntBoundingBox> componentBoxes)
+    private StructureData(StructureType type, ImmutableList<IntBoundingBox> componentBoxes)
     {
         this.type = type;
-        this.mainBox = mainBox;
+        this.mainBox = encompass(componentBoxes);
         this.componentBoxes = componentBoxes;
     }
 
@@ -73,13 +62,13 @@ public class StructureData
             builder.add(IntBoundingBox.fromVanillaBox(component.getBoundingBox()));
         }
 
-        return new StructureData(type, IntBoundingBox.fromVanillaBox(structure.setBoundingBoxFromChildren()), builder.build());
+        return new StructureData(type, builder.build());
     }
 
     @Nullable
     public static StructureData fromStructureStartTag(NbtCompound tag, long currentTime)
     {
-        if (tag.contains("BB", Constants.NBT.TAG_INT_ARRAY) &&
+        if (tag.contains("id", Constants.NBT.TAG_STRING) &&
             tag.contains("Children", Constants.NBT.TAG_LIST))
         {
             StructureType type = StructureType.byStructureId(tag.getString("id"));
@@ -94,7 +83,7 @@ public class StructureData
                 builder.add(IntBoundingBox.fromArray(pieceTag.getIntArray("BB")));
             }
 
-            return new StructureData(type, IntBoundingBox.fromArray(tag.getIntArray("BB")), builder.build(), currentTime);
+            return new StructureData(type, builder.build(), currentTime);
         }
 
         return null;
@@ -150,11 +139,37 @@ public class StructureData
             return false;
         }
 
-        if (this.type != other.type)
+        return this.type == other.type;
+    }
+
+    public static IntBoundingBox encompass(Iterable<IntBoundingBox> boxes)
+    {
+        Iterator<IntBoundingBox> iterator = boxes.iterator();
+
+        if (iterator.hasNext())
         {
-            return false;
+            IntBoundingBox box = iterator.next();
+            int minX = box.minX;
+            int minY = box.minY;
+            int minZ = box.minZ;
+            int maxX = box.maxX;
+            int maxY = box.maxY;
+            int maxZ = box.maxZ;
+
+            while (iterator.hasNext())
+            {
+                box = iterator.next();
+                minX = Math.min(minX, box.minX);
+                minY = Math.min(minY, box.minY);
+                minZ = Math.min(minZ, box.minZ);
+                maxX = Math.max(maxX, box.maxX);
+                maxY = Math.max(maxY, box.maxY);
+                maxZ = Math.max(maxZ, box.maxZ);
+            }
+
+            return new IntBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
         }
 
-        return true;
+        return new IntBoundingBox(0, 0, 0, 0, 0, 0);
     }
 }
