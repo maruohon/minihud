@@ -155,7 +155,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         x += 11;
         y += 54;
 
-        GenericButton button = new GenericButton(-1, false, "malilib.gui.button.render_layers_gui.set_to_player");
+        GenericButton button = new GenericButton("malilib.gui.button.render_layers_gui.set_to_player");
         button.setPosition(x, y);
         button.setActionListener(() -> {
             Entity entity = this.mc.getRenderViewEntity();

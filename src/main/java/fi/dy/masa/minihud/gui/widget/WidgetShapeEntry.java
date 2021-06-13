@@ -28,10 +28,9 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
 
         this.setText(StyledTextLine.of(shape.getDisplayName()));
 
-        this.configureButton = new GenericButton(-1, true, "minihud.gui.button.configure");
+        this.configureButton = new GenericButton("minihud.gui.button.configure");
         this.toggleButton = OnOffButton.simpleSlider(20, this.shape::isEnabled, this::toggleShapeEnabled);
-        this.toggleButton.setRightAlign(true, x, true);
-        this.removeButton = new GenericButton(-1, true, "minihud.gui.button.remove");
+        this.removeButton = new GenericButton("minihud.gui.button.remove");
 
         this.configureButton.setActionListener(() -> {
             GuiShapeEditor gui = new GuiShapeEditor(this.shape);
@@ -47,7 +46,7 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
         this.buttonsStartX = x + width - this.configureButton.getWidth() - this.toggleButton.getWidth() - this.removeButton.getWidth() - 6;
 
         this.setHoverStringProvider("shape_info", shape::getWidgetHoverLines);
-        this.setRenderNormalBackground(true);
+        this.getBackgroundRenderer().getNormalSettings().setEnabled(true);
     }
 
     @Override
@@ -58,16 +57,17 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
         int x = this.getX() + this.getWidth() - 2;
         int y = this.getY() + 1;
 
+        x -= this.removeButton.getWidth() + 2;
+        this.removeButton.setX(x);
         this.removeButton.setY(y);
-        this.removeButton.setRightX(x);
-        x = this.removeButton.getX() - 2;
 
+        x -= this.toggleButton.getWidth() + 2;
+        this.toggleButton.setX(x);
         this.toggleButton.setY(y);
-        this.toggleButton.setRightX(x);
-        x = this.toggleButton.getX() - 2;
 
+        x -= this.configureButton.getWidth() + 2;
+        this.configureButton.setX(x);
         this.configureButton.setY(y);
-        this.configureButton.setRightX(x);
     }
 
     @Override

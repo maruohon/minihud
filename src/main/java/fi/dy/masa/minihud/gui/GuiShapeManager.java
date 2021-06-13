@@ -8,7 +8,7 @@ import fi.dy.masa.malilib.gui.widget.LabelWidget;
 import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -29,7 +29,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
 
         // The position will get updated later
         this.widgetDropDown = new DropDownListWidget<>(160, 16, 200, 10, ShapeType.VALUES, ShapeType::getDisplayName);
-        this.widgetDropDown.setZLevel((int) this.zLevel + 2);
+        this.widgetDropDown.setZ((int) this.zLevel + 2);
     }
 
     @Override
@@ -42,6 +42,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
 
         int x = 12;
         int y = 44;
+        int rightX = this.x + this.screenWidth;
         int lw = StringUtils.getMaxStringRenderWidth(StringUtils.translate("minihud.gui.button.shapes.overlay_rendering"),
                                                      StringUtils.translate("minihud.gui.button.shapes.shape_renderer")) + 8;
 
@@ -54,8 +55,8 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         button.setPosition(x, y);
         this.addWidget(button);
 
-        this.widgetDropDown.setPosition(this.screenWidth - 10, y);
-        this.widgetDropDown.setRightAlign(true, this.screenWidth - 10, true);
+        this.widgetDropDown.setRight(rightX - 10);
+        this.widgetDropDown.setY(y);
         this.addWidget(this.widgetDropDown);
 
         y += 18;
@@ -69,8 +70,9 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         button.setPosition(x, y + 1);
         this.addWidget(button);
 
-        button = new GenericButton(-1, true, "minihud.gui.button.add_shape");
-        button.setPosition(this.x + this.screenWidth - button.getWidth() - 10, y);
+        button = new GenericButton("minihud.gui.button.add_shape");
+        button.setRight(rightX - 10);
+        button.setY(y);
         button.setActionListener(this::addShape);
         this.addWidget(button);
     }
@@ -92,7 +94,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         }
         else
         {
-            MessageUtils.error("minihud.message.error.shapes.select_shape_from_dropdown");
+            MessageDispatcher.error("minihud.message.error.shapes.select_shape_from_dropdown");
         }
     }
 

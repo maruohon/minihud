@@ -101,7 +101,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         ScreenLocation location = Configs.Internal.HUD_LOCATION.getValue();
         InfoArea area = InfoOverlay.INSTANCE.getOrCreateInfoArea(location);
         String marker = Reference.MOD_ID;
-        StringListRendererWidget widget = area.findWidget(StringListRendererWidget.class, (w) -> w.hasMarker(marker));
+        StringListRendererWidget widget = area.findWidget(StringListRendererWidget.class, (w) -> w.matchesMarker(marker));
 
         if (widget == null)
         {
@@ -112,7 +112,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             widget.setScale(0.5);
             widget.getTextSettings().setTextColor(0xFFFFFFFF);
             widget.getTextSettings().setBackgroundColor(0x80505050);
-            widget.getTextSettings().setUseBackground(true);
+            widget.getTextSettings().setBackgroundEnabled(true);
             widget.getMargin().setAll(1, 0, 0, 1);
             widget.getPadding().setAll(2, 2, 0, 2);
             InfoWidgetManager.INSTANCE.addWidget(widget);
