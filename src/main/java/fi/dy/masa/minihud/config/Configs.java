@@ -19,7 +19,6 @@ import fi.dy.masa.malilib.input.KeyBindSettings;
 import fi.dy.masa.minihud.util.BlockGridMode;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
 import fi.dy.masa.minihud.util.LightLevelNumberMode;
-import fi.dy.masa.minihud.util.PrintMode;
 
 public class Configs
 {
@@ -72,6 +71,7 @@ public class Configs
         public static final IntegerConfig SPAWNABLE_COLUMNS_OVERLAY_RADIUS      = new IntegerConfig("spawnableColumnHeightsOverlayRadius", 40, 0, 128);
         public static final IntegerConfig SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL    = new IntegerConfig("spawnableSubChunkCheckInterval", 20, 1, 10000);
         public static final IntegerConfig SPAWNABLE_SUB_CHUNKS_OVERLAY_RADIUS   = new IntegerConfig("spawnableSubChunksOverlayRadius", -1, -1, 40);
+        public static final BooleanConfig SPAWNER_POSITION_PRINT                = new BooleanConfig("spawnerPositionPrint", false);
         public static final BooleanConfig STRUCTURES_RENDER_THROUGH             = new BooleanConfig("structuresRenderThrough", false);
         public static final IntegerConfig TIME_DAY_DIVISOR                      = new IntegerConfig("timeDayDivisor", 24000, 1, Integer.MAX_VALUE);
         public static final IntegerConfig TIME_TOTAL_DIVISOR                    = new IntegerConfig("timeTotalDivisor", 24000, 1, Integer.MAX_VALUE);
@@ -81,7 +81,6 @@ public class Configs
         public static final OptionListConfig<BlockGridMode> BLOCK_GRID_OVERLAY_MODE         = new OptionListConfig<>("blockGridOverlayMode", BlockGridMode.ALL, BlockGridMode.VALUES);
         public static final OptionListConfig<LightLevelMarkerMode> LIGHT_LEVEL_MARKER_MODE  = new OptionListConfig<>("lightLevelMarkers", LightLevelMarkerMode.SQUARE, LightLevelMarkerMode.VALUES);
         public static final OptionListConfig<LightLevelNumberMode> LIGHT_LEVEL_NUMBER_MODE  = new OptionListConfig<>("lightLevelNumbers", LightLevelNumberMode.BLOCK, LightLevelNumberMode.VALUES);
-        public static final OptionListConfig<PrintMode> SPAWNER_POSITION_PRINT              = new OptionListConfig<>("spawnerPositionPrint", PrintMode.SUCCESS, PrintMode.VALUES);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 BEACON_RANGE_AUTO_UPDATE,
@@ -182,6 +181,7 @@ public class Configs
         public static final ColorConfig SPAWNABLE_CHUNKS_PLAYER             = new ColorConfig("spawnableChunksPlayer", "0x40FF3030");
         public static final ColorConfig SPAWNABLE_COLUMNS_OVERLAY_COLOR     = new ColorConfig("spawnableColumnHeights", "0xA0FF00FF");
         public static final ColorConfig SPAWNER_POSITIONS_OVERLAY_COLOR     = new ColorConfig("spawnerPositions", "#40FF8019");
+        public static final ColorConfig WATER_FALL_POSITIONS_OVERLAY_COLOR  = new ColorConfig("waterFallPositions", "#40326BF3");
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 BEACON_RANGE_LVL1_OVERLAY_COLOR,
@@ -211,7 +211,8 @@ public class Configs
                 SPAWNABLE_CHUNKS_FIXED,
                 SPAWNABLE_CHUNKS_PLAYER,
                 SPAWNABLE_COLUMNS_OVERLAY_COLOR,
-                SPAWNER_POSITIONS_OVERLAY_COLOR
+                SPAWNER_POSITIONS_OVERLAY_COLOR,
+                WATER_FALL_POSITIONS_OVERLAY_COLOR
         );
     }
 

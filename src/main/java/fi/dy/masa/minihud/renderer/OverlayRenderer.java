@@ -61,7 +61,12 @@ public class OverlayRenderer
 
         if (RendererToggle.OVERLAY_SPAWNER_POSITIONS.isRendererEnabled())
         {
-            OverlayRendererSpawnerPositions.renderPositionText(dx, dy, dz);
+            RenderContainer.SPAWNER_RENDERER.renderPositionText(dx, dy, dz);
+        }
+
+        if (RendererToggle.OVERLAY_WATER_FALLS.isRendererEnabled())
+        {
+            RenderContainer.WATER_FALL_RENDERER.renderPositionText(dx, dy, dz);
         }
 
         RenderContainer.INSTANCE.render(entity, mc, partialTicks);

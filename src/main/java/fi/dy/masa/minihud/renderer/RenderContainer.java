@@ -16,6 +16,9 @@ import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 
 public class RenderContainer
 {
+    public static final OverlayRendererSpawnerPositions SPAWNER_RENDERER = new OverlayRendererSpawnerPositions();
+    public static final OverlayRendererWaterFalls WATER_FALL_RENDERER = new OverlayRendererWaterFalls();
+
     public static final RenderContainer INSTANCE = new RenderContainer();
 
     protected final List<OverlayRendererBase> renderers = new ArrayList<>();
@@ -37,8 +40,9 @@ public class RenderContainer
         this.addRenderer(new OverlayRendererSpawnableChunks(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER));
         this.addRenderer(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL));
         this.addRenderer(new OverlayRendererSpawnChunks(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER));
-        this.addRenderer(new OverlayRendererSpawnerPositions());
         this.addRenderer(new OverlayRendererStructures());
+        this.addRenderer(SPAWNER_RENDERER);
+        this.addRenderer(WATER_FALL_RENDERER);
     }
 
     private void addRenderer(OverlayRendererBase renderer)

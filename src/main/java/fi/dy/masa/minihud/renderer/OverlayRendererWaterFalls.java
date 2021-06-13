@@ -5,14 +5,14 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 
-public class OverlayRendererSpawnerPositions extends BaseBlockPositionListOverlayRenderer
+public class OverlayRendererWaterFalls extends BaseBlockPositionListOverlayRenderer
 {
-    public OverlayRendererSpawnerPositions()
+    public OverlayRendererWaterFalls()
     {
-        super(RendererToggle.OVERLAY_SPAWNER_POSITIONS::isRendererEnabled,
-              Configs.Colors.SPAWNER_POSITIONS_OVERLAY_COLOR::getColor,
-              DataStorage.getInstance()::areSpawnerPositionsDirty,
-              DataStorage.getInstance()::getSpawnerPositions);
+        super(RendererToggle.OVERLAY_WATER_FALLS::isRendererEnabled,
+              Configs.Colors.WATER_FALL_POSITIONS_OVERLAY_COLOR::getColor,
+              DataStorage.getInstance()::areWaterFallPositionsDirty,
+              DataStorage.getInstance()::getWaterFallPositions);
     }
 
     @Override

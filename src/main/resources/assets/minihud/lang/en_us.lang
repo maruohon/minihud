@@ -42,7 +42,7 @@ minihud.config.comment.sortlinesreversed=Reverse the info line sorting order
 minihud.config.comment.spawnablecolumnheightsoverlayradius=The radius (in blocks) to render the spawnable\ncolumn heights overlay in. Valid range: 0 ... 128
 minihud.config.comment.spawnablesubchunkcheckinterval=The interval in game ticks for the spawnable sub-chunk heightmap checks
 minihud.config.comment.spawnablesubchunksoverlayradius=The radius of chunks to render the spawnable sub-chunks\noverlay in. Valid range: -1 ... 40, where -1 = render distance
-minihud.config.comment.spawnerpositionprint=Whether or not to print spawner generation attempts\nto the game console, and which ones.\nThese are only printed if the Spawner Positions renderer is enabled.
+minihud.config.comment.spawnerpositionprint=Whether or not to print spawner generation attempts\nto the game console.\nThese are only printed if the Spawner Positions renderer is enabled.
 minihud.config.comment.structuresrenderthrough=If enabled, then the Structure Bounding Boxes\nwill be rendered through blocks
 minihud.config.comment.timedaydivisor=The divisor value for the modulo of the day time,\nused for 'Time Modulo (day time)' info line
 minihud.config.comment.timetotaldivisor=The divisor value for the modulo of the total world time,\nused for 'Time Modulo (total time)' info line
@@ -86,6 +86,7 @@ minihud.config.comment.spawnablechunkfixed=Color for the fixed-position spawnabl
 minihud.config.comment.spawnablechunksplayer=Color for the player-following spawnable chunks overlay
 minihud.config.comment.spawnablecolumnheights=Color for the spawnable sub-chunks overlay
 minihud.config.comment.spawnerpositions=Color for the possible spawner positions overlay
+minihud.config.comment.waterfallpositions=Color for the possible water fall positions overlay
 
 
 minihud.config.name.beaconrangeautoupdate=Beacon Range Auto-Update
@@ -178,6 +179,7 @@ minihud.config.name.spawnablechunkfixed=Spawnable Chunks (fixed-position)
 minihud.config.name.spawnablechunksplayer=Spawnable Chunks (player-following)
 minihud.config.name.spawnablecolumnheights=Spawnable Column Heights
 minihud.config.name.spawnerpositions=Spawner Positions (attempts)
+minihud.config.name.waterfallpositions=Water Fall Positions (attempts)
 
 minihud.info_line.comment.infobiome=Show the name of the current biome
 minihud.info_line.comment.infobiomeregistryname=Show the registry name of the current biome
@@ -293,6 +295,7 @@ minihud.renderer_toggle.comment.overlayspawnchunkplayer=Enables the pseudo (play
 minihud.renderer_toggle.comment.overlayspawnerpositions=Enables the Spawner Positions (generation attempts) overlay.\nThe positions are only recorded from the actual generation code,\nso this only works in single player, and only for newly generated chunks.\nThe recorded positions are cleared when logging out.\nThere is an option in Generic category for whether or not\nto also print the positions to the game console.
 minihud.renderer_toggle.comment.overlaystructuremaintoggle=Main toggle option for the Structure Bounding Boxes Renderer
 minihud.renderer_toggle.comment.shaperenderer=The main toggle option for the Shape Renderer
+minihud.renderer_toggle.comment.overlaywaterfalls=Enables the Water Falls (generation attempts) overlay.\nThe positions are only recorded from the actual generation code,\nso this only works in single player, and only for newly generated chunks.\nThe recorded positions are cleared when logging out.
 
 minihud.renderer_toggle.name.debugcollisionboxenabled=Debug: Block Collision Boxes
 minihud.renderer_toggle.name.debugheightmapenabled=Debug: Height Map
@@ -317,6 +320,7 @@ minihud.renderer_toggle.name.overlayspawnchunkplayer=Spawn Chunks (fake)
 minihud.renderer_toggle.name.overlayspawnerpositions=Spawner Positions (attempts)
 minihud.renderer_toggle.name.overlaystructuremaintoggle=§eStructure Bounding Boxes
 minihud.renderer_toggle.name.shaperenderer=§eShape Renderer
+minihud.renderer_toggle.name.overlaywaterfalls=Water Falls (generation attempts)
 
 
 minihud.structure_toggle.comment.desertpyramid=Enable Desert Pyramid structure bounding boxes rendering

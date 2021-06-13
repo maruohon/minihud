@@ -29,7 +29,6 @@ import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.util.MiscUtils;
-import fi.dy.masa.minihud.util.PrintMode;
 
 public class DataStorage
 {
@@ -45,6 +44,7 @@ public class DataStorage
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
     private final ArrayListMultimap<Long, BlockPos> spawnerPositions = ArrayListMultimap.create();
+    private final ArrayListMultimap<Long, BlockPos> waterFallPositions = ArrayListMultimap.create();
     private final int[] blockBreakCounter = new int[100];
     private BlockPos worldSpawn = BlockPos.ORIGIN;
     private Vec3d distanceReferencePoint = Vec3d.ZERO;
@@ -54,6 +54,7 @@ public class DataStorage
     private boolean worldSpawnValid;
     private boolean hasServerDroppedChunksHashSize;
     private boolean spawnerPositionsDirty;
+    private boolean waterFallPositionsDirty;
 
     public static DataStorage getInstance()
     {
@@ -104,6 +105,7 @@ public class DataStorage
         else
         {
             this.spawnerPositions.clear();
+            this.waterFallPositions.clear();
             CarpetPubsubPacketHandler.unsubscribeAll();
         }
     }
@@ -198,7 +200,12 @@ public class DataStorage
         return this.spawnerPositionsDirty;
     }
 
-    public void addDungeonSpawnerPosition(BlockPos pos, boolean success)
+    public boolean areWaterFallPositionsDirty()
+    {
+        return this.waterFallPositionsDirty;
+    }
+
+    public void addDungeonSpawnerPosition(BlockPos pos)
     {
         int cx = pos.getX() >> 4;
         int cz = pos.getZ() >> 4;
@@ -210,12 +217,23 @@ public class DataStorage
             this.spawnerPositionsDirty = true;
         }
 
-        PrintMode mode = Configs.Generic.SPAWNER_POSITION_PRINT.getValue();
-
-        if (mode == PrintMode.BOTH || (mode == PrintMode.FAIL && success == false) || (mode == PrintMode.SUCCESS && success))
+        if (Configs.Generic.SPAWNER_POSITION_PRINT.getBooleanValue())
         {
-            LiteModMiniHud.logger.info(String.format("Spawner gen attempt: Chunk: [%4d, %4d] pos: [%d, %d, %d] - %s",
-                                                     cx, cz, pos.getX(), pos.getY(), pos.getZ(), success ? "SUCCESS" : "FAIL"));
+            LiteModMiniHud.logger.info(String.format("Spawner gen attempt: Chunk: [%4d, %4d] pos: [%d, %d, %d]",
+                                                     cx, cz, pos.getX(), pos.getY(), pos.getZ()));
+        }
+    }
+
+    public void addWaterFallPosition(BlockPos pos)
+    {
+        int cx = pos.getX() >> 4;
+        int cz = pos.getZ() >> 4;
+        long cp = (long) cz << 32 | (((long) cx) & 0xFFFFFFFFL);
+
+        synchronized (this.waterFallPositions)
+        {
+            this.waterFallPositions.put(cp, pos.toImmutable());
+            this.waterFallPositionsDirty = true;
         }
     }
 
@@ -227,6 +245,19 @@ public class DataStorage
         {
             map.putAll(this.spawnerPositions);
             this.spawnerPositionsDirty = false;
+        }
+
+        return map;
+    }
+
+    public ArrayListMultimap<Long, BlockPos> getWaterFallPositions()
+    {
+        ArrayListMultimap<Long, BlockPos> map = ArrayListMultimap.create();
+
+        synchronized (this.waterFallPositions)
+        {
+            map.putAll(this.waterFallPositions);
+            this.waterFallPositionsDirty = false;
         }
 
         return map;

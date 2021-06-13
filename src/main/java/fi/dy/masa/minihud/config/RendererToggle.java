@@ -40,6 +40,7 @@ public enum RendererToggle implements ConfigInfo
     OVERLAY_SPAWN_CHUNK_OVERLAY_REAL    ("overlaySpawnChunkReal"),
     OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER  ("overlaySpawnChunkPlayer"),
     OVERLAY_STRUCTURE_MAIN_TOGGLE       ("overlayStructureMainToggle"),
+    OVERLAY_WATER_FALLS                 ("overlayWaterFalls"),
     SHAPE_RENDERER                      ("shapeRenderer");
 
     public static final ImmutableList<RendererToggle> VALUES = ImmutableList.copyOf(values());
