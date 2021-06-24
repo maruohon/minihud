@@ -1,6 +1,7 @@
 package fi.dy.masa.minihud.util;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import com.google.common.collect.MapMaker;
@@ -19,7 +20,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -156,9 +159,10 @@ public class DebugInfoUtils
 
             if (world != null)
             {
+                TypeFilter<Entity, MobEntity> filter = TypeFilter.instanceOf(MobEntity.class);
                 Predicate<Entity> predicate = (entity) -> (entity instanceof MobEntity) && entity.isAlive();
 
-                for (Entity entity : world.getEntitiesByType(null, predicate))
+                for (Entity entity : world.getEntitiesByType(filter, predicate))
                 {
                     EntityNavigation navigator = ((MobEntity) entity).getNavigation();
 
@@ -200,13 +204,14 @@ public class DebugInfoUtils
 
     private static boolean isAnyPlayerWithinRange(ServerWorld world, Entity entity, double range)
     {
-        for (int i = 0; i < world.getPlayers().size(); ++i)
-        {
-            PlayerEntity player = world.getPlayers().get(i);
+        List<ServerPlayerEntity> players = world.getPlayers();
+        double squaredRange = range * range;
 
+        for (PlayerEntity player : players)
+        {
             double distSq = player.squaredDistanceTo(entity.getX(), entity.getY(), entity.getZ());
 
-            if (range < 0.0D || distSq < range * range)
+            if (range < 0.0 || distSq < squaredRange)
             {
                 return true;
             }
