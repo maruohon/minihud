@@ -122,7 +122,7 @@ public class RenderContainer
             }
 
             VertexBuffer.unbind();
-            VertexBuffer.unbindVertexArray();
+            VertexBuffer.method_34430();
 
             RenderSystem.polygonOffset(0f, 0f);
             RenderSystem.disablePolygonOffset();
