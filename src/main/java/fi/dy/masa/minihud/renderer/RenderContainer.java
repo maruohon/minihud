@@ -5,7 +5,6 @@ import java.util.List;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Matrix4f;
@@ -120,9 +119,6 @@ public class RenderContainer
                     matrixStack.pop();
                 }
             }
-
-            VertexBuffer.unbind();
-            VertexBuffer.unbindVertexArray();
 
             RenderSystem.polygonOffset(0f, 0f);
             RenderSystem.disablePolygonOffset();
