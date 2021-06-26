@@ -423,9 +423,14 @@ public class DataStorage
     {
         ArrayListMultimap<StructureType, StructureData> copy = ArrayListMultimap.create();
 
+        if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue() == false)
+        {
+            return copy;
+        }
+
         synchronized (this.structures)
         {
-            for (StructureType type : StructureType.values())
+            for (StructureType type : StructureType.VALUES)
             {
                 Collection<StructureData> values = this.structures.get(type);
 
@@ -451,11 +456,14 @@ public class DataStorage
             {
                 if (this.mc.isIntegratedServerRunning())
                 {
-                    BlockPos playerPos = PositionUtils.getEntityBlockPos(this.mc.player);
-
-                    if (this.structuresNeedUpdating(playerPos, 32))
+                    if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
                     {
-                        this.updateStructureDataFromIntegratedServer(playerPos);
+                        BlockPos playerPos = PositionUtils.getEntityBlockPos(this.mc.player);
+
+                        if (this.structuresNeedUpdating(playerPos, 32))
+                        {
+                            this.updateStructureDataFromIntegratedServer(playerPos);
+                        }
                     }
                 }
                 else if (this.hasStructureDataFromServer)
