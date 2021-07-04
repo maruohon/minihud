@@ -316,8 +316,7 @@ public class DataStorage
                 return this.serverDroppedChunksHashSize;
 
             case SINGLE_PLAYER:
-                int dimId = WorldUtils.getDimensionId(this.mc.world);
-                return MiscUtils.getCurrentHashSize(this.mc.getIntegratedServer().getWorld(dimId));
+                return MiscUtils.getCurrentHashSize(WorldUtils.getServerWorldForClientWorld(this.mc));
 
             case FALLBACK:
             default:

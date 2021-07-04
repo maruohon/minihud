@@ -21,6 +21,8 @@ public enum StructureType
 
     END_CITY            (DimensionType.THE_END,     "EndCity",     "",     StructureToggle.OVERLAY_STRUCTURE_END_CITY);
 
+    public static final StructureType[] VALUES = StructureType.values();
+
     private final StructureToggle toggle;
     private final String structureName;
     private final String componentId;
@@ -77,7 +79,7 @@ public enum StructureType
     @Nullable
     public static StructureType templeTypeFromComponentId(String id)
     {
-        for (StructureType type : values())
+        for (StructureType type : VALUES)
         {
             if (type.componentId.equals(id))
             {

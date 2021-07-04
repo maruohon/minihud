@@ -35,6 +35,7 @@ import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -233,11 +234,12 @@ public class StructureStorage
 
             if (dir != null && dir.exists() && dir.isDirectory())
             {
-                for (StructureType type : StructureType.values())
+                for (StructureType type : StructureType.VALUES)
                 {
                     if (type.isTemple() == false)
                     {
-                        NBTTagCompound nbt = FileUtils.readNBTFile(new File(dir, type.getStructureName() + ".dat"));
+                        File file = new File(dir, type.getStructureName() + ".dat");
+                        NBTTagCompound nbt = NbtUtils.readNbtFromFile(file);
 
                         if (nbt != null)
                         {
@@ -246,7 +248,7 @@ public class StructureStorage
                     }
                 }
 
-                NBTTagCompound nbt = FileUtils.readNBTFile(new File(dir, "Temple.dat"));
+                NBTTagCompound nbt = NbtUtils.readNbtFromFile(new File(dir, "Temple.dat"));
 
                 if (nbt != null)
                 {

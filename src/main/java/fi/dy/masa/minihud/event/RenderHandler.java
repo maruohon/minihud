@@ -101,12 +101,12 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         ScreenLocation location = Configs.Internal.HUD_LOCATION.getValue();
         InfoArea area = InfoOverlay.INSTANCE.getOrCreateInfoArea(location);
         String marker = Reference.MOD_ID;
-        StringListRendererWidget widget = area.findWidget(StringListRendererWidget.class, (w) -> w.matchesMarker(marker));
+        StringListRendererWidget widget = area.findWidget(StringListRendererWidget.class, (w) -> w.getMarkerManager().matchesMarker(marker));
 
         if (widget == null)
         {
             widget = new StringListRendererWidget();
-            widget.addMarker(marker);
+            widget.getMarkerManager().addMarker(marker);
             widget.setName(Reference.MOD_NAME);
             widget.setSortIndex(90);
             widget.setScale(0.5);
@@ -524,8 +524,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             if (InfoLine.DIMENSION.getBooleanValue())
             {
-                int dimension = WorldUtils.getDimensionId(world);
-                str.append(String.format("%sDimType ID: %d", pre, dimension));
+                str.append(String.format("%sDimType ID: %s", pre, WorldUtils.getDimensionAsString(world)));
             }
 
             this.addLine(str.toString());
