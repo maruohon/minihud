@@ -7,6 +7,7 @@ import fi.dy.masa.malilib.event.dispatch.ClientWorldChangeEventDispatcher;
 import fi.dy.masa.malilib.event.dispatch.RenderEventDispatcher;
 import fi.dy.masa.malilib.event.dispatch.TickEventDispatcher;
 import fi.dy.masa.malilib.gui.config.ConfigSearchInfo;
+import fi.dy.masa.malilib.gui.config.ConfigStatusWidgetRegistry;
 import fi.dy.masa.malilib.gui.config.ConfigTabRegistry;
 import fi.dy.masa.malilib.gui.config.ConfigWidgetRegistry;
 import fi.dy.masa.malilib.input.HotkeyManager;
@@ -23,6 +24,8 @@ import fi.dy.masa.minihud.gui.ConfigScreen;
 import fi.dy.masa.minihud.gui.widget.InfoLineConfigWidget;
 import fi.dy.masa.minihud.gui.widget.RendererToggleConfigWidget;
 import fi.dy.masa.minihud.gui.widget.StructureToggleConfigWidget;
+import fi.dy.masa.minihud.gui.widget.info.RendererToggleConfigStatusWidget;
+import fi.dy.masa.minihud.gui.widget.info.StructureRendererConfigStatusWidget;
 import fi.dy.masa.minihud.hotkeys.Actions;
 
 public class InitHandler implements InitializationHandler
@@ -40,6 +43,9 @@ public class InitHandler implements InitializationHandler
         ConfigWidgetRegistry.INSTANCE.registerConfigSearchInfo(InfoLine.class, new ConfigSearchInfo<InfoLine>(true, true).setBooleanConfigGetter(InfoLine::getBooleanConfig).setKeyBindGetter(InfoLine::getKeyBind));
         ConfigWidgetRegistry.INSTANCE.registerConfigSearchInfo(RendererToggle.class, new ConfigSearchInfo<RendererToggle>(true, true).setBooleanConfigGetter(RendererToggle::getBooleanConfig).setKeyBindGetter(RendererToggle::getKeyBind));
         ConfigWidgetRegistry.INSTANCE.registerConfigSearchInfo(StructureToggle.class, new ConfigSearchInfo<StructureToggle>(true, true).setBooleanConfigGetter(StructureToggle::getBooleanConfig).setKeyBindGetter(StructureToggle::getKeyBind));
+
+        ConfigStatusWidgetRegistry.INSTANCE.registerConfigStatusWidgetFactory(RendererToggle.class, RendererToggleConfigStatusWidget::new, "minihud:csi_value_renderer_toggle");
+        ConfigStatusWidgetRegistry.INSTANCE.registerConfigStatusWidgetFactory(StructureToggle.class, StructureRendererConfigStatusWidget::new, "minihud:csi_value_structure_toggle");
 
         HotkeyManager.INSTANCE.registerHotkeyProvider(HotkeyProvider.INSTANCE);
 
