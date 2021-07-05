@@ -41,6 +41,7 @@ public class Configs
         public static final BooleanConfig ITEM_NBT_ENABLED                      = new BooleanConfig("itemNbtEnabled", false);
         public static final HotkeyConfig ITEM_NBT_KEY_PRETTY                    = new HotkeyConfig("itemNbtKeyPretty", "", KeyBindSettings.GUI_MODIFIER);
         public static final HotkeyConfig ITEM_NBT_KEY_STRING                    = new HotkeyConfig("itemNbtKeyString", "", KeyBindSettings.GUI_MODIFIER);
+        public static final IntegerConfig ITEM_PREVIEW_Z                        = new IntegerConfig("itemPreviewZ", 400, 0, 4096);
         public static final BooleanConfig LIGHT_LEVEL_COLORED_NUMBERS           = new BooleanConfig("lightLevelColoredNumbers", true);
         public static final DoubleConfig LIGHT_LEVEL_MARKER_SIZE                = new DoubleConfig("lightLevelMarkerSize", 0.84, 0.0, 1.0);
         public static final DoubleConfig LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X      = new DoubleConfig("lightLevelNumberOffsetBlockX", 0.09, 0.0, 1.0);
@@ -54,6 +55,7 @@ public class Configs
         public static final HotkeyedBooleanConfig INFO_LINES_RENDERING_TOGGLE   = new HotkeyedBooleanConfig("infoLinesRenderingToggle", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
         public static final HotkeyedBooleanConfig OVERLAYS_RENDERING_TOGGLE     = new HotkeyedBooleanConfig("overlaysRenderingToggle", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
         public static final BooleanConfig MAP_PREVIEW                           = new BooleanConfig("mapPreview", false);
+        public static final BooleanConfig MAP_PREVIEW_REQUIRE_SHIFT             = new BooleanConfig("mapPreviewRequireShift", true);
         public static final IntegerConfig MAP_PREVIEW_SIZE                      = new IntegerConfig("mapPreviewSize", 160, 16, 512);
         public static final StringConfig MC_TIME_FORMAT                         = new StringConfig("mcTimeFormat", "MC time: (day {DAY}) {HOUR}:{MIN}:xx");
         public static final HotkeyConfig OPEN_CONFIG_GUI                        = new HotkeyConfig("openConfigGui", "H,C");
@@ -100,6 +102,7 @@ public class Configs
                 ITEM_NBT_ENABLED,
                 ITEM_NBT_KEY_PRETTY,
                 ITEM_NBT_KEY_STRING,
+                ITEM_PREVIEW_Z,
                 LIGHT_LEVEL_COLORED_NUMBERS,
                 LIGHT_LEVEL_MARKER_MODE,
                 LIGHT_LEVEL_MARKER_SIZE,
@@ -115,6 +118,7 @@ public class Configs
                 INFO_LINES_RENDERING_TOGGLE,
                 OVERLAYS_RENDERING_TOGGLE,
                 MAP_PREVIEW,
+                MAP_PREVIEW_REQUIRE_SHIFT,
                 MAP_PREVIEW_SIZE,
                 MC_TIME_FORMAT,
                 OPEN_CONFIG_GUI,
