@@ -1905,7 +1905,7 @@ public class InventoryUtils
             if (areStacksEqual(stackSlot, originalStacks[i]) == false ||
                 (isStackEmpty(stackSlot) == false && getStackSize(stackSlot) != getStackSize(originalStacks[i])))
             {
-                container.setStackInSlot(i, originalStacks[i]);
+                container.getSlot(i).setStack(originalStacks[i]);
             }
         }
     }
