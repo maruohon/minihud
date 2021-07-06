@@ -4,9 +4,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import fi.dy.masa.itemscroller.event.RenderEventHandler;
 import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.screen.Screen;
+import fi.dy.masa.itemscroller.event.RenderEventHandler;
 
 @Mixin(Screen.class)
 public abstract class MixinScreen extends AbstractParentElement
