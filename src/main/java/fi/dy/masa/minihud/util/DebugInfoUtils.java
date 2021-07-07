@@ -22,6 +22,9 @@ import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -230,6 +233,11 @@ public class DebugInfoUtils
         {
             pathfindingEnabled = config.getBooleanValue();
         }
+        else if (config == RendererToggle.DEBUG_CHUNK_BORDER)
+        {
+            boolean enabled = MinecraftClient.getInstance().debugRenderer.toggleShowChunkBorder();
+            debugWarn(enabled ? "debug.chunk_boundaries.on" : "debug.chunk_boundaries.off");
+        }
         else if (config == RendererToggle.DEBUG_CHUNK_INFO)
         {
             MinecraftClient.getInstance().debugChunkInfo = config.getBooleanValue();
@@ -238,6 +246,14 @@ public class DebugInfoUtils
         {
             MinecraftClient.getInstance().debugChunkOcclusion = config.getBooleanValue();
         }
+    }
+
+    private static void debugWarn(String key, Object... args)
+    {
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage((new LiteralText(""))
+                .append((new TranslatableText("debug.prefix")).formatted(Formatting.YELLOW, Formatting.BOLD))
+                .append(" ")
+                .append((new TranslatableText(key, args))));
     }
 
     public static void renderVanillaDebug(MatrixStack matrixStack, VertexConsumerProvider.Immediate vtx,
