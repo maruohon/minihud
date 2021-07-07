@@ -14,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -27,6 +28,13 @@ public abstract class MixinItemStack
     @Inject(method = "getTooltip", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILSOFT)
     private void onGetTooltip(@Nullable PlayerEntity player, TooltipContext context, CallbackInfoReturnable<List<Text>> ci, List<Text> list)
     {
+        if (Configs.Generic.AXOLOTL_TOOLTIPS.getBooleanValue() &&
+            this.getItem() == Items.AXOLOTL_BUCKET)
+        {
+            MiscUtils.addAxolotlTooltip((ItemStack) (Object) this, list);
+            return;
+        }
+
         if (Configs.Generic.BEE_TOOLTIPS.getBooleanValue() &&
             this.getItem() instanceof BlockItem &&
             ((BlockItem) this.getItem()).getBlock() instanceof BeehiveBlock)

@@ -46,9 +46,11 @@
     "minihud.gui.title.shape_editor": "Shape Editor",
     "minihud.gui.title.shape_manager": "Shape Manager",
 
-    "minihud.label.bee_info.count": "§7Contains §b%s§7 bee(s)",
-    "minihud.label.bee_info.count_babies": "§7Contains §b%s§7 bee(s), (§b%s§7 babies)",
-    "minihud.label.bee_info.name": "§7- %s",
+    "minihud.label.axolotl_tooltip.label": "§7Variant: ",
+    "minihud.label.axolotl_tooltip.value": "%s [%s]",
+    "minihud.label.bee_tooltip.count": "§7Contains §b%s§7 bee(s)",
+    "minihud.label.bee_tooltip.count_babies": "§7Contains §b%s§7 bee(s), (§b%s§7 babies)",
+    "minihud.label.bee_tooltip.name": "§7- %s",
 
     "minihud.label.honey_info.level": "§7Honey level is §b%s§7/5",
 

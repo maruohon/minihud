@@ -33,6 +33,7 @@ public class Configs implements IConfigHandler
 
     public static class Generic
     {
+        public static final ConfigBoolean       AXOLOTL_TOOLTIPS                    = new ConfigBoolean("axolotlTooltipsTooltips", false, "Adds the Axolotl variant name to the bucket tooltip");
         public static final ConfigBoolean       BEE_TOOLTIPS                        = new ConfigBoolean("beeTooltips", false, "Adds the number of contained bees to the tooltip of Bee Hive and Bee Nest items");
         public static final ConfigBoolean       HONEY_TOOLTIPS                      = new ConfigBoolean("honeyTooltips", false, "Adds the honey level to the tooltip of Bee Hive and Bee Nest items");
         public static final ConfigOptionList    BLOCK_GRID_OVERLAY_MODE             = new ConfigOptionList("blockGridOverlayMode", BlockGridMode.ALL, "The block grid render mode");
@@ -84,6 +85,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       USE_TEXT_BACKGROUND                 = new ConfigBoolean("useTextBackground", true, "Use a solid background color behind the text");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
+                AXOLOTL_TOOLTIPS,
                 BEE_TOOLTIPS,
                 HONEY_TOOLTIPS,
                 ENABLED,

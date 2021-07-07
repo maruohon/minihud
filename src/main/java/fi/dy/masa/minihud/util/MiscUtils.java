@@ -3,9 +3,11 @@ package fi.dy.masa.minihud.util;
 import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
+import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockBox;
@@ -92,6 +94,29 @@ public class MiscUtils
                bb1.maxX == bb2.maxX && bb1.maxY == bb2.maxY && bb1.maxZ == bb2.maxZ;
     }
 
+    public static void addAxolotlTooltip(ItemStack stack, List<Text> lines)
+    {
+        NbtCompound tag = stack.getTag();
+
+        if (tag != null && tag.contains(AxolotlEntity.VARIANT_KEY, Constants.NBT.TAG_INT))
+        {
+            int variantId = tag.getInt(AxolotlEntity.VARIANT_KEY);
+
+            if (variantId >= 0 && variantId < AxolotlEntity.Variant.VARIANTS.length)
+            {
+                AxolotlEntity.Variant variant = AxolotlEntity.Variant.VARIANTS[variantId];
+                String variantName = variant.getName();
+                int color = new int[] { 0xFFC7EC, 0x8C6C50, 0xFAD41B, 0xE8F7Fb, 0xB6B5FE } [variantId];
+
+                TranslatableText text = new TranslatableText("minihud.label.axolotl_tooltip.label");
+                Text text2 = new TranslatableText("minihud.label.axolotl_tooltip.value", variantName, variantId)
+                                     .setStyle(Style.EMPTY.withColor(color));
+
+                lines.add(Math.min(1, lines.size()), text.append(text2));
+            }
+        }
+    }
+
     public static void addBeeTooltip(ItemStack stack, List<Text> lines)
     {
         NbtCompound tag = stack.getTag();
@@ -112,7 +137,7 @@ public class MiscUtils
                     if (tag.contains("CustomName", Constants.NBT.TAG_STRING))
                     {
                         String beeName = tag.getString("CustomName");
-                        lines.add(Math.min(1, lines.size()), new TranslatableText("minihud.label.bee_info.name", Text.Serializer.fromJson(beeName).getString()));
+                        lines.add(Math.min(1, lines.size()), new TranslatableText("minihud.label.bee_tooltip.name", Text.Serializer.fromJson(beeName).getString()));
                     }
 
                     if (tag.contains("Age", Constants.NBT.TAG_INT) && tag.getInt("Age") < 0)
@@ -126,11 +151,11 @@ public class MiscUtils
 
             if (babyCount > 0)
             {
-                text = new TranslatableText("minihud.label.bee_info.count_babies", String.valueOf(count), String.valueOf(babyCount));
+                text = new TranslatableText("minihud.label.bee_tooltip.count_babies", String.valueOf(count), String.valueOf(babyCount));
             }
             else
             {
-                text = new TranslatableText("minihud.label.bee_info.count", String.valueOf(count));
+                text = new TranslatableText("minihud.label.bee_tooltip.count", String.valueOf(count));
             }
 
             lines.add(Math.min(1, lines.size()), text);
