@@ -133,7 +133,7 @@ public class DebugInfoUtils
         }
     }
 
-    public static void onNeighborNotify(World world, BlockPos pos, EnumSet<Direction> notifiedSides)
+    public static void onNeighborUpdate(World world, BlockPos pos)
     {
         // This will only work in single player...
         // We are catching updates from the server world, and adding them to the debug renderer directly
@@ -142,10 +142,7 @@ public class DebugInfoUtils
             final long time = world.getTime();
 
             MinecraftClient.getInstance().execute(() -> {
-                for (Direction side : notifiedSides)
-                {
-                    ((NeighborUpdateDebugRenderer) MinecraftClient.getInstance().debugRenderer.neighborUpdateDebugRenderer).addNeighborUpdate(time, pos.offset(side));
-                }
+                ((NeighborUpdateDebugRenderer) MinecraftClient.getInstance().debugRenderer.neighborUpdateDebugRenderer).addNeighborUpdate(time, pos);
             });
         }
     }
