@@ -139,10 +139,8 @@ public class DebugInfoUtils
         // We are catching updates from the server world, and adding them to the debug renderer directly
         if (neighborUpdateEnabled && world.isClient == false)
         {
-            final long time = world.getTime();
-
             MinecraftClient.getInstance().execute(() -> {
-                ((NeighborUpdateDebugRenderer) MinecraftClient.getInstance().debugRenderer.neighborUpdateDebugRenderer).addNeighborUpdate(time, pos);
+                ((NeighborUpdateDebugRenderer) MinecraftClient.getInstance().debugRenderer.neighborUpdateDebugRenderer).addNeighborUpdate(world.getTime(), pos);
             });
         }
     }
