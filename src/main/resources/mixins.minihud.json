@@ -18,6 +18,7 @@
         "MixinMinecraftClient",
         "MixinMinecraftServer",
         "MixinNeighborUpdateDebugRenderer",
+        "MixinObserverBlock",
         "MixinScreen",
         "MixinServerEntityManager",
         "MixinSubtitlesHud",
