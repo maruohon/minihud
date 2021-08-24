@@ -14,18 +14,9 @@ import net.minecraft.world.World;
 @Mixin(World.class)
 public abstract class MixinWorld
 {
-    @Inject(method = "updateNeighborsAlways", at = @At("HEAD"))
-    public void onUpdateNeighborsAlways(BlockPos pos, Block blockType, CallbackInfo ci)
+    @Inject(method = "updateNeighbor", at = @At("HEAD"))
+    public void onUpdateNeighbor(BlockPos pos, Block sourceBlock, BlockPos neighborPos,CallbackInfo ci)
     {
-        EnumSet<Direction> set = EnumSet.allOf(Direction.class);
-        DebugInfoUtils.onNeighborNotify((World) (Object) this, pos, set);
-    }
-
-    @Inject(method = "updateNeighborsExcept", at = @At("HEAD"))
-    public void onUpdateNeighborsExcept(BlockPos pos, Block blockType, Direction skipSide, CallbackInfo ci)
-    {
-        EnumSet<Direction> set = EnumSet.allOf(Direction.class);
-        set.remove(skipSide);
-        DebugInfoUtils.onNeighborNotify((World) (Object) this, pos, set);
+        DebugInfoUtils.onNeighborUpdate((World) (Object) this, pos);
     }
 }
