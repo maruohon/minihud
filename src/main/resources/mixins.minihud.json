@@ -8,7 +8,6 @@
         "IMixinEntityNavigation",
         "IMixinServerWorld",
         "IMixinWorldRenderer",
-        "MixinAbstractRedstoneGateBlock",
         "MixinBlockOutlineDebugRenderer",
         "MixinClientPlayerInteractionManager",
         "MixinClientPlayNetworkHandler",
