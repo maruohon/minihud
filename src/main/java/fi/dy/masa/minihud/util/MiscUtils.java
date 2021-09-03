@@ -96,7 +96,7 @@ public class MiscUtils
 
     public static void addAxolotlTooltip(ItemStack stack, List<Text> lines)
     {
-        NbtCompound tag = stack.getTag();
+        NbtCompound tag = stack.getNbt();
 
         if (tag != null && tag.contains(AxolotlEntity.VARIANT_KEY, Constants.NBT.TAG_INT))
         {
@@ -119,7 +119,7 @@ public class MiscUtils
 
     public static void addBeeTooltip(ItemStack stack, List<Text> lines)
     {
-        NbtCompound tag = stack.getTag();
+        NbtCompound tag = stack.getNbt();
 
         if (tag != null && tag.contains("BlockEntityTag", Constants.NBT.TAG_COMPOUND))
         {
@@ -164,7 +164,7 @@ public class MiscUtils
 
     public static void addHoneyTooltip(ItemStack stack, List<Text> lines)
     {
-        NbtCompound tag = stack.getTag();
+        NbtCompound tag = stack.getNbt();
 
         if (tag != null && tag.contains("BlockStateTag", Constants.NBT.TAG_COMPOUND))
         {
