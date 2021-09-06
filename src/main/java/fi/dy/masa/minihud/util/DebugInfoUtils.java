@@ -130,7 +130,7 @@ public class DebugInfoUtils
             Minecraft.getMinecraft().addScheduledTask(() -> {
                 for (EnumFacing side : notifiedSides)
                 {
-                    ((DebugRendererNeighborsUpdate) Minecraft.getMinecraft().debugRenderer.neighborsUpdate).addUpdate(time, pos.offset(side));
+                    ((DebugRendererNeighborsUpdate) Minecraft.getMinecraft().debugRenderer.neighborsUpdate).addUpdate(time, pos.mutableCopy().offset(side));
                 }
             });
         }
