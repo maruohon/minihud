@@ -71,6 +71,7 @@
     "minihud.label.shape_render_type.inner_edge": "Inner Edge",
     "minihud.label.shape_render_type.outer_edge": "Outer Edge",
 
+    "minihud.label.shapes.adjustable_spawn_sphere": "Adjustable Spawn Sphere",
     "minihud.label.shapes.can_spawn_sphere": "Can Spawn Sphere ( > 24)",
     "minihud.label.shapes.can_despawn_sphere": "Can Despawn Sphere ( > 32)",
     "minihud.label.shapes.circle": "Circle / Cylinder",
