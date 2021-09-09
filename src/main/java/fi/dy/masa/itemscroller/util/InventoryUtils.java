@@ -97,7 +97,7 @@ public class InventoryUtils
 
             return String.format("[%s - display: %s - NBT: %s] (%s)",
                     rl != null ? rl.toString() : "null", stack.getName().getString(),
-                    stack.getTag() != null ? stack.getTag().toString() : "<no NBT>",
+                    stack.getNbt() != null ? stack.getNbt().toString() : "<no NBT>",
                     stack.toString());
         }
 
@@ -673,9 +673,8 @@ public class InventoryUtils
 
     public static void villagerClearTradeInputSlots()
     {
-        if (GuiUtils.getCurrentScreen() instanceof MerchantScreen)
+        if (GuiUtils.getCurrentScreen() instanceof MerchantScreen merchantGui)
         {
-            MerchantScreen merchantGui = (MerchantScreen) GuiUtils.getCurrentScreen();
             Slot slot = merchantGui.getScreenHandler().getSlot(0);
 
             if (slot.hasStack())
@@ -694,10 +693,11 @@ public class InventoryUtils
 
     public static void villagerTradeEverythingPossibleWithTrade(int visibleIndex)
     {
-        if (GuiUtils.getCurrentScreen() instanceof MerchantScreen)
+        if (GuiUtils.getCurrentScreen() instanceof MerchantScreen merchantGui)
         {
-            MerchantScreen merchantGui = (MerchantScreen) GuiUtils.getCurrentScreen();
-            Slot slot = merchantGui.getScreenHandler().getSlot(2);
+            MerchantScreenHandler handler = merchantGui.getScreenHandler();
+            Slot slot = handler.getSlot(2);
+            ItemStack sellItem = handler.getRecipes().get(visibleIndex).getSellItem().copy();
 
             while (true)
             {
@@ -705,7 +705,8 @@ public class InventoryUtils
                 //tryMoveItemsToMerchantBuySlots(merchantGui, true);
 
                 // Not a valid recipe
-                if (slot.hasStack() == false)
+                //if (slot.hasStack() == false)
+                if (areStacksEqual(sellItem, slot.getStack()) == false)
                 {
                     break;
                 }
@@ -1858,7 +1859,7 @@ public class InventoryUtils
 
     public static boolean areStacksEqual(ItemStack stack1, ItemStack stack2)
     {
-        return stack1.isEmpty() == false && stack1.isItemEqual(stack2) && ItemStack.areTagsEqual(stack1, stack2);
+        return stack1.isEmpty() == false && stack1.isItemEqual(stack2) && ItemStack.areNbtEqual(stack1, stack2);
     }
 
     private static boolean areSlotsInSameInventory(Slot slot1, Slot slot2)
