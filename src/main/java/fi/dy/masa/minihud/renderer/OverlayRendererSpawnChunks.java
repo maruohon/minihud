@@ -19,6 +19,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     protected static boolean needsUpdate = true;
 
     protected final RendererToggle toggle;
+    protected final boolean isPlayerFollowing;
 
     public static void setNeedsUpdate()
     {
@@ -28,13 +29,14 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     public OverlayRendererSpawnChunks(RendererToggle toggle)
     {
         this.toggle = toggle;
+        this.isPlayerFollowing = toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER;
     }
 
     @Override
     public boolean shouldRender(MinecraftClient mc)
     {
         return this.toggle.getBooleanValue() &&
-                (this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ||
+                (this.isPlayerFollowing ||
                  (mc.world != null && MiscUtils.isOverworld(mc.world) &&
                   DataStorage.getInstance().isWorldSpawnKnown()));
     }
@@ -47,13 +49,15 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
             return true;
         }
 
+        // Use the client player, to allow looking from the camera perspective
+        entity = this.isPlayerFollowing ? mc.player : entity;
+
         int ex = (int) Math.floor(entity.getX());
         int ez = (int) Math.floor(entity.getZ());
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
-        // Player-following renderer
-        if (this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER)
+        if (this.isPlayerFollowing)
         {
             return ex != lx || ez != lz;
         }
@@ -66,23 +70,26 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     @Override
     public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
+        // Use the client player, to allow looking from the camera perspective
+        entity = this.isPlayerFollowing ? mc.player : entity;
+
         DataStorage data = DataStorage.getInstance();
-        BlockPos spawn = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ? PositionUtils.getEntityBlockPos(entity) : data.getWorldSpawn();
+        BlockPos spawn = this.isPlayerFollowing ? PositionUtils.getEntityBlockPos(entity) : data.getWorldSpawn();
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
 
-        final Color4f colorEntity = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
-                Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getColor() :
-                Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getColor();
-        final Color4f colorLazy = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
-                Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getColor() :
-                Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getColor();
-        final Color4f colorOuter = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
-                Configs.Colors.SPAWN_REAL_OUTER_OVERLAY_COLOR.getColor() :
-                Configs.Colors.SPAWN_PLAYER_OUTER_OVERLAY_COLOR.getColor();
+        final Color4f colorEntity = this.isPlayerFollowing ?
+                Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getColor() :
+                Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getColor();
+        final Color4f colorLazy = this.isPlayerFollowing ?
+                Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getColor() :
+                Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getColor();
+        final Color4f colorOuter = this.isPlayerFollowing ?
+                Configs.Colors.SPAWN_PLAYER_OUTER_OVERLAY_COLOR.getColor() :
+                Configs.Colors.SPAWN_REAL_OUTER_OVERLAY_COLOR.getColor();
 
         fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(spawn, colorEntity, 0.001, BUFFER_2);
         fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxSidesBatchedQuads(spawn, colorEntity, 0.001, BUFFER_1);
