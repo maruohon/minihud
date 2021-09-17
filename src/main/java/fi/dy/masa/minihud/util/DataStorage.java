@@ -12,8 +12,8 @@ import com.google.gson.JsonPrimitive;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerTask;
 import net.minecraft.server.world.ServerWorld;
@@ -532,7 +532,7 @@ public class DataStorage
         this.structuresNeedUpdating = false;
     }
 
-    public void addOrUpdateStructuresFromServer(ListTag structures, int timeout, boolean isServux)
+    public void addOrUpdateStructuresFromServer(NbtList structures, int timeout, boolean isServux)
     {
         MiniHUD.printDebug("DataStorage#addOrUpdateStructuresFromServer(): start");
 
@@ -542,7 +542,7 @@ public class DataStorage
             return;
         }
 
-        if (structures.getElementType() == Constants.NBT.TAG_COMPOUND)
+        if (structures.getHeldType() == Constants.NBT.TAG_COMPOUND)
         {
             MiniHUD.printDebug("DataStorage#addOrUpdateStructuresFromServer(): count: " + structures.size());
             this.structureDataTimeout = timeout + 200;
@@ -554,7 +554,7 @@ public class DataStorage
 
             for (int i = 0; i < count; ++i)
             {
-                CompoundTag tag = structures.getCompound(i);
+                NbtCompound tag = structures.getCompound(i);
                 StructureData data = StructureData.fromStructureStartTag(tag, currentTime);
 
                 if (data != null)
