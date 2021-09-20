@@ -40,9 +40,8 @@ import fi.dy.masa.malilib.event.PostWorldRenderer;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.position.ScreenLocation;
 import fi.dy.masa.malilib.overlay.InfoArea;
-import fi.dy.masa.malilib.overlay.InfoOverlay;
-import fi.dy.masa.malilib.overlay.InfoWidgetManager;
 import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
+import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.render.inventory.InventoryRenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -99,7 +98,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     private StringListRendererWidget createStringListRenderer()
     {
         ScreenLocation location = Configs.Internal.HUD_LOCATION.getValue();
-        InfoArea area = InfoOverlay.INSTANCE.getOrCreateInfoArea(location);
+        InfoArea area = Registry.INFO_OVERLAY.getOrCreateInfoArea(location);
         String marker = Reference.MOD_ID;
         StringListRendererWidget widget = area.findWidget(StringListRendererWidget.class, (w) -> w.getMarkerManager().matchesMarker(marker));
 
@@ -115,7 +114,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             widget.getTextSettings().setBackgroundEnabled(true);
             widget.getMargin().setAll(1, 0, 0, 1);
             widget.getPadding().setAll(2, 2, 0, 2);
-            InfoWidgetManager.INSTANCE.addWidget(widget);
+            Registry.INFO_WIDGET_MANAGER.addWidget(widget);
         }
 
         widget.addLocationChangeListener(Configs.Internal.HUD_LOCATION::setValue);

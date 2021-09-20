@@ -1,16 +1,9 @@
 package fi.dy.masa.minihud;
 
 import fi.dy.masa.malilib.config.BaseModConfig;
-import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InitializationHandler;
-import fi.dy.masa.malilib.event.dispatch.ClientWorldChangeEventDispatcher;
-import fi.dy.masa.malilib.event.dispatch.RenderEventDispatcher;
-import fi.dy.masa.malilib.event.dispatch.TickEventDispatcher;
 import fi.dy.masa.malilib.gui.config.ConfigSearchInfo;
-import fi.dy.masa.malilib.gui.config.ConfigStatusWidgetRegistry;
-import fi.dy.masa.malilib.gui.config.ConfigTabRegistry;
-import fi.dy.masa.malilib.gui.config.ConfigWidgetRegistry;
-import fi.dy.masa.malilib.input.HotkeyManager;
+import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.minihud.config.ConfigCallbacks;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;
@@ -33,30 +26,30 @@ public class InitHandler implements InitializationHandler
     @Override
     public void registerModHandlers()
     {
-        ConfigManager.INSTANCE.registerConfigHandler(BaseModConfig.createDefaultModConfig(Reference.MOD_INFO, Configs.CONFIG_VERSION, Configs.CATEGORIES));
-        ConfigTabRegistry.INSTANCE.registerConfigTabProvider(Reference.MOD_INFO, ConfigScreen::getConfigTabs);
+        Registry.CONFIG_MANAGER.registerConfigHandler(BaseModConfig.createDefaultModConfig(Reference.MOD_INFO, Configs.CONFIG_VERSION, Configs.CATEGORIES));
+        Registry.CONFIG_TAB.registerConfigTabProvider(Reference.MOD_INFO, ConfigScreen::getConfigTabs);
 
-        ConfigWidgetRegistry.INSTANCE.registerConfigWidgetFactory(InfoLine.class, InfoLineConfigWidget::new);
-        ConfigWidgetRegistry.INSTANCE.registerConfigWidgetFactory(RendererToggle.class, RendererToggleConfigWidget::new);
-        ConfigWidgetRegistry.INSTANCE.registerConfigWidgetFactory(StructureToggle.class, StructureToggleConfigWidget::new);
+        Registry.CONFIG_WIDGET.registerConfigWidgetFactory(InfoLine.class, InfoLineConfigWidget::new);
+        Registry.CONFIG_WIDGET.registerConfigWidgetFactory(RendererToggle.class, RendererToggleConfigWidget::new);
+        Registry.CONFIG_WIDGET.registerConfigWidgetFactory(StructureToggle.class, StructureToggleConfigWidget::new);
 
-        ConfigWidgetRegistry.INSTANCE.registerConfigSearchInfo(InfoLine.class, new ConfigSearchInfo<InfoLine>(true, true).setBooleanConfigGetter(InfoLine::getBooleanConfig).setKeyBindGetter(InfoLine::getKeyBind));
-        ConfigWidgetRegistry.INSTANCE.registerConfigSearchInfo(RendererToggle.class, new ConfigSearchInfo<RendererToggle>(true, true).setBooleanConfigGetter(RendererToggle::getBooleanConfig).setKeyBindGetter(RendererToggle::getKeyBind));
-        ConfigWidgetRegistry.INSTANCE.registerConfigSearchInfo(StructureToggle.class, new ConfigSearchInfo<StructureToggle>(true, true).setBooleanConfigGetter(StructureToggle::getBooleanConfig).setKeyBindGetter(StructureToggle::getKeyBind));
+        Registry.CONFIG_WIDGET.registerConfigSearchInfo(InfoLine.class, new ConfigSearchInfo<InfoLine>(true, true).setBooleanConfigGetter(InfoLine::getBooleanConfig).setKeyBindGetter(InfoLine::getKeyBind));
+        Registry.CONFIG_WIDGET.registerConfigSearchInfo(RendererToggle.class, new ConfigSearchInfo<RendererToggle>(true, true).setBooleanConfigGetter(RendererToggle::getBooleanConfig).setKeyBindGetter(RendererToggle::getKeyBind));
+        Registry.CONFIG_WIDGET.registerConfigSearchInfo(StructureToggle.class, new ConfigSearchInfo<StructureToggle>(true, true).setBooleanConfigGetter(StructureToggle::getBooleanConfig).setKeyBindGetter(StructureToggle::getKeyBind));
 
-        ConfigStatusWidgetRegistry.INSTANCE.registerConfigStatusWidgetFactory(RendererToggle.class, RendererToggleConfigStatusWidget::new, "minihud:csi_value_renderer_toggle");
-        ConfigStatusWidgetRegistry.INSTANCE.registerConfigStatusWidgetFactory(StructureToggle.class, StructureRendererConfigStatusWidget::new, "minihud:csi_value_structure_toggle");
+        Registry.CONFIG_STATUS_WIDGET.registerConfigStatusWidgetFactory(RendererToggle.class, RendererToggleConfigStatusWidget::new, "minihud:csi_value_renderer_toggle");
+        Registry.CONFIG_STATUS_WIDGET.registerConfigStatusWidgetFactory(StructureToggle.class, StructureRendererConfigStatusWidget::new, "minihud:csi_value_structure_toggle");
 
-        HotkeyManager.INSTANCE.registerHotkeyProvider(HotkeyProvider.INSTANCE);
+        Registry.HOTKEY_MANAGER.registerHotkeyProvider(HotkeyProvider.INSTANCE);
 
         RenderHandler renderer = RenderHandler.INSTANCE;
-        RenderEventDispatcher.INSTANCE.registerGameOverlayRenderer(renderer);
-        RenderEventDispatcher.INSTANCE.registerTooltipPostRenderer(renderer);
-        RenderEventDispatcher.INSTANCE.registerWorldPostRenderer(renderer);
+        Registry.RENDER_EVENT_DISPATCHER.registerGameOverlayRenderer(renderer);
+        Registry.RENDER_EVENT_DISPATCHER.registerTooltipPostRenderer(renderer);
+        Registry.RENDER_EVENT_DISPATCHER.registerWorldPostRenderer(renderer);
 
-        ClientWorldChangeEventDispatcher.INSTANCE.registerClientWorldChangeHandler(new ClientWorldChangeHandler());
+        Registry.CLIENT_WORLD_CHANGE_EVENT_DISPATCHER.registerClientWorldChangeHandler(new ClientWorldChangeHandler());
 
-        TickEventDispatcher.INSTANCE.registerClientTickHandler(new ClientTickHandler());
+        Registry.TICK_EVENT_DISPATCHER.registerClientTickHandler(new ClientTickHandler());
 
         Actions.init();
         ConfigCallbacks.init();

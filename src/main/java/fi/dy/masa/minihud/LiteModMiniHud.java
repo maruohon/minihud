@@ -10,7 +10,7 @@ import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.PluginChannelListener;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
-import fi.dy.masa.malilib.event.dispatch.InitializationDispatcher;
+import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.minihud.config.gui.MiniHudConfigPanel;
 import fi.dy.masa.minihud.data.DataStorage;
 
@@ -49,7 +49,7 @@ public class LiteModMiniHud implements LiteMod, Configurable, PluginChannelListe
     @Override
     public void init(File configPath)
     {
-        InitializationDispatcher.INSTANCE.registerInitializationHandler(new InitHandler());
+        Registry.INITIALIZATION_DISPATCHER.registerInitializationHandler(new InitHandler());
     }
 
     @Override

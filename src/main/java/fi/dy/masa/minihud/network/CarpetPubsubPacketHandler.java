@@ -22,6 +22,7 @@ import net.minecraft.world.World;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.PluginChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
+import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;
@@ -232,7 +233,7 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
 
         if (world != null)
         {
-            ClientPacketChannelHandler handler = ClientPacketChannelHandler.INSTANCE;
+            ClientPacketChannelHandler handler = Registry.CLIENT_PACKET_CHANNEL_HANDLER;
             Set<String> unsubs = new HashSet<>();
             Set<String> newsubs = new HashSet<>();
             DimensionType dimType = world.provider.getDimensionType();

@@ -30,8 +30,8 @@ import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
-import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
+import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Constants;
@@ -167,7 +167,7 @@ public class StructureStorage
             {
                 if (enabled)
                 {
-                    ClientPacketChannelHandler.INSTANCE.registerClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
+                    Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
 
                     // Request the data using both the old and the new protocol/channel name
                     PacketBuffer data = new PacketBuffer(Unpooled.buffer());
@@ -182,7 +182,7 @@ public class StructureStorage
                 }
                 else
                 {
-                    ClientPacketChannelHandler.INSTANCE.unregisterClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
+                    Registry.CLIENT_PACKET_CHANNEL_HANDLER.unregisterClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
                 }
             }
             else if (enabled)
