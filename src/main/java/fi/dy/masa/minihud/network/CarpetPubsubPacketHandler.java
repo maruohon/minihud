@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import io.netty.buffer.Unpooled;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.Minecraft;
@@ -20,8 +21,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
-import fi.dy.masa.malilib.network.PluginChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
+import fi.dy.masa.malilib.network.PluginChannelHandler;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
@@ -30,7 +31,6 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.MobCapDataHolder;
 import fi.dy.masa.minihud.data.WoolCounters;
-import io.netty.buffer.Unpooled;
 
 public class CarpetPubsubPacketHandler implements PluginChannelHandler
 {

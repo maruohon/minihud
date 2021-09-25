@@ -169,16 +169,7 @@ public class StructureStorage
                 {
                     Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
 
-                    // Request the data using both the old and the new protocol/channel name
-                    PacketBuffer data = new PacketBuffer(Unpooled.buffer());
-                    data.writeInt(CARPET_ID_BOUNDINGBOX_MARKERS);
-                    ClientPluginChannels.sendMessage(LiteModMiniHud.CHANNEL_CARPET_CLIENT_OLD, data, ChannelPolicy.DISPATCH_ALWAYS);
-
-                    data = new PacketBuffer(Unpooled.buffer());
-                    data.writeInt(CARPET_ID_BOUNDINGBOX_MARKERS);
-                    PacketSplitter.send(mc.getConnection(), new ResourceLocation(LiteModMiniHud.CHANNEL_CARPET_CLIENT_NEW), data);
-
-                    LiteModMiniHud.logger.info("Requesting structure data from Carpet server");
+                    LiteModMiniHud.logger.info("Attempting to register structure packet handlers to the server");
                 }
                 else
                 {

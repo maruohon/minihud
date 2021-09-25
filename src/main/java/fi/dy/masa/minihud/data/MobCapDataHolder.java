@@ -1,6 +1,5 @@
 package fi.dy.masa.minihud.data;
 
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.google.common.collect.ImmutableMap;
@@ -25,10 +24,10 @@ public class MobCapDataHolder
             EnumCreatureType.WATER_CREATURE, "water");
 
     private static final ImmutableMap<String, EnumCreatureType> TYPE_MAP = ImmutableMap.of(
-            EnumCreatureType.MONSTER.name().toLowerCase(Locale.ROOT), EnumCreatureType.MONSTER,
-            EnumCreatureType.CREATURE.name().toLowerCase(Locale.ROOT), EnumCreatureType.CREATURE,
-            EnumCreatureType.AMBIENT.name().toLowerCase(Locale.ROOT), EnumCreatureType.AMBIENT,
-            EnumCreatureType.WATER_CREATURE.name().toLowerCase(Locale.ROOT), EnumCreatureType.WATER_CREATURE);
+            "monster", EnumCreatureType.MONSTER,
+            "creature", EnumCreatureType.CREATURE,
+            "ambient", EnumCreatureType.AMBIENT,
+            "water_creature", EnumCreatureType.WATER_CREATURE);
 
     private final Minecraft mc = Minecraft.getMinecraft();
     private final MobCapData localData = new MobCapData();
