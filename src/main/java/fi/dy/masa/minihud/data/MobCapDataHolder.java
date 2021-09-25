@@ -33,6 +33,7 @@ public class MobCapDataHolder
     private final MobCapData localData = new MobCapData();
     private final MobCapData syncedParsedData = new MobCapData();
     private final MobCapData syncedPubsubData = new MobCapData();
+    private final MobCapData syncedInfoSubData = new MobCapData();
     private long lastSyncWorldTick = -1;
 
     public void clear()
@@ -40,12 +41,14 @@ public class MobCapDataHolder
         this.localData.clear();
         this.syncedParsedData.clear();
         this.syncedPubsubData.clear();
+        this.syncedInfoSubData.clear();
         this.lastSyncWorldTick = -1;
     }
 
     public boolean getHasValidData()
     {
         return this.syncedPubsubData.getHasValidData() ||
+               this.syncedInfoSubData.getHasValidData() ||
                this.syncedParsedData.getHasValidData() ||
                this.localData.getHasValidData();
     }
@@ -53,6 +56,7 @@ public class MobCapDataHolder
     public boolean shouldParsePlayerListData()
     {
         return this.syncedPubsubData.getHasValidData() == false &&
+               this.syncedInfoSubData.getHasValidData() == false &&
                this.localData.getHasValidData() == false;
     }
 
@@ -61,6 +65,10 @@ public class MobCapDataHolder
         if (this.syncedPubsubData.getHasValidData())
         {
             return this.syncedPubsubData;
+        }
+        else if (this.syncedInfoSubData.getHasValidData())
+        {
+            return this.syncedInfoSubData;
         }
         else if (this.syncedParsedData.getHasValidData())
         {
@@ -85,9 +93,19 @@ public class MobCapDataHolder
         }
     }
 
+    public void handleServuxInfoSubMobCap(EnumCreatureType type, boolean isCap, int value)
+    {
+        if (type != null && this.mc.world != null)
+        {
+            this.syncedPubsubData.setCapValue(type, isCap, value, this.mc.world.getTotalWorldTime());
+        }
+    }
+
     private void setPlayerListParsedData(EnumCreatureType type, int current, int cap, long worldTick)
     {
-        if (this.syncedPubsubData.getHasValidData() == false && this.mc.world != null)
+        if (this.syncedPubsubData.getHasValidData() == false &&
+            this.syncedInfoSubData.getHasValidData() == false &&
+            this.mc.world != null)
         {
             this.syncedParsedData.setCapValues(type, current, cap, worldTick);
         }

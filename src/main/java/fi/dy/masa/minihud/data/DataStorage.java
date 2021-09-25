@@ -25,6 +25,7 @@ import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.network.CarpetPubsubPacketHandler;
+import fi.dy.masa.minihud.network.ServuxInfoSubDataPacketHandler;
 import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
@@ -108,6 +109,11 @@ public class DataStorage
             this.waterFallPositions.clear();
             CarpetPubsubPacketHandler.unsubscribeAll();
         }
+    }
+
+    public void onLogout()
+    {
+        ServuxInfoSubDataPacketHandler.INSTANCE.onLogout();
     }
 
     public void onWorldLoad(World world)

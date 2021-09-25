@@ -408,14 +408,14 @@ minihud.gui.title.shape_manager=Shape Manager
 
 minihud.info_line.mobcap.data=Mob caps: Ho: %s Pa: %s Wa: %s Am: %s
 minihud.info_line.mobcap.no_data=Mob caps: <no valid data>
-minihud.info_line.mobcap.cap.ambient.full=§7§l%d§r§7 / %s§r
-minihud.info_line.mobcap.cap.ambient.nonfull=§7%d / %s§r
-minihud.info_line.mobcap.cap.creature.full=§a§l%d§r§a / %s§r
-minihud.info_line.mobcap.cap.creature.nonfull=§a%d / %s§r
-minihud.info_line.mobcap.cap.monster.full=§c§l%d§r§c / %s§r
-minihud.info_line.mobcap.cap.monster.nonfull=§c%d / %s§r
-minihud.info_line.mobcap.cap.water.full=§9§l%d§r§9 / %s§r
-minihud.info_line.mobcap.cap.water.nonfull=§9%d / %s§r
+minihud.info_line.mobcap.cap.ambient.full=§7§l%s§r§7 / %s§r
+minihud.info_line.mobcap.cap.ambient.nonfull=§7%s / %s§r
+minihud.info_line.mobcap.cap.creature.full=§a§l%s§r§a / %s§r
+minihud.info_line.mobcap.cap.creature.nonfull=§a%s / %s§r
+minihud.info_line.mobcap.cap.monster.full=§c§l%s§r§c / %s§r
+minihud.info_line.mobcap.cap.monster.nonfull=§c%s / %s§r
+minihud.info_line.mobcap.cap.water.full=§b§l%s§r§b / %s§r
+minihud.info_line.mobcap.cap.water.nonfull=§b%s / %s§r
 
 minihud.info_line.slime_chunk.no=Slime chunk: §cNO
 minihud.info_line.slime_chunk.yes=Slime chunk: §aYES
@@ -483,6 +483,8 @@ minihud.message.toggled_debug_mode.water=Toggled Water debug rendering to %s
 minihud.message.toggled_renderer_on_using_position=Toggled %s §aON§r, using the position %s
 minihud.message.toggled_renderer_on_using_world_spawn=Toggled %s §aON§r, using the world spawn %s
 
+minihud.message.error.infosub.failed_receive_data=Failed to receive info sub data from the server with channel ID '%s'
+minihud.message.error.infosub.failed_receive_metadata=Failed to receive info sub metadata from the server
 minihud.message.error.invalid_dropped_chunks_hash_size=Failed to parse the dropped chunks HashSet size from chat
 minihud.message.error.invalid_seed=Failed to parse the world seed from chat
 minihud.message.error.shapes.select_shape_from_dropdown=Select the Shape type to create from the dropdown widget

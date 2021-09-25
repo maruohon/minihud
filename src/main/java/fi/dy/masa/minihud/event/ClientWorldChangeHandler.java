@@ -81,6 +81,10 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
 
             DataStorage.getInstance().onWorldLoad(worldAfter);
         }
+        else
+        {
+            DataStorage.getInstance().onLogout();
+        }
 
         RenderHandler.INSTANCE.setReady(worldAfter != null);
     }

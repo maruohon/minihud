@@ -1,6 +1,7 @@
 package fi.dy.masa.minihud.data;
 
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldProviderEnd;
@@ -22,6 +23,8 @@ public enum StructureType
     END_CITY            (DimensionType.THE_END,     "EndCity",     "",     StructureToggle.OVERLAY_STRUCTURE_END_CITY);
 
     public static final StructureType[] VALUES = StructureType.values();
+
+    public static final ImmutableMap<String, StructureType> ID_TO_TYPE = buildIdToTypeMap();
 
     private final StructureToggle toggle;
     private final String structureName;
@@ -88,5 +91,24 @@ public enum StructureType
         }
 
         return null;
+    }
+
+    private static ImmutableMap<String, StructureType> buildIdToTypeMap()
+    {
+        ImmutableMap.Builder<String, StructureType> builder = ImmutableMap.builder();
+
+        for (StructureType type : VALUES)
+        {
+            if (type.componentId.isEmpty() == false)
+            {
+                builder.put(type.structureName + "." + type.componentId, type);
+            }
+            else
+            {
+                builder.put(type.structureName, type);
+            }
+        }
+
+        return builder.build();
     }
 }

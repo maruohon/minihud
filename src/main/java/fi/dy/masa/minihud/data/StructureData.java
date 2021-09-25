@@ -12,7 +12,7 @@ import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
-import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.MiniHUD;
 
 public class StructureData
 {
@@ -67,7 +67,6 @@ public class StructureData
      * @param rootCompound
      * @param type
      */
-    @Nullable
     public static void readAndAddStructuresToMap(ArrayListMultimap<StructureType, StructureData> map, NBTTagCompound rootCompound, StructureType type)
     {
         if (rootCompound.hasKey("data", Constants.NBT.TAG_COMPOUND))
@@ -85,28 +84,15 @@ public class StructureData
                     if (nbtBase.getId() == Constants.NBT.TAG_COMPOUND)
                     {
                         NBTTagCompound tag = (NBTTagCompound) nbtBase;
+                        String id = tag.getString("id");
 
-                        if (tag.hasKey("ChunkX") && tag.hasKey("ChunkZ") && tag.hasKey("BB", Constants.NBT.TAG_INT_ARRAY))
+                        if (type.getStructureName().equals(id))
                         {
-                            String id = tag.getString("id");
+                            StructureData data = fromTag(tag);
 
-                            if (type.getStructureName().equals(id))
+                            if (data != null)
                             {
-                                NBTTagList tagList = tag.getTagList("Children", Constants.NBT.TAG_COMPOUND);
-                                ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
-
-                                for (int i = 0; i < tagList.tagCount(); ++i)
-                                {
-                                    NBTTagCompound componentTag = tagList.getCompoundTagAt(i);
-
-                                    if (componentTag.hasKey("id", Constants.NBT.TAG_STRING) &&
-                                        componentTag.hasKey("BB", Constants.NBT.TAG_INT_ARRAY))
-                                    {
-                                        builder.add(IntBoundingBox.fromArray(componentTag.getIntArray("BB")));
-                                    }
-                                }
-
-                                map.put(type, new StructureData(IntBoundingBox.fromArray(tag.getIntArray("BB")), builder.build()));
+                                map.put(type, data);
                             }
                         }
                     }
@@ -115,13 +101,37 @@ public class StructureData
         }
     }
 
+    @Nullable
+    protected static StructureData fromTag(NBTTagCompound tag)
+    {
+        if (tag.hasKey("ChunkX") &&
+            tag.hasKey("ChunkZ") &&
+            tag.hasKey("BB", Constants.NBT.TAG_INT_ARRAY))
+        {
+            NBTTagList tagList = tag.getTagList("Children", Constants.NBT.TAG_COMPOUND);
+            ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
+
+            for (int i = 0; i < tagList.tagCount(); ++i)
+            {
+                NBTTagCompound componentTag = tagList.getCompoundTagAt(i);
+
+                if (componentTag.hasKey("id", Constants.NBT.TAG_STRING) &&
+                    componentTag.hasKey("BB", Constants.NBT.TAG_INT_ARRAY))
+                {
+                    builder.add(IntBoundingBox.fromArray(componentTag.getIntArray("BB")));
+                }
+            }
+
+            return new StructureData(IntBoundingBox.fromArray(tag.getIntArray("BB")), builder.build());
+        }
+
+        return null;
+    }
+
     /**
      * Reads Temple structures from the vanilla 1.12 and below structure files,
      * and adds them to the provided map. The structure type is read from the child component. 
-     * @param map
-     * @param rootCompound
      */
-    @Nullable
     public static void readAndAddTemplesToMap(ArrayListMultimap<StructureType, StructureData> map, NBTTagCompound rootCompound)
     {
         if (rootCompound.hasKey("data", Constants.NBT.TAG_COMPOUND))
@@ -233,6 +243,26 @@ public class StructureData
         }
     }
 
+    public static void readStructureDataServux(ArrayListMultimap<StructureType, StructureData> map, NBTTagList tagList)
+    {
+        final int size = tagList.tagCount();
+
+        for (int i = 0; i < size; ++i)
+        {
+            NBTTagCompound tag = tagList.getCompoundTagAt(i);
+            String id = tag.getString("id");
+            StructureType type = StructureType.ID_TO_TYPE.get(id);
+            StructureData data = fromTag(tag);
+
+            if (type != null && data != null)
+            {
+                map.put(type, data);
+            }
+        }
+
+        //System.out.printf("readStructureDataServux(), size: %d\n", size);
+    }
+
     private static void resetCarpetBoxReader()
     {
         CARPET_BOX_READER.expectedBoxes = -1;
@@ -298,7 +328,7 @@ public class StructureData
 
             resetCarpetBoxReader();
 
-            LiteModMiniHud.logger.info("Structure data updated from Carpet server (split data), structures: {}", map.size());
+            MiniHUD.logInfo("Structure data updated from Carpet server (split data), structures: {}", map.size());
         }
     }
 

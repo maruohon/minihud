@@ -20,6 +20,8 @@ import fi.dy.masa.minihud.gui.widget.StructureToggleConfigWidget;
 import fi.dy.masa.minihud.gui.widget.info.RendererToggleConfigStatusWidget;
 import fi.dy.masa.minihud.gui.widget.info.StructureRendererConfigStatusWidget;
 import fi.dy.masa.minihud.hotkeys.Actions;
+import fi.dy.masa.minihud.network.ServuxInfoSubDataPacketHandler;
+import fi.dy.masa.minihud.network.ServuxInfoSubRegistrationPacketHandler;
 
 public class InitHandler implements InitializationHandler
 {
@@ -50,6 +52,9 @@ public class InitHandler implements InitializationHandler
         Registry.CLIENT_WORLD_CHANGE_EVENT_DISPATCHER.registerClientWorldChangeHandler(new ClientWorldChangeHandler());
 
         Registry.TICK_EVENT_DISPATCHER.registerClientTickHandler(new ClientTickHandler());
+
+        Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(ServuxInfoSubRegistrationPacketHandler.INSTANCE);
+        Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(ServuxInfoSubDataPacketHandler.INSTANCE);
 
         Actions.init();
         ConfigCallbacks.init();

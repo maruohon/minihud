@@ -7,14 +7,11 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
-import com.mumfrey.liteloader.core.ClientPluginChannels;
-import com.mumfrey.liteloader.core.PluginChannels.ChannelPolicy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.ChunkGeneratorEnd;
@@ -30,13 +27,13 @@ import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
-import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorEnd;
@@ -46,8 +43,8 @@ import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorOverworld;
 import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
 import fi.dy.masa.minihud.mixin.IMixinMapGenStructure;
 import fi.dy.masa.minihud.network.CarpetStructurePacketHandler;
+import fi.dy.masa.minihud.network.ServuxStructurePacketHandler;
 import fi.dy.masa.minihud.util.MiscUtils;
-import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
 public class StructureStorage
@@ -55,6 +52,9 @@ public class StructureStorage
     public static final int CARPET_ID_BOUNDINGBOX_MARKERS = 3;
     public static final int CARPET_ID_LARGE_BOUNDINGBOX_MARKERS_START = 7;
     public static final int CARPET_ID_LARGE_BOUNDINGBOX_MARKERS = 8;
+
+    private static final int SERVUX_PACKET_S2C_METADATA = 1; 
+    private static final int SERVUX_PACKET_S2C_STRUCTURE_DATA = 2; 
 
     private final Minecraft mc = Minecraft.getMinecraft();
     private final ArrayListMultimap<StructureType, StructureData> structureMap = ArrayListMultimap.create();
@@ -168,12 +168,14 @@ public class StructureStorage
                 if (enabled)
                 {
                     Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
+                    Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(ServuxStructurePacketHandler.INSTANCE);
 
                     LiteModMiniHud.logger.info("Attempting to register structure packet handlers to the server");
                 }
                 else
                 {
                     Registry.CLIENT_PACKET_CHANNEL_HANDLER.unregisterClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
+                    Registry.CLIENT_PACKET_CHANNEL_HANDLER.unregisterClientChannelHandler(ServuxStructurePacketHandler.INSTANCE);
                 }
             }
             else if (enabled)
@@ -293,6 +295,54 @@ public class StructureStorage
         }
     }
 
+    public void updateStructureDataFromServuxServer(PacketBuffer buf)
+    {
+        try
+        {
+            buf.readerIndex(0);
+            int type = buf.readVarInt();
+
+            if (type == SERVUX_PACKET_S2C_STRUCTURE_DATA)
+            {
+                this.readStructureDataServuxV1(buf.readCompoundTag());
+            }
+            else if (type == SERVUX_PACKET_S2C_METADATA)
+            {
+            }
+
+            buf.readerIndex(0);
+        }
+        catch (Exception e)
+        {
+            LiteModMiniHud.logger.warn("Failed to read structure data from Servux mod packet", e);
+        }
+    }
+
+    private void readStructureDataServuxV1(NBTTagCompound nbt)
+    {
+        NBTTagList tagList = nbt.getTagList("Structures", Constants.NBT.TAG_COMPOUND);
+
+        synchronized (this.structureMap)
+        {
+            this.structureMap.clear();
+
+            StructureData.readStructureDataServux(this.structureMap, tagList);
+
+            this.hasStructureDataFromServer = true;
+            this.structuresDirty = true;
+            this.structuresNeedUpdating = false;
+
+            EntityPlayer player = Minecraft.getMinecraft().player;
+
+            if (player != null)
+            {
+                this.lastStructureUpdatePos = new BlockPos(player);
+            }
+
+            MiniHUD.logInfo("Structure data updated from Servux server, structures: {}", this.structureMap.size());
+        }
+    }
+
     private void readStructureDataCarpetAll(NBTTagCompound nbt)
     {
         NBTTagList tagList = nbt.getTagList("Boxes", Constants.NBT.TAG_LIST);
@@ -313,7 +363,8 @@ public class StructureStorage
                 this.lastStructureUpdatePos = new BlockPos(player);
             }
 
-            LiteModMiniHud.logger.info("Structure data updated from Carpet server (all), structures: {}", this.structureMap.size());
+            MiniHUD.logInfo("Structure data updated from Carpet server (all), structures: {}",
+                            this.structureMap.size());
         }
     }
 
@@ -327,7 +378,7 @@ public class StructureStorage
             StructureData.readStructureDataCarpetIndividualBoxesHeader(boxCount);
         }
 
-        LiteModMiniHud.logger.info("Structure data header received from Carpet server, expecting {} boxes", boxCount);
+        MiniHUD.logInfo("Structure data header received from Carpet server, expecting {} boxes", boxCount);
     }
 
     private void readStructureDataCarpetSplitBoxes(PacketBuffer data, int boxCount) throws IOException
@@ -351,7 +402,7 @@ public class StructureStorage
                 this.lastStructureUpdatePos = new BlockPos(player);
             }
 
-            LiteModMiniHud.logger.info("Structure data received from Carpet server (split boxes), received {} boxes", boxCount);
+            MiniHUD.logInfo("Structure data received from Carpet server (split boxes), received {} boxes", boxCount);
         }
     }
 
@@ -412,7 +463,8 @@ public class StructureStorage
         }
 
         this.structuresDirty = true;
-        LiteModMiniHud.logger.info("Structure data updated from the integrated server");
+
+        MiniHUD.logInfo("Structure data updated from the integrated server");
     }
 
     private void addStructuresWithinRange(StructureType type, MapGenStructure mapGen, BlockPos playerPos, int maxRange)

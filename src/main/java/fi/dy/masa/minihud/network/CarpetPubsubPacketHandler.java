@@ -229,6 +229,8 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
 
     public static void updatePubsubSubscriptions()
     {
+        ServuxInfoSubDataPacketHandler.INSTANCE.updateSubscriptions();
+
         World world = Minecraft.getMinecraft().world;
 
         if (world != null)
