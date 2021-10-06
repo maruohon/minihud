@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import io.netty.buffer.Unpooled;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.item.EnumDyeColor;
@@ -24,6 +23,7 @@ import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.malilib.network.PluginChannelHandler;
 import fi.dy.masa.malilib.registry.Registry;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;
@@ -183,7 +183,7 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
 
     private static void updateSubscriptions(int updateType, Collection<String> nodes)
     {
-        NetHandlerPlayClient handler = Minecraft.getMinecraft().getConnection();
+        NetHandlerPlayClient handler = GameUtils.getClient().getConnection();
 
         if (handler != null)
         {
@@ -231,7 +231,7 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
     {
         ServuxInfoSubDataPacketHandler.INSTANCE.updateSubscriptions();
 
-        World world = Minecraft.getMinecraft().world;
+        World world = GameUtils.getClient().world;
 
         if (world != null)
         {

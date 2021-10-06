@@ -1,13 +1,13 @@
 package fi.dy.masa.minihud.renderer;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.MathUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
 
 public class RenderUtils
 {
@@ -29,7 +29,7 @@ public class RenderUtils
 
         final int centerX = (int) Math.floor(entity.posX);
         final int centerZ = (int) Math.floor(entity.posZ);
-        final int maxDist = Minecraft.getMinecraft().gameSettings.renderDistanceChunks * 32; // double the view distance in blocks
+        final int maxDist = GameUtils.getClient().gameSettings.renderDistanceChunks * 32; // double the view distance in blocks
         final int rangeMinX = centerX - maxDist;
         final int rangeMinZ = centerZ - maxDist;
         final int rangeMaxX = centerX + maxDist;

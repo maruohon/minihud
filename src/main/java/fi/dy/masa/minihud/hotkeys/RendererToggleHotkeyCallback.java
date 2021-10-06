@@ -1,6 +1,5 @@
 package fi.dy.masa.minihud.hotkeys;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
@@ -10,6 +9,7 @@ import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -28,9 +28,7 @@ public class RendererToggleHotkeyCallback extends ToggleBooleanWithMessageKeyCal
     @Override
     public ActionResult onKeyAction(KeyAction action, KeyBind key)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-
-        if (mc != null && mc.player != null && super.onKeyAction(action, key) == ActionResult.SUCCESS)
+        if (GameUtils.getClientPlayer() != null && super.onKeyAction(action, key) == ActionResult.SUCCESS)
         {
             if (this.config.getBooleanValue() == false)
             {

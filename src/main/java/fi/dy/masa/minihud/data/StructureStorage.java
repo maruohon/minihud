@@ -29,6 +29,7 @@ import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
@@ -56,7 +57,7 @@ public class StructureStorage
     private static final int SERVUX_PACKET_S2C_METADATA = 1; 
     private static final int SERVUX_PACKET_S2C_STRUCTURE_DATA = 2; 
 
-    private final Minecraft mc = Minecraft.getMinecraft();
+    private final Minecraft mc = GameUtils.getClient();
     private final ArrayListMultimap<StructureType, StructureData> structureMap = ArrayListMultimap.create();
     @Nullable private BlockPos lastStructureUpdatePos;
     private boolean hasStructureDataFromServer;
@@ -157,20 +158,18 @@ public class StructureStorage
 
     public void requestStructureDataUpdates()
     {
-        Minecraft mc = Minecraft.getMinecraft();
-
-        if (mc.world != null)
+        if (GameUtils.getClient().world != null)
         {
             boolean enabled = RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.isRendererEnabled();
 
-            if (mc.isSingleplayer() == false)
+            if (GameUtils.isSinglePlayer() == false)
             {
                 if (enabled)
                 {
                     Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
                     Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(ServuxStructurePacketHandler.INSTANCE);
 
-                    LiteModMiniHud.logger.info("Attempting to register structure packet handlers to the server");
+                    MiniHUD.logInfo("Attempting to register structure packet handlers to the server");
                 }
                 else
                 {
@@ -332,7 +331,7 @@ public class StructureStorage
             this.structuresDirty = true;
             this.structuresNeedUpdating = false;
 
-            EntityPlayer player = Minecraft.getMinecraft().player;
+            EntityPlayer player = GameUtils.getClientPlayer();
 
             if (player != null)
             {
@@ -356,7 +355,7 @@ public class StructureStorage
             this.structuresDirty = true;
             this.structuresNeedUpdating = false;
 
-            EntityPlayer player = Minecraft.getMinecraft().player;
+            EntityPlayer player = GameUtils.getClientPlayer();
 
             if (player != null)
             {
@@ -395,7 +394,7 @@ public class StructureStorage
             this.structuresDirty = true;
             this.structuresNeedUpdating = false;
 
-            EntityPlayer player = Minecraft.getMinecraft().player;
+            EntityPlayer player = GameUtils.getClientPlayer();
 
             if (player != null)
             {

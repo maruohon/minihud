@@ -20,6 +20,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
@@ -35,7 +36,7 @@ public class DataStorage
 {
     private static final DataStorage INSTANCE = new DataStorage();
 
-    private final Minecraft mc = Minecraft.getMinecraft();
+    private final Minecraft mc = GameUtils.getClient();
 
     private final MobCapDataHolder mobcapData = new MobCapDataHolder();
     private final StructureStorage structureStorage = new StructureStorage();

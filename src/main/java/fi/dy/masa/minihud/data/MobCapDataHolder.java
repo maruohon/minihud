@@ -9,6 +9,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.util.MiscUtils;
 
@@ -29,7 +30,7 @@ public class MobCapDataHolder
             "ambient", EnumCreatureType.AMBIENT,
             "water_creature", EnumCreatureType.WATER_CREATURE);
 
-    private final Minecraft mc = Minecraft.getMinecraft();
+    private final Minecraft mc = GameUtils.getClient();
     private final MobCapData localData = new MobCapData();
     private final MobCapData syncedParsedData = new MobCapData();
     private final MobCapData syncedPubsubData = new MobCapData();

@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 import fi.dy.masa.malilib.listener.LayerRangeChangeListener;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
@@ -18,7 +19,7 @@ import fi.dy.masa.minihud.util.ShapeRenderType;
 
 public abstract class ShapeBase extends OverlayRendererBase implements LayerRangeChangeListener
 {
-    protected final Minecraft mc;
+    protected final Minecraft mc = GameUtils.getClient();
     protected final ShapeType type;
     protected final LayerRange layerRange;
     protected String displayName;
@@ -29,7 +30,6 @@ public abstract class ShapeBase extends OverlayRendererBase implements LayerRang
 
     public ShapeBase(ShapeType type, Color4f color)
     {
-        this.mc = Minecraft.getMinecraft();
         this.type = type;
         this.color = color;
         this.layerRange = new LayerRange(this);

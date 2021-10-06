@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import io.netty.buffer.Unpooled;
 import com.google.common.collect.MapMaker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.debug.DebugRendererNeighborsUpdate;
@@ -19,12 +20,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.mixin.IMixinDebugRenderer;
 import fi.dy.masa.minihud.mixin.IMixinPathNavigate;
-import io.netty.buffer.Unpooled;
 
 public class DebugInfoUtils
 {
@@ -127,10 +128,10 @@ public class DebugInfoUtils
         {
             final long time = world.getTotalWorldTime();
 
-            Minecraft.getMinecraft().addScheduledTask(() -> {
+            GameUtils.getClient().addScheduledTask(() -> {
                 for (EnumFacing side : notifiedSides)
                 {
-                    ((DebugRendererNeighborsUpdate) Minecraft.getMinecraft().debugRenderer.neighborsUpdate).addUpdate(time, pos.offset(side));
+                    ((DebugRendererNeighborsUpdate) GameUtils.getClient().debugRenderer.neighborsUpdate).addUpdate(time, pos.offset(side));
                 }
             });
         }
@@ -138,7 +139,7 @@ public class DebugInfoUtils
 
     public static void onServerTickEnd(MinecraftServer server)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = GameUtils.getClient();
 
         // Send the custom packet with the Path data, if that debug renderer is enabled
         if (pathFindingEnabled && mc.world != null && ++tickCounter >= 10)
@@ -207,7 +208,7 @@ public class DebugInfoUtils
 
     public static void toggleDebugRenderer(RendererToggle config)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = GameUtils.getClient();
         boolean enabled = config.isRendererEnabled();
 
         if (config == RendererToggle.DEBUG_COLLISION_BOXES)

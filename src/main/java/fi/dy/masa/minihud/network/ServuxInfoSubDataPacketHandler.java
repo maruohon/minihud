@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import io.netty.buffer.Unpooled;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,6 +21,7 @@ import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.malilib.network.PluginChannelHandler;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.registry.Registry;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.data.palette.HashMapPalette;
 import fi.dy.masa.malilib.util.data.palette.Palette;
@@ -38,7 +38,6 @@ public class ServuxInfoSubDataPacketHandler implements PluginChannelHandler
     public static final ServuxInfoSubDataPacketHandler INSTANCE = new ServuxInfoSubDataPacketHandler();
     protected static final List<ResourceLocation> CHANNELS = ImmutableList.of(new ResourceLocation("servux:info_data"));
 
-    protected final Minecraft mc = Minecraft.getMinecraft();
     protected final Map<String, BufferReader> allBufferReaders = new HashMap<>();
     protected final Int2ObjectOpenHashMap<BufferReader> idMappedDataReaders = new Int2ObjectOpenHashMap<>();
     protected final Set<String> currentSubscriptions = new HashSet<>();
@@ -191,7 +190,7 @@ public class ServuxInfoSubDataPacketHandler implements PluginChannelHandler
 
     protected void updateSubscriptions(String action, Collection<String> channels)
     {
-        NetHandlerPlayClient handler = Minecraft.getMinecraft().getConnection();
+        NetHandlerPlayClient handler = GameUtils.getClient().getConnection();
 
         if (handler != null)
         {

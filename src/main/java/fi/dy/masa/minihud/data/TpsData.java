@@ -6,13 +6,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class TpsData
 {
     private static final Pattern PATTERN_CARPET_TPS = Pattern.compile("TPS: (?<tps>[0-9]+[\\.,][0-9]) MSPT: (?<mspt>[0-9]+[\\.,][0-9])");
 
-    private final Minecraft mc = Minecraft.getMinecraft();
+    private final Minecraft mc = GameUtils.getClient();
     private boolean hasCalculatedTpsData;
     private boolean hasSyncedTpsData;
     private boolean hasPubsubData;

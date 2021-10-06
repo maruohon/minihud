@@ -44,6 +44,7 @@ import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.render.inventory.InventoryRenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.Reference;
@@ -371,7 +372,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
     private void addLine(InfoLine type)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = GameUtils.getClient();
         Entity entity = mc.getRenderViewEntity();
         World world = entity.getEntityWorld();
         BlockPos pos = new BlockPos(entity.posX, entity.getEntityBoundingBox().minY, entity.posZ);
