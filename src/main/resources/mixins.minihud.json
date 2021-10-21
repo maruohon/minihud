@@ -1,29 +1,29 @@
 {
-    "required": true,
-    "package": "fi.dy.masa.minihud.mixin",
-    "compatibilityLevel": "JAVA_16",
-    "minVersion": "0.7",
-    "client": [
-        "IMixinChunkDeltaUpdateS2CPacket",
-        "IMixinEntityNavigation",
-        "IMixinServerWorld",
-        "IMixinWorldRenderer",
-        "MixinAbstractRedstoneGateBlock",
-        "MixinBlockOutlineDebugRenderer",
-        "MixinClientPlayerInteractionManager",
-        "MixinClientPlayNetworkHandler",
-        "MixinDebugRenderer",
-        "MixinHeightmapDebugRenderer",
-        "MixinItemStack",
-        "MixinMinecraftClient",
-        "MixinMinecraftServer",
-        "MixinNeighborUpdateDebugRenderer",
-        "MixinScreen",
-        "MixinServerEntityManager",
-        "MixinSubtitlesHud",
-        "MixinWorld"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+	"required": true,
+	"package": "fi.dy.masa.minihud.mixin",
+	"compatibilityLevel": "JAVA_16",
+	"minVersion": "0.8",
+	"client": [
+		"IMixinChunkDeltaUpdateS2CPacket",
+		"IMixinEntityNavigation",
+		"IMixinServerWorld",
+		"IMixinWorldRenderer",
+		"MixinAbstractRedstoneGateBlock",
+		"MixinBlockOutlineDebugRenderer",
+		"MixinClientPlayerInteractionManager",
+		"MixinClientPlayNetworkHandler",
+		"MixinDebugRenderer",
+		"MixinHeightmapDebugRenderer",
+		"MixinItemStack",
+		"MixinMinecraftClient",
+		"MixinMinecraftServer",
+		"MixinNeighborUpdateDebugRenderer",
+		"MixinScreen",
+		"MixinServerEntityManager",
+		"MixinSubtitlesHud",
+		"MixinWorld"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
 }

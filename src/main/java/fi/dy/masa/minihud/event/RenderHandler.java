@@ -283,6 +283,14 @@ public class RenderHandler implements IRenderer
         BlockPos pos = new BlockPos(entity.getX(), y, entity.getZ());
         ChunkPos chunkPos = new ChunkPos(pos);
 
+        @SuppressWarnings("deprecation")
+        boolean isChunkLoaded = mc.world.isChunkLoaded(pos);
+
+        if (isChunkLoaded == false)
+        {
+            return;
+        }
+
         if (type == InfoToggle.FPS)
         {
             this.addLine(String.format("%d fps", this.fps));
@@ -525,30 +533,27 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.LIGHT_LEVEL)
         {
-            if (mc.world.isChunkLoaded(pos))
+            WorldChunk clientChunk = this.getClientChunk(chunkPos);
+
+            if (clientChunk.isEmpty() == false)
             {
-                WorldChunk clientChunk = this.getClientChunk(chunkPos);
+                LightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
 
-                if (clientChunk.isEmpty() == false)
+                this.addLine(String.format("Client Light: %d (block: %d, sky: %d)",
+                        lightingProvider.getLight(pos, 0),
+                        lightingProvider.get(LightType.BLOCK).getLightLevel(pos),
+                        lightingProvider.get(LightType.SKY).getLightLevel(pos)));
+
+                World bestWorld = WorldUtils.getBestWorld(mc);
+                WorldChunk serverChunk = this.getChunk(chunkPos);
+
+                if (serverChunk != null && serverChunk != clientChunk)
                 {
-                    LightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
-
-                    this.addLine(String.format("Client Light: %d (block: %d, sky: %d)",
-                            lightingProvider.getLight(pos, 0),
-                            lightingProvider.get(LightType.BLOCK).getLightLevel(pos),
-                            lightingProvider.get(LightType.SKY).getLightLevel(pos)));
-
-                    World bestWorld = WorldUtils.getBestWorld(mc);
-                    WorldChunk serverChunk = this.getChunk(chunkPos);
-
-                    if (serverChunk != null && serverChunk != clientChunk)
-                    {
-                        lightingProvider = bestWorld.getChunkManager().getLightingProvider();
-                        int total = lightingProvider.getLight(pos, 0);
-                        int block = lightingProvider.get(LightType.BLOCK).getLightLevel(pos);
-                        int sky = lightingProvider.get(LightType.SKY).getLightLevel(pos);
-                        this.addLine(String.format("Server Light: %d (block: %d, sky: %d)", total, block, sky));
-                    }
+                    lightingProvider = bestWorld.getChunkManager().getLightingProvider();
+                    int total = lightingProvider.getLight(pos, 0);
+                    int block = lightingProvider.get(LightType.BLOCK).getLightLevel(pos);
+                    int sky = lightingProvider.get(LightType.SKY).getLightLevel(pos);
+                    this.addLine(String.format("Server Light: %d (block: %d, sky: %d)", total, block, sky));
                 }
             }
         }
@@ -654,52 +659,41 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.DIFFICULTY)
         {
-            if (mc.world.isChunkLoaded(pos))
+            long chunkInhabitedTime = 0L;
+            float moonPhaseFactor = 0.0F;
+            WorldChunk serverChunk = this.getChunk(chunkPos);
+
+            if (serverChunk != null)
             {
-                long chunkInhabitedTime = 0L;
-                float moonPhaseFactor = 0.0F;
-                WorldChunk serverChunk = this.getChunk(chunkPos);
-
-                if (serverChunk != null)
-                {
-                    moonPhaseFactor = mc.world.getMoonSize();
-                    chunkInhabitedTime = serverChunk.getInhabitedTime();
-                }
-
-                LocalDifficulty diff = new LocalDifficulty(mc.world.getDifficulty(), mc.world.getTimeOfDay(), chunkInhabitedTime, moonPhaseFactor);
-                this.addLine(String.format("Local Difficulty: %.2f // %.2f (Day %d)",
-                        diff.getLocalDifficulty(), diff.getClampedLocalDifficulty(), mc.world.getTimeOfDay() / 24000L));
+                moonPhaseFactor = mc.world.getMoonSize();
+                chunkInhabitedTime = serverChunk.getInhabitedTime();
             }
+
+            LocalDifficulty diff = new LocalDifficulty(mc.world.getDifficulty(), mc.world.getTimeOfDay(), chunkInhabitedTime, moonPhaseFactor);
+            this.addLine(String.format("Local Difficulty: %.2f // %.2f (Day %d)",
+                    diff.getLocalDifficulty(), diff.getClampedLocalDifficulty(), mc.world.getTimeOfDay() / 24000L));
         }
         else if (type == InfoToggle.BIOME)
         {
-            // Prevent a crash when outside of world
-            if (mc.world.isChunkLoaded(pos))
-            {
-                WorldChunk clientChunk = this.getClientChunk(chunkPos);
+            WorldChunk clientChunk = this.getClientChunk(chunkPos);
 
-                if (clientChunk.isEmpty() == false)
-                {
-                    Biome biome = mc.world.getBiome(pos);
-                    Identifier id = mc.world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
-                    this.addLine("Biome: " + StringUtils.translate("biome." + id.toString().replace(":", ".")));
-                }
+            if (clientChunk.isEmpty() == false)
+            {
+                Biome biome = mc.world.getBiome(pos);
+                Identifier id = mc.world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
+                this.addLine("Biome: " + StringUtils.translate("biome." + id.toString().replace(":", ".")));
             }
         }
         else if (type == InfoToggle.BIOME_REG_NAME)
         {
-            // Prevent a crash when outside of world
-            if (mc.world.isChunkLoaded(pos))
-            {
-                WorldChunk clientChunk = this.getClientChunk(chunkPos);
+            WorldChunk clientChunk = this.getClientChunk(chunkPos);
 
-                if (clientChunk.isEmpty() == false)
-                {
-                    Biome biome = mc.world.getBiome(pos);
-                    Identifier rl = mc.world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
-                    String name = rl != null ? rl.toString() : "?";
-                    this.addLine("Biome reg name: " + name);
-                }
+            if (clientChunk.isEmpty() == false)
+            {
+                Biome biome = mc.world.getBiome(pos);
+                Identifier rl = mc.world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
+                String name = rl != null ? rl.toString() : "?";
+                this.addLine("Biome reg name: " + name);
             }
         }
         else if (type == InfoToggle.ENTITIES)
