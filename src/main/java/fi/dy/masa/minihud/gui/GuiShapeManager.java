@@ -26,12 +26,12 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
 
     public GuiShapeManager()
     {
-        super(10, 64);
+        super(10, 68);
 
         this.title = StringUtils.translate("minihud.gui.title.shape_manager");
 
         // The position will get updated later
-        this.widgetDropDown = new WidgetDropDownList<ShapeType>(0, 0, 160, 18, 200, 10, ImmutableList.copyOf(ShapeType.values()), (type) -> type.getDisplayName());
+        this.widgetDropDown = new WidgetDropDownList<>(0, 0, 160, 18, 200, 10, ImmutableList.copyOf(ShapeType.values()), ShapeType::getDisplayName);
         this.widgetDropDown.setZLevel(this.getZOffset() + 100);
     }
 
@@ -73,24 +73,43 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
             {
                 x = 10;
                 y += 22;
-                rows++;
+                ++rows;
             }
 
             x += this.createTabButton(x, y, width, tab);
         }
 
-        this.setListPosition(this.getListX(), 68 + (rows - 1) * 22);
-        this.getListWidget().setSize(this.getBrowserWidth(), this.getBrowserHeight());
-        this.getListWidget().initGui();
+        String name = StringUtils.translate("minihud.gui.button.add_shape");
+        ButtonGeneric addShapeButton = new ButtonGeneric(this.width - 10, y, -1, true, name);
 
-        y += 24;
+        // Check if there is enough space to put the dropdown widget and
+        // the button at the end of the last tab button row
+        if (rows < 2 || (this.width - 10 - x < (addShapeButton.getWidth() + this.widgetDropDown.getWidth() + 4)))
+        {
+            y += 22;
+        }
 
-        x = this.width - 10;
-        x -= this.addButton(x, y, ButtonListener.Type.ADD_SHAPE);
+        addShapeButton.setY(y);
 
-        this.widgetDropDown.setPosition(x - this.widgetDropDown.getWidth() - 4, y + 1);
+        this.setListPosition(this.getListX(), y + 20);
+        this.reCreateListWidget();
+
+        this.widgetDropDown.setPosition(addShapeButton.getX() - this.widgetDropDown.getWidth() - 4, y + 1);
 
         this.addWidget(this.widgetDropDown);
+        this.addButton(addShapeButton, (btn, mbtn) -> {
+            ShapeType shape = this.widgetDropDown.getSelectedEntry();
+
+            if (shape != null)
+            {
+                ShapeManager.INSTANCE.addShape(shape.createShape());
+                this.getListWidget().refreshEntries();
+            }
+            else
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "Select the shape from the dropdown");
+            }
+        });
     }
 
     protected int createTabButton(int x, int y, int width, ConfigGuiTab tab)
@@ -100,13 +119,6 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         this.addButton(button, new ButtonListenerTab(tab));
 
         return button.getWidth() + 2;
-    }
-
-    protected int addButton(int x, int y, ButtonListener.Type type)
-    {
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, true, type.getDisplayName());
-        this.addButton(button, new ButtonListener(ButtonListener.Type.ADD_SHAPE, this));
-        return button.getWidth();
     }
 
     @Override
@@ -120,54 +132,6 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
     protected WidgetListShapes createListWidget(int listX, int listY)
     {
         return new WidgetListShapes(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this.getZOffset(), this);
-    }
-
-    private static class ButtonListener implements IButtonActionListener
-    {
-        private final Type type;
-        private final GuiShapeManager gui;
-
-        public ButtonListener(Type type, GuiShapeManager gui)
-        {
-            this.type = type;
-            this.gui = gui;
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
-        {
-            if (this.type == Type.ADD_SHAPE)
-            {
-                ShapeType shape = this.gui.widgetDropDown.getSelectedEntry();
-
-                if (shape != null)
-                {
-                    ShapeManager.INSTANCE.addShape(shape.createShape());
-                    this.gui.getListWidget().refreshEntries();
-                }
-                else
-                {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "Select the shape from the dropdown");
-                }
-            }
-        }
-
-        public enum Type
-        {
-            ADD_SHAPE   ("minihud.gui.button.add_shape");
-
-            private final String translationKey;
-
-            private Type(String translationKey)
-            {
-                this.translationKey = translationKey;
-            }
-
-            public String getDisplayName()
-            {
-                return StringUtils.translate(this.translationKey);
-            }
-        }
     }
 
     public static class ButtonListenerTab implements IButtonActionListener
