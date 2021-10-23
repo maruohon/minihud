@@ -9,12 +9,12 @@ import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.IConfigNotifiable;
 import fi.dy.masa.malilib.config.IHotkeyTogglable;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
+import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.minihud.MiniHUD;
-import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleDebugRenderer;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
 import fi.dy.masa.minihud.network.StructurePacketHandlerCarpet;
 import fi.dy.masa.minihud.network.StructurePacketHandlerServux;
@@ -66,7 +66,7 @@ public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfi
 
         if (name.startsWith("debug"))
         {
-            this.keybind.setCallback(new KeyCallbackToggleDebugRenderer(this));
+            this.keybind.setCallback(new KeyCallbackToggleBooleanConfigWithMessage(this));
         }
         else
         {

@@ -1,9 +1,9 @@
 package fi.dy.masa.minihud.util;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import io.netty.buffer.Unpooled;
 import com.google.common.collect.MapMaker;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
@@ -27,12 +27,11 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.mixin.IMixinEntityNavigation;
-import io.netty.buffer.Unpooled;
 
 public class DebugInfoUtils
 {
@@ -218,7 +217,7 @@ public class DebugInfoUtils
         return false;
     }
 
-    public static void toggleDebugRenderer(RendererToggle config)
+    public static void toggleDebugRenderer(IConfigBoolean config)
     {
         if (config == RendererToggle.DEBUG_NEIGHBOR_UPDATES)
         {
