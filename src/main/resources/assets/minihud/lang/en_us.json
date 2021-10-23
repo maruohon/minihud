@@ -6,6 +6,7 @@
     "minihud.gui.button.config_gui.info_toggles": "Info Toggles",
     "minihud.gui.button.config_gui.info_line_order": "Info Line Order",
     "minihud.gui.button.config_gui.info_hotkeys": "Info Hotkeys",
+    "minihud.gui.button.config_gui.renderer_toggles": "Renderer Toggles",
     "minihud.gui.button.config_gui.renderer_hotkeys": "Renderer Hotkeys",
     "minihud.gui.button.config_gui.shapes": "Shapes",
     "minihud.gui.button.config_gui.structures": "Structures",

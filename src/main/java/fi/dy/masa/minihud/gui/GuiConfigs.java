@@ -88,7 +88,8 @@ public class GuiConfigs extends GuiConfigsBase
         }
         else if (tab == ConfigGuiTab.COLORS ||
                  tab == ConfigGuiTab.INFO_LINE_ORDER ||
-                 tab == ConfigGuiTab.INFO_TOGGLES)
+                 tab == ConfigGuiTab.INFO_TOGGLES ||
+                 tab == ConfigGuiTab.RENDERER_TOGGLES)
         {
             return 100;
         }
@@ -135,6 +136,10 @@ public class GuiConfigs extends GuiConfigsBase
             list.addAll(StructureToggle.getHotkeys());
             list.addAll(StructureToggle.getColorConfigs());
             return ConfigOptionWrapper.createFor(list);
+        }
+        else if (tab == ConfigGuiTab.RENDERER_TOGGLES)
+        {
+            configs = ConfigUtils.createConfigWrapperForType(ConfigType.BOOLEAN, ImmutableList.copyOf(RendererToggle.values()));
         }
         else if (tab == ConfigGuiTab.RENDERER_HOTKEYS)
         {
@@ -185,6 +190,7 @@ public class GuiConfigs extends GuiConfigsBase
         INFO_LINE_ORDER     ("minihud.gui.button.config_gui.info_line_order"),
         INFO_HOTKEYS        ("minihud.gui.button.config_gui.info_hotkeys"),
         STRUCTURES          ("minihud.gui.button.config_gui.structures"),
+        RENDERER_TOGGLES    ("minihud.gui.button.config_gui.renderer_toggles"),
         RENDERER_HOTKEYS    ("minihud.gui.button.config_gui.renderer_hotkeys"),
         SHAPES              ("minihud.gui.button.config_gui.shapes");
 
