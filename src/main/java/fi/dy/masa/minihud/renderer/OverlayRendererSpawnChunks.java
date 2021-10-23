@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.renderer;
 
 import org.apache.commons.lang3.tuple.Pair;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -19,6 +20,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     protected static boolean needsUpdate = true;
 
     protected final RendererToggle toggle;
+    protected final boolean isPlayerFollowing;
 
     public static void setNeedsUpdate()
     {
@@ -28,13 +30,14 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     public OverlayRendererSpawnChunks(RendererToggle toggle)
     {
         this.toggle = toggle;
+        this.isPlayerFollowing = toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER;
     }
 
     @Override
     public boolean shouldRender(MinecraftClient mc)
     {
         return this.toggle.getBooleanValue() &&
-                (this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ||
+                (this.isPlayerFollowing ||
                  (mc.world != null && MiscUtils.isOverworld(mc.world) &&
                   DataStorage.getInstance().isWorldSpawnKnown()));
     }
@@ -47,13 +50,15 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
             return true;
         }
 
+        // Use the client player, to allow looking from the camera perspective
+        entity = this.isPlayerFollowing ? mc.player : entity;
+
         int ex = (int) Math.floor(entity.getX());
         int ez = (int) Math.floor(entity.getZ());
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
-        // Player-following renderer
-        if (this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER)
+        if (this.isPlayerFollowing)
         {
             return ex != lx || ez != lz;
         }
@@ -66,26 +71,29 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     @Override
     public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
+        // Use the client player, to allow looking from the camera perspective
+        entity = this.isPlayerFollowing ? mc.player : entity;
+
         DataStorage data = DataStorage.getInstance();
-        BlockPos spawn = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ? PositionUtils.getEntityBlockPos(entity) : data.getWorldSpawn();
+        BlockPos spawn = this.isPlayerFollowing ? PositionUtils.getEntityBlockPos(entity) : data.getWorldSpawn();
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
 
-        final Color4f colorEntity = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
-                Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getColor() :
-                Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getColor();
-        final Color4f colorLazy = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
-                Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getColor() :
-                Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getColor();
-        final Color4f colorOuter = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
-                Configs.Colors.SPAWN_REAL_OUTER_OVERLAY_COLOR.getColor() :
-                Configs.Colors.SPAWN_PLAYER_OUTER_OVERLAY_COLOR.getColor();
+        final Color4f colorEntity = this.isPlayerFollowing ?
+                Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getColor() :
+                Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getColor();
+        final Color4f colorLazy = this.isPlayerFollowing ?
+                Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getColor() :
+                Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getColor();
+        final Color4f colorOuter = this.isPlayerFollowing ?
+                Configs.Colors.SPAWN_PLAYER_OUTER_OVERLAY_COLOR.getColor() :
+                Configs.Colors.SPAWN_REAL_OUTER_OVERLAY_COLOR.getColor();
 
-        fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(spawn, colorEntity, 0.001, BUFFER_2);
-        fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxSidesBatchedQuads(spawn, colorEntity, 0.001, BUFFER_1);
+        fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(spawn, cameraPos, colorEntity, 0.001, BUFFER_2);
+        drawBlockBoundingBoxSidesBatchedQuads(spawn, cameraPos, colorEntity, 0.001, BUFFER_1);
 
         Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 22, mc.world);
         RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorOuter, BUFFER_1, BUFFER_2);
@@ -116,5 +124,20 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         BlockPos pos2 = new BlockPos(((cx + chunkRange) << 4) + 15, maxY, ((cz + chunkRange) << 4) + 15);
 
         return Pair.of(pos1, pos2);
+    }
+
+    /**
+     * Assumes a BufferBuilder in GL_QUADS mode has been initialized
+     */
+    public static void drawBlockBoundingBoxSidesBatchedQuads(BlockPos pos, Vec3d cameraPos, Color4f color, double expand, BufferBuilder buffer)
+    {
+        double minX = pos.getX() - cameraPos.x - expand;
+        double minY = pos.getY() - cameraPos.y - expand;
+        double minZ = pos.getZ() - cameraPos.z - expand;
+        double maxX = pos.getX() - cameraPos.x + expand + 1;
+        double maxY = pos.getY() - cameraPos.y + expand + 1;
+        double maxZ = pos.getZ() - cameraPos.z + expand + 1;
+
+        fi.dy.masa.malilib.render.RenderUtils.drawBoxAllSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
     }
 }

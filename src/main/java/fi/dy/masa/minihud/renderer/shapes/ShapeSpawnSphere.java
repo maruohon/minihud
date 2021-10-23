@@ -10,11 +10,18 @@ import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.Quadrant;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.minihud.config.Configs;
 
 public class ShapeSpawnSphere extends ShapeSphereBlocky
 {
     protected Vec3d[] quadrantCenters;
     protected double margin = 1.5;
+
+    public ShapeSpawnSphere()
+    {
+        this(ShapeType.ADJUSTABLE_SPAWN_SPHERE, Configs.Colors.SHAPE_DESPAWN_SPHERE.getColor(), 24.0);
+        this.margin = 0.0;
+    }
 
     public ShapeSpawnSphere(ShapeType shape, Color4f color, double radius)
     {

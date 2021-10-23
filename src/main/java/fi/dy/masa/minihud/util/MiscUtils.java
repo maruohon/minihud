@@ -19,6 +19,7 @@ import fi.dy.masa.malilib.util.IntBoundingBox;
 public class MiscUtils
 {
     private static final Random RAND = new Random();
+    private static final int[] AXOLOTL_COLORS = new int[] { 0xFFC7EC, 0x8C6C50, 0xFAD41B, 0xE8F7Fb, 0xB6B5FE };
 
     public static long bytesToMb(long bytes)
     {
@@ -96,7 +97,7 @@ public class MiscUtils
 
     public static void addAxolotlTooltip(ItemStack stack, List<Text> lines)
     {
-        NbtCompound tag = stack.getTag();
+        NbtCompound tag = stack.getNbt();
 
         if (tag != null && tag.contains(AxolotlEntity.VARIANT_KEY, Constants.NBT.TAG_INT))
         {
@@ -106,20 +107,22 @@ public class MiscUtils
             {
                 AxolotlEntity.Variant variant = AxolotlEntity.Variant.VARIANTS[variantId];
                 String variantName = variant.getName();
-                int color = new int[] { 0xFFC7EC, 0x8C6C50, 0xFAD41B, 0xE8F7Fb, 0xB6B5FE } [variantId];
+                TranslatableText labelText = new TranslatableText("minihud.label.axolotl_tooltip.label");
+                TranslatableText valueText = new TranslatableText("minihud.label.axolotl_tooltip.value", variantName, variantId);
 
-                TranslatableText text = new TranslatableText("minihud.label.axolotl_tooltip.label");
-                Text text2 = new TranslatableText("minihud.label.axolotl_tooltip.value", variantName, variantId)
-                                     .setStyle(Style.EMPTY.withColor(color));
+                if (variantId < AXOLOTL_COLORS.length)
+                {
+                    valueText.setStyle(Style.EMPTY.withColor(AXOLOTL_COLORS[variantId]));
+                }
 
-                lines.add(Math.min(1, lines.size()), text.append(text2));
+                lines.add(Math.min(1, lines.size()), labelText.append(valueText));
             }
         }
     }
 
     public static void addBeeTooltip(ItemStack stack, List<Text> lines)
     {
-        NbtCompound tag = stack.getTag();
+        NbtCompound tag = stack.getNbt();
 
         if (tag != null && tag.contains("BlockEntityTag", Constants.NBT.TAG_COMPOUND))
         {
@@ -164,7 +167,7 @@ public class MiscUtils
 
     public static void addHoneyTooltip(ItemStack stack, List<Text> lines)
     {
-        NbtCompound tag = stack.getTag();
+        NbtCompound tag = stack.getNbt();
 
         if (tag != null && tag.contains("BlockStateTag", Constants.NBT.TAG_COMPOUND))
         {

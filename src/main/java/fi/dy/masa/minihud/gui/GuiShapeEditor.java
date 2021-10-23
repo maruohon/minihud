@@ -68,7 +68,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         ButtonGeneric button = new ButtonGeneric(x, this.height - 24, -1, 20, ConfigGuiTab.SHAPES.getDisplayName());
         this.addButton(button, new GuiShapeManager.ButtonListenerTab(ConfigGuiTab.SHAPES));
 
-        this.createLayerEditControls(146, 142, this.getLayerRange());
+        this.createLayerEditControls(146, 162, this.getLayerRange());
     }
 
     @Override
@@ -89,7 +89,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.nextY = y + 20;
         this.colorY = y - 1;
 
-        this.addWidget(new WidgetColorIndicator(x + 74, this.colorY, 19, 19, this.shape.getColor(), (val) -> this.shape.setColor(val) ));
+        this.addWidget(new WidgetColorIndicator(x + 74, this.colorY, 19, 19, this.shape.getColor(), this.shape::setColor));
     }
 
     private void createShapeEditorElements(int x, int y)
@@ -107,13 +107,19 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
         switch (this.shape.getType())
         {
+            case ADJUSTABLE_SPAWN_SPHERE:
+            {
+                this.createShapeEditorElementsSphereBase(x, y, true);
+                break;
+            }
+
             case CAN_DESPAWN_SPHERE:
             case CAN_SPAWN_SPHERE:
             case DESPAWN_SPHERE:
             {
                 ShapeSpawnSphere shape = (ShapeSpawnSphere) this.shape;
                 this.createShapeEditorElementsSphereBase(x, y, false);
-                this.createShapeEditorElementDoubleField(x + 150, y + 2, () -> shape.getMargin(), (val) -> shape.setMargin(val), "minihud.gui.label.margin_colon", false);
+                this.createShapeEditorElementDoubleField(x + 150, y + 2, shape::getMargin, shape::setMargin, "minihud.gui.label.margin_colon", false);
                 break;
             }
 
@@ -121,15 +127,15 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
             {
                 ShapeCircle shape = (ShapeCircle) this.shape;
                 this.createShapeEditorElementsSphereBase(x, y, true);
-                this.createShapeEditorElementIntField(x + 150, y + 36, () -> shape.getHeight(), (val) -> shape.setHeight(val), "minihud.gui.label.height_colon", true);
-                this.createDirectionButton(x + 230, y + 36, () -> shape.getMainAxis(), (val) -> shape.setMainAxis(val), "minihud.gui.label.circle.main_axis_colon");
-                this.createRenderTypeButton(renderTypeX, renderTypeY, () -> this.shape.getRenderType(), (val) -> this.shape.setRenderType(val), "minihud.gui.label.render_type_colon");
+                this.createShapeEditorElementIntField(x + 150, y + 36, shape::getHeight, shape::setHeight, "minihud.gui.label.height_colon", true);
+                this.createDirectionButton(x + 230, y + 36, shape::getMainAxis, shape::setMainAxis, "minihud.gui.label.circle.main_axis_colon");
+                this.createRenderTypeButton(renderTypeX, renderTypeY, this.shape::getRenderType, this.shape::setRenderType, "minihud.gui.label.render_type_colon");
                 break;
             }
 
             case SPHERE_BLOCKY:
                 this.createShapeEditorElementsSphereBase(x, y, true);
-                this.createRenderTypeButton(renderTypeX, renderTypeY, () -> this.shape.getRenderType(), (val) -> this.shape.setRenderType(val), "minihud.gui.label.render_type_colon");
+                this.createRenderTypeButton(renderTypeX, renderTypeY, this.shape::getRenderType, this.shape::setRenderType, "minihud.gui.label.render_type_colon");
                 break;
         }
     }
@@ -142,7 +148,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
         if (addRadiusInput)
         {
-            this.createShapeEditorElementDoubleField(x + 150, y + 2, () -> shape.getRadius(), (val) -> shape.setRadius(val), "minihud.gui.label.radius_colon", true);
+            this.createShapeEditorElementDoubleField(x + 150, y + 2, shape::getRadius, shape::setRadius, "minihud.gui.label.radius_colon", true);
         }
 
         y += 12;
@@ -232,16 +238,8 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         return Direction.byId(index);
     }
 
-    private static class SphereEditor implements ICoordinateValueModifier
+    private record SphereEditor(ShapeCircleBase shape, GuiShapeEditor gui) implements ICoordinateValueModifier
     {
-        private final GuiShapeEditor gui;
-        private final ShapeCircleBase shape;
-
-        private SphereEditor(ShapeCircleBase shape, GuiShapeEditor gui)
-        {
-            this.shape = shape;
-            this.gui = gui;
-        }
 
         @Override
         public boolean modifyValue(CoordinateType type, int amount)
@@ -259,22 +257,14 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
                 this.shape.setCenter(PositionUtils.setValue(type, this.shape.getCenter(), Double.parseDouble(newValue)));
                 return true;
             }
-            catch (Exception e) {}
+            catch (Exception ignore) {}
 
             return false;
         }
     }
 
-    private static class ButtonListenerSphere implements IButtonActionListener
+    private record ButtonListenerSphere(ShapeCircleBase shape, GuiShapeEditor gui) implements IButtonActionListener
     {
-        private final GuiShapeEditor gui;
-        private final ShapeCircleBase shape;
-
-        private ButtonListenerSphere(ShapeCircleBase shape, GuiShapeEditor gui)
-        {
-            this.shape = shape;
-            this.gui = gui;
-        }
 
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
@@ -289,16 +279,9 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static class ButtonListenerSphereBlockSnap implements IButtonActionListener
+    private record ButtonListenerSphereBlockSnap(ShapeCircleBase shape,
+                                                 GuiShapeEditor gui) implements IButtonActionListener
     {
-        private final GuiShapeEditor gui;
-        private final ShapeCircleBase shape;
-
-        private ButtonListenerSphereBlockSnap(ShapeCircleBase shape, GuiShapeEditor gui)
-        {
-            this.shape = shape;
-            this.gui = gui;
-        }
 
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
@@ -308,14 +291,8 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static class TextFieldListenerColor implements ITextFieldListener<GuiTextFieldGeneric>
+    private record TextFieldListenerColor(ShapeBase shape) implements ITextFieldListener<GuiTextFieldGeneric>
     {
-        private final ShapeBase shape;
-
-        private TextFieldListenerColor(ShapeBase shape)
-        {
-            this.shape = shape;
-        }
 
         @Override
         public boolean onTextChange(GuiTextFieldGeneric textField)
@@ -325,14 +302,8 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static class TextFieldListenerInteger implements ITextFieldListener<GuiTextFieldInteger>
+    private record TextFieldListenerInteger(IntConsumer consumer) implements ITextFieldListener<GuiTextFieldInteger>
     {
-        private final IntConsumer consumer;
-
-        private TextFieldListenerInteger(IntConsumer consumer)
-        {
-            this.consumer = consumer;
-        }
 
         @Override
         public boolean onTextChange(GuiTextFieldInteger textField)
@@ -342,20 +313,14 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
                 this.consumer.accept(Integer.parseInt(textField.getText()));
                 return true;
             }
-            catch (Exception e) {}
+            catch (Exception ignore) {}
 
             return false;
         }
     }
 
-    private static class TextFieldListenerDouble implements ITextFieldListener<GuiTextFieldDouble>
+    private record TextFieldListenerDouble(DoubleConsumer consumer) implements ITextFieldListener<GuiTextFieldDouble>
     {
-        private final DoubleConsumer consumer;
-
-        private TextFieldListenerDouble(DoubleConsumer consumer)
-        {
-            this.consumer = consumer;
-        }
 
         @Override
         public boolean onTextChange(GuiTextFieldDouble textField)
@@ -365,22 +330,15 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
                 this.consumer.accept(Double.parseDouble(textField.getText()));
                 return true;
             }
-            catch (Exception e) {}
+            catch (Exception ignore) {}
 
             return false;
         }
     }
 
-    private static class ChainedDoubleConsumer implements DoubleConsumer
+    private record ChainedDoubleConsumer(DoubleConsumer consumerOne,
+                                         DoubleConsumer consumerTwo) implements DoubleConsumer
     {
-        private final DoubleConsumer consumerOne;
-        private final DoubleConsumer consumerTwo;
-
-        private ChainedDoubleConsumer(DoubleConsumer consumerOne, DoubleConsumer consumerTwo)
-        {
-            this.consumerOne = consumerOne;
-            this.consumerTwo = consumerTwo;
-        }
 
         @Override
         public void accept(double value)
@@ -390,16 +348,9 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static class ChainedIntConsumer implements IntConsumer
+    private record ChainedIntConsumer(IntConsumer consumerOne,
+                                      IntConsumer consumerTwo) implements IntConsumer
     {
-        private final IntConsumer consumerOne;
-        private final IntConsumer consumerTwo;
-
-        private ChainedIntConsumer(IntConsumer consumerOne, IntConsumer consumerTwo)
-        {
-            this.consumerOne = consumerOne;
-            this.consumerTwo = consumerTwo;
-        }
 
         @Override
         public void accept(int value)

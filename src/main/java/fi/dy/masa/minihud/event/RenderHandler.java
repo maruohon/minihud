@@ -21,6 +21,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.HorseBaseEntity;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -283,6 +284,14 @@ public class RenderHandler implements IRenderer
         BlockPos pos = new BlockPos(entity.getX(), y, entity.getZ());
         ChunkPos chunkPos = new ChunkPos(pos);
 
+        @SuppressWarnings("deprecation")
+        boolean isChunkLoaded = mc.world.isChunkLoaded(pos);
+
+        if (isChunkLoaded == false)
+        {
+            return;
+        }
+
         if (type == InfoToggle.FPS)
         {
             this.addLine(String.format("%d fps", this.fps));
@@ -525,30 +534,27 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.LIGHT_LEVEL)
         {
-            if (mc.world.isChunkLoaded(pos))
+            WorldChunk clientChunk = this.getClientChunk(chunkPos);
+
+            if (clientChunk.isEmpty() == false)
             {
-                WorldChunk clientChunk = this.getClientChunk(chunkPos);
+                LightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
 
-                if (clientChunk.isEmpty() == false)
+                this.addLine(String.format("Client Light: %d (block: %d, sky: %d)",
+                        lightingProvider.getLight(pos, 0),
+                        lightingProvider.get(LightType.BLOCK).getLightLevel(pos),
+                        lightingProvider.get(LightType.SKY).getLightLevel(pos)));
+
+                World bestWorld = WorldUtils.getBestWorld(mc);
+                WorldChunk serverChunk = this.getChunk(chunkPos);
+
+                if (serverChunk != null && serverChunk != clientChunk)
                 {
-                    LightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
-
-                    this.addLine(String.format("Client Light: %d (block: %d, sky: %d)",
-                            lightingProvider.getLight(pos, 0),
-                            lightingProvider.get(LightType.BLOCK).getLightLevel(pos),
-                            lightingProvider.get(LightType.SKY).getLightLevel(pos)));
-
-                    World bestWorld = WorldUtils.getBestWorld(mc);
-                    WorldChunk serverChunk = this.getChunk(chunkPos);
-
-                    if (serverChunk != null && serverChunk != clientChunk)
-                    {
-                        lightingProvider = bestWorld.getChunkManager().getLightingProvider();
-                        int total = lightingProvider.getLight(pos, 0);
-                        int block = lightingProvider.get(LightType.BLOCK).getLightLevel(pos);
-                        int sky = lightingProvider.get(LightType.SKY).getLightLevel(pos);
-                        this.addLine(String.format("Server Light: %d (block: %d, sky: %d)", total, block, sky));
-                    }
+                    lightingProvider = bestWorld.getChunkManager().getLightingProvider();
+                    int total = lightingProvider.getLight(pos, 0);
+                    int block = lightingProvider.get(LightType.BLOCK).getLightLevel(pos);
+                    int sky = lightingProvider.get(LightType.SKY).getLightLevel(pos);
+                    this.addLine(String.format("Server Light: %d (block: %d, sky: %d)", total, block, sky));
                 }
             }
         }
@@ -569,6 +575,48 @@ public class RenderHandler implements IRenderer
             if (state != null && state.getBlock() instanceof BeehiveBlock)
             {
                 this.addLine("Honey: " + GuiBase.TXT_AQUA + BeehiveBlockEntity.getHoneyLevel(state));
+            }
+        }
+        else if (type == InfoToggle.HORSE_SPEED ||
+                 type == InfoToggle.HORSE_JUMP)
+        {
+            if (this.addedTypes.contains(InfoToggle.HORSE_SPEED) ||
+                this.addedTypes.contains(InfoToggle.HORSE_JUMP))
+            {
+                return;
+            }
+
+            Entity vehicle = this.mc.player.getVehicle();
+
+            if ((vehicle instanceof HorseBaseEntity) == false)
+            {
+                return;
+            }
+
+            HorseBaseEntity horse = (HorseBaseEntity) vehicle;
+
+            if (horse.isSaddled())
+            {
+                if (InfoToggle.HORSE_SPEED.getBooleanValue())
+                {
+                    float speed = horse.getMovementSpeed();
+                    speed *= 42.163f;
+                    this.addLine(String.format("Horse Speed: %.3f m/s", speed));
+                }
+
+                if (InfoToggle.HORSE_JUMP.getBooleanValue())
+                {
+                    double jump = horse.getJumpStrength();
+                    double calculatedJumpHeight =
+                            -0.1817584952d * jump * jump * jump +
+                            3.689713992d * jump * jump +
+                            2.128599134d * jump +
+                            -0.343930367;
+                    this.addLine(String.format("Horse Jump: %.3f m", calculatedJumpHeight));
+                }
+
+                this.addedTypes.add(InfoToggle.HORSE_SPEED);
+                this.addedTypes.add(InfoToggle.HORSE_JUMP);
             }
         }
         else if (type == InfoToggle.ROTATION_YAW ||
@@ -613,6 +661,13 @@ public class RenderHandler implements IRenderer
             this.addedTypes.add(InfoToggle.ROTATION_PITCH);
             this.addedTypes.add(InfoToggle.SPEED);
         }
+        else if (type == InfoToggle.SPEED_HV)
+        {
+            double dx = entity.getX() - entity.lastRenderX;
+            double dy = entity.getY() - entity.lastRenderY;
+            double dz = entity.getZ() - entity.lastRenderZ;
+            this.addLine(String.format("speed: xz: %.3f y: %.3f m/s", Math.sqrt(dx * dx + dz * dz) * 20, dy * 20));
+        }
         else if (type == InfoToggle.SPEED_AXIS)
         {
             double dx = entity.getX() - entity.lastRenderX;
@@ -654,52 +709,41 @@ public class RenderHandler implements IRenderer
         }
         else if (type == InfoToggle.DIFFICULTY)
         {
-            if (mc.world.isChunkLoaded(pos))
+            long chunkInhabitedTime = 0L;
+            float moonPhaseFactor = 0.0F;
+            WorldChunk serverChunk = this.getChunk(chunkPos);
+
+            if (serverChunk != null)
             {
-                long chunkInhabitedTime = 0L;
-                float moonPhaseFactor = 0.0F;
-                WorldChunk serverChunk = this.getChunk(chunkPos);
-
-                if (serverChunk != null)
-                {
-                    moonPhaseFactor = mc.world.getMoonSize();
-                    chunkInhabitedTime = serverChunk.getInhabitedTime();
-                }
-
-                LocalDifficulty diff = new LocalDifficulty(mc.world.getDifficulty(), mc.world.getTimeOfDay(), chunkInhabitedTime, moonPhaseFactor);
-                this.addLine(String.format("Local Difficulty: %.2f // %.2f (Day %d)",
-                        diff.getLocalDifficulty(), diff.getClampedLocalDifficulty(), mc.world.getTimeOfDay() / 24000L));
+                moonPhaseFactor = mc.world.getMoonSize();
+                chunkInhabitedTime = serverChunk.getInhabitedTime();
             }
+
+            LocalDifficulty diff = new LocalDifficulty(mc.world.getDifficulty(), mc.world.getTimeOfDay(), chunkInhabitedTime, moonPhaseFactor);
+            this.addLine(String.format("Local Difficulty: %.2f // %.2f (Day %d)",
+                    diff.getLocalDifficulty(), diff.getClampedLocalDifficulty(), mc.world.getTimeOfDay() / 24000L));
         }
         else if (type == InfoToggle.BIOME)
         {
-            // Prevent a crash when outside of world
-            if (mc.world.isChunkLoaded(pos))
-            {
-                WorldChunk clientChunk = this.getClientChunk(chunkPos);
+            WorldChunk clientChunk = this.getClientChunk(chunkPos);
 
-                if (clientChunk.isEmpty() == false)
-                {
-                    Biome biome = mc.world.getBiome(pos);
-                    Identifier id = mc.world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
-                    this.addLine("Biome: " + StringUtils.translate("biome." + id.toString().replace(":", ".")));
-                }
+            if (clientChunk.isEmpty() == false)
+            {
+                Biome biome = mc.world.getBiome(pos);
+                Identifier id = mc.world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
+                this.addLine("Biome: " + StringUtils.translate("biome." + id.toString().replace(":", ".")));
             }
         }
         else if (type == InfoToggle.BIOME_REG_NAME)
         {
-            // Prevent a crash when outside of world
-            if (mc.world.isChunkLoaded(pos))
-            {
-                WorldChunk clientChunk = this.getClientChunk(chunkPos);
+            WorldChunk clientChunk = this.getClientChunk(chunkPos);
 
-                if (clientChunk.isEmpty() == false)
-                {
-                    Biome biome = mc.world.getBiome(pos);
-                    Identifier rl = mc.world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
-                    String name = rl != null ? rl.toString() : "?";
-                    this.addLine("Biome reg name: " + name);
-                }
+            if (clientChunk.isEmpty() == false)
+            {
+                Biome biome = mc.world.getBiome(pos);
+                Identifier rl = mc.world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
+                String name = rl != null ? rl.toString() : "?";
+                this.addLine("Biome reg name: " + name);
             }
         }
         else if (type == InfoToggle.ENTITIES)
