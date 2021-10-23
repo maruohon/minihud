@@ -661,6 +661,13 @@ public class RenderHandler implements IRenderer
             this.addedTypes.add(InfoToggle.ROTATION_PITCH);
             this.addedTypes.add(InfoToggle.SPEED);
         }
+        else if (type == InfoToggle.SPEED_HV)
+        {
+            double dx = entity.getX() - entity.lastRenderX;
+            double dy = entity.getY() - entity.lastRenderY;
+            double dz = entity.getZ() - entity.lastRenderZ;
+            this.addLine(String.format("speed: xz: %.3f y: %.3f m/s", Math.sqrt(dx * dx + dz * dz) * 20, dy * 20));
+        }
         else if (type == InfoToggle.SPEED_AXIS)
         {
             double dx = entity.getX() - entity.lastRenderX;
