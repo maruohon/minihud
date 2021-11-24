@@ -29,10 +29,9 @@ import fi.dy.masa.malilib.render.RenderUtils;
 @Mixin(MerchantScreen.class)
 public abstract class MixinMerchantScreen extends HandledScreen<MerchantScreenHandler>
 {
-    @Shadow private int selectedIndex;
-    @Shadow private int indexStartOffset;
-
     @Nullable private FavoriteData favoriteData;
+    @Shadow private int selectedIndex;
+    @Shadow int indexStartOffset;
     private int indexStartOffsetLast = -1;
 
     private MixinMerchantScreen(MerchantScreenHandler handler, PlayerInventory inventory, Text title)

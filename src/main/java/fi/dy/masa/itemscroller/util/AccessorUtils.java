@@ -12,46 +12,46 @@ public class AccessorUtils
 {
     public static Slot getSlotUnderMouse(HandledScreen<?> gui)
     {
-        return ((IMixinScreenWithHandler) gui).getHoveredSlot();
+        return ((IMixinScreenWithHandler) gui).itemscroller_getHoveredSlot();
     }
 
     public static Slot getSlotAtPosition(HandledScreen<?> gui, int x, int y)
     {
-        return ((IMixinScreenWithHandler) gui).getSlotAtPositionInvoker(x, y);
+        return ((IMixinScreenWithHandler) gui).itemscroller_getSlotAtPositionInvoker(x, y);
     }
 
     public static void handleMouseClick(HandledScreen<?> gui, Slot slotIn, int slotId, int mouseButton, SlotActionType type)
     {
-        ((IMixinScreenWithHandler) gui).handleMouseClickInvoker(slotIn, slotId, mouseButton, type);
+        ((IMixinScreenWithHandler) gui).itemscroller_handleMouseClickInvoker(slotIn, slotId, mouseButton, type);
     }
 
     public static int getGuiLeft(HandledScreen<?> gui)
     {
-        return ((IMixinScreenWithHandler) gui).getGuiLeft();
+        return ((IMixinScreenWithHandler) gui).itemscroller_getGuiLeft();
     }
 
     public static int getGuiTop(HandledScreen<?> gui)
     {
-        return ((IMixinScreenWithHandler) gui).getGuiTop();
+        return ((IMixinScreenWithHandler) gui).itemscroller_getGuiTop();
     }
 
     public static int getGuiXSize(HandledScreen<?> gui)
     {
-        return ((IMixinScreenWithHandler) gui).getGuiSizeX();
+        return ((IMixinScreenWithHandler) gui).itemscroller_getBackgroundWidth();
     }
 
     public static int getGuiYSize(HandledScreen<?> gui)
     {
-        return ((IMixinScreenWithHandler) gui).getGuiSizeY();
+        return ((IMixinScreenWithHandler) gui).itemscroller_getBackgroundHeight();
     }
 
     public static int getSelectedMerchantRecipe(MerchantScreen gui)
     {
-        return ((IMixinMerchantScreen) gui).getSelectedMerchantRecipe();
+        return ((IMixinMerchantScreen) gui).itemscroller_getSelectedMerchantRecipe();
     }
 
     public static int getSlotIndex(Slot slot)
     {
-        return ((IMixinSlot) slot).getSlotIndex();
+        return ((IMixinSlot) slot).itemscroller_getSlotIndex();
     }
 }

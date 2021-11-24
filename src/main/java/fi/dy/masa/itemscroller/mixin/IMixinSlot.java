@@ -2,10 +2,11 @@ package fi.dy.masa.itemscroller.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import net.minecraft.screen.slot.Slot;
 
-@Mixin(net.minecraft.screen.slot.Slot.class)
+@Mixin(Slot.class)
 public interface IMixinSlot
 {
     @Accessor("index")
-    int getSlotIndex();
+    int itemscroller_getSlotIndex();
 }
