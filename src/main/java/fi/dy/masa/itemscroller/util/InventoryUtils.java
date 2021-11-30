@@ -77,14 +77,16 @@ public class InventoryUtils
 
                 if ((recipe.isIgnoredInRecipeBook() ||
                      world.getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
-                     ((ClientPlayerEntity) player).getRecipeBook().contains(recipe))
-               )
-               {
-                   inventoryCraftResult.setLastRecipe(recipe);
-                   stack = recipe.craft(craftMatrix);
-               }
+                     ((ClientPlayerEntity) player).getRecipeBook().contains(recipe)))
+                {
+                    inventoryCraftResult.setLastRecipe(recipe);
+                    stack = recipe.craft(craftMatrix);
+                }
 
-               inventoryCraftResult.setStack(0, stack);
+                if (stack.isEmpty() == false)
+                {
+                    inventoryCraftResult.setStack(0, stack);
+                }
             }
         }
     }
