@@ -1008,7 +1008,9 @@ public class InventoryUtils
         }
 
         // If moving to the other inventory, then move the hovered slot's stack last
-        if (toOtherInventory && shiftClickSlotWithCheck(gui, slot.id) == false)
+        if (toOtherInventory &&
+            shiftClickSlotWithCheck(gui, slot.id) == false &&
+            Configs.Toggles.SCROLL_STACKS_FALLBACK.getBooleanValue())
         {
             clickSlotsToMoveItemsFromSlot(slot, gui, toOtherInventory);
         }
