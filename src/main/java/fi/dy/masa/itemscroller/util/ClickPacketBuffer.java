@@ -1,18 +1,20 @@
 package fi.dy.masa.itemscroller.util;
 
-import java.util.ArrayList;
+import java.util.ArrayDeque;
+import java.util.Queue;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.Packet;
 
 public class ClickPacketBuffer
 {
-    private static final ArrayList<Packet<?>> BUFFER = new ArrayList<>();
+    private static final Queue<Packet<?>> BUFFER = new ArrayDeque<>(2048);
     private static boolean shouldBufferPackets;
+    private static boolean hasBufferedPackets;
 
     public static void reset()
     {
         shouldBufferPackets = false;
+        hasBufferedPackets = false;
         BUFFER.clear();
     }
 
@@ -39,20 +41,30 @@ public class ClickPacketBuffer
 
     public static void bufferPacket(Packet<?> packet)
     {
-        BUFFER.add(packet);
+        BUFFER.offer(packet);
+        hasBufferedPackets = true;
     }
 
     public static void sendBufferedPackets(int maxCount)
     {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        MinecraftClient mc = MinecraftClient.getInstance();
 
-        if (player != null && BUFFER.isEmpty() == false)
+        if (hasBufferedPackets)
         {
-            maxCount = Math.min(maxCount, BUFFER.size());
-
-            for (int i = 0; i < maxCount; ++i)
+            if (mc.currentScreen == null)
             {
-                player.networkHandler.sendPacket(BUFFER.remove(0));
+                reset();
+            }
+            else if (mc.player != null)
+            {
+                maxCount = Math.min(maxCount, BUFFER.size());
+    
+                for (int i = 0; i < maxCount; ++i)
+                {
+                    mc.player.networkHandler.sendPacket(BUFFER.poll());
+                }
+
+                hasBufferedPackets = BUFFER.isEmpty() == false;
             }
         }
     }
