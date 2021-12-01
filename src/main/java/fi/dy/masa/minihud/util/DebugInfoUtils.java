@@ -12,6 +12,7 @@ import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.client.render.debug.NeighborUpdateDebugRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.ai.pathing.PathNode;
@@ -138,9 +139,8 @@ public class DebugInfoUtils
         // We are catching updates from the server world, and adding them to the debug renderer directly
         if (neighborUpdateEnabled && world.isClient == false)
         {
-            MinecraftClient.getInstance().execute(() -> {
-                ((NeighborUpdateDebugRenderer) MinecraftClient.getInstance().debugRenderer.neighborUpdateDebugRenderer).addNeighborUpdate(world.getTime(), pos);
-            });
+            MinecraftClient mc = MinecraftClient.getInstance();
+            mc.execute(() -> ((NeighborUpdateDebugRenderer) mc.debugRenderer.neighborUpdateDebugRenderer).addNeighborUpdate(world.getTime(), pos.toImmutable()));
         }
     }
 
@@ -157,11 +157,11 @@ public class DebugInfoUtils
             if (world != null)
             {
                 TypeFilter<Entity, MobEntity> filter = TypeFilter.instanceOf(MobEntity.class);
-                Predicate<Entity> predicate = (entity) -> (entity instanceof MobEntity) && entity.isAlive();
+                Predicate<MobEntity> predicate = LivingEntity::isAlive;
 
-                for (Entity entity : world.getEntitiesByType(filter, predicate))
+                for (MobEntity entity : world.getEntitiesByType(filter, predicate))
                 {
-                    EntityNavigation navigator = ((MobEntity) entity).getNavigation();
+                    EntityNavigation navigator = entity.getNavigation();
 
                     if (navigator != null && isAnyPlayerWithinRange(world, entity, 64))
                     {
