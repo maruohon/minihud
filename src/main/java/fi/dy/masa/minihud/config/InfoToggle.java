@@ -13,7 +13,7 @@ import fi.dy.masa.minihud.MiniHUD;
 
 public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
 {
-    BEE_COUNT               ("infoBeeCount",                false, 36, "", "Show the number of bees in the targeted Hive or Nest.\nNote: This only works in single player without server-side support."),
+    BEE_COUNT               ("infoBeeCount",                false, 36, "", "Show the number of bees in the targeted Hive or Nest.\n§6Note: This only works in single player (without server-side support,\n§6which doesn't exist yet, but will be in the Servux mod at some point)."),
     BIOME                   ("infoBiome",                   false, 19, "", "Show the name of the current biome"),
     BIOME_REG_NAME          ("infoBiomeRegistryName",       false, 20, "", "Show the registry name of the current biome"),
     BLOCK_BREAK_SPEED       ("infoBlockBreakSpeed",         false,  6, "", "Show the player's current block breaking speed\nover the last 100 ticks (5 seconds)"),
@@ -32,8 +32,9 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     ENTITIES_CLIENT_WORLD   ("infoEntitiesClientWorld",     false, 22, "", "Show the entity count in the world list/map"),
     ENTITY_REG_NAME         ("infoEntityRegistryName",      false, 24, "", "Show the registry name of the entity\nthe player is currently looking at"),
     FACING                  ("infoFacing",                  true,   8, "", "Show the player's current facing"),
+    FURNACE_XP              ("infoFurnaceXp",               false, 30, "", "Show the amount of XP in the looked at Furnace.\n§6Note: This only works in single player (without server-side support,\n§6which doesn't exist yet, but will be in the Servux mod at some point)."),
     FPS                     ("infoFPS",                     false,  0, "", "Show the current FPS"),
-    HONEY_LEVEL             ("infoHoneyLevel",              false, 37, "", "Show the honey level the targeted Hive or Nest.\nNote: This only works in single player without server-side support."),
+    HONEY_LEVEL             ("infoHoneyLevel",              false, 37, "", "Show the honey level the targeted Hive or Nest.\nNote: This only works in single player (without server-side support,\n§6which doesn't exist yet, but will be in the Servux mod at some point)."),
     HORSE_SPEED             ("infoHorseSpeed",              false, 36, "", "Show the speed (m/s) of the horse being ridden."),
     HORSE_JUMP              ("infoHorseJump",               false, 37, "", "Show the jump height of the horse being ridden."),
     LIGHT_LEVEL             ("infoLightLevel",              false, 10, "", "Show the current light level"),

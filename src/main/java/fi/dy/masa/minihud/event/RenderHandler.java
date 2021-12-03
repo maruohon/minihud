@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.block.entity.BeehiveBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -566,6 +567,16 @@ public class RenderHandler implements IRenderer
             if (be instanceof BeehiveBlockEntity)
             {
                 this.addLine("Bees: " + GuiBase.TXT_AQUA + ((BeehiveBlockEntity) be).getBeeCount());
+            }
+        }
+        else if (type == InfoToggle.FURNACE_XP)
+        {
+            World bestWorld = WorldUtils.getBestWorld(mc);
+            BlockEntity be = this.getTargetedBlockEntity(bestWorld, mc);
+
+            if (be instanceof AbstractFurnaceBlockEntity furnace)
+            {
+                this.addLine("Furnace XP: " + GuiBase.TXT_AQUA + MiscUtils.getFurnaceXpAmount(furnace));
             }
         }
         else if (type == InfoToggle.HONEY_LEVEL)

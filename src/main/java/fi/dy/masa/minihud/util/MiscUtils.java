@@ -1,20 +1,28 @@
 package fi.dy.masa.minihud.util;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nullable;
+import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.recipe.AbstractCookingRecipe;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.minihud.mixin.IMixinAbstractFurnaceBlockEntity;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public class MiscUtils
 {
@@ -185,5 +193,24 @@ public class MiscUtils
 
             lines.add(Math.min(1, lines.size()), new TranslatableText("minihud.label.honey_info.level", honeyLevel));
         }
+    }
+
+    public static int getFurnaceXpAmount(AbstractFurnaceBlockEntity be)
+    {
+        Object2IntOpenHashMap<Identifier> recipes = ((IMixinAbstractFurnaceBlockEntity) be).minihud_getUsedRecipes();
+        World world = be.getWorld();
+        double xp = 0.0;
+
+        for (Object2IntMap.Entry<Identifier> entry : recipes.object2IntEntrySet())
+        {
+            Optional<? extends Recipe<?>> recipeOpt = world.getRecipeManager().get(entry.getKey());
+
+            if (recipeOpt.isPresent() && recipeOpt.get() instanceof AbstractCookingRecipe recipe)
+            {
+                xp += entry.getIntValue() * recipe.getExperience();
+            }
+        }
+
+        return (int) xp;
     }
 }
