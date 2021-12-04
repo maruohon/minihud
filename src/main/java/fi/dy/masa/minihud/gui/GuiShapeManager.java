@@ -57,6 +57,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         this.clearWidgets();
         this.clearButtons();
         this.createTabButtons();
+        this.getListWidget().refreshEntries();
     }
 
     protected void createTabButtons()
