@@ -12,7 +12,6 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.Reference;
-import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
@@ -20,10 +19,6 @@ import fi.dy.masa.minihud.util.DataStorage;
 
 public class WorldLoadListener implements IWorldLoadListener
 {
-    private boolean hasCachedSeed;
-    private long cachedSeed;
-    private boolean renderersRead;
-
     @Override
     public void onWorldLoadPre(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, MinecraftClient mc)
     {
@@ -37,20 +32,6 @@ public class WorldLoadListener implements IWorldLoadListener
             {
                 this.writeDataGlobal();
             }
-
-            if (worldAfter != null)
-            {
-                this.hasCachedSeed = DataStorage.getInstance().hasStoredWorldSeed() && Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue();
-
-                if (this.hasCachedSeed)
-                {
-                    this.cachedSeed = DataStorage.getInstance().getWorldSeed(worldAfter);
-                }
-            }
-        }
-        else
-        {
-            this.hasCachedSeed = false;
         }
     }
 
@@ -71,13 +52,6 @@ public class WorldLoadListener implements IWorldLoadListener
 
             this.readStoredDataPerDimension();
             OverlayRenderer.resetRenderTimeout();
-
-            if (this.hasCachedSeed)
-            {
-                DataStorage.getInstance().setWorldSeed(this.cachedSeed);
-                this.hasCachedSeed = false;
-            }
-
             DataStorage.getInstance().onWorldJoin();
         }
     }
@@ -87,8 +61,8 @@ public class WorldLoadListener implements IWorldLoadListener
         File file = getCurrentStorageFile(false);
         JsonObject root = new JsonObject();
 
-        root.add("shapes", ShapeManager.INSTANCE.toJson());
         root.add("data_storage", DataStorage.getInstance().toJson());
+        root.add("shapes", ShapeManager.INSTANCE.toJson());
 
         JsonUtils.writeJsonToFile(root, file);
     }
@@ -135,7 +109,7 @@ public class WorldLoadListener implements IWorldLoadListener
         {
             JsonObject root = element.getAsJsonObject();
 
-            if (this.renderersRead == false && JsonUtils.hasObject(root, "renderers"))
+            if (JsonUtils.hasObject(root, "renderers"))
             {
                 RenderContainer.INSTANCE.fromJson(JsonUtils.getNestedObject(root, "renderers", false));
             }
