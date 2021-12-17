@@ -37,6 +37,8 @@ import fi.dy.masa.minihud.util.LightLevelNumberMode;
 
 public class OverlayRendererLightLevel extends OverlayRendererBase
 {
+    public static final OverlayRendererLightLevel INSTANCE = new OverlayRendererLightLevel();
+
     private static final Identifier TEXTURE_NUMBERS = new Identifier(Reference.MOD_ID, "textures/misc/light_level_numbers.png");
 
     private final List<LightLevelInfo> lightInfos = new ArrayList<>();
@@ -170,7 +172,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         double ox = cfgOffX.getDoubleValue();
         double oz = cfgOffZ.getDoubleValue();
         double tmpX, tmpZ;
-        double offsetY = Configs.Generic.LIGHT_LEVEL_Z_OFFSET.getDoubleValue();
+        double offsetY = Configs.Generic.LIGHT_LEVEL_RENDER_OFFSET.getDoubleValue();
         Color4f colorLit, colorDark;
 
         switch (numberFacing)
@@ -202,21 +204,22 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
         Color4f colorDark = Configs.Colors.LIGHT_LEVEL_MARKER_DARK.getColor();
         double offsetX = cameraPos.x;
-        double offsetY = cameraPos.y - Configs.Generic.LIGHT_LEVEL_Z_OFFSET.getDoubleValue();
+        double offsetY = cameraPos.y - Configs.Generic.LIGHT_LEVEL_RENDER_OFFSET.getDoubleValue();
         double offsetZ = cameraPos.z;
         double offset1 = (1.0 - markerSize) / 2.0;
         double offset2 = (1.0 - offset1);
-        final int count = this.lightInfos.size();
+        boolean autoHeight = Configs.Generic.LIGHT_LEVEL_AUTO_HEIGHT.getBooleanValue();
 
-        for (int i = 0; i < count; ++i)
+        for (LightLevelInfo info : this.lightInfos)
         {
-            LightLevelInfo info = this.lightInfos.get(i);
-
             if (info.block < lightThreshold)
             {
-                BlockPos pos = info.pos;
+                long pos = info.pos;
                 Color4f color = info.sky >= lightThreshold ? colorLit : colorDark;
-                renderer.render(pos.getX() - offsetX, pos.getY() - offsetY, pos.getZ() - offsetZ, color, offset1, offset2, buffer);
+                double x = BlockPos.unpackLongX(pos) - offsetX;
+                double y = (autoHeight ? info.y : BlockPos.unpackLongY(pos)) - offsetY;
+                double z = BlockPos.unpackLongZ(pos) - offsetZ;
+                renderer.render(x, y, z, color, offset1, offset2, buffer);
             }
         }
     }
@@ -225,15 +228,14 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             int lightThreshold, LightLevelNumberMode numberMode,
             Color4f colorLit, Color4f colorDark, BufferBuilder buffer)
     {
-        final int count = this.lightInfos.size();
+        boolean autoHeight = Configs.Generic.LIGHT_LEVEL_AUTO_HEIGHT.getBooleanValue();
 
-        for (int i = 0; i < count; ++i)
+        for (LightLevelInfo info : this.lightInfos)
         {
-            LightLevelInfo info = this.lightInfos.get(i);
-            BlockPos pos = info.pos;
-            double x = pos.getX() - dx;
-            double y = pos.getY() - dy;
-            double z = pos.getZ() - dz;
+            long pos = info.pos;
+            double x = BlockPos.unpackLongX(pos) - dx;
+            double y = (autoHeight ? info.y : BlockPos.unpackLongY(pos)) - dy;
+            double z = BlockPos.unpackLongZ(pos) - dz;
             int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
             Color4f color = lightLevel >= lightThreshold ? colorLit : colorDark;
 
@@ -326,7 +328,10 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         final int maxCX = (maxX >> 4);
         final int maxCZ = (maxZ >> 4);
         LightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
+        BlockPos.Mutable mutablePos = new BlockPos.Mutable();
         final int worldTopHeight = world.getTopY();
+        final boolean collisionCheck = Configs.Generic.LIGHT_LEVEL_COLLISION_CHECK.getBooleanValue();
+        final boolean autoHeight = Configs.Generic.LIGHT_LEVEL_AUTO_HEIGHT.getBooleanValue();
 
         for (int cx = minCX; cx <= maxCX; ++cx)
         {
@@ -348,15 +353,29 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
 
                         for (int y = startY; y <= endY; ++y)
                         {
-                            if (this.canSpawnAtWrapper(x, y, z, chunk, world))
+                            if (this.canSpawnAtWrapper(x, y, z, chunk, world) == false)
                             {
-                                BlockPos pos = new BlockPos(x, y, z);
-                                int block = y < worldTopHeight ? lightingProvider.get(LightType.BLOCK).getLightLevel(pos) : 0;
-                                int sky   = y < worldTopHeight ? lightingProvider.get(LightType.SKY).getLightLevel(pos) : 15;
+                                continue;
+                            }
 
-                                this.lightInfos.add(new LightLevelInfo(pos, block, sky));
+                            mutablePos.set(x, y, z);
+                            BlockState state = chunk.getBlockState(mutablePos);
 
-                                //y += 2; // if the spot is spawnable, that means the next spawnable spot can be the third block up
+                            if (collisionCheck == false || state.getCollisionShape(chunk, mutablePos).isEmpty())
+                            {
+                                int block = y < worldTopHeight ? lightingProvider.get(LightType.BLOCK).getLightLevel(mutablePos) : 0;
+                                int sky   = y < worldTopHeight ? lightingProvider.get(LightType.SKY).getLightLevel(mutablePos) : 15;
+                                double topY = state.getOutlineShape(chunk, mutablePos).getMax(Direction.Axis.Y);
+
+                                // Don't render the light level marker if it would be raised all the way to the next block space
+                                if (autoHeight == false || topY < 1)
+                                {
+                                    float posY = topY >= 0 ? y + (float) topY : y;
+
+                                    this.lightInfos.add(new LightLevelInfo(mutablePos.asLong(), posY, block, sky));
+
+                                    //y += 2; // if the spot is spawnable, that means the next spawnable spot can be the third block up
+                                }
                             }
                         }
                     }
@@ -446,15 +465,17 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
 
     public static class LightLevelInfo
     {
-        public final BlockPos pos;
-        public final int block;
-        public final int sky;
+        public final long pos;
+        public final byte block;
+        public final byte sky;
+        public final float y;
 
-        public LightLevelInfo(BlockPos pos, int block, int sky)
+        public LightLevelInfo(long pos, float y, int block, int sky)
         {
             this.pos = pos;
-            this.block = block;
-            this.sky = sky;
+            this.y = y;
+            this.block = (byte) block;
+            this.sky = (byte) sky;
         }
     }
 
