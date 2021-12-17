@@ -6,6 +6,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public enum ShapeType
 {
+    BOX                     ("box",                     "minihud.label.shapes.box",                     ShapeBox::new),
     CIRCLE                  ("circle",                  "minihud.label.shapes.circle",                  ShapeCircle::new),
     SPHERE_BLOCKY           ("sphere_blocky",           "minihud.label.shapes.sphere_blocky",           ShapeSphereBlocky::new),
     ADJUSTABLE_SPAWN_SPHERE ("adjustable_spawn_sphere", "minihud.label.shapes.adjustable_spawn_sphere", ShapeSpawnSphere::new),

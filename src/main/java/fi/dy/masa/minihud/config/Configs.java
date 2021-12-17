@@ -153,10 +153,10 @@ public class Configs implements IConfigHandler
 
     public static class Colors
     {
-        public static final ConfigColor BEACON_RANGE_LVL1_OVERLAY_COLOR     = new ConfigColor("beaconRangeLvl1", "0x20E060FF", "Color for the Beacon Range lvl 1 overlay");
-        public static final ConfigColor BEACON_RANGE_LVL2_OVERLAY_COLOR     = new ConfigColor("beaconRangeLvl2", "0x20FFB040", "Color for the Beacon Range lvl 2 overlay");
-        public static final ConfigColor BEACON_RANGE_LVL3_OVERLAY_COLOR     = new ConfigColor("beaconRangeLvl3", "0x20FFF040", "Color for the Beacon Range lvl 3 overlay");
-        public static final ConfigColor BEACON_RANGE_LVL4_OVERLAY_COLOR     = new ConfigColor("beaconRangeLvl4", "0x2060FF40", "Color for the Beacon Range lvl 4 overlay");
+        public static final ConfigColor BEACON_RANGE_LVL1_OVERLAY_COLOR         = new ConfigColor("beaconRangeLvl1", "0x20E060FF", "Color for the Beacon Range lvl 1 overlay");
+        public static final ConfigColor BEACON_RANGE_LVL2_OVERLAY_COLOR         = new ConfigColor("beaconRangeLvl2", "0x20FFB040", "Color for the Beacon Range lvl 2 overlay");
+        public static final ConfigColor BEACON_RANGE_LVL3_OVERLAY_COLOR         = new ConfigColor("beaconRangeLvl3", "0x20FFF040", "Color for the Beacon Range lvl 3 overlay");
+        public static final ConfigColor BEACON_RANGE_LVL4_OVERLAY_COLOR         = new ConfigColor("beaconRangeLvl4", "0x2060FF40", "Color for the Beacon Range lvl 4 overlay");
         public static final ConfigColor BLOCK_GRID_OVERLAY_COLOR                = new ConfigColor("blockGridOverlayColor",              "#80FFFFFF", "Color for the block grid overlay");
         public static final ConfigColor LIGHT_LEVEL_MARKER_DARK                 = new ConfigColor("lightLevelMarkerDark",               "#FFFF4848", "The color for the spawnable spots marker");
         public static final ConfigColor LIGHT_LEVEL_MARKER_LIT                  = new ConfigColor("lightLevelMarkerLit",                "#FFFFFF33", "The color for the safe (during day) spots marker");
@@ -167,6 +167,7 @@ public class Configs implements IConfigHandler
         public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR        = new ConfigColor("randomTicksFixedOverlayColor",       "#30F9F225", "Color for the fixed-point random ticked chunks overlay");
         public static final ConfigColor RANDOM_TICKS_PLAYER_OVERLAY_COLOR       = new ConfigColor("randomTicksPlayerOverlayColor",      "#3030FE73", "Color for the player-following random ticked chunks overlay");
         public static final ConfigColor REGION_OVERLAY_COLOR                    = new ConfigColor("regionOverlayColor",                 "#30FF8019", "Color for the region file overlay");
+        public static final ConfigColor SHAPE_BOX                               = new ConfigColor("shapeBox",                           "#6050A0A0", "Default color for the Box shape\nThe color can be changed for each shape via its configuration GUI.");
         public static final ConfigColor SHAPE_CAN_DESPAWN_SPHERE                = new ConfigColor("shapeCanDespawnSphere",              "#60A04050", "Default color for the \"Can Despawn Sphere\" overlay.\nThe color can be changed for each sphere via its configuration GUI.");
         public static final ConfigColor SHAPE_CAN_SPAWN_SPHERE                  = new ConfigColor("shapeCanSpawnSphere",                "#60A04050", "Default color for the \"Can Spawn Sphere\" overlay.\nThe color can be changed for each sphere via its configuration GUI.");
         public static final ConfigColor SHAPE_CIRCLE                            = new ConfigColor("shapeCircle",                        "#6030B0B0", "Default color for the Circle renderer.\nThe color can be changed for each shape via its configuration GUI.");
@@ -198,6 +199,7 @@ public class Configs implements IConfigHandler
                 RANDOM_TICKS_FIXED_OVERLAY_COLOR,
                 RANDOM_TICKS_PLAYER_OVERLAY_COLOR,
                 REGION_OVERLAY_COLOR,
+                SHAPE_BOX,
                 SHAPE_CAN_DESPAWN_SPHERE,
                 SHAPE_CAN_SPAWN_SPHERE,
                 SHAPE_CIRCLE,

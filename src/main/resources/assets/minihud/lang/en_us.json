@@ -41,8 +41,17 @@
     "minihud.gui.label.hover.shape.radius_value": "§7Radius: §6%s",
     "minihud.gui.label.hover.shape.type_value": "§7Type: §b%s",
 
+    "minihud.gui.label.shape.box.max_corner": "§7Max: x: §9%s§7, y: §9%s§7, z: §9%s",
+    "minihud.gui.label.shape.box.min_corner": "§7Min: x: §9%s§7, y: §9%s§7, z: §9%s",
+    "minihud.gui.label.shape_box.minimum_coord": "Min",
+    "minihud.gui.label.shape_box.maximum_coord": "Max",
+    "minihud.gui.label.shape_box.grid_enabled": "Grid Enabled: %s",
+    "minihud.gui.label.shape_box.grid_end_offset": "Grid End Offset",
+    "minihud.gui.label.shape_box.grid_size": "Grid Size",
+    "minihud.gui.label.shape_box.grid_start_offset": "Grid Start Offset",
+
     "minihud.gui.title.configs": "MiniHUD Configs",
-    "minihud.gui.title.shape_editor": "Shape Editor",
+    "minihud.gui.title.shape_editor": "Shape Editor (%s)",
     "minihud.gui.title.shape_manager": "Shape Manager",
 
     "minihud.label.axolotl_tooltip.label": "§7Variant: ",
@@ -71,6 +80,7 @@
     "minihud.label.shape_render_type.outer_edge": "Outer Edge",
 
     "minihud.label.shapes.adjustable_spawn_sphere": "Adjustable Spawn Sphere",
+    "minihud.label.shapes.box": "Box",
     "minihud.label.shapes.can_spawn_sphere": "Can Spawn Sphere ( > 24)",
     "minihud.label.shapes.can_despawn_sphere": "Can Despawn Sphere ( > 32)",
     "minihud.label.shapes.circle": "Circle / Cylinder",
