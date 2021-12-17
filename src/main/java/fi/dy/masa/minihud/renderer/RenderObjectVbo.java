@@ -53,7 +53,7 @@ public class RenderObjectVbo extends RenderObjectBase
         }
 
         RenderSystem.setShader(this.getShader());
-        this.vertexBuffer.setShader(matrixStack.peek().getModel(), projMatrix, this.getShader().get());
+        this.vertexBuffer.setShader(matrixStack.peek().getPositionMatrix(), projMatrix, this.getShader().get());
 
         if (this.hasTexture)
         {

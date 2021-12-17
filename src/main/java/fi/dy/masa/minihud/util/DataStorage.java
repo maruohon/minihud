@@ -646,7 +646,7 @@ public class DataStorage
 
                             if (start != null && start.hasChildren())
                             {
-                                if (MiscUtils.isStructureWithinRange(start.setBoundingBoxFromChildren(), playerPos, maxChunkRange << 4))
+                                if (MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxChunkRange << 4))
                                 {
                                     this.structures.put(type, StructureData.fromStructureStart(type, start));
                                 }

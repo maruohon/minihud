@@ -10,9 +10,9 @@ import net.minecraft.world.entity.EntityIndex;
 import fi.dy.masa.minihud.util.IServerEntityManager;
 
 @Mixin(ServerEntityManager.class)
-public class MixinServerEntityManager implements IServerEntityManager
+public abstract class MixinServerEntityManager implements IServerEntityManager
 {
-    @Shadow @Final private Set<UUID> entityUuids;
+    @Shadow @Final Set<UUID> entityUuids;
     @Shadow @Final private EntityIndex<?> index;
 
     @Override
