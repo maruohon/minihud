@@ -296,23 +296,30 @@ public class DataStorage
     {
         String[] parts = message.split(" ");
 
-        if (parts[0].equals("minihud-seed"))
+        if (parts[0].equals("minihud-seed") || parts[0].equals("/minihud-seed"))
         {
             if (parts.length == 2)
             {
                 try
                 {
                     this.setWorldSeed(Long.parseLong(parts[1]));
-                    InfoUtils.printActionbarMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
+                    InfoUtils.printActionbarMessage("minihud.message.seed_set", this.worldSeed);
                 }
                 catch (NumberFormatException e)
                 {
                     InfoUtils.printActionbarMessage("minihud.message.error.invalid_seed");
                 }
             }
-            else if (this.worldSeedValid && parts.length == 1)
+            else if (parts.length == 1)
             {
-                InfoUtils.printActionbarMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
+                if (this.worldSeedValid)
+                {
+                    InfoUtils.printActionbarMessage("minihud.message.seed_is", this.worldSeed);
+                }
+                else
+                {
+                    InfoUtils.printActionbarMessage("minihud.message.no_seed");
+                }
             }
 
             return true;

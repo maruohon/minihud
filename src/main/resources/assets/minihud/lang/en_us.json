@@ -100,6 +100,8 @@
     "minihud.message.error.shapes.select_shape_from_dropdown": "Select the Shape type to create from the dropdown widget",
 
     "minihud.message.distance_reference_point_set": "Set distance reference point to %s",
+    "minihud.message.no_seed": "MiniHUD: World seed is not known",
+    "minihud.message.seed_is": "The world seed in MiniHUD is currently set to '%s'",
     "minihud.message.seed_set": "MiniHUD: Set the world seed to '%s'",
     "minihud.message.spawn_set": "MiniHUD: Set the world spawn to %s"
 }
