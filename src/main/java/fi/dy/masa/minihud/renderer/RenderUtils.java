@@ -29,7 +29,7 @@ public class RenderUtils
 
         final int centerX = (int) Math.floor(entity.posX);
         final int centerZ = (int) Math.floor(entity.posZ);
-        final int maxDist = GameUtils.getClient().gameSettings.renderDistanceChunks * 32; // double the view distance in blocks
+        final int maxDist = GameUtils.getRenderDistanceChunks() * 16 * 2; // double the view distance in blocks
         final int rangeMinX = centerX - maxDist;
         final int rangeMinZ = centerZ - maxDist;
         final int rangeMaxX = centerX + maxDist;

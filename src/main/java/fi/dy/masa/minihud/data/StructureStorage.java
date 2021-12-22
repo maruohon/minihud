@@ -207,7 +207,7 @@ public class StructureStorage
         if (world != null)
         {
             final IChunkGenerator chunkGenerator = ((IMixinChunkProviderServer) world.getChunkProvider()).getChunkGenerator();
-            final int maxRange = (this.mc.gameSettings.renderDistanceChunks + 4) * 16;
+            final int maxRange = (GameUtils.getRenderDistanceChunks() + 4) * 16;
 
             world.addScheduledTask(() -> this.addStructureDataFromGenerator(chunkGenerator, playerPos, maxRange));
         }

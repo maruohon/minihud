@@ -6,6 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -82,7 +83,7 @@ public class OverlayRenderer
 
         if (r == -1)
         {
-            r = mc.gameSettings.renderDistanceChunks;
+            r = GameUtils.getRenderDistanceChunks();
         }
 
         for (int xOff = -r; xOff <= r; xOff++)

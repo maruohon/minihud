@@ -12,13 +12,14 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProvider;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.StructureData;
-import fi.dy.masa.minihud.util.MiscUtils;
 import fi.dy.masa.minihud.data.StructureType;
+import fi.dy.masa.minihud.util.MiscUtils;
 
 public class OverlayRendererStructures extends OverlayRendererBase
 {
@@ -96,7 +97,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
     private void updateStructures(WorldProvider provider, BlockPos playerPos, Vec3d cameraPos, Minecraft mc)
     {
         ArrayListMultimap<StructureType, StructureData> structures = DataStorage.getInstance().getStructureStorage().getCopyOfStructureData();
-        int maxRange = (mc.gameSettings.renderDistanceChunks + 4) * 16;
+        int maxRange = (GameUtils.getRenderDistanceChunks() + 4) * 16;
 
         for (StructureType type : StructureType.values())
         {

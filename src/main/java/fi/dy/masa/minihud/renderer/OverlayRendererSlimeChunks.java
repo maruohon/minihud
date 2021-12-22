@@ -11,9 +11,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
-import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
@@ -73,7 +74,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
 
             if (r == -1)
             {
-                r = mc.gameSettings.renderDistanceChunks;
+                r = GameUtils.getRenderDistanceChunks();
             }
 
             BaseRenderObject renderQuads = this.renderObjects.get(0);
