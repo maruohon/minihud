@@ -25,6 +25,7 @@ import fi.dy.masa.malilib.gui.widget.DoubleTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OptionListConfigButton;
+import fi.dy.masa.malilib.input.ActionResult;
 import fi.dy.masa.malilib.util.ListUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
@@ -37,6 +38,7 @@ import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircleBase;
+import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.renderer.shapes.ShapeSpawnSphere;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
@@ -288,5 +290,13 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
 
             return false;
         }
+    }
+
+    public static ActionResult openShapeEditor()
+    {
+        ShapeBase shape = ShapeManager.INSTANCE.getSelectedShape();
+        BaseScreen screen = shape != null ? new GuiShapeEditor(shape) : GuiShapeManager.openShapeManager(null);
+        BaseScreen.openScreen(screen);
+        return ActionResult.SUCCESS;
     }
 }
