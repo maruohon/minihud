@@ -2,7 +2,7 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.google.gson.JsonObject;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;

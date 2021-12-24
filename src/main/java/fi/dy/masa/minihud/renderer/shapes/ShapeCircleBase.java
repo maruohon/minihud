@@ -2,7 +2,7 @@ package fi.dy.masa.minihud.renderer.shapes;
 
 import java.util.HashSet;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;

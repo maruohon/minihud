@@ -1,7 +1,7 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public enum ShapeType

@@ -2,7 +2,7 @@ package fi.dy.masa.minihud.util;
 
 import java.util.HashMap;
 import java.util.Locale;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.util.Identifier;
