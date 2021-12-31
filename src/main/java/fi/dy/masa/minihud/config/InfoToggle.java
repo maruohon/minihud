@@ -25,6 +25,7 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     CHUNK_SECTIONS_FULL     ("infoChunkSectionsLine",       false, 15, "", "Show the entire line of the C value from the F3 screen"),
     CHUNK_UPDATES           ("infoChunkUpdates",            false, 16, "", "Show the current number of chunk updates per second"),
     COORDINATES             ("infoCoordinates",             true,   4, "", "Show the player's coordinates"),
+    COORDINATES_SCALED      ("infoCoordinatesScaled",       false,  4, "", "Show the player's coordinates scaled by the dimension's scale factor.\nOnly works in the overworld and the nether,\nand assumes the vanilla nether portal scaling factor."),
     DIFFICULTY              ("infoDifficulty",              false, 18, "", "Show the local difficulty"),
     DIMENSION               ("infoDimensionId",             false,  5, "", "Show the current dimension ID\n(might not be accurate in every case,\ndepending on the server (Sponge?)!)"),
     DISTANCE                ("infoDistance",                false, 33, "", "Show the distance to the current reference point.\nSet the reference point with the setDistanceReferencePoint hotkey"),
