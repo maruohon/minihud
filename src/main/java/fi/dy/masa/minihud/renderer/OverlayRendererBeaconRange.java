@@ -158,7 +158,7 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
         {
             case 1: return Configs.Colors.BEACON_RANGE_LVL1_OVERLAY_COLOR.getColor();
             case 2: return Configs.Colors.BEACON_RANGE_LVL2_OVERLAY_COLOR.getColor();
-            case 3: return Configs.Colors.BEACON_RANGE_LVL2_OVERLAY_COLOR.getColor();
+            case 3: return Configs.Colors.BEACON_RANGE_LVL3_OVERLAY_COLOR.getColor();
             default: return Configs.Colors.BEACON_RANGE_LVL4_OVERLAY_COLOR.getColor();
         }
     }
