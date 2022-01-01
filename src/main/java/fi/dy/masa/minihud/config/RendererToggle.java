@@ -14,6 +14,7 @@ import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
 import fi.dy.masa.minihud.network.StructurePacketHandlerCarpet;
@@ -136,7 +137,7 @@ public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfi
     @Override
     public String getComment()
     {
-        return comment != null ? this.comment : "";
+        return StringUtils.getTranslatedOrFallback("config.comment." + this.getName().toLowerCase(), this.comment);
     }
 
     @Override

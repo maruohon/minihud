@@ -9,6 +9,7 @@ import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBoolean;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.MiniHUD;
 
 public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
@@ -121,7 +122,7 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     @Override
     public String getComment()
     {
-        return comment != null ? this.comment : "";
+        return StringUtils.getTranslatedOrFallback("config.comment." + this.getName().toLowerCase(), this.comment);
     }
 
     @Override
