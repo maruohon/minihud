@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.config;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.config.ConfigType;
@@ -61,6 +62,8 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     TIME_TOTAL_MODULO       ("infoTimeTotalModulo",         false, 34, "", "Show a modulo of the current total world time.\nSee Generic configs for the divisor."),
     TIME_WORLD              ("infoTimeWorld",               false,  2, "", "Show the current world time in ticks"),
     TIME_WORLD_FORMATTED    ("infoWorldTimeFormatted",      false,  3, "", "Show the current world time formatted to days, hours, minutes");
+
+    public static final ImmutableList<InfoToggle> VALUES = ImmutableList.copyOf(values());
 
     private final String name;
     private final String prettyName;

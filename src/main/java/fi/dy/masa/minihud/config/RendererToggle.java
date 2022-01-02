@@ -1,6 +1,7 @@
 package fi.dy.masa.minihud.config;
 
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.MinecraftClient;
@@ -44,6 +45,8 @@ public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfi
     OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER  ("overlaySpawnChunkPlayer",     "", "Toggle the pseudo (player-following) spawn chunks overlay renderer", "Spawn Chunks (player-following, would-be) overlay"),
     OVERLAY_STRUCTURE_MAIN_TOGGLE       ("overlayStructureMainToggle",  "", "Main toggle for all structure bounding boxes", "Structure Bounding Boxes main"),
     SHAPE_RENDERER                      ("shapeRenderer",               "", "The main toggle for the shape renderer", "Shape Renderer");
+
+    public static final ImmutableList<RendererToggle> VALUES = ImmutableList.copyOf(values());
 
     private final String name;
     private final String prettyName;

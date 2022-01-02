@@ -30,12 +30,12 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
     @Override
     public void addKeysToMap(IKeybindManager manager)
     {
-        for (InfoToggle toggle : InfoToggle.values())
+        for (InfoToggle toggle : InfoToggle.VALUES)
         {
             manager.addKeybindToMap(toggle.getKeybind());
         }
 
-        for (RendererToggle toggle : RendererToggle.values())
+        for (RendererToggle toggle : RendererToggle.VALUES)
         {
             manager.addKeybindToMap(toggle.getKeybind());
         }
@@ -50,8 +50,8 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
     public void addHotkeys(IKeybindManager manager)
     {
         manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST);
-        manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", ImmutableList.copyOf(InfoToggle.values()));
-        manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", ImmutableList.copyOf(RendererToggle.values()));
+        manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.info_toggle_hotkeys", ImmutableList.copyOf(InfoToggle.VALUES));
+        manager.addHotkeysForCategory(Reference.MOD_NAME, "minihud.hotkeys.category.renderer_toggle_hotkeys", ImmutableList.copyOf(RendererToggle.VALUES));
     }
 
     @Override

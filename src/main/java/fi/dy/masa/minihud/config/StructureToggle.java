@@ -29,12 +29,17 @@ public enum StructureToggle
     OVERLAY_STRUCTURE_VILLAGE           ("Village",         "", "#3054CB4E", "#3054CB4E", "Toggle Village structure bounding boxes rendering\nNOTE: This is the Village world gen structures!\nThis is not the Village data you use for iron farms etc.!", "Village"),
     OVERLAY_STRUCTURE_WITCH_HUT         ("Witch Hut",       "", "#30BE1DFC", "#300099FF", "Toggle Witch Hut structure bounding boxes rendering", "Witch Hut");
 
+    public static final ImmutableList<StructureToggle> VALUES = ImmutableList.copyOf(values());
+    public static final ImmutableList<IConfigBoolean> TOGGLE_CONFIGS = ImmutableList.copyOf(VALUES.stream().map(StructureToggle::getToggleOption).toList());
+    public static final ImmutableList<IHotkey> HOTKEY_CONFIGS = ImmutableList.copyOf(VALUES.stream().map(StructureToggle::getHotkey).toList());
+    public static final ImmutableList<ConfigColor> COLOR_CONFIGS = getColorConfigs();
+
     private final ConfigBoolean toggleOption;
     private final ConfigColor colorMain;
     private final ConfigColor colorComponents;
     private final IHotkey hotkey;
 
-    private StructureToggle(String name, String defaultHotkey, String colorMain, String colorComponents, String comment, String prettyName)
+    StructureToggle(String name, String defaultHotkey, String colorMain, String colorComponents, String comment, String prettyName)
     {
         this.toggleOption    = new ConfigBoolean(name, false, comment, prettyName);
         this.colorMain       = new ConfigColor(name +  " Main", colorMain, prettyName + " full box");
@@ -65,38 +70,14 @@ public enum StructureToggle
         return this.hotkey;
     }
 
-    public static ImmutableList<ConfigColor> getColorConfigs()
+    private static ImmutableList<ConfigColor> getColorConfigs()
     {
         ImmutableList.Builder<ConfigColor> builder = ImmutableList.builder();
 
-        for (StructureToggle toggle : values())
+        for (StructureToggle toggle : VALUES)
         {
             builder.add(toggle.getColorMain());
             builder.add(toggle.getColorComponents());
-        }
-
-        return builder.build();
-    }
-
-    public static ImmutableList<IConfigBoolean> getToggleConfigs()
-    {
-        ImmutableList.Builder<IConfigBoolean> builder = ImmutableList.builder();
-
-        for (StructureToggle toggle : values())
-        {
-            builder.add(toggle.getToggleOption());
-        }
-
-        return builder.build();
-    }
-
-    public static ImmutableList<IHotkey> getHotkeys()
-    {
-        ImmutableList.Builder<IHotkey> builder = ImmutableList.builder();
-
-        for (StructureToggle toggle : values())
-        {
-            builder.add(toggle.getHotkey());
         }
 
         return builder.build();

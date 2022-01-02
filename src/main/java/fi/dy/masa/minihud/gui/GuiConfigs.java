@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.config.IConfigBase;
+import fi.dy.masa.malilib.config.options.BooleanHotkeyGuiWrapper;
 import fi.dy.masa.malilib.config.options.ConfigTypeWrapper;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
@@ -22,6 +23,12 @@ import fi.dy.masa.minihud.config.StructureToggle;
 
 public class GuiConfigs extends GuiConfigsBase
 {
+    // If you have an add-on mod, you can append stuff to these GUI lists by re-assigning a new list to it.
+    // I'd recommend using your own config handler for the config serialization to/from config files.
+    // Although the config dirty marking stuff probably is a mess in this old malilib code base for that stuff...
+    public static ImmutableList<RendererToggle> RENDERER_LIST = RendererToggle.VALUES;
+    public static ImmutableList<InfoToggle> INFO_LINE_LIST = InfoToggle.VALUES;
+
     public static ConfigGuiTab tab = ConfigGuiTab.INFO_LINES;
 
     public GuiConfigs()
@@ -83,18 +90,15 @@ public class GuiConfigs extends GuiConfigsBase
     {
         ConfigGuiTab tab = GuiConfigs.tab;
 
-        if (tab == ConfigGuiTab.GENERIC ||
-            tab == ConfigGuiTab.STRUCTURES)
+        if (tab == ConfigGuiTab.GENERIC)
         {
             return 200;
         }
-        if (tab == ConfigGuiTab.RENDERERS)
+        else if (tab == ConfigGuiTab.INFO_LINES ||
+                 tab == ConfigGuiTab.STRUCTURES ||
+                 tab == ConfigGuiTab.RENDERERS)
         {
-            return 220;
-        }
-        else if (tab == ConfigGuiTab.INFO_LINES)
-        {
-            return 120;
+            return 260;
         }
         else if (tab == ConfigGuiTab.COLORS)
         {
@@ -125,30 +129,39 @@ public class GuiConfigs extends GuiConfigsBase
         }
         else if (tab == ConfigGuiTab.INFO_LINES)
         {
-            List<IConfigBase> list = new ArrayList<>();
-            list.addAll(ConfigUtils.createConfigWrapperForType(ConfigType.BOOLEAN, ImmutableList.copyOf(InfoToggle.values())));
-            list.addAll(ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(InfoToggle.values())));
-            list.addAll(ConfigUtils.createConfigWrapperForType(ConfigType.INTEGER, ImmutableList.copyOf(InfoToggle.values())));
+            List<IConfigBase> list = new ArrayList<>(INFO_LINE_LIST.stream().map(this::wrapConfig).toList());
+            list.addAll(ConfigUtils.createConfigWrapperForType(ConfigType.INTEGER, INFO_LINE_LIST));
             return ConfigOptionWrapper.createFor(list);
         }
         else if (tab == ConfigGuiTab.STRUCTURES)
         {
             List<IConfigBase> list = new ArrayList<>();
             list.add(new ConfigTypeWrapper(ConfigType.BOOLEAN, RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE));
-            list.addAll(StructureToggle.getToggleConfigs());
-            list.addAll(StructureToggle.getHotkeys());
-            list.addAll(StructureToggle.getColorConfigs());
+            list.addAll(StructureToggle.VALUES.stream().map(this::wrapConfig).toList());
+            list.addAll(StructureToggle.COLOR_CONFIGS);
             return ConfigOptionWrapper.createFor(list);
         }
         else if (tab == ConfigGuiTab.RENDERERS)
         {
-            List<IConfigBase> list = new ArrayList<>();
-            list.addAll(ConfigUtils.createConfigWrapperForType(ConfigType.BOOLEAN, ImmutableList.copyOf(RendererToggle.values())));
-            list.addAll(ConfigUtils.createConfigWrapperForType(ConfigType.HOTKEY, ImmutableList.copyOf(RendererToggle.values())));
-            return ConfigOptionWrapper.createFor(list);
+            return ConfigOptionWrapper.createFor(RENDERER_LIST.stream().map(this::wrapConfig).toList());
         }
 
         return Collections.emptyList();
+    }
+
+    protected BooleanHotkeyGuiWrapper wrapConfig(InfoToggle config)
+    {
+        return new BooleanHotkeyGuiWrapper(config.getName(), config, config);
+    }
+
+    protected BooleanHotkeyGuiWrapper wrapConfig(RendererToggle config)
+    {
+        return new BooleanHotkeyGuiWrapper(config.getName(), config, config);
+    }
+
+    protected BooleanHotkeyGuiWrapper wrapConfig(StructureToggle config)
+    {
+        return new BooleanHotkeyGuiWrapper(config.getToggleOption().getName(), config.getToggleOption(), config.getHotkey());
     }
 
     private static class ButtonListenerConfigTabs implements IButtonActionListener
