@@ -2,6 +2,7 @@ package fi.dy.masa.itemscroller.event;
 
 import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.passive.MerchantEntity;
@@ -108,19 +109,27 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
     private boolean handleInput(int keyCode, boolean keyState, double dWheel)
     {
-        if (Configs.Generic.RATE_LIMIT_CLICK_PACKETS.getBooleanValue())
+        MinecraftClient mc = MinecraftClient.getInstance();
+
+        if (mc.player == null)
+        {
+            return false;
+        }
+
+        if (Configs.Generic.RATE_LIMIT_CLICK_PACKETS.getBooleanValue() &&
+            this.callbacks.functionalityEnabled())
         {
             ClickPacketBuffer.setShouldBufferClickPackets(true);
         }
 
-        boolean cancel = this.handleInputImpl(keyCode, keyState, dWheel);
+        boolean cancel = this.handleInputImpl(keyCode, keyState, dWheel, mc);
 
         ClickPacketBuffer.setShouldBufferClickPackets(false);
 
         return cancel;
     }
 
-    private boolean handleInputImpl(int keyCode, boolean keyState, double dWheel)
+    private boolean handleInputImpl(int keyCode, boolean keyState, double dWheel, MinecraftClient mc)
     {
         MoveAction action = InventoryUtils.getActiveMoveAction();
 
@@ -129,7 +138,6 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             InventoryUtils.stopDragging();
         }
 
-        MinecraftClient mc = MinecraftClient.getInstance();
         boolean cancel = false;
 
         if (this.callbacks.functionalityEnabled() && mc.player != null)
@@ -140,12 +148,13 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             final boolean isAttackUseOrPick = isAttack || isUse || isPickBlock;
             final int mouseX = fi.dy.masa.malilib.util.InputUtils.getMouseX();
             final int mouseY = fi.dy.masa.malilib.util.InputUtils.getMouseY();
+            Screen screen = GuiUtils.getCurrentScreen();
 
             if (Configs.Toggles.VILLAGER_TRADE_FEATURES.getBooleanValue())
             {
                 VillagerDataStorage storage = VillagerDataStorage.getInstance();
 
-                if (GuiUtils.getCurrentScreen() == null && mc.crosshairTarget != null &&
+                if (screen == null && mc.crosshairTarget != null &&
                     mc.crosshairTarget.getType() == HitResult.Type.ENTITY &&
                     ((EntityHitResult) mc.crosshairTarget).getEntity() instanceof MerchantEntity)
                 {
@@ -153,11 +162,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 }
             }
 
-            if (GuiUtils.getCurrentScreen() instanceof HandledScreen &&
-                (GuiUtils.getCurrentScreen() instanceof CreativeInventoryScreen) == false &&
-                Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false)
+            if (screen instanceof HandledScreen &&
+                (screen instanceof CreativeInventoryScreen) == false &&
+                Configs.GUI_BLACKLIST.contains(screen.getClass().getName()) == false)
             {
-                HandledScreen<?> gui = (HandledScreen<?>) GuiUtils.getCurrentScreen();
+                HandledScreen<?> gui = (HandledScreen<?>) screen;
                 RecipeStorage recipes = RecipeStorage.getInstance();
 
                 if (dWheel != 0)
@@ -235,10 +244,10 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
         if (this.callbacks.functionalityEnabled() &&
             mc.player != null &&
-            GuiUtils.getCurrentScreen() instanceof HandledScreen &&
-            Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false)
+            GuiUtils.getCurrentScreen() instanceof HandledScreen screen &&
+            Configs.GUI_BLACKLIST.contains(screen.getClass().getName()) == false)
         {
-            this.handleDragging((HandledScreen<?>) GuiUtils.getCurrentScreen(), mc, mouseX, mouseY, false);
+            this.handleDragging(screen, mc, mouseX, mouseY, false);
         }
     }
 
