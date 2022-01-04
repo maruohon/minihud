@@ -1,10 +1,10 @@
 package fi.dy.masa.minihud.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
@@ -31,6 +31,7 @@ import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.util.MiscUtils;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class DataStorage
 {
@@ -45,8 +46,8 @@ public class DataStorage
 
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
-    private final ArrayListMultimap<Long, BlockPos> spawnerPositions = ArrayListMultimap.create();
-    private final ArrayListMultimap<Long, BlockPos> waterFallPositions = ArrayListMultimap.create();
+    private final Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> spawnerPositions = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> waterFallPositions = new Long2ObjectOpenHashMap<>();
     private final int[] blockBreakCounter = new int[100];
     private BlockPos worldSpawn = BlockPos.ORIGIN;
     private Vec3d distanceReferencePoint = Vec3d.ZERO;
@@ -220,7 +221,9 @@ public class DataStorage
 
         synchronized (this.spawnerPositions)
         {
-            this.spawnerPositions.put(cp, pos.toImmutable());
+            ArrayList<OrderedBlockPosLong> list = this.spawnerPositions.computeIfAbsent(cp, c -> new ArrayList<>());
+            int order = list.size();
+            list.add(OrderedBlockPosLong.of(pos, order));
             this.spawnerPositionsDirty = true;
         }
 
@@ -239,14 +242,16 @@ public class DataStorage
 
         synchronized (this.waterFallPositions)
         {
-            this.waterFallPositions.put(cp, pos.toImmutable());
+            ArrayList<OrderedBlockPosLong> list = this.waterFallPositions.computeIfAbsent(cp, c -> new ArrayList<>());
+            int order = list.size();
+            list.add(OrderedBlockPosLong.of(pos, order));
             this.waterFallPositionsDirty = true;
         }
     }
 
-    public ArrayListMultimap<Long, BlockPos> getSpawnerPositions()
+    public Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> getSpawnerPositions()
     {
-        ArrayListMultimap<Long, BlockPos> map = ArrayListMultimap.create();
+        Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> map = new Long2ObjectOpenHashMap<>();
 
         synchronized (this.spawnerPositions)
         {
@@ -257,9 +262,9 @@ public class DataStorage
         return map;
     }
 
-    public ArrayListMultimap<Long, BlockPos> getWaterFallPositions()
+    public Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> getWaterFallPositions()
     {
-        ArrayListMultimap<Long, BlockPos> map = ArrayListMultimap.create();
+        Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> map = new Long2ObjectOpenHashMap<>();
 
         synchronized (this.waterFallPositions)
         {
@@ -577,4 +582,5 @@ public class DataStorage
             return this.displayName;
         }
     }
+
 }

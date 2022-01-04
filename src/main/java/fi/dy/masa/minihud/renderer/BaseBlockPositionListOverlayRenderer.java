@@ -1,27 +1,27 @@
 package fi.dy.masa.minihud.renderer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.lwjgl.opengl.GL11;
-import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.minihud.data.OrderedBlockPosLong;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public abstract class BaseBlockPositionListOverlayRenderer extends OverlayRendererBase
 {
-    protected final List<BlockPos> textPositions = new ArrayList<>();
-    protected final Supplier<ArrayListMultimap<Long, BlockPos>> dataSource;
+    protected final Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> textPositions = new Long2ObjectOpenHashMap<>();
+    protected final Supplier<Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>>> dataSource;
     protected final Supplier<Color4f> overlayColorSupplier;
     protected final BooleanSupplier enabledSupplier;
     protected final BooleanSupplier dirtySupplier;
@@ -33,7 +33,7 @@ public abstract class BaseBlockPositionListOverlayRenderer extends OverlayRender
     public BaseBlockPositionListOverlayRenderer(BooleanSupplier enabledSupplier,
                                                 Supplier<Color4f> overlayColorSupplier,
                                                 BooleanSupplier dirtySupplier,
-                                                Supplier<ArrayListMultimap<Long, BlockPos>> dataSource)
+                                                Supplier<Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>>> dataSource)
     {
         this.enabledSupplier = enabledSupplier;
         this.dirtySupplier = dirtySupplier;
@@ -83,7 +83,7 @@ public abstract class BaseBlockPositionListOverlayRenderer extends OverlayRender
     {
         Color4f colorQuads = this.overlayColorSupplier.get();
         Color4f colorLines = colorQuads.withAlpha(1.0f);
-        ArrayListMultimap<Long, BlockPos> map = this.dataSource.get();
+        Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> map = this.dataSource.get();
         int centerChunkX = center.getX() >> 4;
         int centerChunkZ = center.getZ() >> 4;
 
@@ -93,23 +93,29 @@ public abstract class BaseBlockPositionListOverlayRenderer extends OverlayRender
         {
             for (int cz = centerChunkZ - chunkRange; cz <= centerChunkZ + chunkRange; ++cz)
             {
-                long cp = (long) cz << 32 | (((long) cx) & 0xFFFFFFFFL);
-                Collection<BlockPos> positions = map.get(cp);
-                this.renderPositions(positions, colorQuads, colorLines, cameraPos);
+                long cp = ChunkPos.asLong(cx, cz);
+                ArrayList<OrderedBlockPosLong> positions = map.get(cp);
 
-                if (Math.abs(cx - centerChunkX) <= textRenderChunkRange &&
-                    Math.abs(cz - centerChunkZ) <= textRenderChunkRange)
+                if (positions != null)
                 {
-                    this.textPositions.addAll(positions);
+                    this.renderPositions(positions, colorQuads, colorLines, cameraPos);
+
+                    if (Math.abs(cx - centerChunkX) <= textRenderChunkRange &&
+                        Math.abs(cz - centerChunkZ) <= textRenderChunkRange)
+                    {
+                        ArrayList<OrderedBlockPosLong> list = this.textPositions.computeIfAbsent(cp, c -> new ArrayList<>());
+                        list.addAll(positions);
+                    }
                 }
             }
         }
     }
 
-    protected void renderPositions(Collection<BlockPos> positions, Color4f colorQuads, Color4f colorLines, Vec3d cameraPos)
+    protected void renderPositions(List<OrderedBlockPosLong> positions, Color4f colorQuads, Color4f colorLines, Vec3d cameraPos)
     {
-        for (BlockPos pos : positions)
+        for (OrderedBlockPosLong orderedPos : positions)
         {
+            BlockPos pos = orderedPos.getPos();
             ShapeRenderUtils.renderBlockPosSideQuads(pos, 0.001, colorQuads, BUFFER_1, cameraPos);
             ShapeRenderUtils.renderBlockPosEdgeLines(pos, 0.001, colorLines, BUFFER_2, cameraPos);
         }
@@ -117,15 +123,26 @@ public abstract class BaseBlockPositionListOverlayRenderer extends OverlayRender
 
     public void renderPositionText(double dx, double dy, double dz)
     {
+        ArrayList<String> list = new ArrayList<>();
         final float scale = 0.025f;
 
-        for (BlockPos pos : this.textPositions)
+        for (ArrayList<OrderedBlockPosLong> posList : this.textPositions.values())
         {
-            String str = String.format("%d, %d, %d", pos.getX(), pos.getY(), pos.getZ());
-            double x = pos.getX() + 0.5;
-            double y = pos.getY() + 1.5;
-            double z = pos.getZ() + 0.5;
-            TextRenderUtils.renderTextPlate(Arrays.asList(str), x - dx, y - dy, z - dz, scale);
+            int count = posList.size();
+
+            for (OrderedBlockPosLong orderedPos : posList)
+            {
+                BlockPos pos = orderedPos.getPos();
+                int posX = pos.getX();
+                int posY = pos.getY();
+                int posZ = pos.getZ();
+
+                list.add(String.format("%d, %d, %d", posX, posY, posZ));
+                list.add(String.format("%d of %d", orderedPos.order, count));
+
+                TextRenderUtils.renderTextPlate(list, posX + 0.5 - dx, posY + 1.75 - dy, posZ + 0.5 - dz, scale);
+                list.clear();
+            }
         }
     }
 }
