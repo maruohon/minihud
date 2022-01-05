@@ -331,6 +331,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();
         final int worldTopHeight = world.getTopY();
         final boolean collisionCheck = Configs.Generic.LIGHT_LEVEL_COLLISION_CHECK.getBooleanValue();
+        final boolean underWater = Configs.Generic.LIGHT_LEVEL_UNDER_WATER.getBooleanValue();
         final boolean autoHeight = Configs.Generic.LIGHT_LEVEL_AUTO_HEIGHT.getBooleanValue();
 
         for (int cx = minCX; cx <= maxCX; ++cx)
@@ -361,7 +362,8 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                             mutablePos.set(x, y, z);
                             BlockState state = chunk.getBlockState(mutablePos);
 
-                            if (collisionCheck == false || state.getCollisionShape(chunk, mutablePos).isEmpty())
+                            if ((collisionCheck == false || state.getCollisionShape(chunk, mutablePos).isEmpty()) &&
+                                (underWater || state.getFluidState().isEmpty()))
                             {
                                 int block = y < worldTopHeight ? lightingProvider.get(LightType.BLOCK).getLightLevel(mutablePos) : 0;
                                 int sky   = y < worldTopHeight ? lightingProvider.get(LightType.SKY).getLightLevel(mutablePos) : 15;
