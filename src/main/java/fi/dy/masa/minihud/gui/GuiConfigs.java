@@ -151,17 +151,17 @@ public class GuiConfigs extends GuiConfigsBase
 
     protected BooleanHotkeyGuiWrapper wrapConfig(InfoToggle config)
     {
-        return new BooleanHotkeyGuiWrapper(config.getName(), config, config);
+        return new BooleanHotkeyGuiWrapper(config.getName(), config, config.getKeybind());
     }
 
     protected BooleanHotkeyGuiWrapper wrapConfig(RendererToggle config)
     {
-        return new BooleanHotkeyGuiWrapper(config.getName(), config, config);
+        return new BooleanHotkeyGuiWrapper(config.getName(), config, config.getKeybind());
     }
 
     protected BooleanHotkeyGuiWrapper wrapConfig(StructureToggle config)
     {
-        return new BooleanHotkeyGuiWrapper(config.getToggleOption().getName(), config.getToggleOption(), config.getHotkey());
+        return new BooleanHotkeyGuiWrapper(config.getToggleOption().getName(), config.getToggleOption(), config.getHotkey().getKeybind());
     }
 
     private static class ButtonListenerConfigTabs implements IButtonActionListener
