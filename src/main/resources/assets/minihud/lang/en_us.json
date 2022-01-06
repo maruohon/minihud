@@ -75,6 +75,11 @@
     "minihud.label.light_level_number_mode.both": "Both",
     "minihud.label.light_level_number_mode.sky": "Sky",
 
+    "minihud.label.light_level_render_condition.always": "Always",
+    "minihud.label.light_level_render_condition.never": "Never",
+    "minihud.label.light_level_render_condition.safe": "Safe",
+    "minihud.label.light_level_render_condition.spawnable": "Spawnable",
+
     "minihud.label.shape_render_type.full_block": "Full Block",
     "minihud.label.shape_render_type.inner_edge": "Inner Edge",
     "minihud.label.shape_render_type.outer_edge": "Outer Edge",

@@ -27,6 +27,7 @@ import fi.dy.masa.minihud.renderer.OverlayRendererStructures;
 import fi.dy.masa.minihud.util.BlockGridMode;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
 import fi.dy.masa.minihud.util.LightLevelNumberMode;
+import fi.dy.masa.minihud.util.LightLevelRenderCondition;
 
 public class Configs implements IConfigHandler
 {
@@ -54,8 +55,10 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       LIGHT_LEVEL_AUTO_HEIGHT             = new ConfigBoolean("lightLevelAutoHeight", false, "If enabled, then the Light Level overlay will be\nautomatically raised to render on top of the block's shape.\n§6Note: This will make the overlay also render\n§6on top of things like slabs, where mobs will not be able to spawn,\n§6unless you turn on the collision check option as well.");
         public static final ConfigBoolean       LIGHT_LEVEL_COLORED_NUMBERS         = new ConfigBoolean("lightLevelColoredNumbers", true, "Whether to use colored or white numbers\nfor the Light Level overlay numbers");
         public static final ConfigBoolean       LIGHT_LEVEL_COLLISION_CHECK         = new ConfigBoolean("lightLevelCollisionCheck", false, "If enabled, then the Light Level overlay is not rendered\nif there is any block with a collision box in the way.\n§6Note: This is not a proper check for spawnability!\n§6This would omit any block even partially sticking into the lower spawn block!\n§6For example open trapdoors or doors would prevent the overlay from showing.");
+        public static final ConfigOptionList    LIGHT_LEVEL_MARKER_CONDITION        = new ConfigOptionList("lightLevelMarkerCondition", LightLevelRenderCondition.SPAWNABLE, "When to render the colored light level marker");
         public static final ConfigOptionList    LIGHT_LEVEL_MARKER_MODE             = new ConfigOptionList("lightLevelMarkers", LightLevelMarkerMode.SQUARE, "Which type of colored marker to use in the\nLight Level overlay, if any");
         public static final ConfigDouble        LIGHT_LEVEL_MARKER_SIZE             = new ConfigDouble("lightLevelMarkerSize", 0.84, 0.0, 1.0, "The size of the light level colored marker.\nRange: 0.0 - 1.0");
+        public static final ConfigOptionList    LIGHT_LEVEL_NUMBER_CONDITION        = new ConfigOptionList("lightLevelNumberCondition", LightLevelRenderCondition.ALWAYS, "When to render the light level number");
         public static final ConfigOptionList    LIGHT_LEVEL_NUMBER_MODE             = new ConfigOptionList("lightLevelNumbers", LightLevelNumberMode.BLOCK, "Which light level number(s) to render in the Light Level overlay");
         public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X   = new ConfigDouble("lightLevelNumberOffsetBlockX", 0.26, 0.0, 1.0, "The relative \"x\" offset for the block light level number.\nRange: 0.0 - 1.0");
         public static final ConfigDouble        LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y   = new ConfigDouble("lightLevelNumberOffsetBlockY", 0.32, 0.0, 1.0, "The relative \"y\" offset for the block light level number.\nRange: 0.0 - 1.0");
@@ -126,7 +129,9 @@ public class Configs implements IConfigHandler
                 TOGGLE_KEY,
 
                 BLOCK_GRID_OVERLAY_MODE,
+                LIGHT_LEVEL_MARKER_CONDITION,
                 LIGHT_LEVEL_MARKER_MODE,
+                LIGHT_LEVEL_NUMBER_CONDITION,
                 LIGHT_LEVEL_NUMBER_MODE,
                 HUD_ALIGNMENT,
 
@@ -168,10 +173,11 @@ public class Configs implements IConfigHandler
         public static final ConfigColor BEACON_RANGE_LVL3_OVERLAY_COLOR         = new ConfigColor("beaconRangeLvl3", "0x20FFF040", "Color for the Beacon Range lvl 3 overlay");
         public static final ConfigColor BEACON_RANGE_LVL4_OVERLAY_COLOR         = new ConfigColor("beaconRangeLvl4", "0x2060FF40", "Color for the Beacon Range lvl 4 overlay");
         public static final ConfigColor BLOCK_GRID_OVERLAY_COLOR                = new ConfigColor("blockGridOverlayColor",              "#80FFFFFF", "Color for the block grid overlay");
+        public static final ConfigColor LIGHT_LEVEL_MARKER_BLOCK_LIT            = new ConfigColor("lightLevelMarkerBlockLit",           "#FF209040", "The color for the safe (during day) spots marker");
         public static final ConfigColor LIGHT_LEVEL_MARKER_DARK                 = new ConfigColor("lightLevelMarkerDark",               "#FFFF4848", "The color for the spawnable spots marker");
-        public static final ConfigColor LIGHT_LEVEL_MARKER_LIT                  = new ConfigColor("lightLevelMarkerLit",                "#FFFFFF33", "The color for the safe (during day) spots marker");
+        public static final ConfigColor LIGHT_LEVEL_MARKER_SKY_LIT              = new ConfigColor("lightLevelMarkerSkyLit",             "#FFFFFF33", "The color for the safe (during day) spots marker");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_DARK           = new ConfigColor("lightLevelNumberBlockDark",          "#FFC03030", "The color for the spawnable spots number of the block light value");
-        public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_LIT            = new ConfigColor("lightLevelNumberBlockLit",           "#FF209040", "The color for the safe spots number of the block light value");
+        public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_LIT            = new ConfigColor("lightLevelNumberBlockLit",           "#FF20FF40", "The color for the safe spots number of the block light value");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_DARK             = new ConfigColor("lightLevelNumberSkyDark",            "#FFFFF030", "The color for the spawnable spots number of the sky light value");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_LIT              = new ConfigColor("lightLevelNumberSkyLit",             "#FF40E0FF", "The color for the safe spots number of the sky light value");
         public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR        = new ConfigColor("randomTicksFixedOverlayColor",       "#30F9F225", "Color for the fixed-point random ticked chunks overlay");
@@ -200,8 +206,9 @@ public class Configs implements IConfigHandler
                 BEACON_RANGE_LVL3_OVERLAY_COLOR,
                 BEACON_RANGE_LVL4_OVERLAY_COLOR,
                 BLOCK_GRID_OVERLAY_COLOR,
+                LIGHT_LEVEL_MARKER_BLOCK_LIT,
                 LIGHT_LEVEL_MARKER_DARK,
-                LIGHT_LEVEL_MARKER_LIT,
+                LIGHT_LEVEL_MARKER_SKY_LIT,
                 LIGHT_LEVEL_NUMBER_BLOCK_DARK,
                 LIGHT_LEVEL_NUMBER_BLOCK_LIT,
                 LIGHT_LEVEL_NUMBER_SKY_DARK,

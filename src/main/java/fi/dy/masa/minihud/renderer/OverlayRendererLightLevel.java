@@ -22,6 +22,8 @@ import net.minecraft.world.LightType;
 import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import fi.dy.masa.malilib.config.IConfigDouble;
 import fi.dy.masa.malilib.config.options.ConfigColor;
@@ -34,6 +36,7 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
 import fi.dy.masa.minihud.util.LightLevelNumberMode;
+import fi.dy.masa.minihud.util.LightLevelRenderCondition;
 
 public class OverlayRendererLightLevel extends OverlayRendererBase
 {
@@ -200,9 +203,11 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
 
     private void renderMarkers(IMarkerRenderer renderer, Vec3d cameraPos, int lightThreshold, BufferBuilder buffer)
     {
-        double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
-        Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
+        Color4f colorBlockLit = Configs.Colors.LIGHT_LEVEL_MARKER_BLOCK_LIT.getColor();
+        Color4f colorSkyLit = Configs.Colors.LIGHT_LEVEL_MARKER_SKY_LIT.getColor();
         Color4f colorDark = Configs.Colors.LIGHT_LEVEL_MARKER_DARK.getColor();
+        LightLevelRenderCondition condition = (LightLevelRenderCondition) Configs.Generic.LIGHT_LEVEL_MARKER_CONDITION.getOptionListValue();
+        double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
         double offsetX = cameraPos.x;
         double offsetY = cameraPos.y - Configs.Generic.LIGHT_LEVEL_RENDER_OFFSET.getDoubleValue();
         double offsetZ = cameraPos.z;
@@ -212,10 +217,10 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
 
         for (LightLevelInfo info : this.lightInfos)
         {
-            if (info.block < lightThreshold)
+            if (condition.shouldRender(info.block, lightThreshold))
             {
                 long pos = info.pos;
-                Color4f color = info.sky >= lightThreshold ? colorLit : colorDark;
+                Color4f color = info.block >= lightThreshold ? colorBlockLit : (info.sky >= lightThreshold ? colorSkyLit : colorDark);
                 double x = BlockPos.unpackLongX(pos) - offsetX;
                 double y = (autoHeight ? info.y : BlockPos.unpackLongY(pos)) - offsetY;
                 double z = BlockPos.unpackLongZ(pos) - offsetZ;
@@ -228,18 +233,22 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             int lightThreshold, LightLevelNumberMode numberMode,
             Color4f colorLit, Color4f colorDark, BufferBuilder buffer)
     {
+        LightLevelRenderCondition condition = (LightLevelRenderCondition) Configs.Generic.LIGHT_LEVEL_NUMBER_CONDITION.getOptionListValue();
         boolean autoHeight = Configs.Generic.LIGHT_LEVEL_AUTO_HEIGHT.getBooleanValue();
 
         for (LightLevelInfo info : this.lightInfos)
         {
-            long pos = info.pos;
-            double x = BlockPos.unpackLongX(pos) - dx;
-            double y = (autoHeight ? info.y : BlockPos.unpackLongY(pos)) - dy;
-            double z = BlockPos.unpackLongZ(pos) - dz;
-            int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
-            Color4f color = lightLevel >= lightThreshold ? colorLit : colorDark;
+            if (condition.shouldRender(info.block, lightThreshold))
+            {
+                long pos = info.pos;
+                double x = BlockPos.unpackLongX(pos) - dx;
+                double y = (autoHeight ? info.y : BlockPos.unpackLongY(pos)) - dy;
+                double z = BlockPos.unpackLongZ(pos) - dz;
+                int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
+                Color4f color = lightLevel >= lightThreshold ? colorLit : colorDark;
 
-            this.renderLightLevelTextureColor(x, y, z, facing, lightLevel, color, buffer);
+                this.renderLightLevelTextureColor(x, y, z, facing, lightLevel, color, buffer);
+            }
         }
     }
 
