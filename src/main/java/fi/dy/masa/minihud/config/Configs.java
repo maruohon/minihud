@@ -68,6 +68,7 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       LIGHT_LEVEL_RANGE                   = new ConfigInteger("lightLevelRange", 24, 1, 64, "The block range to render the Light Level overlay in");
         public static final ConfigDouble        LIGHT_LEVEL_RENDER_OFFSET           = new ConfigDouble("lightLevelRenderOffset", 0.005, 0.0, 1.0, "The relative render offset for the light level overlay.\nMeant to help with potential z-fighting issues with the block surface.\nRange: 0.0 - 1.0");
         public static final ConfigBoolean       LIGHT_LEVEL_RENDER_THROUGH          = new ConfigBoolean("lightLevelRenderThrough", false, "If enabled, then the Light Level overlay\nwill be rendered through blocks");
+        public static final ConfigBoolean       LIGHT_LEVEL_SKIP_BLOCK_CHECK        = new ConfigBoolean("lightLevelSkipBlockCheck", false, "Should the Light Level Overlay skip the spawnability\ncheck of the block below. This would make the\noverlay also appear on top of slabs and glass etc.");
         public static final ConfigInteger       LIGHT_LEVEL_THRESHOLD               = new ConfigInteger("lightLevelSafeThreshold", 1, 0, 15, "The light level threshold which is considered safe");
         public static final ConfigBoolean       LIGHT_LEVEL_UNDER_WATER             = new ConfigBoolean("lightLevelUnderWater", false, "Should the light level overlay render under water");
         public static final ConfigBoolean       MAP_PREVIEW                         = new ConfigBoolean("mapPreview", false, "Enables rendering a preview of the map,\nwhen you hold shift while hovering over a map item");
@@ -109,6 +110,7 @@ public class Configs implements IConfigHandler
                 LIGHT_LEVEL_COLORED_NUMBERS,
                 LIGHT_LEVEL_NUMBER_ROTATION,
                 LIGHT_LEVEL_RENDER_THROUGH,
+                LIGHT_LEVEL_SKIP_BLOCK_CHECK,
                 LIGHT_LEVEL_UNDER_WATER,
                 MAP_PREVIEW,
                 REQUIRE_SNEAK,

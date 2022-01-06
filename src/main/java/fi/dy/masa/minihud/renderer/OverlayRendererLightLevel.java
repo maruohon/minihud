@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.FluidBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
@@ -342,6 +343,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         final boolean collisionCheck = Configs.Generic.LIGHT_LEVEL_COLLISION_CHECK.getBooleanValue();
         final boolean underWater = Configs.Generic.LIGHT_LEVEL_UNDER_WATER.getBooleanValue();
         final boolean autoHeight = Configs.Generic.LIGHT_LEVEL_AUTO_HEIGHT.getBooleanValue();
+        final boolean skipBlockCheck = Configs.Generic.LIGHT_LEVEL_SKIP_BLOCK_CHECK.getBooleanValue();
 
         for (int cx = minCX; cx <= maxCX; ++cx)
         {
@@ -374,7 +376,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                     {
                         for (int z = startZ; z <= endZ; ++z)
                         {
-                            if (this.canSpawnAtWrapper(x, y, z, chunk, world) == false)
+                            if (this.canSpawnAtWrapper(x, y, z, chunk, world, skipBlockCheck) == false)
                             {
                                 continue;
                             }
@@ -406,11 +408,11 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         }
     }
 
-    private boolean canSpawnAtWrapper(int x, int y, int z, Chunk chunk, World world)
+    private boolean canSpawnAtWrapper(int x, int y, int z, Chunk chunk, World world, boolean skipBlockCheck)
     {
         try
         {
-            return this.canSpawnAt(x, y, z, chunk, world);
+            return this.canSpawnAt(x, y, z, chunk, world, skipBlockCheck);
         }
         catch (Exception e)
         {
@@ -424,12 +426,13 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     /**
      * This method mimics the one from WorldEntitySpawner, but takes in the Chunk to avoid that lookup
      */
-    private boolean canSpawnAt(int x, int y, int z, Chunk chunk, World world)
+    private boolean canSpawnAt(int x, int y, int z, Chunk chunk, World world, boolean skipBlockCheck)
     {
         this.mutablePos.set(x, y - 1, z);
         BlockState stateDown = chunk.getBlockState(this.mutablePos);
 
-        if (stateDown.allowsSpawning(world, this.mutablePos, EntityType.CREEPER))
+        if ((skipBlockCheck && stateDown.isAir() == false && (stateDown.getBlock() instanceof FluidBlock) == false) ||
+            stateDown.allowsSpawning(world, this.mutablePos, EntityType.CREEPER))
         {
             this.mutablePos.set(x, y, z);
             BlockState state = chunk.getBlockState(this.mutablePos);
