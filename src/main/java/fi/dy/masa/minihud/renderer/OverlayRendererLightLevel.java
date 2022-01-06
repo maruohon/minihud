@@ -352,16 +352,27 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             {
                 final int startZ = Math.max( cz << 4      , minZ);
                 final int endZ   = Math.min((cz << 4) + 15, maxZ);
-                Chunk chunk = world.getChunk(cx, cz);
+                WorldChunk chunk = world.getChunk(cx, cz);
+                final int startY = Math.max(minY, world.getBottomY());
+                final int endY   = Math.min(maxY, chunk.getHighestNonEmptySectionYOffset() + 15 + 1);
 
-                for (int x = startX; x <= endX; ++x)
+                for (int y = startY; y <= endY; ++y)
                 {
-                    for (int z = startZ; z <= endZ; ++z)
+                    if (y > startY)
                     {
-                        final int startY = Math.max(minY, world.getBottomY());
-                        final int endY   = Math.min(maxY, chunk.getHighestNonEmptySectionYOffset() + 15 + 1);
+                        // If there are no blocks in the section below this layer, then we can skip it
+                        ChunkSection section = chunk.getSection(chunk.getSectionIndex(y - 1));
 
-                        for (int y = startY; y <= endY; ++y)
+                        if (section.isEmpty())
+                        {
+                            //y += 16 - (y & 0xF);
+                            continue;
+                        }
+                    }
+
+                    for (int x = startX; x <= endX; ++x)
+                    {
+                        for (int z = startZ; z <= endZ; ++z)
                         {
                             if (this.canSpawnAtWrapper(x, y, z, chunk, world) == false)
                             {
