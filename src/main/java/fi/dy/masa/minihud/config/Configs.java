@@ -40,6 +40,9 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       BEACON_RANGE_AUTO_UPDATE            = new ConfigBoolean("beaconRangeAutoUpdate", false, "This enables the Beacon Range renderer to update automatically\nwhen block or chunk change packets are received.\nThose updates can have a performance impact if tons of blocks are changing often.\nYou can toggle off/on the renderer to update to those changes manually.");
         public static final ConfigBoolean       BEE_TOOLTIPS                        = new ConfigBoolean("beeTooltips", false, "Adds the number of contained bees to the tooltip of Bee Hive and Bee Nest items");
         public static final ConfigBoolean       HONEY_TOOLTIPS                      = new ConfigBoolean("honeyTooltips", false, "Adds the honey level to the tooltip of Bee Hive and Bee Nest items");
+        public static final ConfigInteger       BIOME_OVERLAY_RANGE                 = new ConfigInteger("biomeOverlayRange", 4, 0, 32, "The horizontal chunk radius to render for the Biome Border Overlay");
+        public static final ConfigInteger       BIOME_OVERLAY_RANGE_VERTICAL        = new ConfigInteger("biomeOverlayRangeVertical", 0, 0, 32, "The vertical (sub-)chunk radius to render for the Biome Border Overlay");
+        public static final ConfigBoolean       BIOME_OVERLAY_SINGLE_COLOR          = new ConfigBoolean("biomeOverlaySingleColor", true, "If enabled, then the Biome Border Overlay will use\nthe same color for all biomes. This can look \"less messy\"\nwhen the adjacent biome's colors and lines aren't blending\ninto a huge mess of colors.");
         public static final ConfigOptionList    BLOCK_GRID_OVERLAY_MODE             = new ConfigOptionList("blockGridOverlayMode", BlockGridMode.ALL, "The block grid render mode");
         public static final ConfigInteger       BLOCK_GRID_OVERLAY_RADIUS           = new ConfigInteger("blockGridOverlayRadius", 32, "The radius of the block grid lines to render");
         public static final ConfigString        COORDINATE_FORMAT_STRING            = new ConfigString("coordinateFormat", "x: %.1f y: %.1f z: %.1f", "The format string for the coordinate line.\nNeeds to have three %f format strings!\nDefault: x: %.1f y: %.1f z: %.1f");
@@ -101,6 +104,7 @@ public class Configs implements IConfigHandler
                 HONEY_TOOLTIPS,
                 ENABLED,
                 BEACON_RANGE_AUTO_UPDATE,
+                BIOME_OVERLAY_SINGLE_COLOR,
                 DEBUG_MESSAGES,
                 DEBUG_RENDERER_PATH_MAX_DIST,
                 DONT_RESET_SEED_ON_DIMENSION_CHANGE,
@@ -137,6 +141,8 @@ public class Configs implements IConfigHandler
                 LIGHT_LEVEL_NUMBER_MODE,
                 HUD_ALIGNMENT,
 
+                BIOME_OVERLAY_RANGE,
+                BIOME_OVERLAY_RANGE_VERTICAL,
                 BLOCK_GRID_OVERLAY_RADIUS,
                 COORDINATE_FORMAT_STRING,
                 DATE_FORMAT_REAL,

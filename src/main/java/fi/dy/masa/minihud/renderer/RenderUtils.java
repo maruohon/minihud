@@ -4,7 +4,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.EntityUtils;
 
@@ -129,6 +131,159 @@ public class RenderUtils
                     bufferLines.vertex(lineX - cx, maxY - cy, minZ - cz).color(color.r, color.g, color.b, 1.0F).next();
                     lineX += lineIntervalH;
                 }
+            }
+        }
+    }
+
+
+    public static void renderInsetQuad(Vec3i minPos,
+                                       int width,
+                                       int height,
+                                       Direction side,
+                                       double inset,
+                                       Color4f color,
+                                       Vec3d cameraPos,
+                                       BufferBuilder buffer)
+    {
+        double minX = minPos.getX() - cameraPos.x;
+        double minY = minPos.getY() - cameraPos.y;
+        double minZ = minPos.getZ() - cameraPos.z;
+        double maxX = minX;
+        double maxY = minY;
+        double maxZ = minZ;
+
+        if (side.getAxis() == Direction.Axis.Z)
+        {
+            maxX += width;
+            maxY += height;
+        }
+        else if (side.getAxis() == Direction.Axis.X)
+        {
+            maxY += height;
+            maxZ += width;
+        }
+        else if (side.getAxis() == Direction.Axis.Y)
+        {
+            maxX += width;
+            maxZ += height;
+        }
+
+        switch (side)
+        {
+            case WEST:
+                minX += inset;
+                buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                break;
+            case EAST:
+                maxX += 1 - inset;
+                buffer.vertex(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
+                break;
+
+            case NORTH:
+                minZ += inset;
+                buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
+                break;
+
+            case SOUTH:
+                maxZ += 1 - inset;
+                buffer.vertex(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                break;
+
+            case DOWN:
+                minY += inset;
+                buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
+                break;
+
+            case UP:
+                maxY += 1 - inset;
+                buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                break;
+        }
+    }
+
+    public static void renderBiomeBorderLines(Vec3i minPos,
+                                              int width,
+                                              int height,
+                                              Direction side,
+                                              double inset,
+                                              Color4f color,
+                                              Vec3d cameraPos,
+                                              BufferBuilder buffer)
+    {
+        double minX = minPos.getX() - cameraPos.x;
+        double minY = minPos.getY() - cameraPos.y;
+        double minZ = minPos.getZ() - cameraPos.z;
+
+        switch (side)
+        {
+            case WEST   -> minX += inset;
+            case EAST   -> minX += 1 - inset;
+            case NORTH  -> minZ += inset;
+            case SOUTH  -> minZ += 1 - inset;
+            case DOWN   -> minY += inset;
+            case UP     -> minY += 1 - inset;
+        }
+
+        double maxX = minX;
+        double maxY = minY;
+        double maxZ = minZ;
+
+        if (side.getAxis() == Direction.Axis.Z)
+        {
+            maxX += width;
+            maxY += height;
+        }
+        else if (side.getAxis() == Direction.Axis.X)
+        {
+            maxY += height;
+            maxZ += width;
+        }
+        else if (side.getAxis() == Direction.Axis.Y)
+        {
+            maxX += width;
+            maxZ += height;
+        }
+
+        if (side.getAxis() == Direction.Axis.Y)
+        {
+            // Line at the "start" end of the quad
+            buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, 1f).next();
+            buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, 1f).next();
+
+            for (double z = minZ; z < maxZ + 0.5; z += 1.0)
+            {
+                buffer.vertex(minX, minY, z).color(color.r, color.g, color.b, 1f).next();
+                buffer.vertex(maxX, maxY, z).color(color.r, color.g, color.b, 1f).next();
+            }
+        }
+        else
+        {
+            // Vertical line at the "start" end of the quad
+            buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, 1f).next();
+            buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, 1f).next();
+
+            for (double y = minY; y < maxY + 0.5; y += 1.0)
+            {
+                buffer.vertex(minX, y, minZ).color(color.r, color.g, color.b, 1f).next();
+                buffer.vertex(maxX, y, maxZ).color(color.r, color.g, color.b, 1f).next();
             }
         }
     }

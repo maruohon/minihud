@@ -6,6 +6,7 @@
 	"client": [
 		"IMixinAbstractFurnaceBlockEntity",
 		"IMixinBeaconBlockEntity",
+		"IMixinBiomeAccess",
 		"IMixinChunkDeltaUpdateS2CPacket",
 		"IMixinEntityNavigation",
 		"IMixinServerWorld",

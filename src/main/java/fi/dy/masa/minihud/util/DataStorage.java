@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Queues;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.MinecraftClient;
@@ -22,8 +26,10 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -40,14 +46,19 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.network.StructurePacketHandlerCarpet;
 import fi.dy.masa.minihud.network.StructurePacketHandlerServux;
 import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
+import fi.dy.masa.minihud.renderer.OverlayRendererBiomeBorders;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
+import fi.dy.masa.minihud.renderer.worker.ThreadWorker;
+import fi.dy.masa.minihud.renderer.worker.ChunkTask;
 
 public class DataStorage
 {
+    private static final ThreadFactory THREAD_FACTORY = (new ThreadFactoryBuilder()).setNameFormat("MiniHUD Worker Thread %d").setDaemon(true).build();
     private static final Pattern PATTERN_CARPET_TPS = Pattern.compile("TPS: (?<tps>[0-9]+[\\.,][0-9]) MSPT: (?<mspt>[0-9]+[\\.,][0-9])");
-    private static final DataStorage INSTANCE = new DataStorage();
+
+    public static final DataStorage INSTANCE = new DataStorage();
 
     public static final int CARPET_ID_BOUNDINGBOX_MARKERS = 3;
     public static final int CARPET_ID_LARGE_BOUNDINGBOX_MARKERS_START = 7;
@@ -76,6 +87,17 @@ public class DataStorage
     private final ArrayListMultimap<StructureType, StructureData> structures = ArrayListMultimap.create();
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
+    private final PriorityBlockingQueue<ChunkTask> taskQueue = Queues.newPriorityBlockingQueue();
+    private final Thread workerThread;
+    private final ThreadWorker worker;
+
+    private DataStorage()
+    {
+        this.worker = new ThreadWorker();
+        this.workerThread = THREAD_FACTORY.newThread(this.worker);
+        this.workerThread.start();
+    }
+
     public static DataStorage getInstance()
     {
         return INSTANCE;
@@ -86,6 +108,19 @@ public class DataStorage
         if (isLogout)
         {
             MiniHUD.printDebug("DataStorage#reset() - log-out");
+            /*
+            this.worker.stopThread();
+
+            try
+            {
+                this.workerThread.interrupt();
+                this.workerThread.join();
+            }
+            catch (InterruptedException e)
+            {
+                MiniHUD.logger.warn("Interrupted whilst waiting for worker thread to die", e);
+            }
+            */
         }
         else
         {
@@ -108,6 +143,7 @@ public class DataStorage
         StructurePacketHandlerServux.INSTANCE.reset();
         ShapeManager.INSTANCE.clear();
         OverlayRendererBeaconRange.clear();
+        OverlayRendererBiomeBorders.INSTANCE.clear();
         OverlayRendererLightLevel.reset();
 
         if (isLogout || Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue() == false)
@@ -120,6 +156,19 @@ public class DataStorage
         {
             this.servuxServer = false;
             this.structureDataTimeout = 30 * 20;
+        }
+    }
+
+    public ChunkTask getNextTask() throws InterruptedException
+    {
+        return this.taskQueue.take();
+    }
+
+    public void addTask(Runnable task, ChunkPos pos, Vec3i playerPos)
+    {
+        if (this.taskQueue.size() < 64000)
+        {
+            this.taskQueue.offer(new ChunkTask(task, pos, playerPos));
         }
     }
 
