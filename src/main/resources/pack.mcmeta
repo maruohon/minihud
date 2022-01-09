@@ -1,6 +1,6 @@
 {
-   "pack": {
-      "pack_format": 4,
-      "description": "MiniHUD"
-   }
+	"pack": {
+		"pack_format": 7,
+		"description": "MiniHUD"
+	}
 }
