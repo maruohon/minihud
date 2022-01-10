@@ -156,11 +156,11 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
 
             if (markerMode == LightLevelMarkerMode.SQUARE)
             {
-                this.renderMarkers(this::renderLightLevelSquare, cameraPos, lightThreshold, bufferLines);
+                this.renderMarkers(this::renderLightLevelSquare, cameraPos, bufferLines);
             }
             else if (markerMode == LightLevelMarkerMode.CROSS)
             {
-                this.renderMarkers(this::renderLightLevelCross, cameraPos, lightThreshold, bufferLines);
+                this.renderMarkers(this::renderLightLevelCross, cameraPos, bufferLines);
             }
         }
     }
@@ -200,12 +200,12 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y - offsetY, tmpZ + cameraPos.z, numberFacing, lightThreshold, mode, colorLit, colorDark, colorDim, buffer);
     }
 
-    private void renderMarkers(IMarkerRenderer renderer, Vec3d cameraPos, int lightThreshold, BufferBuilder buffer)
+    private void renderMarkers(IMarkerRenderer renderer, Vec3d cameraPos, BufferBuilder buffer)
     {
+        int spawnThreshold = Configs.Generic.LIGHT_LEVEL_SPAWNABLE_THRESHOLD.getIntegerValue();
         double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
         Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
         Color4f colorDark = Configs.Colors.LIGHT_LEVEL_MARKER_DARK.getColor();
-        Color4f colorDim = Configs.Colors.LIGHT_LEVEL_MARKER_DIM.getColor();
         double offsetX = cameraPos.x;
         double offsetY = cameraPos.y - Configs.Generic.LIGHT_LEVEL_Z_OFFSET.getDoubleValue();
         double offsetZ = cameraPos.z;
@@ -216,13 +216,9 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         for (int i = 0; i < count; ++i)
         {
             LightLevelInfo info = this.lightInfos.get(i);
-
-            if (info.block < lightThreshold)
-            {
-                BlockPos pos = info.pos;
-                Color4f color = info.sky >= lightThreshold ? colorLit : lightLevel == 0 ? colorDark : colorDim;
-                renderer.render(pos.getX() - offsetX, pos.getY() - offsetY, pos.getZ() - offsetZ, color, offset1, offset2, buffer);
-            }
+            BlockPos pos = info.pos;
+            Color4f color = (info.sky > spawnThreshold || info.block > spawnThreshold) ? colorLit : colorDark;
+            renderer.render(pos.getX() - offsetX, pos.getY() - offsetY, pos.getZ() - offsetZ, color, offset1, offset2, buffer);
         }
     }
 
