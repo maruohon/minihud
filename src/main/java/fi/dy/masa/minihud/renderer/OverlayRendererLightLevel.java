@@ -139,6 +139,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                         Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_LIT,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_DARK,
+                        Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_DIM,
                         useColoredNumbers, lightThreshold, numberFacing, bufferQuads);
             }
 
@@ -149,6 +150,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                         Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_LIT,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_DARK,
+                        Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_DIM,
                         useColoredNumbers, lightThreshold, numberFacing, bufferQuads);
             }
 
@@ -164,14 +166,14 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     }
 
     private void renderNumbers(Vec3d cameraPos, LightLevelNumberMode mode, IConfigDouble cfgOffX, IConfigDouble cfgOffZ,
-            ConfigColor cfgColorLit, ConfigColor cfgColorDark, boolean useColoredNumbers,
+            ConfigColor cfgColorLit, ConfigColor cfgColorDark, ConfigColor cfgColorDim, boolean useColoredNumbers,
             int lightThreshold, Direction numberFacing, BufferBuilder buffer)
     {
         double ox = cfgOffX.getDoubleValue();
         double oz = cfgOffZ.getDoubleValue();
         double tmpX, tmpZ;
         double offsetY = Configs.Generic.LIGHT_LEVEL_Z_OFFSET.getDoubleValue();
-        Color4f colorLit, colorDark;
+        Color4f colorLit, colorDark, colorDim;
 
         switch (numberFacing)
         {
@@ -186,14 +188,16 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         {
             colorLit = cfgColorLit.getColor();
             colorDark = cfgColorDark.getColor();
+            colorDim = cfgColorDim.getColor();
         }
         else
         {
             colorLit = Color4f.fromColor(0xFFFFFFFF);
             colorDark = Color4f.fromColor(0xFFFFFFFF);
+            colorDim = Color4f.fromColor(0xFFFFFFFF);
         }
 
-        this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y - offsetY, tmpZ + cameraPos.z, numberFacing, lightThreshold, mode, colorLit, colorDark, buffer);
+        this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y - offsetY, tmpZ + cameraPos.z, numberFacing, lightThreshold, mode, colorLit, colorDark, colorDim, buffer);
     }
 
     private void renderMarkers(IMarkerRenderer renderer, Vec3d cameraPos, int lightThreshold, BufferBuilder buffer)
@@ -201,6 +205,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
         Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
         Color4f colorDark = Configs.Colors.LIGHT_LEVEL_MARKER_DARK.getColor();
+        Color4f colorDim = Configs.Colors.LIGHT_LEVEL_MARKER_DIM.getColor();
         double offsetX = cameraPos.x;
         double offsetY = cameraPos.y - Configs.Generic.LIGHT_LEVEL_Z_OFFSET.getDoubleValue();
         double offsetZ = cameraPos.z;
@@ -215,7 +220,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             if (info.block < lightThreshold)
             {
                 BlockPos pos = info.pos;
-                Color4f color = info.sky >= lightThreshold ? colorLit : colorDark;
+                Color4f color = info.sky >= lightThreshold ? colorLit : lightLevel == 0 ? colorDark : colorDim;
                 renderer.render(pos.getX() - offsetX, pos.getY() - offsetY, pos.getZ() - offsetZ, color, offset1, offset2, buffer);
             }
         }
@@ -223,7 +228,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
 
     private void renderLightLevelNumbers(double dx, double dy, double dz, Direction facing,
             int lightThreshold, LightLevelNumberMode numberMode,
-            Color4f colorLit, Color4f colorDark, BufferBuilder buffer)
+            Color4f colorLit, Color4f colorDark, Color4f colorDim, BufferBuilder buffer)
     {
         final int count = this.lightInfos.size();
 
@@ -235,7 +240,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             double y = pos.getY() - dy;
             double z = pos.getZ() - dz;
             int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
-            Color4f color = lightLevel >= lightThreshold ? colorLit : colorDark;
+            Color4f color = lightLevel >= lightThreshold ? colorLit : lightLevel == 0 ? colorDark : colorDim;
 
             this.renderLightLevelTextureColor(x, y, z, facing, lightLevel, color, buffer);
         }
