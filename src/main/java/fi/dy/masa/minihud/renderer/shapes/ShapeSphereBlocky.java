@@ -44,7 +44,7 @@ public class ShapeSphereBlocky extends ShapeCircleBase
         this.addPositionsOnHorizontalRing(spherePositions, posMutable, Direction.EAST);
 
         posMutable.set(posCenter);
-        this.addPositionsOnVerticalRing(spherePositions, posMutable, Direction.UP, Direction.EAST);
+        this.addPositionsOnVerticalRing(spherePositions, posMutable, Direction.EAST);
 
         final int r = (int) this.radius + 2;
 
@@ -59,10 +59,10 @@ public class ShapeSphereBlocky extends ShapeCircleBase
 
             // Vertical rings
             posMutable.set(posCenter.getX() - i, posCenter.getY(), posCenter.getZ());
-            this.addPositionsOnVerticalRing(spherePositions, posMutable, Direction.UP, Direction.EAST);
+            this.addPositionsOnVerticalRing(spherePositions, posMutable, Direction.EAST);
 
             posMutable.set(posCenter.getX() + i, posCenter.getY(), posCenter.getZ());
-            this.addPositionsOnVerticalRing(spherePositions, posMutable, Direction.UP, Direction.EAST);
+            this.addPositionsOnVerticalRing(spherePositions, posMutable, Direction.EAST);
         }
         //System.out.printf("time: %.6f s - margin: %.4f\n", (double) (System.nanoTime() - before) / 1000000000D, this.margin);
         //System.out.printf("spherePositions: %d\n", spherePositions.size());

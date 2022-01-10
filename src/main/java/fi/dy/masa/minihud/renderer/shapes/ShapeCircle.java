@@ -68,7 +68,7 @@ public class ShapeCircle extends ShapeCircleBase
             }
             else
             {
-                this.addPositionsOnVerticalRing(circlePositions, posMutable, Direction.UP, this.mainAxis);
+                this.addPositionsOnVerticalRing(circlePositions, posMutable, this.mainAxis);
             }
         }
 

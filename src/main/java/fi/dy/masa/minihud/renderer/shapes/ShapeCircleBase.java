@@ -220,7 +220,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         String gr = GuiBase.TXT_GRAY;
         String rst = GuiBase.TXT_GRAY;
 
-        lines.add(gr + StringUtils.translate("minihud.gui.label.radius_value", gl + String.valueOf(this.getRadius()) + rst));
+        lines.add(gr + StringUtils.translate("minihud.gui.label.radius_value", gl + this.getRadius() + rst));
         lines.add(gr + StringUtils.translate("minihud.gui.label.center_value",
                 String.format("x: %s%.2f%s, y: %s%.2f%s, z: %s%.2f%s",
                         bl, c.x, rst, bl, c.y, rst, bl, c.z, rst)));
@@ -249,9 +249,8 @@ public abstract class ShapeCircleBase extends ShapeBase
         {
             if (range.isPositionWithinRange(pos))
             {
-                for (int i = 0; i < sides.length; ++i)
+                for (Direction side : sides)
                 {
-                    Direction side = sides[i];
                     posMutable.set(pos.getX() + side.getOffsetX(), pos.getY() + side.getOffsetY(), pos.getZ() + side.getOffsetZ());
 
                     if (positions.contains(posMutable) == false)
@@ -261,7 +260,7 @@ public abstract class ShapeCircleBase extends ShapeBase
                         if (full == false)
                         {
                             boolean onOrIn = this.isPositionOnOrInsideRing(posMutable.getX(), posMutable.getY(), posMutable.getZ(), side, mainAxis);
-                            render |= ((outer && onOrIn == false) || (inner && onOrIn));
+                            render = ((outer && onOrIn == false) || (inner && onOrIn));
                         }
 
                         if (render)
@@ -280,8 +279,8 @@ public abstract class ShapeCircleBase extends ShapeBase
         {
             BlockPos posFirst = posMutable.toImmutable();
             positions.add(posFirst);
-            double r = (double) this.radius;
-            int failsafe = (int) (2.5 * Math.PI * r); // somewhat over double the circumference
+            double r = this.radius;
+            int failsafe = (int) (2.5 * Math.PI * r); // a bit over the circumference
 
             while (--failsafe > 0)
             {
@@ -297,14 +296,16 @@ public abstract class ShapeCircleBase extends ShapeBase
         }
     }
 
-    protected void addPositionsOnVerticalRing(HashSet<BlockPos> positions, BlockPos.Mutable posMutable, Direction direction, Direction mainAxis)
+    protected void addPositionsOnVerticalRing(HashSet<BlockPos> positions, BlockPos.Mutable posMutable, Direction mainAxis)
     {
+        Direction direction = Direction.UP;
+
         if (this.movePositionToRing(posMutable, direction, mainAxis))
         {
             BlockPos posFirst = posMutable.toImmutable();
             positions.add(posFirst);
-            double r = (double) this.radius;
-            int failsafe = (int) (2.5 * Math.PI * r); // somewhat over double the circumference
+            double r = this.radius;
+            int failsafe = (int) (2.5 * Math.PI * r); // a bit over the circumference
 
             while (--failsafe > 0)
             {
@@ -457,25 +458,21 @@ public abstract class ShapeCircleBase extends ShapeBase
 
     /**
      * Returns the next horizontal direction in sequence, rotating counter-clockwise
-     * @param dirIn
-     * @return
      */
     protected static Direction getNextDirRotating(Direction dirIn)
     {
         switch (dirIn)
         {
-            case EAST:  return Direction.NORTH;
             case NORTH: return Direction.WEST;
-            case WEST:  return Direction.SOUTH;
             case SOUTH: return Direction.EAST;
+            case WEST:  return Direction.SOUTH;
+            case EAST:
             default:    return Direction.NORTH;
         }
     }
 
     /**
      * Returns the next direction in sequence, rotating up to north
-     * @param dirIn
-     * @return
      */
     protected static Direction getNextDirRotatingVertical(Direction dirIn, Direction mainAxis)
     {
@@ -485,10 +482,10 @@ public abstract class ShapeCircleBase extends ShapeBase
             case DOWN:
                 switch (dirIn)
                 {
-                    case UP:    return Direction.NORTH;
                     case NORTH: return Direction.DOWN;
-                    case DOWN:  return Direction.SOUTH;
                     case SOUTH: return Direction.UP;
+                    case DOWN:  return Direction.SOUTH;
+                    case UP:
                     default:    return Direction.NORTH;
                 }
 
@@ -496,10 +493,10 @@ public abstract class ShapeCircleBase extends ShapeBase
             case SOUTH:
                 switch (dirIn)
                 {
-                    case UP:    return Direction.EAST;
+                    case WEST:  return Direction.UP;
                     case EAST:  return Direction.DOWN;
                     case DOWN:  return Direction.WEST;
-                    case WEST:  return Direction.UP;
+                    case UP:
                     default:    return Direction.EAST;
                 }
 
@@ -507,10 +504,10 @@ public abstract class ShapeCircleBase extends ShapeBase
             case EAST:
                 switch (dirIn)
                 {
-                    case UP:    return Direction.SOUTH;
+                    case NORTH: return Direction.UP;
                     case SOUTH: return Direction.DOWN;
                     case DOWN:  return Direction.NORTH;
-                    case NORTH: return Direction.UP;
+                    case UP:
                     default:    return Direction.SOUTH;
                 }
         }
