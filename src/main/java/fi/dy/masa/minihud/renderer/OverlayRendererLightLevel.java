@@ -131,6 +131,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             LightLevelMarkerMode markerMode = (LightLevelMarkerMode) Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
             boolean useColoredNumbers = Configs.Generic.LIGHT_LEVEL_COLORED_NUMBERS.getBooleanValue();
             int lightThreshold = Configs.Generic.LIGHT_LEVEL_THRESHOLD.getIntegerValue();
+            int spawnThreshold = Configs.Generic.LIGHT_LEVEL_SPAWNABLE_THRESHOLD.getIntegerValue();
 
             if (numberMode == LightLevelNumberMode.BLOCK || numberMode == LightLevelNumberMode.BOTH)
             {
@@ -140,7 +141,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                         Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_LIT,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_DARK,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_DIM,
-                        useColoredNumbers, lightThreshold, numberFacing, bufferQuads);
+                        useColoredNumbers, lightThreshold, spawnThreshold, numberFacing, bufferQuads);
             }
 
             if (numberMode == LightLevelNumberMode.SKY || numberMode == LightLevelNumberMode.BOTH)
@@ -151,23 +152,23 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                         Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_LIT,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_DARK,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_DIM,
-                        useColoredNumbers, lightThreshold, numberFacing, bufferQuads);
+                        useColoredNumbers, lightThreshold, spawnThreshold, numberFacing, bufferQuads);
             }
 
             if (markerMode == LightLevelMarkerMode.SQUARE)
             {
-                this.renderMarkers(this::renderLightLevelSquare, cameraPos, bufferLines);
+                this.renderMarkers(this::renderLightLevelSquare, cameraPos, spawnThreshold, bufferLines);
             }
             else if (markerMode == LightLevelMarkerMode.CROSS)
             {
-                this.renderMarkers(this::renderLightLevelCross, cameraPos, bufferLines);
+                this.renderMarkers(this::renderLightLevelCross, cameraPos, spawnThreshold, bufferLines);
             }
         }
     }
 
     private void renderNumbers(Vec3d cameraPos, LightLevelNumberMode mode, IConfigDouble cfgOffX, IConfigDouble cfgOffZ,
             ConfigColor cfgColorLit, ConfigColor cfgColorDark, ConfigColor cfgColorDim, boolean useColoredNumbers,
-            int lightThreshold, Direction numberFacing, BufferBuilder buffer)
+            int lightThreshold, int spawnThreshold, Direction numberFacing, BufferBuilder buffer)
     {
         double ox = cfgOffX.getDoubleValue();
         double oz = cfgOffZ.getDoubleValue();
@@ -197,12 +198,11 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             colorDim = Color4f.fromColor(0xFFFFFFFF);
         }
 
-        this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y - offsetY, tmpZ + cameraPos.z, numberFacing, lightThreshold, mode, colorLit, colorDark, colorDim, buffer);
+        this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y - offsetY, tmpZ + cameraPos.z, numberFacing, lightThreshold, spawnThreshold, mode, colorLit, colorDark, colorDim, buffer);
     }
 
-    private void renderMarkers(IMarkerRenderer renderer, Vec3d cameraPos, BufferBuilder buffer)
+    private void renderMarkers(IMarkerRenderer renderer, Vec3d cameraPos, int spawnThreshold, BufferBuilder buffer)
     {
-        int spawnThreshold = Configs.Generic.LIGHT_LEVEL_SPAWNABLE_THRESHOLD.getIntegerValue();
         double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
         Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
         Color4f colorDark = Configs.Colors.LIGHT_LEVEL_MARKER_DARK.getColor();
@@ -211,11 +211,8 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         double offsetZ = cameraPos.z;
         double offset1 = (1.0 - markerSize) / 2.0;
         double offset2 = (1.0 - offset1);
-        final int count = this.lightInfos.size();
 
-        for (int i = 0; i < count; ++i)
-        {
-            LightLevelInfo info = this.lightInfos.get(i);
+        for (LightLevelInfo info : this.lightInfos) {
             BlockPos pos = info.pos;
             Color4f color = (info.sky > spawnThreshold || info.block > spawnThreshold) ? colorLit : colorDark;
             renderer.render(pos.getX() - offsetX, pos.getY() - offsetY, pos.getZ() - offsetZ, color, offset1, offset2, buffer);
@@ -223,20 +220,16 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     }
 
     private void renderLightLevelNumbers(double dx, double dy, double dz, Direction facing,
-            int lightThreshold, LightLevelNumberMode numberMode,
+            int lightThreshold, int spawnThreshold, LightLevelNumberMode numberMode,
             Color4f colorLit, Color4f colorDark, Color4f colorDim, BufferBuilder buffer)
     {
-        final int count = this.lightInfos.size();
-
-        for (int i = 0; i < count; ++i)
-        {
-            LightLevelInfo info = this.lightInfos.get(i);
+        for (LightLevelInfo info : this.lightInfos) {
             BlockPos pos = info.pos;
             double x = pos.getX() - dx;
             double y = pos.getY() - dy;
             double z = pos.getZ() - dz;
             int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
-            Color4f color = lightLevel >= lightThreshold ? colorLit : lightLevel == 0 ? colorDark : colorDim;
+            Color4f color = lightLevel >= lightThreshold ? colorLit : lightLevel <= spawnThreshold ? colorDark : colorDim;
 
             this.renderLightLevelTextureColor(x, y, z, facing, lightLevel, color, buffer);
         }
