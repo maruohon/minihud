@@ -7,11 +7,13 @@ import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetDropDownList;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.minihud.gui.widgets.WidgetListShapes;
 import fi.dy.masa.minihud.gui.widgets.WidgetShapeEntry;
@@ -23,12 +25,15 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
                              implements ISelectionListener<ShapeBase>
 {
     protected final WidgetDropDownList<ShapeType> widgetDropDown;
+    protected final ButtonOnOff shapeRendererToggleButton;
 
     public GuiShapeManager()
     {
         super(10, 68);
 
         this.title = StringUtils.translate("minihud.gui.title.shape_manager");
+
+        this.shapeRendererToggleButton = new ButtonOnOff(10, 42, -1, false, "minihud.gui.button.shape_renderer_toggle", RendererToggle.SHAPE_RENDERER.getBooleanValue());
 
         // The position will get updated later
         this.widgetDropDown = new WidgetDropDownList<>(0, 0, 160, 18, 200, 10, ImmutableList.copyOf(ShapeType.values()), ShapeType::getDisplayName);
@@ -95,6 +100,9 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
         this.setListPosition(this.getListX(), y + 20);
         this.reCreateListWidget();
 
+        this.shapeRendererToggleButton.setPosition(10, y + 1);
+        this.addButton(this.shapeRendererToggleButton, (b, mb) -> this.toggleShapeRendererOnOff());
+
         this.widgetDropDown.setPosition(addShapeButton.getX() - this.widgetDropDown.getWidth() - 4, y + 1);
 
         this.addWidget(this.widgetDropDown);
@@ -111,6 +119,12 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
                 InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "Select the shape from the dropdown");
             }
         });
+    }
+
+    protected void toggleShapeRendererOnOff()
+    {
+        RendererToggle.SHAPE_RENDERER.toggleBooleanValue();
+        this.shapeRendererToggleButton.updateDisplayString(RendererToggle.SHAPE_RENDERER.getBooleanValue());
     }
 
     protected int createTabButton(int x, int y, int width, ConfigGuiTab tab)

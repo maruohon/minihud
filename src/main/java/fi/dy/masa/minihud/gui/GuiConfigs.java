@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.config.IConfigBase;
+import fi.dy.masa.malilib.config.options.ConfigTypeWrapper;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -133,6 +134,7 @@ public class GuiConfigs extends GuiConfigsBase
         else if (tab == ConfigGuiTab.STRUCTURES)
         {
             List<IConfigBase> list = new ArrayList<>();
+            list.add(new ConfigTypeWrapper(ConfigType.BOOLEAN, RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE));
             list.addAll(StructureToggle.getToggleConfigs());
             list.addAll(StructureToggle.getHotkeys());
             list.addAll(StructureToggle.getColorConfigs());
