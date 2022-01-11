@@ -1,8 +1,6 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
-import java.util.HashSet;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -23,11 +21,11 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.util.ShapeRenderType;
+import fi.dy.masa.minihud.util.shape.SphereUtils;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public abstract class ShapeCircleBase extends ShapeBase
 {
-    protected static final Direction[] FACING_ALL = new Direction[] { Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST };
-
     protected BlockSnap snap = BlockSnap.CENTER;
     protected Direction mainAxis = Direction.UP;
     protected double radius;
@@ -237,35 +235,46 @@ public abstract class ShapeCircleBase extends ShapeBase
         return lines;
     }
 
-    protected void renderPositions(HashSet<BlockPos> positions, Direction[] sides, Direction mainAxis, Color4f color, Vec3d cameraPos)
+    protected void renderPositions(LongOpenHashSet positions,
+                                   Direction[] sides,
+                                   SphereUtils.RingPositionTest test,
+                                   Color4f color,
+                                   double expand,
+                                   Vec3d cameraPos)
     {
         boolean full = this.renderType == ShapeRenderType.FULL_BLOCK;
         boolean outer = this.renderType == ShapeRenderType.OUTER_EDGE;
         boolean inner = this.renderType == ShapeRenderType.INNER_EDGE;
         LayerRange range = this.layerRange;
-        BlockPos.Mutable posMutable = new BlockPos.Mutable();
 
-        for (BlockPos pos : positions)
+        for (long posLong : positions)
         {
-            if (range.isPositionWithinRange(pos))
+            int x = BlockPos.unpackLongX(posLong);
+            int y = BlockPos.unpackLongY(posLong);
+            int z = BlockPos.unpackLongZ(posLong);
+
+            if (range.isPositionWithinRange(x, y, z))
             {
                 for (Direction side : sides)
                 {
-                    posMutable.set(pos.getX() + side.getOffsetX(), pos.getY() + side.getOffsetY(), pos.getZ() + side.getOffsetZ());
+                    long adjPosLong = BlockPos.offset(posLong, side);
 
-                    if (positions.contains(posMutable) == false)
+                    if (positions.contains(adjPosLong) == false)
                     {
                         boolean render = full;
 
                         if (full == false)
                         {
-                            boolean onOrIn = this.isPositionOnOrInsideRing(posMutable.getX(), posMutable.getY(), posMutable.getZ(), side, mainAxis);
+                            int adjX = BlockPos.unpackLongX(adjPosLong);
+                            int adjY = BlockPos.unpackLongY(adjPosLong);
+                            int adjZ = BlockPos.unpackLongZ(adjPosLong);
+                            boolean onOrIn = test.isInsideOrCloserThan(adjX, adjY, adjZ, side);
                             render = ((outer && onOrIn == false) || (inner && onOrIn));
                         }
 
                         if (render)
                         {
-                            drawBlockSpaceSideBatchedQuads(pos, side, color, 0, cameraPos, BUFFER_1);
+                            drawBlockSpaceSideBatchedQuads(posLong, side, color, expand, cameraPos, BUFFER_1);
                         }
                     }
                 }
@@ -273,259 +282,28 @@ public abstract class ShapeCircleBase extends ShapeBase
         }
     }
 
-    protected void addPositionsOnHorizontalRing(HashSet<BlockPos> positions, BlockPos.Mutable posMutable, Direction direction)
-    {
-        if (this.movePositionToRing(posMutable, direction, Direction.UP))
-        {
-            BlockPos posFirst = posMutable.toImmutable();
-            positions.add(posFirst);
-            double r = this.radius;
-            int failsafe = (int) (2.5 * Math.PI * r); // a bit over the circumference
-
-            while (--failsafe > 0)
-            {
-                direction = this.getNextPositionOnHorizontalRing(posMutable, direction);
-
-                if (direction == null || posMutable.equals(posFirst))
-                {
-                    break;
-                }
-
-                positions.add(posMutable.toImmutable());
-            }
-        }
-    }
-
-    protected void addPositionsOnVerticalRing(HashSet<BlockPos> positions, BlockPos.Mutable posMutable, Direction mainAxis)
-    {
-        Direction direction = Direction.UP;
-
-        if (this.movePositionToRing(posMutable, direction, mainAxis))
-        {
-            BlockPos posFirst = posMutable.toImmutable();
-            positions.add(posFirst);
-            double r = this.radius;
-            int failsafe = (int) (2.5 * Math.PI * r); // a bit over the circumference
-
-            while (--failsafe > 0)
-            {
-                direction = this.getNextPositionOnVerticalRing(posMutable, direction, mainAxis);
-
-                if (direction == null || posMutable.equals(posFirst))
-                {
-                    break;
-                }
-
-                positions.add(posMutable.toImmutable());
-            }
-        }
-    }
-
-    protected boolean movePositionToRing(BlockPos.Mutable posMutable, Direction dir, Direction mainAxis)
-    {
-        int x = posMutable.getX();
-        int y = posMutable.getY();
-        int z = posMutable.getZ();
-        int xNext = x;
-        int yNext = y;
-        int zNext = z;
-        int failsafe = 0;
-        final int failsafeMax = (int) this.radius + 5;
-
-        while (this.isPositionOnOrInsideRing(xNext, yNext, zNext, dir, mainAxis) && ++failsafe < failsafeMax)
-        {
-            x = xNext;
-            y = yNext;
-            z = zNext;
-            xNext += dir.getOffsetX();
-            yNext += dir.getOffsetY();
-            zNext += dir.getOffsetZ();
-        }
-
-        // Successfully entered the loop at least once
-        if (failsafe > 0)
-        {
-            posMutable.set(x, y, z);
-            return true;
-        }
-
-        return false;
-    }
-
-    @Nullable
-    protected Direction getNextPositionOnHorizontalRing(BlockPos.Mutable posMutable, Direction dir)
-    {
-        Direction dirOut = dir;
-        Direction ccw90 = getNextDirRotating(dir);
-        final int y = posMutable.getY();
-
-        for (int i = 0; i < 4; ++i)
-        {
-            int x = posMutable.getX() + dir.getOffsetX();
-            int z = posMutable.getZ() + dir.getOffsetZ();
-
-            // First check the adjacent position
-            if (this.isPositionOnOrInsideRing(x, y, z, dir, Direction.UP))
-            {
-                posMutable.set(x, y, z);
-                return dirOut;
-            }
-
-            // Then check the diagonal position
-            x += ccw90.getOffsetX();
-            z += ccw90.getOffsetZ();
-
-            if (this.isPositionOnOrInsideRing(x, y, z, dir, Direction.UP))
-            {
-                posMutable.set(x, y, z);
-                return dirOut;
-            }
-
-            // Delay the next direction by one cycle, so that it won't get updated too soon on the diagonals
-            dirOut = dir;
-            dir = getNextDirRotating(dir);
-            ccw90 = getNextDirRotating(dir);
-        }
-
-        return null;
-    }
-
-    @Nullable
-    protected Direction getNextPositionOnVerticalRing(BlockPos.Mutable posMutable, Direction dir, Direction mainAxis)
-    {
-        Direction dirOut = dir;
-        Direction ccw90 = getNextDirRotatingVertical(dir, mainAxis);
-
-        for (int i = 0; i < 4; ++i)
-        {
-            int x = posMutable.getX() + dir.getOffsetX();
-            int y = posMutable.getY() + dir.getOffsetY();
-            int z = posMutable.getZ() + dir.getOffsetZ();
-
-            // First check the adjacent position
-            if (this.isPositionOnOrInsideRing(x, y, z, dir, mainAxis))
-            {
-                posMutable.set(x, y, z);
-                return dirOut;
-            }
-
-            // Then check the diagonal position
-            x += ccw90.getOffsetX();
-            y += ccw90.getOffsetY();
-            z += ccw90.getOffsetZ();
-
-            if (this.isPositionOnOrInsideRing(x, y, z, dir, mainAxis))
-            {
-                posMutable.set(x, y, z);
-                return dirOut;
-            }
-
-            // Delay the next direction by one cycle, so that it won't get updated too soon on the diagonals
-            dirOut = dir;
-            dir = getNextDirRotatingVertical(dir, mainAxis);
-            ccw90 = getNextDirRotatingVertical(dir, mainAxis);
-        }
-
-        return null;
-    }
-
-    protected boolean isPositionOnOrInsideRing(int blockX, int blockY, int blockZ, Direction outSide, Direction mainAxis)
-    {
-        double x = (double) blockX + 0.5;
-        double y = (double) blockY + 0.5;
-        double z = (double) blockZ + 0.5;
-        double dist = this.effectiveCenter.squaredDistanceTo(x, y, z);
-        double diff = this.radiusSq - dist;
-
-        if (diff > 0)
-        {
-            return true;
-        }
-
-        double xAdj = (double) blockX + outSide.getOffsetX() + 0.5;
-        double yAdj = (double) blockY + outSide.getOffsetY() + 0.5;
-        double zAdj = (double) blockZ + outSide.getOffsetZ() + 0.5;
-        double distAdj = this.effectiveCenter.squaredDistanceTo(xAdj, yAdj, zAdj);
-        double diffAdj = this.radiusSq - distAdj;
-
-        return diffAdj > 0 && Math.abs(diff) < Math.abs(diffAdj);
-    }
-
-    protected boolean isAdjacentPositionOutside(BlockPos pos, Direction dir, Direction mainAxis)
-    {
-        return this.isPositionOnOrInsideRing(pos.getX() + dir.getOffsetX(), pos.getY() + dir.getOffsetY(), pos.getZ() + dir.getOffsetZ(), dir, mainAxis) == false;
-    }
-
-    /**
-     * Returns the next horizontal direction in sequence, rotating counter-clockwise
-     */
-    protected static Direction getNextDirRotating(Direction dirIn)
-    {
-        switch (dirIn)
-        {
-            case NORTH: return Direction.WEST;
-            case SOUTH: return Direction.EAST;
-            case WEST:  return Direction.SOUTH;
-            case EAST:
-            default:    return Direction.NORTH;
-        }
-    }
-
-    /**
-     * Returns the next direction in sequence, rotating up to north
-     */
-    protected static Direction getNextDirRotatingVertical(Direction dirIn, Direction mainAxis)
-    {
-        switch (mainAxis)
-        {
-            case UP:
-            case DOWN:
-                switch (dirIn)
-                {
-                    case NORTH: return Direction.DOWN;
-                    case SOUTH: return Direction.UP;
-                    case DOWN:  return Direction.SOUTH;
-                    case UP:
-                    default:    return Direction.NORTH;
-                }
-
-            case NORTH:
-            case SOUTH:
-                switch (dirIn)
-                {
-                    case WEST:  return Direction.UP;
-                    case EAST:  return Direction.DOWN;
-                    case DOWN:  return Direction.WEST;
-                    case UP:
-                    default:    return Direction.EAST;
-                }
-
-            case WEST:
-            case EAST:
-                switch (dirIn)
-                {
-                    case NORTH: return Direction.UP;
-                    case SOUTH: return Direction.DOWN;
-                    case DOWN:  return Direction.NORTH;
-                    case UP:
-                    default:    return Direction.SOUTH;
-                }
-        }
-
-        return Direction.UP;
-    }
-
     /**
      * Assumes a BufferBuilder in GL_QUADS mode has been initialized
      */
-    public static void drawBlockSpaceSideBatchedQuads(BlockPos pos, Direction side, Color4f color, double expand, Vec3d cameraPos, BufferBuilder buffer)
+    public static void drawBlockSpaceSideBatchedQuads(long posLong,
+                                                      Direction side,
+                                                      Color4f color,
+                                                      double expand,
+                                                      Vec3d cameraPos,
+                                                      BufferBuilder buffer)
     {
-        double minX = pos.getX() - expand - cameraPos.x;
-        double minY = pos.getY() - expand - cameraPos.y;
-        double minZ = pos.getZ() - expand - cameraPos.z;
-        double maxX = pos.getX() + expand + 1 - cameraPos.x;
-        double maxY = pos.getY() + expand + 1 - cameraPos.y;
-        double maxZ = pos.getZ() + expand + 1 - cameraPos.z;
+        int x = BlockPos.unpackLongX(posLong);
+        int y = BlockPos.unpackLongY(posLong);
+        int z = BlockPos.unpackLongZ(posLong);
+        double offsetX = x - cameraPos.x;
+        double offsetY = y - cameraPos.y;
+        double offsetZ = z - cameraPos.z;
+        double minX = offsetX - expand;
+        double minY = offsetY - expand;
+        double minZ = offsetZ - expand;
+        double maxX = offsetX + expand + 1;
+        double maxY = offsetY + expand + 1;
+        double maxZ = offsetZ + expand + 1;
 
         switch (side)
         {

@@ -11,6 +11,7 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.Quadrant;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.util.shape.SphereUtils;
 
 public class ShapeSpawnSphere extends ShapeSphereBlocky
 {
@@ -99,7 +100,12 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
     }
 
     @Override
-    protected boolean isPositionOnOrInsideRing(int x, int y, int z, Direction outSide, Direction mainAxis)
+    protected SphereUtils.RingPositionTest getPositionTest()
+    {
+        return this::isPositionOnOrInsideRing;
+    }
+
+    protected boolean isPositionOnOrInsideRing(int x, int y, int z, Direction outSide)
     {
         final double maxDistSq = this.radiusSq;
         Vec3d quadrantCenter = this.quadrantCenters[Quadrant.getQuadrant(x, z, this.effectiveCenter).ordinal()];
@@ -107,6 +113,7 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
         double dy = y + 1;
         double dz = z + 0.5;
 
-        return quadrantCenter.squaredDistanceTo(dx, dy, dz) < maxDistSq || this.effectiveCenter.squaredDistanceTo(dx, dy, dz) < maxDistSq;
+        return quadrantCenter.squaredDistanceTo(dx, dy, dz) < maxDistSq ||
+               this.effectiveCenter.squaredDistanceTo(dx, dy, dz) < maxDistSq;
     }
 }

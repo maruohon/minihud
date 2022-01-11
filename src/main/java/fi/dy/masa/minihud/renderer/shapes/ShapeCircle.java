@@ -1,6 +1,5 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
-import java.util.HashSet;
 import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -13,10 +12,13 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.RenderObjectBase;
 import fi.dy.masa.minihud.util.ShapeRenderType;
+import fi.dy.masa.minihud.util.shape.SphereUtils;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public class ShapeCircle extends ShapeCircleBase
 {
@@ -51,74 +53,79 @@ public class ShapeCircle extends ShapeCircleBase
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
 
         BlockPos posCenter = this.getCenterBlock();
-        BlockPos.Mutable posMutable = new BlockPos.Mutable();
-        HashSet<BlockPos> circlePositions = new HashSet<>();
+        SphereUtils.RingPositionTest test = this::isPositionOnOrInsideRing;
+        BlockPos.Mutable mutablePos = new BlockPos.Mutable();
+        LongOpenHashSet positions = new LongOpenHashSet();
 
         Direction.Axis axis = this.mainAxis.getAxis();
 
         for (int i = 0; i < this.height; ++i)
         {
-            posMutable.set(posCenter.getX() + this.mainAxis.getOffsetX() * i,
+            mutablePos.set(posCenter.getX() + this.mainAxis.getOffsetX() * i,
                            posCenter.getY() + this.mainAxis.getOffsetY() * i,
                            posCenter.getZ() + this.mainAxis.getOffsetZ() * i);
 
             if (axis == Direction.Axis.Y)
             {
-                this.addPositionsOnHorizontalRing(circlePositions, posMutable, Direction.NORTH);
+                SphereUtils.addPositionsOnHorizontalBlockRing(positions, mutablePos, test, this.radius);
             }
             else
             {
-                this.addPositionsOnVerticalRing(circlePositions, posMutable, this.mainAxis);
+                SphereUtils.addPositionsOnVerticalBlockRing(positions, mutablePos, this.mainAxis, test, this.radius);
             }
         }
 
-        Direction mainAxis = this.mainAxis;
-        Direction[] sides = FACING_ALL;
+        Direction[] sides = this.getSides();
 
-        // Exclude the two sides on the main axis
-        if (this.renderType != ShapeRenderType.FULL_BLOCK)
-        {
-            sides = new Direction[4];
-
-            for (int i = 0, index = 0; i < 6; ++i)
-            {
-                Direction side = FACING_ALL[i];
-
-                if (side.getAxis() != mainAxis.getAxis())
-                {
-                    sides[index++] = side;
-                }
-            }
-        }
-
-        this.renderPositions(circlePositions, sides, mainAxis, this.color, cameraPos);
+        this.renderPositions(positions, sides, test, this.color, 0, cameraPos);
 
         BUFFER_1.end();
 
         renderQuads.uploadData(BUFFER_1);
     }
 
-    @Override
-    protected boolean isPositionOnOrInsideRing(int blockX, int blockY, int blockZ, Direction outSide, Direction mainAxis)
+    protected Direction[] getSides()
     {
-        Direction.Axis axis = mainAxis.getAxis();
+        Direction[] sides = PositionUtils.ALL_DIRECTIONS;
+
+        // Exclude the two sides on the main axis
+        if (this.renderType != ShapeRenderType.FULL_BLOCK)
+        {
+            sides = new Direction[4];
+            int index = 0;
+
+            for (Direction side : PositionUtils.ALL_DIRECTIONS)
+            {
+                if (side.getAxis() != this.mainAxis.getAxis())
+                {
+                    sides[index++] = side;
+                }
+            }
+        }
+
+        return sides;
+    }
+
+    protected boolean isPositionOnOrInsideRing(int blockX, int blockY, int blockZ, Direction outSide)
+    {
+        Direction.Axis axis = this.mainAxis.getAxis();
 
         double x = axis == Direction.Axis.X ? this.effectiveCenter.x : (double) blockX + 0.5;
         double y = axis == Direction.Axis.Y ? this.effectiveCenter.y : (double) blockY + 0.5;
         double z = axis == Direction.Axis.Z ? this.effectiveCenter.z : (double) blockZ + 0.5;
-        double dist = this.effectiveCenter.squaredDistanceTo(x, y, z);
-        double diff = this.radiusSq - dist;
+        double distSq = this.effectiveCenter.squaredDistanceTo(x, y, z);
+        double diff = this.radiusSq - distSq;
 
         if (diff > 0)
         {
             return true;
         }
 
-        double xAdj = axis == Direction.Axis.X ? this.effectiveCenter.x : (double) blockX + outSide.getOffsetX() + 0.5;
-        double yAdj = axis == Direction.Axis.Y ? this.effectiveCenter.y : (double) blockY + outSide.getOffsetY() + 0.5;
-        double zAdj = axis == Direction.Axis.Z ? this.effectiveCenter.z : (double) blockZ + outSide.getOffsetZ() + 0.5;
-        double distAdj = this.effectiveCenter.squaredDistanceTo(xAdj, yAdj, zAdj);
-        double diffAdj = this.radiusSq - distAdj;
+        double xAdj = x + outSide.getOffsetX();
+        double yAdj = y + outSide.getOffsetY();
+        double zAdj = z + outSide.getOffsetZ();
+        double distAdjSq = this.effectiveCenter.squaredDistanceTo(xAdj, yAdj, zAdj);
+        double diffAdj = this.radiusSq - distAdjSq;
 
         return diffAdj > 0 && Math.abs(diff) < Math.abs(diffAdj);
     }
