@@ -1,11 +1,11 @@
 package fi.dy.masa.minihud.util.shape;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public class SphereUtils
 {
@@ -46,17 +46,17 @@ public class SphereUtils
         return false;
     }
 
-    public static void addPositionsOnHorizontalBlockRing(LongOpenHashSet positions,
+    public static void addPositionsOnHorizontalBlockRing(Consumer<BlockPos.Mutable> positionConsumer,
                                                          BlockPos.Mutable mutablePos,
                                                          RingPositionTest test,
                                                          double radius)
     {
         Function<Direction, Direction> nextDirectionFunction = SphereUtils::getNextHorizontalDirection;
         Direction startDirection = Direction.EAST;
-        addPositionsOnBlockRing(positions, mutablePos, startDirection, test, nextDirectionFunction, radius);
+        addPositionsOnBlockRing(positionConsumer, mutablePos, startDirection, test, nextDirectionFunction, radius);
     }
 
-    public static void addPositionsOnVerticalBlockRing(LongOpenHashSet positions,
+    public static void addPositionsOnVerticalBlockRing(Consumer<BlockPos.Mutable> positionConsumer,
                                                        BlockPos.Mutable mutablePos,
                                                        Direction mainAxis,
                                                        RingPositionTest test,
@@ -64,10 +64,10 @@ public class SphereUtils
     {
         Function<Direction, Direction> nextDirectionFunction = (dir) -> SphereUtils.getNextVerticalRingDirection(dir, mainAxis);
         Direction startDirection = Direction.UP;
-        addPositionsOnBlockRing(positions, mutablePos, startDirection, test, nextDirectionFunction, radius);
+        addPositionsOnBlockRing(positionConsumer, mutablePos, startDirection, test, nextDirectionFunction, radius);
     }
 
-    public static void addPositionsOnBlockRing(LongOpenHashSet positions,
+    public static void addPositionsOnBlockRing(Consumer<BlockPos.Mutable> positionConsumer,
                                                BlockPos.Mutable mutablePos,
                                                Direction startDirection,
                                                RingPositionTest test,
@@ -80,7 +80,7 @@ public class SphereUtils
             Direction direction = startDirection;
             int failsafe = (int) (2.5 * Math.PI * radius); // a bit over the circumference
 
-            positions.add(firstPos.asLong());
+            positionConsumer.accept(mutablePos);
 
             while (--failsafe > 0)
             {
@@ -91,7 +91,7 @@ public class SphereUtils
                     break;
                 }
 
-                positions.add(mutablePos.asLong());
+                positionConsumer.accept(mutablePos);
             }
         }
     }

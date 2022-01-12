@@ -1,6 +1,7 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
 import java.util.List;
+import java.util.function.Consumer;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.MinecraftClient;
@@ -43,7 +44,7 @@ public class ShapeCircle extends ShapeCircleBase
 
     public void setHeight(int height)
     {
-        this.height = MathHelper.clamp(height, 1, 260);
+        this.height = MathHelper.clamp(height, 1, 8192);
         this.setNeedsUpdate();
     }
 
@@ -56,6 +57,7 @@ public class ShapeCircle extends ShapeCircleBase
         SphereUtils.RingPositionTest test = this::isPositionOnOrInsideRing;
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();
         LongOpenHashSet positions = new LongOpenHashSet();
+        Consumer<BlockPos.Mutable> positionConsumer = this.getPositionCollector(positions);
 
         Direction.Axis axis = this.mainAxis.getAxis();
 
@@ -67,11 +69,11 @@ public class ShapeCircle extends ShapeCircleBase
 
             if (axis == Direction.Axis.Y)
             {
-                SphereUtils.addPositionsOnHorizontalBlockRing(positions, mutablePos, test, this.radius);
+                SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test, this.radius);
             }
             else
             {
-                SphereUtils.addPositionsOnVerticalBlockRing(positions, mutablePos, this.mainAxis, test, this.radius);
+                SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, this.mainAxis, test, this.radius);
             }
         }
 
