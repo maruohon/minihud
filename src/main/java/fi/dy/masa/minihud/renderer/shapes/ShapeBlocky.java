@@ -5,17 +5,23 @@ import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public abstract class ShapeBlocky extends ShapeBase
 {
+    protected Box renderPerimeter = ShapeBox.EMPTY_BOX;
     private boolean combineQuads;
 
     public ShapeBlocky(ShapeType type, Color4f color)
@@ -33,6 +39,19 @@ public abstract class ShapeBlocky extends ShapeBase
         this.combineQuads = ! this.combineQuads;
         this.setNeedsUpdate();
         return this.combineQuads;
+    }
+
+    protected void setRenderPerimeter(Vec3d center, double range)
+    {
+        this.renderPerimeter = new Box(center.x - range, center.y - range, center.z - range,
+                                       center.x + range, center.y + range, center.z + range);
+    }
+
+    @Override
+    public boolean shouldRender(MinecraftClient mc)
+    {
+        Entity entity = EntityUtils.getCameraEntity();
+        return super.shouldRender(mc) && entity != null && this.renderPerimeter.contains(entity.getPos());
     }
 
     @Override
