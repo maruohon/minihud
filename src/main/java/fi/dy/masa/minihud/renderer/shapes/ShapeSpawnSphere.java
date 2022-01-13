@@ -16,12 +16,11 @@ import fi.dy.masa.minihud.util.shape.SphereUtils;
 public class ShapeSpawnSphere extends ShapeSphereBlocky
 {
     protected Vec3d[] quadrantCenters;
-    protected double margin = 1.5;
+    protected double margin = 0.0;
 
     public ShapeSpawnSphere()
     {
         this(ShapeType.ADJUSTABLE_SPAWN_SPHERE, Configs.Colors.SHAPE_DESPAWN_SPHERE.getColor(), 24.0);
-        this.margin = 0.0;
     }
 
     public ShapeSpawnSphere(ShapeType shape, Color4f color, double radius)
@@ -96,7 +95,7 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
     {
         super.fromJson(obj);
 
-        this.margin = JsonUtils.getDouble(obj, "margin");
+        this.setMargin(JsonUtils.getDouble(obj, "margin"));
     }
 
     @Override

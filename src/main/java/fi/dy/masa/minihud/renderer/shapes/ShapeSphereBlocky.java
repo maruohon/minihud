@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
+import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
@@ -8,7 +9,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.RenderObjectBase;
 import fi.dy.masa.minihud.util.shape.SphereUtils;
@@ -50,8 +50,12 @@ public class ShapeSphereBlocky extends ShapeCircleBase
         this.collectSpherePositions(positions, test);
         //System.out.printf("time: %.6f s - margin: %.4f\n", (double) (System.nanoTime() - before) / 1000000000D, this.margin);
         //System.out.printf("spherePositions: %d\n", spherePositions.size());
+        //this.renderPositions(positions, PositionUtils.ALL_DIRECTIONS, test, this.color, 0, cameraPos);
 
-        this.renderPositions(positions, PositionUtils.ALL_DIRECTIONS, test, this.color, 0, cameraPos);
+        List<SphereUtils.SideQuad> quads = SphereUtils.buildSphereShellToQuads(positions, this.mainAxis.getAxis(),
+                                                                               test, this.renderType, this.layerRange);
+        this.renderQuads(quads, this.color, 0, cameraPos);
+        //this.renderQuads(quads, this.color, 0, cameraPos.add(32, 0, 0));
         //System.out.printf("rendered: %d\n", r);
 
         BUFFER_1.end();

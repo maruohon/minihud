@@ -50,16 +50,14 @@ public class ShapeCircle extends ShapeCircleBase
 
     protected void renderCircleShape(Vec3d cameraPos)
     {
-        RenderObjectBase renderQuads = this.renderObjects.get(0);
-        BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
-
-        BlockPos posCenter = this.getCenterBlock();
-        SphereUtils.RingPositionTest test = this::isPositionOnOrInsideRing;
-        BlockPos.Mutable mutablePos = new BlockPos.Mutable();
         LongOpenHashSet positions = new LongOpenHashSet();
         Consumer<BlockPos.Mutable> positionConsumer = this.getPositionCollector(positions);
-
+        SphereUtils.RingPositionTest test = this::isPositionOnOrInsideRing;
+        BlockPos.Mutable mutablePos = new BlockPos.Mutable();
+        Vec3d effectiveCenter = this.effectiveCenter;
         Direction.Axis axis = this.mainAxis.getAxis();
+        /*
+        BlockPos posCenter = new BlockPos(effectiveCenter);
 
         for (int i = 0; i < this.height; ++i)
         {
@@ -76,36 +74,41 @@ public class ShapeCircle extends ShapeCircleBase
                 SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, this.mainAxis, test, this.radius);
             }
         }
+        */
 
-        Direction[] sides = this.getSides();
+        mutablePos.set(effectiveCenter.x, effectiveCenter.y, effectiveCenter.z);
 
-        this.renderPositions(positions, sides, test, this.color, 0, cameraPos);
+        if (axis == Direction.Axis.Y)
+        {
+            SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test, this.radius);
+        }
+        else
+        {
+            SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, this.mainAxis, test, this.radius);
+        }
+
+        RenderObjectBase renderQuads = this.renderObjects.get(0);
+        BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
+
+        //Direction[] sides = this.getSides();
+        //this.renderPositions(positions, sides, test, this.color, 0, cameraPos);
+        List<SphereUtils.SideQuad> quads = SphereUtils.buildSphereShellToQuads(positions, axis, test,
+                                                                               this.renderType, this.layerRange);
+        this.renderQuads(quads, this.color, 0, cameraPos);
 
         BUFFER_1.end();
-
         renderQuads.uploadData(BUFFER_1);
     }
 
     protected Direction[] getSides()
     {
-        Direction[] sides = PositionUtils.ALL_DIRECTIONS;
-
         // Exclude the two sides on the main axis
         if (this.renderType != ShapeRenderType.FULL_BLOCK)
         {
-            sides = new Direction[4];
-            int index = 0;
-
-            for (Direction side : PositionUtils.ALL_DIRECTIONS)
-            {
-                if (side.getAxis() != this.mainAxis.getAxis())
-                {
-                    sides[index++] = side;
-                }
-            }
+            return SphereUtils.getDirectionsNotOnAxis(this.mainAxis.getAxis());
         }
 
-        return sides;
+        return PositionUtils.ALL_DIRECTIONS;
     }
 
     protected boolean isPositionOnOrInsideRing(int blockX, int blockY, int blockZ, Direction outSide)

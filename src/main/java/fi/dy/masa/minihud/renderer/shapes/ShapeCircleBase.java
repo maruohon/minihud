@@ -24,6 +24,7 @@ import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.minihud.renderer.RenderUtils;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 import fi.dy.masa.minihud.util.shape.SphereUtils;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
@@ -242,7 +243,7 @@ public abstract class ShapeCircleBase extends ShapeBase
     protected Consumer<BlockPos.Mutable> getPositionCollector(LongOpenHashSet positionsOut)
     {
         World world = MinecraftClient.getInstance().world;
-        IntBoundingBox box = this.layerRange.getExpandedBox(world, 1);
+        IntBoundingBox box = this.layerRange.getExpandedBox(world, 0);
 
         Consumer<BlockPos.Mutable> positionCollector = (pos) -> {
             if (box.containsPos(pos))
@@ -265,6 +266,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         boolean outer = this.renderType == ShapeRenderType.OUTER_EDGE;
         boolean inner = this.renderType == ShapeRenderType.INNER_EDGE;
         LayerRange range = this.layerRange;
+        //int count = 0;
 
         for (long posLong : positions)
         {
@@ -294,22 +296,31 @@ public abstract class ShapeCircleBase extends ShapeBase
                         if (render)
                         {
                             drawBlockSpaceSideBatchedQuads(posLong, side, color, expand, cameraPos, BUFFER_1);
+                            //++count;
                         }
                     }
                 }
             }
         }
+        //System.out.printf("individual: rendered %d quads\n", count);
+    }
+
+    protected void renderQuads(List<SphereUtils.SideQuad> quads, Color4f color, double expand, Vec3d cameraPos)
+    {
+        for (SphereUtils.SideQuad quad : quads)
+        {
+            RenderUtils.renderInsetQuad(quad.startPos(), quad.width(), quad.height(), quad.side(),
+                                        -expand, color, cameraPos, BUFFER_1);
+        }
+        //System.out.printf("merged: rendered %d quads\n", quads.size());
     }
 
     /**
      * Assumes a BufferBuilder in GL_QUADS mode has been initialized
      */
-    public static void drawBlockSpaceSideBatchedQuads(long posLong,
-                                                      Direction side,
-                                                      Color4f color,
-                                                      double expand,
-                                                      Vec3d cameraPos,
-                                                      BufferBuilder buffer)
+    public static void drawBlockSpaceSideBatchedQuads(long posLong, Direction side,
+                                                      Color4f color, double expand,
+                                                      Vec3d cameraPos, BufferBuilder buffer)
     {
         int x = BlockPos.unpackLongX(posLong);
         int y = BlockPos.unpackLongY(posLong);

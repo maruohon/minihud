@@ -135,19 +135,28 @@ public class RenderUtils
         }
     }
 
-
-    public static void renderInsetQuad(Vec3i minPos,
-                                       int width,
-                                       int height,
-                                       Direction side,
-                                       double inset,
-                                       Color4f color,
-                                       Vec3d cameraPos,
-                                       BufferBuilder buffer)
+    public static void renderInsetQuad(Vec3i minPos, int width, int height, Direction side,
+                                       double inset, Color4f color, Vec3d cameraPos, BufferBuilder buffer)
     {
-        double minX = minPos.getX() - cameraPos.x;
-        double minY = minPos.getY() - cameraPos.y;
-        double minZ = minPos.getZ() - cameraPos.z;
+        renderInsetQuad(minPos.getX(), minPos.getY(), minPos.getZ(), width, height, side, inset, color, cameraPos, buffer);
+    }
+
+    public static void renderInsetQuad(long minPos, int width, int height, Direction side,
+                                       double inset, Color4f color, Vec3d cameraPos, BufferBuilder buffer)
+    {
+        int x = BlockPos.unpackLongX(minPos);
+        int y = BlockPos.unpackLongY(minPos);
+        int z = BlockPos.unpackLongZ(minPos);
+
+        renderInsetQuad(x, y, z, width, height, side, inset, color, cameraPos, buffer);
+    }
+
+    public static void renderInsetQuad(int x, int y, int z, int width, int height, Direction side,
+                                       double inset, Color4f color, Vec3d cameraPos, BufferBuilder buffer)
+    {
+        double minX = x - cameraPos.x;
+        double minY = y - cameraPos.y;
+        double minZ = z - cameraPos.z;
         double maxX = minX;
         double maxY = minY;
         double maxZ = minZ;
