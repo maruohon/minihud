@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
+import java.util.List;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.entity.Entity;
@@ -9,6 +10,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.minihud.renderer.shapes.SideQuad;
+import fi.dy.masa.minihud.util.ShapeRenderType;
+import fi.dy.masa.minihud.util.shape.SphereUtils;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public class RenderUtils
 {
@@ -133,6 +139,137 @@ public class RenderUtils
                 }
             }
         }
+    }
+
+
+    /**
+     * Assumes a BufferBuilder in GL_QUADS mode has been initialized
+     */
+    public static void drawBlockSpaceSideBatchedQuads(long posLong, Direction side,
+                                                      Color4f color, double expand,
+                                                      Vec3d cameraPos, BufferBuilder buffer)
+    {
+        int x = BlockPos.unpackLongX(posLong);
+        int y = BlockPos.unpackLongY(posLong);
+        int z = BlockPos.unpackLongZ(posLong);
+        double offsetX = x - cameraPos.x;
+        double offsetY = y - cameraPos.y;
+        double offsetZ = z - cameraPos.z;
+        double minX = offsetX - expand;
+        double minY = offsetY - expand;
+        double minZ = offsetZ - expand;
+        double maxX = offsetX + expand + 1;
+        double maxY = offsetY + expand + 1;
+        double maxZ = offsetZ + expand + 1;
+
+        switch (side)
+        {
+            case DOWN:
+                buffer.vertex(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
+                break;
+
+            case UP:
+                buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
+                break;
+
+            case NORTH:
+                buffer.vertex(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
+                break;
+
+            case SOUTH:
+                buffer.vertex(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                break;
+
+            case WEST:
+                buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
+                break;
+
+            case EAST:
+                buffer.vertex(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
+                buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
+                break;
+        }
+    }
+
+
+    public static void renderCircleBlockPositions(LongOpenHashSet positions,
+                                                  Direction[] sides,
+                                                  SphereUtils.RingPositionTest test,
+                                                  ShapeRenderType renderType,
+                                                  LayerRange range,
+                                                  Color4f color,
+                                                  double expand,
+                                                  Vec3d cameraPos,
+                                                  BufferBuilder buffer)
+    {
+        boolean full = renderType == ShapeRenderType.FULL_BLOCK;
+        boolean outer = renderType == ShapeRenderType.OUTER_EDGE;
+        boolean inner = renderType == ShapeRenderType.INNER_EDGE;
+        //int count = 0;
+
+        for (long posLong : positions)
+        {
+            if (range.isPositionWithinRange(posLong) == false)
+            {
+                continue;
+            }
+
+            for (Direction side : sides)
+            {
+                long adjPosLong = BlockPos.offset(posLong, side);
+
+                if (positions.contains(adjPosLong))
+                {
+                    continue;
+                }
+
+                boolean render = full;
+
+                if (full == false)
+                {
+                    int adjX = BlockPos.unpackLongX(adjPosLong);
+                    int adjY = BlockPos.unpackLongY(adjPosLong);
+                    int adjZ = BlockPos.unpackLongZ(adjPosLong);
+                    boolean onOrIn = test.isInsideOrCloserThan(adjX, adjY, adjZ, side);
+                    render = ((outer && onOrIn == false) || (inner && onOrIn));
+                }
+
+                if (render)
+                {
+                    RenderUtils.drawBlockSpaceSideBatchedQuads(posLong, side, color, expand, cameraPos, buffer);
+                    //++count;
+                }
+            }
+        }
+        //System.out.printf("individual: rendered %d quads\n", count);
+    }
+
+    public static void renderQuads(List<SideQuad> quads, Color4f color, double expand,
+                                   Vec3d cameraPos, BufferBuilder buffer)
+    {
+        for (SideQuad quad : quads)
+        {
+            RenderUtils.renderInsetQuad(quad.startPos(), quad.width(), quad.height(), quad.side(),
+                                        -expand, color, cameraPos, buffer);
+        }
+        //System.out.printf("merged: rendered %d quads\n", quads.size());
     }
 
     public static void renderInsetQuad(Vec3i minPos, int width, int height, Direction side,

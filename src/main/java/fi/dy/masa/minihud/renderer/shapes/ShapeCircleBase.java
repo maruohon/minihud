@@ -1,45 +1,28 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
 import java.util.List;
-import java.util.function.Consumer;
-import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.BlockSnap;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.EntityUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.minihud.renderer.RenderUtils;
-import fi.dy.masa.minihud.util.ShapeRenderType;
-import fi.dy.masa.minihud.util.shape.SphereUtils;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
-public abstract class ShapeCircleBase extends ShapeBase
+public abstract class ShapeCircleBase extends ShapeBlocky
 {
     protected BlockSnap snap = BlockSnap.CENTER;
     protected Direction mainAxis = Direction.UP;
-    protected double radius;
-    protected double radiusSq;
-    protected double maxRadius = 256.0; // TODO use per-chunk VBOs or something to allow bigger shapes?
-    protected Vec3d center = Vec3d.ZERO;
-    protected Vec3d effectiveCenter = Vec3d.ZERO;
-    protected Vec3d lastUpdatePos = Vec3d.ZERO;
-    protected long lastUpdateTime;
+    private double radius;
+    private double radiusSq;
+    private double maxRadius = 256.0; // TODO use per-chunk VBOs or something to allow bigger shapes?
+    private Vec3d center = Vec3d.ZERO;
+    private Vec3d effectiveCenter = Vec3d.ZERO;
 
     public ShapeCircleBase(ShapeType type, Color4f color, double radius)
     {
@@ -66,6 +49,11 @@ public abstract class ShapeCircleBase extends ShapeBase
         return this.center;
     }
 
+    public Vec3d getEffectiveCenter()
+    {
+        return this.effectiveCenter;
+    }
+
     public void setCenter(Vec3d center)
     {
         this.center = center;
@@ -75,6 +63,11 @@ public abstract class ShapeCircleBase extends ShapeBase
     public double getRadius()
     {
         return this.radius;
+    }
+
+    public double getSquaredRadius()
+    {
+        return this.radiusSq;
     }
 
     public void setRadius(double radius)
@@ -100,7 +93,7 @@ public abstract class ShapeCircleBase extends ShapeBase
 
     protected BlockPos getCenterBlock()
     {
-        return new BlockPos(this.center);
+        return new BlockPos(this.effectiveCenter);
     }
 
     public BlockSnap getBlockSnap()
@@ -131,37 +124,7 @@ public abstract class ShapeCircleBase extends ShapeBase
             this.effectiveCenter = center;
         }
 
-        this.center = this.effectiveCenter;
-
         this.setNeedsUpdate();
-    }
-
-    protected void onPostUpdate(Vec3d updatePosition)
-    {
-        this.needsUpdate = false;
-        this.lastUpdatePos = updatePosition;
-        this.lastUpdateTime = System.currentTimeMillis();
-    }
-
-    @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(VertexFormat.DrawMode.QUADS);
-    }
-
-    @Override
-    public void draw(MatrixStack matrixStack, Matrix4f projMatrix)
-    {
-        this.preRender();
-
-        this.renderObjects.get(0).draw(matrixStack, projMatrix);
-
-        // Render the lines as quads with glPolygonMode(GL_LINE)
-        RenderSystem.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
-        RenderSystem.disableBlend();
-        this.renderObjects.get(0).draw(matrixStack, projMatrix);
-        RenderSystem.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
-        RenderSystem.enableBlend();
     }
 
     @Override
@@ -169,10 +132,10 @@ public abstract class ShapeCircleBase extends ShapeBase
     {
         JsonObject obj = super.toJson();
 
-        obj.add("center", JsonUtils.vec3dToJson(this.center));
+        obj.add("center", JsonUtils.vec3dToJson(this.getCenter()));
         obj.add("main_axis", new JsonPrimitive(this.mainAxis.name()));
         obj.add("snap", new JsonPrimitive(this.snap.getStringValue()));
-        obj.add("radius", new JsonPrimitive(this.radius));
+        obj.add("radius", new JsonPrimitive(this.getRadius()));
 
         return obj;
     }
@@ -215,7 +178,7 @@ public abstract class ShapeCircleBase extends ShapeBase
     public List<String> getWidgetHoverLines()
     {
         List<String> lines = super.getWidgetHoverLines();
-        Vec3d c = this.center;
+        Vec3d c = this.getCenter();
 
         String aq = GuiBase.TXT_AQUA;
         String bl = GuiBase.TXT_BLUE;
@@ -238,146 +201,5 @@ public abstract class ShapeCircleBase extends ShapeBase
         }
 
         return lines;
-    }
-
-    protected Consumer<BlockPos.Mutable> getPositionCollector(LongOpenHashSet positionsOut)
-    {
-        World world = MinecraftClient.getInstance().world;
-        IntBoundingBox box = this.layerRange.getExpandedBox(world, 0);
-
-        Consumer<BlockPos.Mutable> positionCollector = (pos) -> {
-            if (box.containsPos(pos))
-            {
-                positionsOut.add(pos.asLong());
-            }
-        };
-
-        return positionCollector;
-    }
-
-    protected void renderPositions(LongOpenHashSet positions,
-                                   Direction[] sides,
-                                   SphereUtils.RingPositionTest test,
-                                   Color4f color,
-                                   double expand,
-                                   Vec3d cameraPos)
-    {
-        boolean full = this.renderType == ShapeRenderType.FULL_BLOCK;
-        boolean outer = this.renderType == ShapeRenderType.OUTER_EDGE;
-        boolean inner = this.renderType == ShapeRenderType.INNER_EDGE;
-        LayerRange range = this.layerRange;
-        //int count = 0;
-
-        for (long posLong : positions)
-        {
-            int x = BlockPos.unpackLongX(posLong);
-            int y = BlockPos.unpackLongY(posLong);
-            int z = BlockPos.unpackLongZ(posLong);
-
-            if (range.isPositionWithinRange(x, y, z))
-            {
-                for (Direction side : sides)
-                {
-                    long adjPosLong = BlockPos.offset(posLong, side);
-
-                    if (positions.contains(adjPosLong) == false)
-                    {
-                        boolean render = full;
-
-                        if (full == false)
-                        {
-                            int adjX = BlockPos.unpackLongX(adjPosLong);
-                            int adjY = BlockPos.unpackLongY(adjPosLong);
-                            int adjZ = BlockPos.unpackLongZ(adjPosLong);
-                            boolean onOrIn = test.isInsideOrCloserThan(adjX, adjY, adjZ, side);
-                            render = ((outer && onOrIn == false) || (inner && onOrIn));
-                        }
-
-                        if (render)
-                        {
-                            drawBlockSpaceSideBatchedQuads(posLong, side, color, expand, cameraPos, BUFFER_1);
-                            //++count;
-                        }
-                    }
-                }
-            }
-        }
-        //System.out.printf("individual: rendered %d quads\n", count);
-    }
-
-    protected void renderQuads(List<SphereUtils.SideQuad> quads, Color4f color, double expand, Vec3d cameraPos)
-    {
-        for (SphereUtils.SideQuad quad : quads)
-        {
-            RenderUtils.renderInsetQuad(quad.startPos(), quad.width(), quad.height(), quad.side(),
-                                        -expand, color, cameraPos, BUFFER_1);
-        }
-        //System.out.printf("merged: rendered %d quads\n", quads.size());
-    }
-
-    /**
-     * Assumes a BufferBuilder in GL_QUADS mode has been initialized
-     */
-    public static void drawBlockSpaceSideBatchedQuads(long posLong, Direction side,
-                                                      Color4f color, double expand,
-                                                      Vec3d cameraPos, BufferBuilder buffer)
-    {
-        int x = BlockPos.unpackLongX(posLong);
-        int y = BlockPos.unpackLongY(posLong);
-        int z = BlockPos.unpackLongZ(posLong);
-        double offsetX = x - cameraPos.x;
-        double offsetY = y - cameraPos.y;
-        double offsetZ = z - cameraPos.z;
-        double minX = offsetX - expand;
-        double minY = offsetY - expand;
-        double minZ = offsetZ - expand;
-        double maxX = offsetX + expand + 1;
-        double maxY = offsetY + expand + 1;
-        double maxZ = offsetZ + expand + 1;
-
-        switch (side)
-        {
-            case DOWN:
-                buffer.vertex(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
-                break;
-
-            case UP:
-                buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
-                break;
-
-            case NORTH:
-                buffer.vertex(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
-                break;
-
-            case SOUTH:
-                buffer.vertex(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                break;
-
-            case WEST:
-                buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
-                break;
-
-            case EAST:
-                buffer.vertex(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
-                buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                break;
-        }
     }
 }

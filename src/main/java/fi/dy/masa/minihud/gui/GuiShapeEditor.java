@@ -45,6 +45,7 @@ import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
+import fi.dy.masa.minihud.renderer.shapes.ShapeBlocky;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBox;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircleBase;
@@ -171,15 +172,21 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         x += 11;
         y += 54;
 
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, false, "malilib.gui.button.render_layers_gui.set_to_player");
+        int btnX = x;
+        ButtonGeneric button = new ButtonGeneric(btnX, y, -1, false, "malilib.gui.button.render_layers_gui.set_to_player");
         this.addButton(button, (btn, mbtn) -> this.setPositionFromCamera(shape::setCenter));
+        btnX = button.getX() + button.getWidth() + 4;
 
         this.configBlockSnap.setOptionListValue(shape.getBlockSnap());
         String label = StringUtils.translate("minihud.gui.label.block_snap", shape.getBlockSnap().getDisplayName());
         int width = this.getStringWidth(label) + 10;
-        ConfigButtonOptionList buttonSnap = new ConfigButtonOptionList(x + button.getWidth() + 4, y, width, 20, this.configBlockSnap, label);
-        this.addButton(buttonSnap, new ButtonListenerSphereBlockSnap(shape, this));
 
+        ConfigButtonOptionList buttonSnap = new ConfigButtonOptionList(btnX, y, width, 20, this.configBlockSnap, label);
+        this.addButton(buttonSnap, new ButtonListenerSphereBlockSnap(shape, this));
+        btnX = buttonSnap.getX() + buttonSnap.getWidth() + 4;
+
+        ButtonOnOff combineQuadsButton = new ButtonOnOff(btnX, y, -1, false, "minihud.gui.button.shape_renderer.toggle_combine_quads", ((ShapeBlocky) this.shape).getCombineQuads());
+        this.addButton(combineQuadsButton, (b, mb) -> this.toggleCombineQuads(shape, combineQuadsButton));
         y += 34;
 
         this.createColorInput(x, y);
@@ -244,6 +251,12 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     {
         shape.toggleGridEnabled();
         this.initGui();
+    }
+
+    private void toggleCombineQuads(ShapeBlocky shape, ButtonOnOff button)
+    {
+        shape.toggleCombineQuads();
+        button.updateDisplayString(shape.getCombineQuads());
     }
 
     private void addBoxSideToggleCheckbox(int x, int y, Direction side, ShapeBox shape)

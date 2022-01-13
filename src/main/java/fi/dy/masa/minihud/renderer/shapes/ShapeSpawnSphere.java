@@ -40,7 +40,7 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
 
     private void updateQuadrantPoints()
     {
-        Vec3d center = this.effectiveCenter;
+        Vec3d center = this.getEffectiveCenter();
 
         if (this.quadrantCenters == null)
         {
@@ -106,13 +106,14 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
 
     protected boolean isPositionOnOrInsideRing(int x, int y, int z, Direction outSide)
     {
-        final double maxDistSq = this.radiusSq;
-        Vec3d quadrantCenter = this.quadrantCenters[Quadrant.getQuadrant(x, z, this.effectiveCenter).ordinal()];
+        final double maxDistSq = this.getSquaredRadius();
+        Vec3d effectiveCenter = this.getEffectiveCenter();
+        Vec3d quadrantCenter = this.quadrantCenters[Quadrant.getQuadrant(x, z, effectiveCenter).ordinal()];
         double dx = x + 0.5;
         double dy = y + 1;
         double dz = z + 0.5;
 
         return quadrantCenter.squaredDistanceTo(dx, dy, dz) < maxDistSq ||
-               this.effectiveCenter.squaredDistanceTo(dx, dy, dz) < maxDistSq;
+               effectiveCenter.squaredDistanceTo(dx, dy, dz) < maxDistSq;
     }
 }

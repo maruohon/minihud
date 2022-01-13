@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import com.google.gson.JsonObject;
@@ -17,8 +18,11 @@ import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.RenderObjectBase;
+import fi.dy.masa.minihud.renderer.RenderUtils;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 import fi.dy.masa.minihud.util.shape.SphereUtils;
+import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public class ShapeCircle extends ShapeCircleBase
@@ -33,8 +37,8 @@ public class ShapeCircle extends ShapeCircleBase
     @Override
     public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
-        this.renderCircleShape(cameraPos);
-        this.onPostUpdate(entity.getPos());
+        this.renderCircleShape(cameraPos, 0);
+        this.needsUpdate = false;
     }
 
     public int getHeight()
@@ -48,53 +52,65 @@ public class ShapeCircle extends ShapeCircleBase
         this.setNeedsUpdate();
     }
 
-    protected void renderCircleShape(Vec3d cameraPos)
+    protected void renderCircleShape(Vec3d cameraPos, double expand)
     {
         LongOpenHashSet positions = new LongOpenHashSet();
         Consumer<BlockPos.Mutable> positionConsumer = this.getPositionCollector(positions);
         SphereUtils.RingPositionTest test = this::isPositionOnOrInsideRing;
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();
-        Vec3d effectiveCenter = this.effectiveCenter;
+        Vec3d effectiveCenter = this.getEffectiveCenter();
         Direction.Axis axis = this.mainAxis.getAxis();
-        /*
-        BlockPos posCenter = new BlockPos(effectiveCenter);
-
-        for (int i = 0; i < this.height; ++i)
-        {
-            mutablePos.set(posCenter.getX() + this.mainAxis.getOffsetX() * i,
-                           posCenter.getY() + this.mainAxis.getOffsetY() * i,
-                           posCenter.getZ() + this.mainAxis.getOffsetZ() * i);
-
-            if (axis == Direction.Axis.Y)
-            {
-                SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test, this.radius);
-            }
-            else
-            {
-                SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, this.mainAxis, test, this.radius);
-            }
-        }
-        */
-
-        mutablePos.set(effectiveCenter.x, effectiveCenter.y, effectiveCenter.z);
-
-        if (axis == Direction.Axis.Y)
-        {
-            SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test, this.radius);
-        }
-        else
-        {
-            SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, this.mainAxis, test, this.radius);
-        }
+        double radius = this.getRadius();
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
 
-        //Direction[] sides = this.getSides();
-        //this.renderPositions(positions, sides, test, this.color, 0, cameraPos);
-        List<SphereUtils.SideQuad> quads = SphereUtils.buildSphereShellToQuads(positions, axis, test,
-                                                                               this.renderType, this.layerRange);
-        this.renderQuads(quads, this.color, 0, cameraPos);
+        if (this.getCombineQuads())
+        {
+            mutablePos.set(effectiveCenter.x, effectiveCenter.y, effectiveCenter.z);
+
+            if (axis == Direction.Axis.Y)
+            {
+                SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test, radius);
+            }
+            else
+            {
+                SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, this.mainAxis, test, radius);
+            }
+
+            Long2ObjectOpenHashMap<SideQuad> strips =
+                    SphereUtils.buildSphereShellToStrips(positions, axis, test, this.renderType, this.layerRange);
+            List<SideQuad> quads = buildStripsToQuadsForCircle(strips, this.mainAxis, this.height);
+
+            RenderUtils.renderQuads(quads, this.color, expand, cameraPos, BUFFER_1);
+        }
+        else
+        {
+            BlockPos posCenter = new BlockPos(effectiveCenter);
+            int offX = this.mainAxis.getOffsetX();
+            int offY = this.mainAxis.getOffsetY();
+            int offZ = this.mainAxis.getOffsetZ();
+    
+            for (int i = 0; i < this.height; ++i)
+            {
+                mutablePos.set(posCenter.getX() + offX * i,
+                               posCenter.getY() + offY * i,
+                               posCenter.getZ() + offZ * i);
+    
+                if (axis == Direction.Axis.Y)
+                {
+                    SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test, radius);
+                }
+                else
+                {
+                    SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, this.mainAxis, test, radius);
+                }
+            }
+
+            Direction[] sides = this.getSides();
+            RenderUtils.renderCircleBlockPositions(positions, sides, test, this.renderType, this.layerRange,
+                                                   this.color, expand, cameraPos, BUFFER_1);
+        }
 
         BUFFER_1.end();
         renderQuads.uploadData(BUFFER_1);
@@ -115,11 +131,13 @@ public class ShapeCircle extends ShapeCircleBase
     {
         Direction.Axis axis = this.mainAxis.getAxis();
 
-        double x = axis == Direction.Axis.X ? this.effectiveCenter.x : (double) blockX + 0.5;
-        double y = axis == Direction.Axis.Y ? this.effectiveCenter.y : (double) blockY + 0.5;
-        double z = axis == Direction.Axis.Z ? this.effectiveCenter.z : (double) blockZ + 0.5;
-        double distSq = this.effectiveCenter.squaredDistanceTo(x, y, z);
-        double diff = this.radiusSq - distSq;
+        Vec3d effectiveCenter = this.getEffectiveCenter();
+        double radiusSq = this.getSquaredRadius();
+        double x = axis == Direction.Axis.X ? effectiveCenter.x : (double) blockX + 0.5;
+        double y = axis == Direction.Axis.Y ? effectiveCenter.y : (double) blockY + 0.5;
+        double z = axis == Direction.Axis.Z ? effectiveCenter.z : (double) blockZ + 0.5;
+        double distSq = effectiveCenter.squaredDistanceTo(x, y, z);
+        double diff = radiusSq - distSq;
 
         if (diff > 0)
         {
@@ -129,10 +147,36 @@ public class ShapeCircle extends ShapeCircleBase
         double xAdj = x + outSide.getOffsetX();
         double yAdj = y + outSide.getOffsetY();
         double zAdj = z + outSide.getOffsetZ();
-        double distAdjSq = this.effectiveCenter.squaredDistanceTo(xAdj, yAdj, zAdj);
-        double diffAdj = this.radiusSq - distAdjSq;
+        double distAdjSq = effectiveCenter.squaredDistanceTo(xAdj, yAdj, zAdj);
+        double diffAdj = radiusSq - distAdjSq;
 
         return diffAdj > 0 && Math.abs(diff) < Math.abs(diffAdj);
+    }
+
+    public static List<SideQuad> buildStripsToQuadsForCircle(Long2ObjectOpenHashMap<SideQuad> strips,
+                                                                         Direction mainAxisDirection, int circleHeight)
+    {
+        List<SideQuad> quads = new ArrayList<>();
+        Long2ByteOpenHashMap handledPositions = new Long2ByteOpenHashMap();
+        final Direction.Axis mainAxis = mainAxisDirection.getAxis();
+
+        for (SideQuad strip : strips.values())
+        {
+            final long pos = strip.startPos();
+            final Direction side = strip.side();
+
+            if (SphereUtils.isHandledAndMarkHandled(pos, side, handledPositions))
+            {
+                continue;
+            }
+
+            final long startPos = side == mainAxisDirection ? SphereUtils.offsetPos(pos, mainAxisDirection, circleHeight - 1) : pos;
+            final int height = side.getAxis() != mainAxis ? circleHeight : strip.height();
+
+            quads.add(new SideQuad(startPos, strip.width(), height, side));
+        }
+
+        return quads;
     }
 
     @Override
