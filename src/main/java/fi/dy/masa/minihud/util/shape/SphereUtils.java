@@ -20,10 +20,8 @@ public class SphereUtils
 {
     public static boolean movePositionToRing(BlockPos.Mutable posMutable,
                                              Direction moveDirection,
-                                             double radius,
                                              RingPositionTest test)
     {
-        final int failsafeMax = (int) radius + 2;
         final int incX = moveDirection.getOffsetX();
         final int incY = moveDirection.getOffsetY();
         final int incZ = moveDirection.getOffsetZ();
@@ -33,9 +31,8 @@ public class SphereUtils
         int nextX = x;
         int nextY = y;
         int nextZ = z;
-        int failsafe = 0;
 
-        while (test.isInsideOrCloserThan(nextX, nextY, nextZ, moveDirection) && ++failsafe < failsafeMax)
+        while (test.isInsideOrCloserThan(nextX, nextY, nextZ, moveDirection))
         {
             x = nextX;
             y = nextY;
@@ -46,7 +43,7 @@ public class SphereUtils
         }
 
         // Successfully entered the loop at least once
-        if (failsafe > 0)
+        if (x != nextX || y != nextY | z != nextZ)
         {
             posMutable.set(x, y, z);
             return true;
@@ -57,50 +54,49 @@ public class SphereUtils
 
     public static void addPositionsOnHorizontalBlockRing(Consumer<BlockPos.Mutable> positionConsumer,
                                                          BlockPos.Mutable mutablePos,
-                                                         RingPositionTest test,
-                                                         double radius)
+                                                         RingPositionTest test)
     {
         Function<Direction, Direction> nextDirectionFunction = SphereUtils::getNextHorizontalDirection;
         Direction startDirection = Direction.EAST;
-        addPositionsOnBlockRing(positionConsumer, mutablePos, startDirection, test, nextDirectionFunction, radius);
+        addPositionsOnBlockRing(positionConsumer, mutablePos, startDirection, test, nextDirectionFunction);
     }
 
     public static void addPositionsOnVerticalBlockRing(Consumer<BlockPos.Mutable> positionConsumer,
                                                        BlockPos.Mutable mutablePos,
                                                        Direction mainAxis,
-                                                       RingPositionTest test,
-                                                       double radius)
+                                                       RingPositionTest test)
     {
         Function<Direction, Direction> nextDirectionFunction = (dir) -> SphereUtils.getNextVerticalRingDirection(dir, mainAxis);
         Direction startDirection = Direction.UP;
-        addPositionsOnBlockRing(positionConsumer, mutablePos, startDirection, test, nextDirectionFunction, radius);
+        addPositionsOnBlockRing(positionConsumer, mutablePos, startDirection, test, nextDirectionFunction);
     }
 
     public static void addPositionsOnBlockRing(Consumer<BlockPos.Mutable> positionConsumer,
                                                BlockPos.Mutable mutablePos,
                                                Direction startDirection,
                                                RingPositionTest test,
-                                               Function<Direction, Direction> nextDirectionFunction,
-                                               double radius)
+                                               Function<Direction, Direction> nextDirectionFunction)
     {
-        if (movePositionToRing(mutablePos, startDirection, radius, test))
+        if (movePositionToRing(mutablePos, startDirection, test))
         {
+            LongOpenHashSet seenPositions = new LongOpenHashSet();
             final BlockPos firstPos = mutablePos.toImmutable();
             Direction direction = startDirection;
-            int failsafe = (int) (2.5 * Math.PI * radius); // a bit over the circumference
 
             positionConsumer.accept(mutablePos);
 
-            while (--failsafe > 0)
+            while (true)
             {
                 direction = getNextPositionOnBlockRing(mutablePos, direction, test, nextDirectionFunction);
+                long posLong = mutablePos.asLong();
 
-                if (direction == null || mutablePos.equals(firstPos))
+                if (direction == null || mutablePos.equals(firstPos) || seenPositions.contains(posLong))
                 {
                     break;
                 }
 
                 positionConsumer.accept(mutablePos);
+                seenPositions.add(posLong);
             }
         }
     }

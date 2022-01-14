@@ -36,7 +36,7 @@ public class ShapeCircle extends ShapeCircleBase
     @Override
     public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
-        this.renderCircleShape(cameraPos, 0);
+        this.renderCircleShape(cameraPos);
         this.needsUpdate = false;
     }
 
@@ -51,7 +51,7 @@ public class ShapeCircle extends ShapeCircleBase
         this.setNeedsUpdate();
     }
 
-    protected void renderCircleShape(Vec3d cameraPos, double expand)
+    protected void renderCircleShape(Vec3d cameraPos)
     {
         LongOpenHashSet positions = new LongOpenHashSet();
         Consumer<BlockPos.Mutable> positionConsumer = this.getPositionCollector(positions);
@@ -59,7 +59,7 @@ public class ShapeCircle extends ShapeCircleBase
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();
         Vec3d effectiveCenter = this.getEffectiveCenter();
         Direction.Axis axis = this.mainAxis.getAxis();
-        double radius = this.getRadius();
+        double expand = 0;
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
@@ -70,11 +70,11 @@ public class ShapeCircle extends ShapeCircleBase
 
             if (axis == Direction.Axis.Y)
             {
-                SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test, radius);
+                SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test);
             }
             else
             {
-                SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, this.mainAxis, test, radius);
+                SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, this.mainAxis, test);
             }
 
             Long2ObjectOpenHashMap<SideQuad> strips =
@@ -98,11 +98,11 @@ public class ShapeCircle extends ShapeCircleBase
     
                 if (axis == Direction.Axis.Y)
                 {
-                    SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test, radius);
+                    SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test);
                 }
                 else
                 {
-                    SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, this.mainAxis, test, radius);
+                    SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, this.mainAxis, test);
                 }
             }
 

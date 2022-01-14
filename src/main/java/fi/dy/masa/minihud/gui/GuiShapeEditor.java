@@ -52,6 +52,7 @@ import fi.dy.masa.minihud.renderer.shapes.ShapeCircle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircleBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeLineBlock;
 import fi.dy.masa.minihud.renderer.shapes.ShapeSpawnSphere;
+import fi.dy.masa.minihud.renderer.shapes.ShapeType;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
 public class GuiShapeEditor extends GuiRenderLayerEditBase
@@ -114,16 +115,10 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
         int renderTypeX = x + 230;
         int renderTypeY = y + 2;
+        ShapeType type = this.shape.getType();
 
-        switch (this.shape.getType())
+        switch (type)
         {
-            case ADJUSTABLE_SPAWN_SPHERE:
-            {
-                this.createShapeEditorElementsSphereBase(x, y, true);
-                this.createLayerEditControls(146, 162, this.getLayerRange());
-                break;
-            }
-
             case BOX:
                 this.createShapeEditorElementsBox(x, y);
                 break;
@@ -132,13 +127,28 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
                 this.createShapeEditorElementsBlockLine(x, y);
                 break;
 
+            case ADJUSTABLE_SPAWN_SPHERE:
             case CAN_DESPAWN_SPHERE:
             case CAN_SPAWN_SPHERE:
             case DESPAWN_SPHERE:
             {
                 ShapeSpawnSphere shape = (ShapeSpawnSphere) this.shape;
-                this.createShapeEditorElementsSphereBase(x, y, false);
-                this.createShapeEditorElementDoubleField(x + 150, y + 2, shape::getMargin, shape::setMargin, "minihud.gui.label.margin_colon", false);
+                boolean isAdjustable = type == ShapeType.ADJUSTABLE_SPAWN_SPHERE;
+                this.createShapeEditorElementsSphereBase(x, y, isAdjustable);
+
+                if (isAdjustable == false)
+                {
+                    this.createShapeEditorElementDoubleField(x + 150, y + 2, shape::getMargin, shape::setMargin, "minihud.gui.label.margin_colon", false);
+                }
+
+                if (shape instanceof ShapeSpawnSphere)
+                {
+                    String key = "minihud.gui.button.shape_renderer.spawn_sphere.toggle_use_quadrants";
+                    String hover = StringUtils.translate("minihud.gui.button.hover.shape_renderer.spawn_sphere.toggle_use_quadrants");
+                    ButtonOnOff button = new ButtonOnOff(x + 160, y + 30, -1, false, key, shape.getUseCornerQuadrants(), hover);
+                    this.addButton(button, (btn, mbtn) -> this.toggleUseQuadrants(shape, button));
+                }
+
                 this.createLayerEditControls(146, 162, this.getLayerRange());
                 break;
             }
@@ -295,6 +305,12 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     {
         shape.toggleCombineQuads();
         button.updateDisplayString(shape.getCombineQuads());
+    }
+
+    private void toggleUseQuadrants(ShapeSpawnSphere shape, ButtonOnOff button)
+    {
+        shape.toggleUseCornerQuadrants();
+        button.updateDisplayString(shape.getUseCornerQuadrants());
     }
 
     private void addBoxSideToggleCheckbox(int x, int y, Direction side, ShapeBox shape)

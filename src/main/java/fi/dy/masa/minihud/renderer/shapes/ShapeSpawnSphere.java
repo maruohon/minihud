@@ -4,6 +4,7 @@ import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -15,6 +16,7 @@ import fi.dy.masa.minihud.util.shape.SphereUtils;
 public class ShapeSpawnSphere extends ShapeSphereBlocky
 {
     protected Vec3d[] quadrantCenters;
+    protected boolean useCornerQuadrants;
     protected double margin = 0.0;
 
     public ShapeSpawnSphere()
@@ -29,11 +31,21 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
         this.updateQuadrantPoints();
     }
 
+    public boolean getUseCornerQuadrants()
+    {
+        return this.useCornerQuadrants;
+    }
+
+    public void toggleUseCornerQuadrants()
+    {
+        this.useCornerQuadrants = ! this.useCornerQuadrants;
+        this.setNeedsUpdate();
+    }
+
     @Override
     protected void updateEffectiveCenter()
     {
         super.updateEffectiveCenter();
-
         this.updateQuadrantPoints();
     }
 
@@ -68,12 +80,16 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
     }
 
     @Override
+    protected double getTotalRadius()
+    {
+        return this.getRadius() + this.margin;
+    }
+
+    @Override
     public List<String> getWidgetHoverLines()
     {
         List<String> lines = super.getWidgetHoverLines();
-
         lines.add(2, StringUtils.translate("minihud.gui.hover.shape.margin_value", d2(this.margin)));
-
         return lines;
     }
 
@@ -101,14 +117,30 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
 
     protected boolean isPositionOnOrInsideRing(int x, int y, int z, Direction outSide)
     {
+        final Vec3d effectiveCenter = this.getEffectiveCenter();
         final double maxDistSq = this.getSquaredRadius();
-        Vec3d effectiveCenter = this.getEffectiveCenter();
-        Vec3d quadrantCenter = this.quadrantCenters[Quadrant.getQuadrant(x, z, effectiveCenter).ordinal()];
-        double dx = x + 0.5;
-        double dy = y + 1;
-        double dz = z + 0.5;
+        final double posX = x + 0.5;
+        final double posY = y + 1;
+        final double posZ = z + 0.5;
 
-        return quadrantCenter.squaredDistanceTo(dx, dy, dz) < maxDistSq ||
-               effectiveCenter.squaredDistanceTo(dx, dy, dz) < maxDistSq;
+        if (this.useCornerQuadrants)
+        {
+            Vec3d quadrantCenter = this.quadrantCenters[Quadrant.getQuadrant(x, z, effectiveCenter).ordinal()];
+
+            return quadrantCenter.squaredDistanceTo(posX, posY, posZ) < maxDistSq ||
+                   effectiveCenter.squaredDistanceTo(posX, posY, posZ) < maxDistSq;
+        }
+        else
+        {
+            double margin = this.margin;
+            double centerX = MathHelper.clamp(posX, effectiveCenter.x - margin, effectiveCenter.x + margin);
+            double centerY = effectiveCenter.y;
+            double centerZ = MathHelper.clamp(posZ, effectiveCenter.z - margin, effectiveCenter.z + margin);
+            double distX = posX - centerX;
+            double distY = posY - centerY;
+            double distZ = posZ - centerZ;
+            double distSq = distX * distX + distY * distY + distZ * distZ;
+            return distSq < maxDistSq;
+        }
     }
 }
