@@ -222,7 +222,7 @@ public class RenderUtils
         boolean full = renderType == ShapeRenderType.FULL_BLOCK;
         boolean outer = renderType == ShapeRenderType.OUTER_EDGE;
         boolean inner = renderType == ShapeRenderType.INNER_EDGE;
-        int count = 0;
+        //int count = 0;
 
         for (long posLong : positions)
         {
@@ -254,11 +254,11 @@ public class RenderUtils
                 if (render)
                 {
                     RenderUtils.drawBlockSpaceSideBatchedQuads(posLong, side, color, expand, cameraPos, buffer);
-                    ++count;
+                    //++count;
                 }
             }
         }
-        System.out.printf("individual: rendered %d quads\n", count);
+        //System.out.printf("individual: rendered %d quads\n", count);
     }
 
 
@@ -269,8 +269,7 @@ public class RenderUtils
                                             Vec3d cameraPos,
                                             BufferBuilder buffer)
     {
-        int count = 0;
-
+        //int count = 0;
         for (long posLong : positions)
         {
             if (range.isPositionWithinRange(posLong) == false)
@@ -288,10 +287,10 @@ public class RenderUtils
                 }
 
                 RenderUtils.drawBlockSpaceSideBatchedQuads(posLong, side, color, expand, cameraPos, buffer);
-                ++count;
+                //++count;
             }
         }
-        System.out.printf("individual: rendered %d quads\n", count);
+        //System.out.printf("individual: rendered %d quads\n", count);
     }
 
     public static void renderQuads(Collection<SideQuad> quads, Color4f color, double expand,
@@ -302,7 +301,7 @@ public class RenderUtils
             RenderUtils.renderInsetQuad(quad.startPos(), quad.width(), quad.height(), quad.side(),
                                         -expand, color, cameraPos, buffer);
         }
-        System.out.printf("merged: rendered %d quads\n", quads.size());
+        //System.out.printf("merged: rendered %d quads\n", quads.size());
     }
 
     public static void renderInsetQuad(Vec3i minPos, int width, int height, Direction side,
