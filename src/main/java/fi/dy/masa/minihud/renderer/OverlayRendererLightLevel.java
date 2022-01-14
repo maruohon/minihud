@@ -136,7 +136,8 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
             LightLevelNumberMode numberMode = (LightLevelNumberMode) Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getOptionListValue();
             LightLevelMarkerMode markerMode = (LightLevelMarkerMode) Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getOptionListValue();
             boolean useColoredNumbers = Configs.Generic.LIGHT_LEVEL_COLORED_NUMBERS.getBooleanValue();
-            int lightThreshold = Configs.Generic.LIGHT_LEVEL_THRESHOLD.getIntegerValue();
+            int safeThreshold = Configs.Generic.LIGHT_LEVEL_THRESHOLD_SAFE.getIntegerValue();
+            int dimThreshold = Configs.Generic.LIGHT_LEVEL_THRESHOLD_DIM.getIntegerValue();
 
             if (numberMode == LightLevelNumberMode.BLOCK || numberMode == LightLevelNumberMode.BOTH)
             {
@@ -144,8 +145,9 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                         Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X,
                         Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_LIT,
+                        Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_DIM,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_DARK,
-                        useColoredNumbers, lightThreshold, numberFacing, bufferQuads);
+                        useColoredNumbers, safeThreshold, dimThreshold, numberFacing, bufferQuads);
             }
 
             if (numberMode == LightLevelNumberMode.SKY || numberMode == LightLevelNumberMode.BOTH)
@@ -154,30 +156,40 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
                         Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_X,
                         Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_LIT,
+                        Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_DIM,
                         Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_DARK,
-                        useColoredNumbers, lightThreshold, numberFacing, bufferQuads);
+                        useColoredNumbers, safeThreshold, dimThreshold, numberFacing, bufferQuads);
             }
 
             if (markerMode == LightLevelMarkerMode.SQUARE)
             {
-                this.renderMarkers(this::renderLightLevelSquare, cameraPos, lightThreshold, bufferLines);
+                this.renderMarkers(this::renderLightLevelSquare, cameraPos, safeThreshold, dimThreshold, bufferLines);
             }
             else if (markerMode == LightLevelMarkerMode.CROSS)
             {
-                this.renderMarkers(this::renderLightLevelCross, cameraPos, lightThreshold, bufferLines);
+                this.renderMarkers(this::renderLightLevelCross, cameraPos, safeThreshold, dimThreshold, bufferLines);
             }
         }
     }
 
-    private void renderNumbers(Vec3d cameraPos, LightLevelNumberMode mode, IConfigDouble cfgOffX, IConfigDouble cfgOffZ,
-            ConfigColor cfgColorLit, ConfigColor cfgColorDark, boolean useColoredNumbers,
-            int lightThreshold, Direction numberFacing, BufferBuilder buffer)
+    private void renderNumbers(Vec3d cameraPos,
+                               LightLevelNumberMode mode,
+                               IConfigDouble cfgOffX,
+                               IConfigDouble cfgOffZ,
+                               ConfigColor cfgColorLit,
+                               ConfigColor cfgColorDim,
+                               ConfigColor cfgColorDark,
+                               boolean useColoredNumbers,
+                               int safeThreshold,
+                               int dimThreshold,
+                               Direction numberFacing,
+                               BufferBuilder buffer)
     {
         double ox = cfgOffX.getDoubleValue();
         double oz = cfgOffZ.getDoubleValue();
         double tmpX, tmpZ;
         double offsetY = Configs.Generic.LIGHT_LEVEL_RENDER_OFFSET.getDoubleValue();
-        Color4f colorLit, colorDark;
+        Color4f colorLit, colorDim, colorDark;
 
         switch (numberFacing)
         {
@@ -191,20 +203,28 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         if (useColoredNumbers)
         {
             colorLit = cfgColorLit.getColor();
+            colorDim = cfgColorDim.getColor();
             colorDark = cfgColorDark.getColor();
         }
         else
         {
             colorLit = Color4f.fromColor(0xFFFFFFFF);
-            colorDark = Color4f.fromColor(0xFFFFFFFF);
+            colorDim = colorLit;
+            colorDark = colorLit;
         }
 
-        this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y - offsetY, tmpZ + cameraPos.z, numberFacing, lightThreshold, mode, colorLit, colorDark, buffer);
+        this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y - offsetY, tmpZ + cameraPos.z, numberFacing,
+                                     safeThreshold, dimThreshold, mode, colorLit, colorDim, colorDark, buffer);
     }
 
-    private void renderMarkers(IMarkerRenderer renderer, Vec3d cameraPos, int lightThreshold, BufferBuilder buffer)
+    private void renderMarkers(IMarkerRenderer renderer,
+                               Vec3d cameraPos,
+                               int safeThreshold,
+                               int dimThreshold,
+                               BufferBuilder buffer)
     {
         Color4f colorBlockLit = Configs.Colors.LIGHT_LEVEL_MARKER_BLOCK_LIT.getColor();
+        Color4f colorDim = Configs.Colors.LIGHT_LEVEL_MARKER_DIM.getColor();
         Color4f colorSkyLit = Configs.Colors.LIGHT_LEVEL_MARKER_SKY_LIT.getColor();
         Color4f colorDark = Configs.Colors.LIGHT_LEVEL_MARKER_DARK.getColor();
         LightLevelRenderCondition condition = (LightLevelRenderCondition) Configs.Generic.LIGHT_LEVEL_MARKER_CONDITION.getOptionListValue();
@@ -215,38 +235,71 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         double offset1 = (1.0 - markerSize) / 2.0;
         double offset2 = (1.0 - offset1);
         boolean autoHeight = Configs.Generic.LIGHT_LEVEL_AUTO_HEIGHT.getBooleanValue();
+        Color4f color;
 
         for (LightLevelInfo info : this.lightInfos)
         {
-            if (condition.shouldRender(info.block, lightThreshold))
+            if (condition.shouldRender(info.block, dimThreshold, safeThreshold))
             {
                 long pos = info.pos;
-                Color4f color = info.block >= lightThreshold ? colorBlockLit : (info.sky >= lightThreshold ? colorSkyLit : colorDark);
                 double x = BlockPos.unpackLongX(pos) - offsetX;
                 double y = (autoHeight ? info.y : BlockPos.unpackLongY(pos)) - offsetY;
                 double z = BlockPos.unpackLongZ(pos) - offsetZ;
+
+                if (info.block < safeThreshold)
+                {
+                    color = info.sky >= safeThreshold ? colorSkyLit : colorDark;
+                }
+                else if (info.block > dimThreshold)
+                {
+                    color = colorBlockLit;
+                }
+                else
+                {
+                    color = colorDim;
+                }
+
                 renderer.render(x, y, z, color, offset1, offset2, buffer);
             }
         }
     }
 
-    private void renderLightLevelNumbers(double dx, double dy, double dz, Direction facing,
-            int lightThreshold, LightLevelNumberMode numberMode,
-            Color4f colorLit, Color4f colorDark, BufferBuilder buffer)
+    private void renderLightLevelNumbers(double dx, double dy, double dz,
+                                         Direction facing,
+                                         int safeThreshold,
+                                         int dimThreshold,
+                                         LightLevelNumberMode numberMode,
+                                         Color4f colorLit,
+                                         Color4f colorDim,
+                                         Color4f colorDark,
+                                         BufferBuilder buffer)
     {
         LightLevelRenderCondition condition = (LightLevelRenderCondition) Configs.Generic.LIGHT_LEVEL_NUMBER_CONDITION.getOptionListValue();
         boolean autoHeight = Configs.Generic.LIGHT_LEVEL_AUTO_HEIGHT.getBooleanValue();
+        Color4f color;
 
         for (LightLevelInfo info : this.lightInfos)
         {
-            if (condition.shouldRender(info.block, lightThreshold))
+            if (condition.shouldRender(info.block, dimThreshold, safeThreshold))
             {
                 long pos = info.pos;
                 double x = BlockPos.unpackLongX(pos) - dx;
                 double y = (autoHeight ? info.y : BlockPos.unpackLongY(pos)) - dy;
                 double z = BlockPos.unpackLongZ(pos) - dz;
                 int lightLevel = numberMode == LightLevelNumberMode.BLOCK ? info.block : info.sky;
-                Color4f color = lightLevel >= lightThreshold ? colorLit : colorDark;
+
+                if (lightLevel < safeThreshold)
+                {
+                    color = colorDark;
+                }
+                else if (lightLevel > dimThreshold)
+                {
+                    color = colorLit;
+                }
+                else
+                {
+                    color = colorDim;
+                }
 
                 this.renderLightLevelTextureColor(x, y, z, facing, lightLevel, color, buffer);
             }

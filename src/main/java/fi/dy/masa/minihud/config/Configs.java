@@ -72,7 +72,8 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        LIGHT_LEVEL_RENDER_OFFSET           = new ConfigDouble("lightLevelRenderOffset", 0.005, 0.0, 1.0, "The relative render offset for the light level overlay.\nMeant to help with potential z-fighting issues with the block surface.\nRange: 0.0 - 1.0");
         public static final ConfigBoolean       LIGHT_LEVEL_RENDER_THROUGH          = new ConfigBoolean("lightLevelRenderThrough", false, "If enabled, then the Light Level overlay\nwill be rendered through blocks");
         public static final ConfigBoolean       LIGHT_LEVEL_SKIP_BLOCK_CHECK        = new ConfigBoolean("lightLevelSkipBlockCheck", false, "Should the Light Level Overlay skip the spawnability\ncheck of the block below. This would make the\noverlay also appear on top of slabs and glass etc.");
-        public static final ConfigInteger       LIGHT_LEVEL_THRESHOLD               = new ConfigInteger("lightLevelSafeThreshold", 1, 0, 15, "The light level threshold which is considered safe");
+        public static final ConfigInteger       LIGHT_LEVEL_THRESHOLD_DIM           = new ConfigInteger("lightLevelThresholdDim", 0, 0, 15, "The §omaximum§r light level which is considered \"dim\".\nThis is an optional user-configurable extra level between \"dark\" and \"safe\".\nSet it below the safe threshold to disable it.");
+        public static final ConfigInteger       LIGHT_LEVEL_THRESHOLD_SAFE          = new ConfigInteger("lightLevelThresholdSafe", 1, 0, 15, "The light level threshold which is considered safe");
         public static final ConfigBoolean       LIGHT_LEVEL_UNDER_WATER             = new ConfigBoolean("lightLevelUnderWater", false, "Should the light level overlay render under water");
         public static final ConfigBoolean       MAP_PREVIEW                         = new ConfigBoolean("mapPreview", false, "Enables rendering a preview of the map,\nwhen you hold shift while hovering over a map item");
         public static final ConfigInteger       MAP_PREVIEW_SIZE                    = new ConfigInteger("mapPreviewSize", 160, 16, 512, "The size of the rendered map previews");
@@ -154,7 +155,8 @@ public class Configs implements IConfigHandler
                 LIGHT_LEVEL_NUMBER_OFFSET_SKY_X,
                 LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
                 LIGHT_LEVEL_RANGE,
-                LIGHT_LEVEL_THRESHOLD,
+                LIGHT_LEVEL_THRESHOLD_DIM,
+                LIGHT_LEVEL_THRESHOLD_SAFE,
                 LIGHT_LEVEL_RENDER_OFFSET,
                 MAP_PREVIEW_SIZE,
                 SLIME_CHUNK_OVERLAY_RADIUS,
@@ -183,10 +185,13 @@ public class Configs implements IConfigHandler
         public static final ConfigColor BLOCK_GRID_OVERLAY_COLOR                = new ConfigColor("blockGridOverlayColor",              "#80FFFFFF", "Color for the block grid overlay");
         public static final ConfigColor LIGHT_LEVEL_MARKER_BLOCK_LIT            = new ConfigColor("lightLevelMarkerBlockLit",           "#FF209040", "The color for the safe (during day) spots marker");
         public static final ConfigColor LIGHT_LEVEL_MARKER_DARK                 = new ConfigColor("lightLevelMarkerDark",               "#FFFF4848", "The color for the spawnable spots marker");
+        public static final ConfigColor LIGHT_LEVEL_MARKER_DIM                  = new ConfigColor("lightLevelMarkerDim",                "#FFC0C040", "The color for the \"dim\" marker (user-definable level)");
         public static final ConfigColor LIGHT_LEVEL_MARKER_SKY_LIT              = new ConfigColor("lightLevelMarkerSkyLit",             "#FFFFFF33", "The color for the safe (during day) spots marker");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_DARK           = new ConfigColor("lightLevelNumberBlockDark",          "#FFC03030", "The color for the spawnable spots number of the block light value");
+        public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_DIM            = new ConfigColor("lightLevelNumberBlockDim",           "#FFC0C040", "The color for the \"dim\" (user-definable level) block light number");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_BLOCK_LIT            = new ConfigColor("lightLevelNumberBlockLit",           "#FF20FF40", "The color for the safe spots number of the block light value");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_DARK             = new ConfigColor("lightLevelNumberSkyDark",            "#FFFFF030", "The color for the spawnable spots number of the sky light value");
+        public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_DIM              = new ConfigColor("lightLevelNumberSkyDim",             "#FFC0C030", "The color for the \"dim\" (user-definable level) sky light number");
         public static final ConfigColor LIGHT_LEVEL_NUMBER_SKY_LIT              = new ConfigColor("lightLevelNumberSkyLit",             "#FF40E0FF", "The color for the safe spots number of the sky light value");
         public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR        = new ConfigColor("randomTicksFixedOverlayColor",       "#30F9F225", "Color for the fixed-point random ticked chunks overlay");
         public static final ConfigColor RANDOM_TICKS_PLAYER_OVERLAY_COLOR       = new ConfigColor("randomTicksPlayerOverlayColor",      "#3030FE73", "Color for the player-following random ticked chunks overlay");
@@ -218,10 +223,13 @@ public class Configs implements IConfigHandler
                 BLOCK_GRID_OVERLAY_COLOR,
                 LIGHT_LEVEL_MARKER_BLOCK_LIT,
                 LIGHT_LEVEL_MARKER_DARK,
+                LIGHT_LEVEL_MARKER_DIM,
                 LIGHT_LEVEL_MARKER_SKY_LIT,
                 LIGHT_LEVEL_NUMBER_BLOCK_DARK,
+                LIGHT_LEVEL_NUMBER_BLOCK_DIM,
                 LIGHT_LEVEL_NUMBER_BLOCK_LIT,
                 LIGHT_LEVEL_NUMBER_SKY_DARK,
+                LIGHT_LEVEL_NUMBER_SKY_DIM,
                 LIGHT_LEVEL_NUMBER_SKY_LIT,
                 RANDOM_TICKS_FIXED_OVERLAY_COLOR,
                 RANDOM_TICKS_PLAYER_OVERLAY_COLOR,

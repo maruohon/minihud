@@ -74,6 +74,7 @@
     "minihud.label.light_level_number_mode.sky": "Sky",
 
     "minihud.label.light_level_render_condition.always": "Always",
+    "minihud.label.light_level_render_condition.dim": "Dim",
     "minihud.label.light_level_render_condition.never": "Never",
     "minihud.label.light_level_render_condition.safe": "Safe",
     "minihud.label.light_level_render_condition.spawnable": "Spawnable",

@@ -6,10 +6,11 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public enum LightLevelRenderCondition implements IConfigOptionListEntry
 {
-    ALWAYS      ("always",    "minihud.label.light_level_render_condition.always",    (l, t) -> true),
-    NEVER       ("never",     "minihud.label.light_level_render_condition.never",     (l, t) -> false),
-    SAFE        ("safe",      "minihud.label.light_level_render_condition.safe",      (l, t) -> l >= t),
-    SPAWNABLE   ("spawnable", "minihud.label.light_level_render_condition.spawnable", (l, t) -> l < t);
+    ALWAYS      ("always",    "minihud.label.light_level_render_condition.always",    (b, d, s) -> true),
+    NEVER       ("never",     "minihud.label.light_level_render_condition.never",     (b, d, s) -> false),
+    SAFE        ("safe",      "minihud.label.light_level_render_condition.safe",      (b, d, s) -> b >= s && (d <= s || b > d)),
+    DIM         ("dim",       "minihud.label.light_level_render_condition.dim",       (b, d, s) -> b <= d && d > s),
+    SPAWNABLE   ("spawnable", "minihud.label.light_level_render_condition.spawnable", (b, d, s) -> b < s);
 
     private static final ImmutableList<LightLevelRenderCondition> VALUES = ImmutableList.copyOf(values());
 
@@ -24,9 +25,9 @@ public enum LightLevelRenderCondition implements IConfigOptionListEntry
         this.condition = condition;
     }
 
-    public boolean shouldRender(int lightLevel, int safeThreshold)
+    public boolean shouldRender(int blockLightLevel, int dimThreshold, int safeThreshold)
     {
-        return this.condition.shouldRender(lightLevel, safeThreshold);
+        return this.condition.shouldRender(blockLightLevel, dimThreshold, safeThreshold);
     }
 
     @Override
@@ -85,6 +86,6 @@ public enum LightLevelRenderCondition implements IConfigOptionListEntry
 
     private interface Condition
     {
-        boolean shouldRender(int lightLevel, int safeThreshold);
+        boolean shouldRender(int blockLightLevel, int dimThreshold, int safeThreshold);
     }
 }
