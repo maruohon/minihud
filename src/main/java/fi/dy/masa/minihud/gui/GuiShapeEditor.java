@@ -36,6 +36,14 @@ import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.gui.GuiConfigs.ConfigGuiTab;
+import fi.dy.masa.minihud.gui.GuiShapeEditor.ButtonListenerSphere;
+import fi.dy.masa.minihud.gui.GuiShapeEditor.ButtonListenerSphereBlockSnap;
+import fi.dy.masa.minihud.gui.GuiShapeEditor.ChainedDoubleConsumer;
+import fi.dy.masa.minihud.gui.GuiShapeEditor.ChainedIntConsumer;
+import fi.dy.masa.minihud.gui.GuiShapeEditor.SphereEditor;
+import fi.dy.masa.minihud.gui.GuiShapeEditor.TextFieldListenerColor;
+import fi.dy.masa.minihud.gui.GuiShapeEditor.TextFieldListenerDouble;
+import fi.dy.masa.minihud.gui.GuiShapeEditor.TextFieldListenerInteger;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircleBase;
@@ -238,7 +246,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         return Direction.byId(index);
     }
 
-    private record SphereEditor(ShapeCircleBase shape, GuiShapeEditor gui) implements ICoordinateValueModifier
+    public record SphereEditor(ShapeCircleBase shape, GuiShapeEditor gui) implements ICoordinateValueModifier
     {
 
         @Override
@@ -263,7 +271,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private record ButtonListenerSphere(ShapeCircleBase shape, GuiShapeEditor gui) implements IButtonActionListener
+    public record ButtonListenerSphere(ShapeCircleBase shape, GuiShapeEditor gui) implements IButtonActionListener
     {
 
         @Override
@@ -279,8 +287,8 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private record ButtonListenerSphereBlockSnap(ShapeCircleBase shape,
-                                                 GuiShapeEditor gui) implements IButtonActionListener
+    public record ButtonListenerSphereBlockSnap(ShapeCircleBase shape,
+                                                GuiShapeEditor gui) implements IButtonActionListener
     {
 
         @Override
@@ -291,7 +299,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private record TextFieldListenerColor(ShapeBase shape) implements ITextFieldListener<GuiTextFieldGeneric>
+    public record TextFieldListenerColor(ShapeBase shape) implements ITextFieldListener<GuiTextFieldGeneric>
     {
 
         @Override
@@ -302,7 +310,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private record TextFieldListenerInteger(IntConsumer consumer) implements ITextFieldListener<GuiTextFieldInteger>
+    public record TextFieldListenerInteger(IntConsumer consumer) implements ITextFieldListener<GuiTextFieldInteger>
     {
 
         @Override
@@ -319,7 +327,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private record TextFieldListenerDouble(DoubleConsumer consumer) implements ITextFieldListener<GuiTextFieldDouble>
+    public record TextFieldListenerDouble(DoubleConsumer consumer) implements ITextFieldListener<GuiTextFieldDouble>
     {
 
         @Override
@@ -336,8 +344,8 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private record ChainedDoubleConsumer(DoubleConsumer consumerOne,
-                                         DoubleConsumer consumerTwo) implements DoubleConsumer
+    public record ChainedDoubleConsumer(DoubleConsumer consumerOne,
+                                        DoubleConsumer consumerTwo) implements DoubleConsumer
     {
 
         @Override
@@ -348,8 +356,8 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private record ChainedIntConsumer(IntConsumer consumerOne,
-                                      IntConsumer consumerTwo) implements IntConsumer
+    public record ChainedIntConsumer(IntConsumer consumerOne,
+                                     IntConsumer consumerTwo) implements IntConsumer
     {
 
         @Override

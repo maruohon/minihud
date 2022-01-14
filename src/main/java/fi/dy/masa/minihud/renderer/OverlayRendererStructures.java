@@ -12,6 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.renderer.OverlayRendererStructures.WrappedData;
 import fi.dy.masa.minihud.util.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 import fi.dy.masa.minihud.util.StructureData;
@@ -130,7 +131,7 @@ public class OverlayRendererStructures extends OverlayRendererBase
         return data;
     }
 
-    private record WrappedData(StructureData data, Color4f mainColor, Color4f componentColor)
+    public record WrappedData(StructureData data, Color4f mainColor, Color4f componentColor)
     {
     }
 }
