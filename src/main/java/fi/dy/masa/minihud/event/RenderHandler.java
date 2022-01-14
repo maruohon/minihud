@@ -554,6 +554,10 @@ public class RenderHandler implements IRenderer
         {
             this.addLine(String.format("BBS: %.2f", DataStorage.getInstance().getBlockBreakingSpeed()));
         }
+        else if (type == InfoToggle.SPRINTING && mc.player.isSprinting())
+        {
+            this.addLine("§6Sprinting");
+        }
         else if (type == InfoToggle.DISTANCE)
         {
             Vec3d ref = DataStorage.getInstance().getDistanceReferencePoint();
