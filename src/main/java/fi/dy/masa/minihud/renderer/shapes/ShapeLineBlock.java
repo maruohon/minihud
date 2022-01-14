@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.malilib.util.BlockSnap;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerRange;
@@ -26,42 +27,51 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public class ShapeLineBlock extends ShapeBlocky
 {
-    protected BlockPos startPos = BlockPos.ORIGIN;
-    protected BlockPos endPos = BlockPos.ORIGIN;
+    protected Vec3d startPos = Vec3d.ZERO;
+    protected Vec3d endPos = Vec3d.ZERO;
+    protected Vec3d effectiveStartPos = Vec3d.ZERO;
+    protected Vec3d effectiveEndPos = Vec3d.ZERO;
 
     public ShapeLineBlock()
     {
         super(ShapeType.BLOCK_LINE, Configs.Colors.SHAPE_LINE_BLOCKY.getColor());
+
+        this.setBlockSnap(BlockSnap.CENTER);
     }
 
-    public BlockPos getStartPos()
+    public Vec3d getStartPos()
     {
-        return this.startPos;
+        return this.effectiveStartPos;
     }
 
-    public BlockPos getEndPos()
+    public Vec3d getEndPos()
     {
-        return this.endPos;
+        return this.effectiveEndPos;
     }
 
-    public void setStartPos(BlockPos startPos)
+    public void setStartPos(Vec3d startPos)
     {
         this.startPos = startPos;
-        this.setNeedsUpdate();
-        this.updateRenderPerimeter();
+        this.updateEffectivePositions();
     }
 
-    public void setEndPos(BlockPos endPos)
+    public void setEndPos(Vec3d endPos)
     {
         this.endPos = endPos;
-        this.setNeedsUpdate();
-        this.updateRenderPerimeter();
+        this.updateEffectivePositions();
+    }
+
+    @Override
+    public void setBlockSnap(BlockSnap snap)
+    {
+        super.setBlockSnap(snap);
+        this.updateEffectivePositions();
     }
 
     @Override
     public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
-        this.renderLineShape(cameraPos, 0);
+        this.renderLineShape(cameraPos);
         this.needsUpdate = false;
     }
 
@@ -69,11 +79,11 @@ public class ShapeLineBlock extends ShapeBlocky
     public List<String> getWidgetHoverLines()
     {
         List<String> lines = super.getWidgetHoverLines();
-        BlockPos s = this.startPos;
-        BlockPos e = this.endPos;
+        Vec3d s = this.startPos;
+        Vec3d e = this.endPos;
 
-        lines.add(StringUtils.translate("minihud.gui.label.shape.line.start", s.getX(), s.getY(), s.getZ()));
-        lines.add(StringUtils.translate("minihud.gui.label.shape.line.end",   e.getX(), e.getY(), e.getZ()));
+        lines.add(StringUtils.translate("minihud.gui.label.shape.line.start", d2(s.x), d2(s.y), d2(s.z)));
+        lines.add(StringUtils.translate("minihud.gui.label.shape.line.end",   d2(e.x), d2(e.y), d2(e.z)));
 
         return lines;
     }
@@ -82,8 +92,8 @@ public class ShapeLineBlock extends ShapeBlocky
     public JsonObject toJson()
     {
         JsonObject obj = super.toJson();
-        obj.add("start", JsonUtils.blockPosToJson(this.startPos));
-        obj.add("end", JsonUtils.blockPosToJson(this.endPos));
+        obj.add("start", JsonUtils.vec3dToJson(this.startPos));
+        obj.add("end", JsonUtils.vec3dToJson(this.endPos));
         return obj;
     }
 
@@ -92,8 +102,8 @@ public class ShapeLineBlock extends ShapeBlocky
     {
         super.fromJson(obj);
 
-        BlockPos startPos = JsonUtils.blockPosFromJson(obj, "start");
-        BlockPos endPos = JsonUtils.blockPosFromJson(obj, "end");
+        Vec3d startPos = JsonUtils.vec3dFromJson(obj, "start");
+        Vec3d endPos = JsonUtils.vec3dFromJson(obj, "end");
 
         if (startPos != null)
         {
@@ -105,33 +115,44 @@ public class ShapeLineBlock extends ShapeBlocky
             this.endPos = endPos;
         }
 
-        this.updateRenderPerimeter();
+        this.updateEffectivePositions();
     }
 
     protected void updateRenderPerimeter()
     {
-        int range = 512;
-        int minX = Math.min(this.startPos.getX(), this.endPos.getX()) - range;
-        int minY = Math.min(this.startPos.getY(), this.endPos.getY()) - range;
-        int minZ = Math.min(this.startPos.getZ(), this.endPos.getZ()) - range;
-        int maxX = Math.max(this.startPos.getX(), this.endPos.getX()) + range;
-        int maxY = Math.max(this.startPos.getY(), this.endPos.getY()) + range;
-        int maxZ = Math.max(this.startPos.getZ(), this.endPos.getZ()) + range;
+        double range = 512;
+        double minX = Math.min(this.effectiveStartPos.getX(), this.effectiveEndPos.getX()) - range;
+        double minY = Math.min(this.effectiveStartPos.getY(), this.effectiveEndPos.getY()) - range;
+        double minZ = Math.min(this.effectiveStartPos.getZ(), this.effectiveEndPos.getZ()) - range;
+        double maxX = Math.max(this.effectiveStartPos.getX(), this.effectiveEndPos.getX()) + range;
+        double maxY = Math.max(this.effectiveStartPos.getY(), this.effectiveEndPos.getY()) + range;
+        double maxZ = Math.max(this.effectiveStartPos.getZ(), this.effectiveEndPos.getZ()) + range;
 
         this.renderPerimeter = new Box(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    protected void renderLineShape(Vec3d cameraPos, double expand)
+    protected void updateEffectivePositions()
     {
-        double distance = this.endPos.getManhattanDistance(this.startPos);
+        this.effectiveStartPos = this.getBlockSnappedPosition(this.startPos);
+        this.effectiveEndPos = this.getBlockSnappedPosition(this.endPos);
+        this.updateRenderPerimeter();
+        this.setNeedsUpdate();
+    }
 
-        if (distance > 100000)
+    protected void renderLineShape(Vec3d cameraPos)
+    {
+        final double distance = this.effectiveEndPos.distanceTo(this.effectiveStartPos);
+        final double maxDist = 10000;
+
+        if (distance > maxDist)
         {
             return;
         }
 
         LongOpenHashSet positions = new LongOpenHashSet();
-        RayTracer tracer = new RayTracer(this.startPos, this.endPos);
+        RayTracer tracer = new RayTracer(this.effectiveStartPos, this.effectiveEndPos);
+        double expand = 0;
+
         tracer.iterateAllPositions(this.getLinePositionCollector(positions));
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
@@ -170,24 +191,11 @@ public class ShapeLineBlock extends ShapeBlocky
         Long2ObjectOpenHashMap<SideQuad> strips = new Long2ObjectOpenHashMap<>();
         Long2ByteOpenHashMap handledPositions = new Long2ByteOpenHashMap();
         Direction[] sides = PositionUtils.ALL_DIRECTIONS;
-        Direction mainAxis;
-        int lengthX = Math.abs(this.endPos.getX() - this.startPos.getX());
-        int lengthY = Math.abs(this.endPos.getY() - this.startPos.getY());
-        int lengthZ = Math.abs(this.endPos.getZ() - this.startPos.getZ());
-
-        if (lengthX >= lengthY && lengthX >= lengthZ)
-        {
-            mainAxis = Direction.WEST;
-        }
-        else if (lengthY >= lengthX && lengthY >= lengthZ)
-        {
-            mainAxis = Direction.DOWN;
-        }
-        else
-        {
-            mainAxis = Direction.NORTH;
-        }
-        System.out.printf("mainAxis: %s\n", mainAxis);
+        double lengthX = Math.abs(this.effectiveEndPos.getX() - this.effectiveStartPos.getX());
+        double lengthY = Math.abs(this.effectiveEndPos.getY() - this.effectiveStartPos.getY());
+        double lengthZ = Math.abs(this.effectiveEndPos.getZ() - this.effectiveStartPos.getZ());
+        Direction mainAxisHor = lengthX >= lengthZ ? Direction.WEST : Direction.NORTH;
+        Direction mainAxisAll = lengthY >= lengthX && lengthY >= lengthZ ? Direction.DOWN : mainAxisHor;
 
         for (long pos : positions)
         {
@@ -204,22 +212,25 @@ public class ShapeLineBlock extends ShapeBlocky
                     continue;
                 }
 
-                final Direction minDir = side.getAxis() != mainAxis.getAxis() ? mainAxis : (mainAxis.getAxis().isVertical() ? Direction.WEST : Direction.DOWN);
+                final Direction minDir = side.getAxis().isVertical() ? mainAxisHor : mainAxisAll;
                 final Direction maxDir = minDir.getOpposite();
                 final int lengthMin = getStripLengthOnSide(pos, side, minDir, positions, handledPositions);
                 final int lengthMax = getStripLengthOnSide(pos, side, maxDir, positions, handledPositions);
                 final long startPosLong = SphereUtils.offsetPos(pos, minDir, lengthMin);
-                final int length = lengthMin + lengthMax + 1;
                 final long index = SphereUtils.getCompressedPosSide(startPosLong, side);
-                int width = length;
+                int width = lengthMin + lengthMax + 1;
                 int height = 1;
 
-                // The render method considers width of top and bottom quads as going along the x-axis
-                if ((side.getAxis().isVertical() && mainAxis.getAxis() == Direction.Axis.Z) ||
-                    mainAxis.getAxis().isVertical())
+                // The render method considers the width of top and bottom quads as going along the x-axis,
+                // and thus the height goes along the z-axis.
+                // So if the strip on the top or bottom face was built along the z-axis, then we need to swap the values.
+                // And since we don't do quad merging for this line shape, we also need to swap the values
+                // if the strips on the horizontal sides are going vertically.
+                if ((side.getAxis().isVertical() && mainAxisHor.getAxis() == Direction.Axis.Z) ||
+                    (side.getAxis().isHorizontal() && mainAxisAll.getAxis().isVertical()))
                 {
+                    height = width;
                     width = 1;
-                    height = length;
                 }
 
                 strips.put(index, new SideQuad(startPosLong, width, height, side));

@@ -104,21 +104,21 @@ public class RayTracer
         if (relStepY == -0.0D) { relStepY = -1.0E-4D; }
         if (relStepZ == -0.0D) { relStepZ = -1.0E-4D; }
 
-        if (relStepX < relStepY && relStepX < relStepZ)
+        if (relStepX <= relStepY && relStepX <= relStepZ)
         {
             this.side = positiveX ? Direction.WEST : Direction.EAST;
             this.x = nextX;
             this.y += distToEndY * relStepX;
             this.z += distToEndZ * relStepX;
         }
-        else if (relStepY < relStepZ)
+        else if (relStepY <= relStepZ && relStepY <= relStepX)
         {
             this.side = positiveY ? Direction.DOWN : Direction.UP;
             this.x += distToEndX * relStepY;
             this.y = nextY;
             this.z += distToEndZ * relStepY;
         }
-        else
+        else //if (relStepZ <= relStepX && relStepZ <= relStepY)
         {
             this.side = positiveZ ? Direction.NORTH : Direction.SOUTH;
             this.x += distToEndX * relStepZ;

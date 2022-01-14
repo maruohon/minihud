@@ -1,5 +1,6 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
+import java.util.List;
 import java.util.function.Consumer;
 import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
@@ -13,20 +14,33 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
+import fi.dy.masa.malilib.util.BlockSnap;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public abstract class ShapeBlocky extends ShapeBase
 {
+    private BlockSnap snap = BlockSnap.CENTER;
     protected Box renderPerimeter = ShapeBox.EMPTY_BOX;
     private boolean combineQuads;
 
     public ShapeBlocky(ShapeType type, Color4f color)
     {
         super(type, color);
+    }
+
+    public BlockSnap getBlockSnap()
+    {
+        return this.snap;
+    }
+
+    public void setBlockSnap(BlockSnap snap)
+    {
+        this.snap = snap;
     }
 
     public boolean getCombineQuads()
@@ -45,6 +59,22 @@ public abstract class ShapeBlocky extends ShapeBase
     {
         this.renderPerimeter = new Box(center.x - range, center.y - range, center.z - range,
                                        center.x + range, center.y + range, center.z + range);
+    }
+
+    protected Vec3d getBlockSnappedPosition(Vec3d pos)
+    {
+        BlockSnap snap = this.getBlockSnap();
+
+        if (snap == BlockSnap.CENTER)
+        {
+            return new Vec3d(Math.floor(pos.x) + 0.5, Math.floor(pos.y), Math.floor(pos.z) + 0.5);
+        }
+        else if (snap == BlockSnap.CORNER)
+        {
+            return new Vec3d(Math.floor(pos.x), Math.floor(pos.y), Math.floor(pos.z));
+        }
+
+        return pos;
     }
 
     @Override
@@ -76,9 +106,21 @@ public abstract class ShapeBlocky extends ShapeBase
     }
 
     @Override
+    public List<String> getWidgetHoverLines()
+    {
+        List<String> lines = super.getWidgetHoverLines();
+
+        BlockSnap snap = this.getBlockSnap();
+        lines.add(StringUtils.translate("minihud.gui.hover.shape.block_snap", snap.getDisplayName()));
+
+        return lines;
+    }
+
+    @Override
     public JsonObject toJson()
     {
         JsonObject obj = super.toJson();
+        obj.add("snap", new JsonPrimitive(this.snap.getStringValue()));
         obj.add("combine_quads", new JsonPrimitive(this.combineQuads));
         return obj;
     }
@@ -87,6 +129,12 @@ public abstract class ShapeBlocky extends ShapeBase
     public void fromJson(JsonObject obj)
     {
         super.fromJson(obj);
+
+        if (JsonUtils.hasString(obj, "snap"))
+        {
+            this.snap = BlockSnap.fromStringStatic(JsonUtils.getString(obj, "snap"));
+        }
+
         this.combineQuads = JsonUtils.getBooleanOrDefault(obj, "combine_quads", false);
     }
 

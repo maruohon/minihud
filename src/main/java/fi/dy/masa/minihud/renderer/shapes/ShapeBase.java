@@ -1,12 +1,12 @@
 package fi.dy.masa.minihud.renderer.shapes;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRangeChangeListener;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -18,6 +18,8 @@ import fi.dy.masa.minihud.util.ShapeRenderType;
 
 public abstract class ShapeBase extends OverlayRendererBase implements IRangeChangeListener
 {
+    protected static final DecimalFormat DEC_FMT = new DecimalFormat("#.##");
+
     protected final MinecraftClient mc;
     protected final ShapeType type;
     protected final LayerRange layerRange;
@@ -148,9 +150,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
     {
         List<String> lines = new ArrayList<>();
 
-        String aq = GuiBase.TXT_AQUA;
-        String rst = GuiBase.TXT_GRAY;
-        lines.add(StringUtils.translate("minihud.gui.label.shape.type_value", aq + this.type.getDisplayName() + rst));
+        lines.add(StringUtils.translate("minihud.gui.hover.shape.type_value", this.type.getDisplayName()));
 
         return lines;
     }
@@ -199,5 +199,10 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
         {
             this.displayName = obj.get("display_name").getAsString();
         }
+    }
+
+    public static String d2(double val)
+    {
+        return DEC_FMT.format(val);
     }
 }

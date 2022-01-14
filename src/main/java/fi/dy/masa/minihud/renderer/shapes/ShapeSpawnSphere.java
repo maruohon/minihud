@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.Quadrant;
@@ -73,11 +72,7 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
     {
         List<String> lines = super.getWidgetHoverLines();
 
-        String gl = GuiBase.TXT_GOLD;
-        String gr = GuiBase.TXT_GRAY;
-        String rst = GuiBase.TXT_GRAY;
-
-        lines.add(2, gr + StringUtils.translate("minihud.gui.label.margin_value", String.format("%s%.2f%s", gl, this.margin, rst)));
+        lines.add(2, StringUtils.translate("minihud.gui.hover.shape.margin_value", d2(this.margin)));
 
         return lines;
     }
