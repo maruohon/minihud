@@ -12,6 +12,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -49,6 +50,7 @@ import fi.dy.masa.minihud.renderer.shapes.ShapeBlocky;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBox;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircleBase;
+import fi.dy.masa.minihud.renderer.shapes.ShapeLineBlock;
 import fi.dy.masa.minihud.renderer.shapes.ShapeSpawnSphere;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
@@ -75,7 +77,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
         this.createShapeEditorElements(x, y);
 
-        ButtonGeneric button = new ButtonGeneric(x, this.height - 24, -1, 14, ConfigGuiTab.SHAPES.getDisplayName());
+        ButtonGeneric button = new ButtonGeneric(x, this.height - 24, -1, 20, ConfigGuiTab.SHAPES.getDisplayName());
         this.addButton(button, new GuiShapeManager.ButtonListenerTab(ConfigGuiTab.SHAPES));
     }
 
@@ -124,6 +126,10 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
 
             case BOX:
                 this.createShapeEditorElementsBox(x, y);
+                break;
+
+            case BLOCK_LINE:
+                this.createShapeEditorElementsBlockLine(x, y);
                 break;
 
             case CAN_DESPAWN_SPHERE:
@@ -237,14 +243,37 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         this.addButton(button, (btn, mbtn) -> this.toggleGridEnabled(shape));
     }
 
-    protected Vec3d boxMinToVec3d(Box box)
+    private void createShapeEditorElementsBlockLine(int xIn, int yIn)
     {
-        return new Vec3d(box.minX, box.minY, box.minZ);
-    }
+        ShapeLineBlock shape = (ShapeLineBlock) this.shape;
 
-    protected Vec3d boxMaxToVec3d(Box box)
-    {
-        return new Vec3d(box.maxX, box.maxY, box.maxZ);
+        int x = xIn;
+        int x2 = x + 160;
+        int y = yIn + 4;
+
+        this.addLabel(x, y, -1, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.shape_box.minimum_coord"));
+        this.addLabel(x2, y, -1, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.shape_box.maximum_coord"));
+        y += 14;
+
+        GuiUtils.createBlockPosInputsVertical(x , y, 120, shape.getStartPos(), new BlockPosEditor(shape::getStartPos, shape::setStartPos, this), true, this);
+        GuiUtils.createBlockPosInputsVertical(x2, y, 120, shape.getEndPos(), new BlockPosEditor(shape::getEndPos, shape::setEndPos, this), true, this);
+        y += 54;
+
+        ButtonGeneric btn = new ButtonGeneric(x + 11, y, -1, 20, StringUtils.translate("malilib.gui.button.render_layers_gui.set_to_player"));
+        this.addButton(btn, (b, mb) -> this.setBlockPosFromCamera(shape::setStartPos));
+
+        btn = new ButtonGeneric(x2 + 11, y, -1, 20, StringUtils.translate("malilib.gui.button.render_layers_gui.set_to_player"));
+        this.addButton(btn, (b, mb) -> this.setBlockPosFromCamera(shape::setEndPos));
+        y += 24;
+
+        ButtonOnOff combineQuadsButton = new ButtonOnOff(xIn + 11, y, -1, false, "minihud.gui.button.shape_renderer.toggle_combine_quads", ((ShapeBlocky) this.shape).getCombineQuads());
+        this.addButton(combineQuadsButton, (b, mb) -> this.toggleCombineQuads(shape, combineQuadsButton));
+        y += 24;
+
+        this.createColorInput(xIn + 12, y);
+        y += 11;
+
+        this.createLayerEditControls(xIn + 115, y, this.getLayerRange());
     }
 
     private void toggleGridEnabled(ShapeBox shape)
@@ -356,18 +385,6 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         return str.length() > 0 ? str.toUpperCase(Locale.ROOT) : str;
     }
 
-    protected void vecToBoxMin(Vec3d vec, Supplier<Box> boxIn, Consumer<Box> boxOut)
-    {
-        Box box = boxIn.get();
-        boxOut.accept(new Box(vec.x, vec.y, vec.z, box.maxX, box.maxY, box.maxZ));
-    }
-
-    protected void vecToBoxMax(Vec3d vec, Supplier<Box> boxIn, Consumer<Box> boxOut)
-    {
-        Box box = boxIn.get();
-        boxOut.accept(new Box(box.minX, box.minY, box.minZ, vec.x, vec.y, vec.z));
-    }
-
     private void createShapeEditorElementDoubleField(int x, int y, DoubleSupplier supplier, DoubleConsumer consumer, String translationKey, boolean addButton)
     {
         this.addLabel(x + 12, y, -1, 12, 0xFFFFFFFF, translationKey);
@@ -443,6 +460,17 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         if (entity != null)
         {
             consumer.accept(entity.getPos());
+            this.initGui();
+        }
+    }
+
+    protected void setBlockPosFromCamera(Consumer<BlockPos> consumer)
+    {
+        Entity entity = EntityUtils.getCameraEntity();
+
+        if (entity != null)
+        {
+            consumer.accept(entity.getBlockPos());
             this.initGui();
         }
     }
@@ -557,7 +585,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    public static record Vec3dEditor(Supplier<Vec3d> supplier, Consumer<Vec3d> consumer, GuiShapeEditor gui) implements ICoordinateValueModifier
+    public record Vec3dEditor(Supplier<Vec3d> supplier, Consumer<Vec3d> consumer, GuiShapeEditor gui) implements ICoordinateValueModifier
     {
         @Override
         public boolean modifyValue(CoordinateType type, int amount)
@@ -581,7 +609,31 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static record ButtonListenerSphereBlockSnap(ShapeCircleBase shape,
+    public record BlockPosEditor(Supplier<BlockPos> supplier, Consumer<BlockPos> consumer, GuiShapeEditor gui) implements ICoordinateValueModifier
+    {
+        @Override
+        public boolean modifyValue(CoordinateType type, int amount)
+        {
+            this.consumer.accept(PositionUtils.modifyValue(type, this.supplier.get(), amount));
+            this.gui.initGui();
+            return true;
+        }
+
+        @Override
+        public boolean setValueFromString(CoordinateType type, String newValue)
+        {
+            try
+            {
+                this.consumer.accept(PositionUtils.setValue(type, this.supplier.get(), Integer.parseInt(newValue)));
+                return true;
+            }
+            catch (Exception ignore) {}
+
+            return false;
+        }
+    }
+
+    private record ButtonListenerSphereBlockSnap(ShapeCircleBase shape,
                                                         GuiShapeEditor gui) implements IButtonActionListener
     {
         @Override
@@ -592,7 +644,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static record TextFieldListenerColor(ShapeBase shape) implements ITextFieldListener<GuiTextFieldGeneric>
+    private record TextFieldListenerColor(ShapeBase shape) implements ITextFieldListener<GuiTextFieldGeneric>
     {
         @Override
         public boolean onTextChange(GuiTextFieldGeneric textField)
@@ -602,7 +654,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static record TextFieldListenerInteger(IntConsumer consumer) implements ITextFieldListener<GuiTextFieldInteger>
+    private record TextFieldListenerInteger(IntConsumer consumer) implements ITextFieldListener<GuiTextFieldInteger>
     {
         @Override
         public boolean onTextChange(GuiTextFieldInteger textField)
@@ -618,7 +670,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static record TextFieldListenerDouble(DoubleConsumer consumer) implements ITextFieldListener<GuiTextFieldGeneric>
+    private record TextFieldListenerDouble(DoubleConsumer consumer) implements ITextFieldListener<GuiTextFieldGeneric>
     {
         @Override
         public boolean onTextChange(GuiTextFieldGeneric textField)
@@ -634,8 +686,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static record ChainedDoubleConsumer(DoubleConsumer consumerOne,
-                                                DoubleConsumer consumerTwo) implements DoubleConsumer
+    private record ChainedDoubleConsumer(DoubleConsumer consumerOne, DoubleConsumer consumerTwo) implements DoubleConsumer
     {
         @Override
         public void accept(double value)
@@ -645,8 +696,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         }
     }
 
-    private static record ChainedIntConsumer(IntConsumer consumerOne,
-                                             IntConsumer consumerTwo) implements IntConsumer
+    private record ChainedIntConsumer(IntConsumer consumerOne, IntConsumer consumerTwo) implements IntConsumer
     {
         @Override
         public void accept(int value)

@@ -1,6 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
-import java.util.List;
+import java.util.Collection;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.entity.Entity;
@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.minihud.renderer.shapes.SideQuad;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 import fi.dy.masa.minihud.util.shape.SphereUtils;
@@ -208,7 +209,6 @@ public class RenderUtils
         }
     }
 
-
     public static void renderCircleBlockPositions(LongOpenHashSet positions,
                                                   Direction[] sides,
                                                   SphereUtils.RingPositionTest test,
@@ -222,7 +222,7 @@ public class RenderUtils
         boolean full = renderType == ShapeRenderType.FULL_BLOCK;
         boolean outer = renderType == ShapeRenderType.OUTER_EDGE;
         boolean inner = renderType == ShapeRenderType.INNER_EDGE;
-        //int count = 0;
+        int count = 0;
 
         for (long posLong : positions)
         {
@@ -254,14 +254,47 @@ public class RenderUtils
                 if (render)
                 {
                     RenderUtils.drawBlockSpaceSideBatchedQuads(posLong, side, color, expand, cameraPos, buffer);
-                    //++count;
+                    ++count;
                 }
             }
         }
-        //System.out.printf("individual: rendered %d quads\n", count);
+        System.out.printf("individual: rendered %d quads\n", count);
     }
 
-    public static void renderQuads(List<SideQuad> quads, Color4f color, double expand,
+
+    public static void renderBlockPositions(LongOpenHashSet positions,
+                                            LayerRange range,
+                                            Color4f color,
+                                            double expand,
+                                            Vec3d cameraPos,
+                                            BufferBuilder buffer)
+    {
+        int count = 0;
+
+        for (long posLong : positions)
+        {
+            if (range.isPositionWithinRange(posLong) == false)
+            {
+                continue;
+            }
+
+            for (Direction side : PositionUtils.ALL_DIRECTIONS)
+            {
+                long adjPosLong = BlockPos.offset(posLong, side);
+
+                if (positions.contains(adjPosLong))
+                {
+                    continue;
+                }
+
+                RenderUtils.drawBlockSpaceSideBatchedQuads(posLong, side, color, expand, cameraPos, buffer);
+                ++count;
+            }
+        }
+        System.out.printf("individual: rendered %d quads\n", count);
+    }
+
+    public static void renderQuads(Collection<SideQuad> quads, Color4f color, double expand,
                                    Vec3d cameraPos, BufferBuilder buffer)
     {
         for (SideQuad quad : quads)
@@ -269,7 +302,7 @@ public class RenderUtils
             RenderUtils.renderInsetQuad(quad.startPos(), quad.width(), quad.height(), quad.side(),
                                         -expand, color, cameraPos, buffer);
         }
-        //System.out.printf("merged: rendered %d quads\n", quads.size());
+        System.out.printf("merged: rendered %d quads\n", quads.size());
     }
 
     public static void renderInsetQuad(Vec3i minPos, int width, int height, Direction side,

@@ -451,7 +451,7 @@ public class SphereUtils
                             direction.getOffsetZ() * amount);
     }
 
-    protected static long getCompressedPosSide(long pos, Direction side)
+    public static long getCompressedPosSide(long pos, Direction side)
     {
         int x = BlockPos.unpackLongX(pos);
         int y = BlockPos.unpackLongY(pos);

@@ -20,7 +20,7 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
 
     public ShapeSpawnSphere()
     {
-        this(ShapeType.ADJUSTABLE_SPAWN_SPHERE, Configs.Colors.SHAPE_DESPAWN_SPHERE.getColor(), 24.0);
+        this(ShapeType.ADJUSTABLE_SPAWN_SPHERE, Configs.Colors.SHAPE_ADJUSTABLE_SPAWN_SPHERE.getColor(), 24.0);
     }
 
     public ShapeSpawnSphere(ShapeType shape, Color4f color, double radius)

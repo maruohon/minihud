@@ -51,6 +51,9 @@
     "minihud.gui.label.shape_box.grid_size": "Grid Size",
     "minihud.gui.label.shape_box.grid_start_offset": "Grid Start Offset",
 
+    "minihud.gui.label.shape.line.start": "§7Pos 1: x: §9%s§7, y: §9%s§7, z: §9%s",
+    "minihud.gui.label.shape.line.end": "§7Pos 2: x: §9%s§7, y: §9%s§7, z: §9%s",
+
     "minihud.gui.title.configs": "MiniHUD Configs",
     "minihud.gui.title.shape_editor": "Shape Editor (%s)",
     "minihud.gui.title.shape_manager": "Shape Manager",
@@ -91,6 +94,7 @@
     "minihud.label.shapes.can_despawn_sphere": "Can Despawn Sphere ( > 32)",
     "minihud.label.shapes.circle": "Circle / Cylinder",
     "minihud.label.shapes.despawn_sphere": "Despawn Sphere ( > 128)",
+    "minihud.label.shapes.block_line": "Line (Blocks)",
     "minihud.label.shapes.sphere_blocky": "Sphere (block-based)",
 
     "minihud.hotkeys.category.generic_hotkeys": "Generic hotkeys",

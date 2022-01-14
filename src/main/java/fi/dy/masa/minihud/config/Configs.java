@@ -191,11 +191,13 @@ public class Configs implements IConfigHandler
         public static final ConfigColor RANDOM_TICKS_FIXED_OVERLAY_COLOR        = new ConfigColor("randomTicksFixedOverlayColor",       "#30F9F225", "Color for the fixed-point random ticked chunks overlay");
         public static final ConfigColor RANDOM_TICKS_PLAYER_OVERLAY_COLOR       = new ConfigColor("randomTicksPlayerOverlayColor",      "#3030FE73", "Color for the player-following random ticked chunks overlay");
         public static final ConfigColor REGION_OVERLAY_COLOR                    = new ConfigColor("regionOverlayColor",                 "#30FF8019", "Color for the region file overlay");
+        public static final ConfigColor SHAPE_ADJUSTABLE_SPAWN_SPHERE           = new ConfigColor("shapeAdjustableSpawnSphere",         "#6030B0B0", "Default color for the \"Adjustable Spawn Sphere\" overlay.\nThe color can be changed for each sphere via its configuration GUI.");
         public static final ConfigColor SHAPE_BOX                               = new ConfigColor("shapeBox",                           "#6050A0A0", "Default color for the Box shape\nThe color can be changed for each shape via its configuration GUI.");
         public static final ConfigColor SHAPE_CAN_DESPAWN_SPHERE                = new ConfigColor("shapeCanDespawnSphere",              "#60A04050", "Default color for the \"Can Despawn Sphere\" overlay.\nThe color can be changed for each sphere via its configuration GUI.");
         public static final ConfigColor SHAPE_CAN_SPAWN_SPHERE                  = new ConfigColor("shapeCanSpawnSphere",                "#60A04050", "Default color for the \"Can Spawn Sphere\" overlay.\nThe color can be changed for each sphere via its configuration GUI.");
         public static final ConfigColor SHAPE_CIRCLE                            = new ConfigColor("shapeCircle",                        "#6030B0B0", "Default color for the Circle renderer.\nThe color can be changed for each shape via its configuration GUI.");
         public static final ConfigColor SHAPE_DESPAWN_SPHERE                    = new ConfigColor("shapeDespawnSphere",                 "#60A04050", "Default color for the \"Despawn Sphere\" overlay.\nThe color can be changed for each sphere via its configuration GUI.");
+        public static final ConfigColor SHAPE_LINE_BLOCKY                       = new ConfigColor("shapeLineBlocky",                    "#6030F0B0", "Default color for the Line (Blocky) renderer.\nThe color can be changed for each shape via its configuration GUI.");
         public static final ConfigColor SHAPE_SPHERE_BLOCKY                     = new ConfigColor("shapeSphereBlocky",                  "#6030B0B0", "Default color for the blocky/block-based Sphere renderer.\nThe color can be changed for each sphere via its configuration GUI.");
         public static final ConfigColor SLIME_CHUNKS_OVERLAY_COLOR              = new ConfigColor("slimeChunksOverlayColor",            "#3020F020", "Color for the slime chunks overlay");
         public static final ConfigColor SPAWN_PLAYER_ENTITY_OVERLAY_COLOR       = new ConfigColor("spawnPlayerEntityOverlayColor",      "#302050D0", "Color for the entity-processing would-be spawn chunks overlay of\nhow the spawn chunks would be if the spawn were\nto be at the player's current position");
@@ -224,11 +226,13 @@ public class Configs implements IConfigHandler
                 RANDOM_TICKS_FIXED_OVERLAY_COLOR,
                 RANDOM_TICKS_PLAYER_OVERLAY_COLOR,
                 REGION_OVERLAY_COLOR,
+                SHAPE_ADJUSTABLE_SPAWN_SPHERE,
                 SHAPE_BOX,
                 SHAPE_CAN_DESPAWN_SPHERE,
                 SHAPE_CAN_SPAWN_SPHERE,
                 SHAPE_CIRCLE,
                 SHAPE_DESPAWN_SPHERE,
+                SHAPE_LINE_BLOCKY,
                 SHAPE_SPHERE_BLOCKY,
                 SLIME_CHUNKS_OVERLAY_COLOR,
                 SPAWN_PLAYER_ENTITY_OVERLAY_COLOR,
