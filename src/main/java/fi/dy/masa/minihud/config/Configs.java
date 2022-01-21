@@ -12,12 +12,14 @@ import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.IConfigHandler;
 import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
+import fi.dy.masa.malilib.config.options.ConfigBooleanHotkeyed;
 import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.config.options.ConfigDouble;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.options.ConfigString;
+import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -51,7 +53,6 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       DEBUG_MESSAGES                      = new ConfigBoolean("debugMessages", false, "Enables some debug messages in the game console");
         public static final ConfigBoolean       DEBUG_RENDERER_PATH_MAX_DIST        = new ConfigBoolean("debugRendererPathFindingEnablePointWidth", true, "If true, then the vanilla pathfinding debug renderer\nwill render the path point width boxes.");
         public static final ConfigBoolean       DONT_RESET_SEED_ON_DIMENSION_CHANGE = new ConfigBoolean("dontClearStoredSeedOnDimensionChange", true, "Don't clear the stored world seed when just changing dimensions.\nSome mods may use per-dimension seeds, so you may need to change\nthis in case the different dimensions on your server/mod pack\nhave different world seeds.");
-        public static final ConfigBoolean       ENABLED                             = new ConfigBoolean("enabled", true, "The main rendering toggle for all MiniHUD rendering");
         public static final ConfigBoolean       FIX_VANILLA_DEBUG_RENDERERS         = new ConfigBoolean("enableVanillaDebugRendererFix", true, "If true, then the vanilla debug renderer OpenGL state is fixed.");
         public static final ConfigDouble        FONT_SCALE                          = new ConfigDouble("fontScale", 0.5, 0.01, 100.0, "Font scale factor for the info line HUD. Default: 0.5\n");
         public static final ConfigOptionList    HUD_ALIGNMENT                       = new ConfigOptionList("hudAlignment", HudAlignment.TOP_LEFT, "The alignment of the info line HUD");
@@ -75,6 +76,7 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       LIGHT_LEVEL_THRESHOLD_DIM           = new ConfigInteger("lightLevelThresholdDim", 0, 0, 15, "The §omaximum§r light level which is considered \"dim\".\nThis is an optional user-configurable extra level between \"dark\" and \"safe\".\nSet it below the safe threshold to disable it.");
         public static final ConfigInteger       LIGHT_LEVEL_THRESHOLD_SAFE          = new ConfigInteger("lightLevelThresholdSafe", 1, 0, 15, "The light level threshold which is considered safe");
         public static final ConfigBoolean       LIGHT_LEVEL_UNDER_WATER             = new ConfigBoolean("lightLevelUnderWater", false, "Should the light level overlay render under water");
+        public static final ConfigBooleanHotkeyed MAIN_RENDERING_TOGGLE             = new ConfigBooleanHotkeyed("mainRenderingToggle", true, "H", KeybindSettings.RELEASE_EXCLUSIVE, "The main rendering toggle for all MiniHUD rendering,\nincluding the info lines AND all the overlay renderers", "MiniHUD Main Rendering");
         public static final ConfigBoolean       MAP_PREVIEW                         = new ConfigBoolean("mapPreview", false, "Enables rendering a preview of the map,\nwhen you hold shift while hovering over a map item");
         public static final ConfigInteger       MAP_PREVIEW_SIZE                    = new ConfigInteger("mapPreviewSize", 160, 16, 512, "The size of the rendered map previews");
         public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "H,C", "A hotkey to open the in-game Config GUI");
@@ -94,7 +96,6 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       TEXT_POS_Y                          = new ConfigInteger("textPosY", 4, 0, 8192, "Text Y position from the screen edge (default: 4)");
         public static final ConfigInteger       TIME_DAY_DIVISOR                    = new ConfigInteger("timeDayDivisor", 24000, 1, Integer.MAX_VALUE, "The divisor value for the modulo of the day time");
         public static final ConfigInteger       TIME_TOTAL_DIVISOR                  = new ConfigInteger("timeTotalDivisor", 24000, 1, Integer.MAX_VALUE, "The divisor value for the modulo of the total world time");
-        public static final ConfigHotkey        TOGGLE_KEY                          = new ConfigHotkey("toggleKey", "H", KeybindSettings.RELEASE_EXCLUSIVE, "The main toggle key");
         public static final ConfigBoolean       USE_CUSTOMIZED_COORDINATES          = new ConfigBoolean("useCustomizedCoordinateFormat", true, "Use the customized coordinate format string");
         public static final ConfigBoolean       USE_FONT_SHADOW                     = new ConfigBoolean("useFontShadow", false, "Use font shadow");
         public static final ConfigBoolean       USE_TEXT_BACKGROUND                 = new ConfigBoolean("useTextBackground", true, "Use a solid background color behind the text");
@@ -103,7 +104,6 @@ public class Configs implements IConfigHandler
                 AXOLOTL_TOOLTIPS,
                 BEE_TOOLTIPS,
                 HONEY_TOOLTIPS,
-                ENABLED,
                 BEACON_RANGE_AUTO_UPDATE,
                 BIOME_OVERLAY_SINGLE_COLOR,
                 DEBUG_MESSAGES,
@@ -129,11 +129,11 @@ public class Configs implements IConfigHandler
                 USE_FONT_SHADOW,
                 USE_TEXT_BACKGROUND,
 
+                MAIN_RENDERING_TOGGLE,
                 OPEN_CONFIG_GUI,
                 REQUIRED_KEY,
                 SET_DISTANCE_REFERENCE_POINT,
                 SHAPE_EDITOR,
-                TOGGLE_KEY,
 
                 BLOCK_GRID_OVERLAY_MODE,
                 LIGHT_LEVEL_MARKER_CONDITION,
@@ -167,8 +167,8 @@ public class Configs implements IConfigHandler
                 TIME_TOTAL_DIVISOR
         );
 
-        public static final List<ConfigHotkey> HOTKEY_LIST = ImmutableList.of(
-                TOGGLE_KEY,
+        public static final List<IHotkey> HOTKEY_LIST = ImmutableList.of(
+                MAIN_RENDERING_TOGGLE,
                 REQUIRED_KEY,
                 OPEN_CONFIG_GUI,
                 SET_DISTANCE_REFERENCE_POINT,

@@ -17,7 +17,7 @@ public abstract class MixinDebugRenderer
     private void renderDebugRenderers(MatrixStack matrixStack, VertexConsumerProvider.Immediate vtx,
             double cameraX, double cameraY, double cameraZ, CallbackInfo ci)
     {
-        if (Configs.Generic.ENABLED.getBooleanValue())
+        if (Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue())
         {
             DebugInfoUtils.renderVanillaDebug(matrixStack, vtx, cameraX, cameraY, cameraZ);
         }

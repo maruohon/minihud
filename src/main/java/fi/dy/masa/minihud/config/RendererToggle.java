@@ -24,15 +24,6 @@ import fi.dy.masa.minihud.util.DataStorage;
 
 public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfigBoolean>
 {
-    DEBUG_CHUNK_BORDER                  ("debugChunkBorder",            "", "Toggles the vanilla Chunk Border debug renderer", "Chunk Border"),
-    DEBUG_CHUNK_INFO                    ("debugChunkInfo",              "", "Toggles the vanilla Chunk Info debug renderer", "Chunk Info"),
-    DEBUG_CHUNK_OCCLUSION               ("debugChunkOcclusion",         "", "Toggles the vanilla Chunk Occlusion debug renderer", "Chunk Occlusion"),
-    DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled",    "", "Toggles the vanilla Block Collision Boxes debug renderer", "Block Collision Boxes"),
-    DEBUG_NEIGHBOR_UPDATES              ("debugNeighborsUpdateEnabled", "", "Toggles the vanilla Block Neighbor Updates debug renderer", "Block Neighbor Updates"),
-    DEBUG_PATH_FINDING                  ("debugPathfindingEnabled",     "", "Toggles the vanilla Pathfinding debug renderer", "Pathfinding"),
-    DEBUG_SOLID_FACES                   ("debugSolidFaceEnabled",       "", "Toggles the vanilla Block Solid Faces debug renderer", "Block Solid Faces"),
-    DEBUG_WATER                         ("debugWaterEnabled",           "", "Toggles the vanilla Water debug renderer", "Water"),
-
     OVERLAY_BEACON_RANGE                ("overlayBeaconRange",          "", "Toggle the Beacon Range overlay renderer", "Beacon Range overlay"),
     OVERLAY_BIOME_BORDER                ("overlayBiomeBorder",          "", "Toggle the Biome Border overlay renderer", "Biome Border overlay"),
     OVERLAY_BLOCK_GRID                  ("overlayBlockGrid",            "", "Toggle the Block Grid overlay renderer", "Block Grid overlay"),
@@ -45,7 +36,16 @@ public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfi
     OVERLAY_SPAWN_CHUNK_OVERLAY_REAL    ("overlaySpawnChunkReal",       "", "Toggle the spawn chunks overlay renderer", "Spawn Chunks (real) overlay"),
     OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER  ("overlaySpawnChunkPlayer",     "", "Toggle the pseudo (player-following) spawn chunks overlay renderer", "Spawn Chunks (player-following, would-be) overlay"),
     OVERLAY_STRUCTURE_MAIN_TOGGLE       ("overlayStructureMainToggle",  "", "Main toggle for all structure bounding boxes", "Structure Bounding Boxes main"),
-    SHAPE_RENDERER                      ("shapeRenderer",               "", "The main toggle for the shape renderer", "Shape Renderer");
+    SHAPE_RENDERER                      ("shapeRenderer",               "", "The main toggle for the shape renderer", "Shape Renderer"),
+
+    DEBUG_CHUNK_BORDER                  ("debugChunkBorder",            "", "Toggles the vanilla Chunk Border debug renderer", "Chunk Border"),
+    DEBUG_CHUNK_INFO                    ("debugChunkInfo",              "", "Toggles the vanilla Chunk Info debug renderer", "Chunk Info"),
+    DEBUG_CHUNK_OCCLUSION               ("debugChunkOcclusion",         "", "Toggles the vanilla Chunk Occlusion debug renderer", "Chunk Occlusion"),
+    DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled",    "", "Toggles the vanilla Block Collision Boxes debug renderer", "Block Collision Boxes"),
+    DEBUG_NEIGHBOR_UPDATES              ("debugNeighborsUpdateEnabled", "", "Toggles the vanilla Block Neighbor Updates debug renderer", "Block Neighbor Updates"),
+    DEBUG_PATH_FINDING                  ("debugPathfindingEnabled",     "", "Toggles the vanilla Pathfinding debug renderer", "Pathfinding"),
+    DEBUG_SOLID_FACES                   ("debugSolidFaceEnabled",       "", "Toggles the vanilla Block Solid Faces debug renderer", "Block Solid Faces"),
+    DEBUG_WATER                         ("debugWaterEnabled",           "", "Toggles the vanilla Water debug renderer", "Water");
 
     public static final ImmutableList<RendererToggle> VALUES = ImmutableList.copyOf(values());
 

@@ -8,7 +8,6 @@ import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.options.BooleanHotkeyGuiWrapper;
-import fi.dy.masa.malilib.config.options.ConfigTypeWrapper;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -111,7 +110,7 @@ public class GuiConfigs extends GuiConfigsBase
     @Override
     protected boolean useKeybindSearch()
     {
-        return GuiConfigs.tab == ConfigGuiTab.INFO_LINES || GuiConfigs.tab == ConfigGuiTab.RENDERERS;
+        return GuiConfigs.tab != ConfigGuiTab.COLORS;
     }
 
     @Override
@@ -129,21 +128,27 @@ public class GuiConfigs extends GuiConfigsBase
         }
         else if (tab == ConfigGuiTab.INFO_LINES)
         {
-            List<IConfigBase> list = new ArrayList<>(INFO_LINE_LIST.stream().map(this::wrapConfig).toList());
+            List<IConfigBase> list = new ArrayList<>();
+            list.add(Configs.Generic.MAIN_RENDERING_TOGGLE);
+            list.addAll(INFO_LINE_LIST.stream().map(this::wrapConfig).toList());
             list.addAll(ConfigUtils.createConfigWrapperForType(ConfigType.INTEGER, INFO_LINE_LIST));
             return ConfigOptionWrapper.createFor(list);
         }
         else if (tab == ConfigGuiTab.STRUCTURES)
         {
             List<IConfigBase> list = new ArrayList<>();
-            list.add(new ConfigTypeWrapper(ConfigType.BOOLEAN, RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE));
+            list.add(Configs.Generic.MAIN_RENDERING_TOGGLE);
+            list.add(this.wrapConfig(RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE));
             list.addAll(StructureToggle.VALUES.stream().map(this::wrapConfig).toList());
             list.addAll(StructureToggle.COLOR_CONFIGS);
             return ConfigOptionWrapper.createFor(list);
         }
         else if (tab == ConfigGuiTab.RENDERERS)
         {
-            return ConfigOptionWrapper.createFor(RENDERER_LIST.stream().map(this::wrapConfig).toList());
+            List<IConfigBase> list = new ArrayList<>();
+            list.add(Configs.Generic.MAIN_RENDERING_TOGGLE);
+            list.addAll(RENDERER_LIST.stream().map(this::wrapConfig).toList());
+            return ConfigOptionWrapper.createFor(list);
         }
 
         return Collections.emptyList();

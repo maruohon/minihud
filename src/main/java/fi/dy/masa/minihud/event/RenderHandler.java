@@ -111,14 +111,13 @@ public class RenderHandler implements IRenderer
     @Override
     public void onRenderGameOverlayPost(MatrixStack matrixStack)
     {
-        if (Configs.Generic.ENABLED.getBooleanValue() == false)
+        if (Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue() == false)
         {
             this.resetCachedChunks();
             return;
         }
 
-        if (Configs.Generic.ENABLED.getBooleanValue() &&
-            this.mc.options.debugEnabled == false &&
+        if (this.mc.options.debugEnabled == false &&
             this.mc.player != null && this.mc.options.hudHidden == false &&
             (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || this.mc.player.isSneaking()) &&
             Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld())
@@ -173,7 +172,7 @@ public class RenderHandler implements IRenderer
     @Override
     public void onRenderWorldLast(MatrixStack matrixStack, Matrix4f projMatrix)
     {
-        if (Configs.Generic.ENABLED.getBooleanValue() &&
+        if (Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
             this.mc.world != null && this.mc.player != null && this.mc.options.hudHidden == false)
         {
             OverlayRenderer.renderOverlays(matrixStack, projMatrix, this.mc);
