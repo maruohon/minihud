@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "minihud",
 	"name": "MiniHUD",
-	"version": "${mod_version}",
+	"version": "0.21.3",
 
 	"description": "Configurable \"mini-F3\" info lines, and various overlay renderers",
 	"authors": [
