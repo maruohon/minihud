@@ -23,7 +23,8 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     //protected static final BufferBuilder BUFFER_3 = new BufferBuilder(2097152);
 
     protected final List<RenderObjectBase> renderObjects = new ArrayList<>();
-    protected boolean renderThrough = false;
+    protected boolean renderThrough;
+    protected boolean useCulling;
     protected float glLineWidth = 1f;
     protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
     private Vec3d updateCameraPos = Vec3d.ZERO;
@@ -49,6 +50,15 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
             RenderSystem.disableDepthTest();
             //RenderSystem.depthMask(false);
         }
+
+        if (this.useCulling)
+        {
+            RenderSystem.enableCull();
+        }
+        else
+        {
+            RenderSystem.disableCull();
+        }
     }
 
     protected void postRender()
@@ -58,6 +68,8 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
             RenderSystem.enableDepthTest();
             //RenderSystem.depthMask(true);
         }
+
+        RenderSystem.enableCull();
     }
 
     @Override

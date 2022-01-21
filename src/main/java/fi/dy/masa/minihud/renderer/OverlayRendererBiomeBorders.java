@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.IntFunction;
 import javax.annotation.Nullable;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
@@ -48,6 +47,11 @@ public class OverlayRendererBiomeBorders extends OverlayRendererBase
     //private long lastUpdateTime = System.nanoTime();
     private boolean needsUpdate;
     private boolean needsRenderUpdate;
+
+    private OverlayRendererBiomeBorders()
+    {
+        this.useCulling = true;
+    }
 
     public void setNeedsUpdate()
     {
@@ -120,14 +124,6 @@ public class OverlayRendererBiomeBorders extends OverlayRendererBase
         this.setUpdatePosition(this.cameraPosition);
         this.needsUpdate = false;
         this.needsRenderUpdate = false;
-    }
-
-    @Override
-    protected void preRender()
-    {
-        super.preRender();
-
-        RenderSystem.enableCull();
     }
 
     protected void renderQuads(List<ColoredQuad> quads, BufferBuilder quadBuffer,
