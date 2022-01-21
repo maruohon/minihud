@@ -24,6 +24,7 @@ import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.SubChunkPos;
+import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -70,6 +71,8 @@ public class OverlayRendererBiomeBorders extends OverlayRendererBase
     {
         synchronized (this.quads)
         {
+            MiniHUD.printDebug("Clearing Biome Border Overlay data...");
+
             this.quads.clear();
             this.scheduledChunks.clear();
             this.biomeMapping.clear();

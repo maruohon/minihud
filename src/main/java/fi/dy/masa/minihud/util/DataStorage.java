@@ -138,6 +138,7 @@ public class DataStorage
         this.lastStructureUpdatePos = null;
         this.structures.clear();
         this.worldSpawn = BlockPos.ORIGIN;
+        this.clearTasks();
 
         StructurePacketHandlerCarpet.INSTANCE.reset();
         StructurePacketHandlerServux.INSTANCE.reset();
@@ -157,6 +158,11 @@ public class DataStorage
             this.servuxServer = false;
             this.structureDataTimeout = 30 * 20;
         }
+    }
+
+    public void clearTasks()
+    {
+        this.taskQueue.clear();
     }
 
     public ChunkTask getNextTask() throws InterruptedException

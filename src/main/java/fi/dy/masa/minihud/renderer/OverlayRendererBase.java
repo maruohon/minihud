@@ -26,7 +26,7 @@ public abstract class OverlayRendererBase implements IOverlayRenderer
     protected boolean renderThrough;
     protected boolean useCulling;
     protected float glLineWidth = 1f;
-    protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
+    @Nullable protected BlockPos lastUpdatePos = BlockPos.ORIGIN;
     private Vec3d updateCameraPos = Vec3d.ZERO;
 
     @Override
