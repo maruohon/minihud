@@ -347,6 +347,7 @@ public class RenderHandler implements IRenderer
                 str = str.replace("{HOUR}", String.format("%02d", hour));
                 str = str.replace("{MIN}",  String.format("%02d", min));
                 str = str.replace("{SEC}",  String.format("%02d", sec));
+                str = str.replace("{TICK}",  String.format("%d", dayTicks));
 
                 this.addLine(str);
             }
