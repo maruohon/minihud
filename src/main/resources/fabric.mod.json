@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "itemscroller",
 	"name": "Item Scroller",
-	"version": "0.15.0",
+	"version": "{dev-env}",
 
 	"description": "Move items in inventory GUIs by scrolling the mouse wheel or dragging over slots",
 	"authors": [
