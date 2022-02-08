@@ -116,12 +116,10 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
         File file = getCurrentStorageFile(false);
         JsonElement element = JsonUtils.parseJsonFile(file);
 
-        if (element != null && element.isJsonObject())
+        if (element != null)
         {
-            JsonObject root = element.getAsJsonObject();
-
-            JsonUtils.readObjectIfPresent(root, "shapes", ShapeManager.INSTANCE::fromJson);
-            JsonUtils.readObjectIfPresent(root, "data_storage", DataStorage.getInstance()::fromJson);
+            JsonUtils.readObjectIfPresent(element, "shapes", ShapeManager.INSTANCE::fromJson);
+            JsonUtils.readObjectIfPresent(element, "data_storage", DataStorage.getInstance()::fromJson);
         }
     }
 
