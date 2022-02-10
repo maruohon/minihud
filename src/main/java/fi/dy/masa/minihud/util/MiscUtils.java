@@ -19,7 +19,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.nbt.PrettyNbtStringifier;
 import fi.dy.masa.malilib.util.nbt.SimpleNbtStringifier;
 import fi.dy.masa.minihud.LiteModMiniHud;
