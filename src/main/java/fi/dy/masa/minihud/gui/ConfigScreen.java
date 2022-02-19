@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.gui.GuiScreen;
+import fi.dy.masa.malilib.config.group.PopupConfigGroup;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.GenericButtonConfig;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
@@ -54,7 +55,14 @@ public class ConfigScreen
 
     public static void open()
     {
-        BaseScreen.openScreen(create(null));
+        BaseScreen.openScreen(create());
+    }
+
+    public static BaseConfigScreen create()
+    {
+        // The parent screen should not be set here, to prevent infinite recursion via
+        // the call to the parent's setWorldAndResolution -> initScreen -> switch tab -> etc.
+        return new BaseConfigScreen(MOD_INFO, null, ALL_TABS, INFO_LINES, "minihud.gui.title.configs");
     }
 
     public static BaseConfigScreen create(@Nullable GuiScreen currentScreen)
@@ -72,7 +80,7 @@ public class ConfigScreen
     private static ImmutableList<ConfigInfo> getGenericOptions()
     {
         ArrayList<ConfigInfo> genericOptions = new ArrayList<>(Configs.Generic.OPTIONS);
-        ArrayList<ConfigInfo> colorOptions = new ArrayList<>(Configs.Generic.OPTIONS);
+        ArrayList<ConfigInfo> colorOptions = new ArrayList<>(Configs.Colors.OPTIONS);
         ArrayList<ConfigInfo> lightOptions = new ArrayList<>();
 
         ListUtils.extractEntriesToSecondList(genericOptions, lightOptions, (c) -> c.getName().startsWith("lightLevel"), true);
@@ -83,6 +91,7 @@ public class ConfigScreen
                                                    ConfigScreen::openHudSettingScreen,
                                                    "minihud.config.comment.info_lines_hud_settings"));
         genericOptions.add(new ExpandableConfigGroup(MOD_INFO, "light_level", lightOptions));
+        genericOptions.add(new PopupConfigGroup(MOD_INFO, "light_level", lightOptions));
         ConfigUtils.sortConfigsByDisplayName(genericOptions);
 
         return ImmutableList.copyOf(genericOptions);

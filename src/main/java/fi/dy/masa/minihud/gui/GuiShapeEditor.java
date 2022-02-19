@@ -64,7 +64,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
 
         this.createShapeEditorElements(x, y);
 
-        GenericButton button = new GenericButton(ConfigScreen.SHAPES.getDisplayName());
+        GenericButton button = GenericButton.create(ConfigScreen.SHAPES.getDisplayName());
         button.setPosition(x, this.height - 24);
         button.setActionListener(() -> {
             BaseConfigScreen.setCurrentTab(Reference.MOD_ID, ConfigScreen.SHAPES);
@@ -157,7 +157,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         x += 11;
         y += 54;
 
-        GenericButton button = new GenericButton("malilib.gui.button.render_layers_gui.set_to_player");
+        GenericButton button = GenericButton.create("malilib.button.render_layers.set_to_player");
         button.setPosition(x, y);
         button.setActionListener(() -> {
             Entity entity = this.mc.getRenderViewEntity();
@@ -200,12 +200,11 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
 
         if (addButton)
         {
-            String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            GenericButton button = GenericButton.createIconOnly(() -> DefaultIcons.BTN_PLUSMINUS_16);
+            GenericButton button = GenericButton.create(DefaultIcons.BTN_PLUSMINUS_16);
             button.setPosition(x + 54, y);
             button.setActionListener(new DoubleModifierButtonListener(supplier, new DualDoubleConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsDouble())) )));
             button.setCanScrollToClick(true);
-            button.addHoverStrings(hover);
+            button.translateAndAddHoverString("malilib.gui.button.hover.plus_minus_tip");
             this.addWidget(button);
         }
     }
@@ -224,12 +223,11 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
 
         if (addButton)
         {
-            String hover = StringUtils.translate("malilib.gui.button.hover.plus_minus_tip");
-            GenericButton button = GenericButton.createIconOnly(() -> DefaultIcons.BTN_PLUSMINUS_16);
+            GenericButton button = GenericButton.create(DefaultIcons.BTN_PLUSMINUS_16);
             button.setPosition(x + 54, y);
             button.setActionListener(new IntegerModifierButtonListener(supplier, new DualIntConsumer(consumer, (val) -> txtField.setText(String.valueOf(supplier.getAsInt())) )));
             button.setCanScrollToClick(true);
-            button.addHoverStrings(hover);
+            button.translateAndAddHoverString("malilib.gui.button.hover.plus_minus_tip");
             this.addWidget(button);
         }
     }
@@ -241,9 +239,10 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         y += 10;
 
         String name = org.apache.commons.lang3.StringUtils.capitalize(supplier.get().toString().toLowerCase());
-        GenericButton button = new GenericButton(50, 20, name);
-        button.setPosition(x, y);
+        GenericButton button = GenericButton.create(50, 20, name);
         button.setActionListener((btn) -> { consumer.accept(PositionUtils.cycleDirection(supplier.get(), btn == 1)); this.initGui(); return true; });
+        button.setPosition(x, y);
+
         this.addWidget(button);
     }
 
@@ -253,9 +252,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.addLabel(x, y, 0xFFFFFFFF, translationKey);
         y += 10;
 
-        GenericButton button = new GenericButton(supplier.get().getDisplayName());
-        button.setPosition(x, y);
+        GenericButton button = GenericButton.create(supplier.get().getDisplayName());
         button.setActionListener((btn) -> { consumer.accept(ListUtils.getNextEntry(ShapeRenderType.VALUES, supplier.get(), btn != 0)); this.initGui(); return true; });
+        button.setPosition(x, y);
         this.addWidget(button);
     }
 

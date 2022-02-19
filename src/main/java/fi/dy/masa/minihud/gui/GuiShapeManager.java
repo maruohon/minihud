@@ -70,10 +70,9 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         button.setPosition(x, y + 1);
         this.addWidget(button);
 
-        button = new GenericButton("minihud.gui.button.add_shape");
+        button = GenericButton.create("minihud.gui.button.add_shape", this::addShape);
         button.setRight(rightX - 10);
         button.setY(y);
-        button.setActionListener(this::addShape);
         this.addWidget(button);
     }
 

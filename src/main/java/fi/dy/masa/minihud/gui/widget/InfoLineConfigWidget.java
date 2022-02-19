@@ -66,6 +66,18 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
     {
         super.reAddSubWidgets();
 
+        this.addWidget(this.textField);
+        this.addWidget(this.booleanButton);
+        this.addWidget(this.hotkeyButton);
+        this.addWidget(this.settingsWidget);
+        this.addWidget(this.resetButton);
+    }
+
+    @Override
+    public void updateSubWidgetsToGeometryChanges()
+    {
+        super.updateSubWidgetsToGeometryChanges();
+
         int x = this.getElementsStartPosition();
         int y = this.getY();
         int elementWidth = this.getElementWidth();
@@ -91,12 +103,6 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
         x += this.settingsWidget.getWidth() + 4;
         this.updateResetButton(x, y);
         this.updateButtonStates();
-
-        this.addWidget(this.textField);
-        this.addWidget(this.booleanButton);
-        this.addWidget(this.hotkeyButton);
-        this.addWidget(this.settingsWidget);
-        this.addWidget(this.resetButton);
     }
 
     @Override
@@ -121,10 +127,12 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
     protected void updateButtonStates()
     {
         this.booleanButton.setEnabled(this.config.getBooleanConfig().isLocked() == false);
-        this.booleanButton.updateDisplayString();
+        this.booleanButton.updateButtonState();
         this.booleanButton.updateHoverStrings();
-        this.hotkeyButton.updateDisplayString();
+
+        this.hotkeyButton.updateButtonState();
         this.hotkeyButton.updateHoverStrings();
+
         this.resetButton.setEnabled(this.config.isModified() && this.config.getBooleanConfig().isLocked() == false);
     }
 }

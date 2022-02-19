@@ -113,10 +113,12 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
     protected void updateButtonStates()
     {
         this.booleanButton.setEnabled(this.config.getBooleanConfig().isLocked() == false);
-        this.booleanButton.updateDisplayString();
+        this.booleanButton.updateButtonState();
         this.booleanButton.updateHoverStrings();
-        this.hotkeyButton.updateDisplayString();
+
+        this.hotkeyButton.updateButtonState();
         this.hotkeyButton.updateHoverStrings();
+
         this.resetButton.setEnabled(this.config.isModified() && this.config.getBooleanConfig().isLocked() == false);
     }
 }
