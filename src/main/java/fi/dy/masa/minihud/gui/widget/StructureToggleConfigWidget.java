@@ -46,15 +46,15 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
 
         this.colorIndicatorWidgetMain = new ColorIndicatorWidget(18, 18, this.config.getColorMain(), (newValue) -> {
             this.config.getColorMain().setValue(newValue);
-            this.reAddSubWidgets();
+            this.updateButtonStates();
         });
-        this.colorIndicatorWidgetMain.translateAndAddHoverString("minihud.hover.structures.color_main");
+        this.colorIndicatorWidgetMain.getHoverInfoFactory().translateAndAddString(90, "minihud.hover.structures.color_main");
 
         this.colorIndicatorWidgetComponents = new ColorIndicatorWidget(18, 18, this.config.getColorComponents(), (newValue) -> {
             this.config.getColorComponents().setValue(newValue);
-            this.reAddSubWidgets();
+            this.updateButtonStates();
         });
-        this.colorIndicatorWidgetComponents.translateAndAddHoverString("minihud.hover.structures.color_components");
+        this.colorIndicatorWidgetComponents.getHoverInfoFactory().translateAndAddString(90, "minihud.hover.structures.color_components");
 
         this.resetButton.setActionListener(() -> {
             this.config.resetToDefault();
@@ -67,37 +67,32 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
     {
         super.reAddSubWidgets();
 
-        int x = this.getElementsStartPosition();
-        int y = this.getY() + 1;
-        int elementWidth = this.getElementWidth();
-
-        this.booleanButton.setPosition(x, y);
-
-        int w = this.booleanButton.getWidth();
-        x += w + 2;
-        this.hotkeyButton.setPosition(x, y);
-
-        w = elementWidth - w - 66;
-        this.hotkeyButton.setWidth(w);
-
-        x += w + 2;
-        this.settingsWidget.setPosition(x, y);
-
-        x += this.settingsWidget.getWidth() + 4;
-        this.colorIndicatorWidgetMain.setPosition(x, y + 2);
-        x += 21;
-        this.colorIndicatorWidgetComponents.setPosition(x, y + 2);
-
-        x += 21;
-        this.updateResetButton(x, y);
-        this.updateButtonStates();
-
         this.addWidget(this.booleanButton);
         this.addWidget(this.hotkeyButton);
         this.addWidget(this.settingsWidget);
         this.addWidget(this.colorIndicatorWidgetMain);
         this.addWidget(this.colorIndicatorWidgetComponents);
         this.addWidget(this.resetButton);
+    }
+
+    @Override
+    public void updateSubWidgetsToGeometryChanges()
+    {
+        super.updateSubWidgetsToGeometryChanges();
+
+        int x = this.getElementsStartPosition();
+        int y = this.getY() + 1;
+        int w = this.getElementWidth() - this.booleanButton.getWidth() - 66;
+        this.hotkeyButton.setWidth(w);
+
+        this.booleanButton.setPosition(x, y);
+        this.hotkeyButton.setPosition(this.booleanButton.getRight() + 2, y);
+        this.settingsWidget.setPosition(this.hotkeyButton.getRight() + 2, y);
+        this.colorIndicatorWidgetMain.setPosition(this.settingsWidget.getRight() + 3, y + 1);
+        this.colorIndicatorWidgetComponents.setPosition(this.colorIndicatorWidgetMain.getRight() + 3, y + 1);
+
+        this.updateResetButton(this.colorIndicatorWidgetComponents.getRight() + 4, y);
+        this.updateButtonStates();
     }
 
     @Override

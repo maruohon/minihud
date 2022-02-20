@@ -36,7 +36,7 @@ public class Configs
         public static final StringConfig  COORDINATE_FORMAT_STRING              = new StringConfig("coordinateFormat", "x: %.1f y: %.1f z: %.1f");
         public static final BooleanConfig COORDINATE_FORMAT_CUSTOMIZED          = new BooleanConfig("coordinateFormatCustomized", false);
         public static final BooleanConfig PATH_FINDING_DEBUG_POINT_WIDTH        = new BooleanConfig("pathFindingDebugPointWidth", true);
-        public static final BooleanConfig DONT_RESET_SEED_ON_DIMENSION_CHANGE   = new BooleanConfig("dontResetSeedOnDimensionChange", false);
+        public static final BooleanConfig DONT_RESET_SEED_ON_DIMENSION_CHANGE   = new BooleanConfig("dontResetSeedOnDimensionChange", true);
         public static final BooleanConfig FIX_VANILLA_DEBUG_RENDERERS           = new BooleanConfig("enableVanillaDebugRendererFix", true);
         public static final HotkeyedBooleanConfig INFO_LINES_RENDERING_TOGGLE   = new HotkeyedBooleanConfig("infoLinesRenderingToggle", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
         public static final BooleanConfig ITEM_NBT_ENABLED                      = new BooleanConfig("itemNbtEnabled", false);
@@ -53,7 +53,7 @@ public class Configs
         public static final IntegerConfig LIGHT_LEVEL_RANGE                     = new IntegerConfig("lightLevelRange", 24, 1, 64);
         public static final IntegerConfig LIGHT_LEVEL_THRESHOLD                 = new IntegerConfig("lightLevelThreshold", 8, 0, 15);
         public static final DoubleConfig  LIGHT_LEVEL_Z_OFFSET                  = new DoubleConfig("lightLevelZOffset", 0.005, 0.0, 1.0);
-        public static final HotkeyedBooleanConfig OVERLAYS_RENDERING_TOGGLE     = new HotkeyedBooleanConfig("overlaysRenderingToggle", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
+        public static final HotkeyedBooleanConfig OVERLAYS_RENDERING_TOGGLE     = new HotkeyedBooleanConfig("overlaysRenderingToggle", true, "");
         public static final BooleanConfig MAP_PREVIEW                           = new BooleanConfig("mapPreview", false);
         public static final BooleanConfig MAP_PREVIEW_REQUIRE_SHIFT             = new BooleanConfig("mapPreviewRequireShift", true);
         public static final IntegerConfig MAP_PREVIEW_SIZE                      = new IntegerConfig("mapPreviewSize", 160, 16, 512);

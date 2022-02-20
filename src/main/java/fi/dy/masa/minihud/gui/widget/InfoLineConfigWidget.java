@@ -34,7 +34,7 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
         this.initialLineOrderStringValue = String.valueOf(this.initialLineOrder);
         this.initialHotkeyValue = this.config.getKeyBind().getKeys();
 
-        this.textField = new BaseTextFieldWidget(32, 16);
+        this.textField = new BaseTextFieldWidget(24, 16);
         this.textField.setTextValidator(new IntegerTextFieldWidget.IntValidator(this.config.getLineOrderConfig().getMinIntegerValue(),
                                                                                 this.config.getLineOrderConfig().getMaxIntegerValue()));
         this.textField.setListener((str) -> {
@@ -77,30 +77,21 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
     {
         super.updateSubWidgetsToGeometryChanges();
 
-        int x = this.getElementsStartPosition();
-        int y = this.getY();
+        int y = this.getY() + 1;
         int elementWidth = this.getElementWidth();
 
-        this.textField.setPosition(x, y + 3);
-        this.textField.setWidth(24);
+        this.textField.setPosition(this.getElementsStartPosition(), y + 2);
         this.textField.setText(String.valueOf(this.config.getLineOrderConfig().getIntegerValue()));
 
-        y += 1;
-        x += this.textField.getWidth() + 2;
-        this.booleanButton.setPosition(x, y);
+        this.booleanButton.setPosition(this.textField.getRight() + 2, y);
 
-        int w = this.booleanButton.getWidth();
-        x += w + 2;
-        this.hotkeyButton.setPosition(x, y);
-
-        w = elementWidth - 24 - 40 - 21 - 5;
+        int w = elementWidth - this.booleanButton.getWidth() - 24 - 20 - 6;
         this.hotkeyButton.setWidth(w);
+        this.hotkeyButton.setPosition(this.booleanButton.getRight() + 2, y);
 
-        x += w + 2;
-        this.settingsWidget.setPosition(x, y);
+        this.settingsWidget.setPosition(this.hotkeyButton.getRight() + 2, y);
 
-        x += this.settingsWidget.getWidth() + 4;
-        this.updateResetButton(x, y);
+        this.updateResetButton(this.settingsWidget.getRight() + 4, y);
         this.updateButtonStates();
     }
 

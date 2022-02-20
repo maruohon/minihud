@@ -50,27 +50,6 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
     }
 
     @Override
-    public void updateSubWidgetsToGeometryChanges()
-    {
-        super.updateSubWidgetsToGeometryChanges();
-
-        int x = this.getX() + this.getWidth() - 2;
-        int y = this.getY() + 1;
-
-        x -= this.removeButton.getWidth() + 2;
-        this.removeButton.setX(x);
-        this.removeButton.setY(y);
-
-        x -= this.toggleButton.getWidth() + 2;
-        this.toggleButton.setX(x);
-        this.toggleButton.setY(y);
-
-        x -= this.configureButton.getWidth() + 2;
-        this.configureButton.setX(x);
-        this.configureButton.setY(y);
-    }
-
-    @Override
     public void reAddSubWidgets()
     {
         super.reAddSubWidgets();
@@ -78,6 +57,23 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
         this.addWidget(this.configureButton);
         this.addWidget(this.toggleButton);
         this.addWidget(this.removeButton);
+    }
+
+    @Override
+    public void updateSubWidgetsToGeometryChanges()
+    {
+        super.updateSubWidgetsToGeometryChanges();
+
+        int y = this.getY() + 1;
+
+        this.removeButton.setRight(this.getX() + this.getWidth() - 4);
+        this.removeButton.setY(y);
+
+        this.toggleButton.setRight(this.removeButton.getX() - 2);
+        this.toggleButton.setY(y);
+
+        this.configureButton.setRight(this.toggleButton.getRight() - 2);
+        this.configureButton.setY(y);
     }
 
     @Override

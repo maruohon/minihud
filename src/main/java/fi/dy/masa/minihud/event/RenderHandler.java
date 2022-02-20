@@ -791,7 +791,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             this.addLine(ent);
         }
-        else if (type == InfoLine.TILE_ENTITIES)
+        else if (type == InfoLine.BLOCK_ENTITIES)
         {
             this.addLine(String.format("Client world TE - L: %d, T: %d", mc.world.loadedTileEntityList.size(), mc.world.tickableTileEntities.size()));
         }
