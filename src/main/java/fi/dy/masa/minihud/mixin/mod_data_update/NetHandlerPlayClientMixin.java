@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.mixin;
+package fi.dy.masa.minihud.mixin.mod_data_update;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,7 +17,7 @@ import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.util.NotificationUtils;
 
 @Mixin(NetHandlerPlayClient.class)
-public abstract class MixinNetHandlerPlayClient
+public abstract class NetHandlerPlayClientMixin
 {
     @Inject(method = "handleChat", at = @At("RETURN"))
     private void onChatMessage(SPacketChat packet, CallbackInfo ci)
@@ -53,7 +53,7 @@ public abstract class MixinNetHandlerPlayClient
     @Inject(method = "handleMultiBlockChange", at = @At("RETURN"))
     private void markChunkChangedMultiBlockChange(SPacketMultiBlockChange packet, CallbackInfo ci)
     {
-        ChunkPos pos = ((IMixinSPacketMultiBlockChange) packet).getChunkPos();
+        ChunkPos pos = ((SPacketMultiBlockChangeMixin) packet).minihud_getChunkPos();
         NotificationUtils.onMultiBlockChange(pos, packet.getChangedBlocks());
     }
 

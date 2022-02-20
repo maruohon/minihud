@@ -19,13 +19,13 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.nbt.PrettyNbtStringifier;
 import fi.dy.masa.malilib.util.nbt.SimpleNbtStringifier;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.data.DataStorage;
-import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
+import fi.dy.masa.minihud.mixin.info_lines.ChunkProviderServerMixin;
 
 public class MiscUtils
 {
@@ -86,11 +86,11 @@ public class MiscUtils
      */
     public static int getCurrentHashSize(WorldServer server)
     {
-        IMixinChunkProviderServer provider = (IMixinChunkProviderServer) server.getChunkProvider();
+        ChunkProviderServerMixin provider = (ChunkProviderServerMixin) server.getChunkProvider();
 
         try
         {
-            Set<Long> droppedChunks = provider.getDroppedChunks();
+            Set<Long> droppedChunks = provider.minihud_getDroppedChunks();
             Field field = droppedChunks.getClass().getDeclaredField("map");
             field.setAccessible(true);
 

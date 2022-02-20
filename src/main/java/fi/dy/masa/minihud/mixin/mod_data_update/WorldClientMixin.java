@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.mixin;
+package fi.dy.masa.minihud.mixin.mod_data_update;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,14 +13,17 @@ import net.minecraft.world.storage.WorldInfo;
 import fi.dy.masa.minihud.data.DataStorage;
 
 @Mixin(WorldClient.class)
-public abstract class MixinWorldClient extends World
+public abstract class WorldClientMixin extends World
 {
-    protected MixinWorldClient(ISaveHandler saveHandlerIn, WorldInfo info, WorldProvider providerIn, Profiler profilerIn, boolean client)
+    private WorldClientMixin(ISaveHandler saveHandlerIn, WorldInfo info, WorldProvider providerIn,
+                             Profiler profilerIn, boolean client)
     {
         super(saveHandlerIn, info, providerIn, profilerIn, client);
     }
 
-    @Inject(method = "doPreChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ChunkProviderClient;unloadChunk(II)V"))
+    @Inject(method = "doPreChunk",
+            at = @At(value = "INVOKE",
+                     target = "Lnet/minecraft/client/multiplayer/ChunkProviderClient;unloadChunk(II)V"))
     private void onUnloadChunk(int chunkX, int chunkZ, boolean loadChunk, CallbackInfo ci)
     {
         DataStorage.getInstance().onChunkUnload(chunkX, chunkZ);

@@ -20,7 +20,6 @@ minihud.config.comment.chunkunloadbuckethashsize=If enabled, uses the more accur
 minihud.config.comment.coordinateformat=The format string for the coordinate line (Info Lines -> 'Coordinates').\nNeeds to have three float format strings specifiers!\n§6Note: You must enable the 'Coordinate Format Customized'\n§6option for this custom string to be used!
 minihud.config.comment.coordinateformatcustomized=Use the customized coordinate format string from 'Coordinate Format'
 minihud.config.comment.debugmessages=Enables some debug messages printed to the game console
-minihud.config.comment.debugrendererpathfindingenablepointwidth=If enabled, then the vanilla pathfinding debug renderer\nwill render the path point width boxes.
 minihud.config.comment.dontresetseedondimensionchange=Don't reset the world seed when just changing dimensions.\nSome mods may use per-dimension seeds, so by default the seed\nis reset every time the player changes dimensions.
 minihud.config.comment.droppedchunkshashsize=The HashSet size for the chunk unload bucket calculation,\nif 'Chunk Unload Bucket With Size' is true.\nUse -1 for automatically getting the current value in single player,\nor on Carpet servers. A value other than -1 will override the automatic\nvalue, including the proper value received from a Carpet server.
 minihud.config.comment.enablevanilladebugrendererfix=If enabled, then the vanilla debug renderer OpenGL states is fixed.\nBy default they have some missing state which breaks the rendering.
@@ -45,6 +44,8 @@ minihud.config.comment.mappreview=Enables rendering a preview of a map,\nwhen yo
 minihud.config.comment.mappreviewrequireshift=If enabled, then holding shift is required for the Map Preview to be rendered
 minihud.config.comment.mappreviewsize=The size of the rendered map previews
 minihud.config.comment.mctimeformat=The format string for the Minecraft time.\nThe supported placeholders are: {DAY_1}, {DAY}, {HOUR}, {MIN}, {SEC}.\n{DAY_1} starts the day counter from 1, {DAY} starts from 0.
+minihud.config.comment.offsetsubtitlehud=Offset the subtitle HUD to not overlap with the info HUD, if the info HUD is set to the bottom right corner of the screen
+minihud.config.comment.pathfindingdebugpointwidth=If enabled, then the vanilla pathfinding debug renderer\nwill render the path point width boxes.
 minihud.config.comment.realtimeformat=The format string for real time, see the the Java SimpleDateFormat\nclass documentation for the format patterns, if needed:\nhttps://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
 minihud.config.comment.requiresneak=Require the player to be sneaking to render the info lines HUD
 minihud.config.comment.shulkerboxpreview=Enables rendering a preview of the Shulker Box contents,\nwhen you hold shift while hovering over a Shulker Box item
@@ -68,7 +69,7 @@ minihud.hotkey.comment.itemnbtkeystring=When held, the hovered item's NBT data i
 minihud.hotkey.comment.openconfiggui=The hotkey to open the in-game config screen
 minihud.hotkey.comment.requiredkey=If set, the player needs to be holding this key to render the HUD
 minihud.hotkey.comment.setdistancereferencepoint=The hotkey to store the player's current position\nas the reference point for the distance info line type
-minihud.hotkey.comment.shapeeditor=The hotkey to open the Shape Editor screen for the\ncurrently selected shape, if any, otherwise opens the Shapes menu.
+minihud.hotkey.comment.shapeeditor=The hotkey to open the Shape Editor screen for the currently selected shape, if any, otherwise opens the Shapes menu.
 
 minihud.config.comment.beaconrangelvl1=Color for the Beacon Range lvl 1 overlay
 minihud.config.comment.beaconrangelvl2=Color for the Beacon Range lvl 2 overlay
@@ -76,11 +77,11 @@ minihud.config.comment.beaconrangelvl3=Color for the Beacon Range lvl 3 overlay
 minihud.config.comment.beaconrangelvl4=Color for the Beacon Range lvl 4 overlay
 minihud.config.comment.blockgrid=Color for the Block Grid overlay
 minihud.config.comment.lightlevelmarkerdark=Color for the Light Level always-spawnable marker
-minihud.config.comment.lightlevelmarkerlit=Color for the Light Level safe-during-day marker
-minihud.config.comment.lightlevelnumberblockdark=Color for the Light Level block light value number\nfor values below the threshold for spawning (= spawnable)
-minihud.config.comment.lightlevelnumberblocklit=Color for the Light Level block light value number\nfor values above the threshold for spawning (= safe)
-minihud.config.comment.lightlevelnumberskydark=Color for the Light Level sky light value number\nfor values below the threshold for spawning (= spawnable)
-minihud.config.comment.lightlevelnumberskylit=Color for the Light Level sky light value number\nfor values above the threshold for spawning (= safe)
+minihud.config.comment.lightlevelmarkerlit=Color for the Light Level spawnable-at-night marker
+minihud.config.comment.lightlevelnumberblockdark=Color for the Light Level block light value number for values below the threshold for spawning (= spawnable)
+minihud.config.comment.lightlevelnumberblocklit=Color for the Light Level block light value number for values above the threshold for spawning (= safe)
+minihud.config.comment.lightlevelnumberskydark=Color for the Light Level sky light value number for values below the threshold for spawning (= spawnable)
+minihud.config.comment.lightlevelnumberskylit=Color for the Light Level sky light value number for values above the threshold for spawning (= safe)
 minihud.config.comment.randomticksfixed=Color for the fixed-position random ticked chunks overlay
 minihud.config.comment.randomticksplayer=Color for the player-following random ticked chunks overlay
 minihud.config.comment.regionfileborders=Color for the region file overlay
@@ -109,8 +110,7 @@ minihud.config.name.droppedchunkshashsize=Dropped Chunks Hash Size
 minihud.config.name.chunkunloadbucketoverlaychunkradius=Chunk Unload Bucket Overlay Radius
 minihud.config.name.chunkunloadbuckethashsize=Chunk Unload Bucket Hash Size
 minihud.config.name.coordinateformat=Coordinate Format
-minihud.config.name.coordinateformatcustomized=Coordinate Format Customized
-minihud.config.name.debugrendererpathfindingenablepointwidth=Debug: Path Finding Point Width
+minihud.config.name.coordinateformatcustomized=Custom Coordinate Format
 minihud.config.name.dontresetseedondimensionchange=Don't Reset Seed On Dim Change
 minihud.config.name.enablevanilladebugrendererfix=Enable Vanilla Debug Renderer Fixes
 minihud.config.name.infolinesrenderingtoggle=§eInfo Lines Rendering Toggle
@@ -133,7 +133,9 @@ minihud.config.name.mappreview=Map Preview
 minihud.config.name.mappreviewrequireshift=Map Preview Require Shift
 minihud.config.name.mappreviewsize=Map Preview Size
 minihud.config.name.mctimeformat=MC time format
+minihud.config.name.offsetsubtitlehud=Offset Subtitle HUD
 minihud.config.name.overlaysrenderingtoggle=§eOverlays Rendering Main Toggle
+minihud.config.name.pathfindingdebugpointwidth=Path Finding Debug Point Width
 minihud.config.name.realtimeformat=Real Time date/time Format
 minihud.config.name.requiresneak=Require Sneak
 minihud.config.name.shulkerboxpreview=Shulker Box Display

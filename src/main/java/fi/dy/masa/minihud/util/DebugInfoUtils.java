@@ -1,7 +1,6 @@
 package fi.dy.masa.minihud.util;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import io.netty.buffer.Unpooled;
@@ -17,15 +16,14 @@ import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.mixin.IMixinDebugRenderer;
-import fi.dy.masa.minihud.mixin.IMixinPathNavigate;
+import fi.dy.masa.minihud.mixin.debugrenderer.DebugRendererMixin;
+import fi.dy.masa.minihud.mixin.debugrenderer.path_finding.PathNavigateMixin;
 
 public class DebugInfoUtils
 {
@@ -33,6 +31,7 @@ public class DebugInfoUtils
     private static boolean pathFindingEnabled;
     private static int tickCounter;
     private static final Map<Entity, Path> OLD_PATHS = new MapMaker().weakKeys().weakValues().makeMap();
+    private static final List<NeighborUpdate> NEIGHBOR_UPDATES = new ArrayList<>();
 
     public static void sendPacketDebugPath(MinecraftServer server, int entityId, Path path, float maxDistance)
     {
@@ -120,71 +119,94 @@ public class DebugInfoUtils
         }
     }
 
-    public static void onNeighborNotify(World world, BlockPos pos, EnumSet<EnumFacing> notifiedSides)
+    public static void onNeighborNotify(BlockPos pos, long worldTime)
     {
         // This will only work in single player...
         // We are catching updates from the server world, and adding them to the debug renderer directly
-        if (neighborUpdateEnabled && world.isRemote == false)
+        if (neighborUpdateEnabled)
         {
-            final long time = world.getTotalWorldTime();
+            NEIGHBOR_UPDATES.add(new NeighborUpdate(pos.toLong(), worldTime));
+        }
+    }
 
-            GameUtils.getClient().addScheduledTask(() -> {
-                for (EnumFacing side : notifiedSides)
+    public static void updateDebugRenderersOnServerTickEnd(MinecraftServer server)
+    {
+        Minecraft mc = GameUtils.getClient();
+
+        // Send the custom packet with the Path data, if that debug renderer is enabled
+        if (pathFindingEnabled)
+        {
+            addPathFindingDebug(server, mc);
+        }
+
+        if (neighborUpdateEnabled)
+        {
+            List<NeighborUpdate> list = new ArrayList<>(NEIGHBOR_UPDATES);
+            NEIGHBOR_UPDATES.clear();
+
+            mc.addScheduledTask(() -> {
+                DebugRendererNeighborsUpdate renderer = (DebugRendererNeighborsUpdate) mc.debugRenderer.neighborsUpdate;
+
+                for (NeighborUpdate update : list)
                 {
-                    ((DebugRendererNeighborsUpdate) GameUtils.getClient().debugRenderer.neighborsUpdate).addUpdate(time, pos.offset(side));
+                    renderer.addUpdate(update.time, update.getPos());
                 }
             });
         }
     }
 
-    public static void onServerTickEnd(MinecraftServer server)
+    private static void addPathFindingDebug(MinecraftServer server, Minecraft mc)
     {
-        Minecraft mc = GameUtils.getClient();
-
-        // Send the custom packet with the Path data, if that debug renderer is enabled
-        if (pathFindingEnabled && mc.world != null && ++tickCounter >= 10)
+        if (mc.world != null && ++tickCounter >= 10)
         {
             tickCounter = 0;
             World world = WorldUtils.getServerWorldForClientWorld(mc);
 
             if (world != null)
             {
+                boolean addMaxDist = Configs.Generic.PATH_FINDING_DEBUG_POINT_WIDTH.getBooleanValue();
+
                 for (Entity entity : world.loadedEntityList)
                 {
-                    PathNavigate navigator = entity instanceof EntityLiving ? ((EntityLiving) entity).getNavigator() : null;
-
-                    if (navigator != null && isAnyPlayerWithinRange(world, entity, 64))
+                    if (entity instanceof EntityLiving)
                     {
-                        final Path path = navigator.getPath();
-                        Path old = OLD_PATHS.get(entity);
-
-                        if (path == null)
-                        {
-                            continue;
-                        }
-
-                        boolean isSamepath = old != null && old.isSamePath(path);
-
-                        if (old == null || isSamepath == false || old.getCurrentPathIndex() != path.getCurrentPathIndex())
-                        {
-                            final int id = entity.getEntityId();
-                            final float maxDistance = Configs.Generic.DEBUG_RENDERER_PATH_MAX_DIST.getBooleanValue() ? ((IMixinPathNavigate) navigator).getMaxDistanceToWaypoint() : 0F;
-
-                            DebugInfoUtils.sendPacketDebugPath(server, id, path, maxDistance);
-
-                            if (isSamepath == false)
-                            {
-                                // Make a copy via a PacketBuffer... :/
-                                PacketBuffer buf = DebugInfoUtils.writePathToBuffer(path);
-                                OLD_PATHS.put(entity, Path.read(buf));
-                            }
-                            else if (old != null)
-                            {
-                                old.setCurrentPathIndex(path.getCurrentPathIndex());
-                            }
-                        }
+                        addEntityPath((EntityLiving) entity, world, addMaxDist, server);
                     }
                 }
+            }
+        }
+    }
+
+    private static void addEntityPath(EntityLiving entity, World world, boolean addMaxDist, MinecraftServer server)
+    {
+        PathNavigate navigator = entity.getNavigator();
+
+        if (navigator == null || navigator.getPath() == null ||
+            isAnyPlayerWithinRange(world, entity, 64) == false)
+        {
+            return;
+        }
+
+        Path path = navigator.getPath();
+        Path old = OLD_PATHS.get(entity);
+        boolean isSamePath = old != null && old.isSamePath(path);
+
+        if (old == null || isSamePath == false || old.getCurrentPathIndex() != path.getCurrentPathIndex())
+        {
+            final int id = entity.getEntityId();
+            final float maxDistance = addMaxDist ? ((PathNavigateMixin) navigator).minihud_getMaxDistanceToWaypoint() : 0F;
+
+            DebugInfoUtils.sendPacketDebugPath(server, id, path, maxDistance);
+
+            if (isSamePath == false)
+            {
+                // Make a copy via a PacketBuffer... :/
+                PacketBuffer buf = DebugInfoUtils.writePathToBuffer(path);
+                OLD_PATHS.put(entity, Path.read(buf));
+            }
+            else if (old != null)
+            {
+                old.setCurrentPathIndex(path.getCurrentPathIndex());
             }
         }
     }
@@ -213,29 +235,46 @@ public class DebugInfoUtils
 
         if (config == RendererToggle.DEBUG_COLLISION_BOXES)
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setCollisionBoxEnabled(enabled);
+            ((DebugRendererMixin) mc.debugRenderer).minihud_setCollisionBoxEnabled(enabled);
         }
         else if (config == RendererToggle.DEBUG_HEIGHT_MAP)
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setHeightMapEnabled(enabled);
+            ((DebugRendererMixin) mc.debugRenderer).minihud_setHeightMapEnabled(enabled);
         }
         else if (config == RendererToggle.DEBUG_NEIGHBOR_UPDATES)
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setNeighborsUpdateEnabled(enabled);
+            ((DebugRendererMixin) mc.debugRenderer).minihud_setNeighborsUpdateEnabled(enabled);
             neighborUpdateEnabled = enabled;
         }
         else if (config == RendererToggle.DEBUG_PATH_FINDING)
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setPathfindingEnabled(enabled);
+            ((DebugRendererMixin) mc.debugRenderer).minihud_setPathfindingEnabled(enabled);
             pathFindingEnabled = enabled;
         }
         else if (config == RendererToggle.DEBUG_SOLID_FACES)
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setSolidFaceEnabled(enabled);
+            ((DebugRendererMixin) mc.debugRenderer).minihud_setSolidFaceEnabled(enabled);
         }
         else if (config == RendererToggle.DEBUG_WATER)
         {
-            ((IMixinDebugRenderer) mc.debugRenderer).setWaterEnabled(enabled);
+            ((DebugRendererMixin) mc.debugRenderer).minihud_setWaterEnabled(enabled);
+        }
+    }
+
+    private static class NeighborUpdate
+    {
+        private final long posLong;
+        private final long time;
+
+        public NeighborUpdate(long posLong, long time)
+        {
+            this.posLong = posLong;
+            this.time = time;
+        }
+
+        public BlockPos getPos()
+        {
+            return BlockPos.fromLong(this.posLong);
         }
     }
 }

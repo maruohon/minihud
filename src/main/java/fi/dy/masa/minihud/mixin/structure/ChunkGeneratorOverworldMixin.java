@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.mixin;
+package fi.dy.masa.minihud.mixin.structure;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -10,20 +10,20 @@ import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.WoodlandMansion;
 
 @Mixin(ChunkGeneratorOverworld.class)
-public interface IMixinChunkGeneratorOverworld
+public interface ChunkGeneratorOverworldMixin
 {
     @Accessor("oceanMonumentGenerator")
-    StructureOceanMonument getOceanMonumentGenerator();
+    StructureOceanMonument minihud_getOceanMonumentGenerator();
 
     @Accessor("scatteredFeatureGenerator")
-    MapGenScatteredFeature getScatteredFeatureGenerator();
+    MapGenScatteredFeature minihud_getScatteredFeatureGenerator();
 
     @Accessor("strongholdGenerator")
-    MapGenStronghold getStrongholdGenerator();
+    MapGenStronghold minihud_getStrongholdGenerator();
 
     @Accessor("villageGenerator")
-    MapGenVillage getVillageGenerator();
+    MapGenVillage minihud_getVillageGenerator();
 
     @Accessor("woodlandMansionGenerator")
-    WoodlandMansion getWoodlandMansionGenerator();
+    WoodlandMansion minihud_getWoodlandMansionGenerator();
 }

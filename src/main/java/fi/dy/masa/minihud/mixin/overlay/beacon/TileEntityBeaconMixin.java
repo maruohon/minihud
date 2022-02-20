@@ -1,14 +1,16 @@
-package fi.dy.masa.minihud.mixin;
+package fi.dy.masa.minihud.mixin.overlay.beacon;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import net.minecraft.tileentity.TileEntityBeacon;
+import net.minecraft.tileentity.TileEntityLockable;
 import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
 
-@Mixin(net.minecraft.tileentity.TileEntityBeacon.class)
-public abstract class MixinTileEntityBeacon extends net.minecraft.tileentity.TileEntityLockable
+@Mixin(TileEntityBeacon.class)
+public abstract class TileEntityBeaconMixin extends TileEntityLockable
 {
     @Shadow private int levels;
 

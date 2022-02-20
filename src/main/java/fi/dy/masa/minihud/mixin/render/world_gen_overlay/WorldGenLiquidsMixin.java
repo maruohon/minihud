@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.mixin;
+package fi.dy.masa.minihud.mixin.render.world_gen_overlay;
 
 import java.util.Random;
 import org.spongepowered.asm.mixin.Final;
@@ -16,7 +16,7 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 
 @Mixin(WorldGenLiquids.class)
-public class MixinWorldGenLiquids
+public abstract class WorldGenLiquidsMixin
 {
     @Shadow @Final private Block block;
 

@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.mixin;
+package fi.dy.masa.minihud.mixin.structure;
 
 import java.util.Map;
 import org.spongepowered.asm.mixin.Mixin;
@@ -7,8 +7,8 @@ import net.minecraft.world.gen.ChunkGeneratorFlat;
 import net.minecraft.world.gen.structure.MapGenStructure;
 
 @Mixin(ChunkGeneratorFlat.class)
-public interface IMixinChunkGeneratorFlat
+public interface ChunkGeneratorFlatMixin
 {
     @Accessor("structureGenerators")
-    Map<String, MapGenStructure> getStructureGenerators();
+    Map<String, MapGenStructure> minihud_getStructureGenerators();
 }

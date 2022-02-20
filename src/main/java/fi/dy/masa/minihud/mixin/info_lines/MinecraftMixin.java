@@ -1,17 +1,22 @@
-package fi.dy.masa.minihud.mixin;
+package fi.dy.masa.minihud.mixin.info_lines;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import net.minecraft.client.Minecraft;
+import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.data.DataStorage;
 
-@Mixin(net.minecraft.client.Minecraft.class)
-public abstract class MixinMinecraft
+@Mixin(Minecraft.class)
+public abstract class MinecraftMixin
 {
     @Inject(method = "runTick", at = @At("HEAD"))
     private void onClientTickPre(CallbackInfo ci)
     {
-        DataStorage.getInstance().onClientTickPre((net.minecraft.client.Minecraft) (Object) this);
+        if (InfoLine.BLOCK_BREAK_SPEED.getBooleanValue())
+        {
+            DataStorage.getInstance().clearBlockBreakCounter((Minecraft) (Object) this);
+        }
     }
 }

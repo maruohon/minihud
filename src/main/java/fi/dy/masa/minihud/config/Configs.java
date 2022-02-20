@@ -28,42 +28,43 @@ public class Configs
     {
         public static final BooleanConfig BEACON_RANGE_AUTO_UPDATE              = new BooleanConfig("beaconRangeAutoUpdate", false);
         public static final IntegerConfig BLOCK_GRID_OVERLAY_RADIUS             = new IntegerConfig("blockGridOverlayRadius", 16, 0, 64);
-        public static final DoubleConfig CHUNK_UNLOAD_BUCKET_FONT_SCALE         = new DoubleConfig("chunkUnloadBucketOverlayFontScale", 0.1625, 0.0, 1.0);
+        public static final DoubleConfig  CHUNK_UNLOAD_BUCKET_FONT_SCALE        = new DoubleConfig("chunkUnloadBucketOverlayFontScale", 0.1625, 0.0, 1.0);
         public static final BooleanConfig DEBUG_MESSAGES                        = new BooleanConfig("debugMessages", false);
         public static final IntegerConfig DROPPED_CHUNKS_HASH_SIZE              = new IntegerConfig("droppedChunksHashSize", -1, -1, Integer.MAX_VALUE);
         public static final IntegerConfig CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS    = new IntegerConfig("chunkUnloadBucketOverlayChunkRadius", -1, -1, 40);
         public static final BooleanConfig CHUNK_UNLOAD_BUCKET_HASH_SIZE         = new BooleanConfig("chunkUnloadBucketHashSize", true);
-        public static final StringConfig COORDINATE_FORMAT_STRING               = new StringConfig("coordinateFormat", "x: %.1f y: %.1f z: %.1f");
+        public static final StringConfig  COORDINATE_FORMAT_STRING              = new StringConfig("coordinateFormat", "x: %.1f y: %.1f z: %.1f");
         public static final BooleanConfig COORDINATE_FORMAT_CUSTOMIZED          = new BooleanConfig("coordinateFormatCustomized", false);
-        public static final BooleanConfig DEBUG_RENDERER_PATH_MAX_DIST          = new BooleanConfig("debugRendererPathFindingEnablePointWidth", true);
+        public static final BooleanConfig PATH_FINDING_DEBUG_POINT_WIDTH        = new BooleanConfig("pathFindingDebugPointWidth", true);
         public static final BooleanConfig DONT_RESET_SEED_ON_DIMENSION_CHANGE   = new BooleanConfig("dontResetSeedOnDimensionChange", false);
         public static final BooleanConfig FIX_VANILLA_DEBUG_RENDERERS           = new BooleanConfig("enableVanillaDebugRendererFix", true);
+        public static final HotkeyedBooleanConfig INFO_LINES_RENDERING_TOGGLE   = new HotkeyedBooleanConfig("infoLinesRenderingToggle", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
         public static final BooleanConfig ITEM_NBT_ENABLED                      = new BooleanConfig("itemNbtEnabled", false);
-        public static final HotkeyConfig ITEM_NBT_KEY_PRETTY                    = new HotkeyConfig("itemNbtKeyPretty", "", KeyBindSettings.GUI_MODIFIER);
-        public static final HotkeyConfig ITEM_NBT_KEY_STRING                    = new HotkeyConfig("itemNbtKeyString", "", KeyBindSettings.GUI_MODIFIER);
+        public static final HotkeyConfig  ITEM_NBT_KEY_PRETTY                   = new HotkeyConfig("itemNbtKeyPretty", "", KeyBindSettings.GUI_MODIFIER);
+        public static final HotkeyConfig  ITEM_NBT_KEY_STRING                   = new HotkeyConfig("itemNbtKeyString", "", KeyBindSettings.GUI_MODIFIER);
         public static final IntegerConfig ITEM_PREVIEW_Z                        = new IntegerConfig("itemPreviewZ", 400, 0, 4096);
         public static final BooleanConfig LIGHT_LEVEL_COLORED_NUMBERS           = new BooleanConfig("lightLevelColoredNumbers", true);
-        public static final DoubleConfig LIGHT_LEVEL_MARKER_SIZE                = new DoubleConfig("lightLevelMarkerSize", 0.84, 0.0, 1.0);
-        public static final DoubleConfig LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X      = new DoubleConfig("lightLevelNumberOffsetBlockX", 0.09, 0.0, 1.0);
-        public static final DoubleConfig LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y      = new DoubleConfig("lightLevelNumberOffsetBlockY", 0.12, 0.0, 1.0);
-        public static final DoubleConfig LIGHT_LEVEL_NUMBER_OFFSET_SKY_X        = new DoubleConfig("lightLevelNumberOffsetSkyX", 0.42, 0.0, 1.0);
-        public static final DoubleConfig LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y        = new DoubleConfig("lightLevelNumberOffsetSkyY", 0.56, 0.0, 1.0);
+        public static final DoubleConfig  LIGHT_LEVEL_MARKER_SIZE               = new DoubleConfig("lightLevelMarkerSize", 0.84, 0.0, 1.0);
+        public static final DoubleConfig  LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X     = new DoubleConfig("lightLevelNumberOffsetBlockX", 0.09, 0.0, 1.0);
+        public static final DoubleConfig  LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y     = new DoubleConfig("lightLevelNumberOffsetBlockY", 0.12, 0.0, 1.0);
+        public static final DoubleConfig  LIGHT_LEVEL_NUMBER_OFFSET_SKY_X       = new DoubleConfig("lightLevelNumberOffsetSkyX", 0.42, 0.0, 1.0);
+        public static final DoubleConfig  LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y       = new DoubleConfig("lightLevelNumberOffsetSkyY", 0.56, 0.0, 1.0);
         public static final BooleanConfig LIGHT_LEVEL_NUMBER_ROTATION           = new BooleanConfig("lightLevelNumberRotation", true);
         public static final IntegerConfig LIGHT_LEVEL_RANGE                     = new IntegerConfig("lightLevelRange", 24, 1, 64);
         public static final IntegerConfig LIGHT_LEVEL_THRESHOLD                 = new IntegerConfig("lightLevelThreshold", 8, 0, 15);
-        public static final DoubleConfig LIGHT_LEVEL_Z_OFFSET                   = new DoubleConfig("lightLevelZOffset", 0.005, 0.0, 1.0);
-        public static final HotkeyedBooleanConfig INFO_LINES_RENDERING_TOGGLE   = new HotkeyedBooleanConfig("infoLinesRenderingToggle", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
+        public static final DoubleConfig  LIGHT_LEVEL_Z_OFFSET                  = new DoubleConfig("lightLevelZOffset", 0.005, 0.0, 1.0);
         public static final HotkeyedBooleanConfig OVERLAYS_RENDERING_TOGGLE     = new HotkeyedBooleanConfig("overlaysRenderingToggle", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
         public static final BooleanConfig MAP_PREVIEW                           = new BooleanConfig("mapPreview", false);
         public static final BooleanConfig MAP_PREVIEW_REQUIRE_SHIFT             = new BooleanConfig("mapPreviewRequireShift", true);
         public static final IntegerConfig MAP_PREVIEW_SIZE                      = new IntegerConfig("mapPreviewSize", 160, 16, 512);
-        public static final StringConfig MC_TIME_FORMAT                         = new StringConfig("mcTimeFormat", "MC time: (day {DAY}) {HOUR}:{MIN}:xx");
-        public static final HotkeyConfig OPEN_CONFIG_GUI                        = new HotkeyConfig("openConfigGui", "H,C");
-        public static final StringConfig REAL_TIME_FORMAT                       = new StringConfig("realTimeFormat", "yyyy-MM-dd HH:mm:ss");
+        public static final StringConfig  MC_TIME_FORMAT                        = new StringConfig("mcTimeFormat", "MC time: (day {DAY}) {HOUR}:{MIN}:xx");
+        public static final BooleanConfig OFFSET_SUBTITLE_HUD                   = new BooleanConfig("offsetSubtitleHud", false);
+        public static final HotkeyConfig  OPEN_CONFIG_GUI                       = new HotkeyConfig("openConfigGui", "H,C");
+        public static final HotkeyConfig  OPEN_SHAPE_EDITOR                     = new HotkeyConfig("openShapeEditor", "");
+        public static final StringConfig  REAL_TIME_FORMAT                      = new StringConfig("realTimeFormat", "yyyy-MM-dd HH:mm:ss");
         public static final BooleanConfig REQUIRE_SNEAK                         = new BooleanConfig("requireSneak", false);
-        public static final HotkeyConfig REQUIRED_KEY                           = new HotkeyConfig("requiredKey", "", KeyBindSettings.INGAME_MODIFIER_EMPTY);
-        public static final HotkeyConfig SET_DISTANCE_REFERENCE_POINT           = new HotkeyConfig("setDistanceReferencePoint", "");
-        public static final HotkeyConfig OPEN_SHAPE_EDITOR                      = new HotkeyConfig("openShapeEditor", "");
+        public static final HotkeyConfig  REQUIRED_KEY                          = new HotkeyConfig("requiredKey", "", KeyBindSettings.INGAME_MODIFIER_EMPTY);
+        public static final HotkeyConfig  SET_DISTANCE_REFERENCE_POINT          = new HotkeyConfig("setDistanceReferencePoint", "");
         public static final BooleanConfig SHULKER_BOX_PREVIEW                   = new BooleanConfig("shulkerBoxPreview", false);
         public static final BooleanConfig SHULKER_DISPLAY_BACKGROUND_COLOR      = new BooleanConfig("shulkerDisplayBgColor", true);
         public static final BooleanConfig SHULKER_DISPLAY_REQUIRE_SHIFT         = new BooleanConfig("shulkerDisplayRequireShift", true);
@@ -78,7 +79,7 @@ public class Configs
         public static final IntegerConfig TIME_DAY_DIVISOR                      = new IntegerConfig("timeDayDivisor", 24000, 1, Integer.MAX_VALUE);
         public static final IntegerConfig TIME_TOTAL_DIVISOR                    = new IntegerConfig("timeTotalDivisor", 24000, 1, Integer.MAX_VALUE);
         public static final BooleanConfig WOOL_COUNTER_ENABLE_ALL               = new BooleanConfig("woolCounterEnableAll", true);
-        public static final StringConfig WOOL_COUNTER_TYPES                     = new StringConfig("woolCounterTypes", "0-15");
+        public static final StringConfig  WOOL_COUNTER_TYPES                    = new StringConfig("woolCounterTypes", "0-15");
 
         public static final OptionListConfig<BlockGridMode> BLOCK_GRID_OVERLAY_MODE         = new OptionListConfig<>("blockGridOverlayMode", BlockGridMode.ALL, BlockGridMode.VALUES);
         public static final OptionListConfig<LightLevelMarkerMode> LIGHT_LEVEL_MARKER_MODE  = new OptionListConfig<>("lightLevelMarkers", LightLevelMarkerMode.SQUARE, LightLevelMarkerMode.VALUES);
@@ -95,10 +96,11 @@ public class Configs
                 COORDINATE_FORMAT_CUSTOMIZED,
                 REAL_TIME_FORMAT,
                 DEBUG_MESSAGES,
-                DEBUG_RENDERER_PATH_MAX_DIST,
+                PATH_FINDING_DEBUG_POINT_WIDTH,
                 DONT_RESET_SEED_ON_DIMENSION_CHANGE,
                 DROPPED_CHUNKS_HASH_SIZE,
                 FIX_VANILLA_DEBUG_RENDERERS,
+                INFO_LINES_RENDERING_TOGGLE,
                 ITEM_NBT_ENABLED,
                 ITEM_NBT_KEY_PRETTY,
                 ITEM_NBT_KEY_STRING,
@@ -115,17 +117,17 @@ public class Configs
                 LIGHT_LEVEL_RANGE,
                 LIGHT_LEVEL_THRESHOLD,
                 LIGHT_LEVEL_Z_OFFSET,
-                INFO_LINES_RENDERING_TOGGLE,
-                OVERLAYS_RENDERING_TOGGLE,
                 MAP_PREVIEW,
                 MAP_PREVIEW_REQUIRE_SHIFT,
                 MAP_PREVIEW_SIZE,
                 MC_TIME_FORMAT,
+                OFFSET_SUBTITLE_HUD,
                 OPEN_CONFIG_GUI,
+                OPEN_SHAPE_EDITOR,
+                OVERLAYS_RENDERING_TOGGLE,
                 REQUIRE_SNEAK,
                 REQUIRED_KEY,
                 SET_DISTANCE_REFERENCE_POINT,
-                OPEN_SHAPE_EDITOR,
                 SHULKER_BOX_PREVIEW,
                 SHULKER_DISPLAY_BACKGROUND_COLOR,
                 SHULKER_DISPLAY_REQUIRE_SHIFT,
@@ -144,14 +146,14 @@ public class Configs
         );
 
         public static final List<Hotkey> HOTKEY_LIST = ImmutableList.of(
+                INFO_LINES_RENDERING_TOGGLE,
                 ITEM_NBT_KEY_PRETTY,
                 ITEM_NBT_KEY_STRING,
-                INFO_LINES_RENDERING_TOGGLE,
+                OPEN_CONFIG_GUI,
+                OPEN_SHAPE_EDITOR,
                 OVERLAYS_RENDERING_TOGGLE,
                 REQUIRED_KEY,
-                OPEN_CONFIG_GUI,
-                SET_DISTANCE_REFERENCE_POINT,
-                OPEN_SHAPE_EDITOR
+                SET_DISTANCE_REFERENCE_POINT
         );
     }
 

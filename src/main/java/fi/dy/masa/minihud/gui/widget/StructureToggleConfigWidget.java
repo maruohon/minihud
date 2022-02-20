@@ -1,11 +1,11 @@
 package fi.dy.masa.minihud.gui.widget;
 
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
-import fi.dy.masa.malilib.gui.widget.button.KeyBindConfigButton;
 import fi.dy.masa.malilib.gui.config.ConfigWidgetContext;
 import fi.dy.masa.malilib.gui.widget.ColorIndicatorWidget;
 import fi.dy.masa.malilib.gui.widget.KeybindSettingsWidget;
+import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
+import fi.dy.masa.malilib.gui.widget.button.KeyBindConfigButton;
 import fi.dy.masa.malilib.gui.widget.list.entry.config.BaseConfigWidget;
 import fi.dy.masa.minihud.config.StructureToggle;
 

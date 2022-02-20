@@ -34,11 +34,11 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.malilib.config.value.ScreenLocation;
 import fi.dy.masa.malilib.event.PostGameOverlayRenderer;
 import fi.dy.masa.malilib.event.PostItemTooltipRenderer;
 import fi.dy.masa.malilib.event.PostWorldRenderer;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.config.value.ScreenLocation;
 import fi.dy.masa.malilib.overlay.InfoArea;
 import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
 import fi.dy.masa.malilib.registry.Registry;
@@ -55,7 +55,7 @@ import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.DataStorage.HashSizeType;
 import fi.dy.masa.minihud.data.MobCapDataHolder;
 import fi.dy.masa.minihud.data.TpsData;
-import fi.dy.masa.minihud.mixin.IMixinRenderGlobal;
+import fi.dy.masa.minihud.mixin.info_lines.RenderGlobalMixin;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.MiscUtils;
 
@@ -687,7 +687,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
         else if (type == InfoLine.CHUNK_SECTIONS)
         {
-            this.addLine(String.format("C: %d", ((IMixinRenderGlobal) mc.renderGlobal).getRenderedChunksInvoker()));
+            this.addLine(String.format("C: %d", ((RenderGlobalMixin) mc.renderGlobal).minihud_getRenderedChunks()));
         }
         else if (type == InfoLine.CHUNK_SECTIONS_FULL)
         {

@@ -37,12 +37,12 @@ import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorEnd;
-import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorFlat;
-import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorHell;
-import fi.dy.masa.minihud.mixin.IMixinChunkGeneratorOverworld;
-import fi.dy.masa.minihud.mixin.IMixinChunkProviderServer;
-import fi.dy.masa.minihud.mixin.IMixinMapGenStructure;
+import fi.dy.masa.minihud.mixin.structure.ChunkGeneratorEndMixin;
+import fi.dy.masa.minihud.mixin.structure.ChunkGeneratorFlatMixin;
+import fi.dy.masa.minihud.mixin.structure.ChunkGeneratorHellMixin;
+import fi.dy.masa.minihud.mixin.structure.ChunkGeneratorOverworldMixin;
+import fi.dy.masa.minihud.mixin.structure.ChunkProviderServerMixin;
+import fi.dy.masa.minihud.mixin.structure.MapGenStructureMixin;
 import fi.dy.masa.minihud.network.CarpetStructurePacketHandler;
 import fi.dy.masa.minihud.network.ServuxStructurePacketHandler;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -206,7 +206,7 @@ public class StructureStorage
 
         if (world != null)
         {
-            final IChunkGenerator chunkGenerator = ((IMixinChunkProviderServer) world.getChunkProvider()).getChunkGenerator();
+            final IChunkGenerator chunkGenerator = ((ChunkProviderServerMixin) world.getChunkProvider()).minihud_getChunkGenerator();
             final int maxRange = (GameUtils.getRenderDistanceChunks() + 4) * 16;
 
             world.addScheduledTask(() -> this.addStructureDataFromGenerator(chunkGenerator, playerPos, maxRange));
@@ -411,34 +411,34 @@ public class StructureStorage
         {
             MapGenStructure mapGen;
 
-            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getOceanMonumentGenerator();
+            mapGen = ((ChunkGeneratorOverworldMixin) chunkGenerator).minihud_getOceanMonumentGenerator();
             this.addStructuresWithinRange(StructureType.OCEAN_MONUMENT, mapGen, playerPos, maxRange);
 
-            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getScatteredFeatureGenerator();
+            mapGen = ((ChunkGeneratorOverworldMixin) chunkGenerator).minihud_getScatteredFeatureGenerator();
             this.addTempleStructuresWithinRange(mapGen, playerPos, maxRange);
 
-            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getStrongholdGenerator();
+            mapGen = ((ChunkGeneratorOverworldMixin) chunkGenerator).minihud_getStrongholdGenerator();
             this.addStructuresWithinRange(StructureType.STRONGHOLD, mapGen, playerPos, maxRange);
 
-            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getVillageGenerator();
+            mapGen = ((ChunkGeneratorOverworldMixin) chunkGenerator).minihud_getVillageGenerator();
             this.addStructuresWithinRange(StructureType.VILLAGE, mapGen, playerPos, maxRange);
 
-            mapGen = ((IMixinChunkGeneratorOverworld) chunkGenerator).getWoodlandMansionGenerator();
+            mapGen = ((ChunkGeneratorOverworldMixin) chunkGenerator).minihud_getWoodlandMansionGenerator();
             this.addStructuresWithinRange(StructureType.MANSION, mapGen, playerPos, maxRange);
         }
         else if (chunkGenerator instanceof ChunkGeneratorHell)
         {
-            MapGenStructure mapGen = ((IMixinChunkGeneratorHell) chunkGenerator).getFortressGenerator();
+            MapGenStructure mapGen = ((ChunkGeneratorHellMixin) chunkGenerator).minihud_getFortressGenerator();
             this.addStructuresWithinRange(StructureType.NETHER_FORTRESS, mapGen, playerPos, maxRange);
         }
         else if (chunkGenerator instanceof ChunkGeneratorEnd)
         {
-            MapGenStructure mapGen = ((IMixinChunkGeneratorEnd) chunkGenerator).getEndCityGenerator();
+            MapGenStructure mapGen = ((ChunkGeneratorEndMixin) chunkGenerator).minihud_getEndCityGenerator();
             this.addStructuresWithinRange(StructureType.END_CITY, mapGen, playerPos, maxRange);
         }
         else if (chunkGenerator instanceof ChunkGeneratorFlat)
         {
-            Map<String, MapGenStructure> map = ((IMixinChunkGeneratorFlat) chunkGenerator).getStructureGenerators();
+            Map<String, MapGenStructure> map = ((ChunkGeneratorFlatMixin) chunkGenerator).minihud_getStructureGenerators();
 
             for (MapGenStructure mapGen : map.values())
             {
@@ -468,7 +468,7 @@ public class StructureStorage
 
     private void addStructuresWithinRange(StructureType type, MapGenStructure mapGen, BlockPos playerPos, int maxRange)
     {
-        Long2ObjectMap<StructureStart> structureMap = ((IMixinMapGenStructure) mapGen).getStructureMap();
+        Long2ObjectMap<StructureStart> structureMap = ((MapGenStructureMixin) mapGen).minihud_getStructureMap();
 
         for (StructureStart start : structureMap.values())
         {
@@ -481,7 +481,7 @@ public class StructureStorage
 
     private void addTempleStructuresWithinRange(MapGenStructure mapGen, BlockPos playerPos, int maxRange)
     {
-        Long2ObjectMap<StructureStart> structureMap = ((IMixinMapGenStructure) mapGen).getStructureMap();
+        Long2ObjectMap<StructureStart> structureMap = ((MapGenStructureMixin) mapGen).minihud_getStructureMap();
 
         for (StructureStart start : structureMap.values())
         {

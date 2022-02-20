@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.mixin;
+package fi.dy.masa.minihud.mixin.info_lines;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -8,10 +8,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiSubtitleOverlay;
 import net.minecraft.client.renderer.GlStateManager;
+import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.event.RenderHandler;
 
 @Mixin(GuiSubtitleOverlay.class)
-public abstract class MixinGuiSubtitleOverlay extends Gui
+public abstract class GuiSubtitleOverlayMixin extends Gui
 {
     @Inject(method = "renderSubtitles", at = @At(
             value = "INVOKE",
@@ -23,11 +24,14 @@ public abstract class MixinGuiSubtitleOverlay extends Gui
             shift = Shift.AFTER))
     private void nudgeSubtitleOverlay(CallbackInfo ci)
     {
-        int offset = RenderHandler.INSTANCE.getSubtitleOffset();
-
-        if (offset != 0)
+        if (Configs.Generic.OFFSET_SUBTITLE_HUD.getBooleanValue())
         {
-            GlStateManager.translate(0, offset, 0);
+            int offset = RenderHandler.INSTANCE.getSubtitleOffset();
+
+            if (offset != 0)
+            {
+                GlStateManager.translate(0, offset, 0);
+            }
         }
     }
 }

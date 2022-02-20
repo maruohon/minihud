@@ -384,7 +384,7 @@ public class DataStorage
         this.chunkHeightmapsToCheck.clear();
     }
 
-    public void onClientTickPre(Minecraft mc)
+    public void clearBlockBreakCounter(Minecraft mc)
     {
         if (mc.world != null)
         {

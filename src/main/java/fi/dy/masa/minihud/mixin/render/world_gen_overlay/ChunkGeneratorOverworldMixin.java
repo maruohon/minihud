@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.mixin;
+package fi.dy.masa.minihud.mixin.render.world_gen_overlay;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -9,10 +9,11 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 
 @Mixin(ChunkGeneratorOverworld.class)
-public class MixinChunkGeneratorOverworld
+public abstract class ChunkGeneratorOverworldMixin
 {
-    @ModifyArg(method = "populate", at = @At(value = "INVOKE",
-               target = "Lnet/minecraft/world/gen/feature/WorldGenDungeons;generate(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/util/math/BlockPos;)Z"))
+    @ModifyArg(method = "populate",
+               at = @At(value = "INVOKE",
+                        target = "Lnet/minecraft/world/gen/feature/WorldGenDungeons;generate(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/util/math/BlockPos;)Z"))
     private BlockPos onDungeonGenerationAttempt(BlockPos position)
     {
         if (RendererToggle.OVERLAY_SPAWNER_POSITIONS.isRendererEnabled())
