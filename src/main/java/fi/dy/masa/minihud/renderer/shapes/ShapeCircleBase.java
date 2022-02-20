@@ -214,14 +214,14 @@ public abstract class ShapeCircleBase extends ShapeBase
         DecimalFormat fmt = new DecimalFormat("#.##");
         Vec3d c = this.center;
 
-        lines.add(StringUtils.translate("minihud.gui.label.hover.shape.radius_value", String.valueOf(this.getRadius())));
-        lines.add(StringUtils.translate("minihud.gui.label.hover.shape.center_value", fmt.format(c.x), fmt.format(c.y), fmt.format(c.z)));
-        lines.add(StringUtils.translate("minihud.gui.label.hover.shape.block_snap", this.snap.getDisplayName()));
+        lines.add(StringUtils.translate("minihud.hover.shape.radius", this.getRadius()));
+        lines.add(StringUtils.translate("minihud.hover.shape.center", fmt.format(c.x), fmt.format(c.y), fmt.format(c.z)));
+        lines.add(StringUtils.translate("minihud.hover.shape.block_snap", this.snap.getDisplayName()));
 
         if (this.snap != BlockSnap.NONE)
         {
             c = this.effectiveCenter;
-            lines.add(StringUtils.translate("minihud.gui.label.hover.shape.effective_center_value", fmt.format(c.x), fmt.format(c.y), fmt.format(c.z)));
+            lines.add(StringUtils.translate("minihud.hover.shape.effective_center", fmt.format(c.x), fmt.format(c.y), fmt.format(c.z)));
         }
 
         return lines;

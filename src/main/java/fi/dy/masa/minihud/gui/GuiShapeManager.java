@@ -10,6 +10,7 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.gui.widget.WidgetShapeEntry;
@@ -25,11 +26,11 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
     {
         super(10, 82, 20, 88, "minihud", ConfigScreen.ALL_TABS, ConfigScreen.SHAPES);
 
-        this.setTitle("minihud.gui.title.shape_manager");
-
         // The position will get updated later
         this.widgetDropDown = new DropDownListWidget<>(160, 16, 200, 10, ShapeType.VALUES, ShapeType::getDisplayName);
         this.widgetDropDown.setZ((int) this.zLevel + 2);
+
+        this.setTitle("minihud.title.screen.shape_manager", Reference.MOD_VERSION);
     }
 
     @Override
@@ -43,10 +44,10 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         int x = 12;
         int y = 44;
         int rightX = this.x + this.screenWidth;
-        int lw = StringUtils.getMaxStringRenderWidth(StringUtils.translate("minihud.gui.button.shapes.overlay_rendering"),
-                                                     StringUtils.translate("minihud.gui.button.shapes.shape_renderer")) + 8;
+        int lw = StringUtils.getMaxStringRenderWidth(StringUtils.translate("minihud.label.shapes.overlay_rendering"),
+                                                     StringUtils.translate("minihud.label.shapes.shape_renderer")) + 8;
 
-        LabelWidget label = new LabelWidget(0xFFFFF040, "minihud.gui.button.shapes.overlay_rendering");
+        LabelWidget label = new LabelWidget(0xFFFFF040, "minihud.label.shapes.overlay_rendering");
         label.setPosition(x, y + 5);
         this.addWidget(label);
 
@@ -61,7 +62,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
 
         y += 18;
         x = 12;
-        label = new LabelWidget(0xFFFFF040, "minihud.gui.button.shapes.shape_renderer");
+        label = new LabelWidget(0xFFFFF040, "minihud.label.shapes.shape_renderer");
         label.setPosition(x, y + 6);
         this.addWidget(label);
 
@@ -70,7 +71,7 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
         button.setPosition(x, y + 1);
         this.addWidget(button);
 
-        button = GenericButton.create("minihud.gui.button.add_shape", this::addShape);
+        button = GenericButton.create("minihud.button.shapes.add_shape", this::addShape);
         button.setRight(rightX - 10);
         button.setY(y);
         this.addWidget(button);

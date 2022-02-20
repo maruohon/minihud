@@ -282,7 +282,7 @@ public class DataStorage
         String x = String.format("%.2f", pos.x);
         String y = String.format("%.2f", pos.y);
         String z = String.format("%.2f", pos.z);
-        MessageUtils.printCustomActionbarMessage("minihud.message.distance_reference_point_set", x, y, z);
+        MessageUtils.printCustomActionbarMessage("minihud.message.info.distance_reference_point_set", x, y, z);
         return true;
     }
 
@@ -431,16 +431,16 @@ public class DataStorage
                 try
                 {
                     this.setWorldSeed(Long.parseLong(parts[1]));
-                    MessageUtils.printCustomActionbarMessage("minihud.message.seed_set", this.worldSeed);
+                    MessageUtils.printCustomActionbarMessage("minihud.message.info.seed_set", this.worldSeed);
                 }
                 catch (NumberFormatException e)
                 {
-                    MessageUtils.printCustomActionbarMessage("minihud.message.error.invalid_seed");
+                    MessageUtils.printCustomActionbarMessage("minihud.message.error.failed_to_parse_seed_from_chat");
                 }
             }
             else if (this.worldSeedValid && parts.length == 1)
             {
-                MessageUtils.printCustomActionbarMessage("minihud.message.seed_set", this.worldSeed);
+                MessageUtils.printCustomActionbarMessage("minihud.message.info.seed_set", this.worldSeed);
             }
 
             return true;
@@ -454,7 +454,7 @@ public class DataStorage
                     int size = Integer.parseInt(parts[1]);
                     Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.setValue(size);
                     // Fetch it again from the config, to take the bounds clamping into account
-                    MessageUtils.printCustomActionbarMessage("minihud.message.dropped_chunks_hash_size_set_to", Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue());
+                    MessageUtils.printCustomActionbarMessage("minihud.message.info.dropped_chunks_hash_size_set_to", Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue());
                 }
                 catch (NumberFormatException e)
                 {
@@ -463,7 +463,7 @@ public class DataStorage
             }
             else if (parts.length == 1)
             {
-                MessageUtils.printCustomActionbarMessage("minihud.message.dropped_chunks_hash_size_get", this.getDroppedChunksHashSize());
+                MessageUtils.printCustomActionbarMessage("minihud.message.info.dropped_chunks_hash_size_get", this.getDroppedChunksHashSize());
             }
 
             return true;
@@ -485,7 +485,7 @@ public class DataStorage
                 {
                     this.setWorldSeed(Long.parseLong(text.getFormatArgs()[0].toString()));
                     LiteModMiniHud.logger.info("Received world seed from the vanilla /seed command: {}", this.worldSeed);
-                    MessageUtils.printCustomActionbarMessage("minihud.message.seed_set", this.worldSeed);
+                    MessageUtils.printCustomActionbarMessage("minihud.message.info.seed_set", this.worldSeed);
                 }
                 catch (Exception e)
                 {
@@ -499,7 +499,7 @@ public class DataStorage
                 {
                     this.setWorldSeed(Long.parseLong(text.getFormatArgs()[1].toString()));
                     LiteModMiniHud.logger.info("Received world seed from the JED '/jed seed' command: {}", this.worldSeed);
-                    MessageUtils.printCustomActionbarMessage("minihud.message.seed_set", this.worldSeed);
+                    MessageUtils.printCustomActionbarMessage("minihud.message.info.seed_set", this.worldSeed);
                 }
                 catch (Exception e)
                 {
@@ -519,7 +519,7 @@ public class DataStorage
 
                     String spawnStr = String.format("x: %d, y: %d, z: %d", this.worldSpawn.getX(), this.worldSpawn.getY(), this.worldSpawn.getZ());
                     LiteModMiniHud.logger.info("Received world spawn from the vanilla /setworldspawn command: {}", spawnStr);
-                    MessageUtils.printCustomActionbarMessage("minihud.message.spawn_set", spawnStr);
+                    MessageUtils.printCustomActionbarMessage("minihud.message.info.spawn_set", spawnStr);
                 }
                 catch (Exception e)
                 {

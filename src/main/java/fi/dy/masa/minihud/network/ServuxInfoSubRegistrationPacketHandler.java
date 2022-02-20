@@ -36,7 +36,7 @@ public class ServuxInfoSubRegistrationPacketHandler implements PluginChannelHand
             }
             catch (Exception e)
             {
-                MessageDispatcher.error("minihud.message.error.infosub.failed_receive_metadata");
+                MessageDispatcher.error("minihud.message.error.info_sub.failed_receive_metadata");
                 MiniHUD.LOGGER.warn("Failed to receive info sub metadata from the server");
             }
         }

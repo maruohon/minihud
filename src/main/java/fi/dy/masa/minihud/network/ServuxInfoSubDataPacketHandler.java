@@ -71,7 +71,7 @@ public class ServuxInfoSubDataPacketHandler implements PluginChannelHandler
                 if (reader == null)
                 {
                     this.supportedProtocol = false;
-                    MessageDispatcher.error("minihud.message.error.infosub.failed_receive_data", channelId);
+                    MessageDispatcher.error("minihud.message.error.info_sub.failed_receive_data", channelId);
                     MiniHUD.LOGGER.warn("Failed to receive info sub data from the server for channel id {}", channelId);
                     break;
                 }

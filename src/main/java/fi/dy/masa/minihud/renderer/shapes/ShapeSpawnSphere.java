@@ -67,7 +67,7 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
         List<String> lines = super.getWidgetHoverLines();
         DecimalFormat fmt = new DecimalFormat("#.##");
 
-        lines.add(2, StringUtils.translate("minihud.gui.label.hover.shape.margin_value", fmt.format(this.margin)));
+        lines.add(2, StringUtils.translate("minihud.hover.shape.margin", fmt.format(this.margin)));
 
         return lines;
     }

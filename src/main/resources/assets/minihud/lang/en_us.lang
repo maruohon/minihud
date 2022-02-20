@@ -1,4 +1,16 @@
 
+minihud.config.tab.colors=Colors
+minihud.config.tab.generic=Generic
+minihud.config.tab.info_lines=Info Lines
+minihud.config.tab.renderers=Renderers
+minihud.config.tab.structures=Structures
+minihud.screen.tab.shapes=Shapes
+
+minihud.hotkeys.category.generic_hotkeys=Generic hotkeys
+minihud.hotkeys.category.info_toggle_hotkeys=Info Toggle hotkeys
+minihud.hotkeys.category.renderer_toggle_hotkeys=Renderer Toggle hotkeys
+minihud.hotkeys.category.structure_toggle_hotkeys=Structure Toggle hotkeys
+
 minihud.config.comment.beaconrangeautoupdate=This enables the Beacon Range renderer to update automatically\nwhen block or chunk change packets are received.\nThose updates can have a performance impact if tons of blocks are changing often.\nYou can toggle off/on the renderer to update to those changes manually.
 minihud.config.comment.blockgridoverlaymode=The Block Grid render mode
 minihud.config.comment.blockgridoverlayradius=The radius of the block grid lines to render
@@ -51,14 +63,12 @@ minihud.config.comment.timetotaldivisor=The divisor value for the modulo of the 
 minihud.config.comment.woolcounterenableall=This overrides the 'Wool Counter Types' config, and enables all the colors.\nIt's meant for quickly seeing all of them,\nwithout having to change the other config all the time.
 minihud.config.comment.woolcountertypes=This defines which wool counter colors are enabled\nfor the Carpet Wool Counters info lines.\nAccepted values are individual metadata values like 0,1,2,\nmetadata ranges like 4-6,8-11 and dye names like purple,blue,white.\nDifferent values should be separated by commas, without spaces.
 
-
 minihud.hotkey.comment.itemnbtkeypretty=When held, the hovered item's NBT data\nis shown in a "pretty" formatted
 minihud.hotkey.comment.itemnbtkeystring=When held, the hovered item's NBT data is shown in a "stringified" format
 minihud.hotkey.comment.openconfiggui=The hotkey to open the in-game config screen
 minihud.hotkey.comment.requiredkey=If set, the player needs to be holding this key to render the HUD
 minihud.hotkey.comment.setdistancereferencepoint=The hotkey to store the player's current position\nas the reference point for the distance info line type
 minihud.hotkey.comment.shapeeditor=The hotkey to open the Shape Editor screen for the\ncurrently selected shape, if any, otherwise opens the Shapes menu.
-
 
 minihud.config.comment.beaconrangelvl1=Color for the Beacon Range lvl 1 overlay
 minihud.config.comment.beaconrangelvl2=Color for the Beacon Range lvl 2 overlay
@@ -89,7 +99,6 @@ minihud.config.comment.spawnablechunksplayer=Color for the player-following spaw
 minihud.config.comment.spawnablecolumnheights=Color for the spawnable sub-chunks overlay
 minihud.config.comment.spawnerpositions=Color for the possible spawner positions overlay
 minihud.config.comment.waterfallpositions=Color for the possible water fall positions overlay
-
 
 minihud.config.name.beaconrangeautoupdate=Beacon Range Auto-Update
 minihud.config.name.blockgridoverlaymode=Block Grid Overlay Mode
@@ -146,14 +155,12 @@ minihud.config.name.woolcountertypes=Wool Counter Types
 minihud.config_group.name.light_level=Light Level Overlay Options
 minihud.config_group.comment.light_level=All Light Level Overlay related config options.\nNote: The colors are also in the Colors category.
 
-
 minihud.hotkey.name.itemnbtkeypretty=Item NBT key (pretty)
 minihud.hotkey.name.itemnbtkeystring=Item NBT key (stringified)
 minihud.hotkey.name.openconfiggui=Open Config Screen
 minihud.hotkey.name.requiredkey=Required Key
 minihud.hotkey.name.setdistancereferencepoint=Set Distance Reference Point
 minihud.hotkey.name.shapeeditor=Shape Editor
-
 
 minihud.config.name.beaconrangelvl1=Beacon Range lvl 1
 minihud.config.name.beaconrangelvl2=Beacon Range lvl 2
@@ -275,7 +282,6 @@ minihud.info_line.name.infotimetotalmodulo=Time Modulo (total time)
 minihud.info_line.name.infotimeworld=World ticks
 minihud.info_line.name.infoworldtimeformatted=World Time (days, months...)
 
-
 minihud.renderer_toggle.comment.debugcollisionboxenabled=Enables the vanilla Block Collision Boxes debug renderer
 minihud.renderer_toggle.comment.debugheightmapenabled=Enables the vanilla Height Map debug renderer
 minihud.renderer_toggle.comment.debugneighborsupdateenabled=Enables the vanilla Block Neighbor Updates debug renderer
@@ -326,7 +332,6 @@ minihud.renderer_toggle.name.overlaystructuremaintoggle=§eStructure Bounding Bo
 minihud.renderer_toggle.name.shaperenderer=§eShape Renderer
 minihud.renderer_toggle.name.overlaywaterfalls=Water Falls (generation attempts)
 
-
 minihud.structure_toggle.comment.desertpyramid=Enable Desert Pyramid structure bounding boxes rendering
 minihud.structure_toggle.comment.endcity=Enable End City structure bounding boxes rendering
 minihud.structure_toggle.comment.igloo=Enable Igloo structure bounding boxes rendering
@@ -337,7 +342,6 @@ minihud.structure_toggle.comment.oceanmonument=Enable Ocean Monument structure b
 minihud.structure_toggle.comment.stronghold=Enable Stronghold structure bounding boxes rendering
 minihud.structure_toggle.comment.village=Enable Village structure bounding boxes rendering\n§6NOTE: This is the Village world gen structures!\nThis is not the Village data you use for iron farms etc.!
 minihud.structure_toggle.comment.witchhut=Enable Witch Hut structure bounding boxes rendering
-
 
 minihud.structure_toggle.name.desertpyramid=Desert Pyramid
 minihud.structure_toggle.name.endcity=End City
@@ -372,40 +376,6 @@ minihud.structure_toggle.color.components.stronghold=Stronghold Components
 minihud.structure_toggle.color.components.village=Village Generation Components
 minihud.structure_toggle.color.components.witchhut=Witch Hut Components
 
-minihud.gui.button.add_shape=Add shape
-minihud.gui.button.configure=Configure
-minihud.gui.button.open_info_lines_hud_settings=Open HUD Settings
-minihud.gui.button.remove=Remove
-minihud.gui.button.shape_entry.enabled=Enabled: %s
-minihud.gui.button.shapes.overlay_rendering=Overlay Rendering:
-minihud.gui.button.shapes.shape_renderer=Shape Renderer:
-
-minihud.gui.label.center_colon=Center:
-minihud.gui.label.circle.main_axis_colon=Axis:
-minihud.gui.label.color=Color:
-minihud.gui.label.display_name_colon=Display name:
-minihud.gui.label.height_colon=Height:
-minihud.gui.label.margin_colon=Margin:
-minihud.gui.label.radius_colon=Radius:
-minihud.gui.label.render_type_colon=Render Type:
-minihud.gui.label.shape.block_snap=Block snap: %s
-
-minihud.gui.label.hover.shape.block_snap=§7Block snap: §b%s
-minihud.gui.label.hover.shape.center_value=§7Center - x: §9%s§7, y: §9%s§7, z: §9%s
-minihud.gui.label.hover.shape.circle.main_axis_value=§7Axis: §b%s
-minihud.gui.label.hover.shape.effective_center_value=§7Effective center - x: §9%s§7, y: §9%s§7, z: §9%s
-minihud.gui.label.hover.shape.height_value=§7Height: §6%s
-minihud.gui.label.hover.shape.margin_value=§7Margin: §6%s
-minihud.gui.label.hover.shape.radius_value=§7Radius: §6%s
-minihud.gui.label.hover.shape.type_value=§7Type: §b%s
-
-minihud.gui.label.hover.structures_color_components=Structure child components
-minihud.gui.label.hover.structures_color_main=Structure Enclosing/main box
-
-minihud.gui.title.configs=MiniHUD Configs
-minihud.gui.title.shape_editor=Shape Editor
-minihud.gui.title.shape_manager=Shape Manager
-
 minihud.info_line.mobcap.data=Mob caps: Ho: %s Pa: %s Wa: %s Am: %s
 minihud.info_line.mobcap.no_data=Mob caps: <no valid data>
 minihud.info_line.mobcap.cap.ambient.full=§7§l%s§r§7 / %s§r
@@ -416,11 +386,9 @@ minihud.info_line.mobcap.cap.monster.full=§c§l%s§r§c / %s§r
 minihud.info_line.mobcap.cap.monster.nonfull=§c%s / %s§r
 minihud.info_line.mobcap.cap.water.full=§b§l%s§r§b / %s§r
 minihud.info_line.mobcap.cap.water.nonfull=§b%s / %s§r
-
 minihud.info_line.slime_chunk.no=Slime chunk: §cNO
 minihud.info_line.slime_chunk.yes=Slime chunk: §aYES
 minihud.info_line.slime_chunk.no_seed=Slime chunk: <world seed not known>
-
 minihud.info_line.tps.no_data=Server TPS: <no valid data>
 minihud.info_line.tps.data_estimate=Server TPS: %s%s§r (MSPT [est]: %s%s§r)
 minihud.info_line.tps.data_real=Server TPS: %s%s§r MSPT: %s%s§r
@@ -430,70 +398,75 @@ minihud.info_line.tps.color.mspt_below50=§6
 minihud.info_line.tps.color.mspt_over50=§c
 minihud.info_line.tps.color.tps20=§a
 minihud.info_line.tps.color.tps_not20=§c
-
 minihud.info_line.wool_counter=Wool Counter [ %s%s§r ]: §b%d§r
 
-minihud.label.blockgridmode.all=All
-minihud.label.blockgridmode.non_air=Non-air
-minihud.label.blockgridmode.adjacent=Adjacent to non-air
+minihud.button.config.open_info_hud_settings=Open HUD Settings
+minihud.button.shapes.add_shape=Add Shape
+minihud.button.shapes.block_snap=Block Snap: %s
+minihud.button.shapes.circle.main_axis=Axis:
+minihud.button.shapes.render_type=Render Type:
 
-minihud.label.config_tab.colors=Colors
-minihud.label.config_tab.generic=Generic
-minihud.label.config_tab.info_lines=Info Lines
-minihud.label.config_tab.renderers=Renderers
-minihud.label.config_tab.structures=Structures
-minihud.label.screen_tab.shapes=Shapes
+minihud.hover.shape.block_snap=§7Block Snap: §b%s
+minihud.hover.shape.center=§7Center - x: §9%s§7, y: §9%s§7, z: §9%s
+minihud.hover.shape.circle.main_axis=§7Axis: §b%s
+minihud.hover.shape.effective_center=§7Effective center - x: §9%s§7, y: §9%s§7, z: §9%s
+minihud.hover.shape.height=§7Height: §6%s
+minihud.hover.shape.margin=§7Margin: §6%s
+minihud.hover.shape.radius=§7Radius: §6%s
+minihud.hover.shape.type=§7Type: §b%s
+minihud.hover.structures.color_components=Structure child components
+minihud.hover.structures.color_main=Structure enclosing/main box
 
-minihud.label.light_level_marker_mode.cross=Cross
-minihud.label.light_level_marker_mode.none=None
-minihud.label.light_level_marker_mode.square=Square
+minihud.label.shapes.center=Center:
+minihud.label.shapes.color=Color:
+minihud.label.shapes.display_name=Display Name:
+minihud.label.shapes.height=Height:
+minihud.label.shapes.margin=Margin:
+minihud.label.shapes.overlay_rendering=Overlay Rendering:
+minihud.label.shapes.radius=Radius:
+minihud.label.shapes.shape_renderer=Shape Renderer:
 
-minihud.label.light_level_number_mode.none=None
-minihud.label.light_level_number_mode.block=Block
-minihud.label.light_level_number_mode.both=Both
-minihud.label.light_level_number_mode.sky=Sky
+minihud.name.block_grid_mode.all=All
+minihud.name.block_grid_mode.non_air=Non-air
+minihud.name.block_grid_mode.adjacent=Adjacent to non-air
+minihud.name.light_level_marker_mode.cross=Cross
+minihud.name.light_level_marker_mode.none=None
+minihud.name.light_level_marker_mode.square=Square
+minihud.name.light_level_number_mode.none=None
+minihud.name.light_level_number_mode.block=Block
+minihud.name.light_level_number_mode.both=Both
+minihud.name.light_level_number_mode.sky=Sky
+minihud.name.print_mode.both=Both
+minihud.name.print_mode.fail=On Fail
+minihud.name.print_mode.none=None
+minihud.name.print_mode.success=On Success
+minihud.name.shape_render_type.full_block=Full Block
+minihud.name.shape_render_type.inner_edge=Inner Edge
+minihud.name.shape_render_type.outer_edge=Outer Edge
+minihud.name.shapes.can_spawn_sphere=Can Spawn Sphere ( > 24)
+minihud.name.shapes.can_despawn_sphere=Can Despawn Sphere ( > 32)
+minihud.name.shapes.circle=Circle / Cylinder
+minihud.name.shapes.despawn_sphere=Despawn Sphere ( > 128)
+minihud.name.shapes.sphere_blocky=Sphere (block-based)
 
-minihud.label.print_mode.both=Both
-minihud.label.print_mode.fail=On Fail
-minihud.label.print_mode.none=None
-minihud.label.print_mode.success=On Success
+minihud.title.screen.configs=MiniHUD %s - Configs
+minihud.title.screen.shape_editor=MiniHUD %s - Shape Editor
+minihud.title.screen.shape_manager=MiniHUD %s - Shape Manager
 
-minihud.label.shape_render_type.full_block=Full Block
-minihud.label.shape_render_type.inner_edge=Inner Edge
-minihud.label.shape_render_type.outer_edge=Outer Edge
-
-minihud.label.shapes.can_spawn_sphere=Can Spawn Sphere ( > 24)
-minihud.label.shapes.can_despawn_sphere=Can Despawn Sphere ( > 32)
-minihud.label.shapes.circle=Circle / Cylinder
-minihud.label.shapes.despawn_sphere=Despawn Sphere ( > 128)
-minihud.label.shapes.sphere_blocky=Sphere (block-based)
-
-minihud.hotkeys.category.generic_hotkeys=Generic hotkeys
-minihud.hotkeys.category.info_toggle_hotkeys=Info Toggle hotkeys
-minihud.hotkeys.category.renderer_toggle_hotkeys=Renderer Toggle hotkeys
-minihud.hotkeys.category.structure_toggle_hotkeys=Structure Toggle hotkeys
-
-minihud.message.toggled_debug_mode.collisions=Toggled Collison Boxes debug rendering to %s
-minihud.message.toggled_debug_mode.height_map=Toggled Height Map debug rendering to %s
-minihud.message.toggled_debug_mode.neighbor_updates=Toggled Neighbor Update debug rendering to %s
-minihud.message.toggled_debug_mode.pathfinding=Toggled Pathfinding debug rendering to %s
-minihud.message.toggled_debug_mode.solid_faces=Toggled Solid Faces debug rendering to %s
-minihud.message.toggled_debug_mode.water=Toggled Water debug rendering to %s
-
-minihud.message.toggled_renderer_on_using_position=Toggled %s §aON§r, using the position %s
-minihud.message.toggled_renderer_on_using_world_spawn=Toggled %s §aON§r, using the world spawn %s
-
-minihud.message.error.infosub.failed_receive_data=Failed to receive info sub data from the server with channel ID '%s'
-minihud.message.error.infosub.failed_receive_metadata=Failed to receive info sub metadata from the server
+minihud.message.error.info_sub.failed_receive_data=Failed to receive info sub data from the server with channel ID '%s'
+minihud.message.error.info_sub.failed_receive_metadata=Failed to receive info sub metadata from the server
 minihud.message.error.invalid_dropped_chunks_hash_size=Failed to parse the dropped chunks HashSet size from chat
-minihud.message.error.invalid_seed=Failed to parse the world seed from chat
+minihud.message.error.failed_to_parse_seed_from_chat=Failed to parse the world seed from chat
 minihud.message.error.shapes.select_shape_from_dropdown=Select the Shape type to create from the dropdown widget
 
-minihud.message.distance_reference_point_set=Distance ref. point set: x = §a%s§r, y = §a%s§r, z = §a%s§r
-minihud.message.dropped_chunks_hash_size_get=Dropped chunks hash size is currently reported as %s
-minihud.message.dropped_chunks_hash_size_set_to=Dropped chunks hash size config set to §a%s
-minihud.message.seed_set=MiniHUD: Set the world seed to '%s'
-minihud.message.spawn_set=MiniHUD: Set the world spawn to %s
+minihud.message.info.distance_reference_point_set=Distance reference point set: x: §b%s§r y: §b%s§r z: §b%s§r
+minihud.message.info.dropped_chunks_hash_size_get=Dropped chunks hash size is currently reported as §b%s
+minihud.message.info.dropped_chunks_hash_size_set_to=Dropped chunks hash size config set to §b%s
+minihud.message.info.seed_set=MiniHUD: Set the world seed to '%s'
+minihud.message.info.spawn_set=MiniHUD: Set the world spawn to %s
+minihud.message.info.toggled_renderer_on_using_block_position=Toggled %s §aON§r, using position x: §b%s§r y: §b%s§r z: §b%s§r
+minihud.message.info.toggled_renderer_on_using_position=Toggled %s §aON§r, using position %s
+minihud.message.info.toggled_renderer_on_using_world_spawn=Toggled %s §aON§r, using the world spawn x: §b%s§r y: §b%s§r z: §b%s§r
 
 minihud.tooltip.item.nbt=§8NBT: %s tag(s)
 minihud.tooltip.item.registry_name=§8%s

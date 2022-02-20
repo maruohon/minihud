@@ -4,17 +4,16 @@ import java.util.ArrayList;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.gui.GuiScreen;
-import fi.dy.masa.malilib.config.group.PopupConfigGroup;
+import fi.dy.masa.malilib.config.group.ExpandableConfigGroup;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.GenericButtonConfig;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.tab.BaseScreenTab;
-import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigTab;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
-import fi.dy.masa.malilib.config.group.ExpandableConfigGroup;
+import fi.dy.masa.malilib.gui.tab.BaseScreenTab;
+import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
 import fi.dy.masa.malilib.util.ListUtils;
 import fi.dy.masa.malilib.util.data.ModInfo;
@@ -62,14 +61,14 @@ public class ConfigScreen
     {
         // The parent screen should not be set here, to prevent infinite recursion via
         // the call to the parent's setWorldAndResolution -> initScreen -> switch tab -> etc.
-        return new BaseConfigScreen(MOD_INFO, null, ALL_TABS, INFO_LINES, "minihud.gui.title.configs");
+        return new BaseConfigScreen(MOD_INFO, null, ALL_TABS, INFO_LINES, "minihud.title.screen.configs", Reference.MOD_VERSION);
     }
 
     public static BaseConfigScreen create(@Nullable GuiScreen currentScreen)
     {
         // The parent screen should not be set here, to prevent infinite recursion via
         // the call to the parent's setWorldAndResolution -> initScreen -> switch tab -> etc.
-        return new BaseConfigScreen(MOD_INFO, null, ALL_TABS, INFO_LINES, "minihud.gui.title.configs");
+        return new BaseConfigScreen(MOD_INFO, null, ALL_TABS, INFO_LINES, "minihud.title.screen.configs", Reference.MOD_VERSION);
     }
 
     public static ImmutableList<ConfigTab> getConfigTabs()
@@ -87,11 +86,10 @@ public class ConfigScreen
         ListUtils.extractEntriesToSecondList(colorOptions,   lightOptions, (c) -> c.getName().startsWith("lightLevel"), false);
 
         genericOptions.add(new GenericButtonConfig("minihud.config.name.info_lines_hud_settings",
-                                                   "minihud.gui.button.open_info_lines_hud_settings",
+                                                   "minihud.button.config.open_info_hud_settings",
                                                    ConfigScreen::openHudSettingScreen,
                                                    "minihud.config.comment.info_lines_hud_settings"));
         genericOptions.add(new ExpandableConfigGroup(MOD_INFO, "light_level", lightOptions));
-        genericOptions.add(new PopupConfigGroup(MOD_INFO, "light_level", lightOptions));
         ConfigUtils.sortConfigsByDisplayName(genericOptions);
 
         return ImmutableList.copyOf(genericOptions);

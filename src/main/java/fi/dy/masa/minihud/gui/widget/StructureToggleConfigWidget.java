@@ -42,20 +42,19 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
         this.hotkeyButton = new KeyBindConfigButton(120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
         this.hotkeyButton.setValueChangeListener(this::updateButtonStates);
 
-        this.settingsWidget = new KeybindSettingsWidget(config.getKeyBind(),
-                                                        config.getDisplayName(), ctx.getDialogHandler());
+        this.settingsWidget = new KeybindSettingsWidget(config.getKeyBind(), config.getDisplayName());
 
         this.colorIndicatorWidgetMain = new ColorIndicatorWidget(18, 18, this.config.getColorMain(), (newValue) -> {
             this.config.getColorMain().setValue(newValue);
             this.reAddSubWidgets();
         });
-        this.colorIndicatorWidgetMain.translateAndAddHoverString("minihud.gui.label.hover.structures_color_main");
+        this.colorIndicatorWidgetMain.translateAndAddHoverString("minihud.hover.structures.color_main");
 
         this.colorIndicatorWidgetComponents = new ColorIndicatorWidget(18, 18, this.config.getColorComponents(), (newValue) -> {
             this.config.getColorComponents().setValue(newValue);
             this.reAddSubWidgets();
         });
-        this.colorIndicatorWidgetComponents.translateAndAddHoverString("minihud.gui.label.hover.structures_color_components");
+        this.colorIndicatorWidgetComponents.translateAndAddHoverString("minihud.hover.structures.color_components");
 
         this.resetButton.setActionListener(() -> {
             this.config.resetToDefault();

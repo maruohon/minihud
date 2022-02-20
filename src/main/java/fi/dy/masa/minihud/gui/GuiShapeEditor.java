@@ -50,8 +50,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     public GuiShapeEditor(ShapeBase shape)
     {
         this.shape = shape;
-        this.setTitle("minihud.gui.title.shape_editor");
         this.configBlockSnap = new OptionListConfig<>("blockSnap", BlockSnap.NONE, BlockSnap.VALUES, "");
+
+        this.setTitle("minihud.title.screen.shape_editor", Reference.MOD_VERSION);
     }
 
     @Override
@@ -83,7 +84,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
 
     private void createColorInput(int x, int y)
     {
-        this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.color"));
+        this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.label.shapes.color"));
         y += 12;
 
         BaseTextFieldWidget txtField = new BaseTextFieldWidget(70, 16, String.format("#%08X", this.shape.getColor().intValue));
@@ -100,7 +101,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
 
     private void createShapeEditorElements(int x, int y)
     {
-        this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.display_name_colon"));
+        this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.label.shapes.display_name"));
         y += 12;
 
         BaseTextFieldWidget textField = new BaseTextFieldWidget(240, 16, this.shape.getDisplayName());
@@ -120,7 +121,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
             {
                 ShapeSpawnSphere shape = (ShapeSpawnSphere) this.shape;
                 this.createShapeEditorElementsSphereBase(x, y, false);
-                this.createShapeEditorElementDoubleField(x + 150, y + 2, shape::getMargin, shape::setMargin, "minihud.gui.label.margin_colon", false);
+                this.createShapeEditorElementDoubleField(x + 150, y + 2, shape::getMargin, shape::setMargin, "minihud.label.shapes.margin", false);
                 break;
             }
 
@@ -128,15 +129,15 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
             {
                 ShapeCircle shape = (ShapeCircle) this.shape;
                 this.createShapeEditorElementsSphereBase(x, y, true);
-                this.createShapeEditorElementIntField(x + 150, y + 36, shape::getHeight, shape::setHeight, "minihud.gui.label.height_colon", true);
-                this.createDirectionButton(x + 230, y + 36, shape::getMainAxis, shape::setMainAxis, "minihud.gui.label.circle.main_axis_colon");
-                this.createRenderTypeButton(renderTypeX, renderTypeY, this.shape::getRenderType, this.shape::setRenderType, "minihud.gui.label.render_type_colon");
+                this.createShapeEditorElementIntField(x + 150, y + 36, shape::getHeight, shape::setHeight, "minihud.label.shapes.height", true);
+                this.createDirectionButton(x + 230, y + 36, shape::getMainAxis, shape::setMainAxis, "minihud.button.shapes.circle.main_axis");
+                this.createRenderTypeButton(renderTypeX, renderTypeY, this.shape::getRenderType, this.shape::setRenderType, "minihud.button.shapes.render_type");
                 break;
             }
 
             case SPHERE_BLOCKY:
                 this.createShapeEditorElementsSphereBase(x, y, true);
-                this.createRenderTypeButton(renderTypeX, renderTypeY, this.shape::getRenderType, this.shape::setRenderType, "minihud.gui.label.render_type_colon");
+                this.createRenderTypeButton(renderTypeX, renderTypeY, this.shape::getRenderType, this.shape::setRenderType, "minihud.button.shapes.render_type");
                 break;
         }
     }
@@ -145,11 +146,11 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     {
         ShapeCircleBase shape = (ShapeCircleBase) this.shape;
 
-        this.addLabel(x, y + 2, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.center_colon"));
+        this.addLabel(x, y + 2, 0xFFFFFFFF, StringUtils.translate("minihud.label.shapes.center"));
 
         if (addRadiusInput)
         {
-            this.createShapeEditorElementDoubleField(x + 150, y + 2, shape::getRadius, shape::setRadius, "minihud.gui.label.radius_colon", true);
+            this.createShapeEditorElementDoubleField(x + 150, y + 2, shape::getRadius, shape::setRadius, "minihud.label.shapes.radius", true);
         }
 
         y += 12;
@@ -173,7 +174,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         this.configBlockSnap.setValue(shape.getBlockSnap());
         int bx = x + button.getWidth() + 4;
 
-        OptionListConfigButton buttonSnap = new OptionListConfigButton(-1, 20, this.configBlockSnap, "minihud.gui.label.shape.block_snap");
+        OptionListConfigButton buttonSnap = new OptionListConfigButton(-1, 20, this.configBlockSnap, "minihud.button.shapes.block_snap");
         buttonSnap.setPosition(bx, y);
         buttonSnap.setActionListener(() -> {
             shape.setBlockSnap(this.configBlockSnap.getValue());

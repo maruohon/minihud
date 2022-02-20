@@ -21,7 +21,7 @@ public class ConfigCallbacks
 
         InfoLine.CHUNK_UNLOAD_ORDER.getHotkeyConfig().getKeyBind().setCallback(AdjustableValueHotkeyCallback.createBitShifter(
                 InfoLine.CHUNK_UNLOAD_ORDER.getBooleanConfig(), Configs.Generic.DROPPED_CHUNKS_HASH_SIZE)
-                    .addAdjustListener(() -> MessageUtils.printCustomActionbarMessage("minihud.message.dropped_chunks_hash_size_set_to", Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue())));
+                    .addAdjustListener(() -> MessageUtils.printCustomActionbarMessage("minihud.message.info.dropped_chunks_hash_size_set_to", Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue())));
 
         RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeyBind().setCallback(AdjustableValueHotkeyCallback.create(
                 RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getBooleanConfig(), Configs.Internal.CHUNK_UNLOAD_BUCKET_OVERLAY_Y));

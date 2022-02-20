@@ -7,11 +7,11 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public enum ShapeType
 {
-    CIRCLE              ("circle",              "minihud.label.shapes.circle",              ShapeCircle::new),
-    SPHERE_BLOCKY       ("sphere_blocky",       "minihud.label.shapes.sphere_blocky",       ShapeSphereBlocky::new),
-    CAN_SPAWN_SPHERE    ("can_spawn_sphere",    "minihud.label.shapes.can_spawn_sphere",    ShapeCanSpawnSphere::new),
-    CAN_DESPAWN_SPHERE  ("can_despawn_sphere",  "minihud.label.shapes.can_despawn_sphere",  ShapeCanDespawnSphere::new),
-    DESPAWN_SPHERE      ("despawn_sphere",      "minihud.label.shapes.despawn_sphere",      ShapeDespawnSphere::new);
+    CIRCLE              ("circle",             "minihud.name.shapes.circle",             ShapeCircle::new),
+    SPHERE_BLOCKY       ("sphere_blocky",      "minihud.name.shapes.sphere_blocky",      ShapeSphereBlocky::new),
+    CAN_SPAWN_SPHERE    ("can_spawn_sphere",   "minihud.name.shapes.can_spawn_sphere",   ShapeCanSpawnSphere::new),
+    CAN_DESPAWN_SPHERE  ("can_despawn_sphere", "minihud.name.shapes.can_despawn_sphere", ShapeCanDespawnSphere::new),
+    DESPAWN_SPHERE      ("despawn_sphere",     "minihud.name.shapes.despawn_sphere",     ShapeDespawnSphere::new);
 
     public static final ImmutableList<ShapeType> VALUES = ImmutableList.copyOf(values());
 

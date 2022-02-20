@@ -30,14 +30,14 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
 
         this.toggleButton = OnOffButton.simpleSlider(20, this.shape::isEnabled, this::toggleShapeEnabled);
 
-        this.configureButton = GenericButton.create("minihud.gui.button.configure");
+        this.configureButton = GenericButton.create("malilib.button.misc.configure");
         this.configureButton.setActionListener(() -> {
             GuiShapeEditor gui = new GuiShapeEditor(this.shape);
             gui.setParent(GuiUtils.getCurrentScreen());
             BaseScreen.openScreen(gui);
         });
 
-        this.removeButton = GenericButton.create("minihud.gui.button.remove");
+        this.removeButton = GenericButton.create("malilib.button.misc.remove");
         this.removeButton.setActionListener(() -> {
             ShapeManager.INSTANCE.removeShape(this.shape);
             this.listWidget.refreshEntries();

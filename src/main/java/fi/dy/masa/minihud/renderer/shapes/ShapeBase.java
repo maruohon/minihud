@@ -148,7 +148,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements LayerRang
     {
         List<String> lines = new ArrayList<>();
 
-        lines.add(StringUtils.translate("minihud.gui.label.hover.shape.type_value", this.type.getDisplayName()));
+        lines.add(StringUtils.translate("minihud.hover.shape.type", this.type.getDisplayName()));
 
         return lines;
     }

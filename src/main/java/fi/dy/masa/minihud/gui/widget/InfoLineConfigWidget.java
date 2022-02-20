@@ -51,8 +51,7 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
         this.hotkeyButton = new KeyBindConfigButton(120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
         this.hotkeyButton.setValueChangeListener(this::updateButtonStates);
 
-        this.settingsWidget = new KeybindSettingsWidget(config.getKeyBind(),
-                                                        config.getDisplayName(), ctx.getDialogHandler());
+        this.settingsWidget = new KeybindSettingsWidget(config.getKeyBind(), config.getDisplayName());
 
         this.resetButton.setActionListener(() -> {
             this.config.resetToDefault();

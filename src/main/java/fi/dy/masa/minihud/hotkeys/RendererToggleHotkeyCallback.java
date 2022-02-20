@@ -50,8 +50,8 @@ public class RendererToggleHotkeyCallback extends ToggleBooleanWithMessageKeyCal
                 OverlayRendererSpawnChunks.setNeedsUpdate();
 
                 BlockPos spawn = DataStorage.getInstance().getWorldSpawn();
-                String strPos = String.format("x: %d, y: %d, z: %d", spawn.getX(), spawn.getY(), spawn.getZ());
-                String message = StringUtils.translate("minihud.message.toggled_renderer_on_using_world_spawn", this.config.getPrettyName(), strPos);
+                String message = StringUtils.translate("minihud.message.info.toggled_renderer_on_using_world_spawn",
+                                                       this.config.getPrettyName(), spawn.getX(), spawn.getY(), spawn.getZ());
 
                 MessageUtils.printCustomActionbarMessage(message);
             }
@@ -59,7 +59,8 @@ public class RendererToggleHotkeyCallback extends ToggleBooleanWithMessageKeyCal
             {
                 OverlayRendererRandomTickableChunks.newPos = pos;
                 String strPos = String.format("x: %.2f, y: %.2f, z: %.2f", pos.x, pos.y, pos.z);
-                String message = StringUtils.translate("minihud.message.toggled_renderer_on_using_position", this.config.getPrettyName(), strPos);
+                String message = StringUtils.translate("minihud.message.info.toggled_renderer_on_using_position",
+                                                       this.config.getPrettyName(), strPos);
 
                 MessageUtils.printCustomActionbarMessage(message);
             }
@@ -69,11 +70,11 @@ public class RendererToggleHotkeyCallback extends ToggleBooleanWithMessageKeyCal
             }
             else if (key == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getKeyBind())
             {
-                BlockPos blockPos = new BlockPos(pos);
-                OverlayRendererSpawnableChunks.newPos = blockPos;
+                BlockPos b = new BlockPos(pos);
+                OverlayRendererSpawnableChunks.newPos = b;
                 OverlayRendererSpawnableChunks.overlayTopY = pos.y;
-                String strPos = String.format("x: %d, y: %d, z: %d", blockPos.getX(), blockPos.getY(), blockPos.getZ());
-                String message = StringUtils.translate("minihud.message.toggled_renderer_on_using_position", this.config.getPrettyName(), strPos);
+                String message = StringUtils.translate("minihud.message.info.toggled_renderer_on_using_block_position",
+                                                       this.config.getPrettyName(), b.getX(), b.getY(), b.getZ());
 
                 MessageUtils.printCustomActionbarMessage(message);
             }
