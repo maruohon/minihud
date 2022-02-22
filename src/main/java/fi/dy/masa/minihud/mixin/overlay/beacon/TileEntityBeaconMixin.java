@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.tileentity.TileEntityBeacon;
 import net.minecraft.tileentity.TileEntityLockable;
-import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
+import fi.dy.masa.minihud.renderer.RenderContainer;
 
 @Mixin(TileEntityBeacon.class)
 public abstract class TileEntityBeaconMixin extends TileEntityLockable
@@ -21,7 +21,7 @@ public abstract class TileEntityBeaconMixin extends TileEntityLockable
     {
         if (id == 0 && value != this.levels)
         {
-            OverlayRendererBeaconRange.setNeedsUpdate();
+            RenderContainer.BEACON_OVERLAY.setNeedsUpdate();
         }
     }
 
@@ -36,7 +36,7 @@ public abstract class TileEntityBeaconMixin extends TileEntityLockable
     {
         if (this.levels != this.levelsPre)
         {
-            OverlayRendererBeaconRange.setNeedsUpdate();
+            RenderContainer.BEACON_OVERLAY.setNeedsUpdate();
         }
     }
 }

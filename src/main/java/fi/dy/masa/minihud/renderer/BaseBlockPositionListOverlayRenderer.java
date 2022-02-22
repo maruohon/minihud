@@ -18,7 +18,7 @@ import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.data.OrderedBlockPosLong;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
-public abstract class BaseBlockPositionListOverlayRenderer extends OverlayRendererBase
+public abstract class BaseBlockPositionListOverlayRenderer extends MiniHUDOverlayRenderer
 {
     protected final Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> textPositions = new Long2ObjectOpenHashMap<>();
     protected final Supplier<Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>>> dataSource;

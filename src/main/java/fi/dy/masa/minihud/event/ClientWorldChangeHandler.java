@@ -15,13 +15,11 @@ import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
-import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 
 public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.ClientWorldChangeHandler
 {
     private boolean hasCachedSeed;
-    private boolean renderersRead;
     private long cachedSeed;
 
     @Override
@@ -31,12 +29,6 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
         if (worldBefore != null)
         {
             this.writeDataPerDimension();
-
-            // Quitting to main menu
-            if (worldAfter == null)
-            {
-                this.writeDataGlobal();
-            }
 
             if (worldAfter != null)
             {
@@ -53,7 +45,6 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
             // Logging in to a world, load the global data
             if (worldAfter != null)
             {
-                this.readStoredDataGlobal();
                 OverlayRenderer.resetRenderTimeout();
             }
 
@@ -79,7 +70,7 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
                 this.hasCachedSeed = false;
             }
 
-            DataStorage.getInstance().onWorldLoad(worldAfter);
+            DataStorage.getInstance().onWorldLoad();
         }
         else
         {
@@ -100,16 +91,6 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
         JsonUtils.writeJsonToFile(root, file);
     }
 
-    private void writeDataGlobal()
-    {
-        File file = getCurrentStorageFile(true);
-        JsonObject root = new JsonObject();
-
-        root.add("renderers", RenderContainer.INSTANCE.toJson());
-
-        JsonUtils.writeJsonToFile(root, file);
-    }
-
     private void readStoredDataPerDimension()
     {
         // Per-dimension file
@@ -123,30 +104,12 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
         }
     }
 
-    private void readStoredDataGlobal()
-    {
-        // Global file
-        File file = getCurrentStorageFile(true);
-        JsonElement element = JsonUtils.parseJsonFile(file);
-
-        if (element != null && element.isJsonObject())
-        {
-            JsonObject root = element.getAsJsonObject();
-
-            if (this.renderersRead == false && JsonUtils.hasObject(root, "renderers"))
-            {
-                RenderContainer.INSTANCE.fromJson(JsonUtils.getNestedObject(root, "renderers", false));
-                this.renderersRead = true;
-            }
-        }
-    }
-
     public static File getCurrentConfigDirectory()
     {
         return new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
     }
 
-    private static File getCurrentStorageFile(boolean globalData)
+    public static File getCurrentStorageFile(boolean globalData)
     {
         File dir = getCurrentConfigDirectory();
 

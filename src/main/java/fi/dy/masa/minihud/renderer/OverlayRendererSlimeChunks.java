@@ -1,8 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
-import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -11,6 +9,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
@@ -20,11 +19,23 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.util.MiscUtils;
 
-public class OverlayRendererSlimeChunks extends OverlayRendererBase
+public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
 {
     protected boolean wasSeedKnown;
     protected long seed;
     protected double topY;
+
+    @Override
+    public void onEnabled()
+    {
+        if (this.shouldRender(GameUtils.getClient()))
+        {
+            Vec3d pos = EntityUtils.getCameraEntityPosition();
+            this.topY = pos.y;
+
+            this.setNeedsUpdate();
+        }
+    }
 
     @Override
     public boolean shouldRender(Minecraft mc)
@@ -37,6 +48,11 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
+        if (this.needsUpdate)
+        {
+            return true;
+        }
+
         boolean isSeedKnown = DataStorage.getInstance().isWorldSeedKnown(entity.dimension);
         long seed = DataStorage.getInstance().getWorldSeed(entity.dimension);
 
@@ -111,13 +127,6 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     }
 
     @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
-    }
-
-    @Override
     public String getSaveId()
     {
         return "slime_chunks";
@@ -126,14 +135,16 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     @Override
     public JsonObject toJson()
     {
-        JsonObject obj = new JsonObject();
-        obj.add("y_top", new JsonPrimitive(Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y.getDoubleValue()));
+        JsonObject obj = super.toJson();
+        obj.addProperty("top_y", this.topY);
         return obj;
     }
 
     @Override
     public void fromJson(JsonObject obj)
     {
-        Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y.setDoubleValue(JsonUtils.getFloatOrDefault(obj, "y_top", 80F));
+        super.fromJson(obj);
+
+        this.topY = JsonUtils.getDoubleOrDefault(obj, "top_y", 80);
     }
 }

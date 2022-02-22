@@ -1,6 +1,5 @@
 package fi.dy.masa.minihud.renderer;
 
-import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -12,7 +11,7 @@ import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 
-public class OverlayRendererRegion extends OverlayRendererBase
+public class OverlayRendererRegion extends MiniHUDOverlayRenderer
 {
     public OverlayRendererRegion()
     {
@@ -56,12 +55,5 @@ public class OverlayRendererRegion extends OverlayRendererBase
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
-    }
-
-    @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
     }
 }

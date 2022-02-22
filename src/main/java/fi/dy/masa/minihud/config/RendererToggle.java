@@ -9,12 +9,10 @@ import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyBindSettings;
+import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.malilib.util.data.ModInfo;
 import fi.dy.masa.minihud.Reference;
-import fi.dy.masa.minihud.data.DataStorage;
-import fi.dy.masa.minihud.hotkeys.DebugRendererHotkeyCallback;
-import fi.dy.masa.minihud.hotkeys.RendererToggleHotkeyCallback;
 
 public enum RendererToggle implements ConfigInfo
 {
@@ -47,7 +45,7 @@ public enum RendererToggle implements ConfigInfo
     public static final ImmutableList<BooleanConfig> TOGGLE_CONFIGS = ImmutableList.copyOf(VALUES.stream().map(RendererToggle::getBooleanConfig).collect(Collectors.toList()));
     public static final ImmutableList<HotkeyConfig> TOGGLE_HOTKEYS = ImmutableList.copyOf(VALUES.stream().map(RendererToggle::getHotkeyConfig).collect(Collectors.toList()));
 
-    private final BooleanConfig toggleStatus;
+    private final BooleanConfig booleanConfig;
     private final HotkeyConfig toggleHotkey;
 
     RendererToggle(String name)
@@ -57,49 +55,42 @@ public enum RendererToggle implements ConfigInfo
 
     RendererToggle(String name, KeyBindSettings settings)
     {
-        this.toggleStatus = new BooleanConfig(name, false);
+        this.booleanConfig = new BooleanConfig(name, false);
         this.toggleHotkey = new HotkeyConfig(name, "", settings);
 
         String nameLower = name.toLowerCase(Locale.ROOT);
         String nameKey = "minihud.renderer_toggle.name." + nameLower;
         String commentKey = "minihud.renderer_toggle.comment." + nameLower;
 
-        if (name.startsWith("debug"))
-        {
-            this.toggleHotkey.getKeyBind().setCallback(new DebugRendererHotkeyCallback(this));
-        }
-        else
-        {
-            this.toggleHotkey.getKeyBind().setCallback(new RendererToggleHotkeyCallback(this.toggleStatus));
-        }
-
-        if (name.equals("overlayStructureMainToggle"))
-        {
-            this.toggleStatus.setValueChangeCallback((newValue, oldValue) -> DataStorage.getInstance().getStructureStorage().requestStructureDataUpdates());
-        }
-
-        this.toggleStatus.setNameTranslationKey(nameKey);
-        this.toggleStatus.setPrettyNameTranslationKey(nameKey);
-        this.toggleStatus.setCommentTranslationKey(commentKey);
+        this.booleanConfig.setNameTranslationKey(nameKey);
+        this.booleanConfig.setPrettyNameTranslationKey(nameKey);
+        this.booleanConfig.setCommentTranslationKey(commentKey);
 
         this.toggleHotkey.setNameTranslationKey(nameKey);
         this.toggleHotkey.setPrettyNameTranslationKey(nameKey);
         this.toggleHotkey.setCommentTranslationKey(commentKey);
+
+        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.booleanConfig));
     }
 
     public boolean isRendererEnabled()
     {
-        return this.toggleStatus.getBooleanValue();
+        return this.booleanConfig.getBooleanValue();
     }
 
     public void addValueChangeListener(EventListener listener)
     {
-        this.toggleStatus.addValueChangeListener(listener);
+        this.booleanConfig.addValueChangeListener(listener);
+    }
+
+    public void addEnableListener(EventListener listener)
+    {
+        this.booleanConfig.addEnableListener(listener);
     }
 
     public BooleanConfig getBooleanConfig()
     {
-        return this.toggleStatus;
+        return this.booleanConfig;
     }
 
     public HotkeyConfig getHotkeyConfig()
@@ -121,31 +112,31 @@ public enum RendererToggle implements ConfigInfo
     @Override
     public String getName()
     {
-        return this.toggleStatus.getName();
+        return this.booleanConfig.getName();
     }
 
     @Override
     public String getDisplayName()
     {
-        return this.toggleStatus.getDisplayName();
+        return this.booleanConfig.getDisplayName();
     }
 
     @Override
     public Optional<String> getComment()
     {
-        return this.toggleStatus.getComment();
+        return this.booleanConfig.getComment();
     }
 
     @Override
     public boolean isModified()
     {
-        return this.toggleStatus.isModified() || this.toggleHotkey.isModified();
+        return this.booleanConfig.isModified() || this.toggleHotkey.isModified();
     }
 
     @Override
     public void resetToDefault()
     {
-        this.toggleStatus.resetToDefault();
+        this.booleanConfig.resetToDefault();
         this.toggleHotkey.resetToDefault();
     }
 }

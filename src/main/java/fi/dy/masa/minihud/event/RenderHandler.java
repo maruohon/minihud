@@ -233,8 +233,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     @Override
     public void onPostWorldRender(Minecraft mc, float partialTicks)
     {
-        if (Configs.Generic.OVERLAYS_RENDERING_TOGGLE.getBooleanValue() &&
-            mc.world != null && mc.player != null)
+        if (Configs.Generic.OVERLAYS_RENDERING_TOGGLE.getBooleanValue())
         {
             OverlayRenderer.renderOverlays(mc, partialTicks);
         }

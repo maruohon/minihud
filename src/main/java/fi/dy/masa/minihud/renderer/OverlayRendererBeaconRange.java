@@ -2,18 +2,12 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.lwjgl.opengl.GL11;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBeacon;
 import net.minecraft.util.math.BlockPos;
@@ -27,52 +21,51 @@ import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 
-public class OverlayRendererBeaconRange extends OverlayRendererBase
+public class OverlayRendererBeaconRange extends MiniHUDOverlayRenderer
 {
-    private static final Set<BlockPos> BEACON_POSITIONS = new HashSet<>();
-    private static final Set<ChunkPos> BEACON_CHUNKS = new HashSet<>();
+    private final Set<BlockPos> BEACON_POSITIONS = new HashSet<>();
+    private final Set<ChunkPos> BEACON_CHUNKS = new HashSet<>();
 
-    private static boolean needsUpdate;
-
-    public static void clear()
+    public void clear()
     {
-        synchronized (BEACON_POSITIONS)
+        synchronized (this.BEACON_POSITIONS)
         {
-            BEACON_CHUNKS.clear();
-            BEACON_POSITIONS.clear();
+            this.BEACON_CHUNKS.clear();
+            this.BEACON_POSITIONS.clear();
         }
     }
 
-    public static void setNeedsUpdate()
+    @Override
+    public void setNeedsUpdate()
     {
+        super.setNeedsUpdate();
+
         if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled() == false)
         {
-            clear();
+            this.clear();
         }
-
-        needsUpdate = true;
     }
 
-    public static void checkNeedsUpdate(BlockPos pos, IBlockState state)
+    public void checkNeedsUpdate(BlockPos pos, IBlockState state)
     {
-        synchronized (BEACON_POSITIONS)
+        synchronized (this.BEACON_POSITIONS)
         {
             if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled() &&
-                (state.getBlock() == Blocks.BEACON || BEACON_POSITIONS.contains(pos)))
+                (state.getBlock() == Blocks.BEACON || this.BEACON_POSITIONS.contains(pos)))
             {
-                setNeedsUpdate();
+                this.setNeedsUpdate();
             }
         }
     }
 
-    public static void checkNeedsUpdate(ChunkPos chunkPos)
+    public void checkNeedsUpdate(ChunkPos chunkPos)
     {
-        synchronized (BEACON_POSITIONS)
+        synchronized (this.BEACON_POSITIONS)
         {
             if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled() &&
-                BEACON_CHUNKS.contains(chunkPos))
+                        this.BEACON_CHUNKS.contains(chunkPos))
             {
-                setNeedsUpdate();
+                this.setNeedsUpdate();
             }
         }
     }
@@ -86,25 +79,20 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
-        if (needsUpdate || this.lastUpdatePos == null)
-        {
-            return true;
-        }
-
-        return false;
+        return this.needsUpdate || this.lastUpdatePos == null;
     }
 
     @Override
     public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
-        clear();
+        this.clear();
 
         BaseRenderObject renderQuads = this.renderObjects.get(0);
         BaseRenderObject renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        synchronized (BEACON_POSITIONS)
+        synchronized (this.BEACON_POSITIONS)
         {
             this.renderBeaconRanges(entity.getEntityWorld(), cameraPos, BUFFER_1, BUFFER_2);
         }
@@ -114,23 +102,16 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
 
-        needsUpdate = false;
+        this.needsUpdate = false;
     }
 
-    @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
-    }
-
-    protected static Color4f getColorForLevel(int level)
+    public static Color4f getColorForLevel(int level)
     {
         switch (level)
         {
             case 1: return Configs.Colors.BEACON_RANGE_LVL1_OVERLAY_COLOR.getColor();
             case 2: return Configs.Colors.BEACON_RANGE_LVL2_OVERLAY_COLOR.getColor();
-            case 3: return Configs.Colors.BEACON_RANGE_LVL2_OVERLAY_COLOR.getColor();
+            case 3: return Configs.Colors.BEACON_RANGE_LVL3_OVERLAY_COLOR.getColor();
             default: return Configs.Colors.BEACON_RANGE_LVL4_OVERLAY_COLOR.getColor();
         }
     }
@@ -169,8 +150,8 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
         ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, bufferQuads);
         ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), bufferLines);
 
-        BEACON_POSITIONS.add(pos);
-        BEACON_CHUNKS.add(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4));
+        this.BEACON_POSITIONS.add(pos);
+        this.BEACON_CHUNKS.add(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4));
     }
 
     protected int getMaxHeight(World world, BlockPos pos, int range)
@@ -212,73 +193,5 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
         }
 
         return maxY + 4;
-    }
-
-    public static void renderBeaconBoxForPlayerIfHoldingItem(EntityPlayer player, double dx, double dy, double dz, float partialTicks)
-    {
-        Item item = player.getHeldItemMainhand().getItem();
-
-        if (item instanceof ItemBlock && ((ItemBlock) item).getBlock() == Blocks.BEACON)
-        {
-            renderBeaconBoxForPlayer(player, dx, dy, dz, partialTicks);
-            return;
-        }
-
-        item = player.getHeldItemOffhand().getItem();
-
-        if (item instanceof ItemBlock && ((ItemBlock) item).getBlock() == Blocks.BEACON)
-        {
-            renderBeaconBoxForPlayer(player, dx, dy, dz, partialTicks);
-            return;
-        }
-    }
-
-    private static void renderBeaconBoxForPlayer(EntityPlayer player, double dx, double dy, double dz, float partialTicks)
-    {
-        double x = Math.floor(player.posX) - dx;
-        double y = Math.floor(player.posY) - dy;
-        double z = Math.floor(player.posZ) - dz;
-        // Use the slot number as the level if sneaking
-        int level = player.isSneaking() ? Math.min(4, player.inventory.currentItem + 1) : 4;
-        double range = level * 10 + 10;
-        double minX = x - range;
-        double minY = y - range;
-        double minZ = z - range;
-        double maxX = x + range + 1;
-        double maxY = y + 4;
-        double maxZ = z + range + 1;
-        Color4f color = getColorForLevel(level);
-
-        GlStateManager.disableTexture2D();
-        GlStateManager.enableAlpha();
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
-        GlStateManager.disableCull();
-        GlStateManager.disableLighting();
-        GlStateManager.enableDepth();
-        GlStateManager.depthMask(false);
-        GlStateManager.doPolygonOffset(-3f, -3f);
-        GlStateManager.enablePolygonOffset();
-        GlStateManager.glLineWidth(1f);
-        fi.dy.masa.malilib.render.RenderUtils.setupBlend();
-        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-
-        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(0.3f), buffer);
-
-        tessellator.draw();
-        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-
-        ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), buffer);
-
-        tessellator.draw();
-
-        GlStateManager.doPolygonOffset(0f, 0f);
-        GlStateManager.disablePolygonOffset();
-        GlStateManager.enableCull();
-        GlStateManager.enableTexture2D();
-        GlStateManager.disableBlend();
     }
 }

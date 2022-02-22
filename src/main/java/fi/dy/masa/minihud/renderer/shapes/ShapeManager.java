@@ -7,8 +7,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import fi.dy.masa.malilib.render.overlay.OverlayRendererContainer;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.minihud.renderer.RenderContainer;
 
 public class ShapeManager
 {
@@ -37,21 +37,21 @@ public class ShapeManager
     {
         this.shapes.add(shape);
 
-        RenderContainer.INSTANCE.addShapeRenderer(shape);
+        OverlayRendererContainer.INSTANCE.addRenderer(shape);
     }
 
     public void removeShape(ShapeBase shape)
     {
         this.shapes.remove(shape);
 
-        RenderContainer.INSTANCE.removeShapeRenderer(shape);
+        OverlayRendererContainer.INSTANCE.removeRenderer(shape);
     }
 
     public void clear()
     {
         for (ShapeBase shape : this.shapes)
         {
-            RenderContainer.INSTANCE.removeShapeRenderer(shape);
+            OverlayRendererContainer.INSTANCE.removeRenderer(shape);
         }
 
         this.shapes.clear();

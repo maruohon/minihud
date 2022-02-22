@@ -1,7 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -15,16 +14,9 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 
-public class OverlayRendererSpawnChunks extends OverlayRendererBase
+public class OverlayRendererSpawnChunks extends MiniHUDOverlayRenderer
 {
-    protected static boolean needsUpdate = true;
-
     protected final RendererToggle toggle;
-
-    public static void setNeedsUpdate()
-    {
-        needsUpdate = true;
-    }
 
     public OverlayRendererSpawnChunks(RendererToggle toggle)
     {
@@ -43,7 +35,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
-        if (needsUpdate)
+        if (this.needsUpdate)
         {
             return true;
         }
@@ -95,14 +87,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
 
-        needsUpdate = false;
-    }
-
-    @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
+        this.needsUpdate = false;
     }
 
     protected Pair<BlockPos, BlockPos> getSpawnChunkCorners(BlockPos worldSpawn, int spawnChunkRange)

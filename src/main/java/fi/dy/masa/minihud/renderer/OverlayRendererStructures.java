@@ -1,7 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
 import java.util.Collection;
-import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
@@ -21,15 +20,8 @@ import fi.dy.masa.minihud.data.StructureData;
 import fi.dy.masa.minihud.data.StructureType;
 import fi.dy.masa.minihud.util.MiscUtils;
 
-public class OverlayRendererStructures extends OverlayRendererBase
+public class OverlayRendererStructures extends MiniHUDOverlayRenderer
 {
-    public static OverlayRendererStructures instance;
-
-    public OverlayRendererStructures()
-    {
-        instance = this;
-    }
-
     @Override
     public boolean shouldRender(Minecraft mc)
     {
@@ -85,13 +77,6 @@ public class OverlayRendererStructures extends OverlayRendererBase
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
-    }
-
-    @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
     }
 
     private void updateStructures(WorldProvider provider, BlockPos playerPos, Vec3d cameraPos, Minecraft mc)

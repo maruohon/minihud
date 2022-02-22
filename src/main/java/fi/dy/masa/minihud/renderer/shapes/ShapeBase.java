@@ -14,10 +14,10 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.renderer.OverlayRendererBase;
+import fi.dy.masa.minihud.renderer.MiniHUDOverlayRenderer;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
-public abstract class ShapeBase extends OverlayRendererBase implements LayerRangeChangeListener
+public abstract class ShapeBase extends MiniHUDOverlayRenderer implements LayerRangeChangeListener
 {
     protected final Minecraft mc = GameUtils.getClient();
     protected final ShapeType type;
@@ -26,7 +26,6 @@ public abstract class ShapeBase extends OverlayRendererBase implements LayerRang
     protected ShapeRenderType renderType;
     protected Color4f color;
     protected boolean enabled;
-    protected boolean needsUpdate;
 
     public ShapeBase(ShapeType type, Color4f color)
     {
@@ -88,9 +87,9 @@ public abstract class ShapeBase extends OverlayRendererBase implements LayerRang
         this.setColor(Color4f.getColorFromString(newValue, 0));
     }
 
-    public boolean isEnabled()
+    public boolean isShapeEnabled()
     {
-        return enabled;
+        return this.enabled;
     }
 
     public void toggleEnabled()
@@ -101,11 +100,6 @@ public abstract class ShapeBase extends OverlayRendererBase implements LayerRang
         {
             this.setNeedsUpdate();
         }
-    }
-
-    public void setNeedsUpdate()
-    {
-        this.needsUpdate = true;
     }
 
     @Override
@@ -156,7 +150,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements LayerRang
     @Override
     public JsonObject toJson()
     {
-        JsonObject obj = new JsonObject();
+        JsonObject obj = super.toJson();
 
         obj.add("type", new JsonPrimitive(this.type.getId()));
         obj.add("color", new JsonPrimitive(this.color.intValue));
@@ -171,6 +165,8 @@ public abstract class ShapeBase extends OverlayRendererBase implements LayerRang
     @Override
     public void fromJson(JsonObject obj)
     {
+        super.fromJson(obj);
+
         this.enabled = JsonUtils.getBoolean(obj, "enabled");
 
         if (JsonUtils.hasInteger(obj, "color"))

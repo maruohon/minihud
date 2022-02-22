@@ -3,7 +3,6 @@ package fi.dy.masa.minihud.renderer;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -12,22 +11,36 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
+import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 
-public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
+public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
 {
-    @Nullable public static Vec3d newPos;
-    private static final EnumFacing[] HORIZONTALS = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
-
     protected final RendererToggle toggle;
     protected Vec3d pos = Vec3d.ZERO;
+    @Nullable protected Vec3d newPos;
 
     public OverlayRendererRandomTickableChunks(RendererToggle toggle)
     {
         this.toggle = toggle;
+    }
+
+    @Override
+    public void onEnabled()
+    {
+        super.onEnabled();
+
+        if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED &&
+            this.shouldRender(GameUtils.getClient()))
+        {
+            Vec3d pos = EntityUtils.getCameraEntityPosition();
+            this.newPos = pos;
+        }
     }
 
     @Override
@@ -41,7 +54,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     {
         if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED)
         {
-            return newPos != null;
+            return this.newPos != null;
         }
         // Player-following renderer
         else if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
@@ -59,10 +72,10 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
         {
             this.pos = entity.getPositionVector();
         }
-        else if (newPos != null)
+        else if (this.newPos != null)
         {
-            this.pos = newPos;
-            newPos = null;
+            this.pos = this.newPos;
+            this.newPos = null;
         }
 
         final Color4f color = this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER ?
@@ -115,7 +128,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
 
     protected void renderChunkEdgesIfApplicable(ChunkPos pos, Vec3d cameraPos, Set<ChunkPos> chunks,Color4f color)
     {
-        for (EnumFacing side : HORIZONTALS)
+        for (EnumFacing side : PositionUtils.HORIZONTAL_DIRECTIONS)
         {
             ChunkPos posTmp = new ChunkPos(pos.x + side.getXOffset(), pos.z + side.getZOffset());
 
@@ -164,13 +177,6 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     }
 
     @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
-    }
-
-    @Override
     public String getSaveId()
     {
         return this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED ? "random_tickable_chunks" : "";
@@ -180,7 +186,7 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     @Override
     public JsonObject toJson()
     {
-        JsonObject obj = new JsonObject();
+        JsonObject obj = super.toJson();
         obj.add("pos", JsonUtils.vec3dToJson(this.pos));
         return obj;
     }
@@ -188,11 +194,13 @@ public class OverlayRendererRandomTickableChunks extends OverlayRendererBase
     @Override
     public void fromJson(JsonObject obj)
     {
+        super.fromJson(obj);
+
         Vec3d pos = JsonUtils.vec3dFromJson(obj, "pos");
 
         if (pos != null && this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED)
         {
-            newPos = pos;
+            this.newPos = pos;
         }
     }
 }

@@ -29,19 +29,12 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
 import fi.dy.masa.minihud.util.LightLevelNumberMode;
 
-public class OverlayRendererLightLevel extends OverlayRendererBase
+public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
 {
-    private static final ResourceLocation TEXTURE_NUMBERS = new ResourceLocation(Reference.MOD_ID, "textures/misc/light_level_numbers.png");
+    private static final ResourceLocation NUMBER_TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/misc/light_level_numbers.png");
 
     private final List<LightLevelInfo> lightInfoList = new ArrayList<>();
     private EnumFacing lastDirection = EnumFacing.NORTH;
-
-    private static boolean needsUpdate;
-
-    public static void setNeedsUpdate()
-    {
-        needsUpdate = true;
-    }
 
     @Override
     public boolean shouldRender(Minecraft mc)
@@ -52,12 +45,12 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
-        return needsUpdate || this.lastUpdatePos == null ||
-                       Math.abs(entity.posX - this.lastUpdatePos.getX()) > 4 ||
-                       Math.abs(entity.posY - this.lastUpdatePos.getY()) > 4 ||
-                       Math.abs(entity.posZ - this.lastUpdatePos.getZ()) > 4 ||
-                       (Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() &&
-                        this.lastDirection != entity.getHorizontalFacing());
+        return this.needsUpdate || this.lastUpdatePos == null ||
+               Math.abs(entity.posX - this.lastUpdatePos.getX()) > 4 ||
+               Math.abs(entity.posY - this.lastUpdatePos.getY()) > 4 ||
+               Math.abs(entity.posZ - this.lastUpdatePos.getZ()) > 4 ||
+               (Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() &&
+                   this.lastDirection != entity.getHorizontalFacing());
     }
 
     @Override
@@ -79,9 +72,8 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
 
-        this.lastUpdatePos = pos;
         this.lastDirection = entity.getHorizontalFacing();
-        needsUpdate = false;
+        this.needsUpdate = false;
     }
 
     @Override
@@ -89,7 +81,7 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     {
         super.preRender();
 
-        fi.dy.masa.malilib.render.RenderUtils.bindTexture(TEXTURE_NUMBERS);
+        fi.dy.masa.malilib.render.RenderUtils.bindTexture(NUMBER_TEXTURE);
     }
 
     @Override

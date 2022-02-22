@@ -1,7 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
 import javax.annotation.Nullable;
-import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
@@ -10,23 +9,32 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 
-public class OverlayRendererSpawnableChunks extends OverlayRendererBase
+public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
 {
-    @Nullable public static BlockPos newPos;
-    public static double overlayTopY;
-
     protected final RendererToggle toggle;
     protected BlockPos posCenter = BlockPos.ORIGIN;
+    @Nullable protected BlockPos newPos;
+    protected double overlayTopY;
     protected double topY = 256;
 
     public OverlayRendererSpawnableChunks(RendererToggle toggle)
     {
         this.toggle = toggle;
+    }
+
+    @Override
+    public void onEnabled()
+    {
+        super.onEnabled();
+
+        Vec3d pos = EntityUtils.getCameraEntityPosition();
+        this.overlayTopY = pos.y;
     }
 
     @Override
@@ -38,16 +46,9 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
-        /*
-        if (this.topY != overlayTopY)
-        {
-            return true;
-        }
-        */
-
         if (this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED)
         {
-            return newPos != null;
+            return this.newPos != null;
         }
         else
         {
@@ -65,10 +66,10 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
     {
         if (this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED)
         {
-            if (newPos != null)
+            if (this.newPos != null)
             {
-                this.posCenter = newPos;
-                newPos = null;
+                this.posCenter = this.newPos;
+                this.newPos = null;
             }
             else
             {
@@ -82,19 +83,18 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
 
         int centerX = this.posCenter.getX() >> 4;
         int centerZ = this.posCenter.getZ() >> 4;
-        int r = 7;
         final Color4f color = this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED ?
                 Configs.Colors.SPAWNABLE_CHUNKS_FIXED.getColor() :
                 Configs.Colors.SPAWNABLE_CHUNKS_PLAYER.getColor();
 
         this.lastUpdatePos = new BlockPos(centerX, 0, centerZ);
-        //this.topY = overlayTopY;
 
         BaseRenderObject renderQuads = this.renderObjects.get(0);
         BaseRenderObject renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
+        int r = 7;
         BlockPos pos1 = new BlockPos( (centerX - r    ) << 4,              0,  (centerZ - r    ) << 4     );
         BlockPos pos2 = new BlockPos(((centerX + r + 1) << 4) - 1, this.topY, ((centerZ + r + 1) << 4) - 1);
 
@@ -105,13 +105,6 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
 
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
-    }
-
-    @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
     }
 
     @Override
@@ -131,22 +124,24 @@ public class OverlayRendererSpawnableChunks extends OverlayRendererBase
     @Override
     public JsonObject toJson()
     {
-        JsonObject obj = new JsonObject();
+        JsonObject obj = super.toJson();
         obj.add("pos", JsonUtils.blockPosToJson(this.posCenter));
-        obj.add("y_top", new JsonPrimitive(this.topY));
+        obj.add("top_y", new JsonPrimitive(this.topY));
         return obj;
     }
 
     @Override
     public void fromJson(JsonObject obj)
     {
-        this.topY = JsonUtils.getDouble(obj, "y_top");
+        super.fromJson(obj);
+
+        this.topY = JsonUtils.getDoubleOrDefault(obj, "top_y", 80);
 
         BlockPos pos = JsonUtils.blockPosFromJson(obj, "pos");
 
         if (pos != null && this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED)
         {
-            newPos = pos;
+            this.newPos = pos;
         }
     }
 }

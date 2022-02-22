@@ -9,14 +9,14 @@ import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
-import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
+import fi.dy.masa.minihud.renderer.RenderContainer;
 
 public class NotificationUtils
 {
     public static void onBlockChange(BlockPos pos, IBlockState stateNew)
     {
         DataStorage.getInstance().markChunkForHeightmapCheck(pos.getX() >> 4, pos.getZ() >> 4);
-        OverlayRendererBeaconRange.checkNeedsUpdate(pos, stateNew);
+        RenderContainer.BEACON_OVERLAY.checkNeedsUpdate(pos, stateNew);
     }
 
     public static void onMultiBlockChange(ChunkPos chunkPos, SPacketMultiBlockChange.BlockUpdateData[] data)
@@ -28,7 +28,7 @@ public class NotificationUtils
         {
             for (SPacketMultiBlockChange.BlockUpdateData d : data)
             {
-                OverlayRendererBeaconRange.checkNeedsUpdate(d.getPos(), d.getBlockState());
+                RenderContainer.BEACON_OVERLAY.checkNeedsUpdate(d.getPos(), d.getBlockState());
             }
         }
     }
@@ -40,7 +40,7 @@ public class NotificationUtils
         if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled() &&
             Configs.Generic.BEACON_RANGE_AUTO_UPDATE.getBooleanValue())
         {
-            OverlayRendererBeaconRange.checkNeedsUpdate(new ChunkPos(chunkX, chunkZ));
+            RenderContainer.BEACON_OVERLAY.checkNeedsUpdate(new ChunkPos(chunkX, chunkZ));
         }
     }
 }

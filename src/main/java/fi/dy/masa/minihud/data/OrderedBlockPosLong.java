@@ -21,13 +21,11 @@ public class OrderedBlockPosLong
     @Override
     public boolean equals(Object o)
     {
-        if (this == o) {return true;}
-        if (o == null || this.getClass() != o.getClass()) {return false;}
+        if (this == o) { return true; }
+        if (o == null || this.getClass() != o.getClass()) { return false; }
 
         OrderedBlockPosLong that = (OrderedBlockPosLong) o;
-
-        if (this.posLong != that.posLong) {return false;}
-        return this.order == that.order;
+        return this.posLong == that.posLong && this.order == that.order;
     }
 
     @Override

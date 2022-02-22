@@ -9,7 +9,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -27,9 +26,8 @@ import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.network.CarpetPubsubPacketHandler;
 import fi.dy.masa.minihud.network.ServuxInfoSubDataPacketHandler;
-import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
-import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
+import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.util.MiscUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
@@ -98,7 +96,7 @@ public class DataStorage
         this.worldSeed = 0;
         this.worldSpawn = BlockPos.ORIGIN;
 
-        OverlayRendererBeaconRange.clear();
+        RenderContainer.BEACON_OVERLAY.clear();
 
         if (this.mc.world != null)
         {
@@ -118,9 +116,9 @@ public class DataStorage
         ServuxInfoSubDataPacketHandler.INSTANCE.onLogout();
     }
 
-    public void onWorldLoad(World world)
+    public void onWorldLoad()
     {
-        OverlayRendererBeaconRange.setNeedsUpdate();
+        RenderContainer.BEACON_OVERLAY.setNeedsUpdate();
     }
 
     public void setWorldSeed(long seed)
@@ -290,7 +288,7 @@ public class DataStorage
     {
         OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
         this.chunkHeightmapsToCheck.add(new ChunkPos(chunkX, chunkZ));
-        OverlayRendererLightLevel.setNeedsUpdate();
+        RenderContainer.LIGHT_LEVEL_OVERLAY.setNeedsUpdate();
     }
 
     public HashSizeType getDroppedChunksHashSizeType()
@@ -420,7 +418,7 @@ public class DataStorage
         return count != null ? count.intValue() : -1;
     }
 
-    public boolean onSendChatMessage(EntityPlayer player, String message)
+    public boolean onSendChatMessage(String message)
     {
         String[] parts = message.split(" ");
 

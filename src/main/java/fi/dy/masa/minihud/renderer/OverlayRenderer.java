@@ -1,12 +1,23 @@
 package fi.dy.masa.minihud.renderer;
 
 import java.util.Collections;
+import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.util.math.MathHelper;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -52,12 +63,12 @@ public class OverlayRenderer
 
         if (RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.isRendererEnabled())
         {
-            renderChunkUnloadBuckets(mc, entity, dx, dy, dz, Configs.Internal.CHUNK_UNLOAD_BUCKET_OVERLAY_Y.getDoubleValue());
+            renderChunkUnloadBuckets(entity, dx, dy, dz, Configs.Internal.CHUNK_UNLOAD_BUCKET_OVERLAY_Y.getDoubleValue());
         }
 
         if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled())
         {
-            OverlayRendererBeaconRange.renderBeaconBoxForPlayerIfHoldingItem(mc.player, dx, dy, dz, partialTicks);
+            renderBeaconBoxForPlayerIfHoldingItem(mc.player, dx, dy, dz);
         }
 
         if (RendererToggle.OVERLAY_SPAWNER_POSITIONS.isRendererEnabled())
@@ -69,11 +80,9 @@ public class OverlayRenderer
         {
             RenderContainer.WATER_FALL_RENDERER.renderPositionText(dx, dy, dz);
         }
-
-        RenderContainer.INSTANCE.render(entity, mc, partialTicks);
     }
 
-    private static void renderChunkUnloadBuckets(Minecraft mc, Entity entity, double dx, double dy, double dz, double chunkOverlayY)
+    private static void renderChunkUnloadBuckets(Entity entity, double dx, double dy, double dz, double chunkOverlayY)
     {
         final int centerX = MathHelper.floor(entity.posX) >> 4;
         final int centerZ = MathHelper.floor(entity.posZ) >> 4;
@@ -97,5 +106,72 @@ public class OverlayRenderer
                 TextRenderUtils.renderTextPlate(Collections.singletonList(str), (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale);
             }
         }
+    }
+
+    public static void renderBeaconBoxForPlayerIfHoldingItem(EntityPlayer player, double dx, double dy, double dz)
+    {
+        Item item = player.getHeldItemMainhand().getItem();
+
+        if (item instanceof ItemBlock && ((ItemBlock) item).getBlock() == Blocks.BEACON)
+        {
+            renderBeaconBoxForPlayer(player, dx, dy, dz);
+            return;
+        }
+
+        item = player.getHeldItemOffhand().getItem();
+
+        if (item instanceof ItemBlock && ((ItemBlock) item).getBlock() == Blocks.BEACON)
+        {
+            renderBeaconBoxForPlayer(player, dx, dy, dz);
+        }
+    }
+
+    private static void renderBeaconBoxForPlayer(EntityPlayer player, double dx, double dy, double dz)
+    {
+        double x = Math.floor(player.posX) - dx;
+        double y = Math.floor(player.posY) - dy;
+        double z = Math.floor(player.posZ) - dz;
+        // Use the slot number as the level if sneaking
+        int level = player.isSneaking() ? Math.min(4, player.inventory.currentItem + 1) : 4;
+        double range = level * 10 + 10;
+        double minX = x - range;
+        double minY = y - range;
+        double minZ = z - range;
+        double maxX = x + range + 1;
+        double maxY = y + 4;
+        double maxZ = z + range + 1;
+        Color4f color = OverlayRendererBeaconRange.getColorForLevel(level);
+
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
+        GlStateManager.disableCull();
+        GlStateManager.disableLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.depthMask(false);
+        GlStateManager.doPolygonOffset(-3f, -3f);
+        GlStateManager.enablePolygonOffset();
+        GlStateManager.glLineWidth(1f);
+        fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+
+        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(0.3f), buffer);
+
+        tessellator.draw();
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+
+        ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), buffer);
+
+        tessellator.draw();
+
+        GlStateManager.doPolygonOffset(0f, 0f);
+        GlStateManager.disablePolygonOffset();
+        GlStateManager.enableCull();
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
     }
 }

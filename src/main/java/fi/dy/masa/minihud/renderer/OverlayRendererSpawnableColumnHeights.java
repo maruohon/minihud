@@ -2,7 +2,6 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -16,7 +15,7 @@ import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 
-public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
+public class OverlayRendererSpawnableColumnHeights extends MiniHUDOverlayRenderer
 {
     private static final Set<Long> DIRTY_CHUNKS = new HashSet<>();
 
@@ -136,12 +135,5 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
         {
             DIRTY_CHUNKS.clear();
         }
-    }
-
-    @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
     }
 }

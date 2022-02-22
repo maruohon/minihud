@@ -28,7 +28,7 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
 
         this.setText(StyledTextLine.of(shape.getDisplayName()));
 
-        this.toggleButton = OnOffButton.simpleSlider(20, this.shape::isEnabled, this::toggleShapeEnabled);
+        this.toggleButton = OnOffButton.simpleSlider(20, this.shape::isShapeEnabled, this::toggleShapeEnabled);
 
         this.configureButton = GenericButton.create("malilib.button.misc.configure");
         this.configureButton.setActionListener(() -> {
@@ -66,13 +66,13 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
 
         int y = this.getY() + 1;
 
-        this.removeButton.setRight(this.getX() + this.getWidth() - 4);
+        this.removeButton.setRight(this.getRight() - 4);
         this.removeButton.setY(y);
 
         this.toggleButton.setRight(this.removeButton.getX() - 2);
         this.toggleButton.setY(y);
 
-        this.configureButton.setRight(this.toggleButton.getRight() - 2);
+        this.configureButton.setRight(this.toggleButton.getX() - 2);
         this.configureButton.setY(y);
     }
 

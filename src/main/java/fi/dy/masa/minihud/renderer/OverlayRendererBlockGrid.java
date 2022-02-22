@@ -19,7 +19,7 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.BlockGridMode;
 
-public class OverlayRendererBlockGrid extends OverlayRendererBase
+public class OverlayRendererBlockGrid extends MiniHUDOverlayRenderer
 {
     @Override
     public boolean shouldRender(Minecraft mc)
