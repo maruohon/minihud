@@ -674,7 +674,7 @@ public class DataStorage
 
         List<StructureType> enabledTypes = new ArrayList<>();
 
-        for (StructureType type : StructureType.values())
+        for (StructureType type : StructureType.VALUES)
         {
             if (type.isEnabled() && type.existsInDimension(dimId))
             {

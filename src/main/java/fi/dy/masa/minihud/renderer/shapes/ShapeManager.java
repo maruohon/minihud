@@ -37,21 +37,21 @@ public class ShapeManager
     {
         this.shapes.add(shape);
 
-        RenderContainer.INSTANCE.addShapeRenderer(shape);
+        RenderContainer.INSTANCE.addRenderer(shape);
     }
 
     public void removeShape(ShapeBase shape)
     {
         this.shapes.remove(shape);
 
-        RenderContainer.INSTANCE.removeShapeRenderer(shape);
+        RenderContainer.INSTANCE.removeRenderer(shape);
     }
 
     public void clear()
     {
         for (ShapeBase shape : this.shapes)
         {
-            RenderContainer.INSTANCE.removeShapeRenderer(shape);
+            RenderContainer.INSTANCE.removeRenderer(shape);
         }
 
         this.shapes.clear();
