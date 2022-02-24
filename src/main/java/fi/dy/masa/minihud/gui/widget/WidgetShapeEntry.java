@@ -4,8 +4,8 @@ import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
-import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
+import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import fi.dy.masa.malilib.render.text.StyledTextLine;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
@@ -19,15 +19,11 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
     private final GenericButton removeButton;
     private final int buttonsStartX;
 
-    public WidgetShapeEntry(int x, int y, int width, int height, int listIndex,
-                            int originalListIndex, ShapeBase shape, DataListWidget<ShapeBase> listWidget)
+    public WidgetShapeEntry(ShapeBase data, DataListEntryWidgetData constructData)
     {
-        super(x, y, width, height, listIndex, originalListIndex, shape, listWidget);
+        super(data, constructData);
 
-        this.shape = shape;
-
-        this.setText(StyledTextLine.of(shape.getDisplayName()));
-
+        this.shape = data;
         this.toggleButton = OnOffButton.simpleSlider(20, this.shape::isShapeEnabled, this::toggleShapeEnabled);
 
         this.configureButton = GenericButton.create("malilib.button.misc.configure");
@@ -43,9 +39,10 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
             this.listWidget.refreshEntries();
         });
 
-        this.buttonsStartX = x + width - this.configureButton.getWidth() - this.toggleButton.getWidth() - this.removeButton.getWidth() - 6;
+        this.buttonsStartX = this.getRight() - this.configureButton.getWidth() - this.toggleButton.getWidth() - this.removeButton.getWidth() - 6;
 
-        this.setHoverStringProvider("shape_info", shape::getWidgetHoverLines);
+        this.setText(StyledTextLine.of(data.getDisplayName()));
+        this.setHoverStringProvider("shape_info", data::getWidgetHoverLines);
         this.getBackgroundRenderer().getNormalSettings().setEnabled(true);
     }
 
@@ -60,9 +57,9 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
     }
 
     @Override
-    public void updateSubWidgetsToGeometryChanges()
+    public void updateSubWidgetPositions()
     {
-        super.updateSubWidgetsToGeometryChanges();
+        super.updateSubWidgetPositions();
 
         int y = this.getY() + 1;
 

@@ -99,14 +99,14 @@ public class GuiShapeManager extends BaseListScreen<DataListWidget<ShapeBase>>
     }
 
     @Override
-    protected DataListWidget<ShapeBase> createListWidget(int listX, int listY, int listWidth, int listHeight)
+    protected DataListWidget<ShapeBase> createListWidget()
     {
-        DataListWidget<ShapeBase> listWidget = new DataListWidget<>(listX, listY, listWidth, listHeight, ShapeManager.INSTANCE::getAllShapes);
-        listWidget.setEntryWidgetFactory(WidgetShapeEntry::new);
-        listWidget.setFetchFromSupplierOnRefresh(true);
+        DataListWidget<ShapeBase> listWidget = new DataListWidget<>(ShapeManager.INSTANCE::getAllShapes, true);
+
         listWidget.setAllowSelection(true);
         listWidget.getEntrySelectionHandler().setSelectedEntry(ShapeManager.INSTANCE.getSelectedShape());
         listWidget.getEntrySelectionHandler().setSelectionListener(this::onSelectionChange);
+        listWidget.setEntryWidgetFactory(WidgetShapeEntry::new);
 
         return listWidget;
     }
