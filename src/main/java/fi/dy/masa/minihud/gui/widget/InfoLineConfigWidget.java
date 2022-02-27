@@ -39,17 +39,17 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
                                                                                 this.config.getLineOrderConfig().getMaxIntegerValue()));
         this.textField.setListener((str) -> {
             this.config.getLineOrderConfig().setValueFromString(str);
-            this.updateWidgetDisplayValues();
+            this.updateWidgetState();
         });
 
         this.booleanButton = new BooleanConfigButton(-1, 20, config.getBooleanConfig());
         this.booleanButton.setActionListener(() -> {
             this.config.getBooleanConfig().toggleBooleanValue();
-            this.updateWidgetDisplayValues();
+            this.updateWidgetState();
         });
 
         this.hotkeyButton = new KeyBindConfigButton(120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
-        this.hotkeyButton.setValueChangeListener(this::updateWidgetDisplayValues);
+        this.hotkeyButton.setValueChangeListener(this::updateWidgetState);
 
         this.settingsWidget = new KeybindSettingsWidget(config.getKeyBind(), config.getDisplayName());
     }
@@ -85,9 +85,9 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
     }
 
     @Override
-    public void updateWidgetDisplayValues()
+    public void updateWidgetState()
     {
-        super.updateWidgetDisplayValues();
+        super.updateWidgetState();
 
         this.textField.setText(String.valueOf(this.config.getLineOrderConfig().getIntegerValue()));
         this.booleanButton.setEnabled(this.config.getBooleanConfig().isLocked() == false);

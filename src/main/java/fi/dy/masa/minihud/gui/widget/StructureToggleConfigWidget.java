@@ -38,23 +38,23 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
         this.booleanButton = new BooleanConfigButton(-1, 20, config.getBooleanConfig());
         this.booleanButton.setActionListener(() -> {
             this.config.getBooleanConfig().toggleBooleanValue();
-            this.updateWidgetDisplayValues();
+            this.updateWidgetState();
         });
 
         this.hotkeyButton = new KeyBindConfigButton(120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
-        this.hotkeyButton.setValueChangeListener(this::updateWidgetDisplayValues);
+        this.hotkeyButton.setValueChangeListener(this::updateWidgetState);
 
         this.settingsWidget = new KeybindSettingsWidget(config.getKeyBind(), config.getDisplayName());
 
         this.colorIndicatorWidgetMain = new ColorIndicatorWidget(18, 18, this.config.getColorMain(), (newValue) -> {
             this.config.getColorMain().setValue(newValue);
-            this.updateWidgetDisplayValues();
+            this.updateWidgetState();
         });
         this.colorIndicatorWidgetMain.getHoverInfoFactory().translateAndAddString(90, "minihud.hover.structures.color_main");
 
         this.colorIndicatorWidgetComponents = new ColorIndicatorWidget(18, 18, this.config.getColorComponents(), (newValue) -> {
             this.config.getColorComponents().setValue(newValue);
-            this.updateWidgetDisplayValues();
+            this.updateWidgetState();
         });
         this.colorIndicatorWidgetComponents.getHoverInfoFactory().translateAndAddString(90, "minihud.hover.structures.color_components");
     }
@@ -92,9 +92,9 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
     }
 
     @Override
-    public void updateWidgetDisplayValues()
+    public void updateWidgetState()
     {
-        super.updateWidgetDisplayValues();
+        super.updateWidgetState();
 
         this.booleanButton.setEnabled(this.config.getBooleanConfig().isLocked() == false);
         this.booleanButton.updateButtonState();

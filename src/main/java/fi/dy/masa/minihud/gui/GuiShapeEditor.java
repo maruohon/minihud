@@ -49,7 +49,12 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
 
     public GuiShapeEditor(ShapeBase shape)
     {
+        super("minihud_shape_editor", ConfigScreen.ALL_TABS, ConfigScreen.SHAPES);
+
         this.shape = shape;
+        this.controlsStartX = 146;
+        this.controlsStartY = 142;
+
         this.configBlockSnap = new OptionListConfig<>("blockSnap", BlockSnap.NONE, BlockSnap.VALUES, "");
 
         this.setTitle("minihud.title.screen.shape_editor", Reference.MOD_VERSION);
@@ -72,8 +77,6 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
             BaseScreen.openScreen(new GuiShapeManager());
         });
         this.addWidget(button);
-
-        this.createLayerEditControls(146, 142, this.getLayerRange());
     }
 
     @Override
@@ -92,7 +95,6 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         txtField.setTextValidator(BaseTextFieldWidget.VALIDATOR_HEX_COLOR_8_6_4_3);
         txtField.setListener(this.shape::setColorFromString);
         this.addWidget(txtField);
-        this.nextY = y + 20;
 
         ColorIndicatorWidget ci = new ColorIndicatorWidget(18, 18, this.shape.getColor().intValue, this.shape::setColor);
         ci.setPosition(x + 74, y - 1);
