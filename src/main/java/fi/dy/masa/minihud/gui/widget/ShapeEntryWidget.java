@@ -11,7 +11,7 @@ import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 
-public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
+public class ShapeEntryWidget extends BaseDataListEntryWidget<ShapeBase>
 {
     private final ShapeBase shape;
     private final GenericButton configureButton;
@@ -19,7 +19,7 @@ public class WidgetShapeEntry extends BaseDataListEntryWidget<ShapeBase>
     private final GenericButton removeButton;
     private final int buttonsStartX;
 
-    public WidgetShapeEntry(ShapeBase data, DataListEntryWidgetData constructData)
+    public ShapeEntryWidget(ShapeBase data, DataListEntryWidgetData constructData)
     {
         super(data, constructData);
 

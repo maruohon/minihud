@@ -33,7 +33,7 @@ public class ConfigScreen
     private static final BaseConfigTab INFO_LINES           = new BaseConfigTab(MOD_INFO, "info_lines", 200, getInfoLinesOptions(),   ConfigScreen::create);
     private static final BaseConfigTab OVERLAY_RENDERERS    = new BaseConfigTab(MOD_INFO, "renderers",  200, getRendererOptions(),    ConfigScreen::create);
     private static final BaseConfigTab STRUCTURES           = new BaseConfigTab(MOD_INFO, "structures", 200, getStructureOptions(),   ConfigScreen::create);
-    public  static final BaseScreenTab SHAPES               = new BaseScreenTab(MOD_INFO, "shapes", GuiShapeManager::screenValidator, GuiShapeManager::openShapeManager);
+    public  static final BaseScreenTab SHAPES               = new BaseScreenTab(MOD_INFO, "shapes", ShapeManagerScreen::screenValidator, ShapeManagerScreen::openShapeManager);
 
     public static final ImmutableList<ConfigTab> CONFIG_TABS = ImmutableList.of(
             GENERIC,

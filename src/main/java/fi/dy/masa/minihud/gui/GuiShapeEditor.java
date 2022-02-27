@@ -74,7 +74,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         button.setPosition(x, this.height - 24);
         button.setActionListener(() -> {
             BaseConfigScreen.setCurrentTab(Reference.MOD_ID, ConfigScreen.SHAPES);
-            BaseScreen.openScreen(new GuiShapeManager());
+            BaseScreen.openScreen(new ShapeManagerScreen());
         });
         this.addWidget(button);
     }
@@ -297,7 +297,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     public static ActionResult openShapeEditor()
     {
         ShapeBase shape = ShapeManager.INSTANCE.getSelectedShape();
-        BaseScreen screen = shape != null ? new GuiShapeEditor(shape) : GuiShapeManager.openShapeManager(null);
+        BaseScreen screen = shape != null ? new GuiShapeEditor(shape) : ShapeManagerScreen.openShapeManager(null);
         BaseScreen.openScreen(screen);
         return ActionResult.SUCCESS;
     }
