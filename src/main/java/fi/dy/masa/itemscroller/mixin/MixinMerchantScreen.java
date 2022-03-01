@@ -34,6 +34,8 @@ public abstract class MixinMerchantScreen extends HandledScreen<MerchantScreenHa
     @Shadow int indexStartOffset;
     private int indexStartOffsetLast = -1;
 
+    @Shadow protected abstract boolean canScroll(int listSize);
+
     private MixinMerchantScreen(MerchantScreenHandler handler, PlayerInventory inventory, Text title)
     {
         super(handler, inventory, title);
@@ -46,10 +48,11 @@ public abstract class MixinMerchantScreen extends HandledScreen<MerchantScreenHa
             Configs.Generic.VILLAGER_TRADE_LIST_REMEMBER_SCROLL.getBooleanValue())
         {
             VillagerData data = VillagerDataStorage.getInstance().getDataForLastInteractionTarget();
+            int listSize = this.handler.getRecipes().size();
 
-            if (data != null)
+            if (data != null && this.canScroll(listSize))
             {
-                this.indexStartOffset = data.getTradeListPosition();
+                this.indexStartOffset = this.getClampedIndex(data.getTradeListPosition());
             }
         }
     }
@@ -61,8 +64,9 @@ public abstract class MixinMerchantScreen extends HandledScreen<MerchantScreenHa
             Configs.Generic.VILLAGER_TRADE_LIST_REMEMBER_SCROLL.getBooleanValue() &&
             this.indexStartOffsetLast != this.indexStartOffset)
         {
-            VillagerDataStorage.getInstance().setTradeListPosition(this.indexStartOffset);
-            this.indexStartOffsetLast = this.indexStartOffset;
+            int index = this.getClampedIndex(this.indexStartOffset);
+            VillagerDataStorage.getInstance().setTradeListPosition(index);
+            this.indexStartOffsetLast = index;
         }
     }
 
@@ -73,8 +77,9 @@ public abstract class MixinMerchantScreen extends HandledScreen<MerchantScreenHa
             Configs.Generic.VILLAGER_TRADE_LIST_REMEMBER_SCROLL.getBooleanValue() &&
             this.indexStartOffsetLast != this.indexStartOffset)
         {
-            VillagerDataStorage.getInstance().setTradeListPosition(this.indexStartOffset);
-            this.indexStartOffsetLast = this.indexStartOffset;
+            int index = this.getClampedIndex(this.indexStartOffset);
+            VillagerDataStorage.getInstance().setTradeListPosition(index);
+            this.indexStartOffsetLast = index;
         }
     }
 
@@ -166,6 +171,12 @@ public abstract class MixinMerchantScreen extends HandledScreen<MerchantScreenHa
                 }
             }
         }
+    }
+
+    private int getClampedIndex(int index)
+    {
+        int listSize = this.handler.getRecipes().size();
+        return Math.max(0, Math.min(index, listSize - 7));
     }
 
     private int getHoveredTradeButtonIndex(double mouseX, double mouseY)
