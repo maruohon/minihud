@@ -2,6 +2,7 @@ package fi.dy.masa.itemscroller.gui;
 
 import java.util.Collections;
 import java.util.List;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.itemscroller.Reference;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Hotkeys;
@@ -14,7 +15,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiConfigs extends GuiConfigsBase
 {
-    private static ConfigGuiTab tab = ConfigGuiTab.HOTKEYS;
+    private static ConfigGuiTab tab = ConfigGuiTab.GENERIC;
 
     public GuiConfigs()
     {
@@ -30,7 +31,7 @@ public class GuiConfigs extends GuiConfigsBase
         int x = 10;
         int y = 26;
 
-        for (ConfigGuiTab tab : ConfigGuiTab.values())
+        for (ConfigGuiTab tab : ConfigGuiTab.VALUES)
         {
             x += this.createButton(x, y, -1, tab);
         }
@@ -114,7 +115,9 @@ public class GuiConfigs extends GuiConfigsBase
 
         private final String translationKey;
 
-        private ConfigGuiTab(String translationKey)
+        public static final ImmutableList<ConfigGuiTab> VALUES = ImmutableList.copyOf(values());
+
+        ConfigGuiTab(String translationKey)
         {
             this.translationKey = translationKey;
         }
