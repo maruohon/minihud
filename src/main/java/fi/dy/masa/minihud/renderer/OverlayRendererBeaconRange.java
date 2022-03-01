@@ -1,111 +1,63 @@
 package fi.dy.masa.minihud.renderer;
 
-import java.util.HashSet;
-import java.util.Set;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BeaconBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientChunkManager;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.network.packet.s2c.play.ChunkData;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.BlockEntityTickInvoker;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.mixin.IMixinBeaconBlockEntity;
-import fi.dy.masa.minihud.mixin.IMixinWorld;
+import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public class OverlayRendererBeaconRange extends OverlayRendererBase
 {
-    private static final Set<BlockPos> BEACON_POSITIONS = new HashSet<>();
-    private static final LongOpenHashSet BEACON_CHUNKS = new LongOpenHashSet();
+    public static final OverlayRendererBeaconRange INSTANCE = new OverlayRendererBeaconRange();
 
-    private static boolean needsUpdate;
+    private final LongOpenHashSet beaconPositions = new LongOpenHashSet();
+    private boolean needsFullRebuild;
+    private boolean needsUpdate;
 
-    public static void clear()
+    public void clear()
     {
-        synchronized (BEACON_POSITIONS)
+        synchronized (this.beaconPositions)
         {
-            BEACON_CHUNKS.clear();
-            BEACON_POSITIONS.clear();
+            this.beaconPositions.clear();
         }
     }
 
-    public static void setNeedsUpdate()
+    public void setNeedsUpdate()
     {
         if (RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue() == false)
         {
-            clear();
+            this.clear();
+            return;
         }
 
-        needsUpdate = true;
+        this.needsUpdate = true;
+        this.needsFullRebuild = true;
     }
 
-    public static void checkNeedsUpdate(BlockPos pos, BlockState state)
+    public void onBeaconLevelChange(BlockPos pos)
     {
-        synchronized (BEACON_POSITIONS)
+        if (RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue())
         {
-            if (RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue() &&
-                Configs.Generic.BEACON_RANGE_AUTO_UPDATE.getBooleanValue() &&
-                (state.getBlock() == Blocks.BEACON || BEACON_POSITIONS.contains(pos)))
+            synchronized (this.beaconPositions)
             {
-                setNeedsUpdate();
+                this.beaconPositions.add(pos.asLong());
+                this.needsUpdate = true;
             }
-        }
-    }
-
-    public static boolean checkNeedsUpdate(int chunkX, int chunkZ)
-    {
-        synchronized (BEACON_POSITIONS)
-        {
-            if (RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue() &&
-                Configs.Generic.BEACON_RANGE_AUTO_UPDATE.getBooleanValue() &&
-                BEACON_CHUNKS.contains(ChunkPos.toLong(chunkX, chunkZ)))
-            {
-                setNeedsUpdate();
-            }
-        }
-
-        return needsUpdate;
-    }
-
-    public static boolean checkNeedsUpdate(int chunkX, int chunkZ, ChunkData data)
-    {
-        synchronized (BEACON_POSITIONS)
-        {
-            if (RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue() &&
-                Configs.Generic.BEACON_RANGE_AUTO_UPDATE.getBooleanValue())
-            {
-                data.getBlockEntities(chunkX, chunkZ).accept((pos, type, nbt) -> checkNeedsUpdate(type));
-            }
-        }
-
-        return needsUpdate;
-    }
-
-    private static void checkNeedsUpdate(BlockEntityType<?> type)
-    {
-        if (type == BlockEntityType.BEACON)
-        {
-            setNeedsUpdate();
         }
     }
 
@@ -116,24 +68,33 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, MinecraftClient mc)
+    public boolean needsUpdate(Entity cameraEntity, MinecraftClient mc)
     {
-        return needsUpdate || this.lastUpdatePos == null;
+        int updateDistance = 48;
+
+        return this.needsUpdate || this.lastUpdatePos == null ||
+               Math.abs(cameraEntity.getX() - this.lastUpdatePos.getX()) > updateDistance ||
+               Math.abs(cameraEntity.getZ() - this.lastUpdatePos.getZ()) > updateDistance;
     }
 
     @Override
     public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
-        clear();
-
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         RenderObjectBase renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
 
-        synchronized (BEACON_POSITIONS)
+        synchronized (this.beaconPositions)
         {
-            this.renderBeaconRanges(entity.getEntityWorld(), cameraPos, BUFFER_1, BUFFER_2);
+            if (this.needsFullRebuild)
+            {
+                this.beaconPositions.clear();
+                this.fetchAllBeacons(mc.world, entity.getBlockPos(), mc);
+                this.needsFullRebuild = false;
+            }
+
+            this.renderBeaconRanges(entity.getEntityWorld(), cameraPos, mc, BUFFER_1, BUFFER_2);
         }
 
         BUFFER_1.end();
@@ -141,10 +102,10 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
 
-        needsUpdate = false;
+        this.needsUpdate = false;
     }
 
-    protected static Color4f getColorForLevel(int level)
+    public static Color4f getColorForLevel(int level)
     {
         switch (level)
         {
@@ -155,27 +116,71 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
         }
     }
 
-    protected void renderBeaconRanges(World world, Vec3d cameraPos, BufferBuilder bufferQuads, BufferBuilder bufferLines)
+    protected void fetchAllBeacons(ClientWorld world, BlockPos centerPos, MinecraftClient mc)
     {
-        for (BlockEntityTickInvoker ticker : ((IMixinWorld) world).minihud_getBlockEntityTickers())
+        ClientChunkManager chunkManager = world.getChunkManager();
+        int centerCX = centerPos.getX() >> 4;
+        int centerCZ = centerPos.getZ() >> 4;
+        int chunkRadius = mc.options.viewDistance;
+
+        for (int cz = centerCZ - chunkRadius; cz <= centerCZ + chunkRadius; ++cz)
         {
-            BlockEntity be = world.getBlockEntity(ticker.getPos());
-
-            if (be instanceof BeaconBlockEntity)
+            for (int cx = centerCX - chunkRadius; cx <= centerCX + chunkRadius; ++cx)
             {
-                BlockPos pos = be.getPos();
-                int level = ((IMixinBeaconBlockEntity) be).minihud_getLevel();
+                WorldChunk chunk = chunkManager.getChunk(cx, cz, ChunkStatus.FULL, false);
 
-                if (level >= 1 && level <= 4)
+                if (chunk != null)
                 {
-                    this.renderBeaconBox(world, pos, level, cameraPos, getColorForLevel(level), bufferQuads, bufferLines);
+                    for (BlockEntity be : chunk.getBlockEntities().values())
+                    {
+                        if (be.getType() == BlockEntityType.BEACON)
+                        {
+                            this.beaconPositions.add(be.getPos().asLong());
+                        }
+                    }
                 }
             }
         }
     }
 
-    protected void renderBeaconBox(World world, BlockPos pos, int level, Vec3d cameraPos,
-                                   Color4f color, BufferBuilder bufferQuads, BufferBuilder bufferLines)
+    protected void renderBeaconRanges(World world, Vec3d cameraPos, MinecraftClient mc,
+                                      BufferBuilder bufferQuads, BufferBuilder bufferLines)
+    {
+        LongIterator it = this.beaconPositions.iterator();
+        BlockPos.Mutable mutablePos = new BlockPos.Mutable();
+        double max = (mc.options.viewDistance + 2) * 16;
+        max = max * max;
+
+        while (it.hasNext())
+        {
+            mutablePos.set(it.nextLong());
+            BlockEntity be = world.getBlockEntity(mutablePos);
+
+            if ((be instanceof BeaconBlockEntity) == false)
+            {
+                it.remove();
+                continue;
+            }
+
+            double distSq = (cameraPos.x - mutablePos.getX()) * (cameraPos.x - mutablePos.getX()) +
+                            (cameraPos.z - mutablePos.getZ()) * (cameraPos.z - mutablePos.getZ());
+
+            if (distSq > max)
+            {
+                continue;
+            }
+
+            int level = ((IMixinBeaconBlockEntity) be).minihud_getLevel();
+
+            if (level >= 1 && level <= 4)
+            {
+                this.renderBeaconBox(world, mutablePos, level, cameraPos, getColorForLevel(level), bufferQuads, bufferLines);
+            }
+        }
+    }
+
+    protected void renderBeaconBox(World world, BlockPos pos, int level, Vec3d cameraPos, Color4f color,
+                                   BufferBuilder bufferQuads, BufferBuilder bufferLines)
     {
         double x = pos.getX() - cameraPos.x;
         double y = pos.getY() - cameraPos.y;
@@ -191,9 +196,6 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
 
         fi.dy.masa.malilib.render.RenderUtils.drawBoxAllSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color, bufferQuads);
         fi.dy.masa.malilib.render.RenderUtils.drawBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, Color4f.fromColor(color, 1f), bufferLines);
-
-        BEACON_POSITIONS.add(pos);
-        BEACON_CHUNKS.add(ChunkPos.toLong(pos.getX() >> 4, pos.getZ() >> 4));
     }
 
     protected int getMaxHeight(World world, BlockPos pos, int range)
@@ -224,75 +226,5 @@ public class OverlayRendererBeaconRange extends OverlayRendererBase
         }
 
         return maxY + 4;
-    }
-
-    public static void renderBeaconBoxForPlayerIfHoldingItem(Entity entity, MatrixStack matrixStack,
-                                                             Matrix4f projMatrix, MinecraftClient mc)
-    {
-        Item item = mc.player.getMainHandStack().getItem();
-
-        if (item instanceof BlockItem && ((BlockItem) item).getBlock() == Blocks.BEACON)
-        {
-            renderBeaconBoxForPlayer(entity, matrixStack, projMatrix, mc);
-            return;
-        }
-
-        item = mc.player.getMainHandStack().getItem();
-
-        if (item instanceof BlockItem && ((BlockItem) item).getBlock() == Blocks.BEACON)
-        {
-            renderBeaconBoxForPlayer(entity, matrixStack, projMatrix, mc);
-        }
-    }
-
-    private static void renderBeaconBoxForPlayer(Entity entity, MatrixStack matrixStack,
-                                                 Matrix4f projMatrix, MinecraftClient mc)
-    {
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
-        double x = Math.floor(entity.getX()) - cameraPos.x;
-        double y = Math.floor(entity.getY()) - cameraPos.y;
-        double z = Math.floor(entity.getZ()) - cameraPos.z;
-        // Use the slot number as the level if sneaking
-        int level = mc.player.isSneaking() ? Math.min(4, mc.player.getInventory().selectedSlot + 1) : 4;
-        double range = level * 10 + 10;
-        double minX = x - range;
-        double minY = y - range;
-        double minZ = z - range;
-        double maxX = x + range + 1;
-        double maxY = y + 4;
-        double maxZ = z + range + 1;
-        Color4f color = getColorForLevel(level);
-
-        RenderSystem.disableTexture();
-        RenderSystem.disableCull();
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthMask(false);
-        RenderSystem.polygonOffset(-3f, -3f);
-        RenderSystem.enablePolygonOffset();
-        fi.dy.masa.malilib.render.RenderUtils.setupBlend();
-        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        RenderSystem.applyModelViewMatrix();
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
-        fi.dy.masa.malilib.render.RenderUtils.drawBoxAllSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, Color4f.fromColor(color, 0.3f), buffer);
-
-        tessellator.draw();
-
-        buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-
-        fi.dy.masa.malilib.render.RenderUtils.drawBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, Color4f.fromColor(color, 1f), buffer);
-
-        tessellator.draw();
-
-        RenderSystem.polygonOffset(0f, 0f);
-        RenderSystem.disablePolygonOffset();
-        RenderSystem.enableCull();
-        RenderSystem.enableTexture();
-        RenderSystem.disableBlend();
     }
 }

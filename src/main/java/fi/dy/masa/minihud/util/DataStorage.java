@@ -143,7 +143,7 @@ public class DataStorage
         StructurePacketHandlerCarpet.INSTANCE.reset();
         StructurePacketHandlerServux.INSTANCE.reset();
         ShapeManager.INSTANCE.clear();
-        OverlayRendererBeaconRange.clear();
+        OverlayRendererBeaconRange.INSTANCE.clear();
         OverlayRendererBiomeBorders.INSTANCE.clear();
         OverlayRendererLightLevel.reset();
 
@@ -188,7 +188,7 @@ public class DataStorage
     public void onWorldJoin()
     {
         MiniHUD.printDebug("DataStorage#onWorldJoin()");
-        OverlayRendererBeaconRange.setNeedsUpdate();
+        OverlayRendererBeaconRange.INSTANCE.setNeedsUpdate();
 
         if (this.mc.isIntegratedServerRunning() == false && RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
         {

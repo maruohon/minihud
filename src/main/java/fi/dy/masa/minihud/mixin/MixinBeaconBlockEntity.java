@@ -19,30 +19,41 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity
 {
     @Shadow int level;
 
-    private int levelPre;
+    private int levelPre = -1;
 
     private MixinBeaconBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state)
     {
         super(type, pos, state);
     }
 
+    @Inject(method = "markRemoved", at = @At("RETURN"))
+    private void minihud_onRemoved(CallbackInfo ci)
+    {
+        OverlayRendererBeaconRange.INSTANCE.onBeaconLevelChange(this.getPos());
+    }
+
     @Inject(method = "tick",
             at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/block/entity/BeaconBlockEntity;updateLevel(Lnet/minecraft/world/World;III)I"))
-    private static void onUpdateSegmentsPre(World world, BlockPos pos, BlockState state,
-                                            BeaconBlockEntity blockEntity, CallbackInfo ci)
+    private static void minihud_onUpdateSegmentsPre(World world, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci)
     {
-        ((MixinBeaconBlockEntity) (Object) blockEntity).levelPre = ((MixinBeaconBlockEntity) (Object) blockEntity).level;
+        if (((MixinBeaconBlockEntity) (Object) blockEntity).levelPre != -1)
+        {
+            ((MixinBeaconBlockEntity) (Object) blockEntity).levelPre = ((MixinBeaconBlockEntity) (Object) blockEntity).level;
+        }
     }
 
     @Inject(method = "tick",
             at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER,
                      target = "Lnet/minecraft/block/entity/BeaconBlockEntity;level:I"))
-    private static void onUpdateSegmentsPost(World world, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci)
+    private static void minihud_onUpdateSegmentsPost(World world, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci)
     {
-        if (((MixinBeaconBlockEntity) (Object) blockEntity).levelPre != ((MixinBeaconBlockEntity) (Object) blockEntity).level)
+        int newLevel = ((MixinBeaconBlockEntity) (Object) blockEntity).level;
+
+        if (((MixinBeaconBlockEntity) (Object) blockEntity).levelPre != newLevel)
         {
-            OverlayRendererBeaconRange.setNeedsUpdate();
+            OverlayRendererBeaconRange.INSTANCE.onBeaconLevelChange(pos);
+            ((MixinBeaconBlockEntity) (Object) blockEntity).levelPre = newLevel;
         }
     }
 }

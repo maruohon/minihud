@@ -23,7 +23,7 @@ public class RenderContainer
 
     private RenderContainer()
     {
-        this.addRenderer(new OverlayRendererBeaconRange());
+        this.addRenderer(OverlayRendererBeaconRange.INSTANCE);
         this.addRenderer(OverlayRendererBiomeBorders.INSTANCE);
         this.addRenderer(new OverlayRendererBlockGrid());
         this.addRenderer(OverlayRendererLightLevel.INSTANCE);
