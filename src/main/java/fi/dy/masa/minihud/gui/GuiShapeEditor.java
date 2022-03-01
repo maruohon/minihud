@@ -7,20 +7,15 @@ import java.util.function.DoubleSupplier;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
-import com.google.common.collect.ImmutableList;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.config.IConfigInteger;
-import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiColorEditorHSV;
 import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldDouble;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
@@ -32,12 +27,10 @@ import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.ConfigButtonOptionList;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
-import fi.dy.masa.malilib.gui.widgets.WidgetBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
+import fi.dy.masa.malilib.gui.widgets.WidgetColorIndicator;
 import fi.dy.masa.malilib.interfaces.ICoordinateValueModifier;
-import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.BlockSnap;
-import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.LayerRange;
@@ -797,54 +790,6 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
             if (GuiBase.isAltDown())   { amount *= this.modifierAlt; }
 
             this.consumer.accept(this.supplier.getAsDouble() + amount);
-        }
-    }
-
-    public static class WidgetColorIndicator extends WidgetBase
-    {
-        protected final IConfigInteger config;
-
-        public WidgetColorIndicator(int x, int y, int width, int height, Color4f color, IntConsumer consumer)
-        {
-            this(x, y, width, height, new ConfigInteger("", color.intValue, ""));
-
-            ((ConfigInteger) this.config).setValueChangeCallback((cfg) -> consumer.accept(cfg.getIntegerValue()) );
-        }
-
-        public WidgetColorIndicator(int x, int y, int width, int height, IConfigInteger config)
-        {
-            super(x, y, width, height);
-
-            this.config = config;
-            //this.addHoverString(StringUtils.translate("malilib.gui.hover.open_color_editor"));
-        }
-
-        @Override
-        protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
-        {
-            GuiColorEditorHSV gui = new GuiColorEditorHSV(this.config, null, GuiUtils.getCurrentScreen());
-            GuiBase.openGui(gui);
-            return true;
-        }
-
-        @Override
-        public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
-        {
-            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of("Open Color Editor"), matrixStack);
-        }
-
-        @Override
-        public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
-        {
-            int x = this.getX();
-            int y = this.getY();
-            int z = this.zLevel;
-            int width = this.getWidth();
-            int height = this.getHeight();
-
-            RenderUtils.drawRect(x    , y    , width    , height    , 0xFFFFFFFF, z);
-            RenderUtils.drawRect(x + 1, y + 1, width - 2, height - 2, 0xFF000000, z);
-            RenderUtils.drawRect(x + 2, y + 2, width - 4, height - 4, 0xFF000000 | this.config.getIntegerValue(), z);
         }
     }
 }
