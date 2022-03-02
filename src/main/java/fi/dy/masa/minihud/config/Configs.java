@@ -39,7 +39,6 @@ public class Configs implements IConfigHandler
     public static class Generic
     {
         public static final ConfigBoolean       AXOLOTL_TOOLTIPS                    = new ConfigBoolean("axolotlTooltipsTooltips", false, "Adds the Axolotl variant name to the bucket tooltip");
-        public static final ConfigBoolean       BEACON_RANGE_AUTO_UPDATE            = new ConfigBoolean("beaconRangeAutoUpdate", false, "This enables the Beacon Range renderer to update automatically\nwhen block or chunk change packets are received.\nThose updates can have a performance impact if tons of blocks are changing often.\nYou can toggle off/on the renderer to update to those changes manually.");
         public static final ConfigBoolean       BEE_TOOLTIPS                        = new ConfigBoolean("beeTooltips", false, "Adds the number of contained bees to the tooltip of Bee Hive and Bee Nest items");
         public static final ConfigBoolean       HONEY_TOOLTIPS                      = new ConfigBoolean("honeyTooltips", false, "Adds the honey level to the tooltip of Bee Hive and Bee Nest items");
         public static final ConfigInteger       BIOME_OVERLAY_RANGE                 = new ConfigInteger("biomeOverlayRange", 4, 0, 32, "The horizontal chunk radius to render for the Biome Border Overlay");
@@ -79,6 +78,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed MAIN_RENDERING_TOGGLE             = new ConfigBooleanHotkeyed("mainRenderingToggle", true, "H", KeybindSettings.RELEASE_EXCLUSIVE, "The main rendering toggle for all MiniHUD rendering,\nincluding the info lines AND all the overlay renderers", "MiniHUD Main Rendering");
         public static final ConfigBoolean       MAP_PREVIEW                         = new ConfigBoolean("mapPreview", false, "Enables rendering a preview of the map,\nwhen you hold shift while hovering over a map item");
         public static final ConfigInteger       MAP_PREVIEW_SIZE                    = new ConfigInteger("mapPreviewSize", 160, 16, 512, "The size of the rendered map previews");
+        public static final ConfigBoolean       OFFSET_SUBTITLE_HUD                 = new ConfigBoolean("offsetSubtitleHud", true, "If the Info Lines HUD is set to the bottom right corner,\nand subtitles are enabled, then the subtitles will\nbe offset to appear above the Info Lines text.");
         public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "H,C", "A hotkey to open the in-game Config GUI");
         public static final ConfigBoolean       REQUIRE_SNEAK                       = new ConfigBoolean("requireSneak", false, "Require the player to be sneaking to render the info line HUD");
         public static final ConfigHotkey        REQUIRED_KEY                        = new ConfigHotkey("requiredKey", "", KeybindSettings.MODIFIER_INGAME_EMPTY, "Require holding this key to render the HUD");
@@ -104,7 +104,6 @@ public class Configs implements IConfigHandler
                 AXOLOTL_TOOLTIPS,
                 BEE_TOOLTIPS,
                 HONEY_TOOLTIPS,
-                BEACON_RANGE_AUTO_UPDATE,
                 BIOME_OVERLAY_SINGLE_COLOR,
                 DEBUG_MESSAGES,
                 DEBUG_RENDERER_PATH_MAX_DIST,
@@ -118,6 +117,7 @@ public class Configs implements IConfigHandler
                 LIGHT_LEVEL_SKIP_BLOCK_CHECK,
                 LIGHT_LEVEL_UNDER_WATER,
                 MAP_PREVIEW,
+                OFFSET_SUBTITLE_HUD,
                 REQUIRE_SNEAK,
                 SHULKER_BOX_PREVIEW,
                 SHULKER_DISPLAY_BACKGROUND_COLOR,

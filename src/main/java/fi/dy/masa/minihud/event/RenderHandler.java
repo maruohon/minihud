@@ -181,9 +181,9 @@ public class RenderHandler implements IRenderer
 
     public int getSubtitleOffset()
     {
-        HudAlignment align = (HudAlignment) Configs.Generic.HUD_ALIGNMENT.getOptionListValue();
-
-        if (align == HudAlignment.BOTTOM_RIGHT)
+        if (Configs.Generic.OFFSET_SUBTITLE_HUD.getBooleanValue() &&
+            Configs.Generic.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
+            Configs.Generic.HUD_ALIGNMENT.getOptionListValue() == HudAlignment.BOTTOM_RIGHT)
         {
             int offset = (int) (this.lineWrappers.size() * (StringUtils.getFontHeight() + 2) * Configs.Generic.FONT_SCALE.getDoubleValue());
 
