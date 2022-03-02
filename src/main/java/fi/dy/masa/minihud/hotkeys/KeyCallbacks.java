@@ -15,6 +15,7 @@ import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.gui.GuiShapeManager;
 import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererBiomeBorders;
+import fi.dy.masa.minihud.renderer.OverlayRendererConduitRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererStructures;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
@@ -36,6 +37,7 @@ public class KeyCallbacks
         Configs.Colors.BEACON_RANGE_LVL2_OVERLAY_COLOR.setValueChangeCallback((config) -> updateBeaconOverlay());
         Configs.Colors.BEACON_RANGE_LVL3_OVERLAY_COLOR.setValueChangeCallback((config) -> updateBeaconOverlay());
         Configs.Colors.BEACON_RANGE_LVL4_OVERLAY_COLOR.setValueChangeCallback((config) -> updateBeaconOverlay());
+        Configs.Colors.CONDUIT_RANGE_OVERLAY_COLOR.setValueChangeCallback((config) -> updateConduitOverlay());
 
         Configs.Generic.LIGHT_LEVEL_RANGE.setValueChangeCallback((config) -> OverlayRendererLightLevel.setNeedsUpdate());
         Configs.Generic.LIGHT_LEVEL_RENDER_THROUGH.setValueChangeCallback((config) -> OverlayRendererLightLevel.INSTANCE.setRenderThrough(config.getBooleanValue()));
@@ -44,6 +46,7 @@ public class KeyCallbacks
         RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY)));
 
         RendererToggle.OVERLAY_BEACON_RANGE.setValueChangeCallback((config) -> updateBeaconOverlay());
+        RendererToggle.OVERLAY_CONDUIT_RANGE.setValueChangeCallback((config) -> updateConduitOverlay());
         RendererToggle.OVERLAY_BIOME_BORDER.setValueChangeCallback((config) -> OverlayRendererBiomeBorders.INSTANCE.setNeedsUpdate());
         RendererToggle.DEBUG_CHUNK_BORDER.setValueChangeCallback(DebugInfoUtils::toggleDebugRenderer);
         RendererToggle.DEBUG_CHUNK_INFO.setValueChangeCallback(DebugInfoUtils::toggleDebugRenderer);
@@ -55,6 +58,11 @@ public class KeyCallbacks
     private static void updateBeaconOverlay()
     {
         OverlayRendererBeaconRange.INSTANCE.setNeedsUpdate();
+    }
+
+    private static void updateConduitOverlay()
+    {
+        OverlayRendererConduitRange.INSTANCE.setNeedsUpdate();
     }
 
     public static class Callbacks implements IHotkeyCallback

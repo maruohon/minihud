@@ -16,6 +16,7 @@
 		"MixinBlockOutlineDebugRenderer",
 		"MixinClientPlayerInteractionManager",
 		"MixinClientPlayNetworkHandler",
+		"MixinConduitBlockEntity",
 		"MixinDebugRenderer",
 		"MixinHeightmapDebugRenderer",
 		"MixinItemStack",

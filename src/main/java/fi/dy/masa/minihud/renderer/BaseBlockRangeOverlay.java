@@ -3,7 +3,6 @@ package fi.dy.masa.minihud.renderer;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.client.world.ClientWorld;
@@ -56,7 +55,7 @@ public abstract class BaseBlockRangeOverlay<T extends BlockEntity> extends Overl
         this.needsFullRebuild = true;
     }
 
-    public void onBeaconLevelChange(BlockPos pos)
+    public void onBlockStatusChange(BlockPos pos)
     {
         if (this.renderToggleConfig.getBooleanValue())
         {
@@ -85,10 +84,7 @@ public abstract class BaseBlockRangeOverlay<T extends BlockEntity> extends Overl
     @Override
     public void update(Vec3d cameraPos, Entity entity, MinecraftClient mc)
     {
-        RenderObjectBase renderQuads = this.renderObjects.get(0);
-        RenderObjectBase renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), VertexFormats.POSITION_COLOR);
+        this.startBuffers();
 
         synchronized (this.blockPositions)
         {
@@ -99,15 +95,26 @@ public abstract class BaseBlockRangeOverlay<T extends BlockEntity> extends Overl
                 this.needsFullRebuild = false;
             }
 
-            this.renderBlockRanges(entity.getEntityWorld(), cameraPos, mc, BUFFER_1, BUFFER_2);
+            this.renderBlockRanges(entity.getEntityWorld(), cameraPos, mc);
         }
 
-        BUFFER_1.end();
-        BUFFER_2.end();
-        renderQuads.uploadData(BUFFER_1);
-        renderLines.uploadData(BUFFER_2);
+        this.uploadBuffers();
 
         this.needsUpdate = false;
+    }
+
+    protected void startBuffers()
+    {
+        BUFFER_1.begin(this.renderObjects.get(0).getGlMode(), VertexFormats.POSITION_COLOR);
+        BUFFER_2.begin(this.renderObjects.get(1).getGlMode(), VertexFormats.POSITION_COLOR);
+    }
+
+    protected void uploadBuffers()
+    {
+        BUFFER_1.end();
+        BUFFER_2.end();
+        this.renderObjects.get(0).uploadData(BUFFER_1);
+        this.renderObjects.get(1).uploadData(BUFFER_2);
     }
 
     protected void fetchAllTargetBlockEntityPositions(ClientWorld world, BlockPos centerPos, MinecraftClient mc)
@@ -137,8 +144,7 @@ public abstract class BaseBlockRangeOverlay<T extends BlockEntity> extends Overl
         }
     }
 
-    protected void renderBlockRanges(World world, Vec3d cameraPos, MinecraftClient mc,
-                                     BufferBuilder bufferQuads, BufferBuilder bufferLines)
+    protected void renderBlockRanges(World world, Vec3d cameraPos, MinecraftClient mc)
     {
         LongIterator it = this.blockPositions.iterator();
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();
@@ -165,7 +171,7 @@ public abstract class BaseBlockRangeOverlay<T extends BlockEntity> extends Overl
             }
 
             T castBe = this.blockEntityClass.cast(be);
-            this.renderBlockRange(world, mutablePos, castBe, cameraPos, bufferQuads, bufferLines);
+            this.renderBlockRange(world, mutablePos, castBe, cameraPos);
         }
     }
 
@@ -199,6 +205,5 @@ public abstract class BaseBlockRangeOverlay<T extends BlockEntity> extends Overl
         return maxY + 4;
     }
 
-    protected abstract void renderBlockRange(World world, BlockPos pos, T be, Vec3d cameraPos,
-                                             BufferBuilder bufferQuads, BufferBuilder bufferLines);
+    protected abstract void renderBlockRange(World world, BlockPos pos, T be, Vec3d cameraPos);
 }

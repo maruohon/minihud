@@ -29,7 +29,7 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity
     @Inject(method = "markRemoved", at = @At("RETURN"))
     private void minihud_onRemoved(CallbackInfo ci)
     {
-        OverlayRendererBeaconRange.INSTANCE.onBeaconLevelChange(this.getPos());
+        OverlayRendererBeaconRange.INSTANCE.onBlockStatusChange(this.getPos());
     }
 
     @Inject(method = "tick",
@@ -52,7 +52,7 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity
 
         if (((MixinBeaconBlockEntity) (Object) blockEntity).levelPre != newLevel)
         {
-            OverlayRendererBeaconRange.INSTANCE.onBeaconLevelChange(pos);
+            OverlayRendererBeaconRange.INSTANCE.onBlockStatusChange(pos);
             ((MixinBeaconBlockEntity) (Object) blockEntity).levelPre = newLevel;
         }
     }

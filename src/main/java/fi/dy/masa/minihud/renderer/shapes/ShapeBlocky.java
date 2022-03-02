@@ -103,6 +103,8 @@ public abstract class ShapeBlocky extends ShapeBase
         this.renderObjects.get(0).draw(matrixStack, projMatrix);
         RenderSystem.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
         RenderSystem.enableBlend();
+
+        this.postRender();
     }
 
     @Override

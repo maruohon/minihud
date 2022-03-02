@@ -18,6 +18,40 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public class SphereUtils
 {
+    public static void collectSpherePositions(Consumer<BlockPos.Mutable> positionConsumer,
+                                              SphereUtils.RingPositionTest test,
+                                              BlockPos centerPos, int radius)
+    {
+        BlockPos.Mutable mutablePos = new BlockPos.Mutable();
+
+        //long before = System.nanoTime();
+        mutablePos.set(centerPos);
+        SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test);
+
+        mutablePos.set(centerPos);
+        SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, Direction.NORTH, test);
+
+        final int r = radius + 2;
+
+        for (int i = 1; i < r; ++i)
+        {
+            // Horizontal rings
+            mutablePos.set(centerPos.getX(), centerPos.getY() - i, centerPos.getZ());
+            SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test);
+
+            mutablePos.set(centerPos.getX(), centerPos.getY() + i, centerPos.getZ());
+            SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test);
+
+            // Vertical rings
+            mutablePos.set(centerPos.getX(), centerPos.getY(), centerPos.getZ() - i);
+            SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, Direction.NORTH, test);
+
+            mutablePos.set(centerPos.getX(), centerPos.getY(), centerPos.getZ() + i);
+            SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, Direction.NORTH, test);
+        }
+        //System.out.printf("time: %.6f s\n", (double) (System.nanoTime() - before) / 1000000000D);
+    }
+
     public static boolean movePositionToRing(BlockPos.Mutable posMutable,
                                              Direction moveDirection,
                                              RingPositionTest test)

@@ -49,8 +49,12 @@ public class ShapeSphereBlocky extends ShapeCircleBase
     protected void renderSphereShape(Vec3d cameraPos)
     {
         SphereUtils.RingPositionTest test = this.getPositionTest();
-        LongOpenHashSet positions = this.collectSpherePositions(test);
+        LongOpenHashSet positions = new LongOpenHashSet();
+        Consumer<BlockPos.Mutable> positionConsumer = this.getPositionCollector(positions);
+        BlockPos centerPos = this.getCenterBlock();
         double expand = 0;
+
+        SphereUtils.collectSpherePositions(positionConsumer, test, centerPos, (int) this.getTotalRadius());
 
         RenderObjectBase renderQuads = this.renderObjects.get(0);
         BUFFER_1.begin(renderQuads.getGlMode(), VertexFormats.POSITION_COLOR);
@@ -69,42 +73,5 @@ public class ShapeSphereBlocky extends ShapeCircleBase
 
         BUFFER_1.end();
         renderQuads.uploadData(BUFFER_1);
-    }
-
-    protected LongOpenHashSet collectSpherePositions(SphereUtils.RingPositionTest test)
-    {
-        LongOpenHashSet positions = new LongOpenHashSet();
-        BlockPos posCenter = this.getCenterBlock();
-        BlockPos.Mutable mutablePos = new BlockPos.Mutable();
-        Consumer<BlockPos.Mutable> positionConsumer = this.getPositionCollector(positions);
-
-        //long before = System.nanoTime();
-        mutablePos.set(posCenter);
-        SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test);
-
-        mutablePos.set(posCenter);
-        SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, Direction.NORTH, test);
-
-        final int r = (int) this.getTotalRadius() + 2;
-
-        for (int i = 1; i < r; ++i)
-        {
-            // Horizontal rings
-            mutablePos.set(posCenter.getX(), posCenter.getY() - i, posCenter.getZ());
-            SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test);
-
-            mutablePos.set(posCenter.getX(), posCenter.getY() + i, posCenter.getZ());
-            SphereUtils.addPositionsOnHorizontalBlockRing(positionConsumer, mutablePos, test);
-
-            // Vertical rings
-            mutablePos.set(posCenter.getX(), posCenter.getY(), posCenter.getZ() - i);
-            SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, Direction.NORTH, test);
-
-            mutablePos.set(posCenter.getX(), posCenter.getY(), posCenter.getZ() + i);
-            SphereUtils.addPositionsOnVerticalBlockRing(positionConsumer, mutablePos, Direction.NORTH, test);
-        }
-        //System.out.printf("time: %.6f s\n", (double) (System.nanoTime() - before) / 1000000000D);
-
-        return positions;
     }
 }

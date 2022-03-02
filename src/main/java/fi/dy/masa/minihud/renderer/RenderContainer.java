@@ -26,6 +26,7 @@ public class RenderContainer
         this.addRenderer(OverlayRendererBeaconRange.INSTANCE);
         this.addRenderer(OverlayRendererBiomeBorders.INSTANCE);
         this.addRenderer(new OverlayRendererBlockGrid());
+        this.addRenderer(OverlayRendererConduitRange.INSTANCE);
         this.addRenderer(OverlayRendererLightLevel.INSTANCE);
         this.addRenderer(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_FIXED));
         this.addRenderer(new OverlayRendererRandomTickableChunks(RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER));
