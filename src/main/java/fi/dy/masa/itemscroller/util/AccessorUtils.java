@@ -1,5 +1,6 @@
 package fi.dy.masa.itemscroller.util;
 
+import javax.annotation.Nullable;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 import net.minecraft.screen.slot.Slot;
@@ -10,11 +11,13 @@ import fi.dy.masa.itemscroller.mixin.IMixinSlot;
 
 public class AccessorUtils
 {
+    @Nullable
     public static Slot getSlotUnderMouse(HandledScreen<?> gui)
     {
         return ((IMixinScreenWithHandler) gui).itemscroller_getHoveredSlot();
     }
 
+    @Nullable
     public static Slot getSlotAtPosition(HandledScreen<?> gui, int x, int y)
     {
         return ((IMixinScreenWithHandler) gui).itemscroller_getSlotAtPositionInvoker(x, y);

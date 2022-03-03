@@ -263,7 +263,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
         if (InputUtils.isActionKeyActive(action))
         {
-            cancel = InventoryUtils.dragMoveItems(gui, mc, action, mouseX, mouseY, false);
+            cancel = InventoryUtils.dragMoveItems(gui, action, mouseX, mouseY, false);
         }
         else if (action != MoveAction.NONE)
         {

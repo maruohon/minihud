@@ -108,7 +108,7 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
             {
                 final int mouseX = fi.dy.masa.malilib.util.InputUtils.getMouseX();
                 final int mouseY = fi.dy.masa.malilib.util.InputUtils.getMouseY();
-                return InventoryUtils.dragMoveItems(gui, mc, moveAction, mouseX, mouseY, true);
+                return InventoryUtils.dragMoveItems(gui, moveAction, mouseX, mouseY, true);
             }
             else if (key == Hotkeys.KEY_MOVE_EVERYTHING.getKeybind())
             {
@@ -204,7 +204,7 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
 
                 RecipePattern recipe = RecipeStorage.getInstance().getSelectedRecipe();
 
-                InventoryUtils.tryClearCursor(gui, mc);
+                InventoryUtils.tryClearCursor(gui);
                 InventoryUtils.throwAllCraftingResultsToGround(recipe, gui);
                 InventoryUtils.tryMoveItemsToFirstCraftingGrid(recipe, gui, true);
 
