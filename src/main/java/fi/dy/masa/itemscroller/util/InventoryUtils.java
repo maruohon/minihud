@@ -1170,7 +1170,7 @@ public class InventoryUtils
             if (isRightClick)
             {
                 Slot outputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
-                boolean dropKeyDown = mc.options.keyDrop.isPressed(); // FIXME 1.14
+                boolean dropKeyDown = mc.options.dropKey.isPressed(); // FIXME 1.14
 
                 if (outputSlot != null)
                 {

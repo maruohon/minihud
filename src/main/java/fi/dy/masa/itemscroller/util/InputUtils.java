@@ -127,16 +127,16 @@ public class InputUtils
 
     public static boolean isAttack(int keyCode)
     {
-        return keyCode == KeybindMulti.getKeyCode(MinecraftClient.getInstance().options.keyAttack);
+        return keyCode == KeybindMulti.getKeyCode(MinecraftClient.getInstance().options.attackKey);
     }
 
     public static boolean isUse(int keyCode)
     {
-        return keyCode == KeybindMulti.getKeyCode(MinecraftClient.getInstance().options.keyUse);
+        return keyCode == KeybindMulti.getKeyCode(MinecraftClient.getInstance().options.useKey);
     }
 
     public static boolean isPickBlock(int keyCode)
     {
-        return keyCode == KeybindMulti.getKeyCode(MinecraftClient.getInstance().options.keyPickItem);
+        return keyCode == KeybindMulti.getKeyCode(MinecraftClient.getInstance().options.pickItemKey);
     }
 }
