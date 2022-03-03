@@ -1,9 +1,7 @@
 package fi.dy.masa.itemscroller.villager;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -13,6 +11,7 @@ import net.minecraft.screen.MerchantScreenHandler;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOfferList;
 import fi.dy.masa.malilib.util.GuiUtils;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 public class VillagerUtils
 {
@@ -75,7 +74,7 @@ public class VillagerUtils
     public static TradeOfferList buildCustomTradeList(TradeOfferList originalList)
     {
         FavoriteData data = VillagerDataStorage.getInstance().getFavoritesForCurrentVillager(originalList);
-        List<Integer> favorites = data.favorites;
+        IntArrayList favorites = data.favorites;
 
         //System.out.printf("build - fav: %s (%s), or: %d\n", favorites, data.isGlobal, originalList.size());
 
@@ -109,9 +108,9 @@ public class VillagerUtils
         return originalList;
     }
 
-    public static List<Integer> getGlobalFavoritesFor(TradeOfferList originalTrades, Collection<TradeType> globalFavorites)
+    public static IntArrayList getGlobalFavoritesFor(TradeOfferList originalTrades, Collection<TradeType> globalFavorites)
     {
-        List<Integer> favorites = new ArrayList<>();
+        IntArrayList favorites = new IntArrayList();
         Map<TradeType, Integer> trades = new HashMap<>();
         final int size = originalTrades.size();
 
@@ -129,7 +128,7 @@ public class VillagerUtils
 
             if (index != null)
             {
-                favorites.add(index);
+                favorites.add(index.intValue());
             }
         }
 

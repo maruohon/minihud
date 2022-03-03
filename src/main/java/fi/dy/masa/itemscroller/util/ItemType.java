@@ -1,11 +1,10 @@
 package fi.dy.masa.itemscroller.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import net.minecraft.item.ItemStack;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 /**
  * Wrapper class for ItemStack, which implements equals()
@@ -68,9 +67,9 @@ public class ItemType
      * @param stacks
      * @return
      */
-    public static Map<ItemType, List<Integer>> getSlotsPerItem(ItemStack[] stacks)
+    public static Map<ItemType, IntArrayList> getSlotsPerItem(ItemStack[] stacks)
     {
-        Map<ItemType, List<Integer>> mapSlots = new HashMap<>();
+        Map<ItemType, IntArrayList> mapSlots = new HashMap<>();
 
         for (int i = 0; i < stacks.length; i++)
         {
@@ -79,7 +78,7 @@ public class ItemType
             if (InventoryUtils.isStackEmpty(stack) == false)
             {
                 ItemType item = new ItemType(stack);
-                List<Integer> slots = mapSlots.computeIfAbsent(item, k -> new ArrayList<>());
+                IntArrayList slots = mapSlots.computeIfAbsent(item, k -> new IntArrayList());
 
                 slots.add(i);
             }

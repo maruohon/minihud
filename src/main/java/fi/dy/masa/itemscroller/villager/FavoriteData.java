@@ -1,13 +1,13 @@
 package fi.dy.masa.itemscroller.villager;
 
-import java.util.List;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 public class FavoriteData
 {
-    public final List<Integer> favorites;
+    public final IntArrayList favorites;
     public final boolean isGlobal;
 
-    public FavoriteData(List<Integer> favorites, boolean isGlobal)
+    public FavoriteData(IntArrayList favorites, boolean isGlobal)
     {
         this.favorites = favorites;
         this.isGlobal = isGlobal;

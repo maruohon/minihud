@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +22,7 @@ import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.util.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 public class VillagerDataStorage
 {
@@ -110,7 +110,7 @@ public class VillagerDataStorage
     public FavoriteData getFavoritesForCurrentVillager(TradeOfferList originalTrades)
     {
         VillagerData data = this.getDataFor(this.lastInteractedUUID, false);
-        List<Integer> favorites = data != null ? data.getFavorites() : null;
+        IntArrayList favorites = data != null ? data.getFavorites() : null;
 
         if (favorites != null && favorites.isEmpty() == false)
         {
@@ -122,7 +122,7 @@ public class VillagerDataStorage
             return new FavoriteData(VillagerUtils.getGlobalFavoritesFor(originalTrades, this.globalFavorites), true);
         }
 
-        return new FavoriteData(Collections.emptyList(), favorites == null);
+        return new FavoriteData(IntArrayList.of(), favorites == null);
     }
 
     private void readFromNBT(NbtCompound nbt)

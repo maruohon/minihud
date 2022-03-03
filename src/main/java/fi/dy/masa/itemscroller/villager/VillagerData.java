@@ -1,18 +1,17 @@
 package fi.dy.masa.itemscroller.villager;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
 import fi.dy.masa.itemscroller.util.Constants;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 public class VillagerData
 {
     private final UUID uuid;
-    private final List<Integer> favorites = new ArrayList<>();
+    private final IntArrayList favorites = new IntArrayList();
     private int tradeListPosition;
 
     VillagerData(UUID uuid)
@@ -39,7 +38,7 @@ public class VillagerData
     {
         if (this.favorites.contains(tradeIndex))
         {
-            this.favorites.remove(Integer.valueOf(tradeIndex));
+            this.favorites.rem(tradeIndex);
         }
         else
         {
@@ -47,7 +46,7 @@ public class VillagerData
         }
     }
 
-    List<Integer> getFavorites()
+    IntArrayList getFavorites()
     {
         return this.favorites;
     }
