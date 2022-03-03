@@ -730,7 +730,7 @@ public class OverlayRendererBiomeBorders extends OverlayRendererBase
     {
         final BiomeAccess biomeAccess = chunk.getWorld().getBiomeAccess();
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();
-        BiomeSource biomeSource = (x, y, z) -> biomeAccess.getBiome(mutablePos.set(x, y, z));
+        BiomeSource biomeSource = (x, y, z) -> biomeAccess.getBiome(mutablePos.set(x, y, z)).value();
         //BiomeSource biomeSource = chunk::getBiomeForNoiseGen;
         //long biomeSeed = ((IMixinBiomeAccess) biomeAccess).minihud_getSeed();
         //BiomeSource biomeSource = (x, y, z) -> MiscUtils.getBiomeMasaOptimization(x, y, z, chunk, biomeSeed);

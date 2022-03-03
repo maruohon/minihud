@@ -787,7 +787,7 @@ public class RenderHandler implements IRenderer
 
             if (clientChunk.isEmpty() == false)
             {
-                Biome biome = mc.world.getBiome(pos);
+                Biome biome = mc.world.getBiome(pos).value();
                 Identifier id = mc.world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
                 this.addLine("Biome: " + StringUtils.translate("biome." + id.toString().replace(":", ".")));
             }
@@ -798,7 +798,7 @@ public class RenderHandler implements IRenderer
 
             if (clientChunk.isEmpty() == false)
             {
-                Biome biome = mc.world.getBiome(pos);
+                Biome biome = mc.world.getBiome(pos).value();
                 Identifier rl = mc.world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
                 String name = rl != null ? rl.toString() : "?";
                 this.addLine("Biome reg name: " + name);

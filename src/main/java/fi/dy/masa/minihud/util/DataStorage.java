@@ -2,7 +2,6 @@ package fi.dy.masa.minihud.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -30,11 +29,13 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -51,8 +52,8 @@ import fi.dy.masa.minihud.renderer.OverlayRendererConduitRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
-import fi.dy.masa.minihud.renderer.worker.ThreadWorker;
 import fi.dy.masa.minihud.renderer.worker.ChunkTask;
+import fi.dy.masa.minihud.renderer.worker.ThreadWorker;
 
 public class DataStorage
 {
@@ -658,17 +659,7 @@ public class DataStorage
     private void removeExpiredStructures(long currentTime, int timeout)
     {
         long maxAge = timeout;
-        Iterator<StructureData> iter = this.structures.values().iterator();
-
-        while (iter.hasNext())
-        {
-            StructureData data = iter.next();
-
-            if (currentTime > (data.getRefreshTime() + maxAge))
-            {
-                iter.remove();
-            }
-        }
+        this.structures.values().removeIf(data -> currentTime > (data.getRefreshTime() + maxAge));
     }
 
     private void addStructureDataFromGenerator(ServerWorld world, DimensionType dimId, BlockPos playerPos, int maxChunkRange)
@@ -687,6 +678,7 @@ public class DataStorage
 
         if (enabledTypes.isEmpty() == false)
         {
+            Registry<ConfiguredStructureFeature<?, ?>> registry = world.getRegistryManager().get(Registry.CONFIGURED_STRUCTURE_FEATURE_KEY);
             int minCX = (playerPos.getX() >> 4) - maxChunkRange;
             int minCZ = (playerPos.getZ() >> 4) - maxChunkRange;
             int maxCX = (playerPos.getX() >> 4) + maxChunkRange;
@@ -703,14 +695,19 @@ public class DataStorage
                     {
                         for (StructureType type : enabledTypes)
                         {
-                            StructureStart<?> start = chunk.getStructureStart(type.getFeature());
+                            ConfiguredStructureFeature<?, ?> feature = registry.get(type.getFeatureId());
 
-                            if (start != null && start.hasChildren())
+                            if (feature == null)
                             {
-                                if (MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxChunkRange << 4))
-                                {
-                                    this.structures.put(type, StructureData.fromStructureStart(type, start));
-                                }
+                                continue;
+                            }
+
+                            StructureStart start = chunk.getStructureStart(feature);
+
+                            if (start != null && start.hasChildren() &&
+                                MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxChunkRange << 4))
+                            {
+                                this.structures.put(type, StructureData.fromStructureStart(type, start));
                             }
                         }
                     }

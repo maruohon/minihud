@@ -17,11 +17,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.biome.source.SeedMixer;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.minihud.mixin.IMixinAbstractFurnaceBlockEntity;
@@ -215,69 +211,5 @@ public class MiscUtils
         }
 
         return (int) xp;
-    }
-
-    public static Biome getBiomeMasaOptimization(int blockX, int blockY, int blockZ,
-                                                 BiomeAccess.Storage storage, long seed)
-    {
-        final int x = blockX - 2;
-        final int y = blockY - 2;
-        final int z = blockZ - 2;
-        final int xBy4 = x >> 2;
-        final int yBy4 = y >> 2;
-        final int zBy4 = z >> 2;
-        final double d = (double)(x & 3) / 4.0;
-        final double e = (double)(y & 3) / 4.0;
-        final double f = (double)(z & 3) / 4.0;
-        int o = 0;
-        double g = Double.POSITIVE_INFINITY;
-
-        for (int i = 0; i < 8; ++i)
-        {
-            int xInc = (i & 4) >> 2;
-            int yInc = (i & 2) >> 1;
-            int zInc = (i & 1);
-            int q = xBy4 + xInc;
-            int r = yBy4 + yInc;
-            int s = zBy4 + zInc;
-            double h = d - xInc;
-            double t = e - yInc;
-            double u = f - zInc;
-            double v = mixer(seed, q, r, s, h, t, u);
-
-            if (g > v)
-            {
-                o = i;
-                g = v;
-            }
-        }
-
-        int finalX = xBy4 + ((o & 4) >> 2);
-        int finalY = yBy4 + ((o & 2) >> 1);
-        int finalZ = zBy4 +  (o & 1);
-
-        return storage.getBiomeForNoiseGen(finalX, finalY, finalZ);
-    }
-
-    private static double mixer(long l, int i, int j, int k, double d, double e, double f)
-    {
-        long m = SeedMixer.mixSeed(l, i);
-        m = SeedMixer.mixSeed(m, j);
-        m = SeedMixer.mixSeed(m, k);
-        m = SeedMixer.mixSeed(m, i);
-        m = SeedMixer.mixSeed(m, j);
-        m = SeedMixer.mixSeed(m, k);
-        m = SeedMixer.mixSeed(m, l);
-        m = SeedMixer.mixSeed(m, l);
-        double g = biomeSomething(m);
-        double h = biomeSomething(m);
-        double n = biomeSomething(m);
-        return MathHelper.square(f + n) + MathHelper.square(e + h) + MathHelper.square(d + g);
-    }
-
-    private static double biomeSomething(long l)
-    {
-        double d = (double)Math.floorMod(l >> 24, 1024) / 1024.0;
-        return (d - 0.5) * 0.9;
     }
 }

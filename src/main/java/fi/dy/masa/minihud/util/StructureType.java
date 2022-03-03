@@ -1,14 +1,11 @@
 package fi.dy.masa.minihud.util;
 
 import java.util.HashMap;
-import java.util.Locale;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.feature.StructureFeature;
 import fi.dy.masa.minihud.config.StructureToggle;
 
 public enum StructureType
@@ -35,24 +32,14 @@ public enum StructureType
 
     END_CITY            (StructureToggle.OVERLAY_STRUCTURE_END_CITY,            "endcity",              DimensionType.THE_END_ID);
 
-    public static final ImmutableList<StructureType> VALUES;
+    public static final ImmutableList<StructureType> VALUES = ImmutableList.copyOf(values());
     private static final HashMap<String, StructureType> ID_TO_TYPE = new HashMap<>();
 
     static
     {
-        VALUES = ImmutableList.copyOf(values());
-
         for (StructureType type : VALUES)
         {
-            if (type.feature != null)
-            {
-                Identifier key = Registry.STRUCTURE_FEATURE.getId(type.feature);
-
-                if (key != null)
-                {
-                    ID_TO_TYPE.put(key.toString(), type);
-                }
-            }
+            ID_TO_TYPE.put(type.featureId.toString(), type);
         }
     }
 
@@ -64,14 +51,14 @@ public enum StructureType
 
     private final StructureToggle toggle;
     private final String structureName;
-    private final StructureFeature<?> feature;
+    private final Identifier featureId;
     private final ImmutableSet<Identifier> dims;
 
     StructureType(StructureToggle toggle, String structureName, Identifier... dims)
     {
         this.toggle = toggle;
         this.structureName = structureName;
-        this.feature = StructureFeature.STRUCTURES.get(structureName.toLowerCase(Locale.ROOT));
+        this.featureId = new Identifier(structureName);
         this.dims = ImmutableSet.copyOf(dims);
     }
 
@@ -85,9 +72,9 @@ public enum StructureType
         return this.structureName;
     }
 
-    public StructureFeature<?> getFeature()
+    public Identifier getFeatureId()
     {
-        return this.feature;
+        return this.featureId;
     }
 
     public StructureToggle getToggle()

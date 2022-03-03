@@ -52,7 +52,7 @@ public class StructureData
         return this.refreshTime;
     }
 
-    public static StructureData fromStructureStart(StructureType type, StructureStart<?> structure)
+    public static StructureData fromStructureStart(StructureType type, StructureStart structure)
     {
         ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
         List<StructurePiece> components = structure.getChildren();
