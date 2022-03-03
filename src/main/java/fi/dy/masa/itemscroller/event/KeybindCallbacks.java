@@ -1,7 +1,6 @@
 package fi.dy.masa.itemscroller.event;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
@@ -30,6 +29,8 @@ import fi.dy.masa.malilib.util.InfoUtils;
 public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
 {
     private static final KeybindCallbacks INSTANCE = new KeybindCallbacks();
+
+    protected int massCraftTicker;
 
     public static KeybindCallbacks getInstance()
     {
@@ -186,13 +187,16 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
             return;
         }
 
-        if (GuiUtils.getCurrentScreen() instanceof HandledScreen &&
+        if (GuiUtils.getCurrentScreen() instanceof HandledScreen<?> gui &&
             (GuiUtils.getCurrentScreen() instanceof CreativeInventoryScreen) == false &&
             Configs.GUI_BLACKLIST.contains(GuiUtils.getCurrentScreen().getClass().getName()) == false &&
             Hotkeys.MASS_CRAFT.getKeybind().isKeybindHeld())
         {
-            Screen guiScreen = GuiUtils.getCurrentScreen();
-            HandledScreen<?> gui = (HandledScreen<?>) guiScreen;
+            if (++this.massCraftTicker < Configs.Generic.MASS_CRAFT_INTERVAL.getIntegerValue())
+            {
+                return;
+            }
+
             Slot outputSlot = CraftingHandler.getFirstCraftingOutputSlotForGui(gui);
 
             if (outputSlot != null)
@@ -203,32 +207,58 @@ public class KeybindCallbacks implements IHotkeyCallback, IClientTickHandler
                 }
 
                 RecipePattern recipe = RecipeStorage.getInstance().getSelectedRecipe();
+                int limit = Configs.Generic.MASS_CRAFT_ITERATIONS.getIntegerValue();
 
-                InventoryUtils.tryClearCursor(gui);
-                InventoryUtils.throwAllCraftingResultsToGround(recipe, gui);
-                InventoryUtils.tryMoveItemsToFirstCraftingGrid(recipe, gui, true);
-
-                int failsafe = 0;
-
-                while (++failsafe < 40 && InventoryUtils.areStacksEqual(outputSlot.getStack(), recipe.getResult()))
+                if (Configs.Generic.MASS_CRAFT_SWAPS.getBooleanValue())
                 {
-                    if (Configs.Generic.CARPET_CTRL_Q_CRAFTING.getBooleanValue())
+                    for (int i = 0; i < limit; ++i)
                     {
-                        InventoryUtils.dropStack(gui, outputSlot.id);
-                    }
-                    else
-                    {
-                        InventoryUtils.dropStacksWhileHasItem(gui, outputSlot.id, recipe.getResult());
-                    }
+                        InventoryUtils.tryClearCursor(gui);
+                        InventoryUtils.throwAllCraftingResultsToGround(recipe, gui);
+                        InventoryUtils.setCraftingGridContentsUsingSwaps(gui, mc.player.getInventory(), recipe, outputSlot);
 
-                    //InventoryUtils.tryClearCursor(gui, mc);
-                    InventoryUtils.throwAllCraftingResultsToGround(recipe, gui);
-                    InventoryUtils.throwAllNonRecipeItemsToGround(recipe, gui);
-                    InventoryUtils.tryMoveItemsToFirstCraftingGrid(recipe, gui, true);
+                        if (InventoryUtils.areStacksEqual(outputSlot.getStack(), recipe.getResult()) == false)
+                        {
+                            break;
+                        }
+
+                        InventoryUtils.shiftClickSlot(gui, outputSlot.id);
+                    }
+                }
+                else
+                {
+                    int failsafe = 0;
+
+                    while (++failsafe < limit)
+                    {
+                        InventoryUtils.tryClearCursor(gui);
+                        InventoryUtils.setInhibitCraftingOutputUpdate(true);
+                        InventoryUtils.throwAllCraftingResultsToGround(recipe, gui);
+                        InventoryUtils.throwAllNonRecipeItemsToGround(recipe, gui);
+                        InventoryUtils.tryMoveItemsToFirstCraftingGrid(recipe, gui, true);
+                        InventoryUtils.setInhibitCraftingOutputUpdate(true);
+                        InventoryUtils.updateCraftingOutputSlot(outputSlot);
+
+                        if (InventoryUtils.areStacksEqual(outputSlot.getStack(), recipe.getResult()) == false)
+                        {
+                            break;
+                        }
+
+                        if (Configs.Generic.CARPET_CTRL_Q_CRAFTING.getBooleanValue())
+                        {
+                            InventoryUtils.dropStack(gui, outputSlot.id);
+                        }
+                        else
+                        {
+                            InventoryUtils.dropStacksWhileHasItem(gui, outputSlot.id, recipe.getResult());
+                        }
+                    }
                 }
 
                 ClickPacketBuffer.setShouldBufferClickPackets(false);
             }
+
+            this.massCraftTicker = 0;
         }
     }
 }

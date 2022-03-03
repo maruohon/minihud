@@ -27,6 +27,7 @@ import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.MerchantScreenHandler;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.screen.slot.TradeOutputSlot;
@@ -39,6 +40,7 @@ import net.minecraft.world.World;
 import fi.dy.masa.itemscroller.ItemScroller;
 import fi.dy.masa.itemscroller.config.Configs;
 import fi.dy.masa.itemscroller.config.Hotkeys;
+import fi.dy.masa.itemscroller.mixin.IMixinCraftingResultSlot;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler;
 import fi.dy.masa.itemscroller.recipes.CraftingHandler.SlotRange;
 import fi.dy.masa.itemscroller.recipes.RecipePattern;
@@ -51,31 +53,71 @@ import it.unimi.dsi.fastutil.ints.IntComparator;
 
 public class InventoryUtils
 {
+    private static final Set<Integer> DRAGGED_SLOTS = new HashSet<>();
+
+    private static WeakReference<Slot> sourceSlotCandidate = null;
+    private static WeakReference<Slot> sourceSlot = null;
+    private static ItemStack stackInCursorLast = ItemStack.EMPTY;
+    @Nullable protected static CraftingRecipe lastRecipe;
     private static MoveAction activeMoveAction = MoveAction.NONE;
     private static int lastPosX;
     private static int lastPosY;
     private static int slotNumberLast;
-    private static final Set<Integer> DRAGGED_SLOTS = new HashSet<>();
-    private static WeakReference<Slot> sourceSlotCandidate = null;
-    private static WeakReference<Slot> sourceSlot = null;
-    private static ItemStack stackInCursorLast = ItemStack.EMPTY;
+    private static boolean inhibitCraftResultUpdate;
+
+    public static void setInhibitCraftingOutputUpdate(boolean inhibitUpdate)
+    {
+        inhibitCraftResultUpdate = inhibitUpdate;
+    }
 
     public static void onSlotChangedCraftingGrid(PlayerEntity player,
                                                  CraftingInventory craftMatrix,
                                                  CraftingResultInventory inventoryCraftResult)
     {
+        if (inhibitCraftResultUpdate)
+        {
+            return;
+        }
+
+        if (Configs.Generic.CLIENT_CRAFTING_FIX.getBooleanValue())
+        {
+            updateCraftingOutputSlot(player, craftMatrix, inventoryCraftResult, true);
+        }
+    }
+
+    public static void updateCraftingOutputSlot(Slot outputSlot)
+    {
+        PlayerEntity player = MinecraftClient.getInstance().player;
+
+        if (player != null &&
+            outputSlot instanceof CraftingResultSlot resultSlot &&
+            resultSlot.inventory instanceof CraftingResultInventory resultInv)
+        {
+            CraftingInventory craftingInv = ((IMixinCraftingResultSlot) outputSlot).itemscroller_getCraftingInventory();
+            updateCraftingOutputSlot(player, craftingInv, resultInv, true);
+        }
+    }
+
+    public static void updateCraftingOutputSlot(PlayerEntity player,
+                                                CraftingInventory craftMatrix,
+                                                CraftingResultInventory inventoryCraftResult,
+                                                boolean setEmptyStack)
+    {
         World world = player.getEntityWorld();
 
-        if (Configs.Generic.CLIENT_CRAFTING_FIX.getBooleanValue() &&
-            world.isClient && (world instanceof ClientWorld) && player instanceof ClientPlayerEntity)
+        if ((world instanceof ClientWorld) && player instanceof ClientPlayerEntity)
         {
             ItemStack stack = ItemStack.EMPTY;
-            Optional<CraftingRecipe> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftMatrix, world);
+            CraftingRecipe recipe = Configs.Generic.USE_RECIPE_CACHING.getBooleanValue() ? lastRecipe : null;
 
-            if (optional.isPresent())
+            if (recipe == null || recipe.matches(craftMatrix, world) == false)
             {
-                CraftingRecipe recipe = optional.get();
+                Optional<CraftingRecipe> optional = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftMatrix, world);
+                recipe = optional.isPresent() ? optional.get() : null;
+            }
 
+            if (recipe != null)
+            {
                 if ((recipe.isIgnoredInRecipeBook() ||
                      world.getGameRules().getBoolean(GameRules.DO_LIMITED_CRAFTING) == false ||
                      ((ClientPlayerEntity) player).getRecipeBook().contains(recipe)))
@@ -84,11 +126,14 @@ public class InventoryUtils
                     stack = recipe.craft(craftMatrix);
                 }
 
-                if (stack.isEmpty() == false)
+                if (setEmptyStack || stack.isEmpty() == false)
                 {
                     inventoryCraftResult.setStack(0, stack);
                 }
+
             }
+
+            lastRecipe = recipe;
         }
     }
 
@@ -1606,6 +1651,70 @@ public class InventoryUtils
         }
     }
 
+    public static void setCraftingGridContentsUsingSwaps(HandledScreen<? extends ScreenHandler> gui,
+                                                         PlayerInventory inv,
+                                                         RecipePattern recipe,
+                                                         Slot outputSlot)
+    {
+        SlotRange range = CraftingHandler.getCraftingGridSlots(gui, outputSlot);
+
+        if (range != null && isStackEmpty(recipe.getResult()) == false)
+        {
+            ItemStack[] recipeItems = recipe.getRecipeItems();
+            final int invSlots = gui.getScreenHandler().slots.size();
+            final int rangeSlots = Math.min(range.getSlotCount(), recipeItems.length);
+            IntArrayList toRemove = new IntArrayList();
+            boolean movedSomething = false;
+
+            setInhibitCraftingOutputUpdate(true);
+
+            for (int i = 0, slotNum = range.getFirst(); i < rangeSlots && slotNum < invSlots; i++, slotNum++)
+            {
+                Slot slotTmp = gui.getScreenHandler().getSlot(slotNum);
+                ItemStack recipeStack = recipeItems[i];
+                ItemStack slotStack = slotTmp.getStack();
+                boolean recipeHasItem = isStackEmpty(recipeStack) == false;
+
+                if (areStacksEqual(recipeStack, slotStack) == false)
+                {
+                    if (recipeHasItem == false)
+                    {
+                        toRemove.add(slotNum);
+                    }
+                    else
+                    {
+                        int index = getPlayerInventoryIndexWithItem(recipeStack, inv);
+
+                        if (index >= 0)
+                        {
+                            clickSlot(gui, slotNum, index, SlotActionType.SWAP);
+                            movedSomething = true;
+                        }
+                    }
+                }
+            }
+
+            movedSomething |= (toRemove.isEmpty() == false);
+
+            for (int slotNum : toRemove)
+            {
+                shiftClickSlot(gui, slotNum);
+
+                if (isStackEmpty(gui.getScreenHandler().getSlot(slotNum).getStack()) == false)
+                {
+                    dropStack(gui, slotNum);
+                }
+            }
+
+            setInhibitCraftingOutputUpdate(false);
+
+            if (movedSomething)
+            {
+                updateCraftingOutputSlot(outputSlot);
+            }
+        }
+    }
+
     private static int putSingleItemIntoSlots(HandledScreen<? extends ScreenHandler> gui,
                                               IntArrayList targetSlots,
                                               int startIndex)
@@ -1893,6 +2002,23 @@ public class InventoryUtils
         }
 
         return slots;
+    }
+
+    public static int getPlayerInventoryIndexWithItem(ItemStack stackReference, PlayerInventory inv)
+    {
+        final int size = inv.main.size();
+
+        for (int index = 0; index < size; ++index)
+        {
+            ItemStack stack = inv.main.get(index);
+
+            if (areStacksEqual(stack, stackReference))
+            {
+                return index;
+            }
+        }
+
+        return -1;
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -2444,11 +2570,11 @@ public class InventoryUtils
                     }
                 }
             }
-        }
 
-        if (isStackEmpty(gui.getScreenHandler().getCursorStack()) == false)
-        {
-            dropItemsFromCursor(gui);
+            if (isStackEmpty(gui.getScreenHandler().getCursorStack()) == false)
+            {
+                dropItemsFromCursor(gui);
+            }
         }
     }
 
