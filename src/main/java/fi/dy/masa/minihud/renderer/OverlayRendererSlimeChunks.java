@@ -83,7 +83,7 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
             final int centerX = MathHelper.floor(entity.posX) >> 4;
             final int centerZ = MathHelper.floor(entity.posZ) >> 4;
             final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
-            final Color4f colorSides = Color4f.fromColor(colorLines, colorLines.a / 6);
+            final Color4f colorSides = colorLines.withAlpha(colorLines.a / 6);
             PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();
             PooledMutableBlockPos pos2 = PooledMutableBlockPos.retain();
             int r = MathHelper.clamp(Configs.Generic.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue(), -1, 40);

@@ -86,7 +86,7 @@ public class ShapeManagerScreen extends BaseListScreen<DataListWidget<ShapeBase>
         listWidget.setAllowSelection(true);
         listWidget.getEntrySelectionHandler().setSelectedEntry(ShapeManager.INSTANCE.getSelectedShape());
         listWidget.getEntrySelectionHandler().setSelectionListener(this::onSelectionChange);
-        listWidget.setEntryWidgetFactory(ShapeEntryWidget::new);
+        listWidget.setDataListEntryWidgetFactory(ShapeEntryWidget::new);
 
         return listWidget;
     }
