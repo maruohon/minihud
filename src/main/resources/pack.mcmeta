@@ -1,7 +1,6 @@
 {
-   "pack":
-   {
-      "pack_format": 3,
-      "description": "MiniHUD Resources"
-   }
+	"pack": {
+		"pack_format": 3,
+		"description": "MiniHUD resources"
+	}
 }
