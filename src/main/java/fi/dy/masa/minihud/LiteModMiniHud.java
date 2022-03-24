@@ -1,11 +1,11 @@
 package fi.dy.masa.minihud;
 
 import java.io.File;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.minihud.gui.MiniHudConfigPanel;
 

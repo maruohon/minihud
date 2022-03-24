@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.BlockPos;
@@ -29,7 +30,6 @@ import fi.dy.masa.minihud.network.ServuxInfoSubDataPacketHandler;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.util.MiscUtils;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class DataStorage
 {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -16,7 +17,6 @@ import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.data.OrderedBlockPosLong;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public abstract class BaseBlockPositionListOverlayRenderer extends MiniHUDOverlayRenderer
 {

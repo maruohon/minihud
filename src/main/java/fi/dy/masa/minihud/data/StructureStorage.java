@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -46,7 +47,6 @@ import fi.dy.masa.minihud.mixin.structure.MapGenStructureMixin;
 import fi.dy.masa.minihud.network.CarpetStructurePacketHandler;
 import fi.dy.masa.minihud.network.ServuxStructurePacketHandler;
 import fi.dy.masa.minihud.util.MiscUtils;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
 public class StructureStorage
 {
