@@ -3,6 +3,7 @@ package fi.dy.masa.minihud.network;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -21,7 +22,7 @@ import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
-import fi.dy.masa.malilib.network.PluginChannelHandler;
+import fi.dy.masa.malilib.network.message.BasePacketHandler;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
@@ -32,7 +33,7 @@ import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.MobCapDataHolder;
 import fi.dy.masa.minihud.data.WoolCounters;
 
-public class CarpetPubsubPacketHandler implements PluginChannelHandler
+public class CarpetPubsubPacketHandler extends BasePacketHandler
 {
     public static final ResourceLocation CHANNEL_NAME = new ResourceLocation("carpet:pubsub");
     public static final List<ResourceLocation> CHANNELS = ImmutableList.of(CHANNEL_NAME);
@@ -112,6 +113,12 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
         }
 
         return builder.build();
+    }
+
+    private CarpetPubsubPacketHandler()
+    {
+        this.registerToServer = true;
+        this.usePacketSplitter = true;
     }
 
     @Override
@@ -217,12 +224,12 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
                 buf.writeVarInt(updateType);
                 buf.writeVarInt(nodeCount);
 
-                for (int i = 0; i < nodeCount; ++i)
+                for (String actionableNode : actionableNodes)
                 {
-                    buf.writeString(actionableNodes.get(i));
+                    buf.writeString(actionableNode);
                 }
 
-                PacketSplitter.send(handler, CHANNEL_NAME, buf);
+                PacketSplitter.send(CHANNEL_NAME, buf, handler);
             }
         }
     }
@@ -236,12 +243,11 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
         if (world != null)
         {
             ClientPacketChannelHandler handler = Registry.CLIENT_PACKET_CHANNEL_HANDLER;
-            Set<String> unsubs = new HashSet<>();
             Set<String> newsubs = new HashSet<>();
             DimensionType dimType = world.provider.getDimensionType();
 
             // First unsubscribe from any previous subscriptions
-            unsubs.addAll(PER_DIMENSION_SUBSCRIPTIONS);
+            Set<String> unsubs = new HashSet<>(PER_DIMENSION_SUBSCRIPTIONS);
             PER_DIMENSION_SUBSCRIPTIONS.clear();
 
             if (InfoLine.SERVER_TPS.getBooleanValue())
@@ -276,7 +282,7 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
                 && Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue())
             {
                 String node = getDroppedChunksHashSizeNodeName(dimType);
-                addPerDimensionSubs(Arrays.asList(node), newsubs, unsubs);
+                addPerDimensionSubs(Collections.singletonList(node), newsubs, unsubs);
             }
 
             if (unsubs.isEmpty() == false || newsubs.isEmpty() == false)
@@ -303,7 +309,7 @@ public class CarpetPubsubPacketHandler implements PluginChannelHandler
     private static void addPerDimensionSubs(List<String> nodes, Set<String> newsubs, Set<String> unsubs)
     {
         newsubs.addAll(nodes);
-        unsubs.removeAll(nodes);
+        nodes.forEach(unsubs::remove);
         PER_DIMENSION_SUBSCRIPTIONS.addAll(nodes);
     }
 

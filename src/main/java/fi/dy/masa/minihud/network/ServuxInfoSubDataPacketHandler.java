@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.google.common.collect.ImmutableList;
-import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.EnumCreatureType;
@@ -18,8 +17,8 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
-import fi.dy.masa.malilib.network.PacketSplitter;
-import fi.dy.masa.malilib.network.PluginChannelHandler;
+import fi.dy.masa.malilib.network.PacketUtils;
+import fi.dy.masa.malilib.network.message.BasePacketHandler;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.util.GameUtils;
@@ -33,7 +32,7 @@ import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 
-public class ServuxInfoSubDataPacketHandler implements PluginChannelHandler
+public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
 {
     public static final ServuxInfoSubDataPacketHandler INSTANCE = new ServuxInfoSubDataPacketHandler();
     protected static final List<ResourceLocation> CHANNELS = ImmutableList.of(new ResourceLocation("servux:info_data"));
@@ -46,6 +45,7 @@ public class ServuxInfoSubDataPacketHandler implements PluginChannelHandler
 
     protected ServuxInfoSubDataPacketHandler()
     {
+        this.registerToServer = true;
         this.registerDataHandlers();
     }
 
@@ -58,10 +58,12 @@ public class ServuxInfoSubDataPacketHandler implements PluginChannelHandler
     @Override
     public void onPacketReceived(PacketBuffer buf)
     {
-        //System.out.printf("DATA packet received\n");
+        MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#onPacketReceived() - start");
+
         if (this.supportedProtocol)
         {
             final int dataCount = buf.readVarInt();
+            MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#onPacketReceived() - data count: {}", dataCount);
 
             for (int i = 0; i < dataCount; ++i)
             {
@@ -71,11 +73,11 @@ public class ServuxInfoSubDataPacketHandler implements PluginChannelHandler
                 if (reader == null)
                 {
                     this.supportedProtocol = false;
-                    MessageDispatcher.error("minihud.message.error.info_sub.failed_receive_data", channelId);
-                    MiniHUD.LOGGER.warn("Failed to receive info sub data from the server for channel id {}", channelId);
+                    MessageDispatcher.error().console().translate("minihud.message.error.info_sub.failed_receive_data", channelId);
                     break;
                 }
 
+                MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#onPacketReceived() - channel: {}", channelId);
                 reader.readData(buf);
             }
         }
@@ -83,7 +85,7 @@ public class ServuxInfoSubDataPacketHandler implements PluginChannelHandler
 
     public void receiveMetadata(NBTTagCompound tag)
     {
-        System.out.printf("METADATA packet received: %s\n", tag);
+        MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#receiveMetadata(), tag: {}", tag);
 
         if (tag.getInteger("version") == 1 &&
             tag.hasKey("channel_ids", Constants.NBT.TAG_LIST))
@@ -104,6 +106,7 @@ public class ServuxInfoSubDataPacketHandler implements PluginChannelHandler
                 if (reader != null)
                 {
                     this.idMappedDataReaders.put(i, reader);
+                    this.currentSubscriptions.add(channel);
                 }
             }
 
@@ -163,7 +166,7 @@ public class ServuxInfoSubDataPacketHandler implements PluginChannelHandler
         // minecraft.status.count.scheduled_fluid_ticks[.dimension_name]
 
         this.allBufferReaders.put("minecraft.status.chunk_loading.dropped_chunks.hash_size", (buf) -> DataStorage.getInstance().setServerDroppedChunksHashSize(buf.readVarInt()));
-        this.allBufferReaders.put("minecraft.status.count.loaded.block_entities", (buf) -> buf.readVarInt());
+        this.allBufferReaders.put("minecraft.status.count.loaded.block_entities", (buf) -> buf.readVarInt()); // TODO
         this.allBufferReaders.put("minecraft.status.count.loaded.block_entities.ticking", (buf) -> buf.readVarInt());
         this.allBufferReaders.put("minecraft.status.count.loaded.chunks", (buf) -> buf.readVarInt());
         this.allBufferReaders.put("minecraft.status.count.loaded.entities", (buf) -> buf.readVarInt());
@@ -198,10 +201,8 @@ public class ServuxInfoSubDataPacketHandler implements PluginChannelHandler
             rootTag.setString("action", action);
             rootTag.setTag("channels", NbtUtils.asListTag(channels, this::channelToTag));
 
-            PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
-            buf.writeCompoundTag(rootTag);
-            PacketSplitter.send(handler, ServuxInfoSubRegistrationPacketHandler.REG_CHANNEL, buf);
-            System.out.printf("UPDATE subs: %s\n", rootTag);
+            PacketUtils.sendTag(ServuxInfoSubRegistrationPacketHandler.REG_CHANNEL, rootTag, handler);
+            MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#updateSubscriptions(), tag: {}", rootTag);
         }
     }
 
