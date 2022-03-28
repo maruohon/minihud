@@ -1,8 +1,7 @@
-package fi.dy.masa.minihud.hotkeys;
+package fi.dy.masa.minihud.feature;
 
 import fi.dy.masa.malilib.action.ActionUtils;
 import fi.dy.masa.malilib.action.NamedAction;
-import fi.dy.masa.malilib.config.option.HotkeyedBooleanConfig;
 import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -21,32 +20,26 @@ public class Actions
 
     public static void init()
     {
-        register("toggleInfoLinesRendering",  Configs.Generic.INFO_LINES_RENDERING_TOGGLE);
-        register("toggleOverlaysRendering",   Configs.Generic.OVERLAYS_RENDERING_TOGGLE);
-
         for (InfoLine line : InfoLine.VALUES)
         {
-            ActionUtils.registerToggle(Reference.MOD_INFO, line.getName(), line.getBooleanConfig());
+            ActionUtils.registerBooleanConfigActions(Reference.MOD_INFO, line.getBooleanConfig(), line.getKeyBind());
         }
 
         for (RendererToggle toggle : RendererToggle.VALUES)
         {
-            ActionUtils.registerToggle(Reference.MOD_INFO, toggle.getName(), toggle.getBooleanConfig());
+            ActionUtils.registerBooleanConfigActions(Reference.MOD_INFO, toggle.getBooleanConfig(), toggle.getKeyBind());
         }
 
         for (StructureToggle toggle : StructureToggle.VALUES)
         {
-            ActionUtils.registerToggle(Reference.MOD_INFO, toggle.getName(), toggle.getBooleanConfig());
+            ActionUtils.registerBooleanConfigActions(Reference.MOD_INFO, toggle.getBooleanConfig(), toggle.getKeyBind());
         }
+
+        ActionUtils.registerBooleanConfigActions(Configs.Generic.OPTIONS);
     }
 
     private static NamedAction register(String name, EventListener action)
     {
         return ActionUtils.register(Reference.MOD_INFO, name, action);
-    }
-
-    private static NamedAction register(String name, HotkeyedBooleanConfig config)
-    {
-        return ActionUtils.registerToggleKey(Reference.MOD_INFO, name, config);
     }
 }

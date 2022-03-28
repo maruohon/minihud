@@ -1,6 +1,6 @@
 package fi.dy.masa.minihud.gui.widget;
 
-import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import fi.dy.masa.malilib.gui.config.ConfigWidgetContext;
 import fi.dy.masa.malilib.gui.widget.ColorIndicatorWidget;
 import fi.dy.masa.malilib.gui.widget.KeybindSettingsWidget;
@@ -13,7 +13,7 @@ import fi.dy.masa.minihud.config.StructureToggle;
 public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggle>
 {
     protected final StructureToggle config;
-    protected final ImmutableList<Integer> initialHotkeyValue;
+    protected final IntArrayList initialHotkeyValue = new IntArrayList();
     protected final BooleanConfigButton booleanButton;
     protected final KeyBindConfigButton hotkeyButton;
     protected final KeybindSettingsWidget settingsWidget;
@@ -33,7 +33,7 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
         this.initialBooleanValue = config.isEnabled();
         this.initialMainColor = config.getColorMain().getIntegerValue();
         this.initialComponentColor = config.getColorComponents().getIntegerValue();
-        this.initialHotkeyValue = config.getKeyBind().getKeys();
+        this.config.getKeyBind().getKeysToList(this.initialHotkeyValue);
 
         this.booleanButton = new BooleanConfigButton(-1, 20, config.getBooleanConfig());
         this.booleanButton.setActionListener(() -> {
@@ -47,13 +47,13 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
         this.settingsWidget = new KeybindSettingsWidget(config.getKeyBind(), config.getDisplayName());
 
         this.colorIndicatorWidgetMain = new ColorIndicatorWidget(18, 18, this.config.getColorMain(), (newValue) -> {
-            this.config.getColorMain().setValue(newValue);
+            this.config.getColorMain().setValueFromInt(newValue);
             this.updateWidgetState();
         });
         this.colorIndicatorWidgetMain.getHoverInfoFactory().translateAndAddString(90, "minihud.hover.structures.color_main");
 
         this.colorIndicatorWidgetComponents = new ColorIndicatorWidget(18, 18, this.config.getColorComponents(), (newValue) -> {
-            this.config.getColorComponents().setValue(newValue);
+            this.config.getColorComponents().setValueFromInt(newValue);
             this.updateWidgetState();
         });
         this.colorIndicatorWidgetComponents.getHoverInfoFactory().translateAndAddString(90, "minihud.hover.structures.color_components");
@@ -113,6 +113,6 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
         return this.config.isEnabled() != this.initialBooleanValue ||
                this.config.getColorMain().getIntegerValue() != this.initialMainColor ||
                this.config.getColorComponents().getIntegerValue() != this.initialComponentColor ||
-               this.config.getKeyBind().getKeys().equals(this.initialHotkeyValue) == false;
+               this.config.getKeyBind().matches(this.initialHotkeyValue) == false;
     }
 }

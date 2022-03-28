@@ -4,7 +4,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.input.callback.AdjustableValueHotkeyCallback;
-import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.malilib.overlay.message.MessageHelpers;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
@@ -12,7 +11,7 @@ import fi.dy.masa.malilib.render.overlay.OverlayRendererContainer;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.data.DataStorage;
-import fi.dy.masa.minihud.hotkeys.Actions;
+import fi.dy.masa.minihud.feature.Actions;
 import fi.dy.masa.minihud.network.CarpetPubsubPacketHandler;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
@@ -77,9 +76,9 @@ public class ConfigCallbacks
         RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.addEnableListener(RenderContainer.SPAWNABLE_CHUNKS_PLAYER_OVERLAY::onEnabled);
         RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.addEnableListener(RenderContainer.SPAWN_CHUNKS_REAL_OVERLAY::onEnabled);
 
-        RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.getBooleanConfig(), ConfigCallbacks::getRandomTicksMessage));
-        RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.getBooleanConfig(), ConfigCallbacks::getSpawnableChunksMessage));
-        RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.getBooleanConfig(), ConfigCallbacks::getSpawnChunksMessage));
+        RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.setToggleMessageFactory(ConfigCallbacks::getRandomTicksMessage);
+        RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.setToggleMessageFactory(ConfigCallbacks::getSpawnableChunksMessage);
+        RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.setToggleMessageFactory(ConfigCallbacks::getSpawnChunksMessage);
     }
 
     private static void onChunkUnloadBucketOverlayEnabled()

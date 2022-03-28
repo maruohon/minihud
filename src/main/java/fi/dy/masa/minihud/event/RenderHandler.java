@@ -399,7 +399,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         {
             try
             {
-                SimpleDateFormat sdf = new SimpleDateFormat(Configs.Generic.REAL_TIME_FORMAT.getStringValue());
+                SimpleDateFormat sdf = new SimpleDateFormat(Configs.Generic.REAL_TIME_FORMAT.getValue());
                 this.date.setTime(System.currentTimeMillis());
                 this.addLine(sdf.format(this.date));
             }
@@ -426,7 +426,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 int min = (int) (dayTicks / 16.666666) % 60;
                 int sec = (int) (dayTicks / 0.277777) % 60;
 
-                String str = Configs.Generic.MC_TIME_FORMAT.getStringValue();
+                String str = Configs.Generic.MC_TIME_FORMAT.getValue();
                 str = str.replace("{DAY}",  String.format("%d", day));
                 str = str.replace("{DAY_1}",String.format("%d", day + 1));
                 str = str.replace("{HOUR}", String.format("%02d", hour));
@@ -511,7 +511,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 {
                     try
                     {
-                        str.append(String.format(Configs.Generic.COORDINATE_FORMAT_STRING.getStringValue(),
+                        str.append(String.format(Configs.Generic.COORDINATE_FORMAT_STRING.getValue(),
                             entity.posX, entity.getEntityBoundingBox().minY, entity.posZ));
                     }
                     // Uh oh, someone done goofed their format string... :P

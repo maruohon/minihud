@@ -2,7 +2,9 @@ package fi.dy.masa.minihud.config;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
@@ -86,6 +88,11 @@ public enum RendererToggle implements ConfigInfo
     public void addEnableListener(EventListener listener)
     {
         this.booleanConfig.addEnableListener(listener);
+    }
+
+    public void setToggleMessageFactory(@Nullable Function<BooleanConfig, String> messageFactory)
+    {
+        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.booleanConfig, messageFactory));
     }
 
     public BooleanConfig getBooleanConfig()

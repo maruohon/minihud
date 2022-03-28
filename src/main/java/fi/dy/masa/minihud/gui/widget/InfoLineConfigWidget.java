@@ -1,6 +1,6 @@
 package fi.dy.masa.minihud.gui.widget;
 
-import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import fi.dy.masa.malilib.gui.config.ConfigWidgetContext;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
@@ -18,7 +18,7 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
     protected final KeyBindConfigButton hotkeyButton;
     protected final KeybindSettingsWidget settingsWidget;
 
-    protected final ImmutableList<Integer> initialHotkeyValue;
+    protected final IntArrayList initialHotkeyValue = new IntArrayList();
     protected final boolean initialBooleanValue;
     protected final int initialLineOrder;
     protected final String initialLineOrderStringValue;
@@ -32,7 +32,7 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
         this.initialBooleanValue = this.config.getBooleanValue();
         this.initialLineOrder = this.config.getLineOrder();
         this.initialLineOrderStringValue = String.valueOf(this.initialLineOrder);
-        this.initialHotkeyValue = this.config.getKeyBind().getKeys();
+        this.config.getKeyBind().getKeysToList(this.initialHotkeyValue);
 
         this.textField = new BaseTextFieldWidget(24, 16);
         this.textField.setTextValidator(new IntegerTextFieldWidget.IntValidator(this.config.getLineOrderConfig().getMinIntegerValue(),
@@ -118,6 +118,6 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
     {
         return this.config.getBooleanValue() != this.initialBooleanValue ||
                this.config.getLineOrder() != this.initialLineOrder ||
-               this.config.getKeyBind().getKeys().equals(this.initialHotkeyValue) == false;
+               this.config.getKeyBind().matches(this.initialHotkeyValue) == false;
     }
 }

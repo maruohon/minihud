@@ -26,6 +26,9 @@ public class Configs
 
     public static class Generic
     {
+        public static final HotkeyedBooleanConfig INFO_LINES_RENDERING_TOGGLE   = new HotkeyedBooleanConfig("infoLinesRendering", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
+        public static final HotkeyedBooleanConfig OVERLAYS_RENDERING_TOGGLE     = new HotkeyedBooleanConfig("overlaysRendering", true, "");
+
         public static final BooleanConfig BEACON_RANGE_AUTO_UPDATE              = new BooleanConfig("beaconRangeAutoUpdate", false);
         public static final IntegerConfig BLOCK_GRID_OVERLAY_RADIUS             = new IntegerConfig("blockGridOverlayRadius", 16, 0, 64);
         public static final DoubleConfig  CHUNK_UNLOAD_BUCKET_FONT_SCALE        = new DoubleConfig("chunkUnloadBucketOverlayFontScale", 0.1625, 0.0, 1.0);
@@ -38,7 +41,6 @@ public class Configs
         public static final BooleanConfig PATH_FINDING_DEBUG_POINT_WIDTH        = new BooleanConfig("pathFindingDebugPointWidth", true);
         public static final BooleanConfig DONT_RESET_SEED_ON_DIMENSION_CHANGE   = new BooleanConfig("dontResetSeedOnDimensionChange", true);
         public static final BooleanConfig FIX_VANILLA_DEBUG_RENDERERS           = new BooleanConfig("enableVanillaDebugRendererFix", true);
-        public static final HotkeyedBooleanConfig INFO_LINES_RENDERING_TOGGLE   = new HotkeyedBooleanConfig("infoLinesRenderingToggle", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
         public static final BooleanConfig ITEM_NBT_ENABLED                      = new BooleanConfig("itemNbtEnabled", false);
         public static final HotkeyConfig  ITEM_NBT_KEY_PRETTY                   = new HotkeyConfig("itemNbtKeyPretty", "", KeyBindSettings.GUI_MODIFIER);
         public static final HotkeyConfig  ITEM_NBT_KEY_STRING                   = new HotkeyConfig("itemNbtKeyString", "", KeyBindSettings.GUI_MODIFIER);
@@ -53,7 +55,6 @@ public class Configs
         public static final IntegerConfig LIGHT_LEVEL_RANGE                     = new IntegerConfig("lightLevelRange", 24, 1, 64);
         public static final IntegerConfig LIGHT_LEVEL_THRESHOLD                 = new IntegerConfig("lightLevelThreshold", 8, 0, 15);
         public static final DoubleConfig  LIGHT_LEVEL_Z_OFFSET                  = new DoubleConfig("lightLevelZOffset", 0.005, 0.0, 1.0);
-        public static final HotkeyedBooleanConfig OVERLAYS_RENDERING_TOGGLE     = new HotkeyedBooleanConfig("overlaysRenderingToggle", true, "");
         public static final BooleanConfig MAP_PREVIEW                           = new BooleanConfig("mapPreview", false);
         public static final BooleanConfig MAP_PREVIEW_REQUIRE_SHIFT             = new BooleanConfig("mapPreviewRequireShift", true);
         public static final IntegerConfig MAP_PREVIEW_SIZE                      = new IntegerConfig("mapPreviewSize", 160, 16, 512);

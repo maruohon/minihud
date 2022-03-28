@@ -19,7 +19,7 @@ import fi.dy.masa.minihud.gui.widget.RendererToggleConfigWidget;
 import fi.dy.masa.minihud.gui.widget.StructureToggleConfigWidget;
 import fi.dy.masa.minihud.gui.widget.info.RendererToggleConfigStatusWidget;
 import fi.dy.masa.minihud.gui.widget.info.StructureRendererConfigStatusWidget;
-import fi.dy.masa.minihud.hotkeys.Actions;
+import fi.dy.masa.minihud.feature.Actions;
 import fi.dy.masa.minihud.network.ServuxInfoSubDataPacketHandler;
 import fi.dy.masa.minihud.network.ServuxInfoSubRegistrationPacketHandler;
 
