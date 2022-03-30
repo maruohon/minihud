@@ -180,8 +180,8 @@ public class MiscUtils
 
     public static void getItemTooltip(ItemStack stack, List<String> lines)
     {
-        boolean showPretty = Configs.Generic.ITEM_NBT_KEY_PRETTY.isHeld();
-        boolean showString = Configs.Generic.ITEM_NBT_KEY_STRING.isHeld();
+        boolean showPretty = Configs.Hotkeys.ITEM_NBT_KEY_PRETTY.isHeld();
+        boolean showString = Configs.Hotkeys.ITEM_NBT_KEY_STRING.isHeld();
 
         // If the vanilla advanced tooltips are disabled, add them here, when showing a tooltip
         if (GameUtils.getClient().gameSettings.advancedItemTooltips == false && (showPretty || showString))

@@ -20,11 +20,12 @@ public class ConfigCallbacks
 {
     public static void init()
     {
-        Configs.Generic.OPEN_CONFIG_GUI.createCallbackForAction(Actions.OPEN_CONFIG_SCREEN);
-        Configs.Generic.OPEN_SHAPE_EDITOR.createCallbackForAction(Actions.OPEN_SHAPE_EDITOR);
-        Configs.Generic.OPEN_SHAPE_MANAGER.createCallbackForAction(Actions.OPEN_SHAPE_MANAGER);
         Configs.Generic.OVERLAYS_RENDERING_TOGGLE.addValueChangeListener(OverlayRendererContainer.INSTANCE::setEnabledRenderersNeedUpdate);
-        Configs.Generic.SET_DISTANCE_REFERENCE_POINT.createCallbackForAction(Actions.SET_DISTANCE_REFERENCE_POINT);
+
+        Configs.Hotkeys.OPEN_CONFIG_GUI.createCallbackForAction(Actions.OPEN_CONFIG_SCREEN);
+        Configs.Hotkeys.OPEN_SHAPE_EDITOR.createCallbackForAction(Actions.OPEN_SHAPE_EDITOR);
+        Configs.Hotkeys.OPEN_SHAPE_MANAGER.createCallbackForAction(Actions.OPEN_SHAPE_MANAGER);
+        Configs.Hotkeys.SET_DISTANCE_REFERENCE_POINT.createCallbackForAction(Actions.SET_DISTANCE_REFERENCE_POINT);
 
         InfoLine.CHUNK_UNLOAD_ORDER.getHotkeyConfig().getKeyBind().setCallback(AdjustableValueHotkeyCallback.createBitShifter(
                 InfoLine.CHUNK_UNLOAD_ORDER.getBooleanConfig(), Configs.Generic.DROPPED_CHUNKS_HASH_SIZE)

@@ -30,6 +30,7 @@ public class ConfigScreen
 
     private static final BaseConfigTab GENERIC              = new BaseConfigTab(MOD_INFO, "generic",    160, getGenericOptions(),     ConfigScreen::create);
     private static final BaseConfigTab COLORS               = new BaseConfigTab(MOD_INFO, "colors",     100, Configs.Colors.OPTIONS,  ConfigScreen::create);
+    private static final BaseConfigTab HOTKEYS              = new BaseConfigTab(MOD_INFO, "hotkeys",    200, Configs.Hotkeys.HOTKEYS, ConfigScreen::create);
     private static final BaseConfigTab INFO_LINES           = new BaseConfigTab(MOD_INFO, "info_lines", 200, getInfoLinesOptions(),   ConfigScreen::create);
     private static final BaseConfigTab OVERLAY_RENDERERS    = new BaseConfigTab(MOD_INFO, "renderers",  200, getRendererOptions(),    ConfigScreen::create);
     private static final BaseConfigTab STRUCTURES           = new BaseConfigTab(MOD_INFO, "structures", 200, getStructureOptions(),   ConfigScreen::create);
@@ -38,6 +39,7 @@ public class ConfigScreen
     public static final ImmutableList<ConfigTab> CONFIG_TABS = ImmutableList.of(
             GENERIC,
             COLORS,
+            HOTKEYS,
             INFO_LINES,
             OVERLAY_RENDERERS,
             STRUCTURES
@@ -46,6 +48,7 @@ public class ConfigScreen
     public static final ImmutableList<ScreenTab> ALL_TABS = ImmutableList.of(
             GENERIC,
             COLORS,
+            HOTKEYS,
             INFO_LINES,
             OVERLAY_RENDERERS,
             STRUCTURES,

@@ -27,7 +27,7 @@ public class Configs
 
     public static class Generic
     {
-        public static final HotkeyedBooleanConfig INFO_LINES_RENDERING_TOGGLE   = new HotkeyedBooleanConfig("infoLinesRendering", true, "", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
+        public static final HotkeyedBooleanConfig INFO_LINES_RENDERING_TOGGLE   = new HotkeyedBooleanConfig("infoLinesRendering", true, "H", KeyBindSettings.INGAME_RELEASE_EXCLUSIVE);
         public static final HotkeyedBooleanConfig OVERLAYS_RENDERING_TOGGLE     = new HotkeyedBooleanConfig("overlaysRendering", true, "");
 
         public static final BooleanConfig BEACON_RANGE_AUTO_UPDATE              = new BooleanConfig("beaconRangeAutoUpdate", false);
@@ -43,8 +43,6 @@ public class Configs
         public static final BooleanConfig DONT_RESET_SEED_ON_DIMENSION_CHANGE   = new BooleanConfig("dontResetSeedOnDimensionChange", true);
         public static final BooleanConfig FIX_VANILLA_DEBUG_RENDERERS           = new BooleanConfig("enableVanillaDebugRendererFix", true);
         public static final BooleanConfig ITEM_NBT_ENABLED                      = new BooleanConfig("itemNbtEnabled", false);
-        public static final HotkeyConfig  ITEM_NBT_KEY_PRETTY                   = new HotkeyConfig("itemNbtKeyPretty", "", KeyBindSettings.GUI_MODIFIER);
-        public static final HotkeyConfig  ITEM_NBT_KEY_STRING                   = new HotkeyConfig("itemNbtKeyString", "", KeyBindSettings.GUI_MODIFIER);
         public static final IntegerConfig ITEM_PREVIEW_Z                        = new IntegerConfig("itemPreviewZ", 400, 0, 4096);
         public static final BooleanConfig LIGHT_LEVEL_COLORED_NUMBERS           = new BooleanConfig("lightLevelColoredNumbers", true);
         public static final DoubleConfig  LIGHT_LEVEL_MARKER_SIZE               = new DoubleConfig("lightLevelMarkerSize", 0.84, 0.0, 1.0);
@@ -61,13 +59,8 @@ public class Configs
         public static final IntegerConfig MAP_PREVIEW_SIZE                      = new IntegerConfig("mapPreviewSize", 160, 16, 512);
         public static final StringConfig  MC_TIME_FORMAT                        = new StringConfig("mcTimeFormat", "MC time: (day {DAY}) {HOUR}:{MIN}:xx");
         public static final BooleanConfig OFFSET_SUBTITLE_HUD                   = new BooleanConfig("offsetSubtitleHud", false);
-        public static final HotkeyConfig  OPEN_CONFIG_GUI                       = new HotkeyConfig("openConfigGui", "H,C");
-        public static final HotkeyConfig  OPEN_SHAPE_EDITOR                     = new HotkeyConfig("openShapeEditor", "");
-        public static final HotkeyConfig  OPEN_SHAPE_MANAGER                    = new HotkeyConfig("openShapeManager", "");
         public static final StringConfig  REAL_TIME_FORMAT                      = new StringConfig("realTimeFormat", "yyyy-MM-dd HH:mm:ss");
         public static final BooleanConfig REQUIRE_SNEAK                         = new BooleanConfig("requireSneak", false);
-        public static final HotkeyConfig  REQUIRED_KEY                          = new HotkeyConfig("requiredKey", "", KeyBindSettings.INGAME_MODIFIER_EMPTY);
-        public static final HotkeyConfig  SET_DISTANCE_REFERENCE_POINT          = new HotkeyConfig("setDistanceReferencePoint", "");
         public static final BooleanConfig SHULKER_BOX_PREVIEW                   = new BooleanConfig("shulkerBoxPreview", false);
         public static final BooleanConfig SHULKER_DISPLAY_BACKGROUND_COLOR      = new BooleanConfig("shulkerDisplayBgColor", true);
         public static final BooleanConfig SHULKER_DISPLAY_REQUIRE_SHIFT         = new BooleanConfig("shulkerDisplayRequireShift", true);
@@ -105,8 +98,6 @@ public class Configs
                 FIX_VANILLA_DEBUG_RENDERERS,
                 INFO_LINES_RENDERING_TOGGLE,
                 ITEM_NBT_ENABLED,
-                ITEM_NBT_KEY_PRETTY,
-                ITEM_NBT_KEY_STRING,
                 ITEM_PREVIEW_Z,
                 LIGHT_LEVEL_COLORED_NUMBERS,
                 LIGHT_LEVEL_MARKER_MODE,
@@ -125,13 +116,8 @@ public class Configs
                 MAP_PREVIEW_SIZE,
                 MC_TIME_FORMAT,
                 OFFSET_SUBTITLE_HUD,
-                OPEN_CONFIG_GUI,
-                OPEN_SHAPE_EDITOR,
-                OPEN_SHAPE_MANAGER,
                 OVERLAYS_RENDERING_TOGGLE,
                 REQUIRE_SNEAK,
-                REQUIRED_KEY,
-                SET_DISTANCE_REFERENCE_POINT,
                 SHULKER_BOX_PREVIEW,
                 SHULKER_DISPLAY_BACKGROUND_COLOR,
                 SHULKER_DISPLAY_REQUIRE_SHIFT,
@@ -151,13 +137,7 @@ public class Configs
 
         public static final List<Hotkey> HOTKEY_LIST = ImmutableList.of(
                 INFO_LINES_RENDERING_TOGGLE,
-                ITEM_NBT_KEY_PRETTY,
-                ITEM_NBT_KEY_STRING,
-                OPEN_CONFIG_GUI,
-                OPEN_SHAPE_EDITOR,
-                OVERLAYS_RENDERING_TOGGLE,
-                REQUIRED_KEY,
-                SET_DISTANCE_REFERENCE_POINT
+                OVERLAYS_RENDERING_TOGGLE
         );
     }
 
@@ -226,6 +206,26 @@ public class Configs
         );
     }
 
+    public static class Hotkeys
+    {
+        public static final HotkeyConfig  ITEM_NBT_KEY_PRETTY                   = new HotkeyConfig("itemNbtKeyPretty", "", KeyBindSettings.GUI_MODIFIER);
+        public static final HotkeyConfig  ITEM_NBT_KEY_STRING                   = new HotkeyConfig("itemNbtKeyString", "", KeyBindSettings.GUI_MODIFIER);
+        public static final HotkeyConfig  OPEN_CONFIG_GUI                       = new HotkeyConfig("openConfigGui", "H,C");
+        public static final HotkeyConfig  OPEN_SHAPE_EDITOR                     = new HotkeyConfig("openShapeEditor", "");
+        public static final HotkeyConfig  OPEN_SHAPE_MANAGER                    = new HotkeyConfig("openShapeManager", "");
+        public static final HotkeyConfig  REQUIRED_KEY                          = new HotkeyConfig("requiredKey", "", KeyBindSettings.INGAME_MODIFIER_EMPTY);
+        public static final HotkeyConfig  SET_DISTANCE_REFERENCE_POINT          = new HotkeyConfig("setDistanceReferencePoint", "");
+
+        public static final List<HotkeyConfig> HOTKEYS = ImmutableList.of(
+                ITEM_NBT_KEY_PRETTY,
+                ITEM_NBT_KEY_STRING,
+                OPEN_CONFIG_GUI,
+                OPEN_SHAPE_EDITOR,
+                REQUIRED_KEY,
+                SET_DISTANCE_REFERENCE_POINT
+        );
+    }
+
     public static class Internal
     {
         public static final OptionListConfig<ScreenLocation> HUD_LOCATION   = new OptionListConfig<>("infoLinesHudLocation", ScreenLocation.TOP_LEFT, ScreenLocation.VALUES);
@@ -241,6 +241,7 @@ public class Configs
 
     public static final List<ConfigOptionCategory> CATEGORIES = ImmutableList.of(
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Generic",          Configs.Generic.OPTIONS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Hotkeys",          Configs.Hotkeys.HOTKEYS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Colors",           Configs.Colors.OPTIONS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoTypeToggles",  InfoLine.TOGGLE_CONFIGS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoLineOrders",   InfoLine.LINE_ORDER_CONFIGS),

@@ -274,7 +274,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                        mc.gameSettings.showDebugInfo == false &&
                        mc.player != null && mc.world != null && mc.gameSettings.hideGUI == false &&
                        (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
-                        Configs.Generic.REQUIRED_KEY.getKeyBind().isKeyBindHeld();
+                        Configs.Hotkeys.REQUIRED_KEY.getKeyBind().isKeyBindHeld();
 
         // Update the string list renderer to remove MiniHUD's info lines when the HUD is disabled
         if (wasEnabled && this.enabled == false && this.stringListRenderer != null)

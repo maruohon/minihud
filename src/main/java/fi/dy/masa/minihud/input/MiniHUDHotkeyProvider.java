@@ -24,6 +24,7 @@ public class MiniHUDHotkeyProvider implements HotkeyProvider
         builder.addAll(RendererToggle.TOGGLE_HOTKEYS);
         builder.addAll(StructureToggle.TOGGLE_HOTKEYS);
         builder.addAll(Configs.Generic.HOTKEY_LIST);
+        builder.addAll(Configs.Hotkeys.HOTKEYS);
 
         return builder.build();
     }
@@ -32,7 +33,8 @@ public class MiniHUDHotkeyProvider implements HotkeyProvider
     public List<HotkeyCategory> getHotkeysByCategories()
     {
         return ImmutableList.of(
-                new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.generic_hotkeys", Configs.Generic.HOTKEY_LIST),
+                new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.generic", Configs.Generic.HOTKEY_LIST),
+                new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.hotkeys", Configs.Hotkeys.HOTKEYS),
                 new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.info_toggle_hotkeys", InfoLine.TOGGLE_HOTKEYS),
                 new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.renderer_toggle_hotkeys", RendererToggle.TOGGLE_HOTKEYS),
                 new HotkeyCategory(Reference.MOD_INFO, "minihud.hotkeys.category.structure_toggle_hotkeys", StructureToggle.TOGGLE_HOTKEYS)

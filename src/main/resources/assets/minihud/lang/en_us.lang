@@ -1,12 +1,14 @@
 
 minihud.config.tab.colors=Colors
 minihud.config.tab.generic=Generic
+minihud.config.tab.hotkeys=Hotkeys
 minihud.config.tab.info_lines=Info Lines
 minihud.config.tab.renderers=Renderers
 minihud.config.tab.structures=Structures
 minihud.screen.tab.shapes=Shapes
 
-minihud.hotkeys.category.generic_hotkeys=Generic hotkeys
+minihud.hotkeys.category.generic=Generic
+minihud.hotkeys.category.hotkeys=Hotkeys
 minihud.hotkeys.category.info_toggle_hotkeys=Info Toggle hotkeys
 minihud.hotkeys.category.renderer_toggle_hotkeys=Renderer Toggle hotkeys
 minihud.hotkeys.category.structure_toggle_hotkeys=Structure Toggle hotkeys
@@ -114,8 +116,8 @@ minihud.config.name.coordinateformat=Coordinate Format
 minihud.config.name.coordinateformatcustomized=Custom Coordinate Format
 minihud.config.name.dontresetseedondimensionchange=Don't Forget Seed On Dimension Change
 minihud.config.name.enablevanilladebugrendererfix=Enable Vanilla Debug Renderer Fixes
-minihud.config.name.infolinesrendering=§eInfo Lines Rendering Toggle
-minihud.config.name.info_lines_hud_settings=Info HUD Settings
+minihud.config.name.infolinesrendering=§eInfo Lines HUD
+minihud.config.name.info_lines_hud_settings=Info Lines HUD Settings
 minihud.config.name.itemnbtenabled=Show Item NBT
 minihud.config.name.itempreviewz=Map/Shulker Preview Render Z
 minihud.config.name.lightlevelcolorednumbers=Light Level Colored Numbers
@@ -135,7 +137,7 @@ minihud.config.name.mappreviewrequireshift=Map Preview Require Shift
 minihud.config.name.mappreviewsize=Map Preview Size
 minihud.config.name.mctimeformat=MC Time Format
 minihud.config.name.offsetsubtitlehud=Offset Subtitle HUD
-minihud.config.name.overlaysrendering=§eOverlays Rendering Main Toggle
+minihud.config.name.overlaysrendering=§eOverlays Rendering (Main Toggle)
 minihud.config.name.pathfindingdebugpointwidth=Path Finding Debug Point Width
 minihud.config.name.realtimeformat=Real Time Date/Time Format
 minihud.config.name.requiresneak=Require Sneak For Info HUD
