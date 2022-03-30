@@ -16,13 +16,14 @@ import fi.dy.masa.malilib.config.option.StringConfig;
 import fi.dy.masa.malilib.config.value.ScreenLocation;
 import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.input.KeyBindSettings;
+import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.util.BlockGridMode;
 import fi.dy.masa.minihud.util.LightLevelMarkerMode;
 import fi.dy.masa.minihud.util.LightLevelNumberMode;
 
 public class Configs
 {
-    public static final int CONFIG_VERSION = 1;
+    public static final int CURRENT_VERSION = 1;
 
     public static class Generic
     {
@@ -237,16 +238,16 @@ public class Configs
     }
 
     public static final List<ConfigOptionCategory> CATEGORIES = ImmutableList.of(
-            BaseConfigOptionCategory.normal("Generic",          Configs.Generic.OPTIONS),
-            BaseConfigOptionCategory.normal("Colors",           Configs.Colors.OPTIONS),
-            BaseConfigOptionCategory.normal("InfoTypeToggles",  InfoLine.TOGGLE_CONFIGS),
-            BaseConfigOptionCategory.normal("InfoLineOrders",   InfoLine.LINE_ORDER_CONFIGS),
-            BaseConfigOptionCategory.normal("InfoHotkeys",      InfoLine.TOGGLE_HOTKEYS),
-            BaseConfigOptionCategory.normal("Internal",         Internal.OPTIONS),
-            BaseConfigOptionCategory.normal("RendererToggles",  RendererToggle.TOGGLE_CONFIGS),
-            BaseConfigOptionCategory.normal("RendererHotkeys",  RendererToggle.TOGGLE_HOTKEYS),
-            BaseConfigOptionCategory.normal("StructureToggles", StructureToggle.TOGGLE_CONFIGS),
-            BaseConfigOptionCategory.normal("StructureHotkeys", StructureToggle.TOGGLE_HOTKEYS),
-            BaseConfigOptionCategory.normal("StructureColors",  StructureToggle.COLOR_CONFIGS)
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Generic",          Configs.Generic.OPTIONS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Colors",           Configs.Colors.OPTIONS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoTypeToggles",  InfoLine.TOGGLE_CONFIGS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoLineOrders",   InfoLine.LINE_ORDER_CONFIGS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoHotkeys",      InfoLine.TOGGLE_HOTKEYS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Internal",         Internal.OPTIONS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "RendererToggles",  RendererToggle.TOGGLE_CONFIGS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "RendererHotkeys",  RendererToggle.TOGGLE_HOTKEYS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "StructureToggles", StructureToggle.TOGGLE_CONFIGS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "StructureHotkeys", StructureToggle.TOGGLE_HOTKEYS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "StructureColors",  StructureToggle.COLOR_CONFIGS)
     );
 }

@@ -1,6 +1,8 @@
 package fi.dy.masa.minihud;
 
-import fi.dy.masa.malilib.config.BaseModConfig;
+import fi.dy.masa.malilib.config.JsonModConfig;
+import fi.dy.masa.malilib.config.JsonModConfig.ConfigDataUpdater;
+import fi.dy.masa.malilib.config.util.ConfigUpdateUtils.KeyBindSettingsResetter;
 import fi.dy.masa.malilib.event.InitializationHandler;
 import fi.dy.masa.malilib.gui.config.ConfigSearchInfo;
 import fi.dy.masa.malilib.registry.Registry;
@@ -11,7 +13,7 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.config.StructureToggle;
 import fi.dy.masa.minihud.event.ClientTickHandler;
 import fi.dy.masa.minihud.event.ClientWorldChangeHandler;
-import fi.dy.masa.minihud.event.HotkeyProvider;
+import fi.dy.masa.minihud.input.MiniHUDHotkeyProvider;
 import fi.dy.masa.minihud.event.RenderHandler;
 import fi.dy.masa.minihud.gui.ConfigScreen;
 import fi.dy.masa.minihud.gui.widget.InfoLineConfigWidget;
@@ -28,7 +30,10 @@ public class InitHandler implements InitializationHandler
     @Override
     public void registerModHandlers()
     {
-        Registry.CONFIG_MANAGER.registerConfigHandler(BaseModConfig.createDefaultModConfig(Reference.MOD_INFO, Configs.CONFIG_VERSION, Configs.CATEGORIES));
+        // Reset all KeyBindSettings when updating to the first post-malilib-refactor version
+        ConfigDataUpdater updater = new KeyBindSettingsResetter(MiniHUDHotkeyProvider.INSTANCE::getAllHotkeys, 1);
+        Registry.CONFIG_MANAGER.registerConfigHandler(JsonModConfig.createJsonModConfig(Reference.MOD_INFO, Configs.CURRENT_VERSION, Configs.CATEGORIES, updater));
+
         Registry.CONFIG_SCREEN.registerConfigScreenFactory(Reference.MOD_INFO, ConfigScreen::create);
         Registry.CONFIG_TAB.registerConfigTabProvider(Reference.MOD_INFO, ConfigScreen::getConfigTabs);
 
@@ -43,7 +48,7 @@ public class InitHandler implements InitializationHandler
         Registry.CONFIG_STATUS_WIDGET.registerConfigStatusWidgetFactory(RendererToggle.class, RendererToggleConfigStatusWidget::new, "minihud:csi_value_renderer_toggle");
         Registry.CONFIG_STATUS_WIDGET.registerConfigStatusWidgetFactory(StructureToggle.class, StructureRendererConfigStatusWidget::new, "minihud:csi_value_structure_toggle");
 
-        Registry.HOTKEY_MANAGER.registerHotkeyProvider(HotkeyProvider.INSTANCE);
+        Registry.HOTKEY_MANAGER.registerHotkeyProvider(MiniHUDHotkeyProvider.INSTANCE);
 
         RenderHandler renderer = RenderHandler.INSTANCE;
         Registry.RENDER_EVENT_DISPATCHER.registerGameOverlayRenderer(renderer);

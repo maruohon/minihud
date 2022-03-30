@@ -1,18 +1,19 @@
-package fi.dy.masa.minihud.event;
+package fi.dy.masa.minihud.input;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.input.HotkeyCategory;
+import fi.dy.masa.malilib.input.HotkeyProvider;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.config.StructureToggle;
 
-public class HotkeyProvider implements fi.dy.masa.malilib.input.HotkeyProvider
+public class MiniHUDHotkeyProvider implements HotkeyProvider
 {
-    public static final HotkeyProvider INSTANCE = new HotkeyProvider();
+    public static final MiniHUDHotkeyProvider INSTANCE = new MiniHUDHotkeyProvider();
 
     @Override
     public List<? extends Hotkey> getAllHotkeys()
