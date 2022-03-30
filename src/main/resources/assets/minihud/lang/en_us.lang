@@ -67,7 +67,8 @@ minihud.config.comment.woolcountertypes=This defines which wool counter colors a
 minihud.hotkey.comment.itemnbtkeypretty=If §eShow Item NBT§r is enabled, then holding this key will render the hovered item's NBT data in a "pretty" format
 minihud.hotkey.comment.itemnbtkeystring=If §eShow Item NBT§r is enabled, then holding this key will render the hovered item's NBT data in a "stringified" format
 minihud.hotkey.comment.openconfiggui=The hotkey to open the in-game MiniHUD config screen
-minihud.hotkey.comment.openshapeeditor=The hotkey to open the Shape Editor screen for the currently selected shape, if any. If no shape is selected, then opens the Shape Manager menu (list of shapes).
+minihud.hotkey.comment.openshapeeditor=The hotkey to open the Shape Editor screen for the currently selected shape, if any. If no shape is selected, then opens the Shape Manager screen (list of shapes) instead.
+minihud.hotkey.comment.openshapemanager=The hotkey to open the Shape Manager screen (list of shapes)
 minihud.hotkey.comment.requiredkey=If set, then this key needs to be held for the info lines HUD to render
 minihud.hotkey.comment.setdistancereferencepoint=The hotkey to store the player's current position as the reference point for the §eDistance to Reference Point§r info line
 
@@ -161,6 +162,7 @@ minihud.hotkey.name.itemnbtkeypretty=Show Item NBT (pretty)
 minihud.hotkey.name.itemnbtkeystring=Show Item NBT (stringified)
 minihud.hotkey.name.openconfiggui=Open Config Screen
 minihud.hotkey.name.openshapeeditor=Open Shape Editor
+minihud.hotkey.name.openshapemanager=Open Shape Manager
 minihud.hotkey.name.requiredkey=Info HUD Required Key
 minihud.hotkey.name.setdistancereferencepoint=Set Distance Reference Point
 

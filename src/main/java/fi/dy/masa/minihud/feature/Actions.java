@@ -11,11 +11,13 @@ import fi.dy.masa.minihud.config.StructureToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.gui.ConfigScreen;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
+import fi.dy.masa.minihud.gui.ShapeManagerScreen;
 
 public class Actions
 {
     public static final NamedAction OPEN_CONFIG_SCREEN              = register("openConfigScreen", ConfigScreen::open);
     public static final NamedAction OPEN_SHAPE_EDITOR               = register("openShapeEditor", GuiShapeEditor::openShapeEditor);
+    public static final NamedAction OPEN_SHAPE_MANAGER              = register("openShapeManager", ShapeManagerScreen::openShapeManager);
     public static final NamedAction SET_DISTANCE_REFERENCE_POINT    = register("setDistanceReferencePoint", DataStorage.getInstance()::setDistanceReferencePoint);
 
     public static void init()

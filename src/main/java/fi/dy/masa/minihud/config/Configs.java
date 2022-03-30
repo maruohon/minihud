@@ -63,6 +63,7 @@ public class Configs
         public static final BooleanConfig OFFSET_SUBTITLE_HUD                   = new BooleanConfig("offsetSubtitleHud", false);
         public static final HotkeyConfig  OPEN_CONFIG_GUI                       = new HotkeyConfig("openConfigGui", "H,C");
         public static final HotkeyConfig  OPEN_SHAPE_EDITOR                     = new HotkeyConfig("openShapeEditor", "");
+        public static final HotkeyConfig  OPEN_SHAPE_MANAGER                    = new HotkeyConfig("openShapeManager", "");
         public static final StringConfig  REAL_TIME_FORMAT                      = new StringConfig("realTimeFormat", "yyyy-MM-dd HH:mm:ss");
         public static final BooleanConfig REQUIRE_SNEAK                         = new BooleanConfig("requireSneak", false);
         public static final HotkeyConfig  REQUIRED_KEY                          = new HotkeyConfig("requiredKey", "", KeyBindSettings.INGAME_MODIFIER_EMPTY);
@@ -126,6 +127,7 @@ public class Configs
                 OFFSET_SUBTITLE_HUD,
                 OPEN_CONFIG_GUI,
                 OPEN_SHAPE_EDITOR,
+                OPEN_SHAPE_MANAGER,
                 OVERLAYS_RENDERING_TOGGLE,
                 REQUIRE_SNEAK,
                 REQUIRED_KEY,
