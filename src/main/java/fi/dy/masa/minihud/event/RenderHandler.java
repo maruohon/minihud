@@ -588,22 +588,8 @@ public class RenderHandler implements IRenderer
             {
                 LightingProvider lightingProvider = world.getChunkManager().getLightingProvider();
 
-                this.addLine(String.format("Client Light: %d (block: %d, sky: %d)",
-                        lightingProvider.getLight(pos, 0),
-                        lightingProvider.get(LightType.BLOCK).getLightLevel(pos),
-                        lightingProvider.get(LightType.SKY).getLightLevel(pos)));
-
-                World bestWorld = WorldUtils.getBestWorld(mc);
-                WorldChunk serverChunk = this.getChunk(chunkPos);
-
-                if (serverChunk != null && serverChunk != clientChunk)
-                {
-                    lightingProvider = bestWorld.getChunkManager().getLightingProvider();
-                    int total = lightingProvider.getLight(pos, 0);
-                    int block = lightingProvider.get(LightType.BLOCK).getLightLevel(pos);
-                    int sky = lightingProvider.get(LightType.SKY).getLightLevel(pos);
-                    this.addLine(String.format("Server Light: %d (block: %d, sky: %d)", total, block, sky));
-                }
+                this.addLine(String.format("Light (block): %d",
+                                           lightingProvider.get(LightType.BLOCK).getLightLevel(pos)));
             }
         }
         else if (type == InfoToggle.BEE_COUNT)
