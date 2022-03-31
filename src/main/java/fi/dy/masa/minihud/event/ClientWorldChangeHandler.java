@@ -99,8 +99,8 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
 
         if (element != null)
         {
-            JsonUtils.readObjectIfPresent(element, "shapes", ShapeManager.INSTANCE::fromJson);
-            JsonUtils.readObjectIfPresent(element, "data_storage", DataStorage.getInstance()::fromJson);
+            JsonUtils.readObjectIfExists(element, "shapes", ShapeManager.INSTANCE::fromJson);
+            JsonUtils.readObjectIfExists(element, "data_storage", DataStorage.getInstance()::fromJson);
         }
     }
 
