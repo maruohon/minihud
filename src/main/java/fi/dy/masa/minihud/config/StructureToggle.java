@@ -61,7 +61,7 @@ public enum StructureToggle implements ConfigInfo
 
         this.toggleHotkey.setNameTranslationKey(nameKey);
         this.toggleHotkey.setCommentTranslationKey(commentKey);
-        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.toggleStatus));
+        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback<>(this.toggleStatus));
         this.toggleStatus.addValueChangeListener(DataStorage.getInstance().getStructureStorage()::requestStructureDataUpdates);
     }
 

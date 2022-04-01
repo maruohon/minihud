@@ -2,7 +2,6 @@ package fi.dy.masa.minihud.config;
 
 import java.util.Locale;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
@@ -13,6 +12,7 @@ import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyBindSettings;
 import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import fi.dy.masa.malilib.listener.EventListener;
+import fi.dy.masa.malilib.overlay.message.MessageHelpers.BooleanConfigMessageFactory;
 import fi.dy.masa.malilib.util.data.ModInfo;
 import fi.dy.masa.minihud.Reference;
 
@@ -72,7 +72,7 @@ public enum RendererToggle implements ConfigInfo
         this.toggleHotkey.setPrettyNameTranslationKey(nameKey);
         this.toggleHotkey.setCommentTranslationKey(commentKey);
 
-        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.booleanConfig));
+        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback<>(this.booleanConfig));
     }
 
     public boolean isRendererEnabled()
@@ -90,9 +90,9 @@ public enum RendererToggle implements ConfigInfo
         this.booleanConfig.addEnableListener(listener);
     }
 
-    public void setToggleMessageFactory(@Nullable Function<BooleanConfig, String> messageFactory)
+    public void setToggleMessageFactory(@Nullable BooleanConfigMessageFactory messageFactory)
     {
-        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.booleanConfig, messageFactory));
+        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback<>(this.booleanConfig, messageFactory));
     }
 
     public BooleanConfig getBooleanConfig()
