@@ -6,7 +6,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import fi.dy.masa.malilib.config.option.OptionListConfig;
 import fi.dy.masa.malilib.config.value.BlockSnap;
@@ -18,21 +17,19 @@ import fi.dy.masa.malilib.gui.listener.DoubleModifierButtonListener;
 import fi.dy.masa.malilib.gui.listener.DoubleTextFieldListener;
 import fi.dy.masa.malilib.gui.listener.IntegerModifierButtonListener;
 import fi.dy.masa.malilib.gui.listener.IntegerTextFieldListener;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.ColorIndicatorWidget;
 import fi.dy.masa.malilib.gui.widget.DoubleTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
+import fi.dy.masa.malilib.gui.widget.Vec3dEditWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OptionListConfigButton;
 import fi.dy.masa.malilib.input.ActionResult;
 import fi.dy.masa.malilib.util.ListUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
-import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.DualDoubleConsumer;
 import fi.dy.masa.malilib.util.data.DualIntConsumer;
-import fi.dy.masa.malilib.util.position.CoordinateValueModifier;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
@@ -52,7 +49,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         super("minihud_shape_editor", ConfigScreen.ALL_TABS, ConfigScreen.SHAPES);
 
         this.shape = shape;
-        this.controlsStartX = 146;
+        this.controlsStartX = 142;
         this.controlsStartY = 142;
 
         this.configBlockSnap = new OptionListConfig<>("blockSnap", BlockSnap.NONE, BlockSnap.VALUES, "");
@@ -131,7 +128,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
             {
                 ShapeCircle shape = (ShapeCircle) this.shape;
                 this.createShapeEditorElementsSphereBase(x, y, true);
-                this.createShapeEditorElementIntField(x + 150, y + 36, shape::getHeight, shape::setHeight, "minihud.label.shapes.height", true);
+                this.createShapeEditorElementIntField(x + 120, y + 38, shape::getHeight, shape::setHeight, "minihud.label.shapes.height", true);
                 this.createDirectionButton(x + 230, y + 36, shape::getMainAxis, shape::setMainAxis, "minihud.button.shapes.circle.main_axis");
                 this.createRenderTypeButton(renderTypeX, renderTypeY, this.shape::getRenderType, this.shape::setRenderType, "minihud.button.shapes.render_type");
                 break;
@@ -150,43 +147,34 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
 
         this.addLabel(x, y + 2, 0xFFFFFFFF, StringUtils.translate("minihud.label.shapes.center"));
 
+        Vec3dEditWidget editWidget = new Vec3dEditWidget(120, 72, 2, true, shape.getCenter(), shape::setCenter);
+        editWidget.setPosition(x, y + 12);
+        this.addWidget(editWidget);
+
         if (addRadiusInput)
         {
-            this.createShapeEditorElementDoubleField(x + 150, y + 2, shape::getRadius, shape::setRadius, "minihud.label.shapes.radius", true);
+            this.createShapeEditorElementDoubleField(editWidget.getRight(), y + 2, shape::getRadius, shape::setRadius, "minihud.label.shapes.radius", true);
         }
 
-        y += 12;
-        GuiUtils.createVec3dInputsVertical(x, y, 120, shape.getCenter(), new SphereEditor(shape, this), true, this);
         x += 11;
-        y += 54;
-
-        GenericButton button = GenericButton.create("malilib.button.render_layers.set_to_player");
-        button.setPosition(x, y);
-        button.setActionListener(() -> {
-            Entity entity = this.mc.getRenderViewEntity();
-
-            if (entity != null)
-            {
-                shape.setCenter(entity.getPositionVector());
-                this.initGui();
-            }
-        });
-        this.addWidget(button);
+        y += 66;
 
         this.configBlockSnap.setValue(shape.getBlockSnap());
-        int bx = x + button.getWidth() + 4;
 
         OptionListConfigButton buttonSnap = new OptionListConfigButton(-1, 20, this.configBlockSnap, "minihud.button.shapes.block_snap");
-        buttonSnap.setPosition(bx, y);
-        buttonSnap.setActionListener(() -> {
-            shape.setBlockSnap(this.configBlockSnap.getValue());
-            this.initGui();
-        });
+        buttonSnap.setPosition(editWidget.getRight() + 12, y);
+        buttonSnap.setChangeListener(this::onBlockSnapChanged);
         this.addWidget(buttonSnap);
 
         y += 24;
 
         this.createColorInput(x, y);
+    }
+
+    protected void onBlockSnapChanged()
+    {
+        ((ShapeCircleBase) this.shape).setBlockSnap(this.configBlockSnap.getValue());
+        this.initScreen();
     }
 
     private void createShapeEditorElementDoubleField(int x, int y, DoubleSupplier supplier,
@@ -259,39 +247,6 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
         button.setActionListener((btn) -> { consumer.accept(ListUtils.getNextEntry(ShapeRenderType.VALUES, supplier.get(), btn != 0)); this.initGui(); return true; });
         button.setPosition(x, y);
         this.addWidget(button);
-    }
-
-    private static class SphereEditor implements CoordinateValueModifier
-    {
-        private final GuiShapeEditor gui;
-        private final ShapeCircleBase shape;
-
-        private SphereEditor(ShapeCircleBase shape, GuiShapeEditor gui)
-        {
-            this.shape = shape;
-            this.gui = gui;
-        }
-
-        @Override
-        public boolean modifyValue(CoordinateType type, int amount)
-        {
-            this.shape.setCenter(PositionUtils.modifyValue(type, this.shape.getCenter(), amount));
-            this.gui.initGui();
-            return true;
-        }
-
-        @Override
-        public boolean setValueFromString(CoordinateType type, String newValue)
-        {
-            try
-            {
-                this.shape.setCenter(PositionUtils.setValue(type, this.shape.getCenter(), Double.parseDouble(newValue)));
-                return true;
-            }
-            catch (Exception ignore) {}
-
-            return false;
-        }
     }
 
     public static ActionResult openShapeEditor()

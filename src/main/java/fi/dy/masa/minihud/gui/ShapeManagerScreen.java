@@ -116,7 +116,7 @@ public class ShapeManagerScreen extends BaseListScreen<DataListWidget<ShapeBase>
 
     public static boolean screenValidator(@Nullable GuiScreen currentScreen)
     {
-        return currentScreen instanceof ShapeManagerScreen;
+        return currentScreen instanceof ShapeManagerScreen || currentScreen instanceof GuiShapeEditor;
     }
 
     public static ShapeManagerScreen openShapeManager(@Nullable GuiScreen currentScreen)
