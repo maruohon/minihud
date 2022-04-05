@@ -39,7 +39,7 @@ public class ShapeManagerScreen extends BaseListScreen<DataListWidget<ShapeBase>
         this.overlaysToggleButton = new BooleanConfigButton(-1, 16, Configs.Generic.OVERLAYS_RENDERING_TOGGLE);
         this.shapeRendererToggleButton = new BooleanConfigButton(-1, 16, RendererToggle.SHAPE_RENDERER.getBooleanConfig());
 
-        this.shapeTypeDropDown = new DropDownListWidget<>(160, 16, 200, 10, ShapeType.VALUES, ShapeType::getDisplayName);
+        this.shapeTypeDropDown = new DropDownListWidget<>(16, 12, ShapeType.VALUES, ShapeType::getDisplayName);
 
         this.setTitle("minihud.title.screen.shape_manager", Reference.MOD_VERSION);
     }
