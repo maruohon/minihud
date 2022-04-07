@@ -240,12 +240,12 @@ public class Configs
     }
 
     public static final List<ConfigOptionCategory> CATEGORIES = ImmutableList.of(
-            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Generic",          Configs.Generic.OPTIONS),
-            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Hotkeys",          Configs.Hotkeys.HOTKEYS),
-            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Colors",           Configs.Colors.OPTIONS),
-            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoTypeToggles",  InfoLine.TOGGLE_CONFIGS),
-            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoLineOrders",   InfoLine.LINE_ORDER_CONFIGS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Generic",          Generic.OPTIONS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Hotkeys",          Hotkeys.HOTKEYS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Colors",           Colors.OPTIONS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoToggles",      InfoLine.TOGGLE_CONFIGS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoHotkeys",      InfoLine.TOGGLE_HOTKEYS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoLineOrders",   InfoLine.LINE_ORDER_CONFIGS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Internal",         Internal.OPTIONS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "RendererToggles",  RendererToggle.TOGGLE_CONFIGS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "RendererHotkeys",  RendererToggle.TOGGLE_HOTKEYS),
