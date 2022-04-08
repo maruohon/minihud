@@ -6,10 +6,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -106,7 +106,7 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
 
     public static File getCurrentConfigDirectory()
     {
-        return new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
+        return ConfigUtils.getConfigDirectoryPath().resolve(Reference.MOD_ID).toFile();
     }
 
     public static File getCurrentStorageFile(boolean globalData)

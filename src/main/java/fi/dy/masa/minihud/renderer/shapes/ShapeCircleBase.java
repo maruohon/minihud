@@ -16,9 +16,9 @@ import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 import fi.dy.masa.malilib.config.value.BlockSnap;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.util.EntityUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 

@@ -28,8 +28,8 @@ import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
+import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.registry.Registry;
-import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Constants;
@@ -96,8 +96,8 @@ public class StructureStorage
 
         if (dirName != null)
         {
-            File dir = new File(new File(FileUtils.getConfigDirectory(), Reference.MOD_ID), "structures");
-            return new File(dir, dirName);
+            return ConfigUtils.getConfigDirectoryPath().resolve(Reference.MOD_ID)
+                    .resolve("structures").resolve(dirName).toFile();
         }
 
         return null;
