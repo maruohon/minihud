@@ -82,11 +82,9 @@ public class ConfigScreen
     private static ImmutableList<ConfigInfo> getGenericOptions()
     {
         ArrayList<ConfigInfo> genericOptions = new ArrayList<>(Configs.Generic.OPTIONS);
-        ArrayList<ConfigInfo> colorOptions = new ArrayList<>(Configs.Colors.OPTIONS);
         ArrayList<ConfigInfo> lightOptions = new ArrayList<>();
 
         ListUtils.extractEntriesToSecondList(genericOptions, lightOptions, (c) -> c.getName().startsWith("lightLevel"), true);
-        ListUtils.extractEntriesToSecondList(colorOptions,   lightOptions, (c) -> c.getName().startsWith("lightLevel"), false);
 
         genericOptions.add(new GenericButtonConfig("minihud.config.name.info_lines_hud_settings",
                                                    "minihud.button.config.open_info_hud_settings",

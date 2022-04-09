@@ -158,7 +158,7 @@ minihud.config.name.woolcounterenableall=Wool Counter Enable All
 minihud.config.name.woolcountertypes=Wool Counter Types
 
 minihud.config_group.name.light_level=Light Level Overlay Options
-minihud.config_group.comment.light_level=All Light Level Overlay related config options.\nNote: The colors are also in the Colors category.
+minihud.config_group.comment.light_level=All Light Level Overlay related config options
 
 minihud.hotkey.name.itemnbtkeypretty=Show Item NBT (pretty)
 minihud.hotkey.name.itemnbtkeystring=Show Item NBT (stringified)
