@@ -13,6 +13,7 @@ import fi.dy.masa.malilib.config.option.HotkeyedBooleanConfig;
 import fi.dy.masa.malilib.config.option.IntegerConfig;
 import fi.dy.masa.malilib.config.option.OptionListConfig;
 import fi.dy.masa.malilib.config.option.StringConfig;
+import fi.dy.masa.malilib.config.option.Vec2dConfig;
 import fi.dy.masa.malilib.config.value.ScreenLocation;
 import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.input.KeyBindSettings;
@@ -46,10 +47,8 @@ public class Configs
         public static final IntegerConfig ITEM_PREVIEW_Z                        = new IntegerConfig("itemPreviewZ", 400, 0, 4096);
         public static final BooleanConfig LIGHT_LEVEL_COLORED_NUMBERS           = new BooleanConfig("lightLevelColoredNumbers", true);
         public static final DoubleConfig  LIGHT_LEVEL_MARKER_SIZE               = new DoubleConfig( "lightLevelMarkerSize", 0.84, 0.0, 1.0);
-        public static final DoubleConfig  LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X     = new DoubleConfig( "lightLevelNumberOffsetBlockX", 0.09, 0.0, 1.0);
-        public static final DoubleConfig  LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y     = new DoubleConfig( "lightLevelNumberOffsetBlockY", 0.12, 0.0, 1.0);
-        public static final DoubleConfig  LIGHT_LEVEL_NUMBER_OFFSET_SKY_X       = new DoubleConfig( "lightLevelNumberOffsetSkyX", 0.42, 0.0, 1.0);
-        public static final DoubleConfig  LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y       = new DoubleConfig( "lightLevelNumberOffsetSkyY", 0.56, 0.0, 1.0);
+        public static final Vec2dConfig   LIGHT_LEVEL_NUMBER_OFFSET_BLOCK       = new Vec2dConfig(  "lightLevelNumberOffsetBlock", 0.24, 0.32, 0.0, 1.0);
+        public static final Vec2dConfig   LIGHT_LEVEL_NUMBER_OFFSET_SKY         = new Vec2dConfig(  "lightLevelNumberOffsetSky", 0.42, 0.56, 0.0, 1.0);
         public static final BooleanConfig LIGHT_LEVEL_NUMBER_ROTATION           = new BooleanConfig("lightLevelNumberRotation", true);
         public static final IntegerConfig LIGHT_LEVEL_RANGE                     = new IntegerConfig("lightLevelRange", 24, 1, 64);
         public static final IntegerConfig LIGHT_LEVEL_THRESHOLD                 = new IntegerConfig("lightLevelThreshold", 8, 0, 15);
@@ -103,10 +102,8 @@ public class Configs
                 LIGHT_LEVEL_MARKER_MODE,
                 LIGHT_LEVEL_MARKER_SIZE,
                 LIGHT_LEVEL_NUMBER_MODE,
-                LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X,
-                LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y,
-                LIGHT_LEVEL_NUMBER_OFFSET_SKY_X,
-                LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
+                LIGHT_LEVEL_NUMBER_OFFSET_BLOCK,
+                LIGHT_LEVEL_NUMBER_OFFSET_SKY,
                 LIGHT_LEVEL_NUMBER_ROTATION,
                 LIGHT_LEVEL_RANGE,
                 LIGHT_LEVEL_THRESHOLD,

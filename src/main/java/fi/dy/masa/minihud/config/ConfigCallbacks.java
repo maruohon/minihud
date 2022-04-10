@@ -44,7 +44,16 @@ public class ConfigCallbacks
         Configs.Colors.BEACON_RANGE_LVL2_OVERLAY_COLOR.addValueChangeListener(beaconUpdateCallback);
         Configs.Colors.BEACON_RANGE_LVL3_OVERLAY_COLOR.addValueChangeListener(beaconUpdateCallback);
         Configs.Colors.BEACON_RANGE_LVL4_OVERLAY_COLOR.addValueChangeListener(beaconUpdateCallback);
+        Configs.Generic.LIGHT_LEVEL_COLORED_NUMBERS.addValueChangeListener(lightLevelUpdateCallback);
+        Configs.Generic.LIGHT_LEVEL_MARKER_MODE.addValueChangeListener(lightLevelUpdateCallback);
+        Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.addValueChangeListener(lightLevelUpdateCallback);
+        Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.addValueChangeListener(lightLevelUpdateCallback);
+        Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK.addValueChangeListener(lightLevelUpdateCallback);
+        Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY.addValueChangeListener(lightLevelUpdateCallback);
+        Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.addValueChangeListener(lightLevelUpdateCallback);
         Configs.Generic.LIGHT_LEVEL_RANGE.addValueChangeListener(lightLevelUpdateCallback);
+        Configs.Generic.LIGHT_LEVEL_THRESHOLD.addValueChangeListener(lightLevelUpdateCallback);
+        Configs.Generic.LIGHT_LEVEL_Z_OFFSET.addValueChangeListener(lightLevelUpdateCallback);
         Configs.Generic.STRUCTURES_RENDER_THROUGH.setValueChangeCallback((newValue, oldValue) -> RenderContainer.STRUCTURE_BOUNDING_BOXES_OVERLAY.setRenderThrough(newValue));
         Configs.Generic.WOOL_COUNTER_TYPES.setValueLoadCallback(DataStorage.getInstance().getWoolCounters()::updateEnabledCounters);
         Configs.Generic.WOOL_COUNTER_TYPES.setValueChangeCallback((newValue, oldValue) -> {

@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.config.option.ColorConfig;
-import fi.dy.masa.malilib.config.option.DoubleConfig;
+import fi.dy.masa.malilib.config.option.Vec2dConfig;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.render.overlay.VboRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
@@ -106,8 +106,7 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
             if (numberMode == LightLevelNumberMode.BLOCK || numberMode == LightLevelNumberMode.BOTH)
             {
                 this.renderNumbers(cameraPos, LightLevelNumberMode.BLOCK,
-                                   Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_X,
-                                   Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK_Y,
+                                   Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK,
                                    Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_LIT,
                                    Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_DARK,
                                    useColoredNumbers, lightThreshold, numberFacing, bufferQuads);
@@ -116,8 +115,7 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
             if (numberMode == LightLevelNumberMode.SKY || numberMode == LightLevelNumberMode.BOTH)
             {
                 this.renderNumbers(cameraPos, LightLevelNumberMode.SKY,
-                                   Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_X,
-                                   Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY_Y,
+                                   Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY,
                                    Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_LIT,
                                    Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_DARK,
                                    useColoredNumbers, lightThreshold, numberFacing, bufferQuads);
@@ -134,12 +132,12 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
         }
     }
 
-    private void renderNumbers(Vec3d cameraPos, LightLevelNumberMode mode, DoubleConfig cfgOffX, DoubleConfig cfgOffZ,
+    private void renderNumbers(Vec3d cameraPos, LightLevelNumberMode mode, Vec2dConfig cfgOff,
                                ColorConfig cfgColorLit, ColorConfig cfgColorDark, boolean useColoredNumbers,
                                int lightThreshold, EnumFacing numberFacing, BufferBuilder buffer)
     {
-        double ox = cfgOffX.getDoubleValue();
-        double oz = cfgOffZ.getDoubleValue();
+        double ox = cfgOff.getValue().x;
+        double oz = cfgOff.getValue().y;
         double tmpX, tmpZ;
         Color4f colorLit, colorDark;
         double offsetY = Configs.Generic.LIGHT_LEVEL_Z_OFFSET.getDoubleValue();
