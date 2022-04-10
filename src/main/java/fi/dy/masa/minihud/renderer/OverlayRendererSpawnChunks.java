@@ -27,7 +27,7 @@ public class OverlayRendererSpawnChunks extends MiniHUDOverlayRenderer
     public boolean shouldRender(Minecraft mc)
     {
         return this.toggle.isRendererEnabled() &&
-                (this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ||
+                (this.toggle == RendererToggle.SPAWN_CHUNKS_PLAYER ||
                  (mc.world != null && mc.world.provider instanceof WorldProviderSurface &&
                   DataStorage.getInstance().isWorldSpawnKnown()));
     }
@@ -46,7 +46,7 @@ public class OverlayRendererSpawnChunks extends MiniHUDOverlayRenderer
         int lz = this.lastUpdatePos.getZ();
 
         // Player-following renderer
-        if (this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER)
+        if (this.toggle == RendererToggle.SPAWN_CHUNKS_PLAYER)
         {
             return ex != lx || ez != lz;
         }
@@ -58,17 +58,17 @@ public class OverlayRendererSpawnChunks extends MiniHUDOverlayRenderer
     public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         DataStorage data = DataStorage.getInstance();
-        BlockPos spawn = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER ? new BlockPos(entity) : data.getWorldSpawn();
+        BlockPos spawn = this.toggle == RendererToggle.SPAWN_CHUNKS_PLAYER ? new BlockPos(entity) : data.getWorldSpawn();
 
         BaseRenderObject renderQuads = this.renderObjects.get(0);
         BaseRenderObject renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        final Color4f colorEntity = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
+        final Color4f colorEntity = this.toggle == RendererToggle.SPAWN_CHUNKS_REAL ?
                                             Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getColor() :
                                             Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getColor();
-        final Color4f colorLazy = this.toggle == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL ?
+        final Color4f colorLazy = this.toggle == RendererToggle.SPAWN_CHUNKS_REAL ?
                                           Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getColor() :
                                           Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getColor();
 

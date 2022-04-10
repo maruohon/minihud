@@ -32,11 +32,11 @@ public class ConfigCallbacks
                 InfoLine.CHUNK_UNLOAD_ORDER.getBooleanConfig(), Configs.Generic.DROPPED_CHUNKS_HASH_SIZE)
                     .addAdjustListener(() -> MessageUtils.printCustomActionbarMessage("minihud.message.info.dropped_chunks_hash_size_set_to", Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue())));
 
-        RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getKeyBind().setCallback(AdjustableValueHotkeyCallback.create(
-                RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.getBooleanConfig(), Configs.Internal.CHUNK_UNLOAD_BUCKET_OVERLAY_Y));
+        RendererToggle.CHUNK_UNLOAD_BUCKET.getKeyBind().setCallback(AdjustableValueHotkeyCallback.create(
+                RendererToggle.CHUNK_UNLOAD_BUCKET.getBooleanConfig(), Configs.Internal.CHUNK_UNLOAD_BUCKET_OVERLAY_Y));
 
-        RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeyBind().setCallback(AdjustableValueHotkeyCallback.create(
-                RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getBooleanConfig(), Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y));
+        RendererToggle.SLIME_CHUNKS.getKeyBind().setCallback(AdjustableValueHotkeyCallback.create(
+                RendererToggle.SLIME_CHUNKS.getBooleanConfig(), Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y));
 
         EventListener beaconUpdateCallback = RenderContainer.BEACON_OVERLAY::setNeedsUpdate;
         EventListener lightLevelUpdateCallback = RenderContainer.LIGHT_LEVEL_OVERLAY::setNeedsUpdate;
@@ -67,21 +67,21 @@ public class ConfigCallbacks
         RendererToggle.DEBUG_SOLID_FACES.addValueChangeListener(     () -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_SOLID_FACES));
         RendererToggle.DEBUG_WATER.addValueChangeListener(           () -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_WATER));
 
-        RendererToggle.OVERLAY_BEACON_RANGE.addValueChangeListener(beaconUpdateCallback);
-        RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.addValueChangeListener(pubSubCallback);
-        RendererToggle.OVERLAY_LIGHT_LEVEL.addValueChangeListener(lightLevelUpdateCallback);
-        RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.addValueChangeListener(DataStorage.getInstance().getStructureStorage()::requestStructureDataUpdates);;
+        RendererToggle.BEACON_RANGE.addValueChangeListener(beaconUpdateCallback);
+        RendererToggle.CHUNK_UNLOAD_BUCKET.addValueChangeListener(pubSubCallback);
+        RendererToggle.LIGHT_LEVEL.addValueChangeListener(lightLevelUpdateCallback);
+        RendererToggle.STRUCTURE_BOUNDING_BOXES.addValueChangeListener(DataStorage.getInstance().getStructureStorage()::requestStructureDataUpdates);;
 
-        RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.addEnableListener(ConfigCallbacks::onChunkUnloadBucketOverlayEnabled);
-        RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.addEnableListener(RenderContainer.RANDOM_TICKS_FIXED_OVERLAY::onEnabled);
-        RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.addEnableListener(RenderContainer.SLIME_CHUNKS_OVERLAY::onEnabled);
-        RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.addEnableListener(RenderContainer.SPAWNABLE_CHUNKS_FIXED_OVERLAY::onEnabled);
-        RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_PLAYER.addEnableListener(RenderContainer.SPAWNABLE_CHUNKS_PLAYER_OVERLAY::onEnabled);
-        RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.addEnableListener(RenderContainer.SPAWN_CHUNKS_REAL_OVERLAY::onEnabled);
+        RendererToggle.CHUNK_UNLOAD_BUCKET.addEnableListener(ConfigCallbacks::onChunkUnloadBucketOverlayEnabled);
+        RendererToggle.RANDOM_TICKS_FIXED.addEnableListener(RenderContainer.RANDOM_TICKS_FIXED_OVERLAY::onEnabled);
+        RendererToggle.SLIME_CHUNKS.addEnableListener(RenderContainer.SLIME_CHUNKS_OVERLAY::onEnabled);
+        RendererToggle.SPAWNABLE_CHUNKS_FIXED.addEnableListener(RenderContainer.SPAWNABLE_CHUNKS_FIXED_OVERLAY::onEnabled);
+        RendererToggle.SPAWNABLE_CHUNKS_PLAYER.addEnableListener(RenderContainer.SPAWNABLE_CHUNKS_PLAYER_OVERLAY::onEnabled);
+        RendererToggle.SPAWN_CHUNKS_REAL.addEnableListener(RenderContainer.SPAWN_CHUNKS_REAL_OVERLAY::onEnabled);
 
-        RendererToggle.OVERLAY_RANDOM_TICKS_FIXED.setToggleMessageFactory(ConfigCallbacks::getRandomTicksMessage);
-        RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED.setToggleMessageFactory(ConfigCallbacks::getSpawnableChunksMessage);
-        RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_REAL.setToggleMessageFactory(ConfigCallbacks::getSpawnChunksMessage);
+        RendererToggle.RANDOM_TICKS_FIXED.setToggleMessageFactory(ConfigCallbacks::getRandomTicksMessage);
+        RendererToggle.SPAWNABLE_CHUNKS_FIXED.setToggleMessageFactory(ConfigCallbacks::getSpawnableChunksMessage);
+        RendererToggle.SPAWN_CHUNKS_REAL.setToggleMessageFactory(ConfigCallbacks::getSpawnChunksMessage);
     }
 
     private static void onChunkUnloadBucketOverlayEnabled()

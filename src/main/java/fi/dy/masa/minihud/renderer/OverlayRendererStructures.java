@@ -25,7 +25,7 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.isRendererEnabled() == false)
+        if (RendererToggle.STRUCTURE_BOUNDING_BOXES.isRendererEnabled() == false)
         {
             return false;
         }

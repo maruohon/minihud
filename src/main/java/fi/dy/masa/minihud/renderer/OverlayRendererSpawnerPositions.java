@@ -9,7 +9,7 @@ public class OverlayRendererSpawnerPositions extends BaseBlockPositionListOverla
 {
     public OverlayRendererSpawnerPositions()
     {
-        super(RendererToggle.OVERLAY_SPAWNER_POSITIONS::isRendererEnabled,
+        super(RendererToggle.SPAWNER_POSITIONS::isRendererEnabled,
               Configs.Colors.SPAWNER_POSITIONS_OVERLAY_COLOR::getColor,
               DataStorage.getInstance()::areSpawnerPositionsDirty,
               DataStorage.getInstance()::getSpawnerPositions);

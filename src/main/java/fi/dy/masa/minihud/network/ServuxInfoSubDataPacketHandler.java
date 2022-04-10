@@ -234,7 +234,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
         }
 
         if ((InfoLine.CHUNK_UNLOAD_ORDER.getBooleanValue() ||
-             RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.isRendererEnabled())
+             RendererToggle.CHUNK_UNLOAD_BUCKET.isRendererEnabled())
             && Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue())
         {
             newSubs.add("minecraft.status.chunk_loading.dropped_chunks.hash_size");

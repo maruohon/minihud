@@ -16,7 +16,7 @@ public abstract class ChunkGeneratorOverworldMixin
                         target = "Lnet/minecraft/world/gen/feature/WorldGenDungeons;generate(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/util/math/BlockPos;)Z"))
     private BlockPos onDungeonGenerationAttempt(BlockPos position)
     {
-        if (RendererToggle.OVERLAY_SPAWNER_POSITIONS.isRendererEnabled())
+        if (RendererToggle.SPAWNER_POSITIONS.isRendererEnabled())
         {
             DataStorage.getInstance().addDungeonSpawnerPosition(position);
         }

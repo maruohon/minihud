@@ -160,7 +160,7 @@ public class StructureStorage
     {
         if (GameUtils.getClient().world != null)
         {
-            boolean enabled = RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.isRendererEnabled();
+            boolean enabled = RendererToggle.STRUCTURE_BOUNDING_BOXES.isRendererEnabled();
 
             if (GameUtils.isSinglePlayer() == false)
             {

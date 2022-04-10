@@ -299,7 +299,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                     DataStorage.getInstance().getMobcapData().updateIntegratedServerMobCaps();
                 }
 
-                if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.isRendererEnabled())
+                if (RendererToggle.STRUCTURE_BOUNDING_BOXES.isRendererEnabled())
                 {
                     DataStorage.getInstance().getStructureStorage().updateStructureDataIfNeeded();
                 }

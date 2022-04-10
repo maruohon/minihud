@@ -28,12 +28,12 @@ public class ConfigScreen
 {
     public static final ModInfo MOD_INFO = Reference.MOD_INFO;
 
-    private static final BaseConfigTab GENERIC              = new BaseConfigTab(MOD_INFO, "generic",    160, getGenericOptions(),     ConfigScreen::create);
-    private static final BaseConfigTab COLORS               = new BaseConfigTab(MOD_INFO, "colors",     100, Configs.Colors.OPTIONS,  ConfigScreen::create);
-    private static final BaseConfigTab HOTKEYS              = new BaseConfigTab(MOD_INFO, "hotkeys",    200, Configs.Hotkeys.HOTKEYS, ConfigScreen::create);
-    private static final BaseConfigTab INFO_LINES           = new BaseConfigTab(MOD_INFO, "info_lines", 200, getInfoLinesOptions(),   ConfigScreen::create);
-    private static final BaseConfigTab OVERLAY_RENDERERS    = new BaseConfigTab(MOD_INFO, "renderers",  200, getRendererOptions(),    ConfigScreen::create);
-    private static final BaseConfigTab STRUCTURES           = new BaseConfigTab(MOD_INFO, "structures", 200, getStructureOptions(),   ConfigScreen::create);
+    private static final BaseConfigTab GENERIC              = new BaseConfigTab(MOD_INFO, "generic",    160, getGenericOptions(),       ConfigScreen::create);
+    private static final BaseConfigTab COLORS               = new BaseConfigTab(MOD_INFO, "colors",     100, Configs.Colors.OPTIONS,    ConfigScreen::create);
+    private static final BaseConfigTab HOTKEYS              = new BaseConfigTab(MOD_INFO, "hotkeys",    200, getHotkeys(),              ConfigScreen::create);
+    private static final BaseConfigTab INFO_LINES           = new BaseConfigTab(MOD_INFO, "info_lines", 200, getInfoLinesOptions(),     ConfigScreen::create);
+    private static final BaseConfigTab OVERLAY_RENDERERS    = new BaseConfigTab(MOD_INFO, "renderers",  200, getRendererOptions(),      ConfigScreen::create);
+    private static final BaseConfigTab STRUCTURES           = new BaseConfigTab(MOD_INFO, "structures", 200, getStructureOptions(),     ConfigScreen::create);
     public  static final BaseScreenTab SHAPES               = new BaseScreenTab(MOD_INFO, "shapes", ShapeManagerScreen::screenValidator, ShapeManagerScreen::openShapeManager);
 
     public static final ImmutableList<ConfigTab> CONFIG_TABS = ImmutableList.of(
@@ -96,6 +96,17 @@ public class ConfigScreen
         return ImmutableList.copyOf(genericOptions);
     }
 
+    private static ImmutableList<ConfigInfo> getHotkeys()
+    {
+        ArrayList<ConfigInfo> list = new ArrayList<>(Configs.Hotkeys.HOTKEYS);
+
+        ConfigUtils.sortConfigsByDisplayName(list);
+        list.add(0, Configs.Generic.INFO_LINES_RENDERING_TOGGLE);
+        list.add(1, Configs.Generic.OVERLAYS_RENDERING_TOGGLE);
+
+        return ImmutableList.copyOf(list);
+    }
+
     private static ImmutableList<ConfigInfo> getInfoLinesOptions()
     {
         ImmutableList.Builder<ConfigInfo> builder = ImmutableList.builder();
@@ -121,7 +132,7 @@ public class ConfigScreen
         ImmutableList.Builder<ConfigInfo> builder = ImmutableList.builder();
 
         builder.add(Configs.Generic.OVERLAYS_RENDERING_TOGGLE);
-        builder.add(RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE);
+        builder.add(RendererToggle.STRUCTURE_BOUNDING_BOXES);
         builder.addAll(StructureToggle.VALUES);
 
         return builder.build();

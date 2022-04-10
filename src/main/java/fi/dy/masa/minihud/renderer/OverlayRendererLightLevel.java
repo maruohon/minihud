@@ -39,7 +39,7 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return RendererToggle.OVERLAY_LIGHT_LEVEL.isRendererEnabled();
+        return RendererToggle.LIGHT_LEVEL.isRendererEnabled();
     }
 
     @Override

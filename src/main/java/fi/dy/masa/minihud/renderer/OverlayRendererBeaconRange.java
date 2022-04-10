@@ -40,7 +40,7 @@ public class OverlayRendererBeaconRange extends MiniHUDOverlayRenderer
     {
         super.setNeedsUpdate();
 
-        if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled() == false)
+        if (RendererToggle.BEACON_RANGE.isRendererEnabled() == false)
         {
             this.clear();
         }
@@ -50,7 +50,7 @@ public class OverlayRendererBeaconRange extends MiniHUDOverlayRenderer
     {
         synchronized (this.BEACON_POSITIONS)
         {
-            if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled() &&
+            if (RendererToggle.BEACON_RANGE.isRendererEnabled() &&
                 (state.getBlock() == Blocks.BEACON || this.BEACON_POSITIONS.contains(pos)))
             {
                 this.setNeedsUpdate();
@@ -62,7 +62,7 @@ public class OverlayRendererBeaconRange extends MiniHUDOverlayRenderer
     {
         synchronized (this.BEACON_POSITIONS)
         {
-            if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled() &&
+            if (RendererToggle.BEACON_RANGE.isRendererEnabled() &&
                         this.BEACON_CHUNKS.contains(chunkPos))
             {
                 this.setNeedsUpdate();
@@ -73,7 +73,7 @@ public class OverlayRendererBeaconRange extends MiniHUDOverlayRenderer
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled();
+        return RendererToggle.BEACON_RANGE.isRendererEnabled();
     }
 
     @Override

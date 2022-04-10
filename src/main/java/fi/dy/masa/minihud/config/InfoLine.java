@@ -47,7 +47,7 @@ public enum InfoLine implements ConfigInfo
     MOB_CAPS                ("infoMobCaps",                 false, 40),
     PARTICLE_COUNT          ("infoParticleCount",           false, 17),
     PING                    ("infoPing",                    false, 36),
-    PLAYER_FACING           ("infoPlayerFacing",            true, 8),
+    PLAYER_FACING           ("infoPlayerFacing",            true,   8),
     PLAYER_PITCH_ROTATION   ("infoPlayerPitchRotation",     false, 12),
     PLAYER_YAW_ROTATION     ("infoPlayerYawRotation",       false, 11),
     REGION_FILE             ("infoRegionFile",              false, 29),

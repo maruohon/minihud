@@ -35,7 +35,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
     {
         super.onEnabled();
 
-        if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED &&
+        if (this.toggle == RendererToggle.RANDOM_TICKS_FIXED &&
             this.shouldRender(GameUtils.getClient()))
         {
             Vec3d pos = EntityUtils.getCameraEntityPosition();
@@ -52,12 +52,12 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
-        if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED)
+        if (this.toggle == RendererToggle.RANDOM_TICKS_FIXED)
         {
             return this.newPos != null;
         }
         // Player-following renderer
-        else if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
+        else if (this.toggle == RendererToggle.RANDOM_TICKS_PLAYER)
         {
             return entity.posX != this.pos.x || entity.posZ != this.pos.z;
         }
@@ -68,7 +68,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
     @Override
     public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
-        if (this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER)
+        if (this.toggle == RendererToggle.RANDOM_TICKS_PLAYER)
         {
             this.pos = entity.getPositionVector();
         }
@@ -78,7 +78,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
             this.newPos = null;
         }
 
-        final Color4f color = this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_PLAYER ?
+        final Color4f color = this.toggle == RendererToggle.RANDOM_TICKS_PLAYER ?
                 Configs.Colors.RANDOM_TICKS_PLAYER_OVERLAY_COLOR.getColor() :
                 Configs.Colors.RANDOM_TICKS_FIXED_OVERLAY_COLOR.getColor();
 
@@ -179,7 +179,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
     @Override
     public String getSaveId()
     {
-        return this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED ? "random_tickable_chunks" : "";
+        return this.toggle == RendererToggle.RANDOM_TICKS_FIXED ? "random_tickable_chunks" : "";
     }
 
     @Nullable
@@ -198,7 +198,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
 
         Vec3d pos = JsonUtils.vec3dFromJson(obj, "pos");
 
-        if (pos != null && this.toggle == RendererToggle.OVERLAY_RANDOM_TICKS_FIXED)
+        if (pos != null && this.toggle == RendererToggle.RANDOM_TICKS_FIXED)
         {
             this.newPos = pos;
         }

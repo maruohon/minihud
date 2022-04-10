@@ -23,7 +23,7 @@ public abstract class WorldGenLiquidsMixin
     @Inject(method = "generate", at = @At("HEAD"))
     private void onGenerate(World worldIn, Random rand, BlockPos position, CallbackInfoReturnable<Boolean> cir)
     {
-        if (RendererToggle.OVERLAY_WATER_FALLS.isRendererEnabled() &&
+        if (RendererToggle.WATER_FALLS.isRendererEnabled() &&
             this.block == Blocks.FLOWING_WATER)
         {
             DataStorage.getInstance().addWaterFallPosition(position);

@@ -46,7 +46,7 @@ public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
-        if (this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED)
+        if (this.toggle == RendererToggle.SPAWNABLE_CHUNKS_FIXED)
         {
             return this.newPos != null;
         }
@@ -64,7 +64,7 @@ public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
     @Override
     public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
-        if (this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED)
+        if (this.toggle == RendererToggle.SPAWNABLE_CHUNKS_FIXED)
         {
             if (this.newPos != null)
             {
@@ -83,7 +83,7 @@ public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
 
         int centerX = this.posCenter.getX() >> 4;
         int centerZ = this.posCenter.getZ() >> 4;
-        final Color4f color = this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED ?
+        final Color4f color = this.toggle == RendererToggle.SPAWNABLE_CHUNKS_FIXED ?
                 Configs.Colors.SPAWNABLE_CHUNKS_FIXED.getColor() :
                 Configs.Colors.SPAWNABLE_CHUNKS_PLAYER.getColor();
 
@@ -110,7 +110,7 @@ public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
     @Override
     public String getSaveId()
     {
-        if (this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED)
+        if (this.toggle == RendererToggle.SPAWNABLE_CHUNKS_FIXED)
         {
             return "spawnable_chunks_fixed";
         }
@@ -139,7 +139,7 @@ public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
 
         BlockPos pos = JsonUtils.blockPosFromJson(obj, "pos");
 
-        if (pos != null && this.toggle == RendererToggle.OVERLAY_SPAWNABLE_CHUNKS_FIXED)
+        if (pos != null && this.toggle == RendererToggle.SPAWNABLE_CHUNKS_FIXED)
         {
             this.newPos = pos;
         }

@@ -20,7 +20,7 @@ public class OverlayRendererRegion extends MiniHUDOverlayRenderer
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return RendererToggle.OVERLAY_REGION_FILE.isRendererEnabled();
+        return RendererToggle.REGION_FILE.isRendererEnabled();
     }
 
     @Override

@@ -40,7 +40,7 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        return RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.isRendererEnabled() &&
+        return RendererToggle.SLIME_CHUNKS.isRendererEnabled() &&
                 DataStorage.getInstance().isWorldSeedKnown(WorldUtils.getDimensionId(mc.world)) &&
                 mc.world.provider.isSurfaceWorld();
     }

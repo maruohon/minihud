@@ -9,7 +9,7 @@ public class OverlayRendererWaterFalls extends BaseBlockPositionListOverlayRende
 {
     public OverlayRendererWaterFalls()
     {
-        super(RendererToggle.OVERLAY_WATER_FALLS::isRendererEnabled,
+        super(RendererToggle.WATER_FALLS::isRendererEnabled,
               Configs.Colors.WATER_FALL_POSITIONS_OVERLAY_COLOR::getColor,
               DataStorage.getInstance()::areWaterFallPositionsDirty,
               DataStorage.getInstance()::getWaterFallPositions);

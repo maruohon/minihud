@@ -23,7 +23,7 @@ public class NotificationUtils
     {
         DataStorage.getInstance().markChunkForHeightmapCheck(chunkPos.x, chunkPos.z);
 
-        if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled() &&
+        if (RendererToggle.BEACON_RANGE.isRendererEnabled() &&
             Configs.Generic.BEACON_RANGE_AUTO_UPDATE.getBooleanValue())
         {
             for (SPacketMultiBlockChange.BlockUpdateData d : data)
@@ -37,7 +37,7 @@ public class NotificationUtils
     {
         DataStorage.getInstance().markChunkForHeightmapCheck(chunkX, chunkZ);
 
-        if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled() &&
+        if (RendererToggle.BEACON_RANGE.isRendererEnabled() &&
             Configs.Generic.BEACON_RANGE_AUTO_UPDATE.getBooleanValue())
         {
             RenderContainer.BEACON_OVERLAY.checkNeedsUpdate(new ChunkPos(chunkX, chunkZ));

@@ -61,22 +61,22 @@ public class OverlayRenderer
         double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
         double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
 
-        if (RendererToggle.OVERLAY_CHUNK_UNLOAD_BUCKET.isRendererEnabled())
+        if (RendererToggle.CHUNK_UNLOAD_BUCKET.isRendererEnabled())
         {
             renderChunkUnloadBuckets(entity, dx, dy, dz, Configs.Internal.CHUNK_UNLOAD_BUCKET_OVERLAY_Y.getDoubleValue());
         }
 
-        if (RendererToggle.OVERLAY_BEACON_RANGE.isRendererEnabled())
+        if (RendererToggle.BEACON_RANGE.isRendererEnabled())
         {
             renderBeaconBoxForPlayerIfHoldingItem(mc.player, dx, dy, dz);
         }
 
-        if (RendererToggle.OVERLAY_SPAWNER_POSITIONS.isRendererEnabled())
+        if (RendererToggle.SPAWNER_POSITIONS.isRendererEnabled())
         {
             RenderContainer.SPAWNER_RENDERER.renderPositionText(dx, dy, dz);
         }
 
-        if (RendererToggle.OVERLAY_WATER_FALLS.isRendererEnabled())
+        if (RendererToggle.WATER_FALLS.isRendererEnabled())
         {
             RenderContainer.WATER_FALL_RENDERER.renderPositionText(dx, dy, dz);
         }
