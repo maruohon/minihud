@@ -17,7 +17,7 @@ import fi.dy.masa.minihud.Reference;
 
 public enum InfoLine implements ConfigInfo
 {
-    BIOME                   ("infoBiome",                   false, 19),
+    BIOME                   ("infoBiomeName",               false, 19),
     BIOME_REG_NAME          ("infoBiomeRegistryName",       false, 20),
     BLOCK_BREAK_SPEED       ("infoBlockBreakSpeed",         false,  6),
     BLOCK_ENTITIES          ("infoBlockEntities",           false, 32),
