@@ -72,7 +72,7 @@ public enum RendererToggle implements ConfigInfo
         this.toggleHotkey.setPrettyNameTranslationKey(nameKey);
         this.toggleHotkey.setCommentTranslationKey(commentKey);
 
-        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback<>(this.booleanConfig));
+        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.booleanConfig));
     }
 
     public boolean isRendererEnabled()
@@ -92,7 +92,7 @@ public enum RendererToggle implements ConfigInfo
 
     public void setToggleMessageFactory(@Nullable BooleanConfigMessageFactory messageFactory)
     {
-        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback<>(this.booleanConfig, messageFactory));
+        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.booleanConfig, messageFactory));
     }
 
     public BooleanConfig getBooleanConfig()

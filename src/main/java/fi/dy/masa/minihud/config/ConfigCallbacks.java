@@ -2,7 +2,7 @@ package fi.dy.masa.minihud.config;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.config.option.BaseGenericConfig;
+import fi.dy.masa.malilib.config.option.BooleanContainingConfig;
 import fi.dy.masa.malilib.input.callback.AdjustableValueHotkeyCallback;
 import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.malilib.overlay.message.MessageHelpers;
@@ -10,7 +10,6 @@ import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.render.overlay.OverlayRendererContainer;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.BooleanStorage;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.feature.Actions;
 import fi.dy.masa.minihud.network.CarpetPubsubPacketHandler;
@@ -99,8 +98,7 @@ public class ConfigCallbacks
         Configs.Internal.CHUNK_UNLOAD_BUCKET_OVERLAY_Y.setDoubleValue(pos.y - 2);
     }
 
-    private static<CFG extends BaseGenericConfig<?> & BooleanStorage>
-    String getSpawnChunksMessage(CFG config)
+    private static String getSpawnChunksMessage(BooleanContainingConfig<?> config)
     {
         if (config.getBooleanValue())
         {
@@ -114,8 +112,7 @@ public class ConfigCallbacks
         return MessageHelpers.getBooleanConfigToggleMessage(config, null);
     }
 
-    private static <CFG extends BaseGenericConfig<?> & BooleanStorage>
-    String getSpawnableChunksMessage(CFG config)
+    private static String getSpawnableChunksMessage(BooleanContainingConfig<?> config)
     {
         if (config.getBooleanValue())
         {
@@ -130,8 +127,7 @@ public class ConfigCallbacks
         return MessageHelpers.getBooleanConfigToggleMessage(config, null);
     }
 
-    private static <CFG extends BaseGenericConfig<?> & BooleanStorage>
-    String getRandomTicksMessage(CFG config)
+    private static String getRandomTicksMessage(BooleanContainingConfig<?> config)
     {
         if (config.getBooleanValue())
         {

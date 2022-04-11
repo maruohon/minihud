@@ -93,7 +93,7 @@ public enum InfoLine implements ConfigInfo
         this.toggleHotkey.setNameTranslationKey(nameKey);
         this.toggleHotkey.setPrettyNameTranslationKey(nameKey);
         this.toggleHotkey.setCommentTranslationKey(commentKey);
-        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback<>(this.toggleStatus));
+        this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.toggleStatus));
     }
 
     public void addValueChangeListener(EventListener listener)
