@@ -10,6 +10,7 @@ import net.minecraft.structure.StructurePiece;
 import net.minecraft.structure.StructureStart;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.minihud.MiniHUD;
 
 public class StructureData
 {
@@ -72,6 +73,12 @@ public class StructureData
             tag.contains("Children", Constants.NBT.TAG_LIST))
         {
             StructureType type = StructureType.byStructureId(tag.getString("id"));
+
+            if (type == null)
+            {
+                MiniHUD.logger.warn("StructureData.fromStructureStartTag(): Unknown structure type '{}'", tag.getString("id"));
+                return null;
+            }
 
             ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
             NbtList pieces = tag.getList("Children", Constants.NBT.TAG_COMPOUND);

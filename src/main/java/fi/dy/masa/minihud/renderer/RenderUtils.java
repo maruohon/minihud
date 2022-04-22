@@ -1,6 +1,7 @@
 package fi.dy.masa.minihud.renderer;
 
 import java.util.Collection;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.entity.Entity;
@@ -15,7 +16,6 @@ import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.minihud.renderer.shapes.SideQuad;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 import fi.dy.masa.minihud.util.shape.SphereUtils;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public class RenderUtils
 {
@@ -37,7 +37,7 @@ public class RenderUtils
 
         final int centerX = (int) Math.floor(entity.getX());
         final int centerZ = (int) Math.floor(entity.getZ());
-        final int maxDist = MinecraftClient.getInstance().options.viewDistance * 32; // double the view distance in blocks
+        final int maxDist = MinecraftClient.getInstance().options.getViewDistance().getValue() * 32; // double the view distance in blocks
         final int rangeMinX = centerX - maxDist;
         final int rangeMinZ = centerZ - maxDist;
         final int rangeMaxX = centerX + maxDist;

@@ -1,5 +1,7 @@
 package fi.dy.masa.minihud.renderer;
 
+import it.unimi.dsi.fastutil.longs.LongIterator;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
@@ -13,8 +15,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import fi.dy.masa.malilib.config.IConfigBoolean;
-import it.unimi.dsi.fastutil.longs.LongIterator;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public abstract class BaseBlockRangeOverlay<T extends BlockEntity> extends OverlayRendererBase
 {
@@ -122,7 +122,7 @@ public abstract class BaseBlockRangeOverlay<T extends BlockEntity> extends Overl
         ClientChunkManager chunkManager = world.getChunkManager();
         int centerCX = centerPos.getX() >> 4;
         int centerCZ = centerPos.getZ() >> 4;
-        int chunkRadius = mc.options.viewDistance;
+        int chunkRadius = mc.options.getViewDistance().getValue();
 
         for (int cz = centerCZ - chunkRadius; cz <= centerCZ + chunkRadius; ++cz)
         {
@@ -148,7 +148,7 @@ public abstract class BaseBlockRangeOverlay<T extends BlockEntity> extends Overl
     {
         LongIterator it = this.blockPositions.iterator();
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();
-        double max = (mc.options.viewDistance + 2) * 16;
+        double max = (mc.options.getViewDistance().getValue() + 2) * 16;
         max = max * max;
 
         while (it.hasNext())

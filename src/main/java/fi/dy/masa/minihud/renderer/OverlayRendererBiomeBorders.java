@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.IntFunction;
 import javax.annotation.Nullable;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormats;
@@ -28,10 +32,6 @@ import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.DataStorage;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 public class OverlayRendererBiomeBorders extends OverlayRendererBase
 {
@@ -148,8 +148,8 @@ public class OverlayRendererBiomeBorders extends OverlayRendererBase
     {
         //long pre = System.nanoTime();
         World world = mc.world;
-        int viewDistance = Math.min(Configs.Generic.BIOME_OVERLAY_RANGE.getIntegerValue(), mc.options.viewDistance);
-        int viewDistanceVertical = Math.min(Configs.Generic.BIOME_OVERLAY_RANGE_VERTICAL.getIntegerValue(), mc.options.viewDistance);
+        int viewDistance = Math.min(Configs.Generic.BIOME_OVERLAY_RANGE.getIntegerValue(), mc.options.getViewDistance().getValue());
+        int viewDistanceVertical = Math.min(Configs.Generic.BIOME_OVERLAY_RANGE_VERTICAL.getIntegerValue(), mc.options.getViewDistance().getValue());
         int chunkX = MathHelper.floor(cameraEntity.getX()) >> 4;
         int chunkY = MathHelper.floor(cameraEntity.getY()) >> 4;
         int chunkZ = MathHelper.floor(cameraEntity.getZ()) >> 4;

@@ -84,7 +84,7 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
 
             if (r == -1)
             {
-                r = mc.options.viewDistance;
+                r = mc.options.getViewDistance().getValue();
             }
 
             RenderObjectBase renderQuads = this.renderObjects.get(0);
