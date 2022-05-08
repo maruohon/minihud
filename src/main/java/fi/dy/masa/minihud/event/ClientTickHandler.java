@@ -1,12 +1,12 @@
 package fi.dy.masa.minihud.event;
 
-import net.minecraft.client.Minecraft;
+import fi.dy.masa.malilib.util.GameUtils;
 
 public class ClientTickHandler implements fi.dy.masa.malilib.event.ClientTickHandler
 {
     @Override
-    public void onClientTick(Minecraft mc)
+    public void onClientTick()
     {
-        RenderHandler.INSTANCE.onClientTick(mc);
+        RenderHandler.INSTANCE.onClientTick(GameUtils.getClient());
     }
 }
