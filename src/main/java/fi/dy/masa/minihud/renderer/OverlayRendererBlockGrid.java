@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
@@ -35,9 +36,9 @@ public class OverlayRendererBlockGrid extends MiniHUDOverlayRenderer
             return true;
         }
 
-        return Math.abs(entity.posX - this.lastUpdatePos.getX()) > 8 ||
-               Math.abs(entity.posY - this.lastUpdatePos.getY()) > 8 ||
-               Math.abs(entity.posZ - this.lastUpdatePos.getZ()) > 8;
+        return Math.abs(EntityUtils.getX(entity) - this.lastUpdatePos.getX()) > 8 ||
+               Math.abs(EntityUtils.getY(entity) - this.lastUpdatePos.getY()) > 8 ||
+               Math.abs(EntityUtils.getZ(entity) - this.lastUpdatePos.getZ()) > 8;
     }
 
     @Override

@@ -17,8 +17,11 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.malilib.util.nbt.PrettyNbtStringifier;
 import fi.dy.masa.malilib.util.nbt.SimpleNbtStringifier;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
@@ -145,8 +148,8 @@ public class MiscUtils
         {
             if (player.isSpectator() == false)
             {
-                int cx = MathHelper.floor(player.posX / 16.0D);
-                int cz = MathHelper.floor(player.posZ / 16.0D);
+                int cx = MathHelper.floor(EntityUtils.getX(player) / 16.0D);
+                int cz = MathHelper.floor(EntityUtils.getZ(player) / 16.0D);
                 int chunkRadius = 8;
 
                 for (int cxOff = -chunkRadius; cxOff <= chunkRadius; ++cxOff)
@@ -182,6 +185,7 @@ public class MiscUtils
     {
         boolean showPretty = Configs.Hotkeys.ITEM_NBT_KEY_PRETTY.isHeld();
         boolean showString = Configs.Hotkeys.ITEM_NBT_KEY_STRING.isHeld();
+        NBTTagCompound tag = ItemUtils.getTag(stack);
 
         // If the vanilla advanced tooltips are disabled, add them here, when showing a tooltip
         if (GameUtils.getClient().gameSettings.advancedItemTooltips == false && (showPretty || showString))
@@ -196,11 +200,9 @@ public class MiscUtils
 
             if (stack.hasTagCompound())
             {
-                lines.add(StringUtils.translate("minihud.tooltip.item.nbt", stack.getTagCompound().getKeySet().size()));
+                lines.add(StringUtils.translate("minihud.tooltip.item.nbt", NbtUtils.getKeys(tag).size()));
             }
         }
-
-        NBTTagCompound tag = stack.getTagCompound();
 
         if (tag != null)
         {

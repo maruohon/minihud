@@ -59,7 +59,8 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
         // Player-following renderer
         else if (this.toggle == RendererToggle.RANDOM_TICKS_PLAYER)
         {
-            return entity.posX != this.pos.x || entity.posZ != this.pos.z;
+            return EntityUtils.getX(entity) != this.pos.x ||
+                   EntityUtils.getZ(entity) != this.pos.z;
         }
 
         return false;

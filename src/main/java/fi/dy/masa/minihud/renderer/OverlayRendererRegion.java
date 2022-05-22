@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -26,8 +27,8 @@ public class OverlayRendererRegion extends MiniHUDOverlayRenderer
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
-        int ex = (int) Math.floor(entity.posX);
-        int ez = (int) Math.floor(entity.posZ);
+        int ex = (int) Math.floor(EntityUtils.getX(entity));
+        int ez = (int) Math.floor(EntityUtils.getZ(entity));
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -42,8 +43,8 @@ public class OverlayRendererRegion extends MiniHUDOverlayRenderer
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        int rx = MathHelper.floor(entity.posX) & ~0x1FF;
-        int rz = MathHelper.floor(entity.posZ) & ~0x1FF;
+        int rx = MathHelper.floor(EntityUtils.getX(entity)) & ~0x1FF;
+        int rz = MathHelper.floor(EntityUtils.getZ(entity)) & ~0x1FF;
         BlockPos pos1 = new BlockPos(rx,         0, rz      );
         BlockPos pos2 = new BlockPos(rx + 511, 256, rz + 511);
         Color4f color = Configs.Colors.REGION_OVERLAY_COLOR.getColor();

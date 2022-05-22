@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProvider;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
@@ -57,9 +58,9 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
         int hysteresis = 16;
 
         return DataStorage.getInstance().getStructureStorage().hasStructureDataChanged() ||
-               Math.abs(entity.posX - this.lastUpdatePos.getX()) > hysteresis ||
-               Math.abs(entity.posY - this.lastUpdatePos.getY()) > hysteresis ||
-               Math.abs(entity.posZ - this.lastUpdatePos.getZ()) > hysteresis;
+               Math.abs(EntityUtils.getX(entity) - this.lastUpdatePos.getX()) > hysteresis ||
+               Math.abs(EntityUtils.getY(entity) - this.lastUpdatePos.getY()) > hysteresis ||
+               Math.abs(EntityUtils.getZ(entity) - this.lastUpdatePos.getZ()) > hysteresis;
     }
 
     @Override

@@ -44,6 +44,7 @@ import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.render.inventory.InventoryRenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
@@ -374,7 +375,11 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         Minecraft mc = GameUtils.getClient();
         Entity entity = mc.getRenderViewEntity();
         World world = entity.getEntityWorld();
-        BlockPos pos = new BlockPos(entity.posX, entity.getEntityBoundingBox().minY, entity.posZ);
+        double x = EntityUtils.getX(entity);
+        double y = EntityUtils.getY(entity);
+        double z = EntityUtils.getZ(entity);
+        double bbY = entity.getEntityBoundingBox().minY;
+        BlockPos pos = new BlockPos(x, bbY, z);
         DataStorage data = DataStorage.getInstance();
 
         if (type == InfoLine.FPS)
@@ -512,7 +517,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                     try
                     {
                         str.append(String.format(Configs.Generic.COORDINATE_FORMAT_STRING.getValue(),
-                            entity.posX, entity.getEntityBoundingBox().minY, entity.posZ));
+                            x, bbY, z));
                     }
                     // Uh oh, someone done goofed their format string... :P
                     catch (Exception e)
@@ -523,7 +528,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 else
                 {
                     str.append(String.format("x: %.1f y: %.1f z: %.1f",
-                        entity.posX, entity.getEntityBoundingBox().minY, entity.posZ));
+                        x, bbY, z));
                 }
 
                 pre = " / ";
@@ -590,9 +595,9 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         else if (type == InfoLine.DISTANCE)
         {
             Vec3d ref = DataStorage.getInstance().getDistanceReferencePoint();
-            double dist = MathHelper.sqrt(ref.squareDistanceTo(entity.posX, entity.posY, entity.posZ));
+            double dist = MathHelper.sqrt(ref.squareDistanceTo(x, y, z));
             this.addLine(String.format("Distance: %.2f (x: %.2f y: %.2f z: %.2f) [to x: %.2f y: %.2f z: %.2f]",
-                    dist, entity.posX - ref.x, entity.posY - ref.y, entity.posZ - ref.z, ref.x, ref.y, ref.z));
+                    dist, x - ref.x, y - ref.y, z - ref.z, ref.x, ref.y, ref.z));
         }
         else if (type == InfoLine.PLAYER_FACING)
         {
@@ -655,9 +660,9 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             if (InfoLine.SPEED.getBooleanValue())
             {
-                double dx = entity.posX - entity.lastTickPosX;
-                double dy = entity.posY - entity.lastTickPosY;
-                double dz = entity.posZ - entity.lastTickPosZ;
+                double dx = x - entity.lastTickPosX;
+                double dy = y - entity.lastTickPosY;
+                double dz = z - entity.lastTickPosZ;
                 double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
                 str.append(pre).append(String.format("speed: %.3f m/s", dist * 20));
             }
@@ -670,9 +675,9 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
         else if (type == InfoLine.SPEED_AXIS)
         {
-            double dx = entity.posX - entity.lastTickPosX;
-            double dy = entity.posY - entity.lastTickPosY;
-            double dz = entity.posZ - entity.lastTickPosZ;
+            double dx = x - entity.lastTickPosX;
+            double dy = y - entity.lastTickPosY;
+            double dz = z - entity.lastTickPosZ;
             this.addLine(String.format("speed: x: %.3f y: %.3f z: %.3f m/s", dx * 20, dy * 20, dz * 20));
         }
         else if (type == InfoLine.CARPET_WOOL_COUNTERS)

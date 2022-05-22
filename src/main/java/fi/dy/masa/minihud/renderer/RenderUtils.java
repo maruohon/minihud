@@ -27,8 +27,8 @@ public class RenderUtils
         final int boxMaxX = Math.max(posStart.getX(), posEnd.getX());
         final int boxMaxZ = Math.max(posStart.getZ(), posEnd.getZ());
 
-        final int centerX = (int) Math.floor(entity.posX);
-        final int centerZ = (int) Math.floor(entity.posZ);
+        final int centerX = (int) Math.floor(EntityUtils.getX(entity));
+        final int centerZ = (int) Math.floor(EntityUtils.getZ(entity));
         final int maxDist = GameUtils.getRenderDistanceChunks() * 16 * 2; // double the view distance in blocks
         final int rangeMinX = centerX - maxDist;
         final int rangeMinZ = centerZ - maxDist;

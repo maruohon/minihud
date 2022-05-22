@@ -62,8 +62,8 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
             return true;
         }
 
-        int ex = (int) Math.floor(entity.posX);
-        int ez = (int) Math.floor(entity.posZ);
+        int ex = (int) Math.floor(EntityUtils.getX(entity));
+        int ez = (int) Math.floor(EntityUtils.getZ(entity));
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -80,8 +80,8 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
 
         if (this.wasSeedKnown)
         {
-            final int centerX = MathHelper.floor(entity.posX) >> 4;
-            final int centerZ = MathHelper.floor(entity.posZ) >> 4;
+            final int centerX = MathHelper.floor(EntityUtils.getX(entity)) >> 4;
+            final int centerZ = MathHelper.floor(EntityUtils.getZ(entity)) >> 4;
             final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
             final Color4f colorSides = colorLines.withAlpha(colorLines.a / 6);
             PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();

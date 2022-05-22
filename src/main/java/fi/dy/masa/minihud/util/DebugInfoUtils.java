@@ -18,6 +18,7 @@ import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
@@ -217,7 +218,7 @@ public class DebugInfoUtils
         {
             EntityPlayer player = world.playerEntities.get(i);
 
-            double distSq = player.getDistanceSq(entity.posX, entity.posY, entity.posZ);
+            double distSq = player.getDistanceSq(EntityUtils.getX(entity), EntityUtils.getY(entity), EntityUtils.getZ(entity));
 
             if (range < 0.0D || distSq < range * range)
             {

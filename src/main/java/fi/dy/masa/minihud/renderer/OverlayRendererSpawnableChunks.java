@@ -52,8 +52,8 @@ public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
         }
         else
         {
-            int ex = ((int) Math.floor(entity.posX)) >> 4;
-            int ez = ((int) Math.floor(entity.posZ)) >> 4;
+            int ex = ((int) Math.floor(EntityUtils.getX(entity))) >> 4;
+            int ez = ((int) Math.floor(EntityUtils.getZ(entity))) >> 4;
             int lx = this.lastUpdatePos.getX();
             int lz = this.lastUpdatePos.getZ();
 

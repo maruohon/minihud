@@ -319,7 +319,7 @@ public class StructureStorage
 
     private void readStructureDataServuxV1(NBTTagCompound nbt)
     {
-        NBTTagList tagList = nbt.getTagList("Structures", Constants.NBT.TAG_COMPOUND);
+        NBTTagList tagList = NbtUtils.getListOfCompounds(nbt, "Structures");
 
         synchronized (this.structureMap)
         {
@@ -344,8 +344,8 @@ public class StructureStorage
 
     private void readStructureDataCarpetAll(NBTTagCompound nbt)
     {
-        NBTTagList tagList = nbt.getTagList("Boxes", Constants.NBT.TAG_LIST);
-        DataStorage.getInstance().setWorldSeed(nbt.getLong("Seed"));
+        NBTTagList tagList = NbtUtils.getList(nbt, "Boxes", Constants.NBT.TAG_LIST);
+        DataStorage.getInstance().setWorldSeed(NbtUtils.getLong(nbt, "Seed"));
 
         synchronized (this.structureMap)
         {
@@ -369,7 +369,7 @@ public class StructureStorage
 
     private void readStructureDataCarpetSplitHeader(NBTTagCompound nbt, int boxCount)
     {
-        DataStorage.getInstance().setWorldSeed(nbt.getLong("Seed"));
+        DataStorage.getInstance().setWorldSeed(NbtUtils.getLong(nbt, "Seed"));
 
         synchronized (this.structureMap)
         {

@@ -87,12 +87,12 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
     {
         MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#receiveMetadata(), tag: {}", tag);
 
-        if (tag.getInteger("version") == 1 &&
-            tag.hasKey("channel_ids", Constants.NBT.TAG_LIST))
+        if (NbtUtils.getInt(tag, "version") == 1 &&
+            NbtUtils.containsList(tag, "channel_ids"))
         {
-            NBTTagList listTag = tag.getTagList("channel_ids", Constants.NBT.TAG_STRING);
+            NBTTagList listTag = NbtUtils.getList(tag, "channel_ids", Constants.NBT.TAG_STRING);
             List<String> mapping = new ArrayList<>();
-            final int size = listTag.tagCount();
+            final int size = NbtUtils.getListSize(listTag);
 
             this.idMappedDataReaders.clear();
 
@@ -187,7 +187,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
     protected NBTTagCompound channelToTag(String channel)
     {
         NBTTagCompound tag = new NBTTagCompound();
-        tag.setString("channel", channel);
+        NbtUtils.putString(tag, "channel", channel);
         return tag;
     }
 
@@ -198,8 +198,8 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
         if (handler != null)
         {
             NBTTagCompound rootTag = new NBTTagCompound();
-            rootTag.setString("action", action);
-            rootTag.setTag("channels", NbtUtils.asListTag(channels, this::channelToTag));
+            NbtUtils.putString(rootTag, "action", action);
+            NbtUtils.putTag(rootTag, "channels", NbtUtils.asListTag(channels, this::channelToTag));
 
             PacketUtils.sendTag(ServuxInfoSubRegistrationPacketHandler.REG_CHANNEL, rootTag, handler);
             MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#updateSubscriptions(), tag: {}", rootTag);

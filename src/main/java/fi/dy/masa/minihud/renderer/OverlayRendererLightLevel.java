@@ -22,6 +22,7 @@ import fi.dy.masa.malilib.config.option.ColorConfig;
 import fi.dy.masa.malilib.config.option.Vec2dConfig;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.render.overlay.VboRenderObject;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -46,9 +47,9 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
         return this.needsUpdate || this.lastUpdatePos == null ||
-               Math.abs(entity.posX - this.lastUpdatePos.getX()) > 4 ||
-               Math.abs(entity.posY - this.lastUpdatePos.getY()) > 4 ||
-               Math.abs(entity.posZ - this.lastUpdatePos.getZ()) > 4 ||
+               Math.abs(EntityUtils.getX(entity) - this.lastUpdatePos.getX()) > 4 ||
+               Math.abs(EntityUtils.getY(entity) - this.lastUpdatePos.getY()) > 4 ||
+               Math.abs(EntityUtils.getZ(entity) - this.lastUpdatePos.getZ()) > 4 ||
                (Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() &&
                    this.lastDirection != entity.getHorizontalFacing());
     }

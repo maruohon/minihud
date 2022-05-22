@@ -42,12 +42,19 @@ public class OverlayRenderer
             return;
         }
 
+        double x = EntityUtils.getX(entity);
+        double y = EntityUtils.getY(entity);
+        double z = EntityUtils.getZ(entity);
+
         if (canRender == false)
         {
             // Don't render before the player has been placed in the actual proper position,
             // otherwise some of the renderers mess up.
             // The magic 8.5, 65, 8.5 comes from the WorldClient constructor
-            if (System.currentTimeMillis() - loginTime >= 5000 || entity.posX != 8.5 || entity.posY != 65 || entity.posZ != 8.5)
+            if (System.currentTimeMillis() - loginTime >= 5000 ||
+                x != 8.5 ||
+                y != 65 ||
+                z != 8.5)
             {
                 canRender = true;
             }
@@ -57,9 +64,9 @@ public class OverlayRenderer
             }
         }
 
-        double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
-        double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
-        double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
+        double dx = entity.lastTickPosX + (x - entity.lastTickPosX) * partialTicks;
+        double dy = entity.lastTickPosY + (y - entity.lastTickPosY) * partialTicks;
+        double dz = entity.lastTickPosZ + (z - entity.lastTickPosZ) * partialTicks;
 
         if (RendererToggle.CHUNK_UNLOAD_BUCKET.isRendererEnabled())
         {
@@ -84,8 +91,8 @@ public class OverlayRenderer
 
     private static void renderChunkUnloadBuckets(Entity entity, double dx, double dy, double dz, double chunkOverlayY)
     {
-        final int centerX = MathHelper.floor(entity.posX) >> 4;
-        final int centerZ = MathHelper.floor(entity.posZ) >> 4;
+        final int centerX = MathHelper.floor(EntityUtils.getX(entity)) >> 4;
+        final int centerZ = MathHelper.floor(EntityUtils.getZ(entity)) >> 4;
         final float y = (float) chunkOverlayY;
         final float scale = Configs.Generic.CHUNK_UNLOAD_BUCKET_FONT_SCALE.getFloatValue();
         int r = Configs.Generic.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue();
@@ -128,9 +135,9 @@ public class OverlayRenderer
 
     private static void renderBeaconBoxForPlayer(EntityPlayer player, double dx, double dy, double dz)
     {
-        double x = Math.floor(player.posX) - dx;
-        double y = Math.floor(player.posY) - dy;
-        double z = Math.floor(player.posZ) - dz;
+        double x = Math.floor(EntityUtils.getX(player)) - dx;
+        double y = Math.floor(EntityUtils.getY(player)) - dy;
+        double z = Math.floor(EntityUtils.getZ(player)) - dz;
         // Use the slot number as the level if sneaking
         int level = player.isSneaking() ? Math.min(4, player.inventory.currentItem + 1) : 4;
         double range = level * 10 + 10;
