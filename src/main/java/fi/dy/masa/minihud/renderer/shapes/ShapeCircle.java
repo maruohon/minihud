@@ -14,6 +14,7 @@ import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
@@ -30,7 +31,7 @@ public class ShapeCircle extends ShapeCircleBase
     public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         this.renderCircleShape(cameraPos);
-        this.onPostUpdate(entity.getPositionVector());
+        this.onPostUpdate(EntityWrap.getEntityPos(entity));
     }
 
     public int getHeight()

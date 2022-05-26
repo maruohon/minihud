@@ -252,7 +252,7 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     public static ActionResult openShapeEditor()
     {
         ShapeBase shape = ShapeManager.INSTANCE.getSelectedShape();
-        BaseScreen screen = shape != null ? new GuiShapeEditor(shape) : ShapeManagerScreen.openShapeManager(null);
+        BaseScreen screen = shape != null ? new GuiShapeEditor(shape) : ShapeManagerScreen.openShapeManagerScreen();
         BaseScreen.openScreen(screen);
         return ActionResult.SUCCESS;
     }

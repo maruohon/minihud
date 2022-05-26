@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.config.Configs;
 
 public class ShapeSphereBlocky extends ShapeCircleBase
@@ -27,7 +28,7 @@ public class ShapeSphereBlocky extends ShapeCircleBase
     public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         this.renderSphereShape(cameraPos);
-        this.onPostUpdate(entity.getPositionVector());
+        this.onPostUpdate(EntityWrap.getEntityPos(entity));
     }
 
     protected void renderSphereShape(Vec3d cameraPos)

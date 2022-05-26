@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.PacketBuffer;
@@ -34,6 +34,8 @@ import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.wrap.NbtWrap;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.Reference;
@@ -133,9 +135,9 @@ public class StructureStorage
     {
         if (this.mc.world != null && this.mc.player != null)
         {
-            final BlockPos playerPos = new BlockPos(this.mc.player);
+            final BlockPos playerPos = EntityWrap.getEntityBlockPos(this.mc.player);
 
-            if (this.mc.isSingleplayer())
+            if (GameUtils.isSinglePlayer())
             {
                 if (this.structuresNeedUpdating(playerPos, 32))
                 {
@@ -158,7 +160,7 @@ public class StructureStorage
 
     public void requestStructureDataUpdates()
     {
-        if (GameUtils.getClient().world != null)
+        if (GameUtils.getClientWorld() != null)
         {
             boolean enabled = RendererToggle.STRUCTURE_BOUNDING_BOXES.isRendererEnabled();
 
@@ -319,7 +321,7 @@ public class StructureStorage
 
     private void readStructureDataServuxV1(NBTTagCompound nbt)
     {
-        NBTTagList tagList = NbtUtils.getListOfCompounds(nbt, "Structures");
+        NBTTagList tagList = NbtWrap.getListOfCompounds(nbt, "Structures");
 
         synchronized (this.structureMap)
         {
@@ -331,11 +333,11 @@ public class StructureStorage
             this.structuresDirty = true;
             this.structuresNeedUpdating = false;
 
-            EntityPlayer player = GameUtils.getClientPlayer();
+            Entity player = GameUtils.getClientPlayer();
 
             if (player != null)
             {
-                this.lastStructureUpdatePos = new BlockPos(player);
+                this.lastStructureUpdatePos = EntityWrap.getEntityBlockPos(player);
             }
 
             MiniHUD.logInfo("Structure data updated from Servux server, structures: {}", this.structureMap.size());
@@ -344,8 +346,8 @@ public class StructureStorage
 
     private void readStructureDataCarpetAll(NBTTagCompound nbt)
     {
-        NBTTagList tagList = NbtUtils.getList(nbt, "Boxes", Constants.NBT.TAG_LIST);
-        DataStorage.getInstance().setWorldSeed(NbtUtils.getLong(nbt, "Seed"));
+        NBTTagList tagList = NbtWrap.getList(nbt, "Boxes", Constants.NBT.TAG_LIST);
+        DataStorage.getInstance().setWorldSeed(NbtWrap.getLong(nbt, "Seed"));
 
         synchronized (this.structureMap)
         {
@@ -355,11 +357,11 @@ public class StructureStorage
             this.structuresDirty = true;
             this.structuresNeedUpdating = false;
 
-            EntityPlayer player = GameUtils.getClientPlayer();
+            Entity player = GameUtils.getClientPlayer();
 
             if (player != null)
             {
-                this.lastStructureUpdatePos = new BlockPos(player);
+                this.lastStructureUpdatePos = EntityWrap.getEntityBlockPos(player);
             }
 
             MiniHUD.logInfo("Structure data updated from Carpet server (all), structures: {}",
@@ -369,7 +371,7 @@ public class StructureStorage
 
     private void readStructureDataCarpetSplitHeader(NBTTagCompound nbt, int boxCount)
     {
-        DataStorage.getInstance().setWorldSeed(NbtUtils.getLong(nbt, "Seed"));
+        DataStorage.getInstance().setWorldSeed(NbtWrap.getLong(nbt, "Seed"));
 
         synchronized (this.structureMap)
         {
@@ -394,11 +396,11 @@ public class StructureStorage
             this.structuresDirty = true;
             this.structuresNeedUpdating = false;
 
-            EntityPlayer player = GameUtils.getClientPlayer();
+            Entity player = GameUtils.getClientPlayer();
 
             if (player != null)
             {
-                this.lastStructureUpdatePos = new BlockPos(player);
+                this.lastStructureUpdatePos = EntityWrap.getEntityBlockPos(player);
             }
 
             MiniHUD.logInfo("Structure data received from Carpet server (split boxes), received {} boxes", boxCount);

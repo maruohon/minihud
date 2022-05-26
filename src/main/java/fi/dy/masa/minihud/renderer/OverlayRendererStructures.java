@@ -11,10 +11,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProvider;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.StructureData;
@@ -58,9 +58,9 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
         int hysteresis = 16;
 
         return DataStorage.getInstance().getStructureStorage().hasStructureDataChanged() ||
-               Math.abs(EntityUtils.getX(entity) - this.lastUpdatePos.getX()) > hysteresis ||
-               Math.abs(EntityUtils.getY(entity) - this.lastUpdatePos.getY()) > hysteresis ||
-               Math.abs(EntityUtils.getZ(entity) - this.lastUpdatePos.getZ()) > hysteresis;
+               Math.abs(EntityWrap.getX(entity) - this.lastUpdatePos.getX()) > hysteresis ||
+               Math.abs(EntityWrap.getY(entity) - this.lastUpdatePos.getY()) > hysteresis ||
+               Math.abs(EntityWrap.getZ(entity) - this.lastUpdatePos.getZ()) > hysteresis;
     }
 
     @Override

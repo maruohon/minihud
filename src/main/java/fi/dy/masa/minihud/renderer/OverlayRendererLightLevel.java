@@ -22,8 +22,8 @@ import fi.dy.masa.malilib.config.option.ColorConfig;
 import fi.dy.masa.malilib.config.option.Vec2dConfig;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.render.overlay.VboRenderObject;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -47,9 +47,9 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
         return this.needsUpdate || this.lastUpdatePos == null ||
-               Math.abs(EntityUtils.getX(entity) - this.lastUpdatePos.getX()) > 4 ||
-               Math.abs(EntityUtils.getY(entity) - this.lastUpdatePos.getY()) > 4 ||
-               Math.abs(EntityUtils.getZ(entity) - this.lastUpdatePos.getZ()) > 4 ||
+               Math.abs(EntityWrap.getX(entity) - this.lastUpdatePos.getX()) > 4 ||
+               Math.abs(EntityWrap.getY(entity) - this.lastUpdatePos.getY()) > 4 ||
+               Math.abs(EntityWrap.getZ(entity) - this.lastUpdatePos.getZ()) > 4 ||
                (Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() &&
                    this.lastDirection != entity.getHorizontalFacing());
     }
@@ -57,7 +57,7 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
     @Override
     public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
-        BlockPos pos = new BlockPos(entity);
+        BlockPos pos = EntityWrap.getEntityBlockPos(entity);
         BaseRenderObject renderQuads = this.renderObjects.get(0);
         BaseRenderObject renderLines = this.renderObjects.get(1);
         BUFFER_1.begin(renderQuads.getGlMode(), renderQuads.getVertexFormat());

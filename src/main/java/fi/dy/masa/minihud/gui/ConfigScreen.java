@@ -1,9 +1,7 @@
 package fi.dy.masa.minihud.gui;
 
 import java.util.ArrayList;
-import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.gui.GuiScreen;
 import fi.dy.masa.malilib.config.group.ExpandableConfigGroup;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.option.GenericButtonConfig;
@@ -34,7 +32,7 @@ public class ConfigScreen
     private static final BaseConfigTab INFO_LINES           = new BaseConfigTab(MOD_INFO, "info_lines", 200, getInfoLinesOptions(),     ConfigScreen::create);
     private static final BaseConfigTab OVERLAY_RENDERERS    = new BaseConfigTab(MOD_INFO, "renderers",  200, getRendererOptions(),      ConfigScreen::create);
     private static final BaseConfigTab STRUCTURES           = new BaseConfigTab(MOD_INFO, "structures", 200, getStructureOptions(),     ConfigScreen::create);
-    public  static final BaseScreenTab SHAPES               = new BaseScreenTab(MOD_INFO, "shapes", ShapeManagerScreen::screenValidator, ShapeManagerScreen::openShapeManager);
+    public  static final BaseScreenTab SHAPES               = new BaseScreenTab(MOD_INFO, "shapes", ShapeManagerScreen::screenValidator, ShapeManagerScreen::openShapeManagerScreen);
 
     public static final ImmutableList<ConfigTab> CONFIG_TABS = ImmutableList.of(
             GENERIC,
@@ -64,14 +62,7 @@ public class ConfigScreen
     {
         // The parent screen should not be set here, to prevent infinite recursion via
         // the call to the parent's setWorldAndResolution -> initScreen -> switch tab -> etc.
-        return new BaseConfigScreen(MOD_INFO, null, ALL_TABS, INFO_LINES, "minihud.title.screen.configs", Reference.MOD_VERSION);
-    }
-
-    public static BaseConfigScreen create(@Nullable GuiScreen currentScreen)
-    {
-        // The parent screen should not be set here, to prevent infinite recursion via
-        // the call to the parent's setWorldAndResolution -> initScreen -> switch tab -> etc.
-        return new BaseConfigScreen(MOD_INFO, null, ALL_TABS, INFO_LINES, "minihud.title.screen.configs", Reference.MOD_VERSION);
+        return new BaseConfigScreen(MOD_INFO, ALL_TABS, INFO_LINES, "minihud.title.screen.configs", Reference.MOD_VERSION);
     }
 
     public static ImmutableList<ConfigTab> getConfigTabs()

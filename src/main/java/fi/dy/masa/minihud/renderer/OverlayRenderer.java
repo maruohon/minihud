@@ -12,12 +12,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.TextRenderUtils;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -35,16 +34,16 @@ public class OverlayRenderer
 
     public static void renderOverlays(Minecraft mc, float partialTicks)
     {
-        Entity entity = EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
 
         if (entity == null)
         {
             return;
         }
 
-        double x = EntityUtils.getX(entity);
-        double y = EntityUtils.getY(entity);
-        double z = EntityUtils.getZ(entity);
+        double x = EntityWrap.getX(entity);
+        double y = EntityWrap.getY(entity);
+        double z = EntityWrap.getZ(entity);
 
         if (canRender == false)
         {
@@ -64,9 +63,9 @@ public class OverlayRenderer
             }
         }
 
-        double dx = entity.lastTickPosX + (x - entity.lastTickPosX) * partialTicks;
-        double dy = entity.lastTickPosY + (y - entity.lastTickPosY) * partialTicks;
-        double dz = entity.lastTickPosZ + (z - entity.lastTickPosZ) * partialTicks;
+        double dx = EntityWrap.lerpX(entity, partialTicks);
+        double dy = EntityWrap.lerpY(entity, partialTicks);
+        double dz = EntityWrap.lerpZ(entity, partialTicks);
 
         if (RendererToggle.CHUNK_UNLOAD_BUCKET.isRendererEnabled())
         {
@@ -91,8 +90,8 @@ public class OverlayRenderer
 
     private static void renderChunkUnloadBuckets(Entity entity, double dx, double dy, double dz, double chunkOverlayY)
     {
-        final int centerX = MathHelper.floor(EntityUtils.getX(entity)) >> 4;
-        final int centerZ = MathHelper.floor(EntityUtils.getZ(entity)) >> 4;
+        final int centerX = EntityWrap.getChunkX(entity);
+        final int centerZ = EntityWrap.getChunkZ(entity);
         final float y = (float) chunkOverlayY;
         final float scale = Configs.Generic.CHUNK_UNLOAD_BUCKET_FONT_SCALE.getFloatValue();
         int r = Configs.Generic.CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS.getIntegerValue();
@@ -135,9 +134,9 @@ public class OverlayRenderer
 
     private static void renderBeaconBoxForPlayer(EntityPlayer player, double dx, double dy, double dz)
     {
-        double x = Math.floor(EntityUtils.getX(player)) - dx;
-        double y = Math.floor(EntityUtils.getY(player)) - dy;
-        double z = Math.floor(EntityUtils.getZ(player)) - dz;
+        double x = Math.floor(EntityWrap.getX(player)) - dx;
+        double y = Math.floor(EntityWrap.getY(player)) - dy;
+        double z = Math.floor(EntityWrap.getZ(player)) - dz;
         // Use the slot number as the level if sneaking
         int level = player.isSneaking() ? Math.min(4, player.inventory.currentItem + 1) : 4;
         double range = level * 10 + 10;

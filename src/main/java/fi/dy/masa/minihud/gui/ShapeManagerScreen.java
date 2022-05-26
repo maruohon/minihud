@@ -120,7 +120,7 @@ public class ShapeManagerScreen extends BaseListScreen<DataListWidget<ShapeBase>
         return currentScreen instanceof ShapeManagerScreen || currentScreen instanceof GuiShapeEditor;
     }
 
-    public static ShapeManagerScreen openShapeManager(@Nullable GuiScreen currentScreen)
+    public static ShapeManagerScreen openShapeManagerScreen()
     {
         ShapeManagerScreen gui = new ShapeManagerScreen();
         gui.setCurrentTab(ConfigScreen.SHAPES);
@@ -129,7 +129,7 @@ public class ShapeManagerScreen extends BaseListScreen<DataListWidget<ShapeBase>
 
     public static ActionResult openShapeManager()
     {
-        BaseScreen.openScreen(openShapeManager(null));
+        BaseScreen.openScreen(openShapeManagerScreen());
         return ActionResult.SUCCESS;
     }
 }

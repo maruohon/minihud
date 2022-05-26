@@ -4,10 +4,10 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.MathUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 
 public class RenderUtils
 {
@@ -21,14 +21,14 @@ public class RenderUtils
             Color4f color,
             BufferBuilder bufferQuads, BufferBuilder bufferLines)
     {
-        Entity entity = EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         final int boxMinX = Math.min(posStart.getX(), posEnd.getX());
         final int boxMinZ = Math.min(posStart.getZ(), posEnd.getZ());
         final int boxMaxX = Math.max(posStart.getX(), posEnd.getX());
         final int boxMaxZ = Math.max(posStart.getZ(), posEnd.getZ());
 
-        final int centerX = (int) Math.floor(EntityUtils.getX(entity));
-        final int centerZ = (int) Math.floor(EntityUtils.getZ(entity));
+        final int centerX = (int) Math.floor(EntityWrap.getX(entity));
+        final int centerZ = (int) Math.floor(EntityWrap.getZ(entity));
         final int maxDist = GameUtils.getRenderDistanceChunks() * 16 * 2; // double the view distance in blocks
         final int rangeMinX = centerX - maxDist;
         final int rangeMinZ = centerZ - maxDist;

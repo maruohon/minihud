@@ -11,8 +11,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 
@@ -42,8 +42,8 @@ public class OverlayRendererSpawnableColumnHeights extends MiniHUDOverlayRendere
     @Override
     public boolean needsUpdate(Entity entity, Minecraft mc)
     {
-        int ex = (int) Math.floor(EntityUtils.getX(entity));
-        int ez = (int) Math.floor(EntityUtils.getZ(entity));
+        int ex = (int) Math.floor(EntityWrap.getX(entity));
+        int ez = (int) Math.floor(EntityWrap.getZ(entity));
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -86,8 +86,8 @@ public class OverlayRendererSpawnableColumnHeights extends MiniHUDOverlayRendere
         final Color4f color = Configs.Colors.SPAWNABLE_COLUMNS_OVERLAY_COLOR.getColor();
         final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
 
-        final int xStart = (int) EntityUtils.getX(entity) - radius;
-        final int zStart = (int) EntityUtils.getZ(entity) - radius;
+        final int xStart = (int) EntityWrap.getX(entity) - radius;
+        final int zStart = (int) EntityWrap.getZ(entity) - radius;
         final int xEnd = xStart + radius * 2;
         final int zEnd = zStart + radius * 2;
         final WorldClient world = mc.world;

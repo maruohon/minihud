@@ -9,11 +9,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
@@ -30,7 +30,7 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
     {
         if (this.shouldRender(GameUtils.getClient()))
         {
-            Vec3d pos = EntityUtils.getCameraEntityPosition();
+            Vec3d pos = EntityWrap.getCameraEntityPosition();
             this.topY = pos.y;
 
             this.setNeedsUpdate();
@@ -62,8 +62,8 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
             return true;
         }
 
-        int ex = (int) Math.floor(EntityUtils.getX(entity));
-        int ez = (int) Math.floor(EntityUtils.getZ(entity));
+        int ex = (int) Math.floor(EntityWrap.getX(entity));
+        int ez = (int) Math.floor(EntityWrap.getZ(entity));
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -80,8 +80,8 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
 
         if (this.wasSeedKnown)
         {
-            final int centerX = MathHelper.floor(EntityUtils.getX(entity)) >> 4;
-            final int centerZ = MathHelper.floor(EntityUtils.getZ(entity)) >> 4;
+            final int centerX = EntityWrap.getChunkX(entity);
+            final int centerZ = EntityWrap.getChunkZ(entity);
             final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
             final Color4f colorSides = colorLines.withAlpha(colorLines.a / 6);
             PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();

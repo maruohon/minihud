@@ -14,17 +14,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.management.PlayerChunkMapEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.malilib.util.nbt.PrettyNbtStringifier;
 import fi.dy.masa.malilib.util.nbt.SimpleNbtStringifier;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.wrap.NbtWrap;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.data.DataStorage;
@@ -148,8 +147,8 @@ public class MiscUtils
         {
             if (player.isSpectator() == false)
             {
-                int cx = MathHelper.floor(EntityUtils.getX(player) / 16.0D);
-                int cz = MathHelper.floor(EntityUtils.getZ(player) / 16.0D);
+                int cx = EntityWrap.getChunkX(player);
+                int cz = EntityWrap.getChunkZ(player);
                 int chunkRadius = 8;
 
                 for (int cxOff = -chunkRadius; cxOff <= chunkRadius; ++cxOff)
@@ -200,7 +199,7 @@ public class MiscUtils
 
             if (stack.hasTagCompound())
             {
-                lines.add(StringUtils.translate("minihud.tooltip.item.nbt", NbtUtils.getKeys(tag).size()));
+                lines.add(StringUtils.translate("minihud.tooltip.item.nbt", NbtWrap.getKeys(tag).size()));
             }
         }
 

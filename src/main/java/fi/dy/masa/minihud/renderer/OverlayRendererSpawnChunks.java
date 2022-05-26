@@ -9,8 +9,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProviderSurface;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
@@ -41,8 +41,8 @@ public class OverlayRendererSpawnChunks extends MiniHUDOverlayRenderer
             return true;
         }
 
-        int ex = (int) Math.floor(EntityUtils.getX(entity));
-        int ez = (int) Math.floor(EntityUtils.getZ(entity));
+        int ex = (int) Math.floor(EntityWrap.getX(entity));
+        int ez = (int) Math.floor(EntityWrap.getZ(entity));
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -59,7 +59,7 @@ public class OverlayRendererSpawnChunks extends MiniHUDOverlayRenderer
     public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         DataStorage data = DataStorage.getInstance();
-        BlockPos spawn = this.toggle == RendererToggle.SPAWN_CHUNKS_PLAYER ? new BlockPos(entity) : data.getWorldSpawn();
+        BlockPos spawn = this.toggle == RendererToggle.SPAWN_CHUNKS_PLAYER ? EntityWrap.getEntityBlockPos(entity) : data.getWorldSpawn();
 
         BaseRenderObject renderQuads = this.renderObjects.get(0);
         BaseRenderObject renderLines = this.renderObjects.get(1);

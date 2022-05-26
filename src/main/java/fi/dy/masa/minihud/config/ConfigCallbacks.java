@@ -8,8 +8,8 @@ import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.malilib.overlay.message.MessageHelpers;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.render.overlay.OverlayRendererContainer;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.feature.Actions;
 import fi.dy.masa.minihud.network.CarpetPubsubPacketHandler;
@@ -94,7 +94,7 @@ public class ConfigCallbacks
 
     private static void onChunkUnloadBucketOverlayEnabled()
     {
-        Vec3d pos = EntityUtils.getCameraEntityPosition();
+        Vec3d pos = EntityWrap.getCameraEntityPosition();
         Configs.Internal.CHUNK_UNLOAD_BUCKET_OVERLAY_Y.setDoubleValue(pos.y - 2);
     }
 
@@ -116,7 +116,7 @@ public class ConfigCallbacks
     {
         if (config.getBooleanValue())
         {
-            Vec3d pos = EntityUtils.getCameraEntityPosition();
+            Vec3d pos = EntityWrap.getCameraEntityPosition();
             BlockPos b = new BlockPos(pos);
             String name = config.getPrettyName();
             String key = "minihud.message.info.toggled_renderer_on_using_block_position";
@@ -131,7 +131,7 @@ public class ConfigCallbacks
     {
         if (config.getBooleanValue())
         {
-            Vec3d pos = EntityUtils.getCameraEntityPosition();
+            Vec3d pos = EntityWrap.getCameraEntityPosition();
             String name = config.getPrettyName();
             String strPos = String.format("x: §b%.2f§r, y: §b%.2f§r, z: §b%.2f§r", pos.x, pos.y, pos.z);
             String key = "minihud.message.info.toggled_renderer_on_using_position";

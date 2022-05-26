@@ -15,11 +15,12 @@ import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 import fi.dy.masa.malilib.config.value.BlockSnap;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
 public abstract class ShapeCircleBase extends ShapeBase
@@ -42,11 +43,11 @@ public abstract class ShapeCircleBase extends ShapeBase
 
         this.setRadius(radius);
 
-        Entity entity = EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
 
         if (entity != null)
         {
-            Vec3d center = entity.getPositionVector();
+            Vec3d center = EntityWrap.getEntityPos(entity);
             center = new Vec3d(Math.floor(center.x) + 0.5, Math.floor(center.y), Math.floor(center.z) + 0.5);
             this.setCenter(center);
         }

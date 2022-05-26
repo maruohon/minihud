@@ -15,8 +15,8 @@ import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.data.OrderedBlockPosLong;
 
 public abstract class BaseBlockPositionListOverlayRenderer extends MiniHUDOverlayRenderer
@@ -48,8 +48,8 @@ public abstract class BaseBlockPositionListOverlayRenderer extends MiniHUDOverla
         int hysteresis = this.updatePositionHysteresis;
 
         return this.wasDisabled || this.dirtySupplier.getAsBoolean() ||
-               Math.abs(EntityUtils.getX(entity) - this.lastUpdatePos.getX()) > hysteresis ||
-               Math.abs(EntityUtils.getZ(entity) - this.lastUpdatePos.getZ()) > hysteresis;
+               Math.abs(EntityWrap.getX(entity) - this.lastUpdatePos.getX()) > hysteresis ||
+               Math.abs(EntityWrap.getZ(entity) - this.lastUpdatePos.getZ()) > hysteresis;
     }
 
     @Override

@@ -26,6 +26,7 @@ import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.data.palette.HashMapPalette;
 import fi.dy.masa.malilib.util.data.palette.Palette;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.malilib.util.wrap.NbtWrap;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;
@@ -87,12 +88,12 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
     {
         MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#receiveMetadata(), tag: {}", tag);
 
-        if (NbtUtils.getInt(tag, "version") == 1 &&
-            NbtUtils.containsList(tag, "channel_ids"))
+        if (NbtWrap.getInt(tag, "version") == 1 &&
+            NbtWrap.containsList(tag, "channel_ids"))
         {
-            NBTTagList listTag = NbtUtils.getList(tag, "channel_ids", Constants.NBT.TAG_STRING);
+            NBTTagList listTag = NbtWrap.getList(tag, "channel_ids", Constants.NBT.TAG_STRING);
             List<String> mapping = new ArrayList<>();
-            final int size = NbtUtils.getListSize(listTag);
+            final int size = NbtWrap.getListSize(listTag);
 
             this.idMappedDataReaders.clear();
 
@@ -187,7 +188,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
     protected NBTTagCompound channelToTag(String channel)
     {
         NBTTagCompound tag = new NBTTagCompound();
-        NbtUtils.putString(tag, "channel", channel);
+        NbtWrap.putString(tag, "channel", channel);
         return tag;
     }
 
@@ -198,8 +199,8 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
         if (handler != null)
         {
             NBTTagCompound rootTag = new NBTTagCompound();
-            NbtUtils.putString(rootTag, "action", action);
-            NbtUtils.putTag(rootTag, "channels", NbtUtils.asListTag(channels, this::channelToTag));
+            NbtWrap.putString(rootTag, "action", action);
+            NbtWrap.putTag(rootTag, "channels", NbtUtils.asListTag(channels, this::channelToTag));
 
             PacketUtils.sendTag(ServuxInfoSubRegistrationPacketHandler.REG_CHANNEL, rootTag, handler);
             MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#updateSubscriptions(), tag: {}", rootTag);

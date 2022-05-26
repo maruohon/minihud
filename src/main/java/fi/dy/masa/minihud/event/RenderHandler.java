@@ -44,10 +44,10 @@ import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.render.inventory.InventoryRenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;
@@ -375,9 +375,9 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         Minecraft mc = GameUtils.getClient();
         Entity entity = mc.getRenderViewEntity();
         World world = entity.getEntityWorld();
-        double x = EntityUtils.getX(entity);
-        double y = EntityUtils.getY(entity);
-        double z = EntityUtils.getZ(entity);
+        double x = EntityWrap.getX(entity);
+        double y = EntityWrap.getY(entity);
+        double z = EntityWrap.getZ(entity);
         double bbY = entity.getEntityBoundingBox().minY;
         BlockPos pos = new BlockPos(x, bbY, z);
         DataStorage data = DataStorage.getInstance();
@@ -648,13 +648,13 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             if (InfoLine.PLAYER_YAW_ROTATION.getBooleanValue())
             {
-                str.append(String.format("yaw: %.1f", MathHelper.wrapDegrees(entity.rotationYaw)));
+                str.append(String.format("yaw: %.1f", MathHelper.wrapDegrees(EntityWrap.getYaw(entity))));
                 pre = " / ";
             }
 
             if (InfoLine.PLAYER_PITCH_ROTATION.getBooleanValue())
             {
-                str.append(pre).append(String.format("pitch: %.1f", MathHelper.wrapDegrees(entity.rotationPitch)));
+                str.append(pre).append(String.format("pitch: %.1f", MathHelper.wrapDegrees(EntityWrap.getPitch(entity))));
                 pre = " / ";
             }
 
@@ -745,7 +745,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
                     if (player != null)
                     {
-                        diff = player.world.getDifficultyForLocation(new BlockPos(player));
+                        diff = player.world.getDifficultyForLocation(EntityWrap.getEntityBlockPos(player));
                     }
                 }
 

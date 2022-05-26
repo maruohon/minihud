@@ -11,8 +11,8 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
 import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
+import fi.dy.masa.malilib.util.wrap.NbtWrap;
 import fi.dy.masa.minihud.MiniHUD;
 
 public class StructureData
@@ -70,22 +70,22 @@ public class StructureData
      */
     public static void readAndAddStructuresToMap(ArrayListMultimap<StructureType, StructureData> map, NBTTagCompound rootCompound, StructureType type)
     {
-        if (NbtUtils.containsCompound(rootCompound, "data"))
+        if (NbtWrap.containsCompound(rootCompound, "data"))
         {
-            rootCompound = NbtUtils.getCompound(rootCompound, "data");
+            rootCompound = NbtWrap.getCompound(rootCompound, "data");
 
-            if (NbtUtils.containsCompound(rootCompound, "Features"))
+            if (NbtWrap.containsCompound(rootCompound, "Features"))
             {
-                rootCompound = NbtUtils.getCompound(rootCompound, "Features");
+                rootCompound = NbtWrap.getCompound(rootCompound, "Features");
 
-                for (String key : NbtUtils.getKeys(rootCompound))
+                for (String key : NbtWrap.getKeys(rootCompound))
                 {
-                    NBTBase nbtBase = NbtUtils.getTag(rootCompound, key);
+                    NBTBase nbtBase = NbtWrap.getTag(rootCompound, key);
 
-                    if (NbtUtils.getTypeId(nbtBase) == Constants.NBT.TAG_COMPOUND)
+                    if (NbtWrap.getTypeId(nbtBase) == Constants.NBT.TAG_COMPOUND)
                     {
                         NBTTagCompound tag = (NBTTagCompound) nbtBase;
-                        String id = NbtUtils.getString(tag, "id");
+                        String id = NbtWrap.getString(tag, "id");
 
                         if (type.getStructureName().equals(id))
                         {
@@ -105,26 +105,26 @@ public class StructureData
     @Nullable
     protected static StructureData fromTag(NBTTagCompound tag)
     {
-        if (NbtUtils.contains(tag, "ChunkX", Constants.NBT.TAG_ANY_NUMERIC) &&
-            NbtUtils.contains(tag, "ChunkZ", Constants.NBT.TAG_ANY_NUMERIC) &&
-            NbtUtils.containsIntArray(tag, "BB"))
+        if (NbtWrap.contains(tag, "ChunkX", Constants.NBT.TAG_ANY_NUMERIC) &&
+            NbtWrap.contains(tag, "ChunkZ", Constants.NBT.TAG_ANY_NUMERIC) &&
+            NbtWrap.containsIntArray(tag, "BB"))
         {
-            NBTTagList tagList = NbtUtils.getListOfCompounds(tag, "Children");
+            NBTTagList tagList = NbtWrap.getListOfCompounds(tag, "Children");
             ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
-            final int size = NbtUtils.getListSize(tagList);
+            final int size = NbtWrap.getListSize(tagList);
 
             for (int i = 0; i < size; ++i)
             {
-                NBTTagCompound componentTag = NbtUtils.getCompoundAt(tagList, i);
+                NBTTagCompound componentTag = NbtWrap.getCompoundAt(tagList, i);
 
-                if (NbtUtils.containsString(componentTag, "id") &&
-                    NbtUtils.containsIntArray(componentTag, "BB"))
+                if (NbtWrap.containsString(componentTag, "id") &&
+                    NbtWrap.containsIntArray(componentTag, "BB"))
                 {
-                    builder.add(IntBoundingBox.fromArray(NbtUtils.getIntArray(componentTag, "BB")));
+                    builder.add(IntBoundingBox.fromArray(NbtWrap.getIntArray(componentTag, "BB")));
                 }
             }
 
-            return new StructureData(IntBoundingBox.fromArray(NbtUtils.getIntArray(tag, "BB")), builder.build());
+            return new StructureData(IntBoundingBox.fromArray(NbtWrap.getIntArray(tag, "BB")), builder.build());
         }
 
         return null;
@@ -136,55 +136,55 @@ public class StructureData
      */
     public static void readAndAddTemplesToMap(ArrayListMultimap<StructureType, StructureData> map, NBTTagCompound rootTag)
     {
-        if (NbtUtils.containsCompound(rootTag, "data") == false)
+        if (NbtWrap.containsCompound(rootTag, "data") == false)
         {
             return;
         }
 
-        NBTTagCompound dataTag = NbtUtils.getCompound(rootTag, "data");
+        NBTTagCompound dataTag = NbtWrap.getCompound(rootTag, "data");
 
-        if (NbtUtils.containsCompound(dataTag, "Features") == false)
+        if (NbtWrap.containsCompound(dataTag, "Features") == false)
         {
             return;
         }
 
-        NBTTagCompound featureTag = NbtUtils.getCompound(dataTag, "Features");
+        NBTTagCompound featureTag = NbtWrap.getCompound(dataTag, "Features");
 
-        for (String key : NbtUtils.getKeys(featureTag))
+        for (String key : NbtWrap.getKeys(featureTag))
         {
-            NBTBase nbtBase = NbtUtils.getTag(featureTag, key);
+            NBTBase nbtBase = NbtWrap.getTag(featureTag, key);
 
-            if (NbtUtils.getTypeId(nbtBase) != Constants.NBT.TAG_COMPOUND)
+            if (NbtWrap.getTypeId(nbtBase) != Constants.NBT.TAG_COMPOUND)
             {
                 continue;
             }
 
             NBTTagCompound tag = (NBTTagCompound) nbtBase;
 
-            if (NbtUtils.contains(tag, "ChunkX", Constants.NBT.TAG_ANY_NUMERIC) &&
-                NbtUtils.contains(tag, "ChunkZ", Constants.NBT.TAG_ANY_NUMERIC) &&
-                NbtUtils.containsIntArray(tag, "BB") &&
-                NbtUtils.getString(tag, "id").equals("Temple"))
+            if (NbtWrap.contains(tag, "ChunkX", Constants.NBT.TAG_ANY_NUMERIC) &&
+                NbtWrap.contains(tag, "ChunkZ", Constants.NBT.TAG_ANY_NUMERIC) &&
+                NbtWrap.containsIntArray(tag, "BB") &&
+                NbtWrap.getString(tag, "id").equals("Temple"))
             {
-                NBTTagList tagList = NbtUtils.getListOfCompounds(tag, "Children");
+                NBTTagList tagList = NbtWrap.getListOfCompounds(tag, "Children");
 
-                if (NbtUtils.getListSize(tagList) != 1)
+                if (NbtWrap.getListSize(tagList) != 1)
                 {
                     continue;
                 }
 
-                NBTTagCompound componentTag = NbtUtils.getCompoundAt(tagList, 0);
+                NBTTagCompound componentTag = NbtWrap.getCompoundAt(tagList, 0);
 
-                if (NbtUtils.containsString(componentTag, "id") &&
-                    NbtUtils.containsIntArray(componentTag, "BB"))
+                if (NbtWrap.containsString(componentTag, "id") &&
+                    NbtWrap.containsIntArray(componentTag, "BB"))
                 {
-                    String id = NbtUtils.getString(componentTag, "id");
+                    String id = NbtWrap.getString(componentTag, "id");
                     StructureType type = StructureType.templeTypeFromComponentId(id);
 
                     if (type != null)
                     {
-                        IntBoundingBox bb = IntBoundingBox.fromArray(NbtUtils.getIntArray(componentTag, "BB"));
-                        map.put(type, new StructureData(IntBoundingBox.fromArray(NbtUtils.getIntArray(tag, "BB")), ImmutableList.of(bb)));
+                        IntBoundingBox bb = IntBoundingBox.fromArray(NbtWrap.getIntArray(componentTag, "BB"));
+                        map.put(type, new StructureData(IntBoundingBox.fromArray(NbtWrap.getIntArray(tag, "BB")), ImmutableList.of(bb)));
                     }
                 }
             }
@@ -194,16 +194,16 @@ public class StructureData
     public static void readStructureDataCarpetAllBoxes(ArrayListMultimap<StructureType, StructureData> map, NBTTagList tagList)
     {
         List<NBTTagCompound> tags = new ArrayList<>();
-        final int size = NbtUtils.getListSize(tagList);
+        final int size = NbtWrap.getListSize(tagList);
 
         for (int listNum = 0; listNum < size; ++listNum)
         {
             NBTTagList innerList = (NBTTagList) tagList.get(listNum);
-            final int innerSize = NbtUtils.getListSize(innerList);
+            final int innerSize = NbtWrap.getListSize(innerList);
 
             for (int i = 0; i < innerSize; ++i)
             {
-                tags.add(NbtUtils.getCompoundAt(innerList, i));
+                tags.add(NbtWrap.getCompoundAt(innerList, i));
             }
         }
 
@@ -221,7 +221,7 @@ public class StructureData
         for (int i = 0; i < tags.size(); ++i)
         {
             NBTTagCompound tag = tags.get(i);
-            int id = NbtUtils.getInt(tag, "type");
+            int id = NbtWrap.getInt(tag, "type");
 
             // Carpet puts the main box as the first entry in the same list of compound tags
             // Only the subsequent component boxes will have the structure type ID
@@ -237,15 +237,15 @@ public class StructureData
 
                 if (tags.size() > i + 1)
                 {
-                    bbMain = IntBoundingBox.fromArray(NbtUtils.getIntArray(tag, "bb"));
-                    id = NbtUtils.getInt(tags.get(i + 1), "type");
+                    bbMain = IntBoundingBox.fromArray(NbtWrap.getIntArray(tag, "bb"));
+                    id = NbtWrap.getInt(tags.get(i + 1), "type");
                     type = getTypeFromCarpetId(id);
                 }
             }
             // Don't add the component boxes of unknown/unsupported structure types to the builder
             else if (type != null)
             {
-                builder.add(IntBoundingBox.fromArray(NbtUtils.getIntArray(tag, "bb")));
+                builder.add(IntBoundingBox.fromArray(NbtWrap.getIntArray(tag, "bb")));
                 ++componentBoxes;
             }
         }
@@ -258,12 +258,12 @@ public class StructureData
 
     public static void readStructureDataServux(ArrayListMultimap<StructureType, StructureData> map, NBTTagList tagList)
     {
-        final int size = NbtUtils.getListSize(tagList);
+        final int size = NbtWrap.getListSize(tagList);
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound tag = NbtUtils.getCompoundAt(tagList, i);
-            String id = NbtUtils.getString(tag, "id");
+            NBTTagCompound tag = NbtWrap.getCompoundAt(tagList, i);
+            String id = NbtWrap.getString(tag, "id");
             StructureType type = StructureType.ID_TO_TYPE.get(id);
             StructureData data = fromTag(tag);
 
@@ -295,8 +295,8 @@ public class StructureData
 
     public static void readStructureDataCarpetIndividualBoxes(ArrayListMultimap<StructureType, StructureData> map, NBTTagCompound tag)
     {
-        int id = NbtUtils.getInt(tag, "type");
-        IntBoundingBox bb = IntBoundingBox.fromArray(NbtUtils.getIntArray(tag, "bb"));
+        int id = NbtWrap.getInt(tag, "type");
+        IntBoundingBox bb = IntBoundingBox.fromArray(NbtWrap.getIntArray(tag, "bb"));
 
         CARPET_BOX_READER.seenBoxes++;
 

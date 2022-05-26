@@ -19,10 +19,10 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.network.CarpetPubsubPacketHandler;
@@ -275,7 +275,7 @@ public class DataStorage
 
     public boolean setDistanceReferencePoint()
     {
-        Vec3d pos = EntityUtils.getCameraEntityPosition();
+        Vec3d pos = EntityWrap.getCameraEntityPosition();
         this.distanceReferencePoint = pos;
         String x = String.format("%.2f", pos.x);
         String y = String.format("%.2f", pos.y);

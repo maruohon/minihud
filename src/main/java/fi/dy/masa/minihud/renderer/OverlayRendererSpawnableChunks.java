@@ -9,9 +9,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 
@@ -33,7 +33,7 @@ public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
     {
         super.onEnabled();
 
-        Vec3d pos = EntityUtils.getCameraEntityPosition();
+        Vec3d pos = EntityWrap.getCameraEntityPosition();
         this.overlayTopY = pos.y;
     }
 
@@ -52,8 +52,8 @@ public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
         }
         else
         {
-            int ex = ((int) Math.floor(EntityUtils.getX(entity))) >> 4;
-            int ez = ((int) Math.floor(EntityUtils.getZ(entity))) >> 4;
+            int ex = EntityWrap.getChunkX(entity);
+            int ez = EntityWrap.getChunkZ(entity);
             int lx = this.lastUpdatePos.getX();
             int lz = this.lastUpdatePos.getZ();
 
@@ -78,7 +78,7 @@ public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
         }
         else
         {
-            this.posCenter = new BlockPos(entity);
+            this.posCenter = EntityWrap.getEntityBlockPos(entity);
         }
 
         int centerX = this.posCenter.getX() >> 4;

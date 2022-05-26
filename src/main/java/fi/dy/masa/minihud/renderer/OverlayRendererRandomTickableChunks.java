@@ -11,11 +11,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 
@@ -38,7 +38,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
         if (this.toggle == RendererToggle.RANDOM_TICKS_FIXED &&
             this.shouldRender(GameUtils.getClient()))
         {
-            Vec3d pos = EntityUtils.getCameraEntityPosition();
+            Vec3d pos = EntityWrap.getCameraEntityPosition();
             this.newPos = pos;
         }
     }
@@ -59,8 +59,8 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
         // Player-following renderer
         else if (this.toggle == RendererToggle.RANDOM_TICKS_PLAYER)
         {
-            return EntityUtils.getX(entity) != this.pos.x ||
-                   EntityUtils.getZ(entity) != this.pos.z;
+            return EntityWrap.getX(entity) != this.pos.x ||
+                   EntityWrap.getZ(entity) != this.pos.z;
         }
 
         return false;
@@ -71,7 +71,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
     {
         if (this.toggle == RendererToggle.RANDOM_TICKS_PLAYER)
         {
-            this.pos = entity.getPositionVector();
+            this.pos = EntityWrap.getEntityPos(entity);
         }
         else if (this.newPos != null)
         {
