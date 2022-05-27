@@ -4,12 +4,11 @@ import java.io.File;
 import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.util.game.WorldUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
@@ -23,7 +22,7 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
     private long cachedSeed;
 
     @Override
-    public void onPreClientWorldChange(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter, Minecraft mc)
+    public void onPreClientWorldChange(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter)
     {
         // Save the settings before the integrated server gets shut down
         if (worldBefore != null)
@@ -53,7 +52,7 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
     }
 
     @Override
-    public void onPostClientWorldChange(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter, Minecraft mc)
+    public void onPostClientWorldChange(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter)
     {
         ShapeManager.INSTANCE.clear();
 

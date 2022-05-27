@@ -9,7 +9,7 @@ import fi.dy.masa.malilib.overlay.message.MessageHelpers;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.render.overlay.OverlayRendererContainer;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.feature.Actions;
 import fi.dy.masa.minihud.network.CarpetPubsubPacketHandler;

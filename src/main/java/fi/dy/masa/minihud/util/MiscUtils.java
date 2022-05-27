@@ -16,14 +16,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
-import fi.dy.masa.malilib.util.GameUtils;
-import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
+import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
 import fi.dy.masa.malilib.util.nbt.PrettyNbtStringifier;
 import fi.dy.masa.malilib.util.nbt.SimpleNbtStringifier;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.wrap.NbtWrap;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.data.DataStorage;
@@ -184,7 +184,7 @@ public class MiscUtils
     {
         boolean showPretty = Configs.Hotkeys.ITEM_NBT_KEY_PRETTY.isHeld();
         boolean showString = Configs.Hotkeys.ITEM_NBT_KEY_STRING.isHeld();
-        NBTTagCompound tag = ItemUtils.getTag(stack);
+        NBTTagCompound tag = ItemWrap.getTag(stack);
 
         // If the vanilla advanced tooltips are disabled, add them here, when showing a tooltip
         if (GameUtils.getClient().gameSettings.advancedItemTooltips == false && (showPretty || showString))

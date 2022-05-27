@@ -12,7 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 

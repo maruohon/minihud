@@ -24,7 +24,7 @@ import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.malilib.network.message.BasePacketHandler;
 import fi.dy.masa.malilib.registry.Registry;
-import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;

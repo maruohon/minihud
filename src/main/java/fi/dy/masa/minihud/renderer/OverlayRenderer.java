@@ -2,7 +2,6 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.Collections;
 import org.lwjgl.opengl.GL11;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -14,9 +13,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.TextRenderUtils;
-import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -32,7 +31,7 @@ public class OverlayRenderer
         loginTime = System.currentTimeMillis();
     }
 
-    public static void renderOverlays(Minecraft mc, float partialTicks)
+    public static void renderOverlays(float tickDelta)
     {
         Entity entity = GameUtils.getCameraEntity();
 
@@ -63,9 +62,9 @@ public class OverlayRenderer
             }
         }
 
-        double dx = EntityWrap.lerpX(entity, partialTicks);
-        double dy = EntityWrap.lerpY(entity, partialTicks);
-        double dz = EntityWrap.lerpZ(entity, partialTicks);
+        double dx = EntityWrap.lerpX(entity, tickDelta);
+        double dy = EntityWrap.lerpY(entity, tickDelta);
+        double dz = EntityWrap.lerpZ(entity, tickDelta);
 
         if (RendererToggle.CHUNK_UNLOAD_BUCKET.isRendererEnabled())
         {
@@ -74,7 +73,7 @@ public class OverlayRenderer
 
         if (RendererToggle.BEACON_RANGE.isRendererEnabled())
         {
-            renderBeaconBoxForPlayerIfHoldingItem(mc.player, dx, dy, dz);
+            renderBeaconBoxForPlayerIfHoldingItem(GameUtils.getClientPlayer(), dx, dy, dz);
         }
 
         if (RendererToggle.SPAWNER_POSITIONS.isRendererEnabled())

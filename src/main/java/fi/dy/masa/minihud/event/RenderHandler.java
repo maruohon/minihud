@@ -43,11 +43,11 @@ import fi.dy.masa.malilib.overlay.InfoArea;
 import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.render.inventory.InventoryRenderUtils;
-import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.BlockUtils;
+import fi.dy.masa.malilib.util.game.WorldUtils;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;
@@ -200,7 +200,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     }
 
     @Override
-    public void onPostRenderItemTooltip(ItemStack stack, int x, int y, Minecraft mc)
+    public void onPostRenderItemTooltip(ItemStack stack, int x, int y)
     {
         float z = Configs.Generic.ITEM_PREVIEW_Z.getIntegerValue();
 
@@ -232,11 +232,11 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     }
 
     @Override
-    public void onPostWorldRender(Minecraft mc, float partialTicks)
+    public void onPostWorldRender(float tickDelta)
     {
         if (Configs.Generic.OVERLAYS_RENDERING_TOGGLE.getBooleanValue())
         {
-            OverlayRenderer.renderOverlays(mc, partialTicks);
+            OverlayRenderer.renderOverlays(tickDelta);
         }
     }
 
@@ -375,6 +375,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         Minecraft mc = GameUtils.getClient();
         Entity entity = mc.getRenderViewEntity();
         World world = entity.getEntityWorld();
+        RayTraceResult hitResult = GameUtils.getHitResult();
         double x = EntityWrap.getX(entity);
         double y = EntityWrap.getY(entity);
         double z = EntityWrap.getZ(entity);
@@ -849,11 +850,11 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
         else if (type == InfoLine.LOOKING_AT_ENTITY)
         {
-            if (mc.objectMouseOver != null &&
-                mc.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY &&
-                mc.objectMouseOver.entityHit != null)
+            if (hitResult != null &&
+                hitResult.typeOfHit == RayTraceResult.Type.ENTITY &&
+                hitResult.entityHit != null)
             {
-                Entity target = mc.objectMouseOver.entityHit;
+                Entity target = hitResult.entityHit;
 
                 if (target instanceof EntityLivingBase)
                 {
@@ -869,11 +870,11 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
         else if (type == InfoLine.ENTITY_REG_NAME)
         {
-            if (mc.objectMouseOver != null &&
-                mc.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY &&
-                mc.objectMouseOver.entityHit != null)
+            if (hitResult != null &&
+                hitResult.typeOfHit == RayTraceResult.Type.ENTITY &&
+                hitResult.entityHit != null)
             {
-                ResourceLocation regName = EntityList.getKey(mc.objectMouseOver.entityHit);
+                ResourceLocation regName = EntityList.getKey(hitResult.entityHit);
 
                 if (regName != null)
                 {
@@ -891,11 +892,11 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 return;
             }
 
-            if (mc.objectMouseOver != null &&
-                mc.objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK &&
-                mc.objectMouseOver.getBlockPos() != null)
+            if (hitResult != null &&
+                hitResult.typeOfHit == RayTraceResult.Type.BLOCK &&
+                hitResult.getBlockPos() != null)
             {
-                BlockPos lookPos = mc.objectMouseOver.getBlockPos();
+                BlockPos lookPos = hitResult.getBlockPos();
                 String pre = "";
                 StringBuilder str = new StringBuilder(128);
 
@@ -939,11 +940,13 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
     private void getBlockProperties(Minecraft mc)
     {
-        if (mc.objectMouseOver != null &&
-            mc.objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK &&
-            mc.objectMouseOver.getBlockPos() != null)
+        RayTraceResult hitResult = GameUtils.getHitResult();
+
+        if (hitResult != null &&
+            hitResult.typeOfHit == RayTraceResult.Type.BLOCK &&
+            hitResult.getBlockPos() != null)
         {
-            BlockPos posLooking = mc.objectMouseOver.getBlockPos();
+            BlockPos posLooking = hitResult.getBlockPos();
             IBlockState state = mc.world.getBlockState(posLooking);
 
             if (mc.world.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES)

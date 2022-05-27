@@ -15,12 +15,12 @@ import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 import fi.dy.masa.malilib.config.value.BlockSnap;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 
 public abstract class ShapeCircleBase extends ShapeBase
