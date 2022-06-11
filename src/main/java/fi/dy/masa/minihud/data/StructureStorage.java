@@ -1,7 +1,8 @@
 package fi.dy.masa.minihud.data;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -92,14 +93,14 @@ public class StructureStorage
     }
 
     @Nullable
-    private File getLocalStructureFileDirectory()
+    private Path getLocalStructureFileDirectory()
     {
         String dirName = StringUtils.getWorldOrServerName();
 
         if (dirName != null)
         {
-            return ConfigUtils.getConfigDirectoryPath().resolve(Reference.MOD_ID)
-                    .resolve("structures").resolve(dirName).toFile();
+            return ConfigUtils.getConfigDirectory().resolve(Reference.MOD_ID)
+                    .resolve("structures").resolve(dirName);
         }
 
         return null;
@@ -224,15 +225,15 @@ public class StructureStorage
         {
             this.structureMap.clear();
 
-            File dir = this.getLocalStructureFileDirectory();
+            Path dir = this.getLocalStructureFileDirectory();
 
-            if (dir != null && dir.exists() && dir.isDirectory())
+            if (dir != null && Files.isDirectory(dir))
             {
                 for (StructureType type : StructureType.VALUES)
                 {
                     if (type.isTemple() == false)
                     {
-                        File file = new File(dir, type.getStructureName() + ".dat");
+                        Path file = dir.resolve(type.getStructureName() + ".dat");
                         NBTTagCompound nbt = NbtUtils.readNbtFromFile(file);
 
                         if (nbt != null)
@@ -242,7 +243,7 @@ public class StructureStorage
                     }
                 }
 
-                NBTTagCompound nbt = NbtUtils.readNbtFromFile(new File(dir, "Temple.dat"));
+                NBTTagCompound nbt = NbtUtils.readNbtFromFile(dir.resolve("Temple.dat"));
 
                 if (nbt != null)
                 {

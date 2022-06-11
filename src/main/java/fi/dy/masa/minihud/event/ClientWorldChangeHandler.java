@@ -1,6 +1,6 @@
 package fi.dy.masa.minihud.event;
 
-import java.io.File;
+import java.nio.file.Path;
 import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -9,7 +9,6 @@ import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.game.WorldUtils;
-import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.data.DataStorage;
@@ -81,20 +80,17 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
 
     private void writeDataPerDimension()
     {
-        File file = getCurrentStorageFile(false);
         JsonObject root = new JsonObject();
 
         root.add("shapes", ShapeManager.INSTANCE.toJson());
         root.add("data_storage", DataStorage.getInstance().toJson());
 
-        JsonUtils.writeJsonToFile(root, file);
+        JsonUtils.writeJsonToFile(root, getCurrentStorageFile(false));
     }
 
     private void readStoredDataPerDimension()
     {
-        // Per-dimension file
-        File file = getCurrentStorageFile(false);
-        JsonElement element = JsonUtils.parseJsonFile(file);
+        JsonElement element = JsonUtils.parseJsonFile(getCurrentStorageFile(false));
 
         if (element != null)
         {
@@ -103,20 +99,9 @@ public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.Client
         }
     }
 
-    public static File getCurrentConfigDirectory()
+    public static Path getCurrentStorageFile(boolean globalData)
     {
-        return ConfigUtils.getConfigDirectoryPath().resolve(Reference.MOD_ID).toFile();
-    }
-
-    public static File getCurrentStorageFile(boolean globalData)
-    {
-        File dir = getCurrentConfigDirectory();
-
-        if (dir.exists() == false && dir.mkdirs() == false)
-        {
-            LiteModMiniHud.logger.warn("Failed to create the config directory '{}'", dir.getAbsolutePath());
-        }
-
-        return new File(dir, StringUtils.getStorageFileName(globalData, "", ".json", Reference.MOD_ID + "_default"));
+        String fileName = StringUtils.getStorageFileName(globalData, "", ".json", Reference.MOD_ID + "_default");
+        return ConfigUtils.createAndGetConfigDirectory(Reference.MOD_ID).resolve(fileName);
     }
 }

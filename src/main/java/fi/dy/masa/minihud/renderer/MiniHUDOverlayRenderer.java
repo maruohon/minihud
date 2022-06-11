@@ -1,6 +1,6 @@
 package fi.dy.masa.minihud.renderer;
 
-import java.io.File;
+import java.nio.file.Path;
 import javax.annotation.Nullable;
 import fi.dy.masa.malilib.render.overlay.BaseOverlayRenderer;
 import fi.dy.masa.malilib.util.data.ModInfo;
@@ -34,7 +34,7 @@ public abstract class MiniHUDOverlayRenderer extends BaseOverlayRenderer
 
     @Nullable
     @Override
-    public File getSaveFile(boolean isDimensionChangeOnly)
+    public Path getSaveFile(boolean isDimensionChangeOnly)
     {
         return ClientWorldChangeHandler.getCurrentStorageFile(! isDimensionChangeOnly);
     }
