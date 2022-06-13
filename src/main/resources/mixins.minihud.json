@@ -14,7 +14,7 @@
 		"IMixinWorldRenderer",
 		"MixinBeaconBlockEntity",
 		"MixinBlockOutlineDebugRenderer",
-    "MixinClientPlayerEntity",
+		"MixinClientPlayerEntity",
 		"MixinClientPlayerInteractionManager",
 		"MixinClientPlayNetworkHandler",
 		"MixinConduitBlockEntity",

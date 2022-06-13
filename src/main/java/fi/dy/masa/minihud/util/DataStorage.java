@@ -35,8 +35,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.StructureAccessor;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -702,7 +700,7 @@ public class DataStorage
                                 continue;
                             }
 
-                            StructureStart start = chunk.getStructureStarts().get(feature);
+                            StructureStart start = chunk.getStructureStart(feature);
 
                             if (start != null && start.hasChildren() &&
                                 MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxChunkRange << 4))
