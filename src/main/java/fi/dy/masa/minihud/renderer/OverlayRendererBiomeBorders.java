@@ -148,8 +148,8 @@ public class OverlayRendererBiomeBorders extends OverlayRendererBase
     {
         //long pre = System.nanoTime();
         World world = mc.world;
-        int viewDistance = Math.min(Configs.Generic.BIOME_OVERLAY_RANGE.getIntegerValue(), mc.options.viewDistance);
-        int viewDistanceVertical = Math.min(Configs.Generic.BIOME_OVERLAY_RANGE_VERTICAL.getIntegerValue(), mc.options.viewDistance);
+        int viewDistance = Math.min(Configs.Generic.BIOME_OVERLAY_RANGE.getIntegerValue(), mc.options.getViewDistance().getValue());
+        int viewDistanceVertical = Math.min(Configs.Generic.BIOME_OVERLAY_RANGE_VERTICAL.getIntegerValue(), mc.options.getViewDistance().getValue());
         int chunkX = MathHelper.floor(cameraEntity.getX()) >> 4;
         int chunkY = MathHelper.floor(cameraEntity.getY()) >> 4;
         int chunkZ = MathHelper.floor(cameraEntity.getZ()) >> 4;

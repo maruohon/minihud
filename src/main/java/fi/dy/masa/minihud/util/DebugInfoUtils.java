@@ -23,8 +23,7 @@ import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
@@ -244,10 +243,10 @@ public class DebugInfoUtils
 
     private static void debugWarn(String key, Object... args)
     {
-        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage((new LiteralText(""))
-                .append((new TranslatableText("debug.prefix")).formatted(Formatting.YELLOW, Formatting.BOLD))
+        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage((Text.literal(""))
+                .append((Text.translatable("debug.prefix")).formatted(Formatting.YELLOW, Formatting.BOLD))
                 .append(" ")
-                .append((new TranslatableText(key, args))));
+                .append((Text.translatable(key, args))));
     }
 
     public static void renderVanillaDebug(MatrixStack matrixStack, VertexConsumerProvider.Immediate vtx,

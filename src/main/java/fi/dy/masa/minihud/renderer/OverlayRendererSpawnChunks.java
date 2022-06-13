@@ -63,7 +63,7 @@ public class OverlayRendererSpawnChunks extends OverlayRendererBase
             return ex != lx || ez != lz;
         }
 
-        int range = mc.options.viewDistance * 16;
+        int range = mc.options.getViewDistance().getValue() * 16;
 
         return Math.abs(lx - ex) > range || Math.abs(lz - ez) > range;
     }

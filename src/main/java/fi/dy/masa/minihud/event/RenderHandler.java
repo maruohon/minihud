@@ -22,7 +22,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.HorseBaseEntity;
+import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -646,12 +646,12 @@ public class RenderHandler implements IRenderer
 
             Entity vehicle = this.mc.player.getVehicle();
 
-            if ((vehicle instanceof HorseBaseEntity) == false)
+            if ((vehicle instanceof AbstractHorseEntity) == false)
             {
                 return;
             }
 
-            HorseBaseEntity horse = (HorseBaseEntity) vehicle;
+            AbstractHorseEntity horse = (AbstractHorseEntity) vehicle;
 
             if (horse.isSaddled())
             {

@@ -14,6 +14,7 @@
 		"IMixinWorldRenderer",
 		"MixinBeaconBlockEntity",
 		"MixinBlockOutlineDebugRenderer",
+    "MixinClientPlayerEntity",
 		"MixinClientPlayerInteractionManager",
 		"MixinClientPlayNetworkHandler",
 		"MixinConduitBlockEntity",
@@ -23,7 +24,6 @@
 		"MixinMinecraftClient",
 		"MixinMinecraftServer",
 		"MixinNeighborUpdateDebugRenderer",
-		"MixinScreen",
 		"MixinServerEntityManager",
 		"MixinSubtitlesHud",
 		"MixinWorld"

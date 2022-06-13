@@ -31,7 +31,7 @@ public class ThreadWorker implements Runnable
             catch (Throwable throwable)
             {
                 CrashReport crashreport = CrashReport.create(throwable, "MiniHUD worker thread");
-                MinecraftClient.getInstance().setCrashReportSupplier(() -> MinecraftClient.getInstance().addDetailsToCrashReport(crashreport));
+                MinecraftClient.getInstance().setCrashReportSupplier(MinecraftClient.getInstance().addDetailsToCrashReport(crashreport));
                 return;
             }
         }
