@@ -280,7 +280,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         // Update the string list renderer to remove MiniHUD's info lines when the HUD is disabled
         if (wasEnabled && this.enabled == false && this.stringListRenderer != null)
         {
-            this.stringListRenderer.markDirty();
+            this.stringListRenderer.notifyStringListChanged();
         }
 
         if (mc.world != null)
@@ -362,7 +362,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             this.lines.add(holder.str);
         }
 
-        widget.markDirty();
+        widget.notifyStringListChanged();
     }
 
     private void addLine(String text)
