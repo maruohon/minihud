@@ -14,19 +14,19 @@
 		"IMixinWorldRenderer",
 		"MixinBeaconBlockEntity",
 		"MixinBlockOutlineDebugRenderer",
+		"MixinChatScreen",
 		"MixinClientPlayerInteractionManager",
 		"MixinClientPlayNetworkHandler",
 		"MixinConduitBlockEntity",
+		"MixinDebugInfoSender",
 		"MixinDebugRenderer",
 		"MixinHeightmapDebugRenderer",
 		"MixinItemStack",
 		"MixinMinecraftClient",
 		"MixinMinecraftServer",
 		"MixinNeighborUpdateDebugRenderer",
-		"MixinScreen",
 		"MixinServerEntityManager",
-		"MixinSubtitlesHud",
-		"MixinWorld"
+		"MixinSubtitlesHud"
 	],
 	"injectors": {
 		"defaultRequire": 1

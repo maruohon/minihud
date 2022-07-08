@@ -117,8 +117,6 @@ public class OverlayRendererBiomeBorders extends OverlayRendererBase
 
         this.renderQuads(quads, BUFFER_1, BUFFER_2, this.cameraPosition);
 
-        BUFFER_1.end();
-        BUFFER_2.end();
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
 

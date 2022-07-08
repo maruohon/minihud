@@ -41,7 +41,10 @@ public class RenderObjectVbo extends RenderObjectBase
     @Override
     public void uploadData(BufferBuilder buffer)
     {
-        this.vertexBuffer.submitUpload(buffer);
+        BufferBuilder.BuiltBuffer builtBuffer = buffer.end();
+        this.vertexBuffer.bind();
+        this.vertexBuffer.upload(builtBuffer);
+        VertexBuffer.unbind();
     }
 
     @Override
@@ -54,7 +57,7 @@ public class RenderObjectVbo extends RenderObjectBase
 
         RenderSystem.setShader(this.getShader());
         this.vertexBuffer.bind();
-        this.vertexBuffer.setShader(matrixStack.peek().getPositionMatrix(), projMatrix, this.getShader().get());
+        this.vertexBuffer.draw(matrixStack.peek().getPositionMatrix(), projMatrix, this.getShader().get());
 
         VertexBuffer.unbind();
 

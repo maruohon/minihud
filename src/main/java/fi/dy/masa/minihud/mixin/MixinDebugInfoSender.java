@@ -4,17 +4,17 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.block.Block;
+import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
 
-@Mixin(World.class)
-public abstract class MixinWorld
+@Mixin(DebugInfoSender.class)
+public abstract class MixinDebugInfoSender
 {
-    @Inject(method = "updateNeighbor", at = @At("HEAD"))
-    public void onUpdateNeighbor(BlockPos pos, Block sourceBlock, BlockPos neighborPos,CallbackInfo ci)
+    @Inject(method = "sendNeighborUpdate", at = @At("HEAD"))
+    private static void onSendNeighborUpdate(World world, BlockPos pos, CallbackInfo ci)
     {
-        DebugInfoUtils.onNeighborUpdate((World) (Object) this, pos);
+        DebugInfoUtils.onNeighborUpdate(world, pos);
     }
 }

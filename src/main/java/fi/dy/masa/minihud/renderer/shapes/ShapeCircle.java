@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
@@ -20,9 +23,6 @@ import fi.dy.masa.minihud.renderer.RenderObjectBase;
 import fi.dy.masa.minihud.renderer.RenderUtils;
 import fi.dy.masa.minihud.util.ShapeRenderType;
 import fi.dy.masa.minihud.util.shape.SphereUtils;
-import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public class ShapeCircle extends ShapeCircleBase
 {
@@ -111,7 +111,6 @@ public class ShapeCircle extends ShapeCircleBase
                                                    this.color, expand, cameraPos, BUFFER_1);
         }
 
-        BUFFER_1.end();
         renderQuads.uploadData(BUFFER_1);
     }
 

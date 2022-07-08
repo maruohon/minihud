@@ -11,6 +11,7 @@ import net.minecraft.structure.StructureStart;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.minihud.MiniHUD;
+import fi.dy.masa.minihud.config.Configs;
 
 public class StructureData
 {
@@ -74,7 +75,7 @@ public class StructureData
         {
             StructureType type = StructureType.byStructureId(tag.getString("id"));
 
-            if (type == null)
+            if (Configs.Generic.DEBUG_MESSAGES.getBooleanValue())
             {
                 MiniHUD.logger.warn("StructureData.fromStructureStartTag(): Unknown structure type '{}'", tag.getString("id"));
                 return null;

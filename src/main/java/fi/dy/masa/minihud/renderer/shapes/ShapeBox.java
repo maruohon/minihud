@@ -132,9 +132,6 @@ public class ShapeBox extends ShapeBase
 
         this.renderBox(box);
 
-        BUFFER_1.end();
-        BUFFER_2.end();
-
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
 

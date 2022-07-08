@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.renderer.shapes;
 
 import java.util.List;
 import java.util.function.Consumer;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
@@ -14,7 +15,6 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.renderer.RenderObjectBase;
 import fi.dy.masa.minihud.renderer.RenderUtils;
 import fi.dy.masa.minihud.util.shape.SphereUtils;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public class ShapeSphereBlocky extends ShapeCircleBase
 {
@@ -71,7 +71,6 @@ public class ShapeSphereBlocky extends ShapeCircleBase
                                                    this.layerRange, this.color, expand, cameraPos, BUFFER_1);
         }
 
-        BUFFER_1.end();
         renderQuads.uploadData(BUFFER_1);
     }
 }

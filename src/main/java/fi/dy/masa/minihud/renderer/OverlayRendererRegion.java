@@ -65,9 +65,6 @@ public class OverlayRendererRegion extends OverlayRendererBase
 
         RenderUtils.renderWallsWithLines(pos1, pos2, cameraPos, 16, 16, true, color, BUFFER_1, BUFFER_2);
 
-        BUFFER_1.end();
-        BUFFER_2.end();
-
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
 

@@ -71,9 +71,6 @@ public class OverlayRendererStructures extends OverlayRendererBase
             this.renderStructureBoxes(data, cameraPos);
         }
 
-        BUFFER_1.end();
-        BUFFER_2.end();
-
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
     }

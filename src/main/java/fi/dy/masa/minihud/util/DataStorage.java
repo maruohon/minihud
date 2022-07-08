@@ -14,15 +14,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerTask;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureStart;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -353,7 +353,7 @@ public class DataStorage
         return MiscUtils.intAverage(this.blockBreakCounter) * 20;
     }
 
-    public boolean onSendChatMessage(PlayerEntity player, String message)
+    public boolean onSendChatMessage(String message)
     {
         String[] parts = message.split(" ");
 
@@ -391,10 +391,9 @@ public class DataStorage
 
     public void onChatMessage(Text message)
     {
-        if (message instanceof TranslatableText)
+        if (message instanceof MutableText mutableText &&
+            mutableText.getContent() instanceof TranslatableTextContent text)
         {
-            TranslatableText text = (TranslatableText) message;
-
             // The vanilla "/seed" command
             if ("commands.seed.success".equals(text.getKey()) && text.getArgs().length == 1)
             {
@@ -409,7 +408,7 @@ public class DataStorage
                         //this.setWorldSeed(Long.parseLong(str.substring(i1 + 1, i2)));
                         this.setWorldSeed(Long.parseLong(str));
                         MiniHUD.logger.info("Received world seed from the vanilla /seed command: {}", this.worldSeed);
-                        InfoUtils.printActionbarMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
+                        InfoUtils.printActionbarMessage("minihud.message.seed_set", this.worldSeed);
                     }
                 }
                 catch (Exception e)
@@ -424,7 +423,7 @@ public class DataStorage
                 {
                     this.setWorldSeed(Long.parseLong(text.getArgs()[1].toString()));
                     MiniHUD.logger.info("Received world seed from the JED '/jed seed' command: {}", this.worldSeed);
-                    InfoUtils.printActionbarMessage("minihud.message.seed_set", Long.valueOf(this.worldSeed));
+                    InfoUtils.printActionbarMessage("minihud.message.seed_set", this.worldSeed);
                 }
                 catch (Exception e)
                 {
@@ -678,7 +677,7 @@ public class DataStorage
 
         if (enabledTypes.isEmpty() == false)
         {
-            Registry<net.minecraft.world.gen.structure.StructureType> registry = world.getRegistryManager().get(Registry.STRUCTURE_KEY);
+            Registry<net.minecraft.world.gen.structure.Structure> registry = world.getRegistryManager().get(Registry.STRUCTURE_KEY);
             int minCX = (playerPos.getX() >> 4) - maxChunkRange;
             int minCZ = (playerPos.getZ() >> 4) - maxChunkRange;
             int maxCX = (playerPos.getX() >> 4) + maxChunkRange;
@@ -695,7 +694,7 @@ public class DataStorage
                     {
                         for (StructureType type : enabledTypes)
                         {
-                            net.minecraft.world.gen.structure.StructureType feature = registry.get(type.getFeatureId());
+                            net.minecraft.world.gen.structure.Structure feature = registry.get(type.getFeatureId());
 
                             if (feature == null)
                             {

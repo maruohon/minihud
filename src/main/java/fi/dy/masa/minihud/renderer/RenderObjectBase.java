@@ -25,7 +25,7 @@ public abstract class RenderObjectBase
 
     public Supplier<Shader> getShader()
     {
-        return shader;
+        return this.shader;
     }
 
     public abstract void uploadData(BufferBuilder buffer);

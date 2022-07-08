@@ -118,9 +118,6 @@ public class OverlayRendererSpawnableColumnHeights extends OverlayRendererBase
             }
         }
 
-        BUFFER_1.end();
-        BUFFER_2.end();
-
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
 

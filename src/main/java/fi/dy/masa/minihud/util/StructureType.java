@@ -11,7 +11,7 @@ import fi.dy.masa.minihud.config.StructureToggle;
 
 public enum StructureType
 {
-    BURIED_TREASURE     (StructureToggle.OVERLAY_STRUCTURE_BURIED_TREASURE, "buried_treasure",          DimensionTypes.OVERWORLD_ID),
+    BURIED_TREASURE     (StructureToggle.OVERLAY_STRUCTURE_BURIED_TREASURE,     "buried_treasure",      DimensionTypes.OVERWORLD_ID),
     DESERT_PYRAMID      (StructureToggle.OVERLAY_STRUCTURE_DESERT_PYRAMID,      "desert_pyramid",       DimensionTypes.OVERWORLD_ID),
     IGLOO               (StructureToggle.OVERLAY_STRUCTURE_IGLOO,               "igloo",                DimensionTypes.OVERWORLD_ID),
     JUNGLE_TEMPLE       (StructureToggle.OVERLAY_STRUCTURE_JUNGLE_TEMPLE,       "jungle_pyramid",       DimensionTypes.OVERWORLD_ID),

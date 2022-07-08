@@ -92,7 +92,7 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
 
     public boolean isEnabled()
     {
-        return enabled;
+        return this.enabled;
     }
 
     public void toggleEnabled()

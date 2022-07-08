@@ -111,8 +111,6 @@ public abstract class BaseBlockRangeOverlay<T extends BlockEntity> extends Overl
 
     protected void uploadBuffers()
     {
-        BUFFER_1.end();
-        BUFFER_2.end();
         this.renderObjects.get(0).uploadData(BUFFER_1);
         this.renderObjects.get(1).uploadData(BUFFER_2);
     }
