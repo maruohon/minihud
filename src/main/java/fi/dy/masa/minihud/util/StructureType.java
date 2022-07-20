@@ -1,80 +1,55 @@
 package fi.dy.masa.minihud.util;
 
 import java.util.HashMap;
-import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.minihud.config.StructureToggle;
 
 public enum StructureType
 {
-    BURIED_TREASURE     (StructureToggle.OVERLAY_STRUCTURE_BURIED_TREASURE,     "buried_treasure",      DimensionType.OVERWORLD_ID),
-    DESERT_PYRAMID      (StructureToggle.OVERLAY_STRUCTURE_DESERT_PYRAMID,      "desert_pyramid",       DimensionType.OVERWORLD_ID),
-    IGLOO               (StructureToggle.OVERLAY_STRUCTURE_IGLOO,               "igloo",                DimensionType.OVERWORLD_ID),
-    JUNGLE_TEMPLE       (StructureToggle.OVERLAY_STRUCTURE_JUNGLE_TEMPLE,       "jungle_pyramid",       DimensionType.OVERWORLD_ID),
-    MANSION             (StructureToggle.OVERLAY_STRUCTURE_MANSION,             "mansion",              DimensionType.OVERWORLD_ID),
-    MINESHAFT           (StructureToggle.OVERLAY_STRUCTURE_MINESHAFT,           "mineshaft",            DimensionType.OVERWORLD_ID),
-    OCEAN_MONUMENT      (StructureToggle.OVERLAY_STRUCTURE_OCEAN_MONUMENT,      "monument",             DimensionType.OVERWORLD_ID),
-    OCEAN_RUIN          (StructureToggle.OVERLAY_STRUCTURE_OCEAN_RUIN,          "ocean_ruin",           DimensionType.OVERWORLD_ID),
-    PILLAGER_OUTPOST    (StructureToggle.OVERLAY_STRUCTURE_PILLAGER_OUTPOST,    "pillager_outpost",     DimensionType.OVERWORLD_ID),
-    SHIPWRECK           (StructureToggle.OVERLAY_STRUCTURE_SHIPWRECK,           "shipwreck",            DimensionType.OVERWORLD_ID),
-    STRONGHOLD          (StructureToggle.OVERLAY_STRUCTURE_STRONGHOLD,          "stronghold",           DimensionType.OVERWORLD_ID),
-    VILLAGE             (StructureToggle.OVERLAY_STRUCTURE_VILLAGE,             "village",              DimensionType.OVERWORLD_ID),
-    WITCH_HUT           (StructureToggle.OVERLAY_STRUCTURE_WITCH_HUT,           "swamp_hut",            DimensionType.OVERWORLD_ID),
+    BURIED_TREASURE     (StructureToggle.OVERLAY_STRUCTURE_BURIED_TREASURE,     "minecraft:buried_treasure"),
+    DESERT_PYRAMID      (StructureToggle.OVERLAY_STRUCTURE_DESERT_PYRAMID,      "minecraft:desert_pyramid"),
+    IGLOO               (StructureToggle.OVERLAY_STRUCTURE_IGLOO,               "minecraft:igloo"),
+    JUNGLE_TEMPLE       (StructureToggle.OVERLAY_STRUCTURE_JUNGLE_TEMPLE,       "minecraft:jungle_pyramid"),
+    MANSION             (StructureToggle.OVERLAY_STRUCTURE_MANSION,             "minecraft:mansion"),
+    MINESHAFT           (StructureToggle.OVERLAY_STRUCTURE_MINESHAFT,           "minecraft:mineshaft", "minecraft:mineshaft_mesa"),
+    OCEAN_MONUMENT      (StructureToggle.OVERLAY_STRUCTURE_OCEAN_MONUMENT,      "minecraft:monument"),
+    OCEAN_RUIN          (StructureToggle.OVERLAY_STRUCTURE_OCEAN_RUIN,          "minecraft:ocean_ruin_cold", "minecraft:ocean_ruin_warm"),
+    PILLAGER_OUTPOST    (StructureToggle.OVERLAY_STRUCTURE_PILLAGER_OUTPOST,    "minecraft:pillager_outpost"),
+    RUINED_PORTAL       (StructureToggle.OVERLAY_STRUCTURE_RUINED_PORTAL,       "minecraft:ruined_portal", "minecraft:ruined_portal_desert", "minecraft:ruined_portal_jungle", "minecraft:ruined_portal_mountain", "minecraft:ruined_portal_nether", "minecraft:ruined_portal_ocean", "minecraft:ruined_portal_swamp"),
+    SHIPWRECK           (StructureToggle.OVERLAY_STRUCTURE_SHIPWRECK,           "minecraft:shipwreck", "minecraft:shipwreck_beached"),
+    STRONGHOLD          (StructureToggle.OVERLAY_STRUCTURE_STRONGHOLD,          "minecraft:stronghold"),
+    VILLAGE             (StructureToggle.OVERLAY_STRUCTURE_VILLAGE,             "minecraft:village_desert", "minecraft:village_plains", "minecraft:village_savanna", "minecraft:village_snowy", "minecraft:village_taiga"),
+    WITCH_HUT           (StructureToggle.OVERLAY_STRUCTURE_WITCH_HUT,           "minecraft:swamp_hut"),
 
-    RUINED_PORTAL       (StructureToggle.OVERLAY_STRUCTURE_RUINED_PORTAL,       "ruined_portal",        DimensionType.OVERWORLD_ID, DimensionType.THE_NETHER_ID),
+    BASTION_REMNANT     (StructureToggle.OVERLAY_STRUCTURE_BASTION_REMNANT,     "minecraft:bastion_remnant"),
+    NETHER_FORTRESS     (StructureToggle.OVERLAY_STRUCTURE_NETHER_FORTRESS,     "minecraft:fortress"),
+    NETHER_FOSSIL       (StructureToggle.OVERLAY_STRUCTURE_NETHER_FOSSIL,       "minecraft:nether_fossil"),
 
-    BASTION_REMNANT     (StructureToggle.OVERLAY_STRUCTURE_BASTION_REMNANT,     "bastion_remnant",      DimensionType.THE_NETHER_ID),
-    NETHER_FOSSIL       (StructureToggle.OVERLAY_STRUCTURE_NETHER_FOSSIL,       "nether_fossil",        DimensionType.THE_NETHER_ID),
-    NETHER_FORTRESS     (StructureToggle.OVERLAY_STRUCTURE_NETHER_FORTRESS,     "fortress",             DimensionType.THE_NETHER_ID),
+    END_CITY            (StructureToggle.OVERLAY_STRUCTURE_END_CITY,            "minecraft:end_city"),
 
-    END_CITY            (StructureToggle.OVERLAY_STRUCTURE_END_CITY,            "endcity",              DimensionType.THE_END_ID);
+    UNKNOWN             (StructureToggle.OVERLAY_STRUCTURE_UNKNOWN);
 
+    private static final HashMap<String, StructureType> STRUCTURE_ID_TO_TYPE = new HashMap<>();
     public static final ImmutableList<StructureType> VALUES = ImmutableList.copyOf(values());
-    private static final HashMap<String, StructureType> ID_TO_TYPE = new HashMap<>();
 
-    static
+    public static StructureType fromStructureId(String id)
     {
-        for (StructureType type : VALUES)
+        if (STRUCTURE_ID_TO_TYPE.isEmpty())
         {
-            ID_TO_TYPE.put(type.featureId.toString(), type);
+            VALUES.forEach(st -> st.structureIds.forEach(i -> STRUCTURE_ID_TO_TYPE.put(i, st)));
         }
-    }
 
-    @Nullable
-    public static StructureType byStructureId(String id)
-    {
-        return ID_TO_TYPE.get(id);
+        return STRUCTURE_ID_TO_TYPE.getOrDefault(id, UNKNOWN);
     }
 
     private final StructureToggle toggle;
-    private final String structureName;
-    private final Identifier featureId;
-    private final ImmutableSet<Identifier> dims;
+    private final ImmutableSet<String> structureIds;
 
-    StructureType(StructureToggle toggle, String structureName, Identifier... dims)
+    StructureType(StructureToggle toggle, String... structuresIds)
     {
         this.toggle = toggle;
-        this.structureName = structureName;
-        this.featureId = new Identifier(structureName);
-        this.dims = ImmutableSet.copyOf(dims);
-    }
-
-    public boolean existsInDimension(DimensionType dimId)
-    {
-        return this.dims.contains(dimId.getEffects()); // a bit of a meh... but works in vanilla
-    }
-
-    public String getStructureName()
-    {
-        return this.structureName;
-    }
-
-    public Identifier getFeatureId()
-    {
-        return this.featureId;
+        this.structureIds = ImmutableSet.copyOf(structuresIds);
     }
 
     public StructureToggle getToggle()

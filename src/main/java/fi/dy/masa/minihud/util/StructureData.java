@@ -71,8 +71,7 @@ public class StructureData
         if (tag.contains("id", Constants.NBT.TAG_STRING) &&
             tag.contains("Children", Constants.NBT.TAG_LIST))
         {
-            StructureType type = StructureType.byStructureId(tag.getString("id"));
-
+            StructureType type = StructureType.fromStructureId(tag.getString("id"));
             ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
             NbtList pieces = tag.getList("Children", Constants.NBT.TAG_COMPOUND);
             final int count = pieces.size();
