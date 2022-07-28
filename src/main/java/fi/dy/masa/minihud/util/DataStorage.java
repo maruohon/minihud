@@ -1,8 +1,7 @@
 package fi.dy.masa.minihud.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.regex.Matcher;
@@ -24,6 +23,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -34,7 +34,7 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.structure.Structure;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -584,7 +584,6 @@ public class DataStorage
 
     private void updateStructureDataFromIntegratedServer(final BlockPos playerPos)
     {
-        final DimensionType dimId = this.mc.player.getEntityWorld().getDimension();
         final RegistryKey<World> worldId = this.mc.player.getEntityWorld().getRegistryKey();
         final ServerWorld world = this.mc.getServer().getWorld(worldId);
 
@@ -597,7 +596,7 @@ public class DataStorage
             {
                 synchronized (this.structures)
                 {
-                    this.addStructureDataFromGenerator(world, dimId, playerPos, maxChunkRange);
+                    this.addStructureDataFromGenerator(world, playerPos, maxChunkRange);
                 }
             }));
         }
@@ -661,54 +660,39 @@ public class DataStorage
         this.structures.values().removeIf(data -> currentTime > (data.getRefreshTime() + maxAge));
     }
 
-    private void addStructureDataFromGenerator(ServerWorld world, DimensionType dimId, BlockPos playerPos, int maxChunkRange)
+    private void addStructureDataFromGenerator(ServerWorld world, BlockPos playerPos, int maxChunkRange)
     {
         this.structures.clear();
 
-        List<StructureType> enabledTypes = new ArrayList<>();
+        int minCX = (playerPos.getX() >> 4) - maxChunkRange;
+        int minCZ = (playerPos.getZ() >> 4) - maxChunkRange;
+        int maxCX = (playerPos.getX() >> 4) + maxChunkRange;
+        int maxCZ = (playerPos.getZ() >> 4) + maxChunkRange;
 
-        for (StructureType type : StructureType.VALUES)
+        for (int cz = minCZ; cz <= maxCZ; ++cz)
         {
-            if (type.isEnabled() && type.existsInDimension(dimId))
+            for (int cx = minCX; cx <= maxCX; ++cx)
             {
-                enabledTypes.add(type);
-            }
-        }
+                // Don't load the chunk
+                Chunk chunk = world.getChunk(cx, cz, ChunkStatus.FULL, false);
 
-        if (enabledTypes.isEmpty() == false)
-        {
-            Registry<net.minecraft.world.gen.structure.Structure> registry = world.getRegistryManager().get(Registry.STRUCTURE_KEY);
-            int minCX = (playerPos.getX() >> 4) - maxChunkRange;
-            int minCZ = (playerPos.getZ() >> 4) - maxChunkRange;
-            int maxCX = (playerPos.getX() >> 4) + maxChunkRange;
-            int maxCZ = (playerPos.getZ() >> 4) + maxChunkRange;
-
-            for (int cz = minCZ; cz <= maxCZ; ++cz)
-            {
-                for (int cx = minCX; cx <= maxCX; ++cx)
+                if (chunk == null)
                 {
-                    // Don't load the chunk
-                    Chunk chunk = world.getChunk(cx, cz, ChunkStatus.FULL, false);
+                    continue;
+                }
 
-                    if (chunk != null)
+                for (Map.Entry<Structure, StructureStart> entry : chunk.getStructureStarts().entrySet())
+                {
+                    Structure structure = entry.getKey();
+                    StructureStart start = entry.getValue();
+                    Identifier id = world.getRegistryManager().get(Registry.STRUCTURE_KEY).getId(structure);
+                    StructureType type = StructureType.fromStructureId(id != null ? id.toString() : "?");
+
+                    if (type.isEnabled() &&
+                        start.hasChildren() &&
+                        MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxChunkRange << 4))
                     {
-                        for (StructureType type : enabledTypes)
-                        {
-                            net.minecraft.world.gen.structure.Structure feature = registry.get(type.getFeatureId());
-
-                            if (feature == null)
-                            {
-                                continue;
-                            }
-
-                            StructureStart start = chunk.getStructureStart(feature);
-
-                            if (start != null && start.hasChildren() &&
-                                MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxChunkRange << 4))
-                            {
-                                this.structures.put(type, StructureData.fromStructureStart(type, start));
-                            }
-                        }
+                        this.structures.put(type, StructureData.fromStructureStart(type, start));
                     }
                 }
             }
@@ -716,7 +700,7 @@ public class DataStorage
 
         this.structureRendererNeedsUpdate = true;
 
-        //MiniHUD.logger.info("Structure data updated from the integrated server");
+        //MiniHUD.printDebug("Structure data updated from the integrated server ({} structures)", this.structures.size());
     }
 
     public void handleCarpetServerTPSData(Text textComponent)

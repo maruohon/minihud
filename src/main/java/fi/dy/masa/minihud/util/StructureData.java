@@ -73,7 +73,7 @@ public class StructureData
         if (tag.contains("id", Constants.NBT.TAG_STRING) &&
             tag.contains("Children", Constants.NBT.TAG_LIST))
         {
-            StructureType type = StructureType.byStructureId(tag.getString("id"));
+            StructureType type = StructureType.fromStructureId(tag.getString("id"));
 
             if (Configs.Generic.DEBUG_MESSAGES.getBooleanValue())
             {
