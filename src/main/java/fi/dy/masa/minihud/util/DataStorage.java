@@ -19,6 +19,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerTask;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureStart;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
@@ -399,9 +400,13 @@ public class DataStorage
             {
                 try
                 {
-                    String str = String.valueOf(text.getArgs()[0]);
+                    //String str = message.getString();
                     //int i1 = str.indexOf("[");
                     //int i2 = str.indexOf("]");
+                    MutableText m = (MutableText) text.getArgs()[0];
+                    TranslatableTextContent t = (TranslatableTextContent) m.getContent();
+                    LiteralTextContent l = (LiteralTextContent) ((MutableText) t.getArgs()[0]).getContent();
+                    String str = l.string();
 
                     //if (i1 != -1 && i2 != -1)
                     {
@@ -413,7 +418,7 @@ public class DataStorage
                 }
                 catch (Exception e)
                 {
-                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getArgs()[0], e);
+                    MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getArgs()[0]);
                 }
             }
             // The "/jed seed" command
