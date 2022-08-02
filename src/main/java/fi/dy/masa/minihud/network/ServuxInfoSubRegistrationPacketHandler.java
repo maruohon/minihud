@@ -45,7 +45,7 @@ public class ServuxInfoSubRegistrationPacketHandler extends BasePacketHandler
             }
             catch (Exception e)
             {
-                MessageDispatcher.error().console().translate("minihud.message.error.info_sub.failed_receive_metadata");
+                MessageDispatcher.error().console(e).translate("minihud.message.error.info_sub.failed_receive_metadata");
             }
         }
     }
