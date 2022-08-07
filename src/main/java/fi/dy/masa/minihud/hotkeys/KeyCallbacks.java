@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.hotkeys;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
+import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
@@ -17,6 +18,7 @@ import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererBiomeBorders;
 import fi.dy.masa.minihud.renderer.OverlayRendererConduitRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
+import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererStructures;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
@@ -46,13 +48,23 @@ public class KeyCallbacks
         RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind().setCallback(new KeyCallbackAdjustable(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY, new KeyCallbackToggleRenderer(RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY)));
 
         RendererToggle.OVERLAY_BEACON_RANGE.setValueChangeCallback((config) -> updateBeaconOverlay());
-        RendererToggle.OVERLAY_CONDUIT_RANGE.setValueChangeCallback((config) -> updateConduitOverlay());
         RendererToggle.OVERLAY_BIOME_BORDER.setValueChangeCallback((config) -> OverlayRendererBiomeBorders.INSTANCE.setNeedsUpdate());
+        RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.setValueChangeCallback(KeyCallbacks::updateSlimeChunkOverlay);
+        RendererToggle.OVERLAY_CONDUIT_RANGE.setValueChangeCallback((config) -> updateConduitOverlay());
+
         RendererToggle.DEBUG_CHUNK_BORDER.setValueChangeCallback(DebugInfoUtils::toggleDebugRenderer);
         RendererToggle.DEBUG_CHUNK_INFO.setValueChangeCallback(DebugInfoUtils::toggleDebugRenderer);
         RendererToggle.DEBUG_CHUNK_OCCLUSION.setValueChangeCallback(DebugInfoUtils::toggleDebugRenderer);
         RendererToggle.DEBUG_NEIGHBOR_UPDATES.setValueChangeCallback(DebugInfoUtils::toggleDebugRenderer);
         RendererToggle.DEBUG_PATH_FINDING.setValueChangeCallback(DebugInfoUtils::toggleDebugRenderer);
+    }
+
+    private static void updateSlimeChunkOverlay(IConfigBoolean config)
+    {
+        if (config.getBooleanValue())
+        {
+            OverlayRendererSlimeChunks.onEnabled();
+        }
     }
 
     private static void updateBeaconOverlay()

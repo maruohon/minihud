@@ -10,6 +10,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -28,6 +29,17 @@ public class OverlayRendererSlimeChunks extends OverlayRendererBase
     public static void setNeedsUpdate()
     {
         needsUpdate = true;
+    }
+
+    public static void onEnabled()
+    {
+        Entity entity = EntityUtils.getCameraEntity();
+
+        if (entity != null)
+        {
+            overlayTopY = entity.getY();
+            setNeedsUpdate();
+        }
     }
 
     @Override

@@ -9,13 +9,13 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererRandomTickableChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererRegion;
-import fi.dy.masa.minihud.renderer.OverlayRendererSlimeChunks;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnChunks;
 import fi.dy.masa.minihud.util.DataStorage;
 
@@ -38,7 +38,7 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
                 return true;
             }
 
-            Entity entity = mc.getCameraEntity() != null ? mc.getCameraEntity() : mc.player;
+            Entity entity = EntityUtils.getCameraEntity();
             String green = GuiBase.TXT_GREEN;
             String rst = GuiBase.TXT_RST;
             String strStatus = green + StringUtils.translate("malilib.message.value.on") + rst;
@@ -54,11 +54,6 @@ public class KeyCallbackToggleRenderer extends KeyCallbackToggleBooleanConfigWit
             else if (key == RendererToggle.OVERLAY_REGION_FILE.getKeybind())
             {
                 OverlayRendererRegion.setNeedsUpdate();
-            }
-            else if (key == RendererToggle.OVERLAY_SLIME_CHUNKS_OVERLAY.getKeybind())
-            {
-                OverlayRendererSlimeChunks.overlayTopY = entity.getY();
-                OverlayRendererSlimeChunks.setNeedsUpdate();
             }
             else if (key == RendererToggle.OVERLAY_SPAWN_CHUNK_OVERLAY_PLAYER.getKeybind())
             {
