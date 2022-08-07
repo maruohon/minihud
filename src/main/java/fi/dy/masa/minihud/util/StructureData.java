@@ -75,10 +75,9 @@ public class StructureData
         {
             StructureType type = StructureType.fromStructureId(tag.getString("id"));
 
-            if (Configs.Generic.DEBUG_MESSAGES.getBooleanValue())
+            if (type == StructureType.UNKNOWN && Configs.Generic.DEBUG_MESSAGES.getBooleanValue())
             {
                 MiniHUD.logger.warn("StructureData.fromStructureStartTag(): Unknown structure type '{}'", tag.getString("id"));
-                return null;
             }
 
             ImmutableList.Builder<IntBoundingBox> builder = ImmutableList.builder();
