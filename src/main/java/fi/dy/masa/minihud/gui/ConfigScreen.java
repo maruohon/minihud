@@ -77,9 +77,10 @@ public class ConfigScreen
 
         ListUtils.extractEntriesToSecondList(genericOptions, lightOptions, (c) -> c.getName().startsWith("lightLevel"), true);
 
-        genericOptions.add(new GenericButtonConfig("minihud.config.name.info_lines_hud_settings",
+        genericOptions.add(new GenericButtonConfig("minihud_generic_info_lines_hud_settings",
                                                    "minihud.button.config.open_info_hud_settings",
                                                    ConfigScreen::openHudSettingScreen,
+                                                   "minihud.config.name.info_lines_hud_settings",
                                                    "minihud.config.comment.info_lines_hud_settings"));
         genericOptions.add(new ExpandableConfigGroup(MOD_INFO, "light_level", lightOptions));
         ConfigUtils.sortConfigsByDisplayName(genericOptions);
