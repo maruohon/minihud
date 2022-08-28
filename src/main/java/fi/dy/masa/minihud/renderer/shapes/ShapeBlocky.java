@@ -25,7 +25,7 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 public abstract class ShapeBlocky extends ShapeBase
 {
     private BlockSnap snap = BlockSnap.CENTER;
-    protected Box renderPerimeter = ShapeBox.EMPTY_BOX;
+    protected Box renderPerimeter = ShapeBox.DEFAULT_BOX;
     private boolean combineQuads;
 
     public ShapeBlocky(ShapeType type, Color4f color)
