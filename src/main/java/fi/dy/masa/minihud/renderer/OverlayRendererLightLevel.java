@@ -112,6 +112,8 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
     @Override
     protected void postRender()
     {
+        super.postRender();
+
         RenderSystem.disableTexture();
     }
 
