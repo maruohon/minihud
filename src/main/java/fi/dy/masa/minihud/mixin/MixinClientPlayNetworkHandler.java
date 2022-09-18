@@ -39,6 +39,7 @@ public abstract class MixinClientPlayNetworkHandler
     private void onHandlePlayerListHeaderFooter(net.minecraft.network.packet.s2c.play.PlayerListHeaderS2CPacket packetIn, CallbackInfo ci)
     {
         DataStorage.getInstance().handleCarpetServerTPSData(packetIn.getFooter());
+        DataStorage.getInstance().getMobCapData().parsePlayerListFooterMobCapData(packetIn.getFooter());
     }
 
     @Inject(method = "onWorldTimeUpdate", at = @At("RETURN"))

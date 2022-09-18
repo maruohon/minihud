@@ -56,6 +56,7 @@ import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.data.MobCapDataHandler;
 import fi.dy.masa.minihud.mixin.IMixinServerWorld;
 import fi.dy.masa.minihud.mixin.IMixinWorldRenderer;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
@@ -418,6 +419,20 @@ public class RenderHandler implements IRenderer
             else
             {
                 this.addLine("Server TPS: <no valid data>");
+            }
+        }
+        else if (type == InfoToggle.MOB_CAPS)
+        {
+            MobCapDataHandler mobCapData = this.data.getMobCapData();
+
+            if (mc.isIntegratedServerRunning() && (mc.getServer().getTicks() % 100) == 0)
+            {
+                mobCapData.updateIntegratedServerMobCaps();
+            }
+
+            if (mobCapData.getHasValidData())
+            {
+                this.addLine(mobCapData.getFormattedInfoLine());
             }
         }
         else if (type == InfoToggle.PING)

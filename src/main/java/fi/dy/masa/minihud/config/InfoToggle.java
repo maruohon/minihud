@@ -45,6 +45,7 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     LOOKING_AT_BLOCK_CHUNK  ("infoLookingAtBlockInChunk",   false, 26, "", "Show which block within its containing chunk\nthe player is currently looking at"),
     LOOKING_AT_ENTITY       ("infoLookingAtEntity",         false, 23, "", "Show the entity name and health when looked at"),
     MEMORY_USAGE            ("infoMemoryUsage",             false,  0, "", "Show the memory usage and allocation"),
+    MOB_CAPS                ("infoMobCaps",                 false, 10, "", "Show the mob caps\n\n§dNote: Currently only works on Carpet servers!\n§6The data is currently only parsed from the player list footer on Carpet servers,\n§6if you have subscribed to the data with '/log mobcaps'"),
     LOADED_CHUNKS_COUNT     ("infoLoadedChunksCount",       false, 31, "", "Show the number of loaded chunks on the client"),
     PARTICLE_COUNT          ("infoParticleCount",           false, 17, "", "Show the currently renderer particle count (P from F3)"),
     PING                    ("infoPing",                    false, 36, "", "Show the current ping to the server"),
