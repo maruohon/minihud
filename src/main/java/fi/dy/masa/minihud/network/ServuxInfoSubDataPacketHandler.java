@@ -7,10 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.PacketBuffer;
@@ -32,6 +31,7 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
+import fi.dy.masa.minihud.data.MobCapData;
 
 public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
 {
@@ -144,9 +144,14 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
         this.channelIdPalette = new HashMapPalette<>(bits, this::resizePalette);
     }
 
-    protected void receiveMobCapData(EnumCreatureType type, boolean limit, int value)
+    protected void receiveMobCapCurrentValue(MobCapData.EntityCategory type, int currentValue)
     {
-        DataStorage.getInstance().getMobcapData().handleServuxInfoSubMobCap(type, limit, value);
+        DataStorage.getInstance().getMobCapData().putServerSubscribedMobCapCurrentValue(type, currentValue);
+    }
+
+    protected void receiveMobCapCapValue(MobCapData.EntityCategory type, int capValue)
+    {
+        DataStorage.getInstance().getMobCapData().putServerSubscribedMobCapCapValue(type, capValue);
     }
 
     protected void registerDataHandlers()
@@ -175,14 +180,14 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
         this.allBufferReaders.put("minecraft.status.performance.tps", (buf) -> DataStorage.getInstance().getTpsData().handleCarpetServerPubsubTps(buf.readFloat()));
         this.allBufferReaders.put("minecraft.status.performance.mspt", (buf) -> DataStorage.getInstance().getTpsData().handleCarpetServerPubsubMspt(buf.readFloat()));
 
-        this.allBufferReaders.put("minecraft.status.count.mobcap.monster.val",        (buf) -> this.receiveMobCapData(EnumCreatureType.MONSTER, false, buf.readVarInt()));
-        this.allBufferReaders.put("minecraft.status.count.mobcap.monster.max",        (buf) -> this.receiveMobCapData(EnumCreatureType.MONSTER, true, buf.readVarInt()));
-        this.allBufferReaders.put("minecraft.status.count.mobcap.creature.val",       (buf) -> this.receiveMobCapData(EnumCreatureType.CREATURE, false, buf.readVarInt()));
-        this.allBufferReaders.put("minecraft.status.count.mobcap.creature.max",       (buf) -> this.receiveMobCapData(EnumCreatureType.CREATURE, true, buf.readVarInt()));
-        this.allBufferReaders.put("minecraft.status.count.mobcap.ambient.val",        (buf) -> this.receiveMobCapData(EnumCreatureType.AMBIENT, false, buf.readVarInt()));
-        this.allBufferReaders.put("minecraft.status.count.mobcap.ambient.max",        (buf) -> this.receiveMobCapData(EnumCreatureType.AMBIENT, true, buf.readVarInt()));
-        this.allBufferReaders.put("minecraft.status.count.mobcap.water_creature.val", (buf) -> this.receiveMobCapData(EnumCreatureType.WATER_CREATURE, false, buf.readVarInt()));
-        this.allBufferReaders.put("minecraft.status.count.mobcap.water_creature.max", (buf) -> this.receiveMobCapData(EnumCreatureType.WATER_CREATURE, true, buf.readVarInt()));
+        this.allBufferReaders.put("minecraft.status.count.mobcap.monster.val",        (buf) -> this.receiveMobCapCurrentValue(MobCapData.EntityCategory.MONSTER, buf.readVarInt()));
+        this.allBufferReaders.put("minecraft.status.count.mobcap.monster.max",        (buf) -> this.receiveMobCapCapValue(MobCapData.EntityCategory.MONSTER, buf.readVarInt()));
+        this.allBufferReaders.put("minecraft.status.count.mobcap.creature.val",       (buf) -> this.receiveMobCapCurrentValue(MobCapData.EntityCategory.CREATURE, buf.readVarInt()));
+        this.allBufferReaders.put("minecraft.status.count.mobcap.creature.max",       (buf) -> this.receiveMobCapCapValue(MobCapData.EntityCategory.CREATURE, buf.readVarInt()));
+        this.allBufferReaders.put("minecraft.status.count.mobcap.ambient.val",        (buf) -> this.receiveMobCapCurrentValue(MobCapData.EntityCategory.AMBIENT, buf.readVarInt()));
+        this.allBufferReaders.put("minecraft.status.count.mobcap.ambient.max",        (buf) -> this.receiveMobCapCapValue(MobCapData.EntityCategory.AMBIENT, buf.readVarInt()));
+        this.allBufferReaders.put("minecraft.status.count.mobcap.water_creature.val", (buf) -> this.receiveMobCapCurrentValue(MobCapData.EntityCategory.WATER, buf.readVarInt()));
+        this.allBufferReaders.put("minecraft.status.count.mobcap.water_creature.max", (buf) -> this.receiveMobCapCapValue(MobCapData.EntityCategory.WATER, buf.readVarInt()));
     }
 
     protected NBTTagCompound channelToTag(String channel)

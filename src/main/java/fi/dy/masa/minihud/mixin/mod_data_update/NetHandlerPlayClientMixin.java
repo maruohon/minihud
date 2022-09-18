@@ -35,7 +35,7 @@ public abstract class NetHandlerPlayClientMixin
     private void onHandlePlayerListHeaderFooter(SPacketPlayerListHeaderFooter packetIn, CallbackInfo ci)
     {
         DataStorage.getInstance().getTpsData().parsePlayerListFooterTpsData(packetIn.getFooter());
-        DataStorage.getInstance().getMobcapData().parsePlayerListFooterMobCapData(packetIn.getFooter());
+        DataStorage.getInstance().getMobCapData().parsePlayerListFooterMobCapData(packetIn.getFooter());
     }
 
     @Inject(method = "handleChunkData", at = @At("RETURN"))

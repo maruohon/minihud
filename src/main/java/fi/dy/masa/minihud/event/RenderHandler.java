@@ -54,7 +54,7 @@ import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.DataStorage.HashSizeType;
-import fi.dy.masa.minihud.data.MobCapDataHolder;
+import fi.dy.masa.minihud.data.MobCapDataHandler;
 import fi.dy.masa.minihud.data.TpsData;
 import fi.dy.masa.minihud.mixin.info_lines.RenderGlobalMixin;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
@@ -297,7 +297,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             {
                 if (InfoLine.MOB_CAPS.getBooleanValue())
                 {
-                    DataStorage.getInstance().getMobcapData().updateIntegratedServerMobCaps();
+                    DataStorage.getInstance().getMobCapData().updateIntegratedServerMobCaps();
                 }
 
                 if (RendererToggle.STRUCTURE_BOUNDING_BOXES.isRendererEnabled())
@@ -474,16 +474,16 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
         else if (type == InfoLine.MOB_CAPS)
         {
-            MobCapDataHolder mobcapData = data.getMobcapData();
+            MobCapDataHandler mobCapData = data.getMobCapData();
 
             if (mc.isSingleplayer() && (mc.getIntegratedServer().getTickCounter() % 100) == 0)
             {
-                mobcapData.updateIntegratedServerMobCaps();
+                mobCapData.updateIntegratedServerMobCaps();
             }
 
-            if (mobcapData.getHasValidData())
+            if (mobCapData.getHasValidData())
             {
-                this.addLine(mobcapData.getFormattedInfoLine());
+                this.addLine(mobCapData.getFormattedInfoLine());
             }   
         }
         else if (type == InfoLine.PING)

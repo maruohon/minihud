@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.BlockPos;
@@ -37,7 +37,7 @@ public class DataStorage
 
     private final Minecraft mc = GameUtils.getClient();
 
-    private final MobCapDataHolder mobcapData = new MobCapDataHolder();
+    private final MobCapDataHandler mobCapData = new MobCapDataHandler();
     private final StructureStorage structureStorage = new StructureStorage();
     private final TpsData tpsData = new TpsData();
     private final WoolCounters woolCounters = new WoolCounters();
@@ -62,9 +62,9 @@ public class DataStorage
         return INSTANCE;
     }
 
-    public MobCapDataHolder getMobcapData()
+    public MobCapDataHandler getMobCapData()
     {
-        return this.mobcapData;
+        return this.mobCapData;
     }
 
     public StructureStorage getStructureStorage()
@@ -88,7 +88,7 @@ public class DataStorage
         this.worldSpawnValid = false;
         this.hasServerDroppedChunksHashSize = false;
 
-        this.mobcapData.clear();
+        this.mobCapData.clear();
         this.structureStorage.clear();
         this.tpsData.clear();
         this.woolCounters.clear();

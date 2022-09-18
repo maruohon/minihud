@@ -10,9 +10,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import io.netty.buffer.Unpooled;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.item.EnumDyeColor;
@@ -30,7 +30,7 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLine;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
-import fi.dy.masa.minihud.data.MobCapDataHolder;
+import fi.dy.masa.minihud.data.MobCapDataHandler;
 import fi.dy.masa.minihud.data.WoolCounters;
 
 public class CarpetPubsubPacketHandler extends BasePacketHandler
@@ -95,7 +95,7 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
             builder.put("carpet.counter." + color.getName(), NodeType.create(TYPE_LONG, buf -> data.getWoolCounters().setValue(color, buf.readLong())));
         }
 
-        MobCapDataHolder mobcapData = data.getMobcapData();
+        MobCapDataHandler mobCapData = data.getMobCapData();
 
         for (DimensionType dim : DimensionType.values())
         {
@@ -107,8 +107,8 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
             {
                 String name = creatureType.name().toLowerCase(Locale.ROOT);
                 String mobcapPrefix = prefix + ".mob_cap." + name;
-                builder.put(mobcapPrefix + ".filled", NodeType.create(TYPE_INT, buf -> mobcapData.handleCarpetServerPubsubMobcap(name, false, buf.readInt())));
-                builder.put(mobcapPrefix + ".total",  NodeType.create(TYPE_INT, buf -> mobcapData.handleCarpetServerPubsubMobcap(name, true, buf.readInt())));
+                builder.put(mobcapPrefix + ".filled", NodeType.create(TYPE_INT, buf -> mobCapData.putCarpetSubscribedMobCapCurrentValue(name, buf.readInt())));
+                builder.put(mobcapPrefix + ".total",  NodeType.create(TYPE_INT, buf -> mobCapData.putCarpetSubscribedMobCapCapValue(name, buf.readInt())));
             }
         }
 
