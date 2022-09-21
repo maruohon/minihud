@@ -13,6 +13,7 @@ import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.feature.Actions;
 import fi.dy.masa.minihud.network.carpet.CarpetPubsubPacketHandler;
+import fi.dy.masa.minihud.network.servux.ServuxInfoSubDataPacketHandler;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
 
@@ -57,16 +58,23 @@ public class ConfigCallbacks
         Configs.Generic.WOOL_COUNTER_TYPES.setValueLoadCallback(DataStorage.getInstance().getWoolCounters()::updateEnabledCounters);
         Configs.Generic.WOOL_COUNTER_TYPES.setValueChangeCallback((newValue, oldValue) -> {
             DataStorage.getInstance().getWoolCounters().updateEnabledCounters(newValue);
-            CarpetPubsubPacketHandler.updatePubSubSubscriptions();
+            CarpetPubsubPacketHandler.INSTANCE.updatePubSubSubscriptions();
         });
 
-        EventListener pubSubCallback = CarpetPubsubPacketHandler::updatePubSubSubscriptions;
-        Configs.Generic.WOOL_COUNTER_ENABLE_ALL.addValueChangeListener(pubSubCallback);
+        EventListener carpetCallback = CarpetPubsubPacketHandler.INSTANCE::updatePubSubSubscriptions;
+        Configs.Generic.WOOL_COUNTER_ENABLE_ALL.addValueChangeListener(carpetCallback);
+        InfoLineToggle.CARPET_WOOL_COUNTERS.addValueChangeListener(carpetCallback);
 
-        InfoLineToggle.CARPET_WOOL_COUNTERS.addValueChangeListener(pubSubCallback);
-        InfoLineToggle.CHUNK_UNLOAD_ORDER.addValueChangeListener(pubSubCallback);
-        InfoLineToggle.MOB_CAPS.addValueChangeListener(pubSubCallback);
-        InfoLineToggle.SERVER_TPS.addValueChangeListener(pubSubCallback);
+        // TODO move this to a proper method somewhere which only(?) updates the registration
+        // TODO for the currently detected server side counterpart(s)
+        EventListener syncCallback = () -> {
+            CarpetPubsubPacketHandler.INSTANCE.updatePubSubSubscriptions();
+            ServuxInfoSubDataPacketHandler.INSTANCE.updateSubscriptions();
+        };
+        InfoLineToggle.CHUNK_UNLOAD_ORDER.addValueChangeListener(syncCallback);
+        InfoLineToggle.MOB_CAPS.addValueChangeListener(syncCallback);
+        InfoLineToggle.SERVER_TPS.addValueChangeListener(syncCallback);
+        RendererToggle.CHUNK_UNLOAD_BUCKET.addValueChangeListener(syncCallback);
 
         RendererToggle.DEBUG_COLLISION_BOXES.addValueChangeListener( () -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_COLLISION_BOXES));
         RendererToggle.DEBUG_HEIGHT_MAP.addValueChangeListener(      () -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_HEIGHT_MAP));
@@ -76,7 +84,6 @@ public class ConfigCallbacks
         RendererToggle.DEBUG_WATER.addValueChangeListener(           () -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_WATER));
 
         RendererToggle.BEACON_RANGE.addValueChangeListener(beaconUpdateCallback);
-        RendererToggle.CHUNK_UNLOAD_BUCKET.addValueChangeListener(pubSubCallback);
         RendererToggle.LIGHT_LEVEL.addValueChangeListener(lightLevelUpdateCallback);
         RendererToggle.STRUCTURE_BOUNDING_BOXES.addValueChangeListener(DataStorage.getInstance().getStructureStorage()::requestStructureDataUpdates);;
 

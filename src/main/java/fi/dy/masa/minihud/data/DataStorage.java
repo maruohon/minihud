@@ -101,14 +101,14 @@ public class DataStorage
         if (this.mc.world != null)
         {
             this.structureStorage.requestStructureDataUpdates();
-            CarpetPubsubPacketHandler.updatePubSubSubscriptions();
+            CarpetPubsubPacketHandler.INSTANCE.updatePubSubSubscriptions();
             ServuxInfoSubDataPacketHandler.INSTANCE.updateSubscriptions();
         }
         else
         {
             this.spawnerPositions.clear();
             this.waterFallPositions.clear();
-            CarpetPubsubPacketHandler.unsubscribeAll();
+            CarpetPubsubPacketHandler.INSTANCE.unsubscribeAll();
         }
     }
 

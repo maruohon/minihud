@@ -55,34 +55,11 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
     public static final String NODE_SERVER_TPS = "minecraft.performance.tps";
     public static final String NODE_SERVER_MSPT = "minecraft.performance.mspt";
 
-    private static final HashSet<String> SUBSCRIPTIONS = new HashSet<>();
-    private static final HashSet<String> PER_DIMENSION_SUBSCRIPTIONS = new HashSet<>();
+    protected final HashSet<String> subscriptions = new HashSet<>();
+    protected final HashSet<String> perDimensionSubscriptions = new HashSet<>();
+    protected final Map<String, NodeType> nodeTypes;
 
-    private static final Map<String, NodeType> NODE_TYPES;
-
-    private static class NodeType
-    {
-        public final int typeId;
-        public final Consumer<PacketBuffer> handler;
-
-        public NodeType(int typeId, Consumer<PacketBuffer> handler)
-        {
-            this.typeId = typeId;
-            this.handler = handler;
-        }
-
-        private static NodeType create(int typeId, Consumer<PacketBuffer> handler)
-        {
-            return new NodeType(typeId, handler);
-        }
-    }
-
-    static
-    {
-        NODE_TYPES = registerTypes();
-    }
-
-    private static Map<String, NodeType> registerTypes()
+    protected static Map<String, NodeType> registerTypes()
     {
         ImmutableMap.Builder<String, NodeType> builder = ImmutableMap.builder();
         DataStorage data = DataStorage.getInstance();
@@ -115,10 +92,11 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
         return builder.build();
     }
 
-    private CarpetPubsubPacketHandler()
+    protected CarpetPubsubPacketHandler()
     {
         this.registerToServer = true;
         this.usePacketSplitter = true;
+        this.nodeTypes = registerTypes();
     }
 
     @Override
@@ -151,7 +129,7 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
 
     protected boolean readNodeData(String node, int type, PacketBuffer buf)
     {
-        NodeType expectedType = NODE_TYPES.getOrDefault(node, null);
+        NodeType expectedType = this.nodeTypes.getOrDefault(node, null);
 
         if (expectedType != null && expectedType.typeId == type)
         {
@@ -162,33 +140,33 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
         return false;
     }
 
-    public static void subscribe(String... nodes)
+    public void subscribe(String... nodes)
     {
-        subscribe(Arrays.asList(nodes));
+        this.subscribe(Arrays.asList(nodes));
     }
 
-    public static void subscribe(Collection<String> nodes)
+    public void subscribe(Collection<String> nodes)
     {
-        updateSubscriptions(PACKET_C2S_SUBSCRIBE, nodes);
+        this.updateSubscriptions(PACKET_C2S_SUBSCRIBE, nodes);
     }
 
-    public static void unsubscribeAll()
+    public void unsubscribeAll()
     {
-        unsubscribe(SUBSCRIPTIONS);
-        SUBSCRIPTIONS.clear();
+        this.unsubscribe(this.subscriptions);
+        this.subscriptions.clear();
     }
 
-    public static void unsubscribe(String... nodes)
+    public void unsubscribe(String... nodes)
     {
-        unsubscribe(Arrays.asList(nodes));
+        this.unsubscribe(Arrays.asList(nodes));
     }
 
-    public static void unsubscribe(Collection<String> nodes)
+    public void unsubscribe(Collection<String> nodes)
     {
-        updateSubscriptions(PACKET_C2S_UNSUBSCRIBE, nodes);
+        this.updateSubscriptions(PACKET_C2S_UNSUBSCRIBE, nodes);
     }
 
-    private static void updateSubscriptions(int updateType, Collection<String> nodes)
+    protected void updateSubscriptions(int updateType, Collection<String> nodes)
     {
         NetHandlerPlayClient handler = GameUtils.getClient().getConnection();
 
@@ -198,15 +176,15 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
 
             for (String node : nodes)
             {
-                if (updateType == PACKET_C2S_SUBSCRIBE && SUBSCRIPTIONS.contains(node) == false)
+                if (updateType == PACKET_C2S_SUBSCRIBE && this.subscriptions.contains(node) == false)
                 {
                     actionableNodes.add(node);
-                    SUBSCRIPTIONS.add(node);
+                    this.subscriptions.add(node);
                 }
-                else if (updateType == PACKET_C2S_UNSUBSCRIBE && SUBSCRIPTIONS.contains(node))
+                else if (updateType == PACKET_C2S_UNSUBSCRIBE && this.subscriptions.contains(node))
                 {
                     actionableNodes.add(node);
-                    SUBSCRIPTIONS.remove(node);
+                    this.subscriptions.remove(node);
                 }
             }
 
@@ -234,7 +212,7 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
         }
     }
 
-    public static void updatePubSubSubscriptions()
+    public void updatePubSubSubscriptions()
     {
         World world = GameUtils.getClientWorld();
 
@@ -245,8 +223,8 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
             DimensionType dimType = world.provider.getDimensionType();
 
             // First unsubscribe from any previous subscriptions
-            Set<String> unSubs = new HashSet<>(PER_DIMENSION_SUBSCRIPTIONS);
-            PER_DIMENSION_SUBSCRIPTIONS.clear();
+            Set<String> unSubs = new HashSet<>(this.perDimensionSubscriptions);
+            this.perDimensionSubscriptions.clear();
 
             if (InfoLineToggle.SERVER_TPS.getBooleanValue())
             {
@@ -271,7 +249,7 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
             if (InfoLineToggle.MOB_CAPS.getBooleanValue())
             {
                 List<String> mobCaps = getMobCapNodeNames(dimType);
-                addPerDimensionSubs(mobCaps, newSubs, unSubs);
+                this.addPerDimensionSubs(mobCaps, newSubs, unSubs);
             }
 
             if ((InfoLineToggle.CHUNK_UNLOAD_ORDER.getBooleanValue()
@@ -280,7 +258,7 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
                 && Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue())
             {
                 String node = getDroppedChunksHashSizeNodeName(dimType);
-                addPerDimensionSubs(Collections.singletonList(node), newSubs, unSubs);
+                this.addPerDimensionSubs(Collections.singletonList(node), newSubs, unSubs);
             }
 
             if (unSubs.isEmpty() == false || newSubs.isEmpty() == false)
@@ -289,12 +267,12 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
 
                 if (unSubs.isEmpty() == false)
                 {
-                    unsubscribe(unSubs);
+                    this.unsubscribe(unSubs);
                 }
 
                 if (newSubs.isEmpty() == false)
                 {
-                    subscribe(newSubs);
+                    this.subscribe(newSubs);
                 }
             }
             else
@@ -304,19 +282,19 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
         }
     }
 
-    private static void addPerDimensionSubs(List<String> nodes, Set<String> newsubs, Set<String> unsubs)
+    protected void addPerDimensionSubs(List<String> nodes, Set<String> newsubs, Set<String> unsubs)
     {
         newsubs.addAll(nodes);
         nodes.forEach(unsubs::remove);
-        PER_DIMENSION_SUBSCRIPTIONS.addAll(nodes);
+        this.perDimensionSubscriptions.addAll(nodes);
     }
 
-    private static String getDroppedChunksHashSizeNodeName(DimensionType dimType)
+    protected static String getDroppedChunksHashSizeNodeName(DimensionType dimType)
     {
         return "minecraft." + dimType.getName() + ".chunk_loading.dropped_chunks.hash_size";
     }
 
-    private static List<String> getMobCapNodeNames(DimensionType dimensionType)
+    protected static List<String> getMobCapNodeNames(DimensionType dimensionType)
     {
         List<String> nodes = new ArrayList<>();
         String prefix = "minecraft." + dimensionType.getName() + ".mob_cap.";
@@ -331,7 +309,7 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
         return nodes;
     }
 
-    private static List<String> getWoolCounterNodeNames(boolean enabledOnly)
+    protected static List<String> getWoolCounterNodeNames(boolean enabledOnly)
     {
         List<String> nodes = new ArrayList<>();
         WoolCounters wc = DataStorage.getInstance().getWoolCounters();
@@ -345,5 +323,22 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
         }
 
         return nodes;
+    }
+
+    public static class NodeType
+    {
+        public final int typeId;
+        public final Consumer<PacketBuffer> handler;
+
+        public NodeType(int typeId, Consumer<PacketBuffer> handler)
+        {
+            this.typeId = typeId;
+            this.handler = handler;
+        }
+
+        public static NodeType create(int typeId, Consumer<PacketBuffer> handler)
+        {
+            return new NodeType(typeId, handler);
+        }
     }
 }
