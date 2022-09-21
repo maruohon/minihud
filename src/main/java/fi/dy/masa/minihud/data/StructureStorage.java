@@ -171,8 +171,12 @@ public class StructureStorage
                 {
                     MiniHUD.debugLog("Attempting to register structure packet handlers to the server");
 
+                    // TODO on Servux servers this re-register shouldn't be done when the player just moves around.
+                    // But on 1.12.x Carpet server I think a re-request is needed, it doesn't seem like the server
+                    // would auto-send structures when the player moves around?
                     Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
                     Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(ServuxStructurePacketHandler.INSTANCE);
+                    CarpetStructurePacketHandler.INSTANCE.sendBoundingBoxRequest();
                 }
                 else
                 {
@@ -271,6 +275,7 @@ public class StructureStorage
             if (data.readerIndex() < data.writerIndex() - 4)
             {
                 int type = data.readInt();
+                MiniHUD.debugLog("StructureStorage#updateStructureDataFromCarpetServer() - type = {}", type);
 
                 if (type == CARPET_ID_BOUNDINGBOX_MARKERS)
                 {
@@ -348,6 +353,7 @@ public class StructureStorage
     private void readStructureDataCarpetAll(NBTTagCompound nbt)
     {
         NBTTagList tagList = NbtWrap.getList(nbt, "Boxes", Constants.NBT.TAG_LIST);
+        MiniHUD.debugLog("StructureStorage#readStructureDataCarpetAll() - count: {}", tagList.tagCount());
         DataStorage.getInstance().setWorldSeed(NbtWrap.getLong(nbt, "Seed"));
 
         synchronized (this.structureMap)
