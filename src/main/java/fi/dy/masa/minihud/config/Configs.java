@@ -18,9 +18,9 @@ import fi.dy.masa.malilib.config.value.ScreenLocation;
 import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.input.KeyBindSettings;
 import fi.dy.masa.minihud.Reference;
-import fi.dy.masa.minihud.util.BlockGridMode;
-import fi.dy.masa.minihud.util.LightLevelMarkerMode;
-import fi.dy.masa.minihud.util.LightLevelNumberMode;
+import fi.dy.masa.minihud.util.value.BlockGridMode;
+import fi.dy.masa.minihud.util.value.LightLevelMarkerMode;
+import fi.dy.masa.minihud.util.value.LightLevelNumberMode;
 
 public class Configs
 {
@@ -240,9 +240,9 @@ public class Configs
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Generic",          Generic.OPTIONS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Hotkeys",          Hotkeys.HOTKEYS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Colors",           Colors.OPTIONS),
-            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoToggles",      InfoLine.TOGGLE_CONFIGS),
-            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoHotkeys",      InfoLine.TOGGLE_HOTKEYS),
-            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoLineOrders",   InfoLine.LINE_ORDER_CONFIGS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoToggles",      InfoLineToggle.TOGGLE_CONFIGS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoHotkeys",      InfoLineToggle.TOGGLE_HOTKEYS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoLineOrders",   InfoLineToggle.LINE_ORDER_CONFIGS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Internal",         Internal.OPTIONS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "RendererToggles",  RendererToggle.TOGGLE_CONFIGS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "RendererHotkeys",  RendererToggle.TOGGLE_HOTKEYS),

@@ -15,7 +15,7 @@ import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.malilib.util.data.ModInfo;
 import fi.dy.masa.minihud.Reference;
 
-public enum InfoLine implements ConfigInfo
+public enum InfoLineToggle implements ConfigInfo
 {
     BIOME                   ("infoBiomeName",               false, 19),
     BIOME_REG_NAME          ("infoBiomeRegistryName",       false, 20),
@@ -62,21 +62,21 @@ public enum InfoLine implements ConfigInfo
     TIME_WORLD              ("infoTimeWorld",               false,  2),
     TIME_WORLD_FORMATTED    ("infoWorldTimeFormatted",      false,  3);
 
-    public static final ImmutableList<InfoLine> VALUES = ImmutableList.copyOf(values());
-    public static final ImmutableList<BooleanConfig> TOGGLE_CONFIGS = ImmutableList.copyOf(VALUES.stream().map(InfoLine::getBooleanConfig).collect(Collectors.toList()));
-    public static final ImmutableList<HotkeyConfig> TOGGLE_HOTKEYS = ImmutableList.copyOf(VALUES.stream().map(InfoLine::getHotkeyConfig).collect(Collectors.toList()));
-    public static final ImmutableList<IntegerConfig> LINE_ORDER_CONFIGS = ImmutableList.copyOf(VALUES.stream().map(InfoLine::getLineOrderConfig).collect(Collectors.toList()));
+    public static final ImmutableList<InfoLineToggle> VALUES = ImmutableList.copyOf(values());
+    public static final ImmutableList<BooleanConfig> TOGGLE_CONFIGS = ImmutableList.copyOf(VALUES.stream().map(InfoLineToggle::getBooleanConfig).collect(Collectors.toList()));
+    public static final ImmutableList<HotkeyConfig> TOGGLE_HOTKEYS = ImmutableList.copyOf(VALUES.stream().map(InfoLineToggle::getHotkeyConfig).collect(Collectors.toList()));
+    public static final ImmutableList<IntegerConfig> LINE_ORDER_CONFIGS = ImmutableList.copyOf(VALUES.stream().map(InfoLineToggle::getLineOrderConfig).collect(Collectors.toList()));
 
     private final BooleanConfig toggleStatus;
     private final HotkeyConfig toggleHotkey;
     private final IntegerConfig lineOrder;
 
-    InfoLine(String name, boolean defaultValue, int lineOrder)
+    InfoLineToggle(String name, boolean defaultValue, int lineOrder)
     {
         this(name, defaultValue, lineOrder, KeyBindSettings.INGAME_DEFAULT);
     }
 
-    InfoLine(String name, boolean defaultValue, int lineOrder, KeyBindSettings settings)
+    InfoLineToggle(String name, boolean defaultValue, int lineOrder, KeyBindSettings settings)
     {
         String nameLower = name.toLowerCase(Locale.ROOT);
         String nameKey = "minihud.info_line.name." + nameLower;

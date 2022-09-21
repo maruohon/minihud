@@ -18,7 +18,7 @@ import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.malilib.util.position.PositionUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.util.BlockGridMode;
+import fi.dy.masa.minihud.util.value.BlockGridMode;
 
 public class OverlayRendererBlockGrid extends MiniHUDOverlayRenderer
 {

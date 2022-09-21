@@ -5,7 +5,7 @@ import fi.dy.masa.malilib.action.NamedAction;
 import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.InfoLine;
+import fi.dy.masa.minihud.config.InfoLineToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.config.StructureToggle;
 import fi.dy.masa.minihud.data.DataStorage;
@@ -22,7 +22,7 @@ public class Actions
 
     public static void init()
     {
-        for (InfoLine line : InfoLine.VALUES)
+        for (InfoLineToggle line : InfoLineToggle.VALUES)
         {
             ActionUtils.registerBooleanConfigActions(Reference.MOD_INFO, line.getBooleanConfig(), line.getKeyBind());
         }

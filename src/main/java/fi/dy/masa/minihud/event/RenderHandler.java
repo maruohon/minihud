@@ -50,7 +50,7 @@ import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.InfoLine;
+import fi.dy.masa.minihud.config.InfoLineToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.DataStorage.HashSizeType;
@@ -64,7 +64,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 {
     public static final RenderHandler INSTANCE = new RenderHandler();
     private final Supplier<String> profilerSectionSupplier = () -> "MiniHUD_RenderHandler";
-    private final Set<InfoLine> addedTypes = new HashSet<>();
+    private final Set<InfoLineToggle> addedTypes = new HashSet<>();
     private final Date date = new Date();
     private StringListRendererWidget stringListRenderer;
     private int fps;
@@ -183,7 +183,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     {
         if (this.enabled)
         {
-            if (InfoLine.FPS.getBooleanValue())
+            if (InfoLineToggle.FPS.getBooleanValue())
             {
                 this.updateFps();
             }
@@ -287,7 +287,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         {
             long worldTick = mc.world.getTotalWorldTime();
 
-            if (InfoLine.SPAWNABLE_SUB_CHUNKS.getBooleanValue() &&
+            if (InfoLineToggle.SPAWNABLE_SUB_CHUNKS.getBooleanValue() &&
                 worldTick % Configs.Generic.SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL.getIntegerValue() == 0)
             {
                 DataStorage.getInstance().checkQueuedDirtyChunkHeightmaps();
@@ -295,7 +295,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             if ((worldTick % 20) == 0)
             {
-                if (InfoLine.MOB_CAPS.getBooleanValue())
+                if (InfoLineToggle.MOB_CAPS.getBooleanValue())
                 {
                     DataStorage.getInstance().getMobCapData().updateIntegratedServerMobCaps();
                 }
@@ -323,7 +323,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         // Get the info line order based on the configs
         List<LinePos> positions = new ArrayList<>();
 
-        for (InfoLine toggle : InfoLine.values())
+        for (InfoLineToggle toggle : InfoLineToggle.values())
         {
             if (toggle.getBooleanValue())
             {
@@ -370,7 +370,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         this.lineWrappers.add(new StringHolder(text));
     }
 
-    private void addLine(InfoLine type)
+    private void addLine(InfoLineToggle type)
     {
         Minecraft mc = GameUtils.getClient();
         Entity entity = mc.getRenderViewEntity();
@@ -383,11 +383,11 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         BlockPos pos = new BlockPos(x, bbY, z);
         DataStorage data = DataStorage.getInstance();
 
-        if (type == InfoLine.FPS)
+        if (type == InfoLineToggle.FPS)
         {
             this.addLine(String.format("%d fps", this.fps));
         }
-        else if (type == InfoLine.MEMORY_USAGE)
+        else if (type == InfoLineToggle.MEMORY_USAGE)
         {
             long memMax = Runtime.getRuntime().maxMemory();
             long memTotal = Runtime.getRuntime().totalMemory();
@@ -401,7 +401,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                     memTotal * 100L / memMax,
                     MiscUtils.bytesToMb(memTotal)));
         }
-        else if (type == InfoLine.TIME_REAL)
+        else if (type == InfoLineToggle.TIME_REAL)
         {
             try
             {
@@ -414,13 +414,13 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 this.addLine("Date formatting failed - Invalid date format string?");
             }
         }
-        else if (type == InfoLine.TIME_WORLD)
+        else if (type == InfoLineToggle.TIME_WORLD)
         {
             long current = world.getWorldTime();
             long total = world.getTotalWorldTime();
             this.addLine(String.format("World time: %5d - total: %d", current, total));
         }
-        else if (type == InfoLine.TIME_WORLD_FORMATTED)
+        else if (type == InfoLineToggle.TIME_WORLD_FORMATTED)
         {
             try
             {
@@ -446,19 +446,19 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 this.addLine("Date formatting failed - Invalid date format string?");
             }
         }
-        else if (type == InfoLine.TIME_DAY_MODULO)
+        else if (type == InfoLineToggle.TIME_DAY_MODULO)
         {
             int mod = Configs.Generic.TIME_DAY_DIVISOR.getIntegerValue();
             long current = world.getWorldTime() % mod;
             this.addLine(String.format("Day time %% %d: %5d", mod, current));
         }
-        else if (type == InfoLine.TIME_TOTAL_MODULO)
+        else if (type == InfoLineToggle.TIME_TOTAL_MODULO)
         {
             int mod = Configs.Generic.TIME_TOTAL_DIVISOR.getIntegerValue();
             long current = world.getTotalWorldTime() % mod;
             this.addLine(String.format("Total time %% %d: %5d", mod, current));
         }
-        else if (type == InfoLine.SERVER_TPS)
+        else if (type == InfoLineToggle.SERVER_TPS)
         {
             TpsData tpsData = data.getTpsData();
 
@@ -472,7 +472,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 this.addLine(tpsData.getFormattedInfoLine());
             }
         }
-        else if (type == InfoLine.MOB_CAPS)
+        else if (type == InfoLineToggle.MOB_CAPS)
         {
             MobCapDataHandler mobCapData = data.getMobCapData();
 
@@ -486,7 +486,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 this.addLine(mobCapData.getFormattedInfoLine());
             }   
         }
-        else if (type == InfoLine.PING)
+        else if (type == InfoLineToggle.PING)
         {
             // The ping is useless in single player
             if (mc.isSingleplayer() == false)
@@ -499,11 +499,11 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 }
             }
         }
-        else if (type == InfoLine.COORDINATES ||
-                 type == InfoLine.DIMENSION)
+        else if (type == InfoLineToggle.COORDINATES ||
+                 type == InfoLineToggle.DIMENSION)
         {
             // Don't add the same line multiple times
-            if (this.addedTypes.contains(InfoLine.COORDINATES) || this.addedTypes.contains(InfoLine.DIMENSION))
+            if (this.addedTypes.contains(InfoLineToggle.COORDINATES) || this.addedTypes.contains(InfoLineToggle.DIMENSION))
             {
                 return;
             }
@@ -511,7 +511,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             String pre = "";
             StringBuilder str = new StringBuilder(128);
 
-            if (InfoLine.COORDINATES.getBooleanValue())
+            if (InfoLineToggle.COORDINATES.getBooleanValue())
             {
                 if (Configs.Generic.COORDINATE_FORMAT_CUSTOMIZED.getBooleanValue())
                 {
@@ -535,24 +535,24 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 pre = " / ";
             }
 
-            if (InfoLine.DIMENSION.getBooleanValue())
+            if (InfoLineToggle.DIMENSION.getBooleanValue())
             {
                 str.append(String.format("%sDimType ID: %s", pre, WorldUtils.getDimensionAsString(world)));
             }
 
             this.addLine(str.toString());
 
-            this.addedTypes.add(InfoLine.COORDINATES);
-            this.addedTypes.add(InfoLine.DIMENSION);
+            this.addedTypes.add(InfoLineToggle.COORDINATES);
+            this.addedTypes.add(InfoLineToggle.DIMENSION);
         }
-        else if (type == InfoLine.BLOCK_POS ||
-                 type == InfoLine.CHUNK_POS ||
-                 type == InfoLine.REGION_FILE)
+        else if (type == InfoLineToggle.BLOCK_POS ||
+                 type == InfoLineToggle.CHUNK_POS ||
+                 type == InfoLineToggle.REGION_FILE)
         {
             // Don't add the same line multiple times
-            if (this.addedTypes.contains(InfoLine.BLOCK_POS) ||
-                this.addedTypes.contains(InfoLine.CHUNK_POS) ||
-                this.addedTypes.contains(InfoLine.REGION_FILE))
+            if (this.addedTypes.contains(InfoLineToggle.BLOCK_POS) ||
+                this.addedTypes.contains(InfoLineToggle.CHUNK_POS) ||
+                this.addedTypes.contains(InfoLineToggle.REGION_FILE))
             {
                 return;
             }
@@ -560,47 +560,47 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             String pre = "";
             StringBuilder str = new StringBuilder(256);
 
-            if (InfoLine.BLOCK_POS.getBooleanValue())
+            if (InfoLineToggle.BLOCK_POS.getBooleanValue())
             {
                 str.append(String.format("Block: %d, %d, %d", pos.getX(), pos.getY(), pos.getZ()));
                 pre = " / ";
             }
 
-            if (InfoLine.CHUNK_POS.getBooleanValue())
+            if (InfoLineToggle.CHUNK_POS.getBooleanValue())
             {
                 str.append(pre).append(String.format("Sub-Chunk: %d, %d, %d", pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4));
                 pre = " / ";
             }
 
-            if (InfoLine.REGION_FILE.getBooleanValue())
+            if (InfoLineToggle.REGION_FILE.getBooleanValue())
             {
                 str.append(pre).append(String.format("Region: r.%d.%d", pos.getX() >> 9, pos.getZ() >> 9));
             }
 
             this.addLine(str.toString());
 
-            this.addedTypes.add(InfoLine.BLOCK_POS);
-            this.addedTypes.add(InfoLine.CHUNK_POS);
-            this.addedTypes.add(InfoLine.REGION_FILE);
+            this.addedTypes.add(InfoLineToggle.BLOCK_POS);
+            this.addedTypes.add(InfoLineToggle.CHUNK_POS);
+            this.addedTypes.add(InfoLineToggle.REGION_FILE);
         }
-        else if (type == InfoLine.BLOCK_IN_CHUNK)
+        else if (type == InfoLineToggle.BLOCK_IN_CHUNK)
         {
             this.addLine(String.format("Block: %d, %d, %d within Sub-Chunk: %d, %d, %d",
                         pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF,
                         pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4));
         }
-        else if (type == InfoLine.BLOCK_BREAK_SPEED)
+        else if (type == InfoLineToggle.BLOCK_BREAK_SPEED)
         {
             this.addLine(String.format("BBS: %.2f", DataStorage.getInstance().getBlockBreakingSpeed()));
         }
-        else if (type == InfoLine.DISTANCE)
+        else if (type == InfoLineToggle.DISTANCE)
         {
             Vec3d ref = DataStorage.getInstance().getDistanceReferencePoint();
             double dist = MathHelper.sqrt(ref.squareDistanceTo(x, y, z));
             this.addLine(String.format("Distance: %.2f (x: %.2f y: %.2f z: %.2f) [to x: %.2f y: %.2f z: %.2f]",
                     dist, x - ref.x, y - ref.y, z - ref.z, ref.x, ref.y, ref.z));
         }
-        else if (type == InfoLine.PLAYER_FACING)
+        else if (type == InfoLineToggle.PLAYER_FACING)
         {
             EnumFacing facing = entity.getHorizontalFacing();
             String str = "Invalid";
@@ -616,7 +616,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             this.addLine(String.format("Facing: %s (%s)", facing, str));
         }
-        else if (type == InfoLine.LIGHT_LEVEL)
+        else if (type == InfoLineToggle.LIGHT_LEVEL)
         {
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
@@ -632,14 +632,14 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 }
             }
         }
-        else if (type == InfoLine.PLAYER_YAW_ROTATION ||
-                 type == InfoLine.PLAYER_PITCH_ROTATION ||
-                 type == InfoLine.SPEED)
+        else if (type == InfoLineToggle.PLAYER_YAW_ROTATION ||
+                 type == InfoLineToggle.PLAYER_PITCH_ROTATION ||
+                 type == InfoLineToggle.SPEED)
         {
             // Don't add the same line multiple times
-            if (this.addedTypes.contains(InfoLine.PLAYER_YAW_ROTATION) ||
-                this.addedTypes.contains(InfoLine.PLAYER_PITCH_ROTATION) ||
-                this.addedTypes.contains(InfoLine.SPEED))
+            if (this.addedTypes.contains(InfoLineToggle.PLAYER_YAW_ROTATION) ||
+                this.addedTypes.contains(InfoLineToggle.PLAYER_PITCH_ROTATION) ||
+                this.addedTypes.contains(InfoLineToggle.SPEED))
             {
                 return;
             }
@@ -647,19 +647,19 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             String pre = "";
             StringBuilder str = new StringBuilder(128);
 
-            if (InfoLine.PLAYER_YAW_ROTATION.getBooleanValue())
+            if (InfoLineToggle.PLAYER_YAW_ROTATION.getBooleanValue())
             {
                 str.append(String.format("yaw: %.1f", MathHelper.wrapDegrees(EntityWrap.getYaw(entity))));
                 pre = " / ";
             }
 
-            if (InfoLine.PLAYER_PITCH_ROTATION.getBooleanValue())
+            if (InfoLineToggle.PLAYER_PITCH_ROTATION.getBooleanValue())
             {
                 str.append(pre).append(String.format("pitch: %.1f", MathHelper.wrapDegrees(EntityWrap.getPitch(entity))));
                 pre = " / ";
             }
 
-            if (InfoLine.SPEED.getBooleanValue())
+            if (InfoLineToggle.SPEED.getBooleanValue())
             {
                 double dx = x - entity.lastTickPosX;
                 double dy = y - entity.lastTickPosY;
@@ -670,18 +670,18 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             this.addLine(str.toString());
 
-            this.addedTypes.add(InfoLine.PLAYER_YAW_ROTATION);
-            this.addedTypes.add(InfoLine.PLAYER_PITCH_ROTATION);
-            this.addedTypes.add(InfoLine.SPEED);
+            this.addedTypes.add(InfoLineToggle.PLAYER_YAW_ROTATION);
+            this.addedTypes.add(InfoLineToggle.PLAYER_PITCH_ROTATION);
+            this.addedTypes.add(InfoLineToggle.SPEED);
         }
-        else if (type == InfoLine.SPEED_AXIS)
+        else if (type == InfoLineToggle.SPEED_AXIS)
         {
             double dx = x - entity.lastTickPosX;
             double dy = y - entity.lastTickPosY;
             double dz = z - entity.lastTickPosZ;
             this.addLine(String.format("speed: x: %.3f y: %.3f z: %.3f m/s", dx * 20, dy * 20, dz * 20));
         }
-        else if (type == InfoLine.CARPET_WOOL_COUNTERS)
+        else if (type == InfoLineToggle.CARPET_WOOL_COUNTERS)
         {
             List<String> lines = DataStorage.getInstance().getWoolCounters().getInfoLines();
 
@@ -690,19 +690,19 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 lines.forEach(this::addLine);
             }
         }
-        else if (type == InfoLine.CHUNK_SECTIONS)
+        else if (type == InfoLineToggle.CHUNK_SECTIONS)
         {
             this.addLine(String.format("C: %d", ((RenderGlobalMixin) mc.renderGlobal).minihud_getRenderedChunks()));
         }
-        else if (type == InfoLine.CHUNK_SECTIONS_FULL)
+        else if (type == InfoLineToggle.CHUNK_SECTIONS_FULL)
         {
             this.addLine(mc.renderGlobal.getDebugInfoRenders());
         }
-        else if (type == InfoLine.CHUNK_UPDATES)
+        else if (type == InfoLineToggle.CHUNK_UPDATES)
         {
             this.addLine(String.format("Chunk updates: %d", RenderChunk.renderChunksUpdated));
         }
-        else if (type == InfoLine.CHUNK_UNLOAD_ORDER)
+        else if (type == InfoLineToggle.CHUNK_UNLOAD_ORDER)
         {
             int bucket = MiscUtils.getChunkUnloadBucket(pos.getX() >> 4, pos.getZ() >> 4);
             String str1 = String.format("Chunk unload bucket: %d", bucket);
@@ -715,7 +715,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             this.addLine(str1);
         }
-        else if (type == InfoLine.LOADED_CHUNKS_COUNT)
+        else if (type == InfoLineToggle.LOADED_CHUNKS_COUNT)
         {
             String chunksClient = mc.world.getProviderName();
             World worldServer = WorldUtils.getBestWorld(mc);
@@ -730,11 +730,11 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 this.addLine(chunksClient);
             }
         }
-        else if (type == InfoLine.PARTICLE_COUNT)
+        else if (type == InfoLineToggle.PARTICLE_COUNT)
         {
             this.addLine(String.format("P: %s", mc.effectRenderer.getStatistics()));
         }
-        else if (type == InfoLine.DIFFICULTY)
+        else if (type == InfoLineToggle.DIFFICULTY)
         {
             if (mc.world.isBlockLoaded(pos))
             {
@@ -754,7 +754,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                         diff.getAdditionalDifficulty(), diff.getClampedAdditionalDifficulty(), mc.world.getWorldTime() / 24000L));
             }
         }
-        else if (type == InfoLine.BIOME)
+        else if (type == InfoLineToggle.BIOME)
         {
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
@@ -767,7 +767,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 }
             }
         }
-        else if (type == InfoLine.BIOME_REG_NAME)
+        else if (type == InfoLineToggle.BIOME_REG_NAME)
         {
             // Prevent a crash when outside of world
             if (pos.getY() >= 0 && pos.getY() < 256 && mc.world.isBlockLoaded(pos))
@@ -783,7 +783,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 }
             }
         }
-        else if (type == InfoLine.ENTITIES)
+        else if (type == InfoLineToggle.ENTITIES)
         {
             String ent = mc.renderGlobal.getDebugInfoEntities();
 
@@ -796,11 +796,11 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             this.addLine(ent);
         }
-        else if (type == InfoLine.BLOCK_ENTITIES)
+        else if (type == InfoLineToggle.BLOCK_ENTITIES)
         {
             this.addLine(String.format("Client world TE - L: %d, T: %d", mc.world.loadedTileEntityList.size(), mc.world.tickableTileEntities.size()));
         }
-        else if (type == InfoLine.ENTITIES_CLIENT_WORLD)
+        else if (type == InfoLineToggle.ENTITIES_CLIENT_WORLD)
         {
             int countClient = mc.world.loadedEntityList.size();
 
@@ -818,7 +818,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             this.addLine(String.format("Entities - Client: %d", countClient));
         }
-        else if (type == InfoLine.SLIME_CHUNK)
+        else if (type == InfoLineToggle.SLIME_CHUNK)
         {
             if (world.provider.isSurfaceWorld() == false)
             {
@@ -848,7 +848,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             this.addLine(StringUtils.translate(result));
         }
-        else if (type == InfoLine.LOOKING_AT_ENTITY)
+        else if (type == InfoLineToggle.LOOKING_AT_ENTITY)
         {
             if (hitResult != null &&
                 hitResult.typeOfHit == RayTraceResult.Type.ENTITY &&
@@ -868,7 +868,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 }
             }
         }
-        else if (type == InfoLine.ENTITY_REG_NAME)
+        else if (type == InfoLineToggle.ENTITY_REG_NAME)
         {
             if (hitResult != null &&
                 hitResult.typeOfHit == RayTraceResult.Type.ENTITY &&
@@ -882,12 +882,12 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 }
             }
         }
-        else if (type == InfoLine.LOOKING_AT_BLOCK ||
-                 type == InfoLine.LOOKING_AT_BLOCK_CHUNK)
+        else if (type == InfoLineToggle.LOOKING_AT_BLOCK ||
+                 type == InfoLineToggle.LOOKING_AT_BLOCK_CHUNK)
         {
             // Don't add the same line multiple times
-            if (this.addedTypes.contains(InfoLine.LOOKING_AT_BLOCK) ||
-                this.addedTypes.contains(InfoLine.LOOKING_AT_BLOCK_CHUNK))
+            if (this.addedTypes.contains(InfoLineToggle.LOOKING_AT_BLOCK) ||
+                this.addedTypes.contains(InfoLineToggle.LOOKING_AT_BLOCK_CHUNK))
             {
                 return;
             }
@@ -900,13 +900,13 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 String pre = "";
                 StringBuilder str = new StringBuilder(128);
 
-                if (InfoLine.LOOKING_AT_BLOCK.getBooleanValue())
+                if (InfoLineToggle.LOOKING_AT_BLOCK.getBooleanValue())
                 {
                     str.append(String.format("Looking at block: %d, %d, %d", lookPos.getX(), lookPos.getY(), lookPos.getZ()));
                     pre = " // ";
                 }
 
-                if (InfoLine.LOOKING_AT_BLOCK_CHUNK.getBooleanValue())
+                if (InfoLineToggle.LOOKING_AT_BLOCK_CHUNK.getBooleanValue())
                 {
                     str.append(pre).append(String.format("Block: %d, %d, %d in Sub-Chunk: %d, %d, %d",
                             lookPos.getX() & 0xF, lookPos.getY() & 0xF, lookPos.getZ() & 0xF,
@@ -915,15 +915,15 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
                 this.addLine(str.toString());
 
-                this.addedTypes.add(InfoLine.LOOKING_AT_BLOCK);
-                this.addedTypes.add(InfoLine.LOOKING_AT_BLOCK_CHUNK);
+                this.addedTypes.add(InfoLineToggle.LOOKING_AT_BLOCK);
+                this.addedTypes.add(InfoLineToggle.LOOKING_AT_BLOCK_CHUNK);
             }
         }
-        else if (type == InfoLine.BLOCK_PROPS)
+        else if (type == InfoLineToggle.BLOCK_PROPS)
         {
             this.getBlockProperties(mc);
         }
-        else if (type == InfoLine.SPAWNABLE_SUB_CHUNKS)
+        else if (type == InfoLineToggle.SPAWNABLE_SUB_CHUNKS)
         {
             int value = DataStorage.getInstance().getSpawnableSubChunkCountFor(pos.getX() >> 4, pos.getZ() >> 4);
 
@@ -990,9 +990,9 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     private static class LinePos implements Comparable<LinePos>
     {
         private final int position;
-        private final InfoLine type;
+        private final InfoLineToggle type;
 
-        private LinePos(int position, InfoLine type)
+        private LinePos(int position, InfoLineToggle type)
         {
             this.position = position;
             this.type = type;

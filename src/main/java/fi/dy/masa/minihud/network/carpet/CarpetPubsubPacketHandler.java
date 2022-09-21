@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.network;
+package fi.dy.masa.minihud.network.carpet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,9 +10,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import io.netty.buffer.Unpooled;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.netty.buffer.Unpooled;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.item.EnumDyeColor;
@@ -27,7 +27,7 @@ import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.InfoLine;
+import fi.dy.masa.minihud.config.InfoLineToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.MobCapDataHandler;
@@ -44,13 +44,13 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
 
     public static final int PACKET_S2C_UPDATE = 1;
 
-    public static final int TYPE_NBT = 0;
-    public static final int TYPE_STRING = 1;
+    //public static final int TYPE_NBT = 0;
+    //public static final int TYPE_STRING = 1;
     public static final int TYPE_INT = 2;
-    public static final int TYPE_FLOAT = 3;
+    //public static final int TYPE_FLOAT = 3;
     public static final int TYPE_LONG = 4;
     public static final int TYPE_DOUBLE = 5;
-    public static final int TYPE_BOOLEAN = 6;
+    //public static final int TYPE_BOOLEAN = 6;
 
     public static final String NODE_SERVER_TPS = "minecraft.performance.tps";
     public static final String NODE_SERVER_MSPT = "minecraft.performance.mspt";
@@ -106,9 +106,9 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
             for (EnumCreatureType creatureType : EnumCreatureType.values())
             {
                 String name = creatureType.name().toLowerCase(Locale.ROOT);
-                String mobcapPrefix = prefix + ".mob_cap." + name;
-                builder.put(mobcapPrefix + ".filled", NodeType.create(TYPE_INT, buf -> mobCapData.putCarpetSubscribedMobCapCurrentValue(name, buf.readInt())));
-                builder.put(mobcapPrefix + ".total",  NodeType.create(TYPE_INT, buf -> mobCapData.putCarpetSubscribedMobCapCapValue(name, buf.readInt())));
+                String mobCapPrefix = prefix + ".mob_cap." + name;
+                builder.put(mobCapPrefix + ".filled", NodeType.create(TYPE_INT, buf -> mobCapData.putCarpetSubscribedMobCapCurrentValue(name, buf.readInt())));
+                builder.put(mobCapPrefix + ".total",  NodeType.create(TYPE_INT, buf -> mobCapData.putCarpetSubscribedMobCapCapValue(name, buf.readInt())));
             }
         }
 
@@ -234,69 +234,67 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
         }
     }
 
-    public static void updatePubsubSubscriptions()
+    public static void updatePubSubSubscriptions()
     {
-        ServuxInfoSubDataPacketHandler.INSTANCE.updateSubscriptions();
-
-        World world = GameUtils.getClient().world;
+        World world = GameUtils.getClientWorld();
 
         if (world != null)
         {
             ClientPacketChannelHandler handler = Registry.CLIENT_PACKET_CHANNEL_HANDLER;
-            Set<String> newsubs = new HashSet<>();
+            Set<String> newSubs = new HashSet<>();
             DimensionType dimType = world.provider.getDimensionType();
 
             // First unsubscribe from any previous subscriptions
-            Set<String> unsubs = new HashSet<>(PER_DIMENSION_SUBSCRIPTIONS);
+            Set<String> unSubs = new HashSet<>(PER_DIMENSION_SUBSCRIPTIONS);
             PER_DIMENSION_SUBSCRIPTIONS.clear();
 
-            if (InfoLine.SERVER_TPS.getBooleanValue())
+            if (InfoLineToggle.SERVER_TPS.getBooleanValue())
             {
-                newsubs.add(NODE_SERVER_TPS);
-                newsubs.add(NODE_SERVER_MSPT);
+                newSubs.add(NODE_SERVER_TPS);
+                newSubs.add(NODE_SERVER_MSPT);
             }
             else
             {
-                unsubs.add(NODE_SERVER_TPS);
-                unsubs.add(NODE_SERVER_MSPT);
+                unSubs.add(NODE_SERVER_TPS);
+                unSubs.add(NODE_SERVER_MSPT);
             }
 
-            if (InfoLine.CARPET_WOOL_COUNTERS.getBooleanValue())
+            if (InfoLineToggle.CARPET_WOOL_COUNTERS.getBooleanValue())
             {
-                newsubs.addAll(getWoolCounterNodeNames(true));
+                newSubs.addAll(getWoolCounterNodeNames(true));
             }
             else
             {
-                unsubs.addAll(getWoolCounterNodeNames(false));
+                unSubs.addAll(getWoolCounterNodeNames(false));
             }
 
-            if (InfoLine.MOB_CAPS.getBooleanValue())
+            if (InfoLineToggle.MOB_CAPS.getBooleanValue())
             {
-                List<String> mobCaps = getMobcapNodeNames(dimType);
-                addPerDimensionSubs(mobCaps, newsubs, unsubs);
+                List<String> mobCaps = getMobCapNodeNames(dimType);
+                addPerDimensionSubs(mobCaps, newSubs, unSubs);
             }
 
-            if ((InfoLine.CHUNK_UNLOAD_ORDER.getBooleanValue()
+            if ((InfoLineToggle.CHUNK_UNLOAD_ORDER.getBooleanValue()
                  || RendererToggle.CHUNK_UNLOAD_BUCKET.isRendererEnabled()
                 )
                 && Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue())
             {
                 String node = getDroppedChunksHashSizeNodeName(dimType);
-                addPerDimensionSubs(Collections.singletonList(node), newsubs, unsubs);
+                addPerDimensionSubs(Collections.singletonList(node), newSubs, unSubs);
             }
 
-            if (unsubs.isEmpty() == false || newsubs.isEmpty() == false)
+            if (unSubs.isEmpty() == false || newSubs.isEmpty() == false)
             {
                 handler.registerClientChannelHandler(INSTANCE);
 
-                if (unsubs.isEmpty() == false)
+                if (unSubs.isEmpty() == false)
                 {
-                    unsubscribe(unsubs);
+                    unsubscribe(unSubs);
                 }
 
-                if (newsubs.isEmpty() == false)
+                if (newSubs.isEmpty() == false)
                 {
-                    subscribe(newsubs);
+                    subscribe(newSubs);
                 }
             }
             else
@@ -318,7 +316,7 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
         return "minecraft." + dimType.getName() + ".chunk_loading.dropped_chunks.hash_size";
     }
 
-    private static List<String> getMobcapNodeNames(DimensionType dimensionType)
+    private static List<String> getMobCapNodeNames(DimensionType dimensionType)
     {
         List<String> nodes = new ArrayList<>();
         String prefix = "minecraft." + dimensionType.getName() + ".mob_cap.";

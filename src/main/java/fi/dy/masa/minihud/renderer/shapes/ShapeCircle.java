@@ -16,7 +16,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.util.ShapeRenderType;
+import fi.dy.masa.minihud.util.value.ShapeRenderType;
 
 public class ShapeCircle extends ShapeCircleBase
 {

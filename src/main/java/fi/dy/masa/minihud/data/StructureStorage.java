@@ -47,8 +47,8 @@ import fi.dy.masa.minihud.mixin.structure.ChunkGeneratorHellMixin;
 import fi.dy.masa.minihud.mixin.structure.ChunkGeneratorOverworldMixin;
 import fi.dy.masa.minihud.mixin.structure.ChunkProviderServerMixin;
 import fi.dy.masa.minihud.mixin.structure.MapGenStructureMixin;
-import fi.dy.masa.minihud.network.CarpetStructurePacketHandler;
-import fi.dy.masa.minihud.network.ServuxStructurePacketHandler;
+import fi.dy.masa.minihud.network.carpet.CarpetStructurePacketHandler;
+import fi.dy.masa.minihud.network.servux.ServuxStructurePacketHandler;
 import fi.dy.masa.minihud.util.MiscUtils;
 
 public class StructureStorage

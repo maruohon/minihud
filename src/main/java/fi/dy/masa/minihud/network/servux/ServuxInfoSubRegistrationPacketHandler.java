@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.network;
+package fi.dy.masa.minihud.network.servux;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;

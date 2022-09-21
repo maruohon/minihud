@@ -37,7 +37,7 @@ import fi.dy.masa.minihud.renderer.shapes.ShapeCircle;
 import fi.dy.masa.minihud.renderer.shapes.ShapeCircleBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.renderer.shapes.ShapeSpawnSphere;
-import fi.dy.masa.minihud.util.ShapeRenderType;
+import fi.dy.masa.minihud.util.value.ShapeRenderType;
 
 public class GuiShapeEditor extends BaseRenderLayerEditScreen
 {

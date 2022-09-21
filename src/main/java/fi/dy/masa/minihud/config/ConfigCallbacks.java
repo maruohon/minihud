@@ -12,7 +12,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.feature.Actions;
-import fi.dy.masa.minihud.network.CarpetPubsubPacketHandler;
+import fi.dy.masa.minihud.network.carpet.CarpetPubsubPacketHandler;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
 
@@ -27,8 +27,8 @@ public class ConfigCallbacks
         Configs.Hotkeys.OPEN_SHAPE_MANAGER.createCallbackForAction(Actions.OPEN_SHAPE_MANAGER);
         Configs.Hotkeys.SET_DISTANCE_REFERENCE_POINT.createCallbackForAction(Actions.SET_DISTANCE_REFERENCE_POINT);
 
-        InfoLine.CHUNK_UNLOAD_ORDER.getHotkeyConfig().getKeyBind().setCallback(AdjustableValueHotkeyCallback.createBitShifter(
-                InfoLine.CHUNK_UNLOAD_ORDER.getBooleanConfig(), Configs.Generic.DROPPED_CHUNKS_HASH_SIZE)
+        InfoLineToggle.CHUNK_UNLOAD_ORDER.getHotkeyConfig().getKeyBind().setCallback(AdjustableValueHotkeyCallback.createBitShifter(
+                        InfoLineToggle.CHUNK_UNLOAD_ORDER.getBooleanConfig(), Configs.Generic.DROPPED_CHUNKS_HASH_SIZE)
                     .addAdjustListener(() -> MessageUtils.printCustomActionbarMessage("minihud.message.info.dropped_chunks_hash_size_set_to", Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue())));
 
         RendererToggle.CHUNK_UNLOAD_BUCKET.getKeyBind().setCallback(AdjustableValueHotkeyCallback.create(
@@ -57,16 +57,16 @@ public class ConfigCallbacks
         Configs.Generic.WOOL_COUNTER_TYPES.setValueLoadCallback(DataStorage.getInstance().getWoolCounters()::updateEnabledCounters);
         Configs.Generic.WOOL_COUNTER_TYPES.setValueChangeCallback((newValue, oldValue) -> {
             DataStorage.getInstance().getWoolCounters().updateEnabledCounters(newValue);
-            CarpetPubsubPacketHandler.updatePubsubSubscriptions();
+            CarpetPubsubPacketHandler.updatePubSubSubscriptions();
         });
 
-        EventListener pubSubCallback = CarpetPubsubPacketHandler::updatePubsubSubscriptions;
+        EventListener pubSubCallback = CarpetPubsubPacketHandler::updatePubSubSubscriptions;
         Configs.Generic.WOOL_COUNTER_ENABLE_ALL.addValueChangeListener(pubSubCallback);
 
-        InfoLine.CARPET_WOOL_COUNTERS.addValueChangeListener(pubSubCallback);
-        InfoLine.CHUNK_UNLOAD_ORDER.addValueChangeListener(pubSubCallback);
-        InfoLine.MOB_CAPS.addValueChangeListener(pubSubCallback);
-        InfoLine.SERVER_TPS.addValueChangeListener(pubSubCallback);
+        InfoLineToggle.CARPET_WOOL_COUNTERS.addValueChangeListener(pubSubCallback);
+        InfoLineToggle.CHUNK_UNLOAD_ORDER.addValueChangeListener(pubSubCallback);
+        InfoLineToggle.MOB_CAPS.addValueChangeListener(pubSubCallback);
+        InfoLineToggle.SERVER_TPS.addValueChangeListener(pubSubCallback);
 
         RendererToggle.DEBUG_COLLISION_BOXES.addValueChangeListener( () -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_COLLISION_BOXES));
         RendererToggle.DEBUG_HEIGHT_MAP.addValueChangeListener(      () -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_HEIGHT_MAP));

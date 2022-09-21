@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.util;
+package fi.dy.masa.minihud.util.value;
 
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;

@@ -8,7 +8,7 @@ import fi.dy.masa.malilib.gui.config.ConfigSearchInfo;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.minihud.config.ConfigCallbacks;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.InfoLine;
+import fi.dy.masa.minihud.config.InfoLineToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.config.StructureToggle;
 import fi.dy.masa.minihud.event.ClientTickHandler;
@@ -21,9 +21,9 @@ import fi.dy.masa.minihud.gui.widget.RendererToggleConfigWidget;
 import fi.dy.masa.minihud.gui.widget.StructureToggleConfigWidget;
 import fi.dy.masa.minihud.gui.widget.info.RendererToggleConfigStatusWidget;
 import fi.dy.masa.minihud.gui.widget.info.StructureRendererConfigStatusWidget;
-import fi.dy.masa.minihud.input.MiniHUDHotkeyProvider;
-import fi.dy.masa.minihud.network.ServuxInfoSubDataPacketHandler;
-import fi.dy.masa.minihud.network.ServuxInfoSubRegistrationPacketHandler;
+import fi.dy.masa.minihud.input.MiniHudHotkeyProvider;
+import fi.dy.masa.minihud.network.servux.ServuxInfoSubDataPacketHandler;
+import fi.dy.masa.minihud.network.servux.ServuxInfoSubRegistrationPacketHandler;
 
 public class InitHandler implements InitializationHandler
 {
@@ -31,24 +31,24 @@ public class InitHandler implements InitializationHandler
     public void registerModHandlers()
     {
         // Reset all KeyBindSettings when updating to the first post-malilib-refactor version
-        ConfigDataUpdater updater = new KeyBindSettingsResetter(MiniHUDHotkeyProvider.INSTANCE::getAllHotkeys, 0);
+        ConfigDataUpdater updater = new KeyBindSettingsResetter(MiniHudHotkeyProvider.INSTANCE::getAllHotkeys, 0);
         Registry.CONFIG_MANAGER.registerConfigHandler(JsonModConfig.createJsonModConfig(Reference.MOD_INFO, Configs.CURRENT_VERSION, Configs.CATEGORIES, updater));
 
         Registry.CONFIG_SCREEN.registerConfigScreenFactory(Reference.MOD_INFO, ConfigScreen::create);
         Registry.CONFIG_TAB.registerConfigTabProvider(Reference.MOD_INFO, ConfigScreen::getConfigTabs);
 
-        Registry.CONFIG_WIDGET.registerConfigWidgetFactory(InfoLine.class, InfoLineConfigWidget::new);
+        Registry.CONFIG_WIDGET.registerConfigWidgetFactory(InfoLineToggle.class, InfoLineConfigWidget::new);
         Registry.CONFIG_WIDGET.registerConfigWidgetFactory(RendererToggle.class, RendererToggleConfigWidget::new);
         Registry.CONFIG_WIDGET.registerConfigWidgetFactory(StructureToggle.class, StructureToggleConfigWidget::new);
 
-        Registry.CONFIG_WIDGET.registerConfigSearchInfo(InfoLine.class, new ConfigSearchInfo<InfoLine>(true, true).setBooleanStorageGetter(InfoLine::getBooleanConfig).setKeyBindGetter(InfoLine::getKeyBind));
+        Registry.CONFIG_WIDGET.registerConfigSearchInfo(InfoLineToggle.class, new ConfigSearchInfo<InfoLineToggle>(true, true).setBooleanStorageGetter(InfoLineToggle::getBooleanConfig).setKeyBindGetter(InfoLineToggle::getKeyBind));
         Registry.CONFIG_WIDGET.registerConfigSearchInfo(RendererToggle.class, new ConfigSearchInfo<RendererToggle>(true, true).setBooleanStorageGetter(RendererToggle::getBooleanConfig).setKeyBindGetter(RendererToggle::getKeyBind));
         Registry.CONFIG_WIDGET.registerConfigSearchInfo(StructureToggle.class, new ConfigSearchInfo<StructureToggle>(true, true).setBooleanStorageGetter(StructureToggle::getBooleanConfig).setKeyBindGetter(StructureToggle::getKeyBind));
 
         Registry.CONFIG_STATUS_WIDGET.registerConfigStatusWidgetFactory(RendererToggle.class, RendererToggleConfigStatusWidget::new, "minihud:csi_value_renderer_toggle");
         Registry.CONFIG_STATUS_WIDGET.registerConfigStatusWidgetFactory(StructureToggle.class, StructureRendererConfigStatusWidget::new, "minihud:csi_value_structure_toggle");
 
-        Registry.HOTKEY_MANAGER.registerHotkeyProvider(MiniHUDHotkeyProvider.INSTANCE);
+        Registry.HOTKEY_MANAGER.registerHotkeyProvider(MiniHudHotkeyProvider.INSTANCE);
 
         RenderHandler renderer = RenderHandler.INSTANCE;
         Registry.RENDER_EVENT_DISPATCHER.registerGameOverlayRenderer(renderer);

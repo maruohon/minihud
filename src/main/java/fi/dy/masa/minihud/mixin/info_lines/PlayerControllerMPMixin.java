@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.minihud.config.InfoLine;
+import fi.dy.masa.minihud.config.InfoLineToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 
 @Mixin(PlayerControllerMP.class)
@@ -25,7 +25,7 @@ public abstract class PlayerControllerMPMixin
                               "Lnet/minecraft/block/state/IBlockState;)V"))
     private void countBlockBreakingSpeed(BlockPos pos, CallbackInfoReturnable<Boolean> cir)
     {
-        if (InfoLine.BLOCK_BREAK_SPEED.getBooleanValue())
+        if (InfoLineToggle.BLOCK_BREAK_SPEED.getBooleanValue())
         {
             DataStorage.getInstance().onPlayerBlockBreak(this.mc);
         }

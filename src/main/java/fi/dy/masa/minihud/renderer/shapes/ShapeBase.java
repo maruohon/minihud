@@ -15,7 +15,7 @@ import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.MiniHUDOverlayRenderer;
-import fi.dy.masa.minihud.util.ShapeRenderType;
+import fi.dy.masa.minihud.util.value.ShapeRenderType;
 
 public abstract class ShapeBase extends MiniHUDOverlayRenderer implements LayerRangeChangeListener
 {

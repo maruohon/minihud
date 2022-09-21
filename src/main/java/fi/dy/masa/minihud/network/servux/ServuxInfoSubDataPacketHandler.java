@@ -1,4 +1,4 @@
-package fi.dy.masa.minihud.network;
+package fi.dy.masa.minihud.network.servux;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -28,10 +28,11 @@ import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.InfoLine;
+import fi.dy.masa.minihud.config.InfoLineToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.MobCapData;
+import fi.dy.masa.minihud.network.BufferReader;
 
 public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
 {
@@ -221,13 +222,13 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
         Set<String> unSubs = new HashSet<>(this.currentSubscriptions);
         this.currentSubscriptions.clear();
 
-        if (InfoLine.SERVER_TPS.getBooleanValue())
+        if (InfoLineToggle.SERVER_TPS.getBooleanValue())
         {
             newSubs.add("minecraft.status.performance.tps");
             newSubs.add("minecraft.status.performance.mspt");
         }
 
-        if (InfoLine.MOB_CAPS.getBooleanValue())
+        if (InfoLineToggle.MOB_CAPS.getBooleanValue())
         {
             newSubs.add("minecraft.status.count.mobcap.monster.val");
             newSubs.add("minecraft.status.count.mobcap.monster.max");
@@ -239,7 +240,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
             newSubs.add("minecraft.status.count.mobcap.water_creature.max");
         }
 
-        if ((InfoLine.CHUNK_UNLOAD_ORDER.getBooleanValue() ||
+        if ((InfoLineToggle.CHUNK_UNLOAD_ORDER.getBooleanValue() ||
              RendererToggle.CHUNK_UNLOAD_BUCKET.isRendererEnabled())
             && Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue())
         {

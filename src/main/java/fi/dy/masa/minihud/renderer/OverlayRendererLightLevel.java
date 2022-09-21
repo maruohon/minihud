@@ -27,8 +27,8 @@ import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.util.LightLevelMarkerMode;
-import fi.dy.masa.minihud.util.LightLevelNumberMode;
+import fi.dy.masa.minihud.util.value.LightLevelMarkerMode;
+import fi.dy.masa.minihud.util.value.LightLevelNumberMode;
 
 public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
 {

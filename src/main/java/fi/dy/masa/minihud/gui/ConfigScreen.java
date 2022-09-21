@@ -17,7 +17,7 @@ import fi.dy.masa.malilib.util.ListUtils;
 import fi.dy.masa.malilib.util.data.ModInfo;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.InfoLine;
+import fi.dy.masa.minihud.config.InfoLineToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.config.StructureToggle;
 import fi.dy.masa.minihud.event.RenderHandler;
@@ -104,7 +104,7 @@ public class ConfigScreen
         ImmutableList.Builder<ConfigInfo> builder = ImmutableList.builder();
 
         builder.add(Configs.Generic.INFO_LINES_RENDERING_TOGGLE);
-        builder.addAll(InfoLine.VALUES);
+        builder.addAll(InfoLineToggle.VALUES);
 
         return builder.build();
     }

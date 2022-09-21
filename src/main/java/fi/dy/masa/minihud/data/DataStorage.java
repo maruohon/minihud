@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.BlockPos;
@@ -25,8 +25,8 @@ import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.network.CarpetPubsubPacketHandler;
-import fi.dy.masa.minihud.network.ServuxInfoSubDataPacketHandler;
+import fi.dy.masa.minihud.network.carpet.CarpetPubsubPacketHandler;
+import fi.dy.masa.minihud.network.servux.ServuxInfoSubDataPacketHandler;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -101,7 +101,8 @@ public class DataStorage
         if (this.mc.world != null)
         {
             this.structureStorage.requestStructureDataUpdates();
-            CarpetPubsubPacketHandler.updatePubsubSubscriptions();
+            CarpetPubsubPacketHandler.updatePubSubSubscriptions();
+            ServuxInfoSubDataPacketHandler.INSTANCE.updateSubscriptions();
         }
         else
         {

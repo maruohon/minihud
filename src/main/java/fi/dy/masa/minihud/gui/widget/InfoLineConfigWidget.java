@@ -9,9 +9,9 @@ import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
 import fi.dy.masa.malilib.gui.widget.button.KeyBindConfigButton;
 import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import fi.dy.masa.malilib.gui.widget.list.entry.config.BaseConfigWidget;
-import fi.dy.masa.minihud.config.InfoLine;
+import fi.dy.masa.minihud.config.InfoLineToggle;
 
-public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
+public class InfoLineConfigWidget extends BaseConfigWidget<InfoLineToggle>
 {
     protected final BaseTextFieldWidget textField;
     protected final BooleanConfigButton booleanButton;
@@ -23,7 +23,7 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLine>
     protected final int initialLineOrder;
     protected final String initialLineOrderStringValue;
 
-    public InfoLineConfigWidget(InfoLine config,
+    public InfoLineConfigWidget(InfoLineToggle config,
                                 DataListEntryWidgetData constructData,
                                 ConfigWidgetContext ctx)
     {
