@@ -60,12 +60,12 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
     @Override
     public void onPacketReceived(PacketBuffer buf)
     {
-        MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#onPacketReceived() - start");
+        MiniHUD.debugLog("ServuxInfoSubDataPacketHandler#onPacketReceived() - start");
 
         if (this.supportedProtocol)
         {
             final int dataCount = buf.readVarInt();
-            MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#onPacketReceived() - data count: {}", dataCount);
+            MiniHUD.debugLog("ServuxInfoSubDataPacketHandler#onPacketReceived() - data count: {}", dataCount);
 
             for (int i = 0; i < dataCount; ++i)
             {
@@ -79,7 +79,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
                     break;
                 }
 
-                MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#onPacketReceived() - channel: {}", channelId);
+                MiniHUD.debugLog("ServuxInfoSubDataPacketHandler#onPacketReceived() - channel: {}", channelId);
                 reader.readData(buf);
             }
         }
@@ -87,7 +87,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
 
     public void receiveMetadata(NBTTagCompound tag)
     {
-        MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#receiveMetadata(), tag: {}", tag);
+        MiniHUD.debugLog("ServuxInfoSubDataPacketHandler#receiveMetadata(), tag: {}", tag);
 
         if (NbtWrap.getInt(tag, "version") == 1 &&
             NbtWrap.containsList(tag, "channel_ids"))
@@ -209,7 +209,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
             NbtWrap.putTag(rootTag, "channels", NbtUtils.asListTag(channels, this::channelToTag));
 
             PacketUtils.sendTag(ServuxInfoSubRegistrationPacketHandler.REG_CHANNEL, rootTag, handler);
-            MiniHUD.logInfo("ServuxInfoSubDataPacketHandler#updateSubscriptions(), tag: {}", rootTag);
+            MiniHUD.debugLog("ServuxInfoSubDataPacketHandler#updateSubscriptions(), tag: {}", rootTag);
         }
     }
 

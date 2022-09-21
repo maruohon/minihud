@@ -341,7 +341,7 @@ public class StructureData
 
             resetCarpetBoxReader();
 
-            MiniHUD.logInfo("Structure data updated from Carpet server (split data), structures: {}", map.size());
+            MiniHUD.debugLog("Structure data updated from Carpet server (split data), structures: {}", map.size());
         }
     }
 

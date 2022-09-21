@@ -33,7 +33,7 @@ public class ServuxInfoSubRegistrationPacketHandler extends BasePacketHandler
     {
         int type = buf.readVarInt();
 
-        MiniHUD.logInfo("ServuxInfoSubRegistrationPacketHandler#onPacketReceived() - type = {}", type);
+        MiniHUD.debugLog("ServuxInfoSubRegistrationPacketHandler#onPacketReceived() - type = {}", type);
 
         if (type == PACKET_S2C_METADATA)
         {
@@ -41,7 +41,7 @@ public class ServuxInfoSubRegistrationPacketHandler extends BasePacketHandler
             {
                 NBTTagCompound tag = buf.readCompoundTag();
                 ServuxInfoSubDataPacketHandler.INSTANCE.receiveMetadata(tag);
-                MiniHUD.logInfo("ServuxInfoSubRegistrationPacketHandler#onPacketReceived() - tag: '{}'", tag);
+                MiniHUD.debugLog("ServuxInfoSubRegistrationPacketHandler#onPacketReceived() - tag: '{}'", tag);
             }
             catch (Exception e)
             {

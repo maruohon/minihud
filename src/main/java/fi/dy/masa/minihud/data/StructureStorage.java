@@ -169,10 +169,10 @@ public class StructureStorage
             {
                 if (enabled)
                 {
+                    MiniHUD.debugLog("Attempting to register structure packet handlers to the server");
+
                     Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(CarpetStructurePacketHandler.INSTANCE);
                     Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(ServuxStructurePacketHandler.INSTANCE);
-
-                    MiniHUD.logInfo("Attempting to register structure packet handlers to the server");
                 }
                 else
                 {
@@ -341,7 +341,7 @@ public class StructureStorage
                 this.lastStructureUpdatePos = EntityWrap.getEntityBlockPos(player);
             }
 
-            MiniHUD.logInfo("Structure data updated from Servux server, structures: {}", this.structureMap.size());
+            MiniHUD.debugLog("Structure data updated from Servux server, structures: {}", this.structureMap.size());
         }
     }
 
@@ -365,8 +365,8 @@ public class StructureStorage
                 this.lastStructureUpdatePos = EntityWrap.getEntityBlockPos(player);
             }
 
-            MiniHUD.logInfo("Structure data updated from Carpet server (all), structures: {}",
-                            this.structureMap.size());
+            MiniHUD.debugLog("Structure data updated from Carpet server (all), structures: {}",
+                             this.structureMap.size());
         }
     }
 
@@ -380,7 +380,7 @@ public class StructureStorage
             StructureData.readStructureDataCarpetIndividualBoxesHeader(boxCount);
         }
 
-        MiniHUD.logInfo("Structure data header received from Carpet server, expecting {} boxes", boxCount);
+        MiniHUD.debugLog("Structure data header received from Carpet server, expecting {} boxes", boxCount);
     }
 
     private void readStructureDataCarpetSplitBoxes(PacketBuffer data, int boxCount) throws IOException
@@ -404,7 +404,7 @@ public class StructureStorage
                 this.lastStructureUpdatePos = EntityWrap.getEntityBlockPos(player);
             }
 
-            MiniHUD.logInfo("Structure data received from Carpet server (split boxes), received {} boxes", boxCount);
+            MiniHUD.debugLog("Structure data received from Carpet server (split boxes), received {} boxes", boxCount);
         }
     }
 
@@ -466,7 +466,7 @@ public class StructureStorage
 
         this.structuresDirty = true;
 
-        MiniHUD.logInfo("Structure data updated from the integrated server");
+        MiniHUD.debugLog("Structure data updated from the integrated server");
     }
 
     private void addStructuresWithinRange(StructureType type, MapGenStructure mapGen, BlockPos playerPos, int maxRange)

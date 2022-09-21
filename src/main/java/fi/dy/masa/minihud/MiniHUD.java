@@ -8,7 +8,7 @@ public class MiniHUD
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_ID);
 
-    public static void logInfo(String msg, Object... args)
+    public static void debugLog(String msg, Object... args)
     {
         if (Configs.Generic.DEBUG_MESSAGES.getBooleanValue())
         {
