@@ -32,6 +32,8 @@ import fi.dy.masa.minihud.config.InfoLineToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.MobCapData;
+import fi.dy.masa.minihud.data.MobCapDataHandler;
+import fi.dy.masa.minihud.data.TpsDataManager;
 import fi.dy.masa.minihud.network.BufferReader;
 
 public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
@@ -147,12 +149,12 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
 
     protected void receiveMobCapCurrentValue(MobCapData.EntityCategory type, int currentValue)
     {
-        DataStorage.getInstance().getMobCapData().putServerSubscribedMobCapCurrentValue(type, currentValue);
+        MobCapDataHandler.INSTANCE.putServerSubscribedMobCapCurrentValue(type, currentValue);
     }
 
     protected void receiveMobCapCapValue(MobCapData.EntityCategory type, int capValue)
     {
-        DataStorage.getInstance().getMobCapData().putServerSubscribedMobCapCapValue(type, capValue);
+        MobCapDataHandler.INSTANCE.putServerSubscribedMobCapCapValue(type, capValue);
     }
 
     protected void registerDataHandlers()

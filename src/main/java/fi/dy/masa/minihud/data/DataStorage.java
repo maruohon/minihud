@@ -37,10 +37,6 @@ public class DataStorage
 
     private final Minecraft mc = GameUtils.getClient();
 
-    private final MobCapDataHandler mobCapData = new MobCapDataHandler();
-    private final StructureStorage structureStorage = new StructureStorage();
-    private final WoolCounters woolCounters = new WoolCounters();
-
     private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
     private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
     private final Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> spawnerPositions = new Long2ObjectOpenHashMap<>();
@@ -61,40 +57,26 @@ public class DataStorage
         return INSTANCE;
     }
 
-    public MobCapDataHandler getMobCapData()
-    {
-        return this.mobCapData;
-    }
-
-    public StructureStorage getStructureStorage()
-    {
-        return this.structureStorage;
-    }
-
-    {
-        return this.woolCounters;
-    }
-
     public void reset()
     {
         this.worldSeedValid = false;
         this.worldSpawnValid = false;
         this.hasServerDroppedChunksHashSize = false;
 
-        this.mobCapData.clear();
-        this.structureStorage.clear();
-        this.woolCounters.clear();
         this.serverDroppedChunksHashSize = 0;
         this.worldSeed = 0;
         this.worldSpawn = BlockPos.ORIGIN;
 
+        MobCapDataHandler.INSTANCE.clear();
+        StructureStorage.INSTANCE.clear();
         TpsDataManager.INSTANCE.clear();
+        WoolCounters.INSTANCE.clear();
 
         RenderContainer.BEACON_OVERLAY.clear();
 
         if (this.mc.world != null)
         {
-            this.structureStorage.requestStructureDataUpdates();
+            StructureStorage.INSTANCE.requestStructureDataUpdates();
             CarpetPubsubPacketHandler.INSTANCE.updatePubSubSubscriptions();
             ServuxInfoSubDataPacketHandler.INSTANCE.updateSubscriptions();
         }

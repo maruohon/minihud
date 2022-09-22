@@ -18,6 +18,9 @@ public class MobCapDataHandler
     protected static final Pattern PATTERN_CARPET_MOBCAPS = Pattern.compile("(?<hocu>[0-9]+)/(?<hoca>[0-9]+) (?<pacu>[0-9]+)/(?<paca>[0-9]+) (?<amcu>[0-9]+)/(?<amca>[0-9]+) (?<wacu>[0-9]+)/(?<waca>[0-9]+)");
     protected static final EntityCategory[] ENTITY_CATEGORIES = EntityCategory.values();
 
+    // Needs to be after the above initializations
+    public static final MobCapDataHandler INSTANCE = new MobCapDataHandler();
+
     protected final Minecraft mc = GameUtils.getClient();
     protected final MobCapData localData = new MobCapData();
     protected final MobCapData parsedServerData = new MobCapData();

@@ -8,7 +8,6 @@ import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.malilib.network.message.BasePacketHandler;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
-import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.StructureStorage;
 
 public class CarpetStructurePacketHandler extends BasePacketHandler
@@ -32,7 +31,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
     @Override
     public void onPacketReceived(PacketBuffer buf)
     {
-        DataStorage.getInstance().getStructureStorage().updateStructureDataFromCarpetServer(buf);
+        StructureStorage.INSTANCE.updateStructureDataFromCarpetServer(buf);
     }
 
     public void sendBoundingBoxRequest()

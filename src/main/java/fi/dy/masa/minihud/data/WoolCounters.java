@@ -17,6 +17,9 @@ public class WoolCounters
     private final long[] counters = new long[COLORS.length];
     private final boolean[] enabledCounters = new boolean[COLORS.length];
 
+    // Needs to be after the COLORS array has been initialized
+    public static final WoolCounters INSTANCE = new WoolCounters();
+
     public void clear()
     {
         Arrays.fill(this.counters, -1);
@@ -107,9 +110,7 @@ public class WoolCounters
                     }
                 }
             }
-            catch (Exception ignore)
-            {
-            }
+            catch (Exception ignore) {}
         }
     }
 }

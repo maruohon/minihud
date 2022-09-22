@@ -53,6 +53,8 @@ import fi.dy.masa.minihud.util.MiscUtils;
 
 public class StructureStorage
 {
+    public static final StructureStorage INSTANCE = new StructureStorage();
+
     public static final int CARPET_ID_BOUNDINGBOX_MARKERS = 3;
     public static final int CARPET_ID_LARGE_BOUNDINGBOX_MARKERS_START = 7;
     public static final int CARPET_ID_LARGE_BOUNDINGBOX_MARKERS = 8;

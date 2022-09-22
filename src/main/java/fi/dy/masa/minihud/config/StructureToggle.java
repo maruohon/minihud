@@ -12,7 +12,7 @@ import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import fi.dy.masa.malilib.util.data.ModInfo;
 import fi.dy.masa.minihud.Reference;
-import fi.dy.masa.minihud.data.DataStorage;
+import fi.dy.masa.minihud.data.StructureStorage;
 
 public enum StructureToggle implements ConfigInfo
 {
@@ -62,7 +62,7 @@ public enum StructureToggle implements ConfigInfo
         this.toggleHotkey.setNameTranslationKey(nameKey);
         this.toggleHotkey.setCommentTranslationKey(commentKey);
         this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.toggleStatus));
-        this.toggleStatus.addValueChangeListener(DataStorage.getInstance().getStructureStorage()::requestStructureDataUpdates);
+        this.toggleStatus.addValueChangeListener(StructureStorage.INSTANCE::requestStructureDataUpdates);
     }
 
     public boolean isEnabled()

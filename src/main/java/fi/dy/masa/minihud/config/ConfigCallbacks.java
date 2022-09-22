@@ -11,6 +11,8 @@ import fi.dy.masa.malilib.render.overlay.OverlayRendererContainer;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.minihud.data.DataStorage;
+import fi.dy.masa.minihud.data.StructureStorage;
+import fi.dy.masa.minihud.data.WoolCounters;
 import fi.dy.masa.minihud.feature.Actions;
 import fi.dy.masa.minihud.network.carpet.CarpetPubsubPacketHandler;
 import fi.dy.masa.minihud.network.servux.ServuxInfoSubDataPacketHandler;
@@ -55,9 +57,9 @@ public class ConfigCallbacks
         Configs.Generic.LIGHT_LEVEL_THRESHOLD.addValueChangeListener(lightLevelUpdateCallback);
         Configs.Generic.LIGHT_LEVEL_Z_OFFSET.addValueChangeListener(lightLevelUpdateCallback);
         Configs.Generic.STRUCTURES_RENDER_THROUGH.setValueChangeCallback((newValue, oldValue) -> RenderContainer.STRUCTURE_BOUNDING_BOXES_OVERLAY.setRenderThrough(newValue));
-        Configs.Generic.WOOL_COUNTER_TYPES.setValueLoadCallback(DataStorage.getInstance().getWoolCounters()::updateEnabledCounters);
+        Configs.Generic.WOOL_COUNTER_TYPES.setValueLoadCallback(WoolCounters.INSTANCE::updateEnabledCounters);
         Configs.Generic.WOOL_COUNTER_TYPES.setValueChangeCallback((newValue, oldValue) -> {
-            DataStorage.getInstance().getWoolCounters().updateEnabledCounters(newValue);
+            WoolCounters.INSTANCE.updateEnabledCounters(newValue);
             CarpetPubsubPacketHandler.INSTANCE.updatePubSubSubscriptions();
         });
 
@@ -85,7 +87,7 @@ public class ConfigCallbacks
 
         RendererToggle.BEACON_RANGE.addValueChangeListener(beaconUpdateCallback);
         RendererToggle.LIGHT_LEVEL.addValueChangeListener(lightLevelUpdateCallback);
-        RendererToggle.STRUCTURE_BOUNDING_BOXES.addValueChangeListener(DataStorage.getInstance().getStructureStorage()::requestStructureDataUpdates);;
+        RendererToggle.STRUCTURE_BOUNDING_BOXES.addValueChangeListener(StructureStorage.INSTANCE::requestStructureDataUpdates);
 
         RendererToggle.CHUNK_UNLOAD_BUCKET.addEnableListener(ConfigCallbacks::onChunkUnloadBucketOverlayEnabled);
         RendererToggle.RANDOM_TICKS_FIXED.addEnableListener(RenderContainer.RANDOM_TICKS_FIXED_OVERLAY::onEnabled);

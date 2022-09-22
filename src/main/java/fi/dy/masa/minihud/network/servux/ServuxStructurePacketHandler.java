@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.malilib.network.message.BasePacketHandler;
-import fi.dy.masa.minihud.data.DataStorage;
+import fi.dy.masa.minihud.data.StructureStorage;
 
 public class ServuxStructurePacketHandler extends BasePacketHandler
 {
@@ -27,6 +27,6 @@ public class ServuxStructurePacketHandler extends BasePacketHandler
     @Override
     public void onPacketReceived(PacketBuffer buf)
     {
-        DataStorage.getInstance().getStructureStorage().updateStructureDataFromServuxServer(buf);
+        StructureStorage.INSTANCE.updateStructureDataFromServuxServer(buf);
     }
 }

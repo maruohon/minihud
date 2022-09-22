@@ -16,8 +16,8 @@ import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.StructureData;
+import fi.dy.masa.minihud.data.StructureStorage;
 import fi.dy.masa.minihud.data.StructureType;
 import fi.dy.masa.minihud.util.MiscUtils;
 
@@ -57,7 +57,7 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
     {
         int hysteresis = 16;
 
-        return DataStorage.getInstance().getStructureStorage().hasStructureDataChanged() ||
+        return StructureStorage.INSTANCE.hasStructureDataChanged() ||
                Math.abs(EntityWrap.getX(entity) - this.lastUpdatePos.getX()) > hysteresis ||
                Math.abs(EntityWrap.getY(entity) - this.lastUpdatePos.getY()) > hysteresis ||
                Math.abs(EntityWrap.getZ(entity) - this.lastUpdatePos.getZ()) > hysteresis;
@@ -71,7 +71,7 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        this.updateStructures(mc.world.provider, this.lastUpdatePos, cameraPos, mc);
+        this.updateStructures(mc.world.provider, this.lastUpdatePos, cameraPos);
 
         BUFFER_1.finishDrawing();
         BUFFER_2.finishDrawing();
@@ -80,12 +80,12 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
         renderLines.uploadData(BUFFER_2);
     }
 
-    private void updateStructures(WorldProvider provider, BlockPos playerPos, Vec3d cameraPos, Minecraft mc)
+    private void updateStructures(WorldProvider provider, BlockPos playerPos, Vec3d cameraPos)
     {
-        ArrayListMultimap<StructureType, StructureData> structures = DataStorage.getInstance().getStructureStorage().getCopyOfStructureData();
+        ArrayListMultimap<StructureType, StructureData> structures = StructureStorage.INSTANCE.getCopyOfStructureData();
         int maxRange = (GameUtils.getRenderDistanceChunks() + 4) * 16;
 
-        for (StructureType type : StructureType.values())
+        for (StructureType type : StructureType.VALUES)
         {
             if (type.isEnabled() && type.existsInDimension(provider))
             {

@@ -71,10 +71,10 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
 
         for (EnumDyeColor color : EnumDyeColor.values())
         {
-            builder.put("carpet.counter." + color.getName(), NodeType.create(TYPE_LONG, buf -> data.getWoolCounters().setValue(color, buf.readLong())));
+            builder.put("carpet.counter." + color.getName(), NodeType.create(TYPE_LONG, buf -> WoolCounters.INSTANCE.setValue(color, buf.readLong())));
         }
 
-        MobCapDataHandler mobCapData = data.getMobCapData();
+        MobCapDataHandler mobCapData = MobCapDataHandler.INSTANCE;
 
         for (DimensionType dim : DimensionType.values())
         {
@@ -314,7 +314,7 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
     protected static List<String> getWoolCounterNodeNames(boolean enabledOnly)
     {
         List<String> nodes = new ArrayList<>();
-        WoolCounters wc = DataStorage.getInstance().getWoolCounters();
+        WoolCounters wc = WoolCounters.INSTANCE;
 
         for (EnumDyeColor color : EnumDyeColor.values())
         {

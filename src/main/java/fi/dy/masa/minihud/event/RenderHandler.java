@@ -55,7 +55,9 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.DataStorage.HashSizeType;
 import fi.dy.masa.minihud.data.MobCapDataHandler;
+import fi.dy.masa.minihud.data.StructureStorage;
 import fi.dy.masa.minihud.data.TpsDataManager;
+import fi.dy.masa.minihud.data.WoolCounters;
 import fi.dy.masa.minihud.mixin.info_lines.RenderGlobalMixin;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -297,12 +299,12 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             {
                 if (InfoLineToggle.MOB_CAPS.getBooleanValue())
                 {
-                    DataStorage.getInstance().getMobCapData().updateIntegratedServerMobCaps();
+                    MobCapDataHandler.INSTANCE.updateIntegratedServerMobCaps();
                 }
 
                 if (RendererToggle.STRUCTURE_BOUNDING_BOXES.isRendererEnabled())
                 {
-                    DataStorage.getInstance().getStructureStorage().updateStructureDataIfNeeded();
+                    StructureStorage.INSTANCE.updateStructureDataIfNeeded();
                 }
             }
         }
@@ -474,7 +476,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
         else if (type == InfoLineToggle.MOB_CAPS)
         {
-            MobCapDataHandler mobCapData = data.getMobCapData();
+            MobCapDataHandler mobCapData = MobCapDataHandler.INSTANCE;
 
             if (mc.isSingleplayer() && (mc.getIntegratedServer().getTickCounter() % 100) == 0)
             {
@@ -683,7 +685,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
         else if (type == InfoLineToggle.CARPET_WOOL_COUNTERS)
         {
-            List<String> lines = DataStorage.getInstance().getWoolCounters().getInfoLines();
+            List<String> lines = WoolCounters.INSTANCE.getInfoLines();
 
             if (lines.isEmpty() == false)
             {
