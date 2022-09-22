@@ -55,7 +55,7 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.DataStorage.HashSizeType;
 import fi.dy.masa.minihud.data.MobCapDataHandler;
-import fi.dy.masa.minihud.data.TpsData;
+import fi.dy.masa.minihud.data.TpsDataManager;
 import fi.dy.masa.minihud.mixin.info_lines.RenderGlobalMixin;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -460,7 +460,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
         else if (type == InfoLineToggle.SERVER_TPS)
         {
-            TpsData tpsData = data.getTpsData();
+            TpsDataManager tpsData = TpsDataManager.INSTANCE;
 
             if (mc.isSingleplayer() && (mc.getIntegratedServer().getTickCounter() % 10) == 0)
             {
@@ -484,7 +484,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             if (mobCapData.getHasValidData())
             {
                 this.addLine(mobCapData.getFormattedInfoLine());
-            }   
+            }
         }
         else if (type == InfoLineToggle.PING)
         {

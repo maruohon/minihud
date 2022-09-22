@@ -14,6 +14,7 @@ import net.minecraft.network.play.server.SPacketSpawnPosition;
 import net.minecraft.network.play.server.SPacketTimeUpdate;
 import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.minihud.data.DataStorage;
+import fi.dy.masa.minihud.data.TpsDataManager;
 import fi.dy.masa.minihud.util.NotificationUtils;
 
 @Mixin(NetHandlerPlayClient.class)
@@ -28,14 +29,14 @@ public abstract class NetHandlerPlayClientMixin
     @Inject(method = "handleTimeUpdate", at = @At("RETURN"))
     private void onTimeUpdate(SPacketTimeUpdate packetIn, CallbackInfo ci)
     {
-        DataStorage.getInstance().getTpsData().onServerTimeUpdate(packetIn.getTotalWorldTime());
+        TpsDataManager.INSTANCE.onServerTimeUpdate(packetIn.getTotalWorldTime());
     }
 
     @Inject(method = "handlePlayerListHeaderFooter", at = @At("RETURN"))
     private void onHandlePlayerListHeaderFooter(SPacketPlayerListHeaderFooter packetIn, CallbackInfo ci)
     {
-        DataStorage.getInstance().getTpsData().parsePlayerListFooterTpsData(packetIn.getFooter());
         DataStorage.getInstance().getMobCapData().parsePlayerListFooterMobCapData(packetIn.getFooter());
+        TpsDataManager.INSTANCE.parsePlayerListFooterTpsData(packetIn.getFooter());
     }
 
     @Inject(method = "handleChunkData", at = @At("RETURN"))

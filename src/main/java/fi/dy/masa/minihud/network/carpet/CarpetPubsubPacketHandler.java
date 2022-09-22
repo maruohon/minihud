@@ -31,6 +31,7 @@ import fi.dy.masa.minihud.config.InfoLineToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.MobCapDataHandler;
+import fi.dy.masa.minihud.data.TpsDataManager;
 import fi.dy.masa.minihud.data.WoolCounters;
 
 public class CarpetPubsubPacketHandler extends BasePacketHandler
@@ -63,9 +64,10 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
     {
         ImmutableMap.Builder<String, NodeType> builder = ImmutableMap.builder();
         DataStorage data = DataStorage.getInstance();
+        TpsDataManager tpsManager = TpsDataManager.INSTANCE;
 
-        builder.put(NODE_SERVER_TPS,    NodeType.create(TYPE_DOUBLE, buf -> data.getTpsData().handleCarpetServerPubsubTps(buf.readDouble())));
-        builder.put(NODE_SERVER_MSPT,   NodeType.create(TYPE_DOUBLE, buf -> data.getTpsData().handleCarpetServerPubsubMspt(buf.readDouble())));
+        builder.put(NODE_SERVER_TPS,    NodeType.create(TYPE_DOUBLE, buf -> tpsManager.addServerSubscribedTps(buf.readDouble())));
+        builder.put(NODE_SERVER_MSPT,   NodeType.create(TYPE_DOUBLE, buf -> tpsManager.addServerSubscribedMspt(buf.readDouble())));
 
         for (EnumDyeColor color : EnumDyeColor.values())
         {

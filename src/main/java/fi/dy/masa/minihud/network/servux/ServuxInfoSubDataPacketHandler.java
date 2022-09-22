@@ -171,6 +171,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
         // 1.13+/1.14+
         // minecraft.status.count.loaded.pois[.dimension_name]
         // minecraft.status.count.scheduled_fluid_ticks[.dimension_name]
+        TpsDataManager tpsManager = TpsDataManager.INSTANCE;
 
         this.allBufferReaders.put("minecraft.status.chunk_loading.dropped_chunks.hash_size", (buf) -> DataStorage.getInstance().setServerDroppedChunksHashSize(buf.readVarInt()));
         this.allBufferReaders.put("minecraft.status.count.loaded.block_entities", (buf) -> buf.readVarInt()); // TODO
@@ -178,8 +179,8 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
         this.allBufferReaders.put("minecraft.status.count.loaded.chunks", (buf) -> buf.readVarInt());
         this.allBufferReaders.put("minecraft.status.count.loaded.entities", (buf) -> buf.readVarInt());
         this.allBufferReaders.put("minecraft.status.count.scheduled_block_ticks", (buf) -> buf.readVarInt());
-        this.allBufferReaders.put("minecraft.status.performance.tps", (buf) -> DataStorage.getInstance().getTpsData().handleCarpetServerPubsubTps(buf.readFloat()));
-        this.allBufferReaders.put("minecraft.status.performance.mspt", (buf) -> DataStorage.getInstance().getTpsData().handleCarpetServerPubsubMspt(buf.readFloat()));
+        this.allBufferReaders.put("minecraft.status.performance.tps",  (buf) -> tpsManager.addServerSubscribedTps(buf.readFloat()));
+        this.allBufferReaders.put("minecraft.status.performance.mspt", (buf) -> tpsManager.addServerSubscribedMspt(buf.readFloat()));
 
         this.allBufferReaders.put("minecraft.status.count.mobcap.monster.val",        (buf) -> this.receiveMobCapCurrentValue(MobCapData.EntityCategory.MONSTER, buf.readVarInt()));
         this.allBufferReaders.put("minecraft.status.count.mobcap.monster.max",        (buf) -> this.receiveMobCapCapValue(MobCapData.EntityCategory.MONSTER, buf.readVarInt()));
