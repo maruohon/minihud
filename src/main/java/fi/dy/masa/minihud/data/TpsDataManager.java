@@ -3,7 +3,7 @@ package fi.dy.masa.minihud.data;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -14,8 +14,6 @@ public class TpsDataManager
 {
     public static final TpsDataManager INSTANCE = new TpsDataManager();
     private static final Pattern PATTERN_CARPET_TPS = Pattern.compile("TPS: (?<tps>[0-9]+[\\.,][0-9]) MSPT: (?<mspt>[0-9]+[\\.,][0-9])");
-
-    private final Minecraft mc = GameUtils.getClient();
 
     private final TpsData calculatedData;
     private final TpsData localData;
@@ -81,8 +79,8 @@ public class TpsDataManager
 
                 if (elapsedTicks > 0)
                 {
-                    double mspt = ((double) (currentTime - this.lastServerTimeUpdate) / (double) elapsedTicks) / 1000000D;
-                    double tps = mspt <= 50 ? 20D : (1000D / mspt);
+                    double mspt = ((double) (currentTime - this.lastServerTimeUpdate) / (double) elapsedTicks) / 1000000.0;
+                    double tps = mspt <= 50.0 ? 20.0 : (1000.0 / mspt);
                     this.calculatedData.setValues(tps, mspt, totalWorldTime);
                 }
             }
@@ -98,11 +96,13 @@ public class TpsDataManager
 
     public void updateIntegratedServerTps()
     {
-        if (this.mc.getIntegratedServer() != null && this.mc.world != null)
+        MinecraftServer server = GameUtils.getIntegratedServer();
+
+        if (server != null && GameUtils.getClientWorld() != null)
         {
-            double mspt = MathHelper.average(this.mc.getIntegratedServer().tickTimeArray) / 1000000D;
-            double tps = mspt <= 50 ? 20D : (1000D / mspt);
-            this.localData.setValues(tps, mspt, this.mc.world.getTotalWorldTime());
+            double mspt = MathHelper.average(server.tickTimeArray) / 1000000.0;
+            double tps = mspt <= 50.0 ? 20.0 : (1000.0 / mspt);
+            this.localData.setValues(tps, mspt, GameUtils.getCurrentWorldTick());
         }
     }
 
