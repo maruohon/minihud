@@ -11,13 +11,13 @@ import fi.dy.masa.malilib.render.overlay.OverlayRendererContainer;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.minihud.data.DataStorage;
-import fi.dy.masa.minihud.data.StructureStorage;
 import fi.dy.masa.minihud.data.WoolCounters;
 import fi.dy.masa.minihud.feature.Actions;
 import fi.dy.masa.minihud.network.carpet.CarpetPubsubPacketHandler;
 import fi.dy.masa.minihud.network.servux.ServuxInfoSubDataPacketHandler;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
+import fi.dy.masa.minihud.data.structure.StructureDataUtils;
 
 public class ConfigCallbacks
 {
@@ -87,7 +87,7 @@ public class ConfigCallbacks
 
         RendererToggle.BEACON_RANGE.addValueChangeListener(beaconUpdateCallback);
         RendererToggle.LIGHT_LEVEL.addValueChangeListener(lightLevelUpdateCallback);
-        RendererToggle.STRUCTURE_BOUNDING_BOXES.addValueChangeListener(StructureStorage.INSTANCE::requestStructureDataUpdates);
+        RendererToggle.STRUCTURE_BOUNDING_BOXES.addValueChangeListener(StructureDataUtils::requestStructureDataUpdates);
 
         RendererToggle.CHUNK_UNLOAD_BUCKET.addEnableListener(ConfigCallbacks::onChunkUnloadBucketOverlayEnabled);
         RendererToggle.RANDOM_TICKS_FIXED.addEnableListener(RenderContainer.RANDOM_TICKS_FIXED_OVERLAY::onEnabled);

@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldProvider;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
@@ -16,9 +15,9 @@ import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.minihud.config.RendererToggle;
-import fi.dy.masa.minihud.data.StructureData;
-import fi.dy.masa.minihud.data.StructureStorage;
-import fi.dy.masa.minihud.data.StructureType;
+import fi.dy.masa.minihud.data.structure.StructureData;
+import fi.dy.masa.minihud.data.structure.StructureStorage;
+import fi.dy.masa.minihud.data.structure.StructureType;
 import fi.dy.masa.minihud.util.MiscUtils;
 
 public class OverlayRendererStructures extends MiniHUDOverlayRenderer
@@ -26,30 +25,8 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
     @Override
     public boolean shouldRender(Minecraft mc)
     {
-        if (RendererToggle.STRUCTURE_BOUNDING_BOXES.isRendererEnabled() == false)
-        {
-            return false;
-        }
-
-        if (mc.world.provider.isSurfaceWorld())
-        {
-            return StructureType.DESERT_PYRAMID.isEnabled() ||
-                   StructureType.IGLOO.isEnabled() ||
-                   StructureType.JUNGLE_TEMPLE.isEnabled() ||
-                   StructureType.MANSION.isEnabled() ||
-                   StructureType.OCEAN_MONUMENT.isEnabled() ||
-                   StructureType.STRONGHOLD.isEnabled() ||
-                   StructureType.VILLAGE.isEnabled() ||
-                   StructureType.WITCH_HUT.isEnabled();
-        }
-        else if (mc.world.provider.isNether())
-        {
-            return StructureType.NETHER_FORTRESS.isEnabled();
-        }
-        else
-        {
-            return StructureType.END_CITY.isEnabled();
-        }
+        // TODO use a cached value for any types enabled?
+        return RendererToggle.STRUCTURE_BOUNDING_BOXES.isRendererEnabled();
     }
 
     @Override
@@ -71,7 +48,7 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        this.updateStructures(mc.world.provider, this.lastUpdatePos, cameraPos);
+        this.updateStructures(this.lastUpdatePos, cameraPos);
 
         BUFFER_1.finishDrawing();
         BUFFER_2.finishDrawing();
@@ -80,14 +57,14 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
         renderLines.uploadData(BUFFER_2);
     }
 
-    private void updateStructures(WorldProvider provider, BlockPos playerPos, Vec3d cameraPos)
+    private void updateStructures(BlockPos playerPos, Vec3d cameraPos)
     {
         ArrayListMultimap<StructureType, StructureData> structures = StructureStorage.INSTANCE.getCopyOfStructureData();
-        int maxRange = (GameUtils.getRenderDistanceChunks() + 4) * 16;
+        int maxRange = (GameUtils.getRenderDistanceChunks() + 2) * 16;
 
-        for (StructureType type : StructureType.VALUES)
+        for (StructureType type : structures.keySet())
         {
-            if (type.isEnabled() && type.existsInDimension(provider))
+            if (type.isEnabled())
             {
                 Collection<StructureData> structureData = structures.get(type);
 
@@ -103,7 +80,7 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
     {
         for (StructureData structure : structureData)
         {
-            if (MiscUtils.isStructureWithinRange(structure.getBoundingBox(), playerPos, maxRange))
+            if (MiscUtils.isStructureWithinRange(structure.getEnclosingBox(), playerPos, maxRange))
             {
                 this.renderStructure(type, structure, cameraPos);
             }
@@ -115,18 +92,19 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
         Color4f color = type.getToggle().getColorMain().getColor();
         ImmutableList<IntBoundingBox> components = structure.getComponents();
 
-        ShapeRenderUtils.renderBoxSidesAndEdges(structure.getBoundingBox(), color, BUFFER_1, BUFFER_2, cameraPos);
+        ShapeRenderUtils.renderBoxSidesAndEdges(structure.getEnclosingBox(), color, BUFFER_1, BUFFER_2, cameraPos);
+        int size = components.size();
 
-        if (components.isEmpty() == false)
+        // Don't render the component box if there is only one component
+        // and the box is the same as the enclosing box (for example a proper, "non-broken" Swamp Hut)
+        if (size >= 1 &&
+            (size > 1 || components.get(0).equals(structure.getEnclosingBox()) == false))
         {
-            if (components.size() > 1 || components.get(0).equals(structure.getBoundingBox()) == false)
-            {
-                color = type.getToggle().getColorComponents().getColor();
+            color = type.getToggle().getColorComponents().getColor();
 
-                for (IntBoundingBox bb : components)
-                {
-                    ShapeRenderUtils.renderBoxSidesAndEdges(bb, color, BUFFER_1, BUFFER_2, cameraPos);
-                }
+            for (IntBoundingBox bb : components)
+            {
+                ShapeRenderUtils.renderBoxSidesAndEdges(bb, color, BUFFER_1, BUFFER_2, cameraPos);
             }
         }
     }

@@ -12,20 +12,24 @@ import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import fi.dy.masa.malilib.util.data.ModInfo;
 import fi.dy.masa.minihud.Reference;
-import fi.dy.masa.minihud.data.StructureStorage;
+import fi.dy.masa.minihud.data.structure.StructureDataUtils;
 
 public enum StructureToggle implements ConfigInfo
 {
-    OVERLAY_STRUCTURE_DESERT_PYRAMID    ("desertPyramid",   "#30FFFF00", "#30FFFF00"),
-    OVERLAY_STRUCTURE_END_CITY          ("endCity",         "#30EB07EB", "#30EB07EB"),
-    OVERLAY_STRUCTURE_IGLOO             ("igloo",           "#300FAFE4", "#300FAFE4"),
-    OVERLAY_STRUCTURE_JUNGLE_TEMPLE     ("jungleTemple",    "#3099FF00", "#3099FF00"),
-    OVERLAY_STRUCTURE_MANSION           ("mansion",         "#30FF6500", "#30FF6500"),
-    OVERLAY_STRUCTURE_NETHER_FORTRESS   ("netherFortress",  "#30FC381D", "#30FC381D"),
-    OVERLAY_STRUCTURE_OCEAN_MONUMENT    ("oceanMonument",   "#3029E6EF", "#3029E6EF"),
-    OVERLAY_STRUCTURE_STRONGHOLD        ("stronghold",      "#30009999", "#30009999"),
-    OVERLAY_STRUCTURE_VILLAGE           ("village",         "#3054CB4E", "#3054CB4E"),
-    OVERLAY_STRUCTURE_WITCH_HUT         ("witchHut",        "#30BE1DFC", "#300099FF");
+    DESERT_PYRAMID      ("desertPyramid",   "#30FFFF00", "#30FFFF00"),
+    IGLOO               ("igloo",           "#300FAFE4", "#300FAFE4"),
+    JUNGLE_TEMPLE       ("jungleTemple",    "#3099FF00", "#3099FF00"),
+    MANSION             ("mansion",         "#30FF6500", "#30FF6500"),
+    OCEAN_MONUMENT      ("oceanMonument",   "#3029E6EF", "#3029E6EF"),
+    STRONGHOLD          ("stronghold",      "#30009999", "#30009999"),
+    VILLAGE             ("village",         "#3054CB4E", "#3054CB4E"),
+    SWAMP_HUT           ("swampHut",        "#30BE1DFC", "#300099FF"),
+
+    END_CITY            ("endCity",         "#30EB07EB", "#30EB07EB"),
+
+    NETHER_FORTRESS     ("netherFortress",  "#30FC381D", "#30FC381D"),
+
+    UNKNOWN             ("unknown",         "#30FFFFFF", "#30FFFFFF");
 
     public static final ImmutableList<StructureToggle> VALUES = ImmutableList.copyOf(values());
     public static final ImmutableList<ColorConfig> COLOR_CONFIGS = getColorConfigs();
@@ -62,7 +66,7 @@ public enum StructureToggle implements ConfigInfo
         this.toggleHotkey.setNameTranslationKey(nameKey);
         this.toggleHotkey.setCommentTranslationKey(commentKey);
         this.toggleHotkey.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(this.toggleStatus));
-        this.toggleStatus.addValueChangeListener(StructureStorage.INSTANCE::requestStructureDataUpdates);
+        this.toggleStatus.addValueChangeListener(StructureDataUtils::requestStructureDataUpdates);
     }
 
     public boolean isEnabled()

@@ -25,11 +25,13 @@ import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.data.structure.StructureStorage;
 import fi.dy.masa.minihud.network.carpet.CarpetPubsubPacketHandler;
 import fi.dy.masa.minihud.network.servux.ServuxInfoSubDataPacketHandler;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.util.MiscUtils;
+import fi.dy.masa.minihud.data.structure.StructureDataUtils;
 
 public class DataStorage
 {
@@ -76,7 +78,7 @@ public class DataStorage
 
         if (this.mc.world != null)
         {
-            StructureStorage.INSTANCE.requestStructureDataUpdates();
+            StructureDataUtils.requestStructureDataUpdates();
             CarpetPubsubPacketHandler.INSTANCE.updatePubSubSubscriptions();
             ServuxInfoSubDataPacketHandler.INSTANCE.updateSubscriptions();
         }

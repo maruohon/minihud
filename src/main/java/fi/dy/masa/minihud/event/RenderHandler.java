@@ -55,7 +55,7 @@ import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.DataStorage.HashSizeType;
 import fi.dy.masa.minihud.data.MobCapDataHandler;
-import fi.dy.masa.minihud.data.StructureStorage;
+import fi.dy.masa.minihud.data.structure.StructureStorage;
 import fi.dy.masa.minihud.data.TpsDataManager;
 import fi.dy.masa.minihud.data.WoolCounters;
 import fi.dy.masa.minihud.mixin.info_lines.RenderGlobalMixin;
