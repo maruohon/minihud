@@ -12,12 +12,12 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.WoolCounters;
+import fi.dy.masa.minihud.data.structure.StructureDataUtils;
 import fi.dy.masa.minihud.feature.Actions;
 import fi.dy.masa.minihud.network.carpet.CarpetPubsubPacketHandler;
 import fi.dy.masa.minihud.network.servux.ServuxInfoSubDataPacketHandler;
 import fi.dy.masa.minihud.renderer.RenderContainer;
 import fi.dy.masa.minihud.util.DebugInfoUtils;
-import fi.dy.masa.minihud.data.structure.StructureDataUtils;
 
 public class ConfigCallbacks
 {

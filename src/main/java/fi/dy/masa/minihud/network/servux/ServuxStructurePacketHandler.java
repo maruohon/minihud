@@ -20,7 +20,7 @@ public class ServuxStructurePacketHandler extends BasePacketHandler
     public static final List<ResourceLocation> CHANNELS = ImmutableList.of(new ResourceLocation("servux:structure"));
     public static final ServuxStructurePacketHandler INSTANCE = new ServuxStructurePacketHandler();
 
-    private static final int SERVUX_PACKET_S2C_METADATA = 1;
+    //private static final int SERVUX_PACKET_S2C_METADATA = 1;
     private static final int SERVUX_PACKET_S2C_STRUCTURE_DATA = 2;
 
     private ServuxStructurePacketHandler()
@@ -46,7 +46,7 @@ public class ServuxStructurePacketHandler extends BasePacketHandler
             if (type == SERVUX_PACKET_S2C_STRUCTURE_DATA)
             {
                 NBTTagCompound tag = buf.readCompoundTag();
-                StructureStorage.INSTANCE.addStructureDataFromServer(map -> this.readStructureDataServuxV1(map, tag));
+                StructureStorage.INSTANCE.addStructureDataFromServer(this.readStructureDataServuxV1(tag));
             }
             /*
             else if (type == SERVUX_PACKET_S2C_METADATA)
@@ -62,8 +62,9 @@ public class ServuxStructurePacketHandler extends BasePacketHandler
         }
     }
 
-    private void readStructureDataServuxV1(ArrayListMultimap<StructureType, StructureData> map, NBTTagCompound nbt)
+    private ArrayListMultimap<StructureType, StructureData> readStructureDataServuxV1(NBTTagCompound nbt)
     {
+        ArrayListMultimap<StructureType, StructureData> map = ArrayListMultimap.create();
         NBTTagList tagList = NbtWrap.getListOfCompounds(nbt, "Structures");
         final int size = NbtWrap.getListSize(tagList);
 
@@ -80,6 +81,8 @@ public class ServuxStructurePacketHandler extends BasePacketHandler
             }
         }
 
-        MiniHUD.debugLog("Structure data updated from Servux server, structures: {}", map.size());
+        MiniHUD.debugLog("Structure data from Servux server, structure count = {}", map.size());
+
+        return map;
     }
 }

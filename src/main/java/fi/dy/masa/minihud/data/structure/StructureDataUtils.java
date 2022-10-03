@@ -2,12 +2,30 @@ package fi.dy.masa.minihud.data.structure;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.gen.ChunkGeneratorEnd;
+import net.minecraft.world.gen.ChunkGeneratorFlat;
+import net.minecraft.world.gen.ChunkGeneratorHell;
+import net.minecraft.world.gen.ChunkGeneratorOverworld;
+import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraft.world.gen.structure.MapGenScatteredFeature;
+import net.minecraft.world.gen.structure.MapGenStronghold;
+import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.structure.MapGenStructureIO;
+import net.minecraft.world.gen.structure.MapGenVillage;
+import net.minecraft.world.gen.structure.StructureComponent;
+import net.minecraft.world.gen.structure.StructureOceanMonument;
+import net.minecraft.world.gen.structure.StructureStart;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -19,8 +37,15 @@ import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.RendererToggle;
+import fi.dy.masa.minihud.mixin.structure.ChunkGeneratorEndMixin;
+import fi.dy.masa.minihud.mixin.structure.ChunkGeneratorFlatMixin;
+import fi.dy.masa.minihud.mixin.structure.ChunkGeneratorHellMixin;
+import fi.dy.masa.minihud.mixin.structure.ChunkGeneratorOverworldMixin;
+import fi.dy.masa.minihud.mixin.structure.ChunkProviderServerMixin;
+import fi.dy.masa.minihud.mixin.structure.MapGenStructureMixin;
 import fi.dy.masa.minihud.network.carpet.CarpetStructurePacketHandler;
 import fi.dy.masa.minihud.network.servux.ServuxStructurePacketHandler;
+import fi.dy.masa.minihud.util.MiscUtils;
 
 public class StructureDataUtils
 {
@@ -53,8 +78,129 @@ public class StructureDataUtils
             {
                 StructureStorage.INSTANCE.setStructuresNeedUpdating();
             }
+        }
+    }
 
-            StructureStorage.INSTANCE.setStructuresDirty();
+    public static class IntegratedServer
+    {
+        public static void updateStructureDataFromIntegratedServer(BlockPos playerPos)
+        {
+            WorldServer world = GameUtils.getClientPlayersServerWorld();
+
+            if (world != null)
+            {
+                int maxRange = (GameUtils.getRenderDistanceChunks() + 4) * 16;
+                world.addScheduledTask(() -> addStructureDataFromGenerator(world, playerPos, maxRange));
+            }
+        }
+
+        private static void addStructureDataFromGenerator(WorldServer world, BlockPos playerPos, int maxRange)
+        {
+            IChunkGenerator chunkGenerator = ((ChunkProviderServerMixin) world.getChunkProvider()).minihud_getChunkGenerator();
+            ArrayListMultimap<StructureType, StructureData> mapOut = ArrayListMultimap.create();
+
+            if (chunkGenerator instanceof ChunkGeneratorOverworld)
+            {
+                MapGenStructure mapGen;
+
+                mapGen = ((ChunkGeneratorOverworldMixin) chunkGenerator).minihud_getOceanMonumentGenerator();
+                addStructuresWithinRange(StructureType.OCEAN_MONUMENT, mapOut, mapGen, playerPos, maxRange);
+
+                mapGen = ((ChunkGeneratorOverworldMixin) chunkGenerator).minihud_getScatteredFeatureGenerator();
+                addTempleStructuresWithinRange(mapOut, mapGen, playerPos, maxRange);
+
+                mapGen = ((ChunkGeneratorOverworldMixin) chunkGenerator).minihud_getStrongholdGenerator();
+                addStructuresWithinRange(StructureType.STRONGHOLD, mapOut, mapGen, playerPos, maxRange);
+
+                mapGen = ((ChunkGeneratorOverworldMixin) chunkGenerator).minihud_getVillageGenerator();
+                addStructuresWithinRange(StructureType.VILLAGE, mapOut, mapGen, playerPos, maxRange);
+
+                mapGen = ((ChunkGeneratorOverworldMixin) chunkGenerator).minihud_getWoodlandMansionGenerator();
+                addStructuresWithinRange(StructureType.MANSION, mapOut, mapGen, playerPos, maxRange);
+            }
+            else if (chunkGenerator instanceof ChunkGeneratorHell)
+            {
+                MapGenStructure mapGen = ((ChunkGeneratorHellMixin) chunkGenerator).minihud_getFortressGenerator();
+                addStructuresWithinRange(StructureType.NETHER_FORTRESS, mapOut, mapGen, playerPos, maxRange);
+            }
+            else if (chunkGenerator instanceof ChunkGeneratorEnd)
+            {
+                MapGenStructure mapGen = ((ChunkGeneratorEndMixin) chunkGenerator).minihud_getEndCityGenerator();
+                addStructuresWithinRange(StructureType.END_CITY, mapOut, mapGen, playerPos, maxRange);
+            }
+            else if (chunkGenerator instanceof ChunkGeneratorFlat)
+            {
+                Map<String, MapGenStructure> map = ((ChunkGeneratorFlatMixin) chunkGenerator).minihud_getStructureGenerators();
+
+                for (MapGenStructure mapGen : map.values())
+                {
+                    if (mapGen instanceof StructureOceanMonument)
+                    {
+                        addStructuresWithinRange(StructureType.OCEAN_MONUMENT, mapOut, mapGen, playerPos, maxRange);
+                    }
+                    else if (mapGen instanceof MapGenScatteredFeature)
+                    {
+                        addTempleStructuresWithinRange(mapOut, mapGen, playerPos, maxRange);
+                    }
+                    else if (mapGen instanceof MapGenStronghold)
+                    {
+                        addStructuresWithinRange(StructureType.STRONGHOLD, mapOut, mapGen, playerPos, maxRange);
+                    }
+                    else if (mapGen instanceof MapGenVillage)
+                    {
+                        addStructuresWithinRange(StructureType.VILLAGE, mapOut, mapGen, playerPos, maxRange);
+                    }
+                }
+            }
+
+            GameUtils.scheduleToClientThread(() -> StructureStorage.INSTANCE.addStructureDataFromIntegratedServer(mapOut));
+        }
+
+        private static void addStructuresWithinRange(StructureType type,
+                                                     ArrayListMultimap<StructureType, StructureData> mapOut,
+                                                     MapGenStructure mapGen,
+                                                     BlockPos playerPos,
+                                                     int maxRange)
+        {
+            if (type.isEnabled() == false)
+            {
+                return;
+            }
+
+            Long2ObjectMap<StructureStart> structureMap = ((MapGenStructureMixin) mapGen).minihud_getStructureMap();
+
+            for (StructureStart start : structureMap.values())
+            {
+                if (MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxRange))
+                {
+                    mapOut.put(type, StructureData.fromStructure(start));
+                }
+            }
+        }
+
+        private static void addTempleStructuresWithinRange(ArrayListMultimap<StructureType, StructureData> mapOut,
+                                                           MapGenStructure mapGen,
+                                                           BlockPos playerPos,
+                                                           int maxRange)
+        {
+            Long2ObjectMap<StructureStart> structureMap = ((MapGenStructureMixin) mapGen).minihud_getStructureMap();
+
+            for (StructureStart start : structureMap.values())
+            {
+                List<StructureComponent> components = start.getComponents();
+
+                if (components.size() == 1 &&
+                    MiscUtils.isStructureWithinRange(start.getBoundingBox(), playerPos, maxRange))
+                {
+                    String id = MapGenStructureIO.getStructureComponentName(components.get(0));
+                    StructureType type = StructureType.fromStructureId("Temple." + id);
+
+                    if (type.isEnabled())
+                    {
+                        mapOut.put(type, StructureData.fromStructure(start));
+                    }
+                }
+            }
         }
     }
 
@@ -74,22 +220,23 @@ public class StructureDataUtils
             return null;
         }
 
-        public static void addStructureDataFromNbtFiles(ArrayListMultimap<StructureType, StructureData> outputMap)
+        public static ArrayListMultimap<StructureType, StructureData> getEnabledStructuresFromNbtFiles()
         {
+            ArrayListMultimap<StructureType, StructureData> map = ArrayListMultimap.create();
             Path dir = getLocalStructureFileDirectory();
 
             if (dir != null && Files.isDirectory(dir))
             {
                 for (StructureType type : StructureType.VALUES)
                 {
-                    if (type.isTemple() == false && type.isEnabled())
+                    if (type.isEnabled() && type.isTemple() == false)
                     {
                         Path file = dir.resolve(type.getStructureName() + ".dat");
                         NBTTagCompound nbt = NbtUtils.readNbtFromFile(file);
 
                         if (nbt != null)
                         {
-                            readAndAddStructuresToMap(outputMap, nbt, type);
+                            readAndAddStructuresToMap(type, map, nbt);
                         }
                     }
                 }
@@ -98,18 +245,22 @@ public class StructureDataUtils
 
                 if (nbt != null)
                 {
-                    readAndAddTemplesToMap(outputMap, nbt);
+                    readAndAddTemplesToMap(map, nbt);
                 }
             }
+
+            return map;
         }
 
         /**
          * Reads structures from the vanilla 1.12 and below structure files,
          * and adds any structures of the provided StructureType <b>type</b> to the provided map.
          */
-        private static void readAndAddStructuresToMap(ArrayListMultimap<StructureType, StructureData> map, NBTTagCompound rootCompound, StructureType type)
+        private static void readAndAddStructuresToMap(StructureType type,
+                                                      ArrayListMultimap<StructureType, StructureData> map,
+                                                      NBTTagCompound rootCompound)
         {
-            if (NbtWrap.containsCompound(rootCompound, "data") && false)
+            if (NbtWrap.containsCompound(rootCompound, "data") == false)
             {
                 return;
             }

@@ -8,17 +8,16 @@ import fi.dy.masa.minihud.config.StructureToggle;
 public enum StructureType
 {
     DESERT_PYRAMID      (StructureToggle.DESERT_PYRAMID,    "Temple",       "TeDP"),
+    END_CITY            (StructureToggle.END_CITY,          "EndCity",      ""),
     IGLOO               (StructureToggle.IGLOO,             "Temple",       "Iglu"),
     JUNGLE_TEMPLE       (StructureToggle.JUNGLE_TEMPLE,     "Temple",       "TeJP"),
     MANSION             (StructureToggle.MANSION,           "Mansion",      ""),
+    MINESHAFT           (StructureToggle.MINESHAFT,         "Mineshaft",    ""),
+    NETHER_FORTRESS     (StructureToggle.NETHER_FORTRESS,   "Fortress",     ""),
     OCEAN_MONUMENT      (StructureToggle.OCEAN_MONUMENT,    "Monument",     ""),
     STRONGHOLD          (StructureToggle.STRONGHOLD,        "Stronghold",   ""),
     VILLAGE             (StructureToggle.VILLAGE,           "Village",      ""),
     WITCH_HUT           (StructureToggle.SWAMP_HUT,         "Temple",       "TeSH"),
-
-    END_CITY            (StructureToggle.END_CITY,          "EndCity",      ""),
-
-    NETHER_FORTRESS     (StructureToggle.NETHER_FORTRESS,   "Fortress",     ""),
 
     UNKNOWN             (StructureToggle.UNKNOWN,           "",             "");
 

@@ -17,17 +17,16 @@ import fi.dy.masa.minihud.data.structure.StructureDataUtils;
 public enum StructureToggle implements ConfigInfo
 {
     DESERT_PYRAMID      ("desertPyramid",   "#30FFFF00", "#30FFFF00"),
+    END_CITY            ("endCity",         "#30EB07EB", "#30EB07EB"),
     IGLOO               ("igloo",           "#300FAFE4", "#300FAFE4"),
     JUNGLE_TEMPLE       ("jungleTemple",    "#3099FF00", "#3099FF00"),
     MANSION             ("mansion",         "#30FF6500", "#30FF6500"),
+    MINESHAFT           ("mineshaft",       "#30E0E000", "#30E0E000"),
     OCEAN_MONUMENT      ("oceanMonument",   "#3029E6EF", "#3029E6EF"),
+    NETHER_FORTRESS     ("netherFortress",  "#30FC381D", "#30FC381D"),
     STRONGHOLD          ("stronghold",      "#30009999", "#30009999"),
     VILLAGE             ("village",         "#3054CB4E", "#3054CB4E"),
     SWAMP_HUT           ("swampHut",        "#30BE1DFC", "#300099FF"),
-
-    END_CITY            ("endCity",         "#30EB07EB", "#30EB07EB"),
-
-    NETHER_FORTRESS     ("netherFortress",  "#30FC381D", "#30FC381D"),
 
     UNKNOWN             ("unknown",         "#30FFFFFF", "#30FFFFFF");
 

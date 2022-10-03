@@ -39,7 +39,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
     public static final int CARPET_STRUCTURE_ID_TEMPLE = 3;
     public static final int CARPET_STRUCTURE_ID_VILLAGE = 4;
     public static final int CARPET_STRUCTURE_ID_STRONGHOLD = 5;
-    //public static final int CARPET_STRUCTURE_ID_MINESHAFT = 6;
+    public static final int CARPET_STRUCTURE_ID_MINESHAFT = 6;
     public static final int CARPET_STRUCTURE_ID_MONUMENT = 7;
     public static final int CARPET_STRUCTURE_ID_MANSION = 8;
 
@@ -67,12 +67,12 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
             if (buf.readerIndex() < buf.writerIndex() - 4)
             {
                 int type = buf.readInt();
-                MiniHUD.debugLog("StructureStorage#updateStructureDataFromCarpetServer() - type = {}", type);
+                MiniHUD.debugLog("StructureStorage#updateStructureDataFromCarpetServer(), packet type = {}", type);
 
                 if (type == CARPET_ID_BOUNDINGBOX_MARKERS)
                 {
                     NBTTagCompound tag = buf.readCompoundTag();
-                    StructureStorage.INSTANCE.addStructureDataFromServer(map -> readStructureDataCarpetAllBoxes(map, tag));
+                    StructureStorage.INSTANCE.addStructureDataFromServer(readStructureDataCarpetAllBoxes(tag));
                 }
                 else if (type == CARPET_ID_LARGE_BOUNDINGBOX_MARKERS_START)
                 {
@@ -80,7 +80,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
                 }
                 else if (type == CARPET_ID_LARGE_BOUNDINGBOX_MARKERS)
                 {
-                    StructureStorage.INSTANCE.addStructureDataFromServer(map -> readSplitStructureBoxes(map, buf));
+                    readSplitStructureBoxes(buf);
                 }
             }
 
@@ -99,10 +99,11 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
         PacketSplitter.send(CHANNEL, buf, GameUtils.getNetworkConnection());
     }
 
-    private static void readStructureDataCarpetAllBoxes(ArrayListMultimap<StructureType, StructureData> map, NBTTagCompound tag)
+    private static ArrayListMultimap<StructureType, StructureData> readStructureDataCarpetAllBoxes(NBTTagCompound tag)
     {
+        ArrayListMultimap<StructureType, StructureData> map = ArrayListMultimap.create();
         NBTTagList tagList = NbtWrap.getList(tag, "Boxes", Constants.NBT.TAG_LIST);
-        MiniHUD.debugLog("StructureStorage#readStructureDataCarpetAll() - count: {}", tagList.tagCount());
+        MiniHUD.debugLog("StructureStorage#readStructureDataCarpetAll() - tag count: {}", tagList.tagCount());
 
         List<NBTTagCompound> tags = new ArrayList<>();
         final int size = NbtWrap.getListSize(tagList);
@@ -125,8 +126,9 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
 
         //System.out.printf("SD - readStructureDataCarpetAllBoxes, list: %d\n", tags.size());
         readStructureDataCarpetAllBoxes(map, tags);
+        MiniHUD.debugLog("Structure data from Carpet server (all), structure count = {}", map.size());
 
-        MiniHUD.debugLog("Structure data updated from Carpet server (all), structures: {}", map.size());
+        return map;
     }
 
     private static void readStructureDataCarpetAllBoxes(ArrayListMultimap<StructureType, StructureData> map, List<NBTTagCompound> tags)
@@ -159,12 +161,14 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
                     id = NbtWrap.getInt(tags.get(i + 1), "type");
                     type = getTypeFromCarpetId(id);
                 }
+                MiniHUD.debugLog("readStructureDataCarpetAllBoxes(): Enclosing box, id = {}", id);
             }
             // Don't add the component boxes of unknown/unsupported structure types to the builder
             else if (type != null)
             {
                 builder.add(IntBoundingBox.fromArray(NbtWrap.getIntArray(tag, "bb")));
                 ++componentBoxes;
+                MiniHUD.debugLog("readStructureDataCarpetAllBoxes(): componentBoxes currently: {}", componentBoxes);
             }
         }
 
@@ -185,13 +189,12 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
             int boxCount = buf.readVarInt();
 
             reader.expectedStructures = boxCount;
+            MiniHUD.debugLog("Structure data header received from Carpet server, expecting {} boxes", boxCount);
 
             if (NbtWrap.containsLong(tag, "Seed"))
             {
                 DataStorage.getInstance().setWorldSeed(NbtWrap.getLong(tag, "Seed"));
             }
-
-            MiniHUD.debugLog("Structure data header received from Carpet server, expecting {} boxes", boxCount);
         }
         catch (Exception e)
         {
@@ -199,12 +202,11 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
         }
     }
 
-    private static void readSplitStructureBoxes(ArrayListMultimap<StructureType, StructureData> map, PacketBuffer buf)
+    private static void readSplitStructureBoxes(PacketBuffer buf)
     {
-        List<NBTTagCompound> tags = new ArrayList<>();
-
         try
         {
+            List<NBTTagCompound> tags = new ArrayList<>();
             int boxCount = buf.readByte();
 
             for (int i = 0; i < boxCount; ++i)
@@ -212,7 +214,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
                 tags.add(buf.readCompoundTag());
             }
 
-            readSplitStructureBoxes(map, tags);
+            readSplitStructureBoxes(tags);
         }
         catch (Exception e)
         {
@@ -220,17 +222,17 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
         }
     }
 
-    private static void readSplitStructureBoxes(ArrayListMultimap<StructureType, StructureData> map, List<NBTTagCompound> tags)
+    private static void readSplitStructureBoxes(List<NBTTagCompound> tags)
     {
         for (NBTTagCompound tag : tags)
         {
-            readSplitStructureBox(map, tag);
+            readSplitStructureBox(tag);
         }
 
         MiniHUD.debugLog("Structure data received from Carpet server (split boxes), received {} boxes", tags.size());
     }
 
-    private static void readSplitStructureBox(ArrayListMultimap<StructureType, StructureData> mapOut, NBTTagCompound tag)
+    private static void readSplitStructureBox(NBTTagCompound tag)
     {
         CarpetBoxReader reader = CARPET_BOX_READER;
         int id = NbtWrap.getInt(tag, "type");
@@ -278,10 +280,8 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
                 reader.map.put(reader.type, new StructureData(reader.bbMain, reader.componentsBuilder.build()));
             }
 
-            mapOut.putAll(reader.map);
-
-            MiniHUD.debugLog("Structure data updated from Carpet server (split data), structures: {}", mapOut.size());
-
+            MiniHUD.debugLog("Structure data from Carpet server (split data), structure count = {}", reader.map.size());
+            StructureStorage.INSTANCE.addStructureDataFromServer(reader.map);
             reader.reset();
         }
     }
@@ -295,6 +295,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
             case CARPET_STRUCTURE_ID_FORTRESS:      return StructureType.NETHER_FORTRESS;
             case CARPET_STRUCTURE_ID_MANSION:       return StructureType.MANSION;
             case CARPET_STRUCTURE_ID_MONUMENT:      return StructureType.OCEAN_MONUMENT;
+            case CARPET_STRUCTURE_ID_MINESHAFT:     return StructureType.MINESHAFT;
             case CARPET_STRUCTURE_ID_STRONGHOLD:    return StructureType.STRONGHOLD;
             case CARPET_STRUCTURE_ID_TEMPLE:        return StructureType.WITCH_HUT;
             case CARPET_STRUCTURE_ID_VILLAGE:       return StructureType.VILLAGE;
@@ -305,10 +306,10 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
 
     private static class CarpetBoxReader
     {
-        protected final ArrayListMultimap<StructureType, StructureData> map = ArrayListMultimap.create();
         protected StructureType type;
         protected IntBoundingBox bbMain;
         protected ImmutableList.Builder<IntBoundingBox> componentsBuilder;
+        protected ArrayListMultimap<StructureType, StructureData> map = ArrayListMultimap.create();
         protected boolean readTypeFromNextBox;
         protected int expectedStructures = -1;
         protected int seenStructures;
@@ -316,7 +317,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
 
         protected void reset()
         {
-            this.map.clear();
+            this.map = ArrayListMultimap.create();
             this.type = null;
             this.bbMain = null;
             this.componentsBuilder = null;

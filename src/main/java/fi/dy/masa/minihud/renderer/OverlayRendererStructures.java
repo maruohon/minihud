@@ -59,7 +59,7 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
 
     private void updateStructures(BlockPos playerPos, Vec3d cameraPos)
     {
-        ArrayListMultimap<StructureType, StructureData> structures = StructureStorage.INSTANCE.getCopyOfStructureData();
+        ArrayListMultimap<StructureType, StructureData> structures = StructureStorage.INSTANCE.getStructureDataAndClearDirtyFlag();
         int maxRange = (GameUtils.getRenderDistanceChunks() + 2) * 16;
 
         for (StructureType type : structures.keySet())
