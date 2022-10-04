@@ -5,6 +5,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Matrix4f;
 import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.minihud.config.RendererToggle;
 
 public class OverlayRenderer
 {
@@ -39,6 +40,11 @@ public class OverlayRenderer
             {
                 return;
             }
+        }
+
+        if (RendererToggle.OVERLAY_BEACON_RANGE.getBooleanValue())
+        {
+            OverlayRendererBeaconRange.renderBeaconBoxForPlayerIfHoldingItem(entity, matrixStack, projMatrix, mc);
         }
 
         RenderContainer.INSTANCE.render(entity, matrixStack, projMatrix, mc);

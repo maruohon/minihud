@@ -39,6 +39,7 @@ import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.network.StructurePacketHandlerCarpet;
 import fi.dy.masa.minihud.network.StructurePacketHandlerServux;
+import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererLightLevel;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
@@ -106,6 +107,7 @@ public class DataStorage
         StructurePacketHandlerCarpet.INSTANCE.reset();
         StructurePacketHandlerServux.INSTANCE.reset();
         ShapeManager.INSTANCE.clear();
+        OverlayRendererBeaconRange.clear();
         OverlayRendererLightLevel.reset();
 
         if (isLogout || Configs.Generic.DONT_RESET_SEED_ON_DIMENSION_CHANGE.getBooleanValue() == false)
@@ -131,6 +133,7 @@ public class DataStorage
     public void onWorldJoin()
     {
         MiniHUD.printDebug("DataStorage#onWorldJoin()");
+        OverlayRendererBeaconRange.setNeedsUpdate();
 
         if (this.mc.isIntegratedServerRunning() == false && RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
         {
