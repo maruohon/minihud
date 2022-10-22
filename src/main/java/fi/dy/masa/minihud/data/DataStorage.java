@@ -154,7 +154,7 @@ public class DataStorage
     {
         if (this.worldSeedValid == false && this.mc.isSingleplayer())
         {
-            World worldTmp = this.mc.getIntegratedServer().getWorld(dimension);
+            World worldTmp = WorldUtils.getServerWorldForClientWorld(world);
 
             if (worldTmp != null)
             {

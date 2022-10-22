@@ -86,9 +86,9 @@ public class MiscUtils
     /**
      * This method has been taken from the Carpet mod, by gnembon
      */
-    public static int getCurrentHashSize(WorldServer server)
+    public static int getCurrentHashSize(WorldServer world)
     {
-        ChunkProviderServerMixin provider = (ChunkProviderServerMixin) server.getChunkProvider();
+        ChunkProviderServerMixin provider = (ChunkProviderServerMixin) world.getChunkProvider();
 
         try
         {

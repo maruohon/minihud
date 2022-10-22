@@ -539,7 +539,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             if (InfoLineToggle.DIMENSION.getBooleanValue())
             {
-                str.append(String.format("%sDimType ID: %s", pre, WorldUtils.getDimensionAsString(world)));
+                str.append(String.format("%sDimType ID: %s", pre, WorldUtils.getDimensionIdAsString(world)));
             }
 
             this.addLine(str.toString());

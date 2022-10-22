@@ -132,16 +132,15 @@ public class DebugInfoUtils
 
     public static void updateDebugRenderersOnServerTickEnd(MinecraftServer server)
     {
-        Minecraft mc = GameUtils.getClient();
-
         // Send the custom packet with the Path data, if that debug renderer is enabled
         if (pathFindingEnabled)
         {
-            addPathFindingDebug(server, mc);
+            addPathFindingDebug(server);
         }
 
         if (neighborUpdateEnabled)
         {
+            Minecraft mc = GameUtils.getClient();
             List<NeighborUpdate> list = new ArrayList<>(NEIGHBOR_UPDATES);
             NEIGHBOR_UPDATES.clear();
 
@@ -156,12 +155,12 @@ public class DebugInfoUtils
         }
     }
 
-    private static void addPathFindingDebug(MinecraftServer server, Minecraft mc)
+    private static void addPathFindingDebug(MinecraftServer server)
     {
-        if (mc.world != null && ++tickCounter >= 10)
+        if (++tickCounter >= 10)
         {
             tickCounter = 0;
-            World world = WorldUtils.getServerWorldForClientWorld(mc);
+            World world = WorldUtils.getServerWorldForClientWorld();
 
             if (world != null)
             {
