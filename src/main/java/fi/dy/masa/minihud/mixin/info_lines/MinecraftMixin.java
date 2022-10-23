@@ -16,7 +16,7 @@ public abstract class MinecraftMixin
     {
         if (InfoLineToggle.BLOCK_BREAK_SPEED.getBooleanValue())
         {
-            DataStorage.getInstance().clearBlockBreakCounter((Minecraft) (Object) this);
+            DataStorage.getInstance().clearBlockBreakCounter();
         }
     }
 }

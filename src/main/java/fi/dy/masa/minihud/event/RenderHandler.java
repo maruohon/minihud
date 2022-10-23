@@ -828,11 +828,10 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
             }
 
             String result;
-            int dimension = entity.dimension;
 
-            if (data.isWorldSeedKnown(dimension))
+            if (data.isWorldSeedKnown(world))
             {
-                long seed = data.getWorldSeed(dimension);
+                long seed = data.getWorldSeed(world);
 
                 if (MiscUtils.canSlimeSpawnAt(pos.getX(), pos.getZ(), seed))
                 {

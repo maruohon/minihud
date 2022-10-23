@@ -41,7 +41,6 @@ public class Configs
         public static final StringConfig  COORDINATE_FORMAT_STRING              = new StringConfig( "coordinateFormat", "x: %.1f y: %.1f z: %.1f");
         public static final BooleanConfig COORDINATE_FORMAT_CUSTOMIZED          = new BooleanConfig("coordinateFormatCustomized", false);
         public static final BooleanConfig PATH_FINDING_DEBUG_POINT_WIDTH        = new BooleanConfig("pathFindingDebugPointWidth", true);
-        public static final BooleanConfig DONT_RESET_SEED_ON_DIMENSION_CHANGE   = new BooleanConfig("dontResetSeedOnDimensionChange", true);
         public static final BooleanConfig FIX_VANILLA_DEBUG_RENDERERS           = new BooleanConfig("enableVanillaDebugRendererFix", true);
         public static final BooleanConfig ITEM_NBT_ENABLED                      = new BooleanConfig("itemNbtEnabled", false);
         public static final IntegerConfig ITEM_PREVIEW_Z                        = new IntegerConfig("itemPreviewZ", 400, 0, 4096);
@@ -73,6 +72,7 @@ public class Configs
         public static final BooleanConfig STRUCTURES_RENDER_THROUGH             = new BooleanConfig("structuresRenderThrough", false);
         public static final IntegerConfig TIME_DAY_DIVISOR                      = new IntegerConfig("timeDayDivisor", 24000, 1, Integer.MAX_VALUE);
         public static final IntegerConfig TIME_TOTAL_DIVISOR                    = new IntegerConfig("timeTotalDivisor", 24000, 1, Integer.MAX_VALUE);
+        public static final BooleanConfig USE_PER_DIMENSION_SEED                = new BooleanConfig("usePerDimensionSeed", false);
         public static final BooleanConfig WOOL_COUNTER_ENABLE_ALL               = new BooleanConfig("woolCounterEnableAll", true);
         public static final StringConfig  WOOL_COUNTER_TYPES                    = new StringConfig( "woolCounterTypes", "0-15");
 
@@ -92,7 +92,6 @@ public class Configs
                 REAL_TIME_FORMAT,
                 DEBUG_MESSAGES,
                 PATH_FINDING_DEBUG_POINT_WIDTH,
-                DONT_RESET_SEED_ON_DIMENSION_CHANGE,
                 DROPPED_CHUNKS_HASH_SIZE,
                 FIX_VANILLA_DEBUG_RENDERERS,
                 INFO_LINES_RENDERING_TOGGLE,
@@ -128,6 +127,7 @@ public class Configs
                 STRUCTURES_RENDER_THROUGH,
                 TIME_DAY_DIVISOR,
                 TIME_TOTAL_DIVISOR,
+                USE_PER_DIMENSION_SEED,
                 WOOL_COUNTER_ENABLE_ALL,
                 WOOL_COUNTER_TYPES
         );

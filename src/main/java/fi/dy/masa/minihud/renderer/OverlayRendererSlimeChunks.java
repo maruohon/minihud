@@ -7,11 +7,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos.PooledMutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
-import fi.dy.masa.malilib.util.game.WorldUtils;
 import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.config.Configs;
@@ -41,7 +41,7 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
     public boolean shouldRender(Minecraft mc)
     {
         return RendererToggle.SLIME_CHUNKS.isRendererEnabled() &&
-                DataStorage.getInstance().isWorldSeedKnown(WorldUtils.getDimensionId(mc.world)) &&
+                DataStorage.getInstance().isWorldSeedKnown(mc.world) &&
                 mc.world.provider.isSurfaceWorld();
     }
 
@@ -53,8 +53,9 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
             return true;
         }
 
-        boolean isSeedKnown = DataStorage.getInstance().isWorldSeedKnown(entity.dimension);
-        long seed = DataStorage.getInstance().getWorldSeed(entity.dimension);
+        World world = entity.getEntityWorld();
+        boolean isSeedKnown = DataStorage.getInstance().isWorldSeedKnown(world);
+        long seed = DataStorage.getInstance().getWorldSeed(world);
 
         if (this.topY != Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y.getDoubleValue() ||
             this.wasSeedKnown != isSeedKnown || this.seed != seed)
@@ -74,9 +75,10 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
     public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
     {
         DataStorage data = DataStorage.getInstance();
+        World world = entity.getEntityWorld();
         this.topY = Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y.getDoubleValue();
-        this.wasSeedKnown = data.isWorldSeedKnown(entity.dimension);
-        this.seed = data.getWorldSeed(entity.dimension);
+        this.wasSeedKnown = data.isWorldSeedKnown(world);
+        this.seed = data.getWorldSeed(world);
 
         if (this.wasSeedKnown)
         {

@@ -1,14 +1,14 @@
 package fi.dy.masa.minihud.data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import net.minecraft.client.Minecraft;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -17,40 +17,36 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.game.WorldUtils;
 import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+import fi.dy.masa.malilib.util.position.PositionUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
+import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.data.structure.StructureDataUtils;
 import fi.dy.masa.minihud.data.structure.StructureStorage;
+import fi.dy.masa.minihud.event.RenderHandler;
 import fi.dy.masa.minihud.network.carpet.CarpetPubsubPacketHandler;
 import fi.dy.masa.minihud.network.servux.ServuxInfoSubDataPacketHandler;
 import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.renderer.RenderContainer;
+import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.util.MiscUtils;
 
 public class DataStorage
 {
-    private static final DataStorage INSTANCE = new DataStorage();
+    public static final DataStorage INSTANCE = new DataStorage();
 
-    private final Minecraft mc = GameUtils.getClient();
-
-    private final Set<ChunkPos> chunkHeightmapsToCheck = new HashSet<>();
-    private final Map<ChunkPos, Integer> spawnableSubChunks = new HashMap<>();
-    private final Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> spawnerPositions = new Long2ObjectOpenHashMap<>();
-    private final Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> waterFallPositions = new Long2ObjectOpenHashMap<>();
+    protected final WorldProperties worldProperties = new WorldProperties();
+    private final LongOpenHashSet chunkHeightmapsToCheck = new LongOpenHashSet();
+    private final Long2IntOpenHashMap spawnableSubChunks = new Long2IntOpenHashMap();
     private final int[] blockBreakCounter = new int[100];
-    private BlockPos worldSpawn = BlockPos.ORIGIN;
     private Vec3d distanceReferencePoint = Vec3d.ZERO;
-    private long worldSeed;
-    private int serverDroppedChunksHashSize;
-    private boolean worldSeedValid;
-    private boolean worldSpawnValid;
-    private boolean hasServerDroppedChunksHashSize;
     private boolean spawnerPositionsDirty;
     private boolean waterFallPositionsDirty;
 
@@ -59,82 +55,70 @@ public class DataStorage
         return INSTANCE;
     }
 
-    public void reset()
+    public void clear(boolean isLogout)
     {
-        this.worldSeedValid = false;
-        this.worldSpawnValid = false;
-        this.hasServerDroppedChunksHashSize = false;
-
-        this.serverDroppedChunksHashSize = 0;
-        this.worldSeed = 0;
-        this.worldSpawn = BlockPos.ORIGIN;
+        this.worldProperties.clearOnWorldChange(isLogout);
+        RenderHandler.INSTANCE.setReady(false);
 
         MobCapDataHandler.INSTANCE.clear();
+        ShapeManager.INSTANCE.clear();
         StructureStorage.INSTANCE.clear();
         TpsDataManager.INSTANCE.clear();
         WoolCounters.INSTANCE.clear();
 
         RenderContainer.BEACON_OVERLAY.clear();
 
-        if (this.mc.world != null)
+        if (isLogout)
         {
-            StructureDataUtils.requestStructureDataUpdates();
-            CarpetPubsubPacketHandler.INSTANCE.updatePubSubSubscriptions();
-            ServuxInfoSubDataPacketHandler.INSTANCE.updateSubscriptions();
+            CarpetPubsubPacketHandler.INSTANCE.unsubscribeAll();
+            ServuxInfoSubDataPacketHandler.INSTANCE.onLogout();
         }
         else
         {
-            this.spawnerPositions.clear();
-            this.waterFallPositions.clear();
-            CarpetPubsubPacketHandler.INSTANCE.unsubscribeAll();
+            CarpetPubsubPacketHandler.INSTANCE.updatePubSubSubscriptions();
+            ServuxInfoSubDataPacketHandler.INSTANCE.updateSubscriptions();
+            StructureDataUtils.requestStructureDataUpdates();
         }
     }
 
-    public void onLogout()
-    {
-        ServuxInfoSubDataPacketHandler.INSTANCE.onLogout();
-    }
-
-    public void onWorldLoad()
+    public void afterWorldLoad()
     {
         RenderContainer.BEACON_OVERLAY.setNeedsUpdate();
+        RenderHandler.INSTANCE.setReady(true);
     }
 
     public void setWorldSeed(long seed)
     {
-        this.worldSeed = seed;
-        this.worldSeedValid = true;
+        this.worldProperties.worldSeed = OptionalLong.of(seed);
     }
 
     public void setWorldSpawn(BlockPos spawn)
     {
-        this.worldSpawn = spawn;
-        this.worldSpawnValid = true;
-    }
-
-    public void setServerDroppedChunksHashSize(int size)
-    {
-        this.serverDroppedChunksHashSize = size;
-        this.hasServerDroppedChunksHashSize = true;
+        this.worldProperties.worldSpawn = Optional.of(spawn);
     }
 
     public void setWorldSpawnIfUnknown(BlockPos spawn)
     {
-        if (this.worldSpawnValid == false)
+        if (this.worldProperties.worldSpawn.isPresent() == false)
         {
             this.setWorldSpawn(spawn);
         }
     }
 
-    public boolean isWorldSeedKnown(int dimension)
+    public void setServerDroppedChunksHashSize(int size)
     {
-        if (this.worldSeedValid)
+        this.worldProperties.droppedChunksHashSize = OptionalInt.of(size);
+    }
+
+    public boolean isWorldSeedKnown(World world)
+    {
+        if (this.worldProperties.worldSeed.isPresent())
         {
             return true;
         }
-        else if (this.mc.isSingleplayer())
+        else if (GameUtils.isSinglePlayer())
         {
-            return this.mc.getIntegratedServer().getWorld(dimension) != null;
+            return GameUtils.getIntegratedServer().getWorld(WorldUtils.getDimensionId(world)) != null;
         }
 
         return false;
@@ -142,17 +126,12 @@ public class DataStorage
 
     public boolean hasStoredWorldSeed()
     {
-        return this.worldSeedValid;
+        return this.worldProperties.worldSeed.isPresent();
     }
 
-    public boolean getHasDroppedChunksHashSizeFromServer()
+    public long getWorldSeed(World world)
     {
-        return this.hasServerDroppedChunksHashSize;
-    }
-
-    public long getWorldSeed(int dimension)
-    {
-        if (this.worldSeedValid == false && this.mc.isSingleplayer())
+        if (this.hasStoredWorldSeed() == false && GameUtils.isSinglePlayer())
         {
             World worldTmp = WorldUtils.getServerWorldForClientWorld(world);
 
@@ -162,17 +141,17 @@ public class DataStorage
             }
         }
 
-        return this.worldSeed;
+        return this.worldProperties.worldSeed.isPresent() ? this.worldProperties.worldSeed.getAsLong() : 0;
     }
 
     public boolean isWorldSpawnKnown()
     {
-        return this.worldSpawnValid;
+        return this.worldProperties.worldSpawn.isPresent();
     }
 
     public BlockPos getWorldSpawn()
     {
-        return this.worldSpawn;
+        return this.worldProperties.worldSpawn.isPresent() ? this.worldProperties.worldSpawn.get() : BlockPos.ORIGIN;
     }
 
     public Vec3d getDistanceReferencePoint()
@@ -196,9 +175,9 @@ public class DataStorage
         int cz = pos.getZ() >> 4;
         long cp = (long) cz << 32 | (((long) cx) & 0xFFFFFFFFL);
 
-        synchronized (this.spawnerPositions)
+        synchronized (this.worldProperties.spawnerPositions)
         {
-            ArrayList<OrderedBlockPosLong> list = this.spawnerPositions.computeIfAbsent(cp, c -> new ArrayList<>());
+            ArrayList<OrderedBlockPosLong> list = this.worldProperties.spawnerPositions.computeIfAbsent(cp, c -> new ArrayList<>());
             int order = list.size();
             list.add(OrderedBlockPosLong.of(pos, order));
             this.spawnerPositionsDirty = true;
@@ -206,8 +185,8 @@ public class DataStorage
 
         if (Configs.Generic.SPAWNER_POSITION_PRINT.getBooleanValue())
         {
-            LiteModMiniHud.logger.info(String.format("Spawner gen attempt: Chunk: [%4d, %4d] pos: [%d, %d, %d]",
-                                                     cx, cz, pos.getX(), pos.getY(), pos.getZ()));
+            MiniHUD.LOGGER.info("Spawner gen attempt: Chunk: [{}, {}] pos: [{}, {}, {}]",
+                                cx, cz, pos.getX(), pos.getY(), pos.getZ());
         }
     }
 
@@ -217,9 +196,9 @@ public class DataStorage
         int cz = pos.getZ() >> 4;
         long cp = (long) cz << 32 | (((long) cx) & 0xFFFFFFFFL);
 
-        synchronized (this.waterFallPositions)
+        synchronized (this.worldProperties.waterFallPositions)
         {
-            ArrayList<OrderedBlockPosLong> list = this.waterFallPositions.computeIfAbsent(cp, c -> new ArrayList<>());
+            ArrayList<OrderedBlockPosLong> list = this.worldProperties.waterFallPositions.computeIfAbsent(cp, c -> new ArrayList<>());
             int order = list.size();
             list.add(OrderedBlockPosLong.of(pos, order));
             this.waterFallPositionsDirty = true;
@@ -230,9 +209,9 @@ public class DataStorage
     {
         Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> map = new Long2ObjectOpenHashMap<>();
 
-        synchronized (this.spawnerPositions)
+        synchronized (this.worldProperties.spawnerPositions)
         {
-            map.putAll(this.spawnerPositions);
+            map.putAll(this.worldProperties.spawnerPositions);
             this.spawnerPositionsDirty = false;
         }
 
@@ -243,9 +222,9 @@ public class DataStorage
     {
         Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> map = new Long2ObjectOpenHashMap<>();
 
-        synchronized (this.waterFallPositions)
+        synchronized (this.worldProperties.waterFallPositions)
         {
-            map.putAll(this.waterFallPositions);
+            map.putAll(this.worldProperties.waterFallPositions);
             this.waterFallPositionsDirty = false;
         }
 
@@ -266,7 +245,7 @@ public class DataStorage
     public void markChunkForHeightmapCheck(int chunkX, int chunkZ)
     {
         OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
-        this.chunkHeightmapsToCheck.add(new ChunkPos(chunkX, chunkZ));
+        this.chunkHeightmapsToCheck.add(ChunkPos.asLong(chunkX, chunkZ));
         RenderContainer.LIGHT_LEVEL_OVERLAY.setNeedsUpdate();
     }
 
@@ -279,12 +258,12 @@ public class DataStorage
             return HashSizeType.CONFIG;
         }
 
-        if (this.hasServerDroppedChunksHashSize)
+        if (this.worldProperties.droppedChunksHashSize.isPresent())
         {
             return HashSizeType.CARPET;
         }
 
-        if (this.mc.isSingleplayer() && this.mc.world != null)
+        if (GameUtils.isSinglePlayer() && GameUtils.getClientWorld() != null)
         {
             return HashSizeType.SINGLE_PLAYER;
         }
@@ -301,11 +280,15 @@ public class DataStorage
             case CONFIG:
                 return Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
 
-            case CARPET:
-                return this.serverDroppedChunksHashSize;
-
             case SINGLE_PLAYER:
-                return MiscUtils.getCurrentHashSize(WorldUtils.getServerWorldForClientWorld(this.mc));
+                WorldServer world = GameUtils.getClientPlayersServerWorld();
+                return world != null ? MiscUtils.getCurrentHashSize(world) : 0xFFFF;
+
+            case CARPET:
+                if (this.worldProperties.droppedChunksHashSize.isPresent())
+                {
+                    return this.worldProperties.droppedChunksHashSize.getAsInt();
+                }
 
             case FALLBACK:
             default:
@@ -315,15 +298,16 @@ public class DataStorage
 
     public void checkQueuedDirtyChunkHeightmaps()
     {
-        WorldClient world = this.mc.world;
+        WorldClient world = GameUtils.getClientWorld();
 
         if (world != null)
         {
             if (this.chunkHeightmapsToCheck.isEmpty() == false)
             {
-                for (ChunkPos pos : this.chunkHeightmapsToCheck)
+                for (long posLong : this.chunkHeightmapsToCheck)
                 {
-                    Chunk chunk = world.getChunk(pos.x, pos.z);
+                    Chunk chunk = world.getChunk(PositionUtils.getChunkPosX(posLong),
+                                                 PositionUtils.getChunkPosZ(posLong));
                     int[] heightMap = chunk.getHeightMap();
                     int maxHeight = -1;
 
@@ -349,7 +333,7 @@ public class DataStorage
 
                     //System.out.printf("@ %d, %d - subChunks: %d, maxHeight: %d\n", pos.x, pos.z, subChunks, maxHeight);
 
-                    this.spawnableSubChunks.put(pos, subChunks);
+                    this.spawnableSubChunks.put(posLong, subChunks);
                 }
             }
         }
@@ -361,20 +345,20 @@ public class DataStorage
         this.chunkHeightmapsToCheck.clear();
     }
 
-    public void clearBlockBreakCounter(Minecraft mc)
+    public void clearBlockBreakCounter()
     {
-        if (mc.world != null)
+        if (GameUtils.getClientWorld() != null)
         {
-            int tick = (int) (mc.world.getTotalWorldTime() % this.blockBreakCounter.length);
+            int tick = (int) (GameUtils.getCurrentWorldTick() % this.blockBreakCounter.length);
             this.blockBreakCounter[tick] = 0;
         }
     }
 
-    public void onPlayerBlockBreak(Minecraft mc)
+    public void onPlayerBlockBreak()
     {
-        if (mc.world != null)
+        if (GameUtils.getClientWorld() != null)
         {
-            int tick = (int) (mc.world.getTotalWorldTime() % this.blockBreakCounter.length);
+            int tick = (int) (GameUtils.getCurrentWorldTick() % this.blockBreakCounter.length);
             ++this.blockBreakCounter[tick];
         }
     }
@@ -386,15 +370,14 @@ public class DataStorage
 
     public void onChunkUnload(int chunkX, int chunkZ)
     {
-        ChunkPos pos = new ChunkPos(chunkX, chunkZ);
-        this.chunkHeightmapsToCheck.remove(pos);
-        this.spawnableSubChunks.remove(pos);
+        long posLong = ChunkPos.asLong(chunkX, chunkZ);
+        this.chunkHeightmapsToCheck.remove(posLong);
+        this.spawnableSubChunks.remove(posLong);
     }
 
     public int getSpawnableSubChunkCountFor(int chunkX, int chunkZ)
     {
-        Integer count = this.spawnableSubChunks.get(new ChunkPos(chunkX, chunkZ));
-        return count != null ? count.intValue() : -1;
+        return this.spawnableSubChunks.getOrDefault(ChunkPos.asLong(chunkX, chunkZ), -1);
     }
 
     public boolean onSendChatMessage(String message)
@@ -407,17 +390,19 @@ public class DataStorage
             {
                 try
                 {
-                    this.setWorldSeed(Long.parseLong(parts[1]));
-                    MessageUtils.printCustomActionbarMessage("minihud.message.info.seed_set", this.worldSeed);
+                    long seed = Long.parseLong(parts[1]);
+                    this.setWorldSeed(seed);
+                    MessageUtils.printCustomActionbarMessage("minihud.message.info.seed_set", seed);
                 }
                 catch (NumberFormatException e)
                 {
                     MessageUtils.printCustomActionbarMessage("minihud.message.error.failed_to_parse_seed_from_chat");
                 }
             }
-            else if (this.worldSeedValid && parts.length == 1)
+            else if (this.worldProperties.worldSeed.isPresent() && parts.length == 1)
             {
-                MessageUtils.printCustomActionbarMessage("minihud.message.info.seed_set", this.worldSeed);
+                MessageUtils.printCustomActionbarMessage("minihud.message.info.seed_set",
+                                                         this.worldProperties.worldSeed.getAsLong());
             }
 
             return true;
@@ -431,7 +416,8 @@ public class DataStorage
                     int size = Integer.parseInt(parts[1]);
                     Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.setValue(size);
                     // Fetch it again from the config, to take the bounds clamping into account
-                    MessageUtils.printCustomActionbarMessage("minihud.message.info.dropped_chunks_hash_size_set_to", Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue());
+                    MessageUtils.printCustomActionbarMessage("minihud.message.info.dropped_chunks_hash_size_set_to",
+                                                             Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue());
                 }
                 catch (NumberFormatException e)
                 {
@@ -440,7 +426,8 @@ public class DataStorage
             }
             else if (parts.length == 1)
             {
-                MessageUtils.printCustomActionbarMessage("minihud.message.info.dropped_chunks_hash_size_get", this.getDroppedChunksHashSize());
+                MessageUtils.printCustomActionbarMessage("minihud.message.info.dropped_chunks_hash_size_get",
+                                                         this.getDroppedChunksHashSize());
             }
 
             return true;
@@ -460,9 +447,10 @@ public class DataStorage
             {
                 try
                 {
-                    this.setWorldSeed(Long.parseLong(text.getFormatArgs()[0].toString()));
-                    LiteModMiniHud.logger.info("Received world seed from the vanilla /seed command: {}", this.worldSeed);
-                    MessageUtils.printCustomActionbarMessage("minihud.message.info.seed_set", this.worldSeed);
+                    long seed = Long.parseLong(text.getFormatArgs()[0].toString());
+                    this.setWorldSeed(seed);
+                    LiteModMiniHud.logger.info("Received world seed from the vanilla /seed command: {}", seed);
+                    MessageUtils.printCustomActionbarMessage("minihud.message.info.seed_set", seed);
                 }
                 catch (Exception e)
                 {
@@ -474,9 +462,10 @@ public class DataStorage
             {
                 try
                 {
-                    this.setWorldSeed(Long.parseLong(text.getFormatArgs()[1].toString()));
-                    LiteModMiniHud.logger.info("Received world seed from the JED '/jed seed' command: {}", this.worldSeed);
-                    MessageUtils.printCustomActionbarMessage("minihud.message.info.seed_set", this.worldSeed);
+                    long seed = Long.parseLong(text.getFormatArgs()[1].toString());
+                    this.setWorldSeed(seed);
+                    LiteModMiniHud.logger.info("Received world seed from the JED '/jed seed' command: {}", seed);
+                    MessageUtils.printCustomActionbarMessage("minihud.message.info.seed_set", seed);
                 }
                 catch (Exception e)
                 {
@@ -492,9 +481,10 @@ public class DataStorage
                     int y = Integer.parseInt(o[1].toString());
                     int z = Integer.parseInt(o[2].toString());
 
-                    this.setWorldSpawn(new BlockPos(x, y, z));
+                    BlockPos spawn = new BlockPos(x, y, z);
+                    this.setWorldSpawn(spawn);
 
-                    String spawnStr = String.format("x: %d, y: %d, z: %d", this.worldSpawn.getX(), this.worldSpawn.getY(), this.worldSpawn.getZ());
+                    String spawnStr = String.format("x: %d, y: %d, z: %d", spawn.getX(), spawn.getY(), spawn.getZ());
                     LiteModMiniHud.logger.info("Received world spawn from the vanilla /setworldspawn command: {}", spawnStr);
                     MessageUtils.printCustomActionbarMessage("minihud.message.info.spawn_set", spawnStr);
                 }
@@ -512,9 +502,10 @@ public class DataStorage
 
         obj.add("distance_pos", JsonUtils.vec3dToJson(this.distanceReferencePoint));
 
-        if (this.worldSeedValid)
+        if (this.worldProperties.worldSeed.isPresent())
         {
-            obj.add("seed", new JsonPrimitive(this.worldSeed));
+            long seed = this.worldProperties.worldSeed.getAsLong();
+            obj.add("seed", new JsonPrimitive(seed));
         }
 
         return obj;
@@ -535,8 +526,7 @@ public class DataStorage
 
         if (JsonUtils.hasLong(obj, "seed"))
         {
-            this.worldSeed = JsonUtils.getLong(obj, "seed");
-            this.worldSeedValid = true;
+            this.worldProperties.worldSeed = OptionalLong.of(JsonUtils.getLong(obj, "seed"));
         }
     }
 
