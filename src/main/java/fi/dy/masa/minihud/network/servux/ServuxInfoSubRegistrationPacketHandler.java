@@ -2,11 +2,13 @@ package fi.dy.masa.minihud.network.servux;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import fi.dy.masa.malilib.network.message.BasePacketHandler;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+
+import malilib.network.message.BasePacketHandler;
+import malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.minihud.MiniHUD;
 
 public class ServuxInfoSubRegistrationPacketHandler extends BasePacketHandler

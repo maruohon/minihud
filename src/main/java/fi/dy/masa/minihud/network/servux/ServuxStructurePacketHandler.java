@@ -3,12 +3,14 @@ package fi.dy.masa.minihud.network.servux;
 import java.util.List;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import fi.dy.masa.malilib.network.message.BasePacketHandler;
-import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
+
+import malilib.network.message.BasePacketHandler;
+import malilib.util.game.wrap.NbtWrap;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.data.structure.StructureData;

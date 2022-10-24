@@ -7,20 +7,22 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
-import fi.dy.masa.malilib.config.value.BlockSnap;
-import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.data.json.JsonUtils;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
-import fi.dy.masa.malilib.util.position.LayerRange;
+
+import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BlockSnap;
+import malilib.render.ShapeRenderUtils;
+import malilib.util.StringUtils;
+import malilib.util.data.Color4f;
+import malilib.util.data.json.JsonUtils;
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.LayerRange;
 import fi.dy.masa.minihud.util.value.ShapeRenderType;
 
 public abstract class ShapeCircleBase extends ShapeBase

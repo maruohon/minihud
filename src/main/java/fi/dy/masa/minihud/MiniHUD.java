@@ -2,6 +2,7 @@ package fi.dy.masa.minihud;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import fi.dy.masa.minihud.config.Configs;
 
 public class MiniHUD

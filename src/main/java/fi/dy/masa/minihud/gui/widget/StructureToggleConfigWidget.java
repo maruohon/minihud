@@ -1,13 +1,14 @@
 package fi.dy.masa.minihud.gui.widget;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import fi.dy.masa.malilib.gui.config.ConfigWidgetContext;
-import fi.dy.masa.malilib.gui.widget.ColorIndicatorWidget;
-import fi.dy.masa.malilib.gui.widget.KeybindSettingsWidget;
-import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
-import fi.dy.masa.malilib.gui.widget.button.KeyBindConfigButton;
-import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
-import fi.dy.masa.malilib.gui.widget.list.entry.config.BaseConfigWidget;
+
+import malilib.gui.config.ConfigWidgetContext;
+import malilib.gui.widget.ColorIndicatorWidget;
+import malilib.gui.widget.KeybindSettingsWidget;
+import malilib.gui.widget.button.BooleanConfigButton;
+import malilib.gui.widget.button.KeyBindConfigButton;
+import malilib.gui.widget.list.entry.DataListEntryWidgetData;
+import malilib.gui.widget.list.entry.config.BaseConfigWidget;
 import fi.dy.masa.minihud.config.StructureToggle;
 
 public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggle>

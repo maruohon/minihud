@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.netty.buffer.Unpooled;
+
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.item.EnumDyeColor;
@@ -20,11 +21,12 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
-import fi.dy.masa.malilib.network.PacketSplitter;
-import fi.dy.masa.malilib.network.message.BasePacketHandler;
-import fi.dy.masa.malilib.registry.Registry;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.network.ClientPacketChannelHandler;
+import malilib.network.PacketSplitter;
+import malilib.network.message.BasePacketHandler;
+import malilib.registry.Registry;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.LiteModMiniHud;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLineToggle;

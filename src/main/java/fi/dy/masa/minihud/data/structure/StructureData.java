@@ -3,13 +3,15 @@ package fi.dy.masa.minihud.data.structure;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
-import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
+
+import malilib.util.data.Constants;
+import malilib.util.game.wrap.NbtWrap;
+import malilib.util.position.IntBoundingBox;
 
 public class StructureData
 {

@@ -2,9 +2,10 @@ package fi.dy.masa.minihud.renderer;
 
 import java.nio.file.Path;
 import javax.annotation.Nullable;
-import fi.dy.masa.malilib.render.overlay.BaseOverlayRenderer;
-import fi.dy.masa.malilib.util.data.ModInfo;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.render.overlay.BaseOverlayRenderer;
+import malilib.util.data.ModInfo;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.event.ClientWorldChangeHandler;

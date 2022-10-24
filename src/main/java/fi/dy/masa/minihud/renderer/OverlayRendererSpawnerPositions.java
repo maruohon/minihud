@@ -1,6 +1,7 @@
 package fi.dy.masa.minihud.renderer;
 
 import net.minecraft.client.Minecraft;
+
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.DataStorage;

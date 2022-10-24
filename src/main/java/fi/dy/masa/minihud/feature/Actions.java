@@ -1,8 +1,8 @@
 package fi.dy.masa.minihud.feature;
 
-import fi.dy.masa.malilib.action.ActionUtils;
-import fi.dy.masa.malilib.action.NamedAction;
-import fi.dy.masa.malilib.listener.EventListener;
+import malilib.action.ActionUtils;
+import malilib.action.NamedAction;
+import malilib.listener.EventListener;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLineToggle;

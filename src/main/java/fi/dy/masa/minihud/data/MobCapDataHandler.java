@@ -2,14 +2,16 @@ package fi.dy.masa.minihud.data;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.util.StringUtils;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.data.MobCapData.EntityCategory;
 import fi.dy.masa.minihud.util.MiscUtils;
 

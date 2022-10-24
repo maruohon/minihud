@@ -5,7 +5,9 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+
 import net.minecraft.util.math.BlockPos;
+
 import fi.dy.masa.minihud.config.Configs;
 
 public class WorldProperties

@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.Collections;
 import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -11,11 +12,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.render.TextRenderUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.render.RenderUtils;
+import malilib.render.ShapeRenderUtils;
+import malilib.render.TextRenderUtils;
+import malilib.util.data.Color4f;
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.util.MiscUtils;
@@ -157,8 +160,8 @@ public class OverlayRenderer
         GlStateManager.doPolygonOffset(-3f, -3f);
         GlStateManager.enablePolygonOffset();
         GlStateManager.glLineWidth(1f);
-        fi.dy.masa.malilib.render.RenderUtils.setupBlend();
-        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
+        RenderUtils.setupBlend();
+        RenderUtils.color(1f, 1f, 1f, 1f);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();

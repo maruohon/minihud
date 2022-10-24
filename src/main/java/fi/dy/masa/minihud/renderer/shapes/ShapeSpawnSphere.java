@@ -4,12 +4,14 @@ import java.text.DecimalFormat;
 import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.data.json.JsonUtils;
-import fi.dy.masa.malilib.util.position.Quadrant;
+
+import malilib.util.StringUtils;
+import malilib.util.data.Color4f;
+import malilib.util.data.json.JsonUtils;
+import malilib.util.position.Quadrant;
 
 public class ShapeSpawnSphere extends ShapeSphereBlocky
 {

@@ -2,14 +2,15 @@ package fi.dy.masa.minihud.config;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import fi.dy.masa.malilib.config.option.BooleanContainingConfig;
-import fi.dy.masa.malilib.input.callback.AdjustableValueHotkeyCallback;
-import fi.dy.masa.malilib.listener.EventListener;
-import fi.dy.masa.malilib.overlay.message.MessageHelpers;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
-import fi.dy.masa.malilib.render.overlay.OverlayRendererContainer;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+
+import malilib.config.option.BooleanContainingConfig;
+import malilib.input.callback.AdjustableValueHotkeyCallback;
+import malilib.listener.EventListener;
+import malilib.overlay.message.MessageHelpers;
+import malilib.overlay.message.MessageUtils;
+import malilib.render.overlay.OverlayRendererContainer;
+import malilib.util.StringUtils;
+import malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.data.WoolCounters;
 import fi.dy.masa.minihud.data.structure.StructureDataUtils;

@@ -2,8 +2,10 @@ package fi.dy.masa.minihud.data;
 
 import java.util.Arrays;
 import javax.annotation.Nullable;
+
 import net.minecraft.entity.EnumCreatureType;
-import fi.dy.masa.malilib.util.MathUtils;
+
+import malilib.util.MathUtils;
 
 public class MobCapData
 {

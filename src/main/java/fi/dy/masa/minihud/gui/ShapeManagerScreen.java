@@ -1,16 +1,18 @@
 package fi.dy.masa.minihud.gui;
 
 import javax.annotation.Nullable;
+
 import net.minecraft.client.gui.GuiScreen;
-import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.widget.DropDownListWidget;
-import fi.dy.masa.malilib.gui.widget.LabelWidget;
-import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
-import fi.dy.masa.malilib.input.ActionResult;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+
+import malilib.gui.BaseListScreen;
+import malilib.gui.BaseScreen;
+import malilib.gui.widget.DropDownListWidget;
+import malilib.gui.widget.LabelWidget;
+import malilib.gui.widget.button.BooleanConfigButton;
+import malilib.gui.widget.button.GenericButton;
+import malilib.gui.widget.list.DataListWidget;
+import malilib.input.ActionResult;
+import malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;

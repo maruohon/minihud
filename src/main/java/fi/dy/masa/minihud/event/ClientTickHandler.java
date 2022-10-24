@@ -1,8 +1,8 @@
 package fi.dy.masa.minihud.event;
 
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameUtils;
 
-public class ClientTickHandler implements fi.dy.masa.malilib.event.ClientTickHandler
+public class ClientTickHandler implements malilib.event.ClientTickHandler
 {
     @Override
     public void onClientTick()

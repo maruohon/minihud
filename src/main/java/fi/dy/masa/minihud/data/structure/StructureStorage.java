@@ -2,10 +2,12 @@ package fi.dy.masa.minihud.data.structure;
 
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.data.structure.StructureDataUtils.StructureFileUtils;
 

@@ -3,6 +3,7 @@ package fi.dy.masa.minihud.data.structure;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+
 import fi.dy.masa.minihud.config.StructureToggle;
 
 public enum StructureType

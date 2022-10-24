@@ -3,12 +3,14 @@ package fi.dy.masa.minihud.data;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.util.StringUtils;
+import malilib.util.game.wrap.GameUtils;
 
 public class TpsDataManager
 {

@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.mixin.debugrenderer;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+
 import net.minecraft.client.renderer.debug.DebugRenderer;
 
 @Mixin(DebugRenderer.class)

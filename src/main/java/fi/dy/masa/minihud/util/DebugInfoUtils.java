@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import com.google.common.collect.MapMaker;
 import io.netty.buffer.Unpooled;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.debug.DebugRendererNeighborsUpdate;
 import net.minecraft.entity.Entity;
@@ -18,9 +19,10 @@ import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.util.game.WorldUtils;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.mixin.debugrenderer.DebugRendererMixin;

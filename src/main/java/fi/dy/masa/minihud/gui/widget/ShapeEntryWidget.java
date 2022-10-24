@@ -1,12 +1,12 @@
 package fi.dy.masa.minihud.gui.widget;
 
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
-import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
-import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
-import fi.dy.masa.malilib.render.text.StyledTextLine;
+import malilib.gui.BaseScreen;
+import malilib.gui.util.GuiUtils;
+import malilib.gui.widget.button.GenericButton;
+import malilib.gui.widget.button.OnOffButton;
+import malilib.gui.widget.list.entry.BaseDataListEntryWidget;
+import malilib.gui.widget.list.entry.DataListEntryWidgetData;
+import malilib.render.text.StyledTextLine;
 import fi.dy.masa.minihud.gui.GuiShapeEditor;
 import fi.dy.masa.minihud.renderer.shapes.ShapeBase;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;

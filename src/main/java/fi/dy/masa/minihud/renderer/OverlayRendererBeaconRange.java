@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.renderer;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -15,9 +16,10 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
-import fi.dy.masa.malilib.util.data.Color4f;
+
+import malilib.render.ShapeRenderUtils;
+import malilib.render.overlay.BaseRenderObject;
+import malilib.util.data.Color4f;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 

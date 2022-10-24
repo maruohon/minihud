@@ -3,6 +3,7 @@ package fi.dy.masa.minihud.renderer;
 import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -18,12 +19,14 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.chunk.Chunk;
-import fi.dy.masa.malilib.config.option.ColorConfig;
-import fi.dy.masa.malilib.config.option.Vec2dConfig;
-import fi.dy.masa.malilib.render.overlay.BaseRenderObject;
-import fi.dy.masa.malilib.render.overlay.VboRenderObject;
-import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+
+import malilib.config.option.ColorConfig;
+import malilib.config.option.Vec2dConfig;
+import malilib.render.RenderUtils;
+import malilib.render.overlay.BaseRenderObject;
+import malilib.render.overlay.VboRenderObject;
+import malilib.util.data.Color4f;
+import malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -82,7 +85,7 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
     {
         super.preRender();
 
-        fi.dy.masa.malilib.render.RenderUtils.bindTexture(NUMBER_TEXTURE);
+        RenderUtils.bindTexture(NUMBER_TEXTURE);
     }
 
     @Override

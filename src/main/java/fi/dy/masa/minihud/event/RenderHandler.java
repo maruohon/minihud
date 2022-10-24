@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -34,20 +35,22 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
-import fi.dy.masa.malilib.config.value.ScreenLocation;
-import fi.dy.masa.malilib.event.PostGameOverlayRenderer;
-import fi.dy.masa.malilib.event.PostItemTooltipRenderer;
-import fi.dy.masa.malilib.event.PostWorldRenderer;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.overlay.InfoArea;
-import fi.dy.masa.malilib.overlay.widget.StringListRendererWidget;
-import fi.dy.masa.malilib.registry.Registry;
-import fi.dy.masa.malilib.render.inventory.InventoryRenderUtils;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.game.BlockUtils;
-import fi.dy.masa.malilib.util.game.WorldUtils;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.config.value.ScreenLocation;
+import malilib.event.PostGameOverlayRenderer;
+import malilib.event.PostItemTooltipRenderer;
+import malilib.event.PostWorldRenderer;
+import malilib.gui.BaseScreen;
+import malilib.overlay.InfoArea;
+import malilib.overlay.widget.StringListRendererWidget;
+import malilib.registry.Registry;
+import malilib.render.RenderUtils;
+import malilib.render.inventory.InventoryRenderUtils;
+import malilib.util.StringUtils;
+import malilib.util.game.BlockUtils;
+import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.InfoLineToggle;
@@ -215,7 +218,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 if (render)
                 {
                     int dimensions = Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue();
-                    fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(stack, x, y, z, dimensions);
+                    RenderUtils.renderMapPreview(stack, x, y, z, dimensions);
                 }
             }
         }

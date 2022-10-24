@@ -3,7 +3,8 @@ package fi.dy.masa.minihud.renderer.shapes;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.util.StringUtils;
+
+import malilib.util.StringUtils;
 
 public enum ShapeType
 {

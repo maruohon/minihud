@@ -4,15 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
-import fi.dy.masa.malilib.listener.LayerRangeChangeListener;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.data.json.JsonUtils;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
-import fi.dy.masa.malilib.util.position.LayerRange;
+
+import malilib.config.value.BaseOptionListConfigValue;
+import malilib.listener.LayerRangeChangeListener;
+import malilib.util.StringUtils;
+import malilib.util.data.Color4f;
+import malilib.util.data.json.JsonUtils;
+import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.LayerRange;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.renderer.MiniHUDOverlayRenderer;
 import fi.dy.masa.minihud.util.value.ShapeRenderType;

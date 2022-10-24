@@ -1,7 +1,7 @@
 package fi.dy.masa.minihud.renderer;
 
-import fi.dy.masa.malilib.render.overlay.BaseOverlayRenderer;
-import fi.dy.masa.malilib.render.overlay.OverlayRendererContainer;
+import malilib.render.overlay.BaseOverlayRenderer;
+import malilib.render.overlay.OverlayRendererContainer;
 import fi.dy.masa.minihud.config.RendererToggle;
 
 public class RenderContainer

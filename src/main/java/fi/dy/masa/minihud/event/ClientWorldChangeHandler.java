@@ -4,16 +4,18 @@ import java.nio.file.Path;
 import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import net.minecraft.client.multiplayer.WorldClient;
-import fi.dy.masa.malilib.config.util.ConfigUtils;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.json.JsonUtils;
+
+import malilib.config.util.ConfigUtils;
+import malilib.util.StringUtils;
+import malilib.util.data.json.JsonUtils;
 import fi.dy.masa.minihud.Reference;
 import fi.dy.masa.minihud.data.DataStorage;
 import fi.dy.masa.minihud.renderer.OverlayRenderer;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 
-public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.ClientWorldChangeHandler
+public class ClientWorldChangeHandler implements malilib.event.ClientWorldChangeHandler
 {
     @Override
     public void onPreClientWorldChange(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter)

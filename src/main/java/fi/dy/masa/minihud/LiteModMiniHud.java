@@ -6,7 +6,8 @@ import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import fi.dy.masa.malilib.registry.Registry;
+
+import malilib.registry.Registry;
 import fi.dy.masa.minihud.gui.MiniHudConfigPanel;
 
 public class LiteModMiniHud implements LiteMod, Configurable

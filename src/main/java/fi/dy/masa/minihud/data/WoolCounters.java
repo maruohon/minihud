@@ -5,9 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import net.minecraft.item.EnumDyeColor;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.DyeColorCode;
+
+import malilib.util.StringUtils;
+import malilib.util.data.DyeColorCode;
 import fi.dy.masa.minihud.config.Configs;
 
 public class WoolCounters
