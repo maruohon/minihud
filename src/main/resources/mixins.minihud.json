@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "fi.dy.masa.minihud.mixin",
+	"package": "minihud.mixin",
 	"compatibilityLevel": "JAVA_8",
 	"refmap": "mixins.minihud.refmap.json",
 	"minVersion": "0.7",
