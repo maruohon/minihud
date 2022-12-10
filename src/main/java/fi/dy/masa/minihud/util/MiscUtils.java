@@ -110,21 +110,18 @@ public class MiscUtils
         if (tag != null && tag.contains(AxolotlEntity.VARIANT_KEY, Constants.NBT.TAG_INT))
         {
             int variantId = tag.getInt(AxolotlEntity.VARIANT_KEY);
+            // FIXME 1.19.3+ this is not validated now... with AIOOB it will return the entry for ID 0
+            AxolotlEntity.Variant variant = AxolotlEntity.Variant.byId(variantId);
+            String variantName = variant.getName();
+            MutableText labelText = Text.translatable("minihud.label.axolotl_tooltip.label");
+            MutableText valueText = Text.translatable("minihud.label.axolotl_tooltip.value", variantName, variantId);
 
-            if (variantId >= 0 && variantId < AxolotlEntity.Variant.VARIANTS.length)
+            if (variantId < AXOLOTL_COLORS.length)
             {
-                AxolotlEntity.Variant variant = AxolotlEntity.Variant.VARIANTS[variantId];
-                String variantName = variant.getName();
-                MutableText labelText = Text.translatable("minihud.label.axolotl_tooltip.label");
-                MutableText valueText = Text.translatable("minihud.label.axolotl_tooltip.value", variantName, variantId);
-
-                if (variantId < AXOLOTL_COLORS.length)
-                {
-                    valueText.setStyle(Style.EMPTY.withColor(AXOLOTL_COLORS[variantId]));
-                }
-
-                lines.add(Math.min(1, lines.size()), labelText.append(valueText));
+                valueText.setStyle(Style.EMPTY.withColor(AXOLOTL_COLORS[variantId]));
             }
+
+            lines.add(Math.min(1, lines.size()), labelText.append(valueText));
         }
     }
 

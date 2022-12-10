@@ -15,6 +15,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerTask;
 import net.minecraft.server.world.ServerWorld;
@@ -30,8 +32,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -698,7 +698,7 @@ public class DataStorage
                 {
                     Structure structure = entry.getKey();
                     StructureStart start = entry.getValue();
-                    Identifier id = world.getRegistryManager().get(Registry.STRUCTURE_KEY).getId(structure);
+                    Identifier id = world.getRegistryManager().get(RegistryKeys.STRUCTURE).getId(structure);
                     StructureType type = StructureType.fromStructureId(id != null ? id.toString() : "?");
 
                     if (type.isEnabled() &&

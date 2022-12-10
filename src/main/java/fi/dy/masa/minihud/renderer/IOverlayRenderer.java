@@ -1,9 +1,9 @@
 package fi.dy.masa.minihud.renderer;
 
+import org.joml.Matrix4f;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 
 public interface IOverlayRenderer

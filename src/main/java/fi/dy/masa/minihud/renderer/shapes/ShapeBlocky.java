@@ -2,17 +2,18 @@ package fi.dy.masa.minihud.renderer.shapes;
 
 import java.util.List;
 import java.util.function.Consumer;
-import org.lwjgl.opengl.GL11;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.systems.RenderSystem;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.BlockSnap;
 import fi.dy.masa.malilib.util.Color4f;
@@ -20,7 +21,6 @@ import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public abstract class ShapeBlocky extends ShapeBase
 {
