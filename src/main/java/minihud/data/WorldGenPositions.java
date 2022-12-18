@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import net.minecraft.util.math.BlockPos;
 
-import minihud.MiniHUD;
+import minihud.MiniHud;
 import minihud.config.Configs;
 
 public class WorldGenPositions
@@ -49,7 +49,7 @@ public class WorldGenPositions
 
         if (Configs.Generic.SPAWNER_POSITION_PRINT.getBooleanValue())
         {
-            MiniHUD.LOGGER.info("Spawner gen attempt: Chunk: [{}, {}] pos: [{}, {}, {}]",
+            MiniHud.LOGGER.info("Spawner gen attempt: Chunk: [{}, {}] pos: [{}, {}, {}]",
                                 pos.getX() >> 4, pos.getZ() >> 4, pos.getX(), pos.getY(), pos.getZ());
         }
     }

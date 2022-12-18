@@ -36,7 +36,7 @@ import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.nbt.NbtUtils;
 import malilib.util.position.IntBoundingBox;
-import minihud.MiniHUD;
+import minihud.MiniHud;
 import minihud.Reference;
 import minihud.config.RendererToggle;
 import minihud.mixin.structure.ChunkGeneratorEndMixin;
@@ -61,7 +61,7 @@ public class StructureDataUtils
             {
                 if (enabled)
                 {
-                    MiniHUD.debugLog("Attempting to register structure packet handlers to the server");
+                    MiniHud.debugLog("Attempting to register structure packet handlers to the server");
 
                     // TODO on Servux servers this re-register shouldn't be done when the player just moves around.
                     // But on 1.12.x Carpet server I think a re-request is needed, it doesn't seem like the server

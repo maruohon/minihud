@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import minihud.config.Configs;
 
-public class MiniHUD
+public class MiniHud
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_ID);
 

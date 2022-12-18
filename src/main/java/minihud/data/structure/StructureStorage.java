@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
-import minihud.MiniHUD;
+import minihud.MiniHud;
 import minihud.data.structure.StructureDataUtils.StructureFileUtils;
 
 public class StructureStorage
@@ -62,13 +62,13 @@ public class StructureStorage
     public void addStructureDataFromLocalStructureFiles(ArrayListMultimap<StructureType, StructureData> data)
     {
         this.addStructureData(data);
-        MiniHUD.debugLog("Structure data updated from local structure files, structure count = {}", data.size());
+        MiniHud.debugLog("Structure data updated from local structure files, structure count = {}", data.size());
     }
 
     public void addStructureDataFromIntegratedServer(ArrayListMultimap<StructureType, StructureData> data)
     {
         this.addStructureData(data);
-        MiniHUD.debugLog("Structure data updated from the integrated server, structure count = {}", data.size());
+        MiniHud.debugLog("Structure data updated from the integrated server, structure count = {}", data.size());
     }
 
     protected void addStructureData(ArrayListMultimap<StructureType, StructureData> data)

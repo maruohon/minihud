@@ -18,8 +18,7 @@ import malilib.util.data.Constants;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.position.IntBoundingBox;
-import minihud.LiteModMiniHud;
-import minihud.MiniHUD;
+import minihud.MiniHud;
 import minihud.data.DataStorage;
 import minihud.data.structure.StructureData;
 import minihud.data.structure.StructureStorage;
@@ -69,7 +68,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
             if (buf.readerIndex() < buf.writerIndex() - 4)
             {
                 int type = buf.readInt();
-                MiniHUD.debugLog("StructureStorage#updateStructureDataFromCarpetServer(), packet type = {}", type);
+                MiniHud.debugLog("StructureStorage#updateStructureDataFromCarpetServer(), packet type = {}", type);
 
                 if (type == CARPET_ID_BOUNDINGBOX_MARKERS)
                 {
@@ -90,7 +89,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
         }
         catch (Exception e)
         {
-            LiteModMiniHud.logger.warn("Failed to read structure data from Carpet mod packet", e);
+            MiniHud.LOGGER.warn("Failed to read structure data from Carpet mod packet", e);
         }
     }
 
@@ -105,7 +104,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
     {
         ArrayListMultimap<StructureType, StructureData> map = ArrayListMultimap.create();
         NBTTagList tagList = NbtWrap.getList(tag, "Boxes", Constants.NBT.TAG_LIST);
-        MiniHUD.debugLog("StructureStorage#readStructureDataCarpetAll() - tag count: {}", tagList.tagCount());
+        MiniHud.debugLog("StructureStorage#readStructureDataCarpetAll() - tag count: {}", tagList.tagCount());
 
         List<NBTTagCompound> tags = new ArrayList<>();
         final int size = NbtWrap.getListSize(tagList);
@@ -128,7 +127,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
 
         //System.out.printf("SD - readStructureDataCarpetAllBoxes, list: %d\n", tags.size());
         readStructureDataCarpetAllBoxes(map, tags);
-        MiniHUD.debugLog("Structure data from Carpet server (all), structure count = {}", map.size());
+        MiniHud.debugLog("Structure data from Carpet server (all), structure count = {}", map.size());
 
         return map;
     }
@@ -163,14 +162,14 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
                     id = NbtWrap.getInt(tags.get(i + 1), "type");
                     type = getTypeFromCarpetId(id);
                 }
-                MiniHUD.debugLog("readStructureDataCarpetAllBoxes(): Enclosing box, id = {}", id);
+                MiniHud.debugLog("readStructureDataCarpetAllBoxes(): Enclosing box, id = {}", id);
             }
             // Don't add the component boxes of unknown/unsupported structure types to the builder
             else if (type != null)
             {
                 builder.add(IntBoundingBox.fromArray(NbtWrap.getIntArray(tag, "bb")));
                 ++componentBoxes;
-                MiniHUD.debugLog("readStructureDataCarpetAllBoxes(): componentBoxes currently: {}", componentBoxes);
+                MiniHud.debugLog("readStructureDataCarpetAllBoxes(): componentBoxes currently: {}", componentBoxes);
             }
         }
 
@@ -191,7 +190,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
             int boxCount = buf.readVarInt();
 
             reader.expectedStructures = boxCount;
-            MiniHUD.debugLog("Structure data header received from Carpet server, expecting {} boxes", boxCount);
+            MiniHud.debugLog("Structure data header received from Carpet server, expecting {} boxes", boxCount);
 
             if (NbtWrap.containsLong(tag, "Seed"))
             {
@@ -200,7 +199,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
         }
         catch (Exception e)
         {
-            MiniHUD.LOGGER.warn("Failed to read structure data from Carpet server (split boxes header)", e);
+            MiniHud.LOGGER.warn("Failed to read structure data from Carpet server (split boxes header)", e);
         }
     }
 
@@ -220,7 +219,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
         }
         catch (Exception e)
         {
-            MiniHUD.LOGGER.warn("Failed to read structure data from Carpet server", e);
+            MiniHud.LOGGER.warn("Failed to read structure data from Carpet server", e);
         }
     }
 
@@ -231,7 +230,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
             readSplitStructureBox(tag);
         }
 
-        MiniHUD.debugLog("Structure data received from Carpet server (split boxes), received {} boxes", tags.size());
+        MiniHud.debugLog("Structure data received from Carpet server (split boxes), received {} boxes", tags.size());
     }
 
     private static void readSplitStructureBox(NBTTagCompound tag)
@@ -282,7 +281,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
                 reader.map.put(reader.type, new StructureData(reader.bbMain, reader.componentsBuilder.build()));
             }
 
-            MiniHUD.debugLog("Structure data from Carpet server (split data), structure count = {}", reader.map.size());
+            MiniHud.debugLog("Structure data from Carpet server (split data), structure count = {}", reader.map.size());
             StructureStorage.INSTANCE.addStructureDataFromServer(reader.map);
             reader.reset();
         }

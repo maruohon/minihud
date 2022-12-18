@@ -12,7 +12,7 @@ import minihud.gui.ConfigScreen;
 import minihud.gui.GuiShapeEditor;
 import minihud.gui.ShapeManagerScreen;
 
-public class MiniHUDActions
+public class MiniHudActions
 {
     public static final NamedAction OPEN_CONFIG_SCREEN              = register("openConfigScreen", ConfigScreen::open);
     public static final NamedAction OPEN_SHAPE_EDITOR               = register("openShapeEditor", GuiShapeEditor::openShapeEditor);

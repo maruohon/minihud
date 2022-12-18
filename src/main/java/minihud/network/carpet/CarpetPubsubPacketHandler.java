@@ -27,7 +27,7 @@ import malilib.network.PacketSplitter;
 import malilib.network.message.BasePacketHandler;
 import malilib.registry.Registry;
 import malilib.util.game.wrap.GameUtils;
-import minihud.LiteModMiniHud;
+import minihud.MiniHud;
 import minihud.config.Configs;
 import minihud.config.InfoLineToggle;
 import minihud.config.RendererToggle;
@@ -199,7 +199,7 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
                 if (Configs.Generic.DEBUG_MESSAGES.getBooleanValue())
                 {
                     String action = updateType == PACKET_C2S_SUBSCRIBE ? "sub" : "unsub";
-                    LiteModMiniHud.logger.info("Action: '{}', nodes: '{}'", action, actionableNodes);
+                    MiniHud.LOGGER.info("Action: '{}', nodes: '{}'", action, actionableNodes);
                 }
 
                 PacketBuffer buf = new PacketBuffer(Unpooled.buffer());

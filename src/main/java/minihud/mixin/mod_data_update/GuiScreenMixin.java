@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 
-import minihud.data.DataStorage;
+import minihud.util.ChatUtils;
 
 @Mixin(GuiScreen.class)
 public abstract class GuiScreenMixin extends Gui
@@ -19,7 +19,7 @@ public abstract class GuiScreenMixin extends Gui
             cancellable = true)
     private void onSendMessage(String msg, boolean addToChat, CallbackInfo ci)
     {
-        if (DataStorage.getInstance().onSendChatMessage(msg))
+        if (ChatUtils.onSendChatMessage(msg))
         {
             ci.cancel();
         }

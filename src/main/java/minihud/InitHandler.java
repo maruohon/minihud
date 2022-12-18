@@ -61,7 +61,7 @@ public class InitHandler implements InitializationHandler
         Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(ServuxInfoSubRegistrationPacketHandler.INSTANCE);
         Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(ServuxInfoSubDataPacketHandler.INSTANCE);
 
-        MiniHUDActions.init();
+        MiniHudActions.init();
         ConfigCallbacks.init();
     }
 }

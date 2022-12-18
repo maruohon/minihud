@@ -14,7 +14,7 @@ import malilib.util.game.wrap.EntityWrap;
 import minihud.data.DataStorage;
 import minihud.data.WoolCounters;
 import minihud.data.structure.StructureDataUtils;
-import minihud.MiniHUDActions;
+import minihud.MiniHudActions;
 import minihud.network.carpet.CarpetPubsubPacketHandler;
 import minihud.network.servux.ServuxInfoSubDataPacketHandler;
 import minihud.renderer.RenderContainer;
@@ -26,10 +26,10 @@ public class ConfigCallbacks
     {
         Configs.Generic.OVERLAYS_RENDERING_TOGGLE.addValueChangeListener(OverlayRendererContainer.INSTANCE::setEnabledRenderersNeedUpdate);
 
-        Configs.Hotkeys.OPEN_CONFIG_GUI.createCallbackForAction(MiniHUDActions.OPEN_CONFIG_SCREEN);
-        Configs.Hotkeys.OPEN_SHAPE_EDITOR.createCallbackForAction(MiniHUDActions.OPEN_SHAPE_EDITOR);
-        Configs.Hotkeys.OPEN_SHAPE_MANAGER.createCallbackForAction(MiniHUDActions.OPEN_SHAPE_MANAGER);
-        Configs.Hotkeys.SET_DISTANCE_REFERENCE_POINT.createCallbackForAction(MiniHUDActions.SET_DISTANCE_REFERENCE_POINT);
+        Configs.Hotkeys.OPEN_CONFIG_GUI.createCallbackForAction(MiniHudActions.OPEN_CONFIG_SCREEN);
+        Configs.Hotkeys.OPEN_SHAPE_EDITOR.createCallbackForAction(MiniHudActions.OPEN_SHAPE_EDITOR);
+        Configs.Hotkeys.OPEN_SHAPE_MANAGER.createCallbackForAction(MiniHudActions.OPEN_SHAPE_MANAGER);
+        Configs.Hotkeys.SET_DISTANCE_REFERENCE_POINT.createCallbackForAction(MiniHudActions.SET_DISTANCE_REFERENCE_POINT);
 
         InfoLineToggle.CHUNK_UNLOAD_ORDER.getHotkeyConfig().getKeyBind().setCallback(AdjustableValueHotkeyCallback.createBitShifter(
                         InfoLineToggle.CHUNK_UNLOAD_ORDER.getBooleanConfig(), Configs.Generic.DROPPED_CHUNKS_HASH_SIZE)

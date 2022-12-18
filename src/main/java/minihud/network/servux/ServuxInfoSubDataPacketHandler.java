@@ -28,7 +28,7 @@ import malilib.util.data.palette.Palette;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.nbt.NbtUtils;
-import minihud.MiniHUD;
+import minihud.MiniHud;
 import minihud.config.Configs;
 import minihud.config.InfoLineToggle;
 import minihud.config.RendererToggle;
@@ -64,12 +64,12 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
     @Override
     public void onPacketReceived(PacketBuffer buf)
     {
-        MiniHUD.debugLog("ServuxInfoSubDataPacketHandler#onPacketReceived() - start");
+        MiniHud.debugLog("ServuxInfoSubDataPacketHandler#onPacketReceived() - start");
 
         if (this.supportedProtocol)
         {
             final int dataCount = buf.readVarInt();
-            MiniHUD.debugLog("ServuxInfoSubDataPacketHandler#onPacketReceived() - data count: {}", dataCount);
+            MiniHud.debugLog("ServuxInfoSubDataPacketHandler#onPacketReceived() - data count: {}", dataCount);
 
             for (int i = 0; i < dataCount; ++i)
             {
@@ -83,7 +83,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
                     break;
                 }
 
-                MiniHUD.debugLog("ServuxInfoSubDataPacketHandler#onPacketReceived() - channel: {}", channelId);
+                MiniHud.debugLog("ServuxInfoSubDataPacketHandler#onPacketReceived() - channel: {}", channelId);
                 reader.readData(buf);
             }
         }
@@ -91,7 +91,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
 
     public void receiveMetadata(NBTTagCompound tag)
     {
-        MiniHUD.debugLog("ServuxInfoSubDataPacketHandler#receiveMetadata(), tag: {}", tag);
+        MiniHud.debugLog("ServuxInfoSubDataPacketHandler#receiveMetadata(), tag: {}", tag);
 
         if (NbtWrap.getInt(tag, "version") == 1 &&
             NbtWrap.containsList(tag, "channel_ids"))
@@ -214,7 +214,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
             NbtWrap.putTag(rootTag, "channels", NbtUtils.asListTag(channels, this::channelToTag));
 
             PacketUtils.sendTag(ServuxInfoSubRegistrationPacketHandler.REG_CHANNEL, rootTag, handler);
-            MiniHUD.debugLog("ServuxInfoSubDataPacketHandler#updateSubscriptions(), tag: {}", rootTag);
+            MiniHud.debugLog("ServuxInfoSubDataPacketHandler#updateSubscriptions(), tag: {}", rootTag);
         }
     }
 

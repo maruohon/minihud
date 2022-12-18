@@ -11,8 +11,7 @@ import net.minecraft.util.ResourceLocation;
 
 import malilib.network.message.BasePacketHandler;
 import malilib.util.game.wrap.NbtWrap;
-import minihud.LiteModMiniHud;
-import minihud.MiniHUD;
+import minihud.MiniHud;
 import minihud.data.structure.StructureData;
 import minihud.data.structure.StructureStorage;
 import minihud.data.structure.StructureType;
@@ -60,7 +59,7 @@ public class ServuxStructurePacketHandler extends BasePacketHandler
         }
         catch (Exception e)
         {
-            LiteModMiniHud.logger.warn("Failed to read structure data from Servux mod packet", e);
+            MiniHud.LOGGER.warn("Failed to read structure data from Servux mod packet", e);
         }
     }
 
@@ -83,7 +82,7 @@ public class ServuxStructurePacketHandler extends BasePacketHandler
             }
         }
 
-        MiniHUD.debugLog("Structure data from Servux server, structure count = {}", map.size());
+        MiniHud.debugLog("Structure data from Servux server, structure count = {}", map.size());
 
         return map;
     }

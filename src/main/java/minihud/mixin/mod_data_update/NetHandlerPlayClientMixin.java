@@ -18,6 +18,7 @@ import net.minecraft.util.math.ChunkPos;
 import minihud.data.DataStorage;
 import minihud.data.MobCapDataHandler;
 import minihud.data.TpsDataManager;
+import minihud.util.ChatUtils;
 import minihud.util.NotificationUtils;
 
 @Mixin(NetHandlerPlayClient.class)
@@ -26,7 +27,7 @@ public abstract class NetHandlerPlayClientMixin
     @Inject(method = "handleChat", at = @At("RETURN"))
     private void onChatMessage(SPacketChat packet, CallbackInfo ci)
     {
-        DataStorage.getInstance().onChatMessage(packet.getChatComponent());
+        ChatUtils.onReceiveChatMessage(packet.getChatComponent());
     }
 
     @Inject(method = "handleTimeUpdate", at = @At("RETURN"))

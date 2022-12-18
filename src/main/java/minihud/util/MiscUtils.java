@@ -26,7 +26,7 @@ import malilib.util.game.wrap.NbtWrap;
 import malilib.util.nbt.PrettyNbtStringifier;
 import malilib.util.nbt.SimpleNbtStringifier;
 import malilib.util.position.IntBoundingBox;
-import minihud.LiteModMiniHud;
+import minihud.MiniHud;
 import minihud.config.Configs;
 import minihud.data.DroppedChunks;
 import minihud.mixin.info_lines.ChunkProviderServerMixin;
@@ -135,7 +135,7 @@ public class MiscUtils
         }
         catch (Exception e)
         {
-            LiteModMiniHud.logger.error("Error while trying to get the chunk unload order");
+            MiniHud.LOGGER.error("Error while trying to get the chunk unload order");
             return -1;
         }
     }

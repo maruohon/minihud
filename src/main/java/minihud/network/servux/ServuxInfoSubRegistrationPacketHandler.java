@@ -9,7 +9,7 @@ import net.minecraft.util.ResourceLocation;
 
 import malilib.network.message.BasePacketHandler;
 import malilib.overlay.message.MessageDispatcher;
-import minihud.MiniHUD;
+import minihud.MiniHud;
 
 public class ServuxInfoSubRegistrationPacketHandler extends BasePacketHandler
 {
@@ -35,7 +35,7 @@ public class ServuxInfoSubRegistrationPacketHandler extends BasePacketHandler
     {
         int type = buf.readVarInt();
 
-        MiniHUD.debugLog("ServuxInfoSubRegistrationPacketHandler#onPacketReceived() - type = {}", type);
+        MiniHud.debugLog("ServuxInfoSubRegistrationPacketHandler#onPacketReceived() - type = {}", type);
 
         if (type == PACKET_S2C_METADATA)
         {
@@ -43,7 +43,7 @@ public class ServuxInfoSubRegistrationPacketHandler extends BasePacketHandler
             {
                 NBTTagCompound tag = buf.readCompoundTag();
                 ServuxInfoSubDataPacketHandler.INSTANCE.receiveMetadata(tag);
-                MiniHUD.debugLog("ServuxInfoSubRegistrationPacketHandler#onPacketReceived() - tag: '{}'", tag);
+                MiniHud.debugLog("ServuxInfoSubRegistrationPacketHandler#onPacketReceived() - tag: '{}'", tag);
             }
             catch (Exception e)
             {
