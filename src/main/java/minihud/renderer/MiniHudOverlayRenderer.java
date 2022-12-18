@@ -5,12 +5,11 @@ import javax.annotation.Nullable;
 
 import malilib.render.overlay.BaseOverlayRenderer;
 import malilib.util.data.ModInfo;
-import malilib.util.game.wrap.GameUtils;
 import minihud.Reference;
 import minihud.config.Configs;
 import minihud.event.ClientWorldChangeHandler;
 
-public abstract class MiniHUDOverlayRenderer extends BaseOverlayRenderer
+public abstract class MiniHudOverlayRenderer extends BaseOverlayRenderer
 {
     @Override
     public ModInfo getModInfo()
@@ -27,7 +26,7 @@ public abstract class MiniHUDOverlayRenderer extends BaseOverlayRenderer
     @Override
     public void onEnabled()
     {
-        if (this.shouldRender(GameUtils.getClient()))
+        if (this.shouldRender())
         {
             this.setNeedsUpdate();
         }

@@ -54,7 +54,6 @@ public enum InfoLineToggle implements ConfigInfo
     REGION_FILE             ("infoRegionFile",              false, 29),
     SERVER_TPS              ("infoServerTPS",               false,  9),
     SLIME_CHUNK             ("infoSlimeChunk",              false, 22),
-    SPAWNABLE_SUB_CHUNKS    ("infoSpawnableSubChunks",      false, 32),
     SPEED                   ("infoSpeed",                   false, 13),
     SPEED_AXIS              ("infoSpeedAxis",               false, 13),
     TIME_REAL               ("infoTimeIRL",                 true,   1),

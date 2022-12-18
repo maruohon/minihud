@@ -28,7 +28,7 @@ import malilib.util.nbt.SimpleNbtStringifier;
 import malilib.util.position.IntBoundingBox;
 import minihud.LiteModMiniHud;
 import minihud.config.Configs;
-import minihud.data.DataStorage;
+import minihud.data.DroppedChunks;
 import minihud.mixin.info_lines.ChunkProviderServerMixin;
 
 public class MiscUtils
@@ -75,7 +75,7 @@ public class MiscUtils
     {
         if (Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue())
         {
-            return getChunkOrder(chunkX, chunkZ, DataStorage.getInstance().getDroppedChunksHashSize());
+            return getChunkOrder(chunkX, chunkZ, DroppedChunks.getDroppedChunksHashSize());
         }
         // The old simple calculation, without knowledge of the HashSet size
         else
@@ -211,7 +211,7 @@ public class MiscUtils
 
             if (showPretty)
             {
-                lines.addAll((new PrettyNbtStringifier(color).getNbtLines(tag)));
+                lines.addAll((new PrettyNbtStringifier(color)).getNbtLines(tag));
             }
 
             if (showString)

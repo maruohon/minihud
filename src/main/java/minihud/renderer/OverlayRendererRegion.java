@@ -1,6 +1,5 @@
 package minihud.renderer;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -13,20 +12,16 @@ import malilib.util.game.wrap.EntityWrap;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 
-public class OverlayRendererRegion extends MiniHUDOverlayRenderer
+public class OverlayRendererRegion extends MiniHudOverlayRenderer
 {
-    public OverlayRendererRegion()
-    {
-    }
-
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
         return RendererToggle.REGION_FILE.isRendererEnabled();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity)
     {
         int ex = (int) Math.floor(EntityWrap.getX(entity));
         int ez = (int) Math.floor(EntityWrap.getZ(entity));
@@ -37,7 +32,7 @@ public class OverlayRendererRegion extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity)
     {
         BaseRenderObject renderQuads = this.renderObjects.get(0);
         BaseRenderObject renderLines = this.renderObjects.get(1);

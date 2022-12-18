@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -20,20 +19,21 @@ import net.minecraft.world.chunk.Chunk;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
+import malilib.util.game.wrap.GameUtils;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 
-public class OverlayRendererBeaconRange extends MiniHUDOverlayRenderer
+public class OverlayRendererBeaconRange extends MiniHudOverlayRenderer
 {
-    private final Set<BlockPos> BEACON_POSITIONS = new HashSet<>();
-    private final Set<ChunkPos> BEACON_CHUNKS = new HashSet<>();
+    private final Set<BlockPos> beaconPositions = new HashSet<>();
+    private final Set<ChunkPos> beaconChunks = new HashSet<>();
 
     public void clear()
     {
-        synchronized (this.BEACON_POSITIONS)
+        synchronized (this.beaconPositions)
         {
-            this.BEACON_CHUNKS.clear();
-            this.BEACON_POSITIONS.clear();
+            this.beaconChunks.clear();
+            this.beaconPositions.clear();
         }
     }
 
@@ -50,10 +50,10 @@ public class OverlayRendererBeaconRange extends MiniHUDOverlayRenderer
 
     public void checkNeedsUpdate(BlockPos pos, IBlockState state)
     {
-        synchronized (this.BEACON_POSITIONS)
+        synchronized (this.beaconPositions)
         {
             if (RendererToggle.BEACON_RANGE.isRendererEnabled() &&
-                (state.getBlock() == Blocks.BEACON || this.BEACON_POSITIONS.contains(pos)))
+                (state.getBlock() == Blocks.BEACON || this.beaconPositions.contains(pos)))
             {
                 this.setNeedsUpdate();
             }
@@ -62,10 +62,10 @@ public class OverlayRendererBeaconRange extends MiniHUDOverlayRenderer
 
     public void checkNeedsUpdate(ChunkPos chunkPos)
     {
-        synchronized (this.BEACON_POSITIONS)
+        synchronized (this.beaconPositions)
         {
             if (RendererToggle.BEACON_RANGE.isRendererEnabled() &&
-                        this.BEACON_CHUNKS.contains(chunkPos))
+                this.beaconChunks.contains(chunkPos))
             {
                 this.setNeedsUpdate();
             }
@@ -73,19 +73,19 @@ public class OverlayRendererBeaconRange extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
         return RendererToggle.BEACON_RANGE.isRendererEnabled();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity)
     {
         return this.needsUpdate || this.lastUpdatePos == null;
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity)
     {
         this.clear();
 
@@ -94,9 +94,9 @@ public class OverlayRendererBeaconRange extends MiniHUDOverlayRenderer
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        synchronized (this.BEACON_POSITIONS)
+        synchronized (this.beaconPositions)
         {
-            this.renderBeaconRanges(entity.getEntityWorld(), cameraPos, BUFFER_1, BUFFER_2);
+            this.renderBeaconRanges(GameUtils.getClientWorld(), cameraPos, BUFFER_1, BUFFER_2);
         }
 
         BUFFER_1.finishDrawing();
@@ -152,8 +152,8 @@ public class OverlayRendererBeaconRange extends MiniHUDOverlayRenderer
         ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, bufferQuads);
         ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), bufferLines);
 
-        this.BEACON_POSITIONS.add(pos);
-        this.BEACON_CHUNKS.add(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4));
+        this.beaconPositions.add(pos);
+        this.beaconChunks.add(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4));
     }
 
     protected int getMaxHeight(World world, BlockPos pos, int range)

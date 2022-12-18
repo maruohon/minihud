@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -17,7 +16,7 @@ import malilib.util.game.wrap.EntityWrap;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 
-public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
+public class OverlayRendererSpawnableChunks extends MiniHudOverlayRenderer
 {
     protected final RendererToggle toggle;
     protected BlockPos posCenter = BlockPos.ORIGIN;
@@ -40,13 +39,13 @@ public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
         return this.toggle.isRendererEnabled();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity)
     {
         if (this.toggle == RendererToggle.SPAWNABLE_CHUNKS_FIXED)
         {
@@ -64,7 +63,7 @@ public class OverlayRendererSpawnableChunks extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity)
     {
         if (this.toggle == RendererToggle.SPAWNABLE_CHUNKS_FIXED)
         {

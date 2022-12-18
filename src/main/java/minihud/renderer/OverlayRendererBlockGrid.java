@@ -3,7 +3,6 @@ package minihud.renderer;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -17,21 +16,22 @@ import malilib.render.ShapeRenderUtils;
 import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.PositionUtils;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 import minihud.util.value.BlockGridMode;
 
-public class OverlayRendererBlockGrid extends MiniHUDOverlayRenderer
+public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
 {
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
         return RendererToggle.BLOCK_GRID.isRendererEnabled();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity)
     {
         if (this.lastUpdatePos == null)
         {
@@ -44,14 +44,16 @@ public class OverlayRendererBlockGrid extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity)
     {
         Color4f color = Configs.Colors.BLOCK_GRID_OVERLAY_COLOR.getColor();
         int radius = Configs.Generic.BLOCK_GRID_OVERLAY_RADIUS.getIntegerValue();
 
         BaseRenderObject renderLines = this.renderObjects.get(0);
-        BUFFER_1.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BlockGridMode mode = Configs.Generic.BLOCK_GRID_OVERLAY_MODE.getValue();
+        World world = GameUtils.getClientWorld();
+
+        BUFFER_1.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
         if (mode == BlockGridMode.ALL)
         {
@@ -59,11 +61,11 @@ public class OverlayRendererBlockGrid extends MiniHUDOverlayRenderer
         }
         else if (mode == BlockGridMode.NON_AIR)
         {
-            this.renderLinesNonAir(cameraPos, entity.getEntityWorld(), this.lastUpdatePos, radius, color, BUFFER_1);
+            this.renderLinesNonAir(cameraPos, world, this.lastUpdatePos, radius, color, BUFFER_1);
         }
         else if (mode == BlockGridMode.ADJACENT)
         {
-            this.renderLinesAdjacentToNonAir(cameraPos, entity.getEntityWorld(), this.lastUpdatePos, radius, color, BUFFER_1);
+            this.renderLinesAdjacentToNonAir(cameraPos, world, this.lastUpdatePos, radius, color, BUFFER_1);
         }
 
         BUFFER_1.finishDrawing();

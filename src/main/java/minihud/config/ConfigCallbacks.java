@@ -79,11 +79,11 @@ public class ConfigCallbacks
         InfoLineToggle.SERVER_TPS.addValueChangeListener(syncCallback);
         RendererToggle.CHUNK_UNLOAD_BUCKET.addValueChangeListener(syncCallback);
 
-        RendererToggle.DEBUG_COLLISION_BOXES.addValueChangeListener( () -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_COLLISION_BOXES));
+        RendererToggle.DEBUG_BLOCK_COLLISION_BOXES.addValueChangeListener(() -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_BLOCK_COLLISION_BOXES));
         RendererToggle.DEBUG_HEIGHT_MAP.addValueChangeListener(      () -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_HEIGHT_MAP));
-        RendererToggle.DEBUG_NEIGHBOR_UPDATES.addValueChangeListener(() -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_NEIGHBOR_UPDATES));
+        RendererToggle.DEBUG_BLOCK_NEIGHBOR_UPDATES.addValueChangeListener(() -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_BLOCK_NEIGHBOR_UPDATES));
         RendererToggle.DEBUG_PATH_FINDING.addValueChangeListener(    () -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_PATH_FINDING));
-        RendererToggle.DEBUG_SOLID_FACES.addValueChangeListener(     () -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_SOLID_FACES));
+        RendererToggle.DEBUG_BLOCK_SOLID_FACES.addValueChangeListener(() -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_BLOCK_SOLID_FACES));
         RendererToggle.DEBUG_WATER.addValueChangeListener(           () -> DebugInfoUtils.toggleDebugRenderer(RendererToggle.DEBUG_WATER));
 
         RendererToggle.BEACON_RANGE.addValueChangeListener(beaconUpdateCallback);

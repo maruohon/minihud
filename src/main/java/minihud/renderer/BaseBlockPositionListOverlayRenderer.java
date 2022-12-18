@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -21,7 +20,7 @@ import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import minihud.data.OrderedBlockPosLong;
 
-public abstract class BaseBlockPositionListOverlayRenderer extends MiniHUDOverlayRenderer
+public abstract class BaseBlockPositionListOverlayRenderer extends MiniHudOverlayRenderer
 {
     protected final Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> textPositions = new Long2ObjectOpenHashMap<>();
     protected final Supplier<Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>>> dataSource;
@@ -45,7 +44,7 @@ public abstract class BaseBlockPositionListOverlayRenderer extends MiniHUDOverla
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity)
     {
         int hysteresis = this.updatePositionHysteresis;
 
@@ -55,7 +54,7 @@ public abstract class BaseBlockPositionListOverlayRenderer extends MiniHUDOverla
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity)
     {
         BaseRenderObject renderQuads = this.renderObjects.get(0);
         BaseRenderObject renderLines = this.renderObjects.get(1);

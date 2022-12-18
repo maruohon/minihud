@@ -4,7 +4,6 @@ import java.util.Collection;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -22,17 +21,17 @@ import minihud.data.structure.StructureStorage;
 import minihud.data.structure.StructureType;
 import minihud.util.MiscUtils;
 
-public class OverlayRendererStructures extends MiniHUDOverlayRenderer
+public class OverlayRendererStructures extends MiniHudOverlayRenderer
 {
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
         // TODO use a cached value for any types enabled?
         return RendererToggle.STRUCTURE_BOUNDING_BOXES.isRendererEnabled();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity)
     {
         int hysteresis = 16;
 
@@ -43,7 +42,7 @@ public class OverlayRendererStructures extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity)
     {
         BaseRenderObject renderQuads = this.renderObjects.get(0);
         BaseRenderObject renderLines = this.renderObjects.get(1);

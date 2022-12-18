@@ -56,7 +56,8 @@ import minihud.config.Configs;
 import minihud.config.InfoLineToggle;
 import minihud.config.RendererToggle;
 import minihud.data.DataStorage;
-import minihud.data.DataStorage.HashSizeType;
+import minihud.data.DroppedChunks;
+import minihud.data.DroppedChunks.HashSizeType;
 import minihud.data.MobCapDataHandler;
 import minihud.data.TpsDataManager;
 import minihud.data.WoolCounters;
@@ -291,12 +292,6 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         if (mc.world != null)
         {
             long worldTick = mc.world.getTotalWorldTime();
-
-            if (InfoLineToggle.SPAWNABLE_SUB_CHUNKS.getBooleanValue() &&
-                worldTick % Configs.Generic.SPAWNABLE_SUB_CHUNK_CHECK_INTERVAL.getIntegerValue() == 0)
-            {
-                DataStorage.getInstance().checkQueuedDirtyChunkHeightmaps();
-            }
 
             if ((worldTick % 20) == 0)
             {
@@ -714,8 +709,8 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             if (Configs.Generic.CHUNK_UNLOAD_BUCKET_HASH_SIZE.getBooleanValue())
             {
-                HashSizeType hashType = data.getDroppedChunksHashSizeType();
-                str1 += String.format(" - Hash size [%s]: %d", hashType.getDisplayName(), data.getDroppedChunksHashSize());
+                HashSizeType hashType = DroppedChunks.getDroppedChunksHashSizeType();
+                str1 += String.format(" - Hash size [%s]: %d", hashType.getDisplayName(), DroppedChunks.getDroppedChunksHashSize());
             }
 
             this.addLine(str1);
@@ -926,19 +921,6 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         else if (type == InfoLineToggle.BLOCK_PROPS)
         {
             this.getBlockProperties(mc);
-        }
-        else if (type == InfoLineToggle.SPAWNABLE_SUB_CHUNKS)
-        {
-            int value = DataStorage.getInstance().getSpawnableSubChunkCountFor(pos.getX() >> 4, pos.getZ() >> 4);
-
-            if (value >= 0)
-            {
-                this.addLine(String.format("Spawnable sub-chunks: %d (y: 0 - %d)", value, value * 16 - 1));
-            }
-            else
-            {
-                this.addLine("Spawnable sub-chunks: <no data>");
-            }
         }
     }
 

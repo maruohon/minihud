@@ -23,12 +23,11 @@ public abstract class WorldGenLiquidsMixin
     @Shadow @Final private Block block;
 
     @Inject(method = "generate", at = @At("HEAD"))
-    private void onGenerate(World worldIn, Random rand, BlockPos position, CallbackInfoReturnable<Boolean> cir)
+    private void minihud_onWaterfallGenerationAttempt(World worldIn, Random rand, BlockPos position, CallbackInfoReturnable<Boolean> cir)
     {
-        if (RendererToggle.WATER_FALLS.isRendererEnabled() &&
-            this.block == Blocks.FLOWING_WATER)
+        if (RendererToggle.WATER_FALLS.isRendererEnabled() && this.block == Blocks.FLOWING_WATER)
         {
-            DataStorage.getInstance().addWaterFallPosition(position);
+            DataStorage.INSTANCE.worldGenPositions.addWaterFallPosition(position);
         }
     }
 }

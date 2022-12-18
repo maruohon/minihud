@@ -2,10 +2,9 @@ package minihud.renderer;
 
 import com.google.gson.JsonObject;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos.PooledMutableBlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -21,7 +20,7 @@ import minihud.config.RendererToggle;
 import minihud.data.DataStorage;
 import minihud.util.MiscUtils;
 
-public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
+public class OverlayRendererSlimeChunks extends MiniHudOverlayRenderer
 {
     protected boolean wasSeedKnown;
     protected long seed;
@@ -30,7 +29,7 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
     @Override
     public void onEnabled()
     {
-        if (this.shouldRender(GameUtils.getClient()))
+        if (this.shouldRender())
         {
             Vec3d pos = EntityWrap.getCameraEntityPosition();
             this.topY = pos.y;
@@ -40,24 +39,26 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
+        World world = GameUtils.getClientWorld();
+
         return RendererToggle.SLIME_CHUNKS.isRendererEnabled() &&
-                DataStorage.getInstance().isWorldSeedKnown(mc.world) &&
-                mc.world.provider.isSurfaceWorld();
+                DataStorage.INSTANCE.isWorldSeedKnown(world) &&
+                world.provider.isSurfaceWorld();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity)
     {
         if (this.needsUpdate)
         {
             return true;
         }
 
-        World world = entity.getEntityWorld();
-        boolean isSeedKnown = DataStorage.getInstance().isWorldSeedKnown(world);
-        long seed = DataStorage.getInstance().getWorldSeed(world);
+        World world = GameUtils.getClientWorld();
+        boolean isSeedKnown = DataStorage.INSTANCE.isWorldSeedKnown(world);
+        long seed = DataStorage.INSTANCE.getWorldSeed(world);
 
         if (this.topY != Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y.getDoubleValue() ||
             this.wasSeedKnown != isSeedKnown || this.seed != seed)
@@ -74,10 +75,10 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity)
     {
         DataStorage data = DataStorage.getInstance();
-        World world = entity.getEntityWorld();
+        World world = GameUtils.getClientWorld();
         this.topY = Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y.getDoubleValue();
         this.wasSeedKnown = data.isWorldSeedKnown(world);
         this.seed = data.getWorldSeed(world);
@@ -88,9 +89,9 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
             final int centerZ = EntityWrap.getChunkZ(entity);
             final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
             final Color4f colorSides = colorLines.withAlpha(colorLines.a / 6);
-            PooledMutableBlockPos pos1 = PooledMutableBlockPos.retain();
-            PooledMutableBlockPos pos2 = PooledMutableBlockPos.retain();
             int r = MathHelper.clamp(Configs.Generic.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
+            BlockPos.MutableBlockPos pos1 = new BlockPos.MutableBlockPos();
+            BlockPos.MutableBlockPos pos2 = new BlockPos.MutableBlockPos();
 
             if (r == -1)
             {
@@ -118,9 +119,6 @@ public class OverlayRendererSlimeChunks extends MiniHUDOverlayRenderer
                     }
                 }
             }
-
-            pos1.release();
-            pos2.release();
 
             BUFFER_1.finishDrawing();
             BUFFER_2.finishDrawing();

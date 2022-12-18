@@ -284,12 +284,12 @@ minihud.info_line.name.infotimetotalmodulo=Time Modulo (Total Ticks)
 minihud.info_line.name.infotimeworld=World Ticks
 minihud.info_line.name.infoworldtimeformatted=World Time (in-game days, months...)
 
-minihud.renderer_toggle.comment.debugcollisionboxenabled=Enables the vanilla Block Collision Boxes debug renderer
-minihud.renderer_toggle.comment.debugheightmapenabled=Enables the vanilla Height Map debug renderer
-minihud.renderer_toggle.comment.debugneighborsupdateenabled=Enables the vanilla Block Neighbor Updates debug renderer
-minihud.renderer_toggle.comment.debugpathfindingenabled=Enables the vanilla Path Finding debug renderer
-minihud.renderer_toggle.comment.debugsolidfaceenabled=Enables the vanilla Block Solid Faces debug renderer
-minihud.renderer_toggle.comment.debugwaterenabled=Enables the vanilla Water debug renderer
+minihud.renderer_toggle.comment.debugblockcollisionboxes=Enables the vanilla Block Collision Boxes debug renderer
+minihud.renderer_toggle.comment.debugblockneighborupdates=Enables the vanilla Block Neighbor Updates debug renderer
+minihud.renderer_toggle.comment.debugblocksolidfaces=Enables the vanilla Block Solid Faces debug renderer
+minihud.renderer_toggle.comment.debugheightmap=Enables the vanilla Height Map debug renderer
+minihud.renderer_toggle.comment.debugpathfinding=Enables the vanilla Path Finding debug renderer
+minihud.renderer_toggle.comment.debugwater=Enables the vanilla Water debug renderer
 
 minihud.renderer_toggle.comment.beaconrange=Enables the Beacon Range Overlay renderer
 minihud.renderer_toggle.comment.blockgrid=Enables the Block Grid Overlay renderer
@@ -309,12 +309,12 @@ minihud.renderer_toggle.comment.spawnerpositions=Enables the Spawner Positions (
 minihud.renderer_toggle.comment.structuremaintoggle=Main toggle for the Structure Bounding Boxes Renderer.\n\nThis is needed for any of the structure bounding boxes to render!
 minihud.renderer_toggle.comment.waterfalls=Enables the Water Falls (generation attempts) overlay.\n\nThe positions are only recorded from the actual generation code, so this only works in single player, and only for newly generated chunks. The recorded positions are cleared when logging out.
 
-minihud.renderer_toggle.name.debugcollisionboxenabled=Debug: Block Collision Boxes
-minihud.renderer_toggle.name.debugheightmapenabled=Debug: Height Map
-minihud.renderer_toggle.name.debugneighborsupdateenabled=Debug: Block Neighbor Updates
-minihud.renderer_toggle.name.debugpathfindingenabled=Debug: Path Finding
-minihud.renderer_toggle.name.debugsolidfaceenabled=Debug: Block Solid Faces
-minihud.renderer_toggle.name.debugwaterenabled=Debug: Water
+minihud.renderer_toggle.name.debugblockcollisionboxes=Vanilla Debug: Block Collision Boxes
+minihud.renderer_toggle.name.debugblockneighborupdates=Vanilla Debug: Block Neighbor Updates
+minihud.renderer_toggle.name.debugblocksolidfaces=Vanilla Debug: Block Solid Faces
+minihud.renderer_toggle.name.debugheightmap=Vanilla Debug: Height Map
+minihud.renderer_toggle.name.debugpathfinding=Vanilla Debug: Path Finding
+minihud.renderer_toggle.name.debugwater=Vanilla Debug: Water
 
 minihud.renderer_toggle.name.beaconrange=Beacon Range
 minihud.renderer_toggle.name.blockgrid=Block Grid

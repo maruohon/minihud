@@ -1,11 +1,9 @@
 package minihud.renderer;
 
-import java.util.HashSet;
-import java.util.Set;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
@@ -16,12 +14,11 @@ import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.PositionUtils;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 
-public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
+public class OverlayRendererRandomTickableChunks extends MiniHudOverlayRenderer
 {
     protected final RendererToggle toggle;
     protected Vec3d pos = Vec3d.ZERO;
@@ -37,8 +34,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
     {
         super.onEnabled();
 
-        if (this.toggle == RendererToggle.RANDOM_TICKS_FIXED &&
-            this.shouldRender(GameUtils.getClient()))
+        if (this.toggle == RendererToggle.RANDOM_TICKS_FIXED && this.shouldRender())
         {
             Vec3d pos = EntityWrap.getCameraEntityPosition();
             this.newPos = pos;
@@ -46,13 +42,13 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
         return this.toggle.isRendererEnabled();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity)
     {
         if (this.toggle == RendererToggle.RANDOM_TICKS_FIXED)
         {
@@ -69,7 +65,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity)
     {
         if (this.toggle == RendererToggle.RANDOM_TICKS_PLAYER)
         {
@@ -90,11 +86,11 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
         BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
 
-        Set<ChunkPos> chunks = this.getRandomTickableChunks(this.pos);
+        LongOpenHashSet chunks = this.getRandomTickableChunks(this.pos);
 
-        for (ChunkPos pos : chunks)
+        for (long posLong : chunks)
         {
-            this.renderChunkEdgesIfApplicable(pos, cameraPos, chunks, color);
+            this.renderChunkEdgesIfApplicable(posLong, cameraPos, chunks, color);
         }
 
         BUFFER_1.finishDrawing();
@@ -104,12 +100,12 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
         renderLines.uploadData(BUFFER_2);
     }
 
-    protected Set<ChunkPos> getRandomTickableChunks(Vec3d posCenter)
+    protected LongOpenHashSet getRandomTickableChunks(Vec3d posCenter)
     {
-        Set<ChunkPos> set = new HashSet<>();
+        LongOpenHashSet set = new LongOpenHashSet();
         final int centerChunkX = ((int) Math.floor(posCenter.x)) >> 4;
         final int centerChunkZ = ((int) Math.floor(posCenter.z)) >> 4;
-        final double maxRange = 128D * 128D;
+        final double maxRange = 128.0 * 128.0;
         final int r = 9;
 
         for (int cz = centerChunkZ - r; cz <= centerChunkZ + r; ++cz)
@@ -121,7 +117,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
 
                 if ((dx * dx + dz * dz) < maxRange)
                 {
-                    set.add(new ChunkPos(cx, cz));
+                    set.add(ChunkPos.asLong(cx, cz));
                 }
             }
         }
@@ -129,48 +125,52 @@ public class OverlayRendererRandomTickableChunks extends MiniHUDOverlayRenderer
         return set;
     }
 
-    protected void renderChunkEdgesIfApplicable(ChunkPos pos, Vec3d cameraPos, Set<ChunkPos> chunks,Color4f color)
+    protected void renderChunkEdgesIfApplicable(long chunkPosLong, Vec3d cameraPos, LongOpenHashSet chunks, Color4f color)
     {
         for (EnumFacing side : PositionUtils.HORIZONTAL_DIRECTIONS)
         {
-            ChunkPos posTmp = new ChunkPos(pos.x + side.getXOffset(), pos.z + side.getZOffset());
+            int cx = PositionUtils.getChunkPosX(chunkPosLong);
+            int cz = PositionUtils.getChunkPosZ(chunkPosLong);
+            long posTmp = ChunkPos.asLong(cx + side.getXOffset(), cz + side.getZOffset());
 
             if (chunks.contains(posTmp) == false)
             {
-                this.renderChunkEdge(pos, side, cameraPos, color);
+                this.renderChunkEdge(chunkPosLong, side, cameraPos, color);
             }
         }
     }
 
-    private void renderChunkEdge(ChunkPos pos, EnumFacing side, Vec3d cameraPos, Color4f color)
+    private void renderChunkEdge(long chunkPosLong, EnumFacing side, Vec3d cameraPos, Color4f color)
     {
+        int cx = PositionUtils.getChunkPosX(chunkPosLong);
+        int cz = PositionUtils.getChunkPosZ(chunkPosLong);
         double minX, minZ, maxX, maxZ;
 
         switch (side)
         {
             case NORTH:
-                minX = (pos.x << 4);
-                minZ = (pos.z << 4);
-                maxX = (pos.x << 4) + 16.0;
-                maxZ = (pos.z << 4);
+                minX = (cx << 4);
+                minZ = (cz << 4);
+                maxX = (cx << 4) + 16.0;
+                maxZ = (cz << 4);
                 break;
             case SOUTH:
-                minX = (pos.x << 4);
-                minZ = (pos.z << 4) + 16.0;
-                maxX = (pos.x << 4) + 16.0;
-                maxZ = (pos.z << 4) + 16.0;
+                minX = (cx << 4);
+                minZ = (cz << 4) + 16.0;
+                maxX = (cx << 4) + 16.0;
+                maxZ = (cz << 4) + 16.0;
                 break;
             case WEST:
-                minX = (pos.x << 4);
-                minZ = (pos.z << 4);
-                maxX = (pos.x << 4);
-                maxZ = (pos.z << 4) + 16.0;
+                minX = (cx << 4);
+                minZ = (cz << 4);
+                maxX = (cx << 4);
+                maxZ = (cz << 4) + 16.0;
                 break;
             case EAST:
-                minX = (pos.x << 4) + 16.0;
-                minZ = (pos.z << 4);
-                maxX = (pos.x << 4) + 16.0;
-                maxZ = (pos.z << 4) + 16.0;
+                minX = (cx << 4) + 16.0;
+                minZ = (cz << 4);
+                maxX = (cx << 4) + 16.0;
+                maxZ = (cz << 4) + 16.0;
                 break;
             default:
                 return;

@@ -21,7 +21,6 @@
 		"mod_data_update.GuiScreenMixin",
 		"mod_data_update.NetHandlerPlayClientMixin",
 		"mod_data_update.SPacketMultiBlockChangeMixin",
-		"mod_data_update.WorldClientMixin",
 		"overlay.beacon.TileEntityBeaconMixin",
 		"render.GuiScreenMixin",
 		"render.world_gen_overlay.ChunkGeneratorOverworldMixin",

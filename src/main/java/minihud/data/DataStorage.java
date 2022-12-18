@@ -1,41 +1,29 @@
 package minihud.data;
 
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.chunk.Chunk;
 
 import malilib.overlay.message.MessageUtils;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
-import malilib.util.position.PositionUtils;
 import minihud.LiteModMiniHud;
-import minihud.MiniHUD;
 import minihud.config.Configs;
 import minihud.data.structure.StructureDataUtils;
 import minihud.data.structure.StructureStorage;
 import minihud.event.RenderHandler;
 import minihud.network.carpet.CarpetPubsubPacketHandler;
 import minihud.network.servux.ServuxInfoSubDataPacketHandler;
-import minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import minihud.renderer.RenderContainer;
 import minihud.renderer.shapes.ShapeManager;
 import minihud.util.MiscUtils;
@@ -45,12 +33,14 @@ public class DataStorage
     public static final DataStorage INSTANCE = new DataStorage();
 
     protected final WorldProperties worldProperties = new WorldProperties();
-    private final LongOpenHashSet chunkHeightmapsToCheck = new LongOpenHashSet();
-    private final Long2IntOpenHashMap spawnableSubChunks = new Long2IntOpenHashMap();
+    public final WorldGenPositions worldGenPositions;
     private final int[] blockBreakCounter = new int[100];
     private Vec3d distanceReferencePoint = Vec3d.ZERO;
-    private boolean spawnerPositionsDirty;
-    private boolean waterFallPositionsDirty;
+
+    public DataStorage()
+    {
+        this.worldGenPositions = new WorldGenPositions(this.worldProperties);
+    }
 
     public static DataStorage getInstance()
     {
@@ -161,78 +151,6 @@ public class DataStorage
         return this.distanceReferencePoint;
     }
 
-    public boolean areSpawnerPositionsDirty()
-    {
-        return this.spawnerPositionsDirty;
-    }
-
-    public boolean areWaterFallPositionsDirty()
-    {
-        return this.waterFallPositionsDirty;
-    }
-
-    public void addDungeonSpawnerPosition(BlockPos pos)
-    {
-        int cx = pos.getX() >> 4;
-        int cz = pos.getZ() >> 4;
-        long cp = (long) cz << 32 | (((long) cx) & 0xFFFFFFFFL);
-
-        synchronized (this.worldProperties.spawnerPositions)
-        {
-            ArrayList<OrderedBlockPosLong> list = this.worldProperties.spawnerPositions.computeIfAbsent(cp, c -> new ArrayList<>());
-            int order = list.size();
-            list.add(OrderedBlockPosLong.of(pos, order));
-            this.spawnerPositionsDirty = true;
-        }
-
-        if (Configs.Generic.SPAWNER_POSITION_PRINT.getBooleanValue())
-        {
-            MiniHUD.LOGGER.info("Spawner gen attempt: Chunk: [{}, {}] pos: [{}, {}, {}]",
-                                cx, cz, pos.getX(), pos.getY(), pos.getZ());
-        }
-    }
-
-    public void addWaterFallPosition(BlockPos pos)
-    {
-        int cx = pos.getX() >> 4;
-        int cz = pos.getZ() >> 4;
-        long cp = (long) cz << 32 | (((long) cx) & 0xFFFFFFFFL);
-
-        synchronized (this.worldProperties.waterFallPositions)
-        {
-            ArrayList<OrderedBlockPosLong> list = this.worldProperties.waterFallPositions.computeIfAbsent(cp, c -> new ArrayList<>());
-            int order = list.size();
-            list.add(OrderedBlockPosLong.of(pos, order));
-            this.waterFallPositionsDirty = true;
-        }
-    }
-
-    public Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> getSpawnerPositions()
-    {
-        Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> map = new Long2ObjectOpenHashMap<>();
-
-        synchronized (this.worldProperties.spawnerPositions)
-        {
-            map.putAll(this.worldProperties.spawnerPositions);
-            this.spawnerPositionsDirty = false;
-        }
-
-        return map;
-    }
-
-    public Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> getWaterFallPositions()
-    {
-        Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> map = new Long2ObjectOpenHashMap<>();
-
-        synchronized (this.worldProperties.waterFallPositions)
-        {
-            map.putAll(this.worldProperties.waterFallPositions);
-            this.waterFallPositionsDirty = false;
-        }
-
-        return map;
-    }
-
     public boolean setDistanceReferencePoint()
     {
         Vec3d pos = EntityWrap.getCameraEntityPosition();
@@ -244,107 +162,10 @@ public class DataStorage
         return true;
     }
 
-    public void markChunkForHeightmapCheck(int chunkX, int chunkZ)
+    public void onBlocksChangedInChunk(int chunkX, int chunkZ)
     {
-        OverlayRendererSpawnableColumnHeights.markChunkChanged(chunkX, chunkZ);
-        this.chunkHeightmapsToCheck.add(ChunkPos.asLong(chunkX, chunkZ));
         RenderContainer.LIGHT_LEVEL_OVERLAY.setNeedsUpdate();
-    }
-
-    public HashSizeType getDroppedChunksHashSizeType()
-    {
-        int size = Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
-
-        if (size != -1)
-        {
-            return HashSizeType.CONFIG;
-        }
-
-        if (this.worldProperties.droppedChunksHashSize.isPresent())
-        {
-            return HashSizeType.CARPET;
-        }
-
-        if (GameUtils.isSinglePlayer() && GameUtils.getClientWorld() != null)
-        {
-            return HashSizeType.SINGLE_PLAYER;
-        }
-
-        return HashSizeType.FALLBACK;
-    }
-
-    public int getDroppedChunksHashSize()
-    {
-        HashSizeType type = this.getDroppedChunksHashSizeType();
-
-        switch (type)
-        {
-            case CONFIG:
-                return Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
-
-            case SINGLE_PLAYER:
-                WorldServer world = GameUtils.getClientPlayersServerWorld();
-                return world != null ? MiscUtils.getCurrentHashSize(world) : 0xFFFF;
-
-            case CARPET:
-                if (this.worldProperties.droppedChunksHashSize.isPresent())
-                {
-                    return this.worldProperties.droppedChunksHashSize.getAsInt();
-                }
-
-            case FALLBACK:
-            default:
-                return 0xFFFF;
-        }
-    }
-
-    public void checkQueuedDirtyChunkHeightmaps()
-    {
-        WorldClient world = GameUtils.getClientWorld();
-
-        if (world != null)
-        {
-            if (this.chunkHeightmapsToCheck.isEmpty() == false)
-            {
-                for (long posLong : this.chunkHeightmapsToCheck)
-                {
-                    Chunk chunk = world.getChunk(PositionUtils.getChunkPosX(posLong),
-                                                 PositionUtils.getChunkPosZ(posLong));
-                    int[] heightMap = chunk.getHeightMap();
-                    int maxHeight = -1;
-
-                    for (int j : heightMap)
-                    {
-                        if (j > maxHeight)
-                        {
-                            maxHeight = j;
-                        }
-                    }
-
-                    int subChunks;
-
-                    if (maxHeight >= 0)
-                    {
-                        subChunks = MathHelper.clamp((maxHeight / 16) + 1, 1, 16);
-                    }
-                    // Void world? Use the topFilledSegment, see WorldEntitySpawner.getRandomChunkPosition()
-                    else
-                    {
-                        subChunks = MathHelper.clamp((chunk.getTopFilledSegment() + 16) / 16, 1, 16);
-                    }
-
-                    //System.out.printf("@ %d, %d - subChunks: %d, maxHeight: %d\n", pos.x, pos.z, subChunks, maxHeight);
-
-                    this.spawnableSubChunks.put(posLong, subChunks);
-                }
-            }
-        }
-        else
-        {
-            this.spawnableSubChunks.clear();
-        }
-
-        this.chunkHeightmapsToCheck.clear();
+        RenderContainer.SPAWNABLE_COLUMN_HEIGHTS_OVERLAY.markChunkChanged(chunkX, chunkZ);
     }
 
     public void clearBlockBreakCounter()
@@ -368,18 +189,6 @@ public class DataStorage
     public double getBlockBreakingSpeed()
     {
         return MiscUtils.intAverage(this.blockBreakCounter) * 20;
-    }
-
-    public void onChunkUnload(int chunkX, int chunkZ)
-    {
-        long posLong = ChunkPos.asLong(chunkX, chunkZ);
-        this.chunkHeightmapsToCheck.remove(posLong);
-        this.spawnableSubChunks.remove(posLong);
-    }
-
-    public int getSpawnableSubChunkCountFor(int chunkX, int chunkZ)
-    {
-        return this.spawnableSubChunks.getOrDefault(ChunkPos.asLong(chunkX, chunkZ), -1);
     }
 
     public boolean onSendChatMessage(String message)
@@ -429,7 +238,7 @@ public class DataStorage
             else if (parts.length == 1)
             {
                 MessageUtils.printCustomActionbarMessage("minihud.message.info.dropped_chunks_hash_size_get",
-                                                         this.getDroppedChunksHashSize());
+                                                         DroppedChunks.getDroppedChunksHashSize());
             }
 
             return true;
@@ -531,25 +340,4 @@ public class DataStorage
             this.worldProperties.worldSeed = OptionalLong.of(JsonUtils.getLong(obj, "seed"));
         }
     }
-
-    public enum HashSizeType
-    {
-        CARPET          ("Carpet"),
-        CONFIG          ("Config"),
-        SINGLE_PLAYER   ("SP"),
-        FALLBACK        ("0xFFFF");
-
-        private final String displayName;
-
-        HashSizeType(String displayName)
-        {
-            this.displayName = displayName;
-        }
-
-        public String getDisplayName()
-        {
-            return this.displayName;
-        }
-    }
-
 }

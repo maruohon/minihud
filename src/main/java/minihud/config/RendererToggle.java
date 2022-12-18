@@ -19,13 +19,6 @@ import minihud.Reference;
 
 public enum RendererToggle implements ConfigInfo
 {
-    DEBUG_COLLISION_BOXES               ("debugCollisionBoxEnabled"),
-    DEBUG_HEIGHT_MAP                    ("debugHeightMapEnabled"),
-    DEBUG_NEIGHBOR_UPDATES              ("debugNeighborsUpdateEnabled"),
-    DEBUG_PATH_FINDING                  ("debugPathfindingEnabled"),
-    DEBUG_SOLID_FACES                   ("debugSolidFaceEnabled"),
-    DEBUG_WATER                         ("debugWaterEnabled"),
-
     BEACON_RANGE                        ("beaconRange"),
     BLOCK_GRID                          ("blockGrid"),
     CHUNK_UNLOAD_BUCKET                 ("chunkUnloadBucket", KeyBindSettings.INGAME_BOTH),
@@ -42,7 +35,14 @@ public enum RendererToggle implements ConfigInfo
     SPAWN_CHUNKS_REAL                   ("spawnChunkReal"),
     SPAWN_CHUNKS_PLAYER                 ("spawnChunkPlayer"),
     STRUCTURE_BOUNDING_BOXES            ("structureMainToggle"),
-    WATER_FALLS                         ("waterFalls");
+    WATER_FALLS                         ("waterFalls"),
+
+    DEBUG_BLOCK_COLLISION_BOXES         ("debugBlockCollisionBoxes"),
+    DEBUG_BLOCK_NEIGHBOR_UPDATES        ("debugBlockNeighborUpdates"),
+    DEBUG_BLOCK_SOLID_FACES             ("debugBlockSolidFaces"),
+    DEBUG_HEIGHT_MAP                    ("debugHeightMap"),
+    DEBUG_PATH_FINDING                  ("debugPathfinding"),
+    DEBUG_WATER                         ("debugWater");
 
     public static final ImmutableList<RendererToggle> VALUES = ImmutableList.copyOf(values());
     public static final ImmutableList<BooleanConfig> TOGGLE_CONFIGS = ImmutableList.copyOf(VALUES.stream().map(RendererToggle::getBooleanConfig).collect(Collectors.toList()));

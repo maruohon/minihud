@@ -2,7 +2,6 @@ package minihud.renderer.shapes;
 
 import java.util.HashSet;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
@@ -27,7 +26,7 @@ public class ShapeSphereBlocky extends ShapeCircleBase
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity)
     {
         this.renderSphereShape(cameraPos);
         this.onPostUpdate(EntityWrap.getEntityPos(entity));

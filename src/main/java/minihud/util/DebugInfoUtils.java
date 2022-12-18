@@ -235,7 +235,7 @@ public class DebugInfoUtils
         Minecraft mc = GameUtils.getClient();
         boolean enabled = config.isRendererEnabled();
 
-        if (config == RendererToggle.DEBUG_COLLISION_BOXES)
+        if (config == RendererToggle.DEBUG_BLOCK_COLLISION_BOXES)
         {
             ((DebugRendererMixin) mc.debugRenderer).minihud_setCollisionBoxEnabled(enabled);
         }
@@ -243,7 +243,7 @@ public class DebugInfoUtils
         {
             ((DebugRendererMixin) mc.debugRenderer).minihud_setHeightMapEnabled(enabled);
         }
-        else if (config == RendererToggle.DEBUG_NEIGHBOR_UPDATES)
+        else if (config == RendererToggle.DEBUG_BLOCK_NEIGHBOR_UPDATES)
         {
             ((DebugRendererMixin) mc.debugRenderer).minihud_setNeighborsUpdateEnabled(enabled);
             neighborUpdateEnabled = enabled;
@@ -253,7 +253,7 @@ public class DebugInfoUtils
             ((DebugRendererMixin) mc.debugRenderer).minihud_setPathfindingEnabled(enabled);
             pathFindingEnabled = enabled;
         }
-        else if (config == RendererToggle.DEBUG_SOLID_FACES)
+        else if (config == RendererToggle.DEBUG_BLOCK_SOLID_FACES)
         {
             ((DebugRendererMixin) mc.debugRenderer).minihud_setSolidFaceEnabled(enabled);
         }

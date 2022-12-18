@@ -16,10 +16,10 @@ import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.LayerRange;
 import minihud.config.RendererToggle;
-import minihud.renderer.MiniHUDOverlayRenderer;
+import minihud.renderer.MiniHudOverlayRenderer;
 import minihud.util.value.ShapeRenderType;
 
-public abstract class ShapeBase extends MiniHUDOverlayRenderer implements LayerRangeChangeListener
+public abstract class ShapeBase extends MiniHudOverlayRenderer implements LayerRangeChangeListener
 {
     protected final Minecraft mc = GameUtils.getClient();
     protected final ShapeType type;
@@ -105,13 +105,13 @@ public abstract class ShapeBase extends MiniHUDOverlayRenderer implements LayerR
     }
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
         return this.enabled && RendererToggle.SHAPE_RENDERER.isRendererEnabled();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity)
     {
         return this.needsUpdate;
     }

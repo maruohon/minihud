@@ -16,11 +16,11 @@ public abstract class ChunkGeneratorOverworldMixin
     @ModifyArg(method = "populate",
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/world/gen/feature/WorldGenDungeons;generate(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/util/math/BlockPos;)Z"))
-    private BlockPos onDungeonGenerationAttempt(BlockPos position)
+    private BlockPos minihud_onDungeonGenerationAttempt(BlockPos position)
     {
         if (RendererToggle.SPAWNER_POSITIONS.isRendererEnabled())
         {
-            DataStorage.getInstance().addDungeonSpawnerPosition(position);
+            DataStorage.INSTANCE.worldGenPositions.addDungeonSpawnerPosition(position);
         }
 
         return position;

@@ -1,7 +1,6 @@
 package minihud.renderer;
 
-import net.minecraft.client.Minecraft;
-
+import malilib.util.game.wrap.GameUtils;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 import minihud.data.DataStorage;
@@ -12,15 +11,15 @@ public class OverlayRendererWaterFalls extends BaseBlockPositionListOverlayRende
     {
         super(RendererToggle.WATER_FALLS::isRendererEnabled,
               Configs.Colors.WATER_FALL_POSITIONS_OVERLAY_COLOR::getColor,
-              DataStorage.getInstance()::areWaterFallPositionsDirty,
-              DataStorage.getInstance()::getWaterFallPositions);
+              DataStorage.INSTANCE.worldGenPositions::areWaterFallPositionsDirty,
+              DataStorage.INSTANCE.worldGenPositions::getWaterFallPositions);
     }
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
-        boolean render = this.enabledSupplier.getAsBoolean() && mc.world.provider.isSurfaceWorld();
-        this.wasDisabled |= ! render;
+        boolean render = this.enabledSupplier.getAsBoolean() && GameUtils.getClientWorld().provider.isSurfaceWorld();
+        this.wasDisabled |= (render == false);
         return render;
     }
 }

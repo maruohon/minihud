@@ -6,7 +6,6 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -27,13 +26,14 @@ import malilib.render.overlay.BaseRenderObject;
 import malilib.render.overlay.VboRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import minihud.Reference;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 import minihud.util.value.LightLevelMarkerMode;
 import minihud.util.value.LightLevelNumberMode;
 
-public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
+public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
 {
     private static final ResourceLocation NUMBER_TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/misc/light_level_numbers.png");
 
@@ -41,13 +41,13 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
     private EnumFacing lastDirection = EnumFacing.NORTH;
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
         return RendererToggle.LIGHT_LEVEL.isRendererEnabled();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity)
     {
         return this.needsUpdate || this.lastUpdatePos == null ||
                Math.abs(EntityWrap.getX(entity) - this.lastUpdatePos.getX()) > 4 ||
@@ -58,7 +58,7 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity)
     {
         BlockPos pos = EntityWrap.getEntityBlockPos(entity);
         BaseRenderObject renderQuads = this.renderObjects.get(0);
@@ -67,9 +67,9 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
         BUFFER_2.begin(renderLines.getGlMode(), renderLines.getVertexFormat());
 
         //long pre = System.nanoTime();
-        this.updateLightLevels(mc.world, pos);
+        this.updateLightLevels(GameUtils.getClientWorld(), pos);
         //System.out.printf("LL markers: %d, time: %.3f s\n", LIGHT_INFOS.size(), (double) (System.nanoTime() - pre) / 1000000000D);
-        this.renderLightLevels(cameraPos, mc, BUFFER_1, BUFFER_2);
+        this.renderLightLevels(cameraPos, BUFFER_1, BUFFER_2);
 
         BUFFER_1.finishDrawing();
         BUFFER_2.finishDrawing();
@@ -95,13 +95,14 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
         this.allocateBuffer(GL11.GL_LINES);
     }
 
-    private void renderLightLevels(Vec3d cameraPos, Minecraft mc, BufferBuilder bufferQuads, BufferBuilder bufferLines)
+    private void renderLightLevels(Vec3d cameraPos, BufferBuilder bufferQuads, BufferBuilder bufferLines)
     {
         final int count = this.lightInfoList.size();
+        Entity entity = GameUtils.getCameraEntity();
 
         if (count > 0)
         {
-            EnumFacing numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? mc.player.getHorizontalFacing() : EnumFacing.NORTH;
+            EnumFacing numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? entity.getHorizontalFacing() : EnumFacing.NORTH;
             LightLevelNumberMode numberMode = Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getValue();
             LightLevelMarkerMode markerMode = Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getValue();
             boolean useColoredNumbers = Configs.Generic.LIGHT_LEVEL_COLORED_NUMBERS.getBooleanValue();
@@ -336,11 +337,6 @@ public class OverlayRendererLightLevel extends MiniHUDOverlayRenderer
 
     /**
      * This method mimics the one from WorldEntitySpawner, but takes in the Chunk to avoid that lookup
-     * @param stateDown
-     * @param state
-     * @param stateUp
-     * @param stateUp2
-     * @return
      */
     public static boolean canSpawnAt(IBlockState stateDown, IBlockState state, IBlockState stateUp, IBlockState stateUp2)
     {

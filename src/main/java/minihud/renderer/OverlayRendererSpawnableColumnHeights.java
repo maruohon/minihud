@@ -1,48 +1,47 @@
 package minihud.renderer;
 
-import java.util.HashSet;
-import java.util.Set;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 import malilib.render.ShapeRenderUtils;
 import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.PositionUtils;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 
-public class OverlayRendererSpawnableColumnHeights extends MiniHUDOverlayRenderer
+public class OverlayRendererSpawnableColumnHeights extends MiniHudOverlayRenderer
 {
-    private static final Set<Long> DIRTY_CHUNKS = new HashSet<>();
+    private final LongOpenHashSet changedChunks = new LongOpenHashSet();
+    private long lastCheckTime = System.nanoTime();
 
-    private long lastCheckTime;
-
-    public static void markChunkChanged(int cx, int cz)
+    public void markChunkChanged(int cx, int cz)
     {
         if (RendererToggle.SPAWNABLE_COLUMN_HEIGHTS.isRendererEnabled())
         {
-            synchronized (DIRTY_CHUNKS)
+            synchronized (this.changedChunks)
             {
-                DIRTY_CHUNKS.add(ChunkPos.asLong(cx, cz));
+                this.changedChunks.add(ChunkPos.asLong(cx, cz));
             }
         }
     }
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
         return RendererToggle.SPAWNABLE_COLUMN_HEIGHTS.isRendererEnabled();
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity)
     {
         int ex = (int) Math.floor(EntityWrap.getX(entity));
         int ez = (int) Math.floor(EntityWrap.getZ(entity));
@@ -54,36 +53,37 @@ public class OverlayRendererSpawnableColumnHeights extends MiniHUDOverlayRendere
             return true;
         }
 
-        if (System.currentTimeMillis() - this.lastCheckTime > 1000)
-        {
-            final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
-            final int xStart = (ex >> 4) - radius;
-            final int zStart = (ez >> 4) - radius;
-            final int xEnd = (ex >> 4) + radius;
-            final int zEnd = (ez >> 4) + radius;
+        long currentTime = System.nanoTime();
 
-            synchronized (DIRTY_CHUNKS)
+        if (currentTime - this.lastCheckTime > 1000000000L) // 1 second minimum check interval
+        {
+            this.lastCheckTime = currentTime;
+
+            int entityCX = ex >> 4;
+            int entityCZ = ez >> 4;
+            final int chunkRadius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128) >> 4;
+
+            synchronized (this.changedChunks)
             {
-                for (int cx = xStart; cx <= xEnd; ++cx)
+                for (long cpLong : this.changedChunks)
                 {
-                    for (int cz = zStart; cz <= zEnd; ++cz)
+                    int cx = PositionUtils.getChunkPosX(cpLong);
+                    int cz = PositionUtils.getChunkPosZ(cpLong);
+
+                    if (Math.abs(entityCX - cx) <= chunkRadius ||
+                        Math.abs(entityCZ - cz) <= chunkRadius)
                     {
-                        if (DIRTY_CHUNKS.contains(ChunkPos.asLong(cx, cz)))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }
-
-            this.lastCheckTime = System.currentTimeMillis();
         }
 
         return false;
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity)
     {
         final Color4f color = Configs.Colors.SPAWNABLE_COLUMNS_OVERLAY_COLOR.getColor();
         final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
@@ -92,7 +92,7 @@ public class OverlayRendererSpawnableColumnHeights extends MiniHUDOverlayRendere
         final int zStart = (int) EntityWrap.getZ(entity) - radius;
         final int xEnd = xStart + radius * 2;
         final int zEnd = zStart + radius * 2;
-        final WorldClient world = mc.world;
+        final World world = GameUtils.getClientWorld();
 
         BaseRenderObject renderQuads = this.renderObjects.get(0);
         BaseRenderObject renderLines = this.renderObjects.get(1);
@@ -132,11 +132,11 @@ public class OverlayRendererSpawnableColumnHeights extends MiniHUDOverlayRendere
         renderQuads.uploadData(BUFFER_1);
         renderLines.uploadData(BUFFER_2);
 
-        this.lastCheckTime = System.currentTimeMillis();
+        this.lastCheckTime = System.nanoTime();
 
-        synchronized (DIRTY_CHUNKS)
+        synchronized (this.changedChunks)
         {
-            DIRTY_CHUNKS.clear();
+            this.changedChunks.clear();
         }
     }
 }

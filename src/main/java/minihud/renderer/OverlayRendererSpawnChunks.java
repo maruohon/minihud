@@ -2,22 +2,22 @@ package minihud.renderer;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldProviderSurface;
+import net.minecraft.world.World;
 
 import malilib.render.ShapeRenderUtils;
 import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 import minihud.data.DataStorage;
 
-public class OverlayRendererSpawnChunks extends MiniHUDOverlayRenderer
+public class OverlayRendererSpawnChunks extends MiniHudOverlayRenderer
 {
     protected final RendererToggle toggle;
 
@@ -27,16 +27,18 @@ public class OverlayRendererSpawnChunks extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
+        World world = GameUtils.getClientWorld();
+
         return this.toggle.isRendererEnabled() &&
                 (this.toggle == RendererToggle.SPAWN_CHUNKS_PLAYER ||
-                 (mc.world != null && mc.world.provider instanceof WorldProviderSurface &&
+                 (world != null && world.provider.isSurfaceWorld() &&
                   DataStorage.getInstance().isWorldSpawnKnown()));
     }
 
     @Override
-    public boolean needsUpdate(Entity entity, Minecraft mc)
+    public boolean needsUpdate(Entity entity)
     {
         if (this.needsUpdate)
         {
@@ -58,7 +60,7 @@ public class OverlayRendererSpawnChunks extends MiniHUDOverlayRenderer
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity, Minecraft mc)
+    public void update(Vec3d cameraPos, Entity entity)
     {
         DataStorage data = DataStorage.getInstance();
         BlockPos spawn = this.toggle == RendererToggle.SPAWN_CHUNKS_PLAYER ? EntityWrap.getEntityBlockPos(entity) : data.getWorldSpawn();

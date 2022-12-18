@@ -1,7 +1,6 @@
 package minihud.renderer;
 
-import net.minecraft.client.Minecraft;
-
+import malilib.util.game.wrap.GameUtils;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 import minihud.data.DataStorage;
@@ -12,15 +11,15 @@ public class OverlayRendererSpawnerPositions extends BaseBlockPositionListOverla
     {
         super(RendererToggle.SPAWNER_POSITIONS::isRendererEnabled,
               Configs.Colors.SPAWNER_POSITIONS_OVERLAY_COLOR::getColor,
-              DataStorage.getInstance()::areSpawnerPositionsDirty,
-              DataStorage.getInstance()::getSpawnerPositions);
+              DataStorage.INSTANCE.worldGenPositions::areSpawnerPositionsDirty,
+              DataStorage.INSTANCE.worldGenPositions::getSpawnerPositions);
     }
 
     @Override
-    public boolean shouldRender(Minecraft mc)
+    public boolean shouldRender()
     {
-        boolean render = this.enabledSupplier.getAsBoolean() && mc.world.provider.isSurfaceWorld();
-        this.wasDisabled |= ! render;
+        boolean render = this.enabledSupplier.getAsBoolean() && GameUtils.getClientWorld().provider.isSurfaceWorld();
+        this.wasDisabled |= (render == false);
         return render;
     }
 }
