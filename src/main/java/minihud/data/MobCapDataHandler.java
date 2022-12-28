@@ -8,9 +8,11 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 import malilib.util.StringUtils;
+import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.GameUtils;
 import minihud.data.MobCapData.EntityCategory;
 import minihud.util.MiscUtils;
@@ -130,10 +132,12 @@ public class MobCapDataHandler
 
     public void updateIntegratedServerMobCaps()
     {
-        if (GameUtils.isSinglePlayer() && this.mc.world != null)
+        World clientWorld = GameUtils.getClientWorld();
+
+        if (GameUtils.isSinglePlayer() && clientWorld != null)
         {
             MinecraftServer server = GameUtils.getIntegratedServer();
-            int dim = this.mc.world.provider.getDimensionType().getId();
+            int dim = WorldUtils.getDimensionId(clientWorld);
 
             server.addScheduledTask(() -> {
                 WorldServer world = server.getWorld(dim);
@@ -163,7 +167,7 @@ public class MobCapDataHandler
 
     public void parsePlayerListFooterMobCapData(ITextComponent textComponent)
     {
-        if (this.mc.world == null)
+        if (GameUtils.getClientWorld() == null)
         {
             return;
         }

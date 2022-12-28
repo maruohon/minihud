@@ -718,7 +718,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         else if (type == InfoLineToggle.LOADED_CHUNKS_COUNT)
         {
             String chunksClient = mc.world.getProviderName();
-            World worldServer = WorldUtils.getBestWorld(mc);
+            World worldServer = WorldUtils.getBestWorld();
 
             if (worldServer != null && worldServer != mc.world)
             {
@@ -806,7 +806,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             if (mc.isIntegratedServerRunning())
             {
-                World serverWorld = WorldUtils.getBestWorld(mc);
+                World serverWorld = WorldUtils.getBestWorld();
 
                 if (serverWorld instanceof WorldServer)
                 {
