@@ -9,7 +9,6 @@ import java.util.Random;
 import java.util.Set;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.management.PlayerChunkMapEntry;
@@ -23,6 +22,7 @@ import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.game.wrap.NbtWrap;
+import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.nbt.PrettyNbtStringifier;
 import malilib.util.nbt.SimpleNbtStringifier;
 import malilib.util.position.IntBoundingBox;
@@ -196,7 +196,7 @@ public class MiscUtils
                 lines.add(StringUtils.translate("item.durability", stack.getMaxDamage() - stack.getItemDamage(), stack.getMaxDamage()));
             }
 
-            String regName = Item.REGISTRY.getNameForObject(stack.getItem()).toString();
+            String regName = RegistryUtils.getItemIdStr(stack.getItem());
             lines.add(StringUtils.translate("minihud.tooltip.item.registry_name", regName));
 
             if (stack.hasTagCompound())

@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -51,6 +50,7 @@ import malilib.util.game.BlockUtils;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.RegistryUtils;
 import minihud.Reference;
 import minihud.config.Configs;
 import minihud.config.InfoLineToggle;
@@ -940,7 +940,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 state = state.getActualState(mc.world, posLooking);
             }
 
-            this.addLine(String.valueOf(Block.REGISTRY.getNameForObject(state.getBlock())));
+            this.addLine(RegistryUtils.getBlockIdStr(state.getBlock()));
 
             for (String line : BlockUtils.getFormattedBlockStateProperties(state))
             {

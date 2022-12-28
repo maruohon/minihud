@@ -1,7 +1,6 @@
 package minihud.gui.widget;
 
 import malilib.gui.BaseScreen;
-import malilib.gui.util.GuiUtils;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.button.OnOffButton;
 import malilib.gui.widget.list.entry.BaseDataListEntryWidget;
@@ -27,11 +26,7 @@ public class ShapeEntryWidget extends BaseDataListEntryWidget<ShapeBase>
         this.toggleButton = OnOffButton.simpleSlider(20, this.shape::isShapeEnabled, this::toggleShapeEnabled);
 
         this.configureButton = GenericButton.create("malilib.button.misc.configure");
-        this.configureButton.setActionListener(() -> {
-            GuiShapeEditor gui = new GuiShapeEditor(this.shape);
-            gui.setParent(GuiUtils.getCurrentScreen());
-            BaseScreen.openScreen(gui);
-        });
+        this.configureButton.setActionListener(() -> BaseScreen.openScreenWithParent(new GuiShapeEditor(this.shape)));
 
         this.removeButton = GenericButton.create("malilib.button.misc.remove");
         this.removeButton.setActionListener(() -> {
