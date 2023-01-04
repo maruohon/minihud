@@ -318,12 +318,12 @@ public class RenderHandler implements IRenderer
             {
                 String str = Configs.Generic.DATE_FORMAT_REAL.getStringValue();
                 LocalDateTime now = LocalDateTime.now();
-                str = str.replace("{YEAR}",  String.valueOf(now.getYear()));
-                str = str.replace("{MONTH}",  String.valueOf(now.getMonthValue()));
-                str = str.replace("{DAY}",  String.valueOf(now.getDayOfMonth()));
-                str = str.replace("{HOUR}",  String.valueOf(now.getHour()));
-                str = str.replace("{MIN}",  String.valueOf(now.getMinute()));
-                str = str.replace("{SEC}",  String.valueOf(now.getSecond()));
+                str = str.replace("{YEAR}",  String.format("%d", now.getYear()));
+                str = str.replace("{MONTH}",  String.format("%02d", now.getMonthValue()));
+                str = str.replace("{DAY}",  String.format("%02d", now.getDayOfMonth()));
+                str = str.replace("{HOUR}",  String.format("%02d", now.getHour()));
+                str = str.replace("{MIN}",  String.format("%02d", now.getMinute()));
+                str = str.replace("{SEC}",  String.format("%02d", now.getSecond()));
                 this.addLine(str);
             }
             catch (Exception e)
