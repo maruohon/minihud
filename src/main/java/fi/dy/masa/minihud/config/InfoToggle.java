@@ -60,7 +60,7 @@ public enum InfoToggle implements IConfigInteger, IHotkeyTogglable
     SPRINTING               ("infoSprinting",               false, 40, "", "Show the \"Sprinting\" info line if the player is sprinting"),
     TILE_ENTITIES           ("infoTileEntities",            false, 32, "", "Show the number of TileEntities in the client world"),
     TIME_DAY_MODULO         ("infoTimeDayModulo",           false, 35, "", "Show a modulo of the current day time.\nSee Generic configs for the divisor."),
-    TIME_REAL               ("infoTimeIRL",                 true,   1, "", "Show the current real time formatted according to dateFormatReal"),
+    TIME_REAL               ("infoTimeIRL",                 true,   1, "", "Show the current real time formatted to years, months, days, hours, minutes, seconds"),
     TIME_TOTAL_MODULO       ("infoTimeTotalModulo",         false, 34, "", "Show a modulo of the current total world time.\nSee Generic configs for the divisor."),
     TIME_WORLD              ("infoTimeWorld",               false,  2, "", "Show the current world time in ticks"),
     TIME_WORLD_FORMATTED    ("infoWorldTimeFormatted",      false,  3, "", "Show the current world time formatted to days, hours, minutes");
