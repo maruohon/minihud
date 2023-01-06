@@ -60,8 +60,8 @@ public class ClientWorldChangeHandler implements malilib.event.ClientWorldChange
 
         if (element != null)
         {
-            JsonUtils.readObjectIfExists(element, "shapes", ShapeManager.INSTANCE::fromJson);
-            JsonUtils.readObjectIfExists(element, "data_storage", DataStorage.INSTANCE::fromJson);
+            JsonUtils.getObjectIfExists(element, "shapes", ShapeManager.INSTANCE::fromJson);
+            JsonUtils.getObjectIfExists(element, "data_storage", DataStorage.INSTANCE::fromJson);
         }
     }
 

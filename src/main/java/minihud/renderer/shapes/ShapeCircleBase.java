@@ -202,7 +202,7 @@ public abstract class ShapeCircleBase extends ShapeBase
             this.setRadius(JsonUtils.getDouble(obj, "radius"));
         }
 
-        Vec3d center = JsonUtils.vec3dFromJson(obj, "center");
+        Vec3d center = JsonUtils.getVec3d(obj, "center");
 
         if (center != null)
         {

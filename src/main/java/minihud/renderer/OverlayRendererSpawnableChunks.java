@@ -138,7 +138,7 @@ public class OverlayRendererSpawnableChunks extends MiniHudOverlayRenderer
 
         this.topY = JsonUtils.getDoubleOrDefault(obj, "top_y", 80);
 
-        BlockPos pos = JsonUtils.blockPosFromJson(obj, "pos");
+        BlockPos pos = JsonUtils.getBlockPos(obj, "pos");
 
         if (pos != null && this.toggle == RendererToggle.SPAWNABLE_CHUNKS_FIXED)
         {

@@ -209,7 +209,7 @@ public class DataStorage
 
     public void fromJson(JsonObject obj)
     {
-        Vec3d pos = JsonUtils.vec3dFromJson(obj, "distance_pos");
+        Vec3d pos = JsonUtils.getVec3d(obj, "distance_pos");
 
         if (pos != null)
         {

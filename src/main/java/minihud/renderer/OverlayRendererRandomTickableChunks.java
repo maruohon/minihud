@@ -199,7 +199,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHudOverlayRenderer
     {
         super.fromJson(obj);
 
-        Vec3d pos = JsonUtils.vec3dFromJson(obj, "pos");
+        Vec3d pos = JsonUtils.getVec3d(obj, "pos");
 
         if (pos != null && this.toggle == RendererToggle.RANDOM_TICKS_FIXED)
         {

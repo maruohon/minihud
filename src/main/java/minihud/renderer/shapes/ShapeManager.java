@@ -93,7 +93,7 @@ public class ShapeManager
     {
         this.clear();
 
-        JsonUtils.readArrayElementsIfExists(obj, "shapes", this::readAndAddShape);
+        JsonUtils.getArrayElementsIfExists(obj, "shapes", this::readAndAddShape);
         int selected = JsonUtils.getIntegerOrDefault(obj, "selected", -1);
 
         if (selected >= 0 && selected < this.shapes.size())
