@@ -124,10 +124,6 @@ public class RenderHandler implements IRenderer
             (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || this.mc.player.isSneaking()) &&
             Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld())
         {
-            if (InfoToggle.FPS.getBooleanValue())
-            {
-                this.updateFps();
-            }
 
             long currentTime = System.currentTimeMillis();
 
@@ -193,19 +189,6 @@ public class RenderHandler implements IRenderer
         }
 
         return 0;
-    }
-
-    private void updateFps()
-    {
-        this.fpsCounter++;
-        long time = System.currentTimeMillis();
-
-        if (time >= (this.fpsUpdateTime + 1000L))
-        {
-            this.fpsUpdateTime = time;
-            this.fps = this.fpsCounter;
-            this.fpsCounter = 0;
-        }
     }
 
     public void updateData(MinecraftClient mc)
@@ -296,7 +279,7 @@ public class RenderHandler implements IRenderer
 
         if (type == InfoToggle.FPS)
         {
-            this.addLine(String.format("%d fps", this.fps));
+            this.addLine(String.format("%d fps", MinecraftClient.getInstance().getCurrentFps()));
         }
         else if (type == InfoToggle.MEMORY_USAGE)
         {
