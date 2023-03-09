@@ -34,7 +34,7 @@ public class InitHandler implements InitializationHandler
         Registry.CONFIG_MANAGER.registerConfigHandler(JsonModConfig.createJsonModConfig(Reference.MOD_INFO, Configs.CURRENT_VERSION, Configs.CATEGORIES, updater));
 
         Registry.CONFIG_SCREEN.registerConfigScreenFactory(Reference.MOD_INFO, ConfigScreen::create);
-        Registry.CONFIG_TAB.registerConfigTabProvider(Reference.MOD_INFO, ConfigScreen::getConfigTabs);
+        Registry.CONFIG_TAB.registerConfigTabSupplier(Reference.MOD_INFO, ConfigScreen::getConfigTabs);
 
         Registry.CONFIG_WIDGET.registerConfigWidgetFactory(InfoLineToggle.class, InfoLineConfigWidget::new);
         Registry.CONFIG_WIDGET.registerConfigWidgetFactory(RendererToggle.class, RendererToggleConfigWidget::new);
