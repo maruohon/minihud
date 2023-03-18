@@ -50,21 +50,11 @@ public class RenderObjectVbo extends RenderObjectBase
     @Override
     public void draw(MatrixStack matrixStack, Matrix4f projMatrix)
     {
-        if (this.hasTexture)
-        {
-            RenderSystem.enableTexture();
-        }
-
         RenderSystem.setShader(this.getShader());
         this.vertexBuffer.bind();
         this.vertexBuffer.draw(matrixStack.peek().getPositionMatrix(), projMatrix, this.getShader().get());
 
         VertexBuffer.unbind();
-
-        if (this.hasTexture)
-        {
-            RenderSystem.disableTexture();
-        }
     }
 
     @Override

@@ -36,15 +36,26 @@ public class MiscUtils
 
     public static double intAverage(int[] values)
     {
-        final int size = values.length;
         long sum = 0L;
 
-        for (int i = 0; i < size; ++i)
+        for (int value : values)
         {
-            sum += values[i];
+            sum += value;
         }
 
         return (double) sum / (double) values.length;
+    }
+
+    public static long longAverage(long[] values)
+    {
+        long sum = 0L;
+
+        for (long value : values)
+        {
+            sum += value;
+        }
+
+        return sum / values.length;
     }
 
     public static boolean canSlimeSpawnAt(int posX, int posZ, long worldSeed)

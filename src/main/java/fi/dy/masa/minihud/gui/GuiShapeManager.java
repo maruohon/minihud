@@ -37,7 +37,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
 
         // The position will get updated later
         this.widgetDropDown = new WidgetDropDownList<>(0, 0, 160, 18, 200, 10, ImmutableList.copyOf(ShapeType.values()), ShapeType::getDisplayName);
-        this.widgetDropDown.setZLevel(this.getZOffset() + 100);
+        this.widgetDropDown.setZLevel(100);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class GuiShapeManager extends GuiListBase<ShapeBase, WidgetShapeEntry, Wi
     @Override
     protected WidgetListShapes createListWidget(int listX, int listY)
     {
-        return new WidgetListShapes(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this.getZOffset(), this);
+        return new WidgetListShapes(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), 0, this);
     }
 
     public static class ButtonListenerTab implements IButtonActionListener

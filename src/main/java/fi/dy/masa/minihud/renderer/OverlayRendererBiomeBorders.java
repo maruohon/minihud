@@ -107,7 +107,7 @@ public class OverlayRendererBiomeBorders extends OverlayRendererBase
     public void update(Vec3d cameraPos, Entity cameraEntity, MinecraftClient mc)
     {
         List<SubChunkPos> chunks = this.getSubChunksWithinRange(cameraEntity, mc);
-        BlockPos cameraBlockPos = new BlockPos(cameraPos);
+        BlockPos cameraBlockPos = BlockPos.ofFloored(cameraPos);
         this.scheduleTasksForMissingChunks(chunks, cameraBlockPos, mc.world);
 
         List<ColoredQuad> quads = this.getQuadsToRender(chunks);

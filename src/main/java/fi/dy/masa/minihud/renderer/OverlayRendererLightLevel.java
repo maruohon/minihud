@@ -106,15 +106,6 @@ public class OverlayRendererLightLevel extends OverlayRendererBase
         super.preRender();
 
         fi.dy.masa.malilib.render.RenderUtils.bindTexture(TEXTURE_NUMBERS);
-        RenderSystem.enableTexture();
-    }
-
-    @Override
-    protected void postRender()
-    {
-        super.postRender();
-
-        RenderSystem.disableTexture();
     }
 
     @Override

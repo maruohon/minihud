@@ -266,7 +266,7 @@ public class RenderHandler implements IRenderer
         Entity entity = mc.getCameraEntity();
         World world = entity.getEntityWorld();
         double y = entity.getY();
-        BlockPos pos = new BlockPos(entity.getX(), y, entity.getZ());
+        BlockPos pos = BlockPos.ofFloored(entity.getX(), y, entity.getZ());
         ChunkPos chunkPos = new ChunkPos(pos);
 
         @SuppressWarnings("deprecation")

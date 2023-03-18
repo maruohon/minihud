@@ -55,6 +55,7 @@ import fi.dy.masa.minihud.renderer.OverlayRendererSpawnableColumnHeights;
 import fi.dy.masa.minihud.renderer.shapes.ShapeManager;
 import fi.dy.masa.minihud.renderer.worker.ChunkTask;
 import fi.dy.masa.minihud.renderer.worker.ThreadWorker;
+import fi.dy.masa.minihud.util.MiscUtils;
 
 public class DataStorage
 {
@@ -496,7 +497,7 @@ public class DataStorage
     {
         if (this.mc != null && this.mc.player != null && this.mc.getServer() != null)
         {
-            this.serverMSPT = MathHelper.average(this.mc.getServer().lastTickLengths) / 1000000D;
+            this.serverMSPT = MiscUtils.longAverage(this.mc.getServer().lastTickLengths) / 1000000D;
             this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
             this.serverTPSValid = true;
         }

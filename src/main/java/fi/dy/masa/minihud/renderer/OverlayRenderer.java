@@ -99,7 +99,6 @@ public class OverlayRenderer
         double maxZ = z + range + 1;
         Color4f color = OverlayRendererBeaconRange.getColorForLevel(level);
 
-        RenderSystem.disableTexture();
         RenderSystem.disableCull();
         RenderSystem.enableDepthTest();
         RenderSystem.depthMask(false);
@@ -128,7 +127,6 @@ public class OverlayRenderer
         RenderSystem.polygonOffset(0f, 0f);
         RenderSystem.disablePolygonOffset();
         RenderSystem.enableCull();
-        RenderSystem.enableTexture();
         RenderSystem.disableBlend();
     }
 }

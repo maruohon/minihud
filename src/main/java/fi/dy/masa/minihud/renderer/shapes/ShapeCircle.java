@@ -85,7 +85,7 @@ public class ShapeCircle extends ShapeCircleBase
         }
         else
         {
-            BlockPos posCenter = new BlockPos(effectiveCenter);
+            BlockPos posCenter = BlockPos.ofFloored(effectiveCenter);
             int offX = this.mainAxis.getOffsetX();
             int offY = this.mainAxis.getOffsetY();
             int offZ = this.mainAxis.getOffsetZ();

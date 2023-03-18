@@ -100,7 +100,6 @@ public class RenderContainer
         {
             mc.getProfiler().push(() -> "RenderContainer#draw()");
 
-            RenderSystem.disableTexture();
             RenderSystem.disableCull();
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(false);
@@ -135,7 +134,6 @@ public class RenderContainer
             RenderSystem.enableDepthTest();
             RenderSystem.enableCull();
             RenderSystem.depthMask(true);
-            RenderSystem.enableTexture();
 
             mc.getProfiler().pop();
         }
