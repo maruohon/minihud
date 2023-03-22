@@ -1,6 +1,6 @@
 package fi.dy.masa.minihud.event;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -299,9 +299,15 @@ public class RenderHandler implements IRenderer
         {
             try
             {
-                SimpleDateFormat sdf = new SimpleDateFormat(Configs.Generic.DATE_FORMAT_REAL.getStringValue());
-                this.date.setTime(System.currentTimeMillis());
-                this.addLine(sdf.format(this.date));
+                String str = Configs.Generic.DATE_FORMAT_REAL.getStringValue();
+                LocalDateTime now = LocalDateTime.now();
+                str = str.replace("{YEAR}",  String.format("%d", now.getYear()));
+                str = str.replace("{MONTH}",  String.format("%02d", now.getMonthValue()));
+                str = str.replace("{DAY}",  String.format("%02d", now.getDayOfMonth()));
+                str = str.replace("{HOUR}",  String.format("%02d", now.getHour()));
+                str = str.replace("{MIN}",  String.format("%02d", now.getMinute()));
+                str = str.replace("{SEC}",  String.format("%02d", now.getSecond()));
+                this.addLine(str);
             }
             catch (Exception e)
             {
