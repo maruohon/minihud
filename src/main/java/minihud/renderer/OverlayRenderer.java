@@ -13,6 +13,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 
+import malilib.render.RenderContext;
 import malilib.render.RenderUtils;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.TextRenderUtils;
@@ -34,7 +35,7 @@ public class OverlayRenderer
         loginTime = System.currentTimeMillis();
     }
 
-    public static void renderOverlays(float tickDelta)
+    public static void renderOverlays(RenderContext ctx, float tickDelta)
     {
         Entity entity = GameUtils.getCameraEntity();
 
@@ -71,7 +72,8 @@ public class OverlayRenderer
 
         if (RendererToggle.CHUNK_UNLOAD_BUCKET.isRendererEnabled())
         {
-            renderChunkUnloadBuckets(entity, dx, dy, dz, Configs.Internal.CHUNK_UNLOAD_BUCKET_OVERLAY_Y.getDoubleValue());
+            double overlayY = Configs.Internal.CHUNK_UNLOAD_BUCKET_OVERLAY_Y.getDoubleValue();
+            renderChunkUnloadBuckets(entity, dx, dy, dz, overlayY, ctx);
         }
 
         if (RendererToggle.BEACON_RANGE.isRendererEnabled())
@@ -81,16 +83,17 @@ public class OverlayRenderer
 
         if (RendererToggle.SPAWNER_POSITIONS.isRendererEnabled())
         {
-            RenderContainer.SPAWNER_RENDERER.renderPositionText(dx, dy, dz);
+            RenderContainer.SPAWNER_RENDERER.renderPositionText(dx, dy, dz, ctx);
         }
 
         if (RendererToggle.WATER_FALLS.isRendererEnabled())
         {
-            RenderContainer.WATER_FALL_RENDERER.renderPositionText(dx, dy, dz);
+            RenderContainer.WATER_FALL_RENDERER.renderPositionText(dx, dy, dz, ctx);
         }
     }
 
-    private static void renderChunkUnloadBuckets(Entity entity, double dx, double dy, double dz, double chunkOverlayY)
+    private static void renderChunkUnloadBuckets(Entity entity, double dx, double dy, double dz,
+                                                 double chunkOverlayY, RenderContext ctx)
     {
         final int centerX = EntityWrap.getChunkX(entity);
         final int centerZ = EntityWrap.getChunkZ(entity);
@@ -111,7 +114,8 @@ public class OverlayRenderer
                 int cz = centerZ + zOff;
                 int bucket = MiscUtils.getChunkUnloadBucket(cx, cz);
                 String str = String.valueOf(bucket);
-                TextRenderUtils.renderTextPlate(Collections.singletonList(str), (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale);
+                TextRenderUtils.renderTextPlate(Collections.singletonList(str),
+                                                (cx << 4) + 8.5d - dx, y - dy, (cz << 4) + 8.5D - dz, scale, ctx);
             }
         }
     }

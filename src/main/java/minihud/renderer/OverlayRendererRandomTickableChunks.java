@@ -36,8 +36,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHudOverlayRenderer
 
         if (this.toggle == RendererToggle.RANDOM_TICKS_FIXED && this.shouldRender())
         {
-            Vec3d pos = EntityWrap.getCameraEntityPosition();
-            this.newPos = pos;
+            this.newPos = EntityWrap.getCameraEntityPosition();
         }
     }
 

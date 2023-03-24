@@ -43,6 +43,7 @@ import malilib.gui.BaseScreen;
 import malilib.overlay.InfoArea;
 import malilib.overlay.widget.StringListRendererWidget;
 import malilib.registry.Registry;
+import malilib.render.RenderContext;
 import malilib.render.RenderUtils;
 import malilib.render.inventory.InventoryRenderUtils;
 import malilib.util.StringUtils;
@@ -185,7 +186,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     }
 
     @Override
-    public void onPostGameOverlayRender()
+    public void onPostGameOverlayRender(RenderContext ctx)
     {
         if (this.enabled)
         {
@@ -206,7 +207,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     }
 
     @Override
-    public void onPostRenderItemTooltip(ItemStack stack, int x, int y)
+    public void onPostRenderItemTooltip(ItemStack stack, int x, int y, RenderContext ctx)
     {
         float z = Configs.Generic.ITEM_PREVIEW_Z.getIntegerValue();
 
@@ -232,17 +233,17 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 boolean background = Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue();
                 x += 8;
                 y -= 10;
-                InventoryRenderUtils.renderItemInventoryPreview(stack, x, y, z, background);
+                InventoryRenderUtils.renderItemInventoryPreview(stack, x, y, z, background, ctx);
             }
         }
     }
 
     @Override
-    public void onPostWorldRender(float tickDelta)
+    public void onPostWorldRender(RenderContext ctx, float tickDelta)
     {
         if (Configs.Generic.OVERLAYS_RENDERING_TOGGLE.getBooleanValue())
         {
-            OverlayRenderer.renderOverlays(tickDelta);
+            OverlayRenderer.renderOverlays(ctx, tickDelta);
         }
     }
 

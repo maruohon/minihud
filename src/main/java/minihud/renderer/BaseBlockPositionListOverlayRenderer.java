@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 
+import malilib.render.RenderContext;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.TextRenderUtils;
 import malilib.render.overlay.BaseRenderObject;
@@ -123,7 +124,7 @@ public abstract class BaseBlockPositionListOverlayRenderer extends MiniHudOverla
         }
     }
 
-    public void renderPositionText(double dx, double dy, double dz)
+    public void renderPositionText(double dx, double dy, double dz, RenderContext ctx)
     {
         ArrayList<String> list = new ArrayList<>();
         final float scale = 0.025f;
@@ -142,7 +143,7 @@ public abstract class BaseBlockPositionListOverlayRenderer extends MiniHudOverla
                 list.add(String.format("%d, %d, %d", posX, posY, posZ));
                 list.add(String.format("%d of %d", orderedPos.order, count));
 
-                TextRenderUtils.renderTextPlate(list, posX + 0.5 - dx, posY + 1.75 - dy, posZ + 0.5 - dz, scale);
+                TextRenderUtils.renderTextPlate(list, posX + 0.5 - dx, posY + 1.75 - dy, posZ + 0.5 - dz, scale, ctx);
                 list.clear();
             }
         }
