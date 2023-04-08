@@ -23,12 +23,12 @@ import malilib.gui.widget.BaseTextFieldWidget;
 import malilib.gui.widget.ColorIndicatorWidget;
 import malilib.gui.widget.DoubleTextFieldWidget;
 import malilib.gui.widget.IntegerTextFieldWidget;
+import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.Vec3dEditWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.button.OptionListConfigButton;
 import malilib.input.ActionResult;
 import malilib.util.ListUtils;
-import malilib.util.StringUtils;
 import malilib.util.data.DualDoubleConsumer;
 import malilib.util.data.DualIntConsumer;
 import malilib.util.position.LayerRange;
@@ -86,7 +86,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
 
     private void createColorInput(int x, int y)
     {
-        this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.label.shapes.color"));
+        LabelWidget label = new LabelWidget("minihud.label.shapes.color");
+        label.setPosition(x, y + 1);
+        this.addWidget(label);
         y += 12;
 
         BaseTextFieldWidget txtField = new BaseTextFieldWidget(70, 16, String.format("#%08X", this.shape.getColor().intValue));
@@ -102,7 +104,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
 
     private void createShapeEditorElements(int x, int y)
     {
-        this.addLabel(x, y + 1, 0xFFFFFFFF, StringUtils.translate("minihud.label.shapes.display_name"));
+        LabelWidget label = new LabelWidget("minihud.label.shapes.display_name");
+        label.setPosition(x, y + 1);
+        this.addWidget(label);
         y += 12;
 
         BaseTextFieldWidget textField = new BaseTextFieldWidget(240, 16, this.shape.getDisplayName());
@@ -147,7 +151,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     {
         ShapeCircleBase shape = (ShapeCircleBase) this.shape;
 
-        this.addLabel(x, y + 2, 0xFFFFFFFF, StringUtils.translate("minihud.label.shapes.center"));
+        LabelWidget label = new LabelWidget("minihud.label.shapes.center");
+        label.setPosition(x, y + 2);
+        this.addWidget(label);
 
         Vec3dEditWidget editWidget = new Vec3dEditWidget(120, 72, 2, true, shape.getCenter(), shape::setCenter);
         editWidget.setPosition(x, y + 12);
@@ -182,7 +188,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     private void createShapeEditorElementDoubleField(int x, int y, DoubleSupplier supplier,
                                                      DoubleConsumer consumer, String translationKey, boolean addButton)
     {
-        this.addLabel(x + 12, y, 0xFFFFFFFF, translationKey);
+        LabelWidget label = new LabelWidget(translationKey);
+        label.setPosition(x + 12, y);
+        this.addWidget(label);
         y += 10;
 
         DoubleTextFieldWidget txtField = new DoubleTextFieldWidget(40, 16, supplier.getAsDouble());
@@ -205,7 +213,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     private void createShapeEditorElementIntField(int x, int y, IntSupplier supplier, IntConsumer consumer,
                                                   String translationKey, boolean addButton)
     {
-        this.addLabel(x + 12, y, 0xFFFFFFFF, translationKey);
+        LabelWidget label = new LabelWidget(translationKey);
+        label.setPosition(x + 12, y);
+        this.addWidget(label);
         y += 10;
 
         IntegerTextFieldWidget txtField = new IntegerTextFieldWidget(40, 16, supplier.getAsInt());
@@ -228,7 +238,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     private void createDirectionButton(int x, int y, Supplier<EnumFacing> supplier,
                                        Consumer<EnumFacing> consumer, String translationKey)
     {
-        this.addLabel(x, y, 0xFFFFFFFF, translationKey);
+        LabelWidget label = new LabelWidget(translationKey);
+        label.setPosition(x, y);
+        this.addWidget(label);
         y += 10;
 
         String name = org.apache.commons.lang3.StringUtils.capitalize(supplier.get().toString().toLowerCase());
@@ -242,7 +254,9 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     private void createRenderTypeButton(int x, int y, Supplier<ShapeRenderType> supplier,
                                         Consumer<ShapeRenderType> consumer, String translationKey)
     {
-        this.addLabel(x, y, 0xFFFFFFFF, translationKey);
+        LabelWidget label = new LabelWidget(translationKey);
+        label.setPosition(x, y);
+        this.addWidget(label);
         y += 10;
 
         GenericButton button = GenericButton.create(supplier.get().getDisplayName());
