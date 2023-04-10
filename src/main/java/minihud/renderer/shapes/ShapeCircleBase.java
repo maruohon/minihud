@@ -37,7 +37,6 @@ public abstract class ShapeCircleBase extends ShapeBase
     protected Vec3d center = Vec3d.ZERO;
     protected Vec3d effectiveCenter = Vec3d.ZERO;
     protected Vec3d lastUpdatePos = Vec3d.ZERO;
-    protected long lastUpdateTime;
 
     public ShapeCircleBase(ShapeType type, Color4f color, double radius)
     {
@@ -138,7 +137,6 @@ public abstract class ShapeCircleBase extends ShapeBase
     {
         this.needsUpdate = false;
         this.lastUpdatePos = updatePosition;
-        this.lastUpdateTime = System.currentTimeMillis();
     }
 
     @Override

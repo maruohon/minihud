@@ -195,10 +195,10 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 this.updateFps();
             }
 
-            long currentTime = System.currentTimeMillis();
+            long currentTime = System.nanoTime();
 
             // Only update the text once per game tick
-            if (currentTime - this.infoUpdateTime >= 50)
+            if (currentTime - this.infoUpdateTime >= 50000000L)
             {
                 this.updateLines();
                 this.infoUpdateTime = currentTime;

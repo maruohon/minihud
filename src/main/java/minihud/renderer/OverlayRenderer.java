@@ -32,7 +32,7 @@ public class OverlayRenderer
     public static void resetRenderTimeout()
     {
         canRender = false;
-        loginTime = System.currentTimeMillis();
+        loginTime = System.nanoTime();
     }
 
     public static void renderOverlays(RenderContext ctx, float tickDelta)
@@ -53,7 +53,7 @@ public class OverlayRenderer
             // Don't render before the player has been placed in the actual proper position,
             // otherwise some of the renderers mess up.
             // The magic 8.5, 65, 8.5 comes from the WorldClient constructor
-            if (System.currentTimeMillis() - loginTime >= 5000 ||
+            if (System.nanoTime() - loginTime >= 5000000000L ||
                 x != 8.5 ||
                 y != 65 ||
                 z != 8.5)
