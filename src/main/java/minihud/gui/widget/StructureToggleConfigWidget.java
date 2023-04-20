@@ -43,7 +43,7 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
         });
 
         this.hotkeyButton = new KeyBindConfigButton(120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
-        this.hotkeyButton.setValueChangeListener(this::updateWidgetState);
+        this.hotkeyButton.setValueChangeListener(this::onKeybindModified);
 
         this.settingsWidget = new KeybindSettingsWidget(config.getKeyBind(), config.getDisplayName());
 
@@ -115,5 +115,17 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
                this.config.getColorMain().getIntegerValue() != this.initialMainColor ||
                this.config.getColorComponents().getIntegerValue() != this.initialComponentColor ||
                this.config.getKeyBind().matches(this.initialHotkeyValue) == false;
+    }
+
+    @Override
+    protected void onResetButtonClicked()
+    {
+        this.config.resetToDefault();
+        this.ctx.getListWidget().refreshEntries();
+    }
+
+    protected void onKeybindModified()
+    {
+        this.ctx.getListWidget().refreshEntries();
     }
 }

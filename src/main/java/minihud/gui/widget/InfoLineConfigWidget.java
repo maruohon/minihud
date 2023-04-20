@@ -50,7 +50,7 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLineToggle>
         });
 
         this.hotkeyButton = new KeyBindConfigButton(120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
-        this.hotkeyButton.setValueChangeListener(this::updateWidgetState);
+        this.hotkeyButton.setValueChangeListener(this::onKeybindModified);
 
         this.settingsWidget = new KeybindSettingsWidget(config.getKeyBind(), config.getDisplayName());
     }
@@ -120,5 +120,17 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLineToggle>
         return this.config.getBooleanValue() != this.initialBooleanValue ||
                this.config.getLineOrder() != this.initialLineOrder ||
                this.config.getKeyBind().matches(this.initialHotkeyValue) == false;
+    }
+
+    @Override
+    protected void onResetButtonClicked()
+    {
+        this.config.resetToDefault();
+        this.ctx.getListWidget().refreshEntries();
+    }
+
+    protected void onKeybindModified()
+    {
+        this.ctx.getListWidget().refreshEntries();
     }
 }
