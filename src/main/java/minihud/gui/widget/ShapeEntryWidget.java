@@ -69,9 +69,9 @@ public class ShapeEntryWidget extends BaseDataListEntryWidget<ShapeBase>
     }
 
     @Override
-    public boolean canHoverAt(int mouseX, int mouseY, int mouseButton)
+    public boolean canHoverAt(int mouseX, int mouseY)
     {
-        return mouseX < this.buttonsStartX && super.canHoverAt(mouseX, mouseY, mouseButton);
+        return mouseX < this.buttonsStartX && super.canHoverAt(mouseX, mouseY);
     }
 
     @Override

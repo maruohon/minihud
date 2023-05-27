@@ -1,6 +1,6 @@
 package minihud;
 
-import malilib.action.ActionUtils;
+import malilib.action.util.ActionUtils;
 import malilib.action.NamedAction;
 import malilib.listener.EventListener;
 import minihud.config.Configs;
