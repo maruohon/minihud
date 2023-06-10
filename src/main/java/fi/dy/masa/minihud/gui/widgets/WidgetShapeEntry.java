@@ -2,7 +2,9 @@ package fi.dy.masa.minihud.gui.widgets;
 
 import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.util.math.MatrixStack;
+
+import net.minecraft.client.gui.DrawContext;
+
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -67,7 +69,7 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    public void render(int mouseX, int mouseY, boolean selected, DrawContext context)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -94,22 +96,22 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         }
 
         String name = this.shape.getDisplayName();
-        this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name, matrixStack);
+        this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name, context);
 
         RenderUtils.color(1f, 1f, 1f, 1f);
         RenderSystem.disableBlend();
 
-        super.render(mouseX, mouseY, selected, matrixStack);
+        super.render(mouseX, mouseY, selected, context);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected, DrawContext context)
     {
-        super.postRenderHovered(mouseX, mouseY, selected, matrixStack);
+        super.postRenderHovered(mouseX, mouseY, selected, context);
 
         if (mouseX >= this.x && mouseX < this.buttonsStartX && mouseY >= this.y && mouseY <= this.y + this.height)
         {
-            RenderUtils.drawHoverText(mouseX, mouseY, this.hoverLines, matrixStack);
+            RenderUtils.drawHoverText(mouseX, mouseY, this.hoverLines, context);
         }
     }
 
