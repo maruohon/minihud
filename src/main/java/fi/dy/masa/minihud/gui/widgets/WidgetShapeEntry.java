@@ -100,8 +100,6 @@ public class WidgetShapeEntry extends WidgetListEntryBase<ShapeBase>
         RenderSystem.disableBlend();
 
         super.render(mouseX, mouseY, selected, matrixStack);
-
-        RenderUtils.disableDiffuseLighting();
     }
 
     @Override
