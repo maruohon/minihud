@@ -163,8 +163,8 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
         }
         else
         {
-            colorLit = Color4f.fromColor(0xFFFFFFFF);
-            colorDark = Color4f.fromColor(0xFFFFFFFF);
+            colorLit = Color4f.WHITE;
+            colorDark = Color4f.WHITE;
         }
 
         this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y - offsetY, tmpZ + cameraPos.z, numberFacing, lightThreshold, mode, colorLit, colorDark, buffer);
@@ -218,31 +218,31 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
         switch (facing)
         {
             case NORTH:
-                buffer.pos(x    , y, z    ).tex(u    , v    ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x    , y, z + 1).tex(u    , v + w).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x + 1, y, z + 1).tex(u + w, v + w).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x + 1, y, z    ).tex(u + w, v    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z    ).tex(u    , v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u    , v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u + w, v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u + w, v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
                 break;
 
             case SOUTH:
-                buffer.pos(x + 1, y, z + 1).tex(u    , v    ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x + 1, y, z    ).tex(u    , v + w).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x    , y, z    ).tex(u + w, v + w).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x    , y, z + 1).tex(u + w, v    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u    , v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u    , v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x    , y, z    ).tex(u + w, v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u + w, v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
                 break;
 
             case EAST:
-                buffer.pos(x + 1, y, z    ).tex(u    , v    ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x    , y, z    ).tex(u    , v + w).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x    , y, z + 1).tex(u + w, v + w).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x + 1, y, z + 1).tex(u + w, v    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u    , v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x    , y, z    ).tex(u    , v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u + w, v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u + w, v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
                 break;
 
             case WEST:
-                buffer.pos(x    , y, z + 1).tex(u    , v    ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x + 1, y, z + 1).tex(u    , v + w).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x + 1, y, z    ).tex(u + w, v + w).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x    , y, z    ).tex(u + w, v    ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x    , y, z + 1).tex(u    , v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x + 1, y, z + 1).tex(u    , v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x + 1, y, z    ).tex(u + w, v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x    , y, z    ).tex(u + w, v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
                 break;
 
             default:
@@ -251,26 +251,26 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
 
     private void renderLightLevelCross(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
     {
-        buffer.pos(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
-        buffer.pos(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x + offset1, y, z + offset1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        buffer.pos(x + offset2, y, z + offset2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
 
-        buffer.pos(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
-        buffer.pos(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x + offset1, y, z + offset2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        buffer.pos(x + offset2, y, z + offset1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
     }
 
     private void renderLightLevelSquare(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
     {
-        buffer.pos(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
-        buffer.pos(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x + offset1, y, z + offset1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        buffer.pos(x + offset1, y, z + offset2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
 
-        buffer.pos(x + offset1, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
-        buffer.pos(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x + offset1, y, z + offset2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        buffer.pos(x + offset2, y, z + offset2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
 
-        buffer.pos(x + offset2, y, z + offset2).color(color.r, color.g, color.b, color.a).endVertex();
-        buffer.pos(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x + offset2, y, z + offset2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        buffer.pos(x + offset2, y, z + offset1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
 
-        buffer.pos(x + offset2, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
-        buffer.pos(x + offset1, y, z + offset1).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x + offset2, y, z + offset1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        buffer.pos(x + offset1, y, z + offset1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
     }
 
     private void updateLightLevels(World world, BlockPos center)

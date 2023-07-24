@@ -91,8 +91,8 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
         {
             for (double y = startY; y <= endY; y += 1.0D)
             {
-                buffer.pos(x, y, startZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x, y, endZ  ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x, y, startZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x, y, endZ  ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
             }
         }
 
@@ -100,8 +100,8 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
         {
             for (double z = startZ; z <= endZ; z += 1.0D)
             {
-                buffer.pos(x, startY, z).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(x, endY  , z).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(x, startY, z).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(x, endY  , z).color(color.ri, color.gi, color.bi, color.ai).endVertex();
             }
         }
 
@@ -109,8 +109,8 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
         {
             for (double y = startY; y <= endY; y += 1.0D)
             {
-                buffer.pos(startX, y, z).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(endX  , y, z).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(startX, y, z).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                buffer.pos(endX  , y, z).color(color.ri, color.gi, color.bi, color.ai).endVertex();
             }
         }
     }

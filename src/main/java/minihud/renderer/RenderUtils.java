@@ -91,10 +91,10 @@ public class RenderUtils
         double cy = cameraPos.y;
         double cz = cameraPos.z;
 
-        bufferQuads.pos(minX - cx, maxY - cy, minZ - cz).color(color.r, color.g, color.b, color.a).endVertex();
-        bufferQuads.pos(minX - cx, minY - cy, minZ - cz).color(color.r, color.g, color.b, color.a).endVertex();
-        bufferQuads.pos(maxX - cx, minY - cy, maxZ - cz).color(color.r, color.g, color.b, color.a).endVertex();
-        bufferQuads.pos(maxX - cx, maxY - cy, maxZ - cz).color(color.r, color.g, color.b, color.a).endVertex();
+        bufferQuads.pos(minX - cx, maxY - cy, minZ - cz).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        bufferQuads.pos(minX - cx, minY - cy, minZ - cz).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        bufferQuads.pos(maxX - cx, minY - cy, maxZ - cz).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        bufferQuads.pos(maxX - cx, maxY - cy, maxZ - cz).color(color.ri, color.gi, color.bi, color.ai).endVertex();
 
         if (lineIntervalV > 0.0)
         {
@@ -102,8 +102,8 @@ public class RenderUtils
 
             while (lineY <= maxY)
             {
-                bufferLines.pos(minX - cx, lineY - cy, minZ - cz).color(color.r, color.g, color.b, 1.0F).endVertex();
-                bufferLines.pos(maxX - cx, lineY - cy, maxZ - cz).color(color.r, color.g, color.b, 1.0F).endVertex();
+                bufferLines.pos(minX - cx, lineY - cy, minZ - cz).color(color.ri, color.gi, color.bi, 255).endVertex();
+                bufferLines.pos(maxX - cx, lineY - cy, maxZ - cz).color(color.ri, color.gi, color.bi, 255).endVertex();
                 lineY += lineIntervalV;
             }
         }
@@ -116,8 +116,8 @@ public class RenderUtils
 
                 while (lineZ <= maxZ)
                 {
-                    bufferLines.pos(minX - cx, minY - cy, lineZ - cz).color(color.r, color.g, color.b, 1.0F).endVertex();
-                    bufferLines.pos(minX - cx, maxY - cy, lineZ - cz).color(color.r, color.g, color.b, 1.0F).endVertex();
+                    bufferLines.pos(minX - cx, minY - cy, lineZ - cz).color(color.ri, color.gi, color.bi, 255).endVertex();
+                    bufferLines.pos(minX - cx, maxY - cy, lineZ - cz).color(color.ri, color.gi, color.bi, 255).endVertex();
                     lineZ += lineIntervalH;
                 }
             }
@@ -127,8 +127,8 @@ public class RenderUtils
 
                 while (lineX <= maxX)
                 {
-                    bufferLines.pos(lineX - cx, minY - cy, minZ - cz).color(color.r, color.g, color.b, 1.0F).endVertex();
-                    bufferLines.pos(lineX - cx, maxY - cy, minZ - cz).color(color.r, color.g, color.b, 1.0F).endVertex();
+                    bufferLines.pos(lineX - cx, minY - cy, minZ - cz).color(color.ri, color.gi, color.bi, 255).endVertex();
+                    bufferLines.pos(lineX - cx, maxY - cy, minZ - cz).color(color.ri, color.gi, color.bi, 255).endVertex();
                     lineX += lineIntervalH;
                 }
             }
