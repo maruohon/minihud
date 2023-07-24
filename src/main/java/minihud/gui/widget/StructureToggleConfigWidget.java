@@ -37,6 +37,7 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
         this.config.getKeyBind().getKeysToList(this.initialHotkeyValue);
 
         this.booleanButton = new BooleanConfigButton(-1, 20, config.getBooleanConfig());
+        this.booleanButton.setHoverStringProvider("locked", config.getBooleanConfig()::getLockAndOverrideMessages);
         this.booleanButton.setActionListener(() -> {
             this.config.getBooleanConfig().toggleBooleanValue();
             this.updateWidgetState();

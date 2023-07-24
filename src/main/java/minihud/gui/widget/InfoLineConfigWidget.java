@@ -36,6 +36,8 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLineToggle>
         this.config.getKeyBind().getKeysToList(this.initialHotkeyValue);
 
         this.textField = new BaseTextFieldWidget(24, 16);
+        this.textField.setHoverStringProvider("locked", this.config.getLineOrderConfig()::getLockAndOverrideMessages);
+        this.textField.setEnabled(this.config.getLineOrderConfig().isLocked() == false);
         this.textField.setTextValidator(new IntegerTextFieldWidget.IntValidator(this.config.getLineOrderConfig().getMinIntegerValue(),
                                                                                 this.config.getLineOrderConfig().getMaxIntegerValue()));
         this.textField.setListener((str) -> {
@@ -44,6 +46,7 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLineToggle>
         });
 
         this.booleanButton = new BooleanConfigButton(-1, 20, config.getBooleanConfig());
+        this.booleanButton.setHoverStringProvider("locked", this.config.getBooleanConfig()::getLockAndOverrideMessages);
         this.booleanButton.setActionListener(() -> {
             this.config.getBooleanConfig().toggleBooleanValue();
             this.updateWidgetState();
