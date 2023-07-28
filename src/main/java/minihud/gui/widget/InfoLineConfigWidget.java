@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 import malilib.gui.config.ConfigWidgetContext;
 import malilib.gui.widget.BaseTextFieldWidget;
-import malilib.gui.widget.IntegerTextFieldWidget;
+import malilib.gui.widget.IntegerTextFieldWidget.IntRangeValidator;
 import malilib.gui.widget.KeybindSettingsWidget;
 import malilib.gui.widget.button.BooleanConfigButton;
 import malilib.gui.widget.button.KeyBindConfigButton;
@@ -38,8 +38,8 @@ public class InfoLineConfigWidget extends BaseConfigWidget<InfoLineToggle>
         this.textField = new BaseTextFieldWidget(24, 16);
         this.textField.setHoverStringProvider("locked", this.config.getLineOrderConfig()::getLockAndOverrideMessages);
         this.textField.setEnabled(this.config.getLineOrderConfig().isLocked() == false);
-        this.textField.setTextValidator(new IntegerTextFieldWidget.IntValidator(this.config.getLineOrderConfig().getMinIntegerValue(),
-                                                                                this.config.getLineOrderConfig().getMaxIntegerValue()));
+        this.textField.setTextValidator(new IntRangeValidator(this.config.getLineOrderConfig().getMinIntegerValue(),
+                                                              this.config.getLineOrderConfig().getMaxIntegerValue()));
         this.textField.setListener((str) -> {
             this.config.getLineOrderConfig().setValueFromString(str);
             this.updateWidgetState();

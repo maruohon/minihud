@@ -13,7 +13,7 @@ import malilib.config.option.OptionListConfig;
 import malilib.config.value.BlockSnap;
 import malilib.gui.BaseScreen;
 import malilib.gui.config.BaseConfigScreen;
-import malilib.gui.edit.BaseRenderLayerEditScreen;
+import malilib.gui.edit.BaseLayerRangeEditScreen;
 import malilib.gui.icon.DefaultIcons;
 import malilib.gui.listener.DoubleModifierButtonListener;
 import malilib.gui.listener.DoubleTextFieldListener;
@@ -31,7 +31,6 @@ import malilib.input.ActionResult;
 import malilib.util.ListUtils;
 import malilib.util.data.DualDoubleConsumer;
 import malilib.util.data.DualIntConsumer;
-import malilib.util.position.LayerRange;
 import malilib.util.position.PositionUtils;
 import minihud.Reference;
 import minihud.renderer.shapes.ShapeBase;
@@ -41,19 +40,16 @@ import minihud.renderer.shapes.ShapeManager;
 import minihud.renderer.shapes.ShapeSpawnSphere;
 import minihud.util.value.ShapeRenderType;
 
-public class GuiShapeEditor extends BaseRenderLayerEditScreen
+public class GuiShapeEditor extends BaseLayerRangeEditScreen
 {
     private final ShapeBase shape;
     private final OptionListConfig<BlockSnap> configBlockSnap;
 
     public GuiShapeEditor(ShapeBase shape)
     {
-        super("minihud_shape_editor", ConfigScreen.ALL_TABS, ConfigScreen.SHAPES);
+        super("minihud_shape_editor", ConfigScreen.ALL_TABS, ConfigScreen.SHAPES, shape.getLayerRange());
 
         this.shape = shape;
-        this.controlsStartX = 142;
-        this.controlsStartY = 142;
-
         this.configBlockSnap = new OptionListConfig<>("blockSnap", BlockSnap.NONE, BlockSnap.VALUES, "");
 
         this.setTitle("minihud.title.screen.shape_editor", Reference.MOD_VERSION);
@@ -79,9 +75,11 @@ public class GuiShapeEditor extends BaseRenderLayerEditScreen
     }
 
     @Override
-    protected LayerRange getLayerRange()
+    protected void updateWidgetPositions()
     {
-        return this.shape.getLayerRange();
+        super.updateWidgetPositions();
+
+        this.editWidget.setPosition(this.x + 142, this.y + 142);
     }
 
     private void createColorInput(int x, int y)
