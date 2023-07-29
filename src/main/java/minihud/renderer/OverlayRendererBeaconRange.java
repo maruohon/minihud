@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
@@ -17,7 +15,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import malilib.render.ShapeRenderUtils;
-import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.GameUtils;
 import minihud.config.Configs;
@@ -88,23 +85,14 @@ public class OverlayRendererBeaconRange extends MiniHudOverlayRenderer
     public void update(Vec3d cameraPos, Entity entity)
     {
         this.clear();
-
-        BaseRenderObject renderQuads = this.renderObjects.get(0);
-        BaseRenderObject renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+        this.startBuffers();
 
         synchronized (this.beaconPositions)
         {
-            this.renderBeaconRanges(GameUtils.getClientWorld(), cameraPos, BUFFER_1, BUFFER_2);
+            this.renderBeaconRanges(GameUtils.getClientWorld(), cameraPos);
         }
 
-        BUFFER_1.finishDrawing();
-        BUFFER_2.finishDrawing();
-        renderQuads.uploadData(BUFFER_1);
-        renderLines.uploadData(BUFFER_2);
-
-        this.needsUpdate = false;
+        this.uploadBuffers();
     }
 
     public static Color4f getColorForLevel(int level)
@@ -118,7 +106,7 @@ public class OverlayRendererBeaconRange extends MiniHudOverlayRenderer
         }
     }
 
-    protected void renderBeaconRanges(World world, Vec3d cameraPos, BufferBuilder bufferQuads, BufferBuilder bufferLines)
+    protected void renderBeaconRanges(World world, Vec3d cameraPos)
     {
         for (TileEntity be : world.loadedTileEntityList)
         {
@@ -129,13 +117,13 @@ public class OverlayRendererBeaconRange extends MiniHudOverlayRenderer
 
                 if (level >= 1 && level <= 4)
                 {
-                    this.renderBeaconBox(world, pos, cameraPos, level, getColorForLevel(level), bufferQuads, bufferLines);
+                    this.renderBeaconBox(world, pos, cameraPos, level, getColorForLevel(level));
                 }
             }
         }
     }
 
-    protected void renderBeaconBox(World world, BlockPos pos, Vec3d cameraPos, int level, Color4f color, BufferBuilder bufferQuads, BufferBuilder bufferLines)
+    protected void renderBeaconBox(World world, BlockPos pos, Vec3d cameraPos, int level, Color4f color)
     {
         double x = pos.getX();
         double y = pos.getY();
@@ -149,8 +137,8 @@ public class OverlayRendererBeaconRange extends MiniHudOverlayRenderer
         double maxY = this.getMaxHeight(world, pos, range) - cameraPos.y;
         double maxZ = z + range + 1 -cameraPos.z;
 
-        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, bufferQuads);
-        ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), bufferLines);
+        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, this.quadBuilder);
+        ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), this.lineBuilder);
 
         this.beaconPositions.add(pos);
         this.beaconChunks.add(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4));

@@ -3,8 +3,6 @@ package minihud.renderer;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -13,7 +11,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import malilib.render.ShapeRenderUtils;
-import malilib.render.overlay.BaseRenderObject;
+import malilib.render.buffer.VertexBuilder;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
@@ -44,41 +42,63 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
     }
 
     @Override
-    public void update(Vec3d cameraPos, Entity entity)
+    public void allocateGlResources()
     {
-        Color4f color = Configs.Colors.BLOCK_GRID_OVERLAY_COLOR.getColor();
-        int radius = Configs.Generic.BLOCK_GRID_OVERLAY_RADIUS.getIntegerValue();
-
-        BaseRenderObject renderLines = this.renderObjects.get(0);
-        BlockGridMode mode = Configs.Generic.BLOCK_GRID_OVERLAY_MODE.getValue();
-        World world = GameUtils.getClientWorld();
-
-        BUFFER_1.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-
-        if (mode == BlockGridMode.ALL)
-        {
-            this.renderLinesAll(cameraPos, this.lastUpdatePos, radius, color, BUFFER_1);
-        }
-        else if (mode == BlockGridMode.NON_AIR)
-        {
-            this.renderLinesNonAir(cameraPos, world, this.lastUpdatePos, radius, color, BUFFER_1);
-        }
-        else if (mode == BlockGridMode.ADJACENT)
-        {
-            this.renderLinesAdjacentToNonAir(cameraPos, world, this.lastUpdatePos, radius, color, BUFFER_1);
-        }
-
-        BUFFER_1.finishDrawing();
-        renderLines.uploadData(BUFFER_1);
+        this.outlineRenderer = this.allocateBuffer(GL11.GL_LINES);
     }
 
     @Override
-    public void allocateGlResources()
+    protected void uploadBuffers()
     {
-        this.allocateBuffer(GL11.GL_LINES);
+        this.outlineRenderer.uploadData(this.lineBuilder);
+        this.needsUpdate = false;
     }
 
-    protected void renderLinesAll(Vec3d cameraPos, BlockPos center, int radius, Color4f color, BufferBuilder buffer)
+    @Override
+    protected void startBuffers()
+    {
+        this.lineBuilder.start();
+    }
+
+    @Override
+    public void draw()
+    {
+        this.preRender();
+        this.outlineRenderer.draw();
+        this.postRender();
+    }
+
+    @Override
+    public void update(Vec3d cameraPos, Entity entity)
+    {
+        World world = GameUtils.getClientWorld();
+        Color4f color = Configs.Colors.BLOCK_GRID_OVERLAY_COLOR.getColor();
+        BlockGridMode mode = Configs.Generic.BLOCK_GRID_OVERLAY_MODE.getValue();
+        int radius = Configs.Generic.BLOCK_GRID_OVERLAY_RADIUS.getIntegerValue();
+
+        this.startBuffers();
+
+        if (mode == BlockGridMode.ALL)
+        {
+            this.renderLinesAll(cameraPos, this.lastUpdatePos, radius, color, this.lineBuilder);
+        }
+        else if (mode == BlockGridMode.NON_AIR)
+        {
+            this.renderLinesNonAir(cameraPos, world, this.lastUpdatePos, radius, color, this.lineBuilder);
+        }
+        else if (mode == BlockGridMode.ADJACENT)
+        {
+            this.renderLinesAdjacentToNonAir(cameraPos, world, this.lastUpdatePos, radius, color, this.lineBuilder);
+        }
+
+        this.uploadBuffers();
+    }
+
+    protected void renderLinesAll(Vec3d cameraPos,
+                                  BlockPos center,
+                                  int radius,
+                                  Color4f color,
+                                  VertexBuilder builder)
     {
         final double startX = center.getX() - radius - cameraPos.x;
         final double startY = center.getY() - radius - cameraPos.y;
@@ -91,8 +111,8 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
         {
             for (double y = startY; y <= endY; y += 1.0D)
             {
-                buffer.pos(x, y, startZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x, y, endZ  ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                builder.posColor(x, y, startZ, color);
+                builder.posColor(x, y, endZ  , color);
             }
         }
 
@@ -100,8 +120,8 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
         {
             for (double z = startZ; z <= endZ; z += 1.0D)
             {
-                buffer.pos(x, startY, z).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x, endY  , z).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                builder.posColor(x, startY, z, color);
+                builder.posColor(x, endY  , z, color);
             }
         }
 
@@ -109,13 +129,18 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
         {
             for (double y = startY; y <= endY; y += 1.0D)
             {
-                buffer.pos(startX, y, z).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(endX  , y, z).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                builder.posColor(startX, y, z, color);
+                builder.posColor(endX  , y, z, color);
             }
         }
     }
 
-    protected void renderLinesNonAir(Vec3d cameraPos, World world, BlockPos center, int radius, Color4f color, BufferBuilder buffer)
+    protected void renderLinesNonAir(Vec3d cameraPos,
+                                     World world,
+                                     BlockPos center,
+                                     int radius,
+                                     Color4f color,
+                                     VertexBuilder builder)
     {
         final int startX = center.getX() - radius;
         final int startY = center.getY() - radius;
@@ -155,14 +180,19 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
 
                     if (chunk.getBlockState(x, y, z).getMaterial() != Material.AIR)
                     {
-                        ShapeRenderUtils.renderBlockPosEdgeLines(posMutable, 0.001, color, buffer, cameraPos);
+                        ShapeRenderUtils.renderBlockPosEdgeLines(posMutable, 0.001, color, cameraPos, builder);
                     }
                 }
             }
         }
     }
 
-    protected void renderLinesAdjacentToNonAir(Vec3d cameraPos, World world, BlockPos center, int radius, Color4f color, BufferBuilder buffer)
+    protected void renderLinesAdjacentToNonAir(Vec3d cameraPos,
+                                               World world,
+                                               BlockPos center,
+                                               int radius,
+                                               Color4f color,
+                                               VertexBuilder builder)
     {
         final int startX = center.getX() - radius;
         final int startY = center.getY() - radius;
@@ -205,7 +235,7 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
 
                             if (chunk.getBlockState(posMutable2).getMaterial() != Material.AIR)
                             {
-                                ShapeRenderUtils.renderBlockPosEdgeLines(posMutable, 0.001, color, buffer, cameraPos);
+                                ShapeRenderUtils.renderBlockPosEdgeLines(posMutable, 0.001, color, cameraPos, builder);
                                 break;
                             }
                         }
@@ -219,7 +249,7 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
 
                             if (world.getBlockState(posMutable2).getMaterial() != Material.AIR)
                             {
-                                ShapeRenderUtils.renderBlockPosEdgeLines(posMutable, 0.001, color, buffer, cameraPos);
+                                ShapeRenderUtils.renderBlockPosEdgeLines(posMutable, 0.001, color, cameraPos, builder);
                                 break;
                             }
                         }

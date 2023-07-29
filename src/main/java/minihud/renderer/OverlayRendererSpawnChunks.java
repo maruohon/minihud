@@ -2,14 +2,12 @@ package minihud.renderer;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import malilib.render.ShapeRenderUtils;
-import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
@@ -65,11 +63,6 @@ public class OverlayRendererSpawnChunks extends MiniHudOverlayRenderer
         DataStorage data = DataStorage.getInstance();
         BlockPos spawn = this.toggle == RendererToggle.SPAWN_CHUNKS_PLAYER ? EntityWrap.getEntityBlockPos(entity) : data.getWorldSpawn();
 
-        BaseRenderObject renderQuads = this.renderObjects.get(0);
-        BaseRenderObject renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-
         final Color4f colorEntity = this.toggle == RendererToggle.SPAWN_CHUNKS_REAL ?
                                             Configs.Colors.SPAWN_REAL_ENTITY_OVERLAY_COLOR.getColor() :
                                             Configs.Colors.SPAWN_PLAYER_ENTITY_OVERLAY_COLOR.getColor();
@@ -77,21 +70,20 @@ public class OverlayRendererSpawnChunks extends MiniHudOverlayRenderer
                                           Configs.Colors.SPAWN_REAL_LAZY_OVERLAY_COLOR.getColor() :
                                           Configs.Colors.SPAWN_PLAYER_LAZY_OVERLAY_COLOR.getColor();
 
-        ShapeRenderUtils.renderBlockPosEdgeLines(spawn, 0.001, colorEntity, BUFFER_2, cameraPos);
-        ShapeRenderUtils.renderBlockPosSideQuads(spawn, 0.001, colorEntity, BUFFER_1, cameraPos);
+        this.startBuffers();
+
+        ShapeRenderUtils.renderBlockPosSideQuads(spawn, 0.001, colorEntity, cameraPos, this.quadBuilder);
+        ShapeRenderUtils.renderBlockPosEdgeLines(spawn, 0.001, colorEntity, cameraPos, this.lineBuilder);
 
         Pair<BlockPos, BlockPos> corners = this.getSpawnChunkCorners(spawn, 128);
-        RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorLazy, BUFFER_1, BUFFER_2);
+        RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16,
+                                         true, colorLazy, this.quadBuilder, this.lineBuilder);
 
         corners = this.getSpawnChunkCorners(spawn, 128 - 32);
-        RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16, true, colorEntity, BUFFER_1, BUFFER_2);
+        RenderUtils.renderWallsWithLines(corners.getLeft(), corners.getRight(), cameraPos, 16, 16,
+                                         true, colorEntity, this.quadBuilder, this.lineBuilder);
 
-        BUFFER_1.finishDrawing();
-        BUFFER_2.finishDrawing();
-
-        renderQuads.uploadData(BUFFER_1);
-        renderLines.uploadData(BUFFER_2);
-
+        this.uploadBuffers();
         this.needsUpdate = false;
     }
 

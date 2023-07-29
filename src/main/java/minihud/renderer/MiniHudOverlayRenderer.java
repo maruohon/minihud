@@ -3,14 +3,25 @@ package minihud.renderer;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
 
-import malilib.render.overlay.BaseOverlayRenderer;
+import malilib.render.buffer.VertexBuilder;
+import malilib.render.overlay.BaseColoredQuadOverlayRenderer;
 import malilib.util.data.ModInfo;
 import minihud.Reference;
 import minihud.config.Configs;
 import minihud.event.ClientWorldChangeHandler;
 
-public abstract class MiniHudOverlayRenderer extends BaseOverlayRenderer
+public abstract class MiniHudOverlayRenderer extends BaseColoredQuadOverlayRenderer
 {
+    public MiniHudOverlayRenderer()
+    {
+        super();
+    }
+
+    public MiniHudOverlayRenderer(VertexBuilder quadBuilder, VertexBuilder lineBuilder)
+    {
+        super(quadBuilder, lineBuilder);
+    }
+
     @Override
     public ModInfo getModInfo()
     {

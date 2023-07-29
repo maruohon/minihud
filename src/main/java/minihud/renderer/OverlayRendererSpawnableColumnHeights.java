@@ -2,7 +2,6 @@ package minihud.renderer;
 
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -10,7 +9,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import malilib.render.ShapeRenderUtils;
-import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
@@ -61,7 +59,7 @@ public class OverlayRendererSpawnableColumnHeights extends MiniHudOverlayRendere
 
             int entityCX = ex >> 4;
             int entityCZ = ez >> 4;
-            final int chunkRadius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128) >> 4;
+            final int chunkRadius = Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue() >> 4;
 
             synchronized (this.changedChunks)
             {
@@ -94,10 +92,7 @@ public class OverlayRendererSpawnableColumnHeights extends MiniHudOverlayRendere
         final int zEnd = zStart + radius * 2;
         final World world = GameUtils.getClientWorld();
 
-        BaseRenderObject renderQuads = this.renderObjects.get(0);
-        BaseRenderObject renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+        this.startBuffers();
 
         for (int x = xStart; x <= xEnd; ++x)
         {
@@ -119,18 +114,13 @@ public class OverlayRendererSpawnableColumnHeights extends MiniHudOverlayRendere
                 final double minZ = z + 0.25 - cameraPos.z;
                 final double maxZ = minZ + 0.5;
 
-                ShapeRenderUtils.renderBoxHorizontalSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, BUFFER_1);
-                ShapeRenderUtils.renderBoxTopQuad(minX, minZ, maxX, maxY, maxZ, color, BUFFER_1);
-
-                ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color, BUFFER_2);
+                ShapeRenderUtils.renderBoxHorizontalSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, this.quadBuilder);
+                ShapeRenderUtils.renderBoxTopQuad(minX, minZ, maxX, maxY, maxZ, color, this.quadBuilder);
+                ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color, this.lineBuilder);
             }
         }
 
-        BUFFER_1.finishDrawing();
-        BUFFER_2.finishDrawing();
-
-        renderQuads.uploadData(BUFFER_1);
-        renderLines.uploadData(BUFFER_2);
+        this.uploadBuffers();
 
         this.lastCheckTime = System.nanoTime();
 

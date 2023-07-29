@@ -4,12 +4,10 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
-import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
@@ -90,22 +88,15 @@ public class OverlayRendererSpawnableChunks extends MiniHudOverlayRenderer
 
         this.lastUpdatePos = new BlockPos(centerX, 0, centerZ);
 
-        BaseRenderObject renderQuads = this.renderObjects.get(0);
-        BaseRenderObject renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-
         int r = 7;
         BlockPos pos1 = new BlockPos( (centerX - r    ) << 4,              0,  (centerZ - r    ) << 4     );
         BlockPos pos2 = new BlockPos(((centerX + r + 1) << 4) - 1, this.topY, ((centerZ + r + 1) << 4) - 1);
 
-        RenderUtils.renderWallsWithLines(pos1, pos2, cameraPos, 16, 16, true, color, BUFFER_1, BUFFER_2);
+        this.startBuffers();
 
-        BUFFER_1.finishDrawing();
-        BUFFER_2.finishDrawing();
+        RenderUtils.renderWallsWithLines(pos1, pos2, cameraPos, 16, 16, true, color, this.quadBuilder, this.lineBuilder);
 
-        renderQuads.uploadData(BUFFER_1);
-        renderLines.uploadData(BUFFER_2);
+        this.uploadBuffers();
     }
 
     @Override

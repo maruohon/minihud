@@ -1,10 +1,10 @@
 package minihud.renderer;
 
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
+import malilib.render.buffer.VertexBuilder;
 import malilib.util.MathUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
@@ -20,7 +20,7 @@ public class RenderUtils
             double lineIntervalV,
             boolean alignLinesToModulo,
             Color4f color,
-            BufferBuilder bufferQuads, BufferBuilder bufferLines)
+            VertexBuilder quadBuilder, VertexBuilder lineBuilder)
     {
         Entity entity = GameUtils.getCameraEntity();
         final int boxMinX = Math.min(posStart.getX(), posEnd.getX());
@@ -48,13 +48,13 @@ public class RenderUtils
             if (rangeMinZ <= boxMinZ && rangeMaxZ >= boxMinZ)
             {
                 minZ = maxZ = boxMinZ;
-                renderWallWithLines(minX, minY, minZ, maxX, maxY, maxZ, lineIntervalH, lineIntervalV, alignLinesToModulo, cameraPos, color, bufferQuads, bufferLines);
+                renderWallWithLines(minX, minY, minZ, maxX, maxY, maxZ, lineIntervalH, lineIntervalV, alignLinesToModulo, cameraPos, color, quadBuilder, lineBuilder);
             }
 
             if (rangeMinZ <= boxMaxZ && rangeMaxZ >= boxMaxZ)
             {
                 minZ = maxZ = boxMaxZ + 1;
-                renderWallWithLines(minX, minY, minZ, maxX, maxY, maxZ, lineIntervalH, lineIntervalV, alignLinesToModulo, cameraPos, color, bufferQuads, bufferLines);
+                renderWallWithLines(minX, minY, minZ, maxX, maxY, maxZ, lineIntervalH, lineIntervalV, alignLinesToModulo, cameraPos, color, quadBuilder, lineBuilder);
             }
         }
 
@@ -67,13 +67,13 @@ public class RenderUtils
             if (rangeMinX <= boxMinX && rangeMaxX >= boxMinX)
             {
                 minX = maxX = boxMinX;
-                renderWallWithLines(minX, minY, minZ, maxX, maxY, maxZ, lineIntervalH, lineIntervalV, alignLinesToModulo, cameraPos, color, bufferQuads, bufferLines);
+                renderWallWithLines(minX, minY, minZ, maxX, maxY, maxZ, lineIntervalH, lineIntervalV, alignLinesToModulo, cameraPos, color, quadBuilder, lineBuilder);
             }
 
             if (rangeMinX <= boxMaxX && rangeMaxX >= boxMaxX)
             {
                 minX = maxX = boxMaxX + 1;
-                renderWallWithLines(minX, minY, minZ, maxX, maxY, maxZ, lineIntervalH, lineIntervalV, alignLinesToModulo, cameraPos, color, bufferQuads, bufferLines);
+                renderWallWithLines(minX, minY, minZ, maxX, maxY, maxZ, lineIntervalH, lineIntervalV, alignLinesToModulo, cameraPos, color, quadBuilder, lineBuilder);
             }
         }
     }
@@ -85,16 +85,16 @@ public class RenderUtils
             boolean alignLinesToModulo,
             Vec3d cameraPos,
             Color4f color,
-            BufferBuilder bufferQuads, BufferBuilder bufferLines)
+            VertexBuilder quadBuilder, VertexBuilder lineBuilder)
     {
         double cx = cameraPos.x;
         double cy = cameraPos.y;
         double cz = cameraPos.z;
 
-        bufferQuads.pos(minX - cx, maxY - cy, minZ - cz).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        bufferQuads.pos(minX - cx, minY - cy, minZ - cz).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        bufferQuads.pos(maxX - cx, minY - cy, maxZ - cz).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        bufferQuads.pos(maxX - cx, maxY - cy, maxZ - cz).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        quadBuilder.posColor(minX - cx, maxY - cy, minZ - cz, color);
+        quadBuilder.posColor(minX - cx, minY - cy, minZ - cz, color);
+        quadBuilder.posColor(maxX - cx, minY - cy, maxZ - cz, color);
+        quadBuilder.posColor(maxX - cx, maxY - cy, maxZ - cz, color);
 
         if (lineIntervalV > 0.0)
         {
@@ -102,8 +102,8 @@ public class RenderUtils
 
             while (lineY <= maxY)
             {
-                bufferLines.pos(minX - cx, lineY - cy, minZ - cz).color(color.ri, color.gi, color.bi, 255).endVertex();
-                bufferLines.pos(maxX - cx, lineY - cy, maxZ - cz).color(color.ri, color.gi, color.bi, 255).endVertex();
+                lineBuilder.posColor(minX - cx, lineY - cy, minZ - cz, color.ri, color.gi, color.bi, 255);
+                lineBuilder.posColor(maxX - cx, lineY - cy, maxZ - cz, color.ri, color.gi, color.bi, 255);
                 lineY += lineIntervalV;
             }
         }
@@ -116,8 +116,8 @@ public class RenderUtils
 
                 while (lineZ <= maxZ)
                 {
-                    bufferLines.pos(minX - cx, minY - cy, lineZ - cz).color(color.ri, color.gi, color.bi, 255).endVertex();
-                    bufferLines.pos(minX - cx, maxY - cy, lineZ - cz).color(color.ri, color.gi, color.bi, 255).endVertex();
+                    lineBuilder.posColor(minX - cx, minY - cy, lineZ - cz, color.ri, color.gi, color.bi, 255);
+                    lineBuilder.posColor(minX - cx, maxY - cy, lineZ - cz, color.ri, color.gi, color.bi, 255);
                     lineZ += lineIntervalH;
                 }
             }
@@ -127,8 +127,8 @@ public class RenderUtils
 
                 while (lineX <= maxX)
                 {
-                    bufferLines.pos(lineX - cx, minY - cy, minZ - cz).color(color.ri, color.gi, color.bi, 255).endVertex();
-                    bufferLines.pos(lineX - cx, maxY - cy, minZ - cz).color(color.ri, color.gi, color.bi, 255).endVertex();
+                    lineBuilder.posColor(lineX - cx, minY - cy, minZ - cz, color.ri, color.gi, color.bi, 255);
+                    lineBuilder.posColor(lineX - cx, maxY - cy, minZ - cz, color.ri, color.gi, color.bi, 255);
                     lineX += lineIntervalH;
                 }
             }

@@ -4,13 +4,11 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 
-import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
@@ -80,23 +78,16 @@ public class OverlayRendererRandomTickableChunks extends MiniHudOverlayRenderer
                 Configs.Colors.RANDOM_TICKS_PLAYER_OVERLAY_COLOR.getColor() :
                 Configs.Colors.RANDOM_TICKS_FIXED_OVERLAY_COLOR.getColor();
 
-        BaseRenderObject renderQuads = this.renderObjects.get(0);
-        BaseRenderObject renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-
         LongOpenHashSet chunks = this.getRandomTickableChunks(this.pos);
+
+        this.startBuffers();
 
         for (long posLong : chunks)
         {
             this.renderChunkEdgesIfApplicable(posLong, cameraPos, chunks, color);
         }
 
-        BUFFER_1.finishDrawing();
-        BUFFER_2.finishDrawing();
-
-        renderQuads.uploadData(BUFFER_1);
-        renderLines.uploadData(BUFFER_2);
+        this.uploadBuffers();
     }
 
     protected LongOpenHashSet getRandomTickableChunks(Vec3d posCenter)
@@ -175,7 +166,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHudOverlayRenderer
                 return;
         }
 
-        RenderUtils.renderWallWithLines(minX, 0, minZ, maxX, 256, maxZ, 16, 16, true, cameraPos, color, BUFFER_1, BUFFER_2);
+        RenderUtils.renderWallWithLines(minX, 0, minZ, maxX, 256, maxZ, 16, 16, true, cameraPos, color, this.quadBuilder, this.lineBuilder);
     }
 
     @Override

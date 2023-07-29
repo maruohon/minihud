@@ -5,14 +5,12 @@ import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
-import malilib.render.overlay.BaseRenderObject;
 import malilib.util.StringUtils;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
@@ -48,9 +46,6 @@ public class ShapeCircle extends ShapeCircleBase
 
     protected void renderCircleShape(Vec3d cameraPos)
     {
-        BaseRenderObject renderQuads = this.renderObjects.get(0);
-        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-
         BlockPos posCenter = this.getCenterBlock();
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
         HashSet<BlockPos> circlePositions = new HashSet<>();
@@ -92,11 +87,9 @@ public class ShapeCircle extends ShapeCircleBase
             }
         }
 
+        this.startBuffers();
         this.renderPositions(circlePositions, sides, mainAxis, this.color, cameraPos);
-
-        BUFFER_1.finishDrawing();
-
-        renderQuads.uploadData(BUFFER_1);
+        this.uploadBuffers();
     }
 
     @Override

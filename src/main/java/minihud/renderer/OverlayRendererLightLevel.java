@@ -6,12 +6,10 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumSkyBlock;
@@ -22,9 +20,10 @@ import net.minecraft.world.chunk.Chunk;
 import malilib.config.option.ColorConfig;
 import malilib.config.option.Vec2dConfig;
 import malilib.render.RenderUtils;
-import malilib.render.overlay.BaseRenderObject;
+import malilib.render.buffer.VertexBuilder;
 import malilib.render.overlay.VboRenderObject;
 import malilib.util.data.Color4f;
+import malilib.util.data.Identifier;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import minihud.Reference;
@@ -35,10 +34,15 @@ import minihud.util.value.LightLevelNumberMode;
 
 public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
 {
-    private static final ResourceLocation NUMBER_TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/misc/light_level_numbers.png");
+    private static final Identifier NUMBER_TEXTURE = new Identifier(Reference.MOD_ID, "textures/misc/light_level_numbers.png");
 
     private final List<LightLevelInfo> lightInfoList = new ArrayList<>();
     private EnumFacing lastDirection = EnumFacing.NORTH;
+
+    public OverlayRendererLightLevel()
+    {
+        super(COLORED_TEXTURED_QUADS_BUILDER, COLORED_LINES_BUILDER);
+    }
 
     @Override
     public boolean shouldRender()
@@ -60,22 +64,15 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
     @Override
     public void update(Vec3d cameraPos, Entity entity)
     {
-        BlockPos pos = EntityWrap.getEntityBlockPos(entity);
-        BaseRenderObject renderQuads = this.renderObjects.get(0);
-        BaseRenderObject renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), renderQuads.getVertexFormat());
-        BUFFER_2.begin(renderLines.getGlMode(), renderLines.getVertexFormat());
+        this.startBuffers();
 
+        BlockPos pos = EntityWrap.getEntityBlockPos(entity);
         //long pre = System.nanoTime();
         this.updateLightLevels(GameUtils.getClientWorld(), pos);
         //System.out.printf("LL markers: %d, time: %.3f s\n", LIGHT_INFOS.size(), (double) (System.nanoTime() - pre) / 1000000000D);
-        this.renderLightLevels(cameraPos, BUFFER_1, BUFFER_2);
+        this.renderLightLevels(cameraPos);
 
-        BUFFER_1.finishDrawing();
-        BUFFER_2.finishDrawing();
-        renderQuads.uploadData(BUFFER_1);
-        renderLines.uploadData(BUFFER_2);
-
+        this.uploadBuffers();
         this.lastDirection = entity.getHorizontalFacing();
         this.needsUpdate = false;
     }
@@ -91,11 +88,11 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
     @Override
     public void allocateGlResources()
     {
-        this.allocateBuffer(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR, VboRenderObject::setupArrayPointersPosUvColor);
-        this.allocateBuffer(GL11.GL_LINES);
+        this.quadRenderer = this.allocateBuffer(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR, VboRenderObject::setupArrayPointersPosUvColor);
+        this.outlineRenderer = this.allocateBuffer(GL11.GL_LINES);
     }
 
-    private void renderLightLevels(Vec3d cameraPos, BufferBuilder bufferQuads, BufferBuilder bufferLines)
+    protected void renderLightLevels(Vec3d cameraPos)
     {
         final int count = this.lightInfoList.size();
         Entity entity = GameUtils.getCameraEntity();
@@ -114,7 +111,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
                                    Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_BLOCK,
                                    Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_LIT,
                                    Configs.Colors.LIGHT_LEVEL_NUMBER_BLOCK_DARK,
-                                   useColoredNumbers, lightThreshold, numberFacing, bufferQuads);
+                                   useColoredNumbers, lightThreshold, numberFacing);
             }
 
             if (numberMode == LightLevelNumberMode.SKY || numberMode == LightLevelNumberMode.BOTH)
@@ -123,23 +120,23 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
                                    Configs.Generic.LIGHT_LEVEL_NUMBER_OFFSET_SKY,
                                    Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_LIT,
                                    Configs.Colors.LIGHT_LEVEL_NUMBER_SKY_DARK,
-                                   useColoredNumbers, lightThreshold, numberFacing, bufferQuads);
+                                   useColoredNumbers, lightThreshold, numberFacing);
             }
 
             if (markerMode == LightLevelMarkerMode.SQUARE)
             {
-                this.renderMarkers(this::renderLightLevelSquare, cameraPos, lightThreshold, bufferLines);
+                this.renderMarkers(this::renderLightLevelSquare, cameraPos, lightThreshold);
             }
             else if (markerMode == LightLevelMarkerMode.CROSS)
             {
-                this.renderMarkers(this::renderLightLevelCross, cameraPos, lightThreshold, bufferLines);
+                this.renderMarkers(this::renderLightLevelCross, cameraPos, lightThreshold);
             }
         }
     }
 
-    private void renderNumbers(Vec3d cameraPos, LightLevelNumberMode mode, Vec2dConfig cfgOff,
-                               ColorConfig cfgColorLit, ColorConfig cfgColorDark, boolean useColoredNumbers,
-                               int lightThreshold, EnumFacing numberFacing, BufferBuilder buffer)
+    protected void renderNumbers(Vec3d cameraPos, LightLevelNumberMode mode, Vec2dConfig cfgOff,
+                                 ColorConfig cfgColorLit, ColorConfig cfgColorDark, boolean useColoredNumbers,
+                                 int lightThreshold, EnumFacing numberFacing)
     {
         double ox = cfgOff.getValue().x;
         double oz = cfgOff.getValue().y;
@@ -167,10 +164,11 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
             colorDark = Color4f.WHITE;
         }
 
-        this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y - offsetY, tmpZ + cameraPos.z, numberFacing, lightThreshold, mode, colorLit, colorDark, buffer);
+        this.renderLightLevelNumbers(tmpX + cameraPos.x, cameraPos.y - offsetY, tmpZ + cameraPos.z,
+                                     numberFacing, lightThreshold, mode, colorLit, colorDark);
     }
 
-    private void renderMarkers(IMarkerRenderer renderer, Vec3d cameraPos, int lightThreshold, BufferBuilder buffer)
+    protected void renderMarkers(IMarkerRenderer renderer, Vec3d cameraPos, int lightThreshold)
     {
         double markerSize = Configs.Generic.LIGHT_LEVEL_MARKER_SIZE.getDoubleValue();
         Color4f colorLit = Configs.Colors.LIGHT_LEVEL_MARKER_LIT.getColor();
@@ -180,6 +178,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
         double offsetZ = cameraPos.z;
         double offset1 = (1.0 - markerSize) / 2.0;
         double offset2 = (1.0 - offset1);
+        VertexBuilder lineBuilder = this.lineBuilder;
 
         for (LightLevelInfo info : this.lightInfoList)
         {
@@ -187,14 +186,15 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
             {
                 BlockPos pos = info.pos;
                 Color4f color = info.sky >= lightThreshold ? colorLit : colorDark;
-                renderer.render(pos.getX() - offsetX, pos.getY() - offsetY, pos.getZ() - offsetZ, color, offset1, offset2, buffer);
+                renderer.render(pos.getX() - offsetX, pos.getY() - offsetY, pos.getZ() - offsetZ,
+                                color, offset1, offset2, lineBuilder);
             }
         }
     }
 
-    private void renderLightLevelNumbers(double dx, double dy, double dz, EnumFacing facing,
-                                         int lightThreshold, LightLevelNumberMode numberMode,
-                                         Color4f colorLit, Color4f colorDark, BufferBuilder buffer)
+    protected void renderLightLevelNumbers(double dx, double dy, double dz, EnumFacing facing,
+                                           int lightThreshold, LightLevelNumberMode numberMode,
+                                           Color4f colorLit, Color4f colorDark)
     {
         for (LightLevelInfo info : this.lightInfoList)
         {
@@ -205,11 +205,12 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
             double y = pos.getY() - dy;
             double z = pos.getZ() - dz;
 
-            this.renderLightLevelTextureColor(x, y, z, facing, lightLevel, color, buffer);
+            this.renderLightLevelTextureColor(x, y, z, facing, lightLevel, color, this.quadBuilder);
         }
     }
 
-    private void renderLightLevelTextureColor(double x, double y, double z, EnumFacing facing, int lightLevel, Color4f color, BufferBuilder buffer)
+    protected void renderLightLevelTextureColor(double x, double y, double z, EnumFacing facing,
+                                                int lightLevel, Color4f color, VertexBuilder builder)
     {
         float w = 0.25f;
         float u = (lightLevel & 0x3) * w;
@@ -218,59 +219,61 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
         switch (facing)
         {
             case NORTH:
-                buffer.pos(x    , y, z    ).tex(u    , v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x    , y, z + 1).tex(u    , v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x + 1, y, z + 1).tex(u + w, v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x + 1, y, z    ).tex(u + w, v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                builder.posUvColor(x    , y, z    , u    , v    , color);
+                builder.posUvColor(x    , y, z + 1, u    , v + w, color);
+                builder.posUvColor(x + 1, y, z + 1, u + w, v + w, color);
+                builder.posUvColor(x + 1, y, z    , u + w, v    , color);
                 break;
 
             case SOUTH:
-                buffer.pos(x + 1, y, z + 1).tex(u    , v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x + 1, y, z    ).tex(u    , v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x    , y, z    ).tex(u + w, v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x    , y, z + 1).tex(u + w, v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                builder.posUvColor(x + 1, y, z + 1, u    , v    , color);
+                builder.posUvColor(x + 1, y, z    , u    , v + w, color);
+                builder.posUvColor(x    , y, z    , u + w, v + w, color);
+                builder.posUvColor(x    , y, z + 1, u + w, v    , color);
                 break;
 
             case EAST:
-                buffer.pos(x + 1, y, z    ).tex(u    , v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x    , y, z    ).tex(u    , v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x    , y, z + 1).tex(u + w, v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x + 1, y, z + 1).tex(u + w, v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                builder.posUvColor(x + 1, y, z    , u    , v    , color);
+                builder.posUvColor(x    , y, z    , u    , v + w, color);
+                builder.posUvColor(x    , y, z + 1, u + w, v + w, color);
+                builder.posUvColor(x + 1, y, z + 1, u + w, v    , color);
                 break;
 
             case WEST:
-                buffer.pos(x    , y, z + 1).tex(u    , v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x + 1, y, z + 1).tex(u    , v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x + 1, y, z    ).tex(u + w, v + w).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-                buffer.pos(x    , y, z    ).tex(u + w, v    ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+                builder.posUvColor(x    , y, z + 1, u    , v    , color);
+                builder.posUvColor(x + 1, y, z + 1, u    , v + w, color);
+                builder.posUvColor(x + 1, y, z    , u + w, v + w, color);
+                builder.posUvColor(x    , y, z    , u + w, v    , color);
                 break;
 
             default:
         }
     }
 
-    private void renderLightLevelCross(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
+    protected void renderLightLevelCross(double x, double y, double z, Color4f color,
+                                         double offset1, double offset2, VertexBuilder builder)
     {
-        buffer.pos(x + offset1, y, z + offset1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(x + offset2, y, z + offset2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(x + offset1, y, z + offset1, color);
+        builder.posColor(x + offset2, y, z + offset2, color);
 
-        buffer.pos(x + offset1, y, z + offset2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(x + offset2, y, z + offset1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(x + offset1, y, z + offset2, color);
+        builder.posColor(x + offset2, y, z + offset1, color);
     }
 
-    private void renderLightLevelSquare(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer)
+    private void renderLightLevelSquare(double x, double y, double z, Color4f color,
+                                        double offset1, double offset2, VertexBuilder builder)
     {
-        buffer.pos(x + offset1, y, z + offset1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(x + offset1, y, z + offset2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(x + offset1, y, z + offset1, color);
+        builder.posColor(x + offset1, y, z + offset2, color);
 
-        buffer.pos(x + offset1, y, z + offset2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(x + offset2, y, z + offset2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(x + offset1, y, z + offset2, color);
+        builder.posColor(x + offset2, y, z + offset2, color);
 
-        buffer.pos(x + offset2, y, z + offset2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(x + offset2, y, z + offset1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(x + offset2, y, z + offset2, color);
+        builder.posColor(x + offset2, y, z + offset1, color);
 
-        buffer.pos(x + offset2, y, z + offset1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(x + offset1, y, z + offset1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(x + offset2, y, z + offset1, color);
+        builder.posColor(x + offset1, y, z + offset1, color);
     }
 
     private void updateLightLevels(World world, BlockPos center)
@@ -375,6 +378,6 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
 
     private interface IMarkerRenderer
     {
-        void render(double x, double y, double z, Color4f color, double offset1, double offset2, BufferBuilder buffer);
+        void render(double x, double y, double z, Color4f color, double offset1, double offset2, VertexBuilder builder);
     }
 }

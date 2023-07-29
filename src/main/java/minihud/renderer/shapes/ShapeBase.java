@@ -5,7 +5,6 @@ import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 
 import malilib.config.value.BaseOptionListConfigValue;
@@ -13,7 +12,6 @@ import malilib.listener.LayerRangeChangeListener;
 import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
-import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.LayerRange;
 import minihud.config.RendererToggle;
 import minihud.renderer.MiniHudOverlayRenderer;
@@ -21,7 +19,6 @@ import minihud.util.value.ShapeRenderType;
 
 public abstract class ShapeBase extends MiniHudOverlayRenderer implements LayerRangeChangeListener
 {
-    protected final Minecraft mc = GameUtils.getClient();
     protected final ShapeType type;
     protected final LayerRange layerRange;
     protected String displayName;

@@ -3,10 +3,7 @@ package minihud.renderer;
 import java.util.Collections;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -17,9 +14,12 @@ import malilib.render.RenderContext;
 import malilib.render.RenderUtils;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.TextRenderUtils;
+import malilib.render.buffer.VanillaWrappingVertexBuilder;
+import malilib.render.buffer.VertexBuilder;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.inventory.InventoryUtils;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 import minihud.util.MiscUtils;
@@ -144,7 +144,7 @@ public class OverlayRenderer
         double y = Math.floor(EntityWrap.getY(player)) - dy;
         double z = Math.floor(EntityWrap.getZ(player)) - dz;
         // Use the slot number as the level if sneaking
-        int level = player.isSneaking() ? Math.min(4, player.inventory.currentItem + 1) : 4;
+        int level = player.isSneaking() ? Math.min(4, InventoryUtils.getSelectedHotbarSlot() + 1) : 4;
         double range = level * 10 + 10;
         double minX = x - range;
         double minY = y - range;
@@ -154,7 +154,6 @@ public class OverlayRenderer
         double maxZ = z + range + 1;
         Color4f color = OverlayRendererBeaconRange.getColorForLevel(level);
 
-        GlStateManager.disableTexture2D();
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
         GlStateManager.disableCull();
@@ -164,26 +163,18 @@ public class OverlayRenderer
         GlStateManager.doPolygonOffset(-3f, -3f);
         GlStateManager.enablePolygonOffset();
         GlStateManager.glLineWidth(1f);
-        RenderUtils.setupBlend();
         RenderUtils.color(1f, 1f, 1f, 1f);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        VertexBuilder quadBuilder = VanillaWrappingVertexBuilder.coloredQuads();
+        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(0.3f), quadBuilder);
+        quadBuilder.draw();
 
-        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(0.3f), buffer);
-
-        tessellator.draw();
-        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-
-        ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), buffer);
-
-        tessellator.draw();
+        VertexBuilder lineBuilder = VanillaWrappingVertexBuilder.coloredLines();
+        ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), lineBuilder);
+        lineBuilder.draw();
 
         GlStateManager.doPolygonOffset(0f, 0f);
         GlStateManager.disablePolygonOffset();
         GlStateManager.enableCull();
-        GlStateManager.enableTexture2D();
-        GlStateManager.disableBlend();
     }
 }

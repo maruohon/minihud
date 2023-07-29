@@ -4,13 +4,11 @@ import java.util.Collection;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 import malilib.render.ShapeRenderUtils;
-import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
@@ -44,21 +42,12 @@ public class OverlayRendererStructures extends MiniHudOverlayRenderer
     @Override
     public void update(Vec3d cameraPos, Entity entity)
     {
-        BaseRenderObject renderQuads = this.renderObjects.get(0);
-        BaseRenderObject renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-
+        this.startBuffers();
         this.updateStructures(this.lastUpdatePos, cameraPos);
-
-        BUFFER_1.finishDrawing();
-        BUFFER_2.finishDrawing();
-
-        renderQuads.uploadData(BUFFER_1);
-        renderLines.uploadData(BUFFER_2);
+        this.uploadBuffers();
     }
 
-    private void updateStructures(BlockPos playerPos, Vec3d cameraPos)
+    protected void updateStructures(BlockPos playerPos, Vec3d cameraPos)
     {
         ArrayListMultimap<StructureType, StructureData> structures = StructureStorage.INSTANCE.getStructureDataAndClearDirtyFlag();
         int maxRange = (GameUtils.getRenderDistanceChunks() + 2) * 16;
@@ -77,7 +66,8 @@ public class OverlayRendererStructures extends MiniHudOverlayRenderer
         }
     }
 
-    private void renderStructuresWithinRange(StructureType type, Collection<StructureData> structureData, BlockPos playerPos, int maxRange, Vec3d cameraPos)
+    protected void renderStructuresWithinRange(StructureType type, Collection<StructureData> structureData,
+                                               BlockPos playerPos, int maxRange, Vec3d cameraPos)
     {
         for (StructureData structure : structureData)
         {
@@ -88,12 +78,12 @@ public class OverlayRendererStructures extends MiniHudOverlayRenderer
         }
     }
 
-    private void renderStructure(StructureType type, StructureData structure, Vec3d cameraPos)
+    protected void renderStructure(StructureType type, StructureData structure, Vec3d cameraPos)
     {
         Color4f color = type.getToggle().getColorMain().getColor();
         ImmutableList<IntBoundingBox> components = structure.getComponents();
 
-        ShapeRenderUtils.renderBoxSidesAndEdges(structure.getEnclosingBox(), color, BUFFER_1, BUFFER_2, cameraPos);
+        ShapeRenderUtils.renderBoxSidesAndEdges(structure.getEnclosingBox(), color, cameraPos, this.quadBuilder, this.lineBuilder);
         int size = components.size();
 
         // Don't render the component box if there is only one component
@@ -105,7 +95,7 @@ public class OverlayRendererStructures extends MiniHudOverlayRenderer
 
             for (IntBoundingBox bb : components)
             {
-                ShapeRenderUtils.renderBoxSidesAndEdges(bb, color, BUFFER_1, BUFFER_2, cameraPos);
+                ShapeRenderUtils.renderBoxSidesAndEdges(bb, color, cameraPos, this.quadBuilder, this.lineBuilder);
             }
         }
     }

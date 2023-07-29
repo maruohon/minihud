@@ -2,13 +2,11 @@ package minihud.renderer.shapes;
 
 import java.util.HashSet;
 
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
-import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import minihud.config.Configs;
@@ -34,12 +32,11 @@ public class ShapeSphereBlocky extends ShapeCircleBase
 
     protected void renderSphereShape(Vec3d cameraPos)
     {
-        BaseRenderObject renderQuads = this.renderObjects.get(0);
-        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-
         BlockPos posCenter = this.getCenterBlock();
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
         HashSet<BlockPos> spherePositions = new HashSet<>();
+
+        this.startBuffers();
 
         //long before = System.nanoTime();
         posMutable.setPos(posCenter);
@@ -74,8 +71,6 @@ public class ShapeSphereBlocky extends ShapeCircleBase
         this.renderPositions(spherePositions, sides, this.mainAxis, this.color, cameraPos);
         //System.out.printf("rendered: %d\n", r);
 
-        BUFFER_1.finishDrawing();
-
-        renderQuads.uploadData(BUFFER_1);
+        this.uploadBuffers();
     }
 }

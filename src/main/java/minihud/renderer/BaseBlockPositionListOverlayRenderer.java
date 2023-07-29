@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -16,7 +14,6 @@ import net.minecraft.util.math.Vec3d;
 import malilib.render.RenderContext;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.TextRenderUtils;
-import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import minihud.data.OrderedBlockPosLong;
@@ -57,29 +54,14 @@ public abstract class BaseBlockPositionListOverlayRenderer extends MiniHudOverla
     @Override
     public void update(Vec3d cameraPos, Entity entity)
     {
-        BaseRenderObject renderQuads = this.renderObjects.get(0);
-        BaseRenderObject renderLines = this.renderObjects.get(1);
-        BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-        BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
+        this.startBuffers();
 
         this.renderPositionsWithinChunkRange(this.lastUpdatePos,
                                              this.overlayRenderChunkRange,
                                              this.textRenderChunkRange, cameraPos);
 
-        BUFFER_1.finishDrawing();
-        BUFFER_2.finishDrawing();
-
-        renderQuads.uploadData(BUFFER_1);
-        renderLines.uploadData(BUFFER_2);
-
+        this.uploadBuffers();
         this.wasDisabled = false;
-    }
-
-    @Override
-    public void allocateGlResources()
-    {
-        this.allocateBuffer(GL11.GL_QUADS);
-        this.allocateBuffer(GL11.GL_LINES);
     }
 
     protected void renderPositionsWithinChunkRange(BlockPos center, int chunkRange, int textRenderChunkRange, Vec3d cameraPos)
@@ -101,7 +83,7 @@ public abstract class BaseBlockPositionListOverlayRenderer extends MiniHudOverla
 
                 if (positions != null)
                 {
-                    this.renderPositions(positions, colorQuads, colorLines, cameraPos);
+                    this.renderPositions(positions, cameraPos, colorQuads, colorLines);
 
                     if (Math.abs(cx - centerChunkX) <= textRenderChunkRange &&
                         Math.abs(cz - centerChunkZ) <= textRenderChunkRange)
@@ -114,13 +96,14 @@ public abstract class BaseBlockPositionListOverlayRenderer extends MiniHudOverla
         }
     }
 
-    protected void renderPositions(List<OrderedBlockPosLong> positions, Color4f colorQuads, Color4f colorLines, Vec3d cameraPos)
+    protected void renderPositions(List<OrderedBlockPosLong> positions, Vec3d cameraPos,
+                                   Color4f colorQuads, Color4f colorLines)
     {
         for (OrderedBlockPosLong orderedPos : positions)
         {
             BlockPos pos = orderedPos.getPos();
-            ShapeRenderUtils.renderBlockPosSideQuads(pos, 0.001, colorQuads, BUFFER_1, cameraPos);
-            ShapeRenderUtils.renderBlockPosEdgeLines(pos, 0.001, colorLines, BUFFER_2, cameraPos);
+            ShapeRenderUtils.renderBlockPosSideQuads(pos, 0.001, colorQuads, cameraPos, this.quadBuilder);
+            ShapeRenderUtils.renderBlockPosEdgeLines(pos, 0.001, colorLines, cameraPos, this.lineBuilder);
         }
     }
 

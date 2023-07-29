@@ -33,7 +33,7 @@ public abstract class ShapeCircleBase extends ShapeBase
     protected EnumFacing mainAxis = EnumFacing.UP;
     protected double radius;
     protected double radiusSq;
-    protected double maxRadius = 256.0; // TODO use per-chunk VBOs or something to allow bigger shapes?
+    protected double maxRadius = 1024.0; // TODO use per-chunk VBOs or something to allow bigger shapes?
     protected Vec3d center = Vec3d.ZERO;
     protected Vec3d effectiveCenter = Vec3d.ZERO;
     protected Vec3d lastUpdatePos = Vec3d.ZERO;
@@ -142,7 +142,20 @@ public abstract class ShapeCircleBase extends ShapeBase
     @Override
     public void allocateGlResources()
     {
-        this.allocateBuffer(GL11.GL_QUADS);
+        this.quadRenderer = this.allocateBuffer(GL11.GL_QUADS);
+    }
+
+    @Override
+    protected void startBuffers()
+    {
+        this.quadBuilder.start();
+    }
+
+    @Override
+    protected void uploadBuffers()
+    {
+        this.quadRenderer.uploadData(this.quadBuilder);
+        this.needsUpdate = false;
     }
 
     @Override
@@ -150,15 +163,17 @@ public abstract class ShapeCircleBase extends ShapeBase
     {
         this.preRender();
 
-        this.renderObjects.get(0).draw();
+        this.quadRenderer.draw();
 
         // Render the lines as quads with glPolygonMode(GL_LINE)
         GlStateManager.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
         GlStateManager.disableBlend();
-        this.renderObjects.get(0).draw();
+        this.quadRenderer.draw();
 
         GlStateManager.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
         GlStateManager.enableBlend();
+
+        this.postRender();
     }
 
     @Override
@@ -256,7 +271,7 @@ public abstract class ShapeCircleBase extends ShapeBase
 
                         if (render)
                         {
-                            ShapeRenderUtils.renderBlockPosSideQuad(pos, side, 0, color, BUFFER_1, cameraPos);
+                            ShapeRenderUtils.renderBlockPosSideQuad(pos, side, 0, color, cameraPos, this.quadBuilder);
                         }
                     }
                 }

@@ -2,15 +2,12 @@ package minihud.renderer;
 
 import com.google.gson.JsonObject;
 
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import malilib.render.ShapeRenderUtils;
-import malilib.render.overlay.BaseRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
@@ -89,7 +86,7 @@ public class OverlayRendererSlimeChunks extends MiniHudOverlayRenderer
             final int centerZ = EntityWrap.getChunkZ(entity);
             final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
             final Color4f colorSides = colorLines.withAlpha(colorLines.a / 6);
-            int r = MathHelper.clamp(Configs.Generic.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue(), -1, 40);
+            int r = Configs.Generic.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue();
             BlockPos.MutableBlockPos pos1 = new BlockPos.MutableBlockPos();
             BlockPos.MutableBlockPos pos2 = new BlockPos.MutableBlockPos();
 
@@ -98,11 +95,9 @@ public class OverlayRendererSlimeChunks extends MiniHudOverlayRenderer
                 r = GameUtils.getRenderDistanceChunks();
             }
 
-            BaseRenderObject renderQuads = this.renderObjects.get(0);
-            BaseRenderObject renderLines = this.renderObjects.get(1);
-            BUFFER_1.begin(renderQuads.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
-            BUFFER_2.begin(renderLines.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
             int topY = (int) Math.floor(this.topY);
+
+            this.startBuffers();
 
             for (int xOff = -r; xOff <= r; xOff++)
             {
@@ -115,16 +110,13 @@ public class OverlayRendererSlimeChunks extends MiniHudOverlayRenderer
                     {
                         pos1.setPos( cx << 4,          0,  cz << 4);
                         pos2.setPos((cx << 4) + 15, topY, (cz << 4) + 15);
-                        ShapeRenderUtils.renderBoxSidesAndEdges(pos1, pos2, colorLines, colorSides, BUFFER_1, BUFFER_2, cameraPos);
+                        ShapeRenderUtils.renderBoxSidesAndEdges(pos1, pos2, colorLines, colorSides, cameraPos,
+                                                                this.quadBuilder, this.lineBuilder);
                     }
                 }
             }
 
-            BUFFER_1.finishDrawing();
-            BUFFER_2.finishDrawing();
-
-            renderQuads.uploadData(BUFFER_1);
-            renderLines.uploadData(BUFFER_2);
+            this.uploadBuffers();
         }
     }
 
