@@ -220,7 +220,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 if (render)
                 {
                     int dimensions = Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue();
-                    RenderUtils.renderMapPreview(stack, x, y, z, dimensions);
+                    RenderUtils.renderMapPreview(stack, x, y, z, dimensions, ctx);
                 }
             }
         }
