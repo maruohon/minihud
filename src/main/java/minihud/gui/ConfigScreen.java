@@ -85,7 +85,7 @@ public class ConfigScreen
                                                    "minihud.config.name.info_lines_hud_settings",
                                                    "minihud.config.comment.info_lines_hud_settings"));
         genericOptions.add(new ExpandableConfigGroup(MOD_INFO, "light_level", lightOptions));
-        ConfigUtils.sortConfigsByDisplayName(genericOptions);
+        ConfigUtils.sortConfigsInPlaceByDisplayName(genericOptions);
 
         return ImmutableList.copyOf(genericOptions);
     }
@@ -94,7 +94,7 @@ public class ConfigScreen
     {
         ArrayList<ConfigInfo> list = new ArrayList<>(Configs.Hotkeys.HOTKEYS);
 
-        ConfigUtils.sortConfigsByDisplayName(list);
+        ConfigUtils.sortConfigsInPlaceByDisplayName(list);
         list.add(0, Configs.Generic.INFO_LINES_RENDERING_TOGGLE);
         list.add(1, Configs.Generic.OVERLAYS_RENDERING_TOGGLE);
 
