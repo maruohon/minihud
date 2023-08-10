@@ -15,6 +15,7 @@ public class RenderObjectVbo extends RenderObjectBase
     protected final VertexBuffer vertexBuffer;
     protected final VertexFormat format;
     protected final boolean hasTexture;
+    protected boolean hasData;
 
     public RenderObjectVbo(VertexFormat.DrawMode glMode, VertexFormat format, Supplier<ShaderProgram> shader)
     {
@@ -41,20 +42,31 @@ public class RenderObjectVbo extends RenderObjectBase
     @Override
     public void uploadData(BufferBuilder buffer)
     {
+        this.hasData = ! buffer.isBatchEmpty();
         BufferBuilder.BuiltBuffer builtBuffer = buffer.end();
-        this.vertexBuffer.bind();
-        this.vertexBuffer.upload(builtBuffer);
-        VertexBuffer.unbind();
+
+        if (this.hasData)
+        {
+            this.vertexBuffer.bind();
+            this.vertexBuffer.upload(builtBuffer);
+            VertexBuffer.unbind();
+        }
+        else
+        {
+            builtBuffer.release();
+        }
     }
 
     @Override
     public void draw(MatrixStack matrixStack, Matrix4f projMatrix)
     {
-        RenderSystem.setShader(this.getShader());
-        this.vertexBuffer.bind();
-        this.vertexBuffer.draw(matrixStack.peek().getPositionMatrix(), projMatrix, this.getShader().get());
-
-        VertexBuffer.unbind();
+        if (this.hasData)
+        {
+            RenderSystem.setShader(this.getShader());
+            this.vertexBuffer.bind();
+            this.vertexBuffer.draw(matrixStack.peek().getPositionMatrix(), projMatrix, this.getShader().get());
+            VertexBuffer.unbind();
+        }
     }
 
     @Override
