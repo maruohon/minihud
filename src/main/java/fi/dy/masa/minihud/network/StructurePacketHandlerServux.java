@@ -40,7 +40,8 @@ public class StructurePacketHandlerServux implements IPluginChannelHandler
     {
         int id = buf.readVarInt();
 
-        MiniHUD.printDebug("StructurePacketHandlerServux#onPacketReceived(): " + id);
+        MiniHUD.printDebug("StructurePacketHandlerServux#onPacketReceived(): type: {} (old timeout: {}, old reg: {})",
+                           id, this.timeout, this.registered);
 
         if (id == PACKET_S2C_STRUCTURE_DATA && this.registered)
         {
@@ -49,6 +50,7 @@ public class StructurePacketHandlerServux implements IPluginChannelHandler
             if (tag != null)
             {
                 NbtList structures = tag.getList("Structures", Constants.NBT.TAG_COMPOUND);
+                MiniHUD.printDebug("StructurePacketHandlerServux#onPacketReceived(): structures; list size: {}", structures.size());
                 DataStorage.getInstance().addOrUpdateStructuresFromServer(structures, this.timeout, true);
             }
         }
@@ -63,6 +65,7 @@ public class StructurePacketHandlerServux implements IPluginChannelHandler
                 this.timeout = tag.getInt("timeout");
                 this.registered = true;
                 DataStorage.getInstance().setIsServuxServer();
+                MiniHUD.printDebug("StructurePacketHandlerServux#onPacketReceived(): register; timeout: {}", this.timeout);
             }
         }
     }
