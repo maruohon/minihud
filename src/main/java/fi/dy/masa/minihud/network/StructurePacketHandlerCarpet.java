@@ -1,19 +1,18 @@
 package fi.dy.masa.minihud.network;
 
-import java.util.List;
-import com.google.common.collect.ImmutableList;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import fi.dy.masa.malilib.network.IPluginChannelHandler;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.util.DataStorage;
 
-public class StructurePacketHandlerCarpet implements IPluginChannelHandler
-{
-    public static final List<Identifier> CHANNELS = ImmutableList.of(new Identifier("carpet:structures"));
+public class StructurePacketHandlerCarpet {
+    public static final Identifier CHANNEL = new Identifier("carpet:structures");
     public static final int PACKET_S2C_DATA = 0;
     public static final int VERSION = 1;
 
@@ -27,14 +26,7 @@ public class StructurePacketHandlerCarpet implements IPluginChannelHandler
         this.registered = false;
     }
 
-    @Override
-    public List<Identifier> getChannels()
-    {
-        return CHANNELS;
-    }
-
-    @Override
-    public void onPacketReceived(PacketByteBuf buf)
+    public void onPacketReceived(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender sender)
     {
         int id = buf.readVarInt();
 
