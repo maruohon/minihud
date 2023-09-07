@@ -7,13 +7,12 @@ import javax.annotation.Nullable;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
-import net.minecraft.class_8786;
 import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.AbstractCookingRecipe;
-import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -211,9 +210,9 @@ public class MiscUtils
 
         for (Object2IntMap.Entry<Identifier> entry : recipes.object2IntEntrySet())
         {
-            Optional<class_8786<?>> recipeOpt = world.getRecipeManager().get(entry.getKey());
+            Optional<RecipeEntry<?>> recipeOpt = world.getRecipeManager().get(entry.getKey());
 
-            if (recipeOpt.isPresent() && recipeOpt.get().comp_1933() instanceof AbstractCookingRecipe recipe)
+            if (recipeOpt.isPresent() && recipeOpt.get().value() instanceof AbstractCookingRecipe recipe)
             {
                 xp += entry.getIntValue() * recipe.getExperience();
             }
