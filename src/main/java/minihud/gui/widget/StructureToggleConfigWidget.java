@@ -43,7 +43,7 @@ public class StructureToggleConfigWidget extends BaseConfigWidget<StructureToggl
             this.updateWidgetState();
         });
 
-        this.hotkeyButton = new KeyBindConfigButton(120, 20, config.getKeyBind(), ctx.getKeybindEditingScreen());
+        this.hotkeyButton = new KeyBindConfigButton(120, 20, config.getKeyBind());
         this.hotkeyButton.setValueChangeListener(this::onKeybindModified);
 
         this.settingsWidget = new KeybindSettingsWidget(config.getKeyBind(), config.getDisplayName());
