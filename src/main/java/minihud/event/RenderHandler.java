@@ -518,8 +518,45 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 {
                     try
                     {
-                        str.append(String.format(Configs.Generic.COORDINATE_FORMAT_STRING.getValue(),
-                            x, bbY, z));
+                        // Follow a python like formatted string input, parse then make it java
+                        StringBuilder javaFormat = new StringBuilder(128);
+                        //                                      aka stuff between {}
+                        Matcher matcher = Pattern.compile("\\{([^\\}]+)\\}").matcher(line);
+
+                        int from = 0, to = 0;
+                        float[] vals = {x, bbY, z};
+
+                        for (int i = 0; i < 3; i++)
+                        {
+                            if (!matcher.find(from)) 
+                            {
+                                break;
+                            }
+                            
+                            to = matcher.start();
+                            // Add the content between the {x:%.2f}
+                            javaFormat.append(line.substring(from, to));
+
+                            String[] parts = matcher.group(1).split(":");
+                            String varname = parts[0], format = parts[1];
+
+                            if (varname.equals("x"))
+                            {
+                                vals[i] = x;
+                            }
+                            else if (varname.equals("y"))
+                            {
+                                vals[i] = bbY;
+                            } else if (varname.equals("z"))
+                            {
+                                vals[i] = z;
+                            }
+                            javaFormat.append(format);
+
+                            from = matcher.end();
+                        }
+
+                        str.append(String.format(javaFormat.toString(), vals[0], vals[1], vals[2]));
                     }
                     // Uh oh, someone done goofed their format string... :P
                     catch (Exception e)

@@ -39,7 +39,7 @@ public class Configs
         public static final IntegerConfig DROPPED_CHUNKS_HASH_SIZE              = new IntegerConfig("droppedChunksHashSize", -1, -1, Integer.MAX_VALUE);
         public static final IntegerConfig CHUNK_UNLOAD_BUCKET_OVERLAY_RADIUS    = new IntegerConfig("chunkUnloadBucketOverlayChunkRadius", -1, -1, 40);
         public static final BooleanConfig CHUNK_UNLOAD_BUCKET_HASH_SIZE         = new BooleanConfig("chunkUnloadBucketHashSize", true);
-        public static final StringConfig  COORDINATE_FORMAT_STRING              = new StringConfig( "coordinateFormat", "x: %.1f y: %.1f z: %.1f");
+        public static final StringConfig  COORDINATE_FORMAT_STRING              = new StringConfig( "coordinateFormat", "x: {x:%.1f} y: {y:%.1f} z: {z:%.1f}");
         public static final BooleanConfig COORDINATE_FORMAT_CUSTOMIZED          = new BooleanConfig("coordinateFormatCustomized", false);
         public static final BooleanConfig PATH_FINDING_DEBUG_POINT_WIDTH        = new BooleanConfig("pathFindingDebugPointWidth", true);
         public static final BooleanConfig FIX_VANILLA_DEBUG_RENDERERS           = new BooleanConfig("enableVanillaDebugRendererFix", true);
