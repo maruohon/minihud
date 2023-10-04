@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.AbstractCookingRecipe;
-import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -210,9 +210,9 @@ public class MiscUtils
 
         for (Object2IntMap.Entry<Identifier> entry : recipes.object2IntEntrySet())
         {
-            Optional<? extends Recipe<?>> recipeOpt = world.getRecipeManager().get(entry.getKey());
+            Optional<RecipeEntry<?>> recipeOpt = world.getRecipeManager().get(entry.getKey());
 
-            if (recipeOpt.isPresent() && recipeOpt.get() instanceof AbstractCookingRecipe recipe)
+            if (recipeOpt.isPresent() && recipeOpt.get().value() instanceof AbstractCookingRecipe recipe)
             {
                 xp += entry.getIntValue() * recipe.getExperience();
             }

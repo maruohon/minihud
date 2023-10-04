@@ -19,7 +19,7 @@ public abstract class MixinClientPlayNetworkHandler
     @Inject(method = "onChunkData", at = @At("RETURN"))
     private void markChunkChangedFullChunk(net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket packet, CallbackInfo ci)
     {
-        NotificationUtils.onChunkData(packet.getX(), packet.getZ(), packet.getChunkData());
+        NotificationUtils.onChunkData(packet.getChunkX(), packet.getChunkZ(), packet.getChunkData());
     }
 
     @Inject(method = "onChunkDeltaUpdate", at = @At("RETURN"))

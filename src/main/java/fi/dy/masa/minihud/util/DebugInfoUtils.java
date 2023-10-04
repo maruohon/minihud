@@ -2,6 +2,7 @@ package fi.dy.masa.minihud.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 import com.google.common.collect.MapMaker;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -19,7 +20,8 @@ import net.minecraft.entity.ai.pathing.PathNode;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.custom.DebugPathCustomPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -47,8 +49,8 @@ public class DebugInfoUtils
         buffer.writeFloat(maxDistance);
         writePathToBuffer(buffer, path);
 
-        CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(CustomPayloadS2CPacket.DEBUG_PATH, buffer);
-        server.getPlayerManager().sendToAll(packet);
+        DebugPathCustomPayload packet = new DebugPathCustomPayload(buffer);
+        server.getPlayerManager().sendToAll(new CustomPayloadS2CPacket(packet));
     }
 
     private static void writeBlockPosToBuffer(PacketByteBuf buf, BlockPos pos)
@@ -104,8 +106,8 @@ public class DebugInfoUtils
 
             writeBlockPosToBuffer(buf, target);
 
-            PathNode[] openSet = path.getDebugNodes();
-            PathNode[] closedSet = path.getDebugSecondNodes();
+            PathNode[] openSet = Objects.requireNonNull(path.getDebugNodeInfos()).openSet();
+            PathNode[] closedSet = path.getDebugNodeInfos().closedSet();
             int length = path.getLength();
 
             buf.writeInt(length);
@@ -185,7 +187,7 @@ public class DebugInfoUtils
                             {
                                 // Make a copy via a PacketBuffer... :/
                                 PacketByteBuf buf = DebugInfoUtils.writePathTobuffer(path);
-                                OLD_PATHS.put(entity, Path.fromBuffer(buf));
+                                OLD_PATHS.put(entity, Path.fromBuf(buf));
                             }
                             else
                             {

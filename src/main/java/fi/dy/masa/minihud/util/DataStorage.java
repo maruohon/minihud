@@ -11,7 +11,6 @@ import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
@@ -46,8 +45,6 @@ import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.MobCapDataHandler;
-import fi.dy.masa.minihud.network.StructurePacketHandlerCarpet;
-import fi.dy.masa.minihud.network.StructurePacketHandlerServux;
 import fi.dy.masa.minihud.renderer.OverlayRendererBeaconRange;
 import fi.dy.masa.minihud.renderer.OverlayRendererBiomeBorders;
 import fi.dy.masa.minihud.renderer.OverlayRendererConduitRange;
@@ -194,7 +191,7 @@ public class DataStorage
     {
         MiniHUD.printDebug("DataStorage#setIsServuxServer()");
         this.servuxServer = true;
-        ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
+        ClientPlayNetworking.unregisterGlobalReceiver(StructurePacketHandlerCarpet.CHANNEL);
     }
 
     public void onWorldJoin()
@@ -563,8 +560,8 @@ public class DataStorage
                     {
                         MiniHUD.printDebug("DataStorage#updateStructureData(): Unregister channels");
                         // (re-)register the structure packet handlers
-                        ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
-                        ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
+                        ClientPlayNetworking.unregisterGlobalReceiver(StructurePacketHandlerCarpet.CHANNEL);
+                        ClientPlayNetworking.unregisterGlobalReceiver(StructurePacketHandlerServux.CHANNEL);
 
                         this.registerStructureChannel();
                     }
@@ -578,13 +575,14 @@ public class DataStorage
     public void registerStructureChannel()
     {
         MiniHUD.printDebug("DataStorage#registerStructureChannel(): Servux");
-        ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
+        ClientPlayNetworking.registerGlobalReceiver(StructurePacketHandlerServux.CHANNEL, StructurePacketHandlerServux.INSTANCE::onPacketReceived);
 
         // Don't register the Carpet structure channel if the server is known to have the Servux mod
         if (this.servuxServer == false)
         {
             MiniHUD.printDebug("DataStorage#registerStructureChannel(): Carpet");
-            ClientPacketChannelHandler.getInstance().registerClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
+
+            ClientPlayNetworking.registerGlobalReceiver(StructurePacketHandlerCarpet.CHANNEL, StructurePacketHandlerCarpet.INSTANCE::onPacketReceived);
         }
     }
 

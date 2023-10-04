@@ -119,7 +119,7 @@ public class RenderHandler implements IRenderer
             return;
         }
 
-        if (this.mc.options.debugEnabled == false &&
+        if (this.mc.getDebugHud().shouldShowDebugHud() == false &&
             this.mc.player != null && this.mc.options.hudHidden == false &&
             (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || this.mc.player.isSneaking()) &&
             Configs.Generic.REQUIRED_KEY.getKeybind().isKeybindHeld())

@@ -1,26 +1,24 @@
 package fi.dy.masa.minihud.network;
 
-import java.util.List;
-import com.google.common.collect.ImmutableList;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import fi.dy.masa.malilib.network.IPluginChannelHandler;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.util.DataStorage;
 
-public class StructurePacketHandlerServux implements IPluginChannelHandler
-{
+public class StructurePacketHandlerServux {
+    public static final Identifier CHANNEL = new Identifier("servux:structures");
     public static final int PROTOCOL_VERSION = 1;
     public static final int PACKET_S2C_METADATA = 1;
     public static final int PACKET_S2C_STRUCTURE_DATA = 2;
 
     public static final StructurePacketHandlerServux INSTANCE = new StructurePacketHandlerServux();
 
-    private final Identifier channel = new Identifier("servux:structures");
-    private final List<Identifier> channels = ImmutableList.of(this.channel);
     private boolean registered;
     private int timeout;
 
@@ -29,14 +27,7 @@ public class StructurePacketHandlerServux implements IPluginChannelHandler
         this.registered = false;
     }
 
-    @Override
-    public List<Identifier> getChannels()
-    {
-        return this.channels;
-    }
-
-    @Override
-    public void onPacketReceived(PacketByteBuf buf)
+    public void onPacketReceived(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender sender)
     {
         int id = buf.readVarInt();
 
@@ -60,7 +51,7 @@ public class StructurePacketHandlerServux implements IPluginChannelHandler
 
             if (tag != null &&
                 tag.getInt("version") == PROTOCOL_VERSION &&
-                tag.getString("id").equals(this.channel.toString()))
+                tag.getString("id").equals(CHANNEL.toString()))
             {
                 this.timeout = tag.getInt("timeout");
                 this.registered = true;
