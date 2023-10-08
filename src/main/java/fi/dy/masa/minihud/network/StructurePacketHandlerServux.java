@@ -1,24 +1,24 @@
 package fi.dy.masa.minihud.network;
 
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
+
+import fi.dy.masa.malilib.network.IPluginChannelHandler;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.util.DataStorage;
 
-public class StructurePacketHandlerServux {
-    public static final Identifier CHANNEL = new Identifier("servux:structures");
+public class StructurePacketHandlerServux implements IPluginChannelHandler
+{
     public static final int PROTOCOL_VERSION = 1;
     public static final int PACKET_S2C_METADATA = 1;
     public static final int PACKET_S2C_STRUCTURE_DATA = 2;
 
     public static final StructurePacketHandlerServux INSTANCE = new StructurePacketHandlerServux();
 
+    private static final Identifier CHANNEL = new Identifier("servux:structures");
     private boolean registered;
     private int timeout;
 
@@ -27,7 +27,14 @@ public class StructurePacketHandlerServux {
         this.registered = false;
     }
 
-    public void onPacketReceived(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender sender)
+    @Override
+    public Identifier getChannel()
+    {
+        return CHANNEL;
+    }
+
+    @Override
+    public void onPacketReceived(PacketByteBuf buf)
     {
         int id = buf.readVarInt();
 

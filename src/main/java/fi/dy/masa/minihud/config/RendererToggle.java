@@ -4,8 +4,9 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+
 import net.minecraft.client.MinecraftClient;
+
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.IConfigNotifiable;
@@ -15,6 +16,7 @@ import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
+import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
@@ -96,8 +98,8 @@ public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfi
                         }
                         else
                         {
-                            ClientPlayNetworking.unregisterGlobalReceiver(StructurePacketHandlerCarpet.CHANNEL);
-                            ClientPlayNetworking.unregisterGlobalReceiver(StructurePacketHandlerServux.CHANNEL);
+                            ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
+                            ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
                         }
                     }
                     else
