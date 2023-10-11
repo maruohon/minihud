@@ -2,11 +2,11 @@ package fi.dy.masa.minihud.util;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Predicate;
 import com.google.common.collect.MapMaker;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.netty.buffer.Unpooled;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.debug.DebugRenderer;
@@ -16,7 +16,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
-import net.minecraft.entity.ai.pathing.PathNode;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
@@ -30,6 +29,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.minihud.config.Configs;
 import fi.dy.masa.minihud.config.RendererToggle;
@@ -44,94 +44,32 @@ public class DebugInfoUtils
 
     public static void sendPacketDebugPath(MinecraftServer server, int entityId, Path path, float maxDistance)
     {
-        PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
-        buffer.writeInt(entityId);
-        buffer.writeFloat(maxDistance);
-        writePathToBuffer(buffer, path);
-
-        DebugPathCustomPayload packet = new DebugPathCustomPayload(buffer);
+        DebugPathCustomPayload packet = new DebugPathCustomPayload(entityId, path, maxDistance);
         server.getPlayerManager().sendToAll(new CustomPayloadS2CPacket(packet));
     }
 
-    private static void writeBlockPosToBuffer(PacketByteBuf buf, BlockPos pos)
+    private static Path copyPath(Path path)
     {
-        buf.writeInt(pos.getX());
-        buf.writeInt(pos.getY());
-        buf.writeInt(pos.getZ());
-    }
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        //path.toBuf(buf); // This won't work because the DebugNodeInfo is not set
 
-    private static void writePathPointToBuffer(PacketByteBuf buf, PathNode node)
-    {
-        buf.writeInt(node.x);
-        buf.writeInt(node.y);
-        buf.writeInt(node.z);
+        buf.writeBoolean(path.reachesTarget());
+        buf.writeInt(path.getCurrentNodeIndex());
+        buf.writeBlockPos(path.getTarget());
 
-        buf.writeFloat(node.pathLength);
-        buf.writeFloat(node.penalty);
-        buf.writeBoolean(node.visited);
-        buf.writeInt(node.type.ordinal());
-        buf.writeFloat(node.heapWeight);
-    }
+        int size = path.getLength();
+        buf.writeVarInt(path.getLength());
 
-    public static PacketByteBuf writePathTobuffer(Path path)
-    {
-        PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
-        writePathToBuffer(buffer, path);
-        return buffer;
-    }
-
-    private static void writePathToBuffer(PacketByteBuf buf, Path path)
-    {
-        // This is the path node the navigation ends on
-        PathNode destination = path.getEnd();
-
-        // This is the actual block the path is targeting. Not all targets
-        // and paths will be the same. For example, a valid path (destination
-        // in this case) to the the "meeting" POI can be up to 6 Manhattan
-        // distance away from the target BlockPos; the actual POI.
-        BlockPos target = path.getTarget();
-
-        if (destination != null)
+        for (int i = 0; i < size; ++i)
         {
-            // Whether or not the destination is within the manhattan distance
-            // of the target POI (the last param to PointOfInterestType::register)
-            buf.writeBoolean(path.reachesTarget());
-            buf.writeInt(path.getCurrentNodeIndex());
-
-            // There is a hash set of class_4459 prefixed with its count here, which
-            // gets written to Path.field_20300, but field_20300 doesn't appear to be
-            // used anywhere, so for now we'll write a zero so the set is treated as
-            // empty.
-            buf.writeInt(0);
-
-            writeBlockPosToBuffer(buf, target);
-
-            PathNode[] openSet = Objects.requireNonNull(path.getDebugNodeInfos()).openSet();
-            PathNode[] closedSet = path.getDebugNodeInfos().closedSet();
-            int length = path.getLength();
-
-            buf.writeInt(length);
-
-            for (int i = 0; i < length; ++i)
-            {
-                PathNode point = path.getNode(i);
-                writePathPointToBuffer(buf, point);
-            }
-
-            buf.writeInt(openSet.length);
-
-            for (PathNode point : openSet)
-            {
-                writePathPointToBuffer(buf, point);
-            }
-
-            buf.writeInt(closedSet.length);
-
-            for (PathNode point : closedSet)
-            {
-                writePathPointToBuffer(buf, point);
-            }
+            path.getNode(i).write(buf);
         }
+
+        buf.writeVarInt(0); // number of nodes in DebugNodeInfo
+        buf.writeVarInt(0); // number of entries in openSet
+        buf.writeVarInt(0); // number of entries in closedSet
+
+        return Path.fromBuf(buf);
     }
 
     public static void onNeighborUpdate(World world, BlockPos pos)
@@ -167,13 +105,13 @@ public class DebugInfoUtils
                     if (navigator != null && isAnyPlayerWithinRange(world, entity, 64))
                     {
                         final Path path = navigator.getCurrentPath();
-                        Path old = OLD_PATHS.get(entity);
 
                         if (path == null)
                         {
                             continue;
                         }
 
+                        Path old = OLD_PATHS.get(entity);
                         boolean isSamepath = old != null && old.equalsPath(path);
 
                         if (old == null || isSamepath == false || old.getCurrentNodeIndex() != path.getCurrentNodeIndex())
@@ -185,9 +123,7 @@ public class DebugInfoUtils
 
                             if (isSamepath == false)
                             {
-                                // Make a copy via a PacketBuffer... :/
-                                PacketByteBuf buf = DebugInfoUtils.writePathTobuffer(path);
-                                OLD_PATHS.put(entity, Path.fromBuf(buf));
+                                OLD_PATHS.put(entity, copyPath(path));
                             }
                             else
                             {
