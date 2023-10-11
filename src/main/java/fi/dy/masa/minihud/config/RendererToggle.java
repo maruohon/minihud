@@ -5,24 +5,18 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.client.MinecraftClient;
-
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.IConfigNotifiable;
 import fi.dy.masa.malilib.config.IHotkeyTogglable;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
-import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
+import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
-import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.minihud.MiniHUD;
-import fi.dy.masa.minihud.hotkeys.KeyCallbackToggleRenderer;
-import fi.dy.masa.minihud.network.StructurePacketHandlerCarpet;
-import fi.dy.masa.minihud.network.StructurePacketHandlerServux;
-import fi.dy.masa.minihud.util.DataStorage;
 
 public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfigBoolean>
 {
@@ -73,42 +67,16 @@ public enum RendererToggle implements IHotkeyTogglable, IConfigNotifiable<IConfi
         this.defaultValueBoolean = false;
         this.keybind = KeybindMulti.fromStorageString(defaultHotkey, settings);
 
-        if (name.startsWith("debug"))
-        {
-            this.keybind.setCallback(new KeyCallbackToggleBooleanConfigWithMessage(this));
-        }
-        else
-        {
-            this.keybind.setCallback(new KeyCallbackToggleRenderer(this));
-        }
+        this.keybind.setCallback(this::toggleValueWithMessage);
+    }
 
-        if (name.equals("overlayStructureMainToggle"))
-        {
-            this.setValueChangeCallback((config) ->
-            {
-                MinecraftClient mc = MinecraftClient.getInstance();
-
-                if (mc != null && mc.player != null)
-                {
-                    if (mc.isIntegratedServerRunning() == false)
-                    {
-                        if (this.getBooleanValue())
-                        {
-                            DataStorage.getInstance().registerStructureChannel();
-                        }
-                        else
-                        {
-                            ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerCarpet.INSTANCE);
-                            ClientPacketChannelHandler.getInstance().unregisterClientChannelHandler(StructurePacketHandlerServux.INSTANCE);
-                        }
-                    }
-                    else
-                    {
-                        DataStorage.getInstance().setStructuresNeedUpdating();
-                    }
-                }
-            });
-        }
+    private boolean toggleValueWithMessage(KeyAction action, IKeybind key)
+    {
+        // Print the message before toggling the value, so that this message
+        // doesn't overwrite the possible value change callback message
+        InfoUtils.printBooleanConfigToggleMessage(this.getPrettyName(), ! this.valueBoolean);
+        this.setBooleanValue(! this.valueBoolean);
+        return true;
     }
 
     @Override
