@@ -155,7 +155,7 @@ public class MiscUtils
                 if (entityDataTag.contains("CustomName", Constants.NBT.TAG_STRING))
                 {
                     String beeName = entityDataTag.getString("CustomName");
-                    lines.add(Math.min(1, lines.size()), Text.translatable("minihud.label.bee_tooltip.name", Text.Serializer.fromJson(beeName).getString()));
+                    lines.add(Math.min(1, lines.size()), Text.translatable("minihud.label.bee_tooltip.name", Text.Serialization.fromJson(beeName).getString()));
                 }
 
                 if (entityDataTag.contains("Age", Constants.NBT.TAG_INT) &&

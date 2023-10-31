@@ -22,8 +22,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerTask;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureStart;
-import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.PlainTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting;
@@ -414,7 +414,7 @@ public class DataStorage
                     //int i2 = str.indexOf("]");
                     MutableText m = (MutableText) text.getArgs()[0];
                     TranslatableTextContent t = (TranslatableTextContent) m.getContent();
-                    LiteralTextContent l = (LiteralTextContent) ((MutableText) t.getArgs()[0]).getContent();
+                    PlainTextContent.Literal l = (PlainTextContent.Literal) ((MutableText) t.getArgs()[0]).getContent();
                     String str = l.string();
 
                     //if (i1 != -1 && i2 != -1)
@@ -497,7 +497,7 @@ public class DataStorage
     {
         if (this.mc != null && this.mc.player != null && this.mc.getServer() != null)
         {
-            this.serverMSPT = MiscUtils.longAverage(this.mc.getServer().lastTickLengths) / 1000000D;
+            this.serverMSPT = MiscUtils.longAverage(this.mc.getServer().getTickTimes()) / 1000000D;
             this.serverTPS = this.serverMSPT <= 50 ? 20D : (1000D / this.serverMSPT);
             this.serverTPSValid = true;
         }
