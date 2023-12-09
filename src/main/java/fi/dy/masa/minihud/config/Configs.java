@@ -79,6 +79,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed MAIN_RENDERING_TOGGLE             = new ConfigBooleanHotkeyed("mainRenderingToggle", true, "H", KeybindSettings.RELEASE_EXCLUSIVE, "The main rendering toggle for all MiniHUD rendering,\nincluding the info lines AND all the overlay renderers", "MiniHUD Main Rendering");
         public static final ConfigBoolean       MAP_PREVIEW                         = new ConfigBoolean("mapPreview", false, "Enables rendering a preview of the map,\nwhen you hold shift while hovering over a map item");
         public static final ConfigInteger       MAP_PREVIEW_SIZE                    = new ConfigInteger("mapPreviewSize", 160, 16, 512, "The size of the rendered map previews");
+        public static final ConfigHotkey        MOVE_SHAPE_TO_PLAYER                = new ConfigHotkey("moveShapeToPlayer", "", "Move the currently selected shape to the player's\n(or the camera's) current location");
         public static final ConfigBoolean       OFFSET_SUBTITLE_HUD                 = new ConfigBoolean("offsetSubtitleHud", true, "If the Info Lines HUD is set to the bottom right corner,\nand subtitles are enabled, then the subtitles will\nbe offset to appear above the Info Lines text.");
         public static final ConfigHotkey        OPEN_CONFIG_GUI                     = new ConfigHotkey("openConfigGui", "H,C", "A hotkey to open the in-game Config GUI");
         public static final ConfigBoolean       REQUIRE_SNEAK                       = new ConfigBoolean("requireSneak", false, "Require the player to be sneaking to render the info line HUD");
@@ -133,6 +134,7 @@ public class Configs implements IConfigHandler
                 USE_TEXT_BACKGROUND,
 
                 MAIN_RENDERING_TOGGLE,
+                MOVE_SHAPE_TO_PLAYER,
                 OPEN_CONFIG_GUI,
                 REQUIRED_KEY,
                 SET_DISTANCE_REFERENCE_POINT,
@@ -173,8 +175,9 @@ public class Configs implements IConfigHandler
 
         public static final List<IHotkey> HOTKEY_LIST = ImmutableList.of(
                 MAIN_RENDERING_TOGGLE,
-                REQUIRED_KEY,
+                MOVE_SHAPE_TO_PLAYER,
                 OPEN_CONFIG_GUI,
+                REQUIRED_KEY,
                 SET_DISTANCE_REFERENCE_POINT,
                 SHAPE_EDITOR
         );

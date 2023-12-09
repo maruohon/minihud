@@ -31,6 +31,7 @@ public class KeyCallbacks
         Callbacks callback = new Callbacks();
 
         Configs.Generic.SET_DISTANCE_REFERENCE_POINT.getKeybind().setCallback(callback);
+        Configs.Generic.MOVE_SHAPE_TO_PLAYER.getKeybind().setCallback(callback);
         Configs.Generic.OPEN_CONFIG_GUI.getKeybind().setCallback(callback);
         Configs.Generic.SHAPE_EDITOR.getKeybind().setCallback(callback);
 
@@ -85,6 +86,16 @@ public class KeyCallbacks
             if (key == Configs.Generic.OPEN_CONFIG_GUI.getKeybind())
             {
                 GuiBase.openGui(new GuiConfigs());
+            }
+            else if (key == Configs.Generic.MOVE_SHAPE_TO_PLAYER.getKeybind())
+            {
+                Entity entity = mc.getCameraEntity() != null ? mc.getCameraEntity() : mc.player;
+                ShapeBase shape = ShapeManager.INSTANCE.getSelectedShape();
+
+                if (shape != null)
+                {
+                    shape.moveToPosition(entity.getPos());
+                }
             }
             else if (key == Configs.Generic.SET_DISTANCE_REFERENCE_POINT.getKeybind())
             {
