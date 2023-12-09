@@ -58,6 +58,7 @@ import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
+import fi.dy.masa.minihud.config.Configs.Generic;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.MobCapDataHandler;
@@ -536,7 +537,17 @@ public class RenderHandler implements IRenderer
 
             if (InfoToggle.BLOCK_POS.getBooleanValue())
             {
-                str.append(String.format("Block: %d, %d, %d", pos.getX(), pos.getY(), pos.getZ()));
+                try
+                {
+                    String fmt = Configs.Generic.BLOCK_POS_FORMAT_STRING.getStringValue();
+                    str.append(String.format(fmt, pos.getX(), pos.getY(), pos.getZ()));
+                }
+                // Uh oh, someone done goofed their format string... :P
+                catch (Exception e)
+                {
+                    str.append("broken format string in 'blockPosFormat'");
+                }
+
                 pre = " / ";
             }
 

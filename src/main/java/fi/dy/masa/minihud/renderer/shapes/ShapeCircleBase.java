@@ -10,13 +10,16 @@ import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.BlockSnap;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public abstract class ShapeCircleBase extends ShapeBlocky
 {
+    private static final double DEFAULT_MAX_RADIUS = 1024.0;
+
     protected Direction mainAxis = Direction.UP;
-    private final double maxRadius = 1024;
+    private double maxRadius = DEFAULT_MAX_RADIUS;
     private double radius;
     private double radiusSq;
     private Vec3d center = Vec3d.ZERO;
@@ -56,6 +59,14 @@ public abstract class ShapeCircleBase extends ShapeBlocky
     {
         this.center = center;
         this.updateEffectiveCenter();
+    }
+
+    @Override
+    public void moveToPosition(Vec3d pos)
+    {
+        this.setCenter(pos);
+        InfoUtils.printActionbarMessage(String.format("Moved shape to %.1f %.1f %.1f",
+                                                      pos.getX(), pos.getY(), pos.getZ()));
     }
 
     public double getRadius()
@@ -118,6 +129,11 @@ public abstract class ShapeCircleBase extends ShapeBlocky
         obj.add("main_axis", new JsonPrimitive(this.mainAxis.name()));
         obj.add("radius", new JsonPrimitive(this.getRadius()));
 
+        if (this.maxRadius != DEFAULT_MAX_RADIUS)
+        {
+            obj.add("max_radius", new JsonPrimitive(this.maxRadius));
+        }
+
         return obj;
     }
 
@@ -134,6 +150,16 @@ public abstract class ShapeCircleBase extends ShapeBlocky
             if (facing != null)
             {
                 this.setMainAxis(facing);
+            }
+        }
+
+        if (JsonUtils.hasDouble(obj, "max_radius"))
+        {
+            double maxRadius = JsonUtils.getDouble(obj, "max_radius");
+
+            if (maxRadius > 0 && maxRadius < 1000000)
+            {
+                this.maxRadius = maxRadius;
             }
         }
 

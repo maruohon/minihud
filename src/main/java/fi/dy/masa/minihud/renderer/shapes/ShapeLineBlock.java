@@ -14,6 +14,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.util.BlockSnap;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerRange;
@@ -59,6 +60,17 @@ public class ShapeLineBlock extends ShapeBlocky
     {
         this.endPos = endPos;
         this.updateEffectivePositions();
+    }
+
+    @Override
+    public void moveToPosition(Vec3d pos)
+    {
+        Vec3d diff = this.endPos.subtract(this.startPos);
+        this.startPos = pos;
+        this.endPos = pos.add(diff);
+        this.updateEffectivePositions();
+        InfoUtils.printActionbarMessage(String.format("Moved shape to %.1f %.1f %.1f",
+                                                      pos.getX(), pos.getY(), pos.getZ()));
     }
 
     @Override
@@ -141,10 +153,9 @@ public class ShapeLineBlock extends ShapeBlocky
 
     protected void renderLineShape(Vec3d cameraPos)
     {
-        final double distance = this.effectiveEndPos.distanceTo(this.effectiveStartPos);
-        final double maxDist = 10000;
+        final double maxDist = 30000;
 
-        if (distance > maxDist)
+        if (this.effectiveEndPos.distanceTo(this.effectiveStartPos) > maxDist)
         {
             return;
         }

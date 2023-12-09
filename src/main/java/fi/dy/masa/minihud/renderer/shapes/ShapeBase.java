@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Vec3d;
+
 import fi.dy.masa.malilib.interfaces.IRangeChangeListener;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -108,6 +111,10 @@ public abstract class ShapeBase extends OverlayRendererBase implements IRangeCha
     public void setNeedsUpdate()
     {
         this.needsUpdate = true;
+    }
+
+    public void moveToPosition(Vec3d pos)
+    {
     }
 
     @Override
