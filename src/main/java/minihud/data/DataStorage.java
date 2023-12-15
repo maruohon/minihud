@@ -173,8 +173,9 @@ public class DataStorage
     {
         if (GameUtils.getClientWorld() != null)
         {
-            int tick = (int) (GameUtils.getCurrentWorldTick() % this.blockBreakCounter.length);
-            this.blockBreakCounter[tick] = 0;
+            int worldTick = (int) (GameUtils.getCurrentWorldTick() & 0x7FFFFFFFL);
+            int index = worldTick % this.blockBreakCounter.length;
+            this.blockBreakCounter[index] = 0;
         }
     }
 
@@ -182,8 +183,9 @@ public class DataStorage
     {
         if (GameUtils.getClientWorld() != null)
         {
-            int tick = (int) (GameUtils.getCurrentWorldTick() % this.blockBreakCounter.length);
-            ++this.blockBreakCounter[tick];
+            int worldTick = (int) (GameUtils.getCurrentWorldTick() & 0x7FFFFFFFL);
+            int index = worldTick % this.blockBreakCounter.length;
+            ++this.blockBreakCounter[index];
         }
     }
 
