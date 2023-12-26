@@ -65,11 +65,11 @@ public class WorldGenPositions
 
     public Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> getSpawnerPositions()
     {
-        Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> map = new Long2ObjectOpenHashMap<>();
+        Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> map;
 
         synchronized (this.worldProperties.spawnerPositions)
         {
-            map.putAll(this.worldProperties.spawnerPositions);
+            map = this.copyMap(this.worldProperties.spawnerPositions);
             this.spawnerPositionsDirty = false;
         }
 
@@ -78,14 +78,26 @@ public class WorldGenPositions
 
     public Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> getWaterFallPositions()
     {
-        Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> map = new Long2ObjectOpenHashMap<>();
+        Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> map;
 
         synchronized (this.worldProperties.waterFallPositions)
         {
-            map.putAll(this.worldProperties.waterFallPositions);
+            map = this.copyMap(this.worldProperties.waterFallPositions);
             this.waterFallPositionsDirty = false;
         }
 
         return map;
+    }
+
+    protected Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> copyMap(Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> mapIn)
+    {
+        Long2ObjectOpenHashMap<ArrayList<OrderedBlockPosLong>> newMap = new Long2ObjectOpenHashMap<>();
+
+        for (long key : mapIn.keySet())
+        {
+            newMap.put(key, new ArrayList<>(mapIn.get(key)));
+        }
+
+        return newMap;
     }
 }
