@@ -2,8 +2,7 @@
 	"required": true,
 	"package": "minihud.mixin",
 	"compatibilityLevel": "JAVA_8",
-	"refmap": "mixins.minihud.refmap.json",
-	"minVersion": "0.7",
+	"minVersion": "0.8",
 	"client": [
 		"debugrenderer.DebugRendererMixin",
 		"debugrenderer.MinecraftServerMixin",

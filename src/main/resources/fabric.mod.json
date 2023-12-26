@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "minihud",
+	"name": "MiniHUD",
+	"version": "${mod_version}",
+
+	"description": "Configurable \"mini-F3\" info lines, and various overlay renderers",
+	"license": "LGPLv3",
+	"authors": [ "masa" ],
+	"contact": {
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/minihud",
+		"issues": "https://github.com/maruohon/minihud/issues",
+		"sources": "https://github.com/maruohon/minihud",
+		"discord": "https://discordapp.com/channels/169369095538606080/897532889741275176"
+	},
+
+	"icon": "assets/minihud/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client-init": [
+			"minihud.MiniHud"
+		],
+		"modmenu": [
+			"minihud.compat.modmenu.ModMenuImpl"
+		]
+	},
+
+	"mixins": [
+		{
+			"config": "mixins.minihud.json",
+			"environment": "client"
+		}
+	],
+
+	"depends": {
+		"minecraft": "1.12.x",
+		"malilib": ">=0.55.0",
+		"osl-entrypoints": "*",
+		"osl-resource-loader": "*"
+	}
+}
