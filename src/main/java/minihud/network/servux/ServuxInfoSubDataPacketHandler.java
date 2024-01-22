@@ -15,13 +15,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 
 import malilib.network.ClientPacketChannelHandler;
 import malilib.network.PacketUtils;
 import malilib.network.message.BasePacketHandler;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.registry.Registry;
+import malilib.util.MathUtils;
 import malilib.util.data.Constants;
 import malilib.util.data.palette.HashMapPalette;
 import malilib.util.data.palette.Palette;
@@ -145,7 +145,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
 
     protected void createPaletteForSize(int minSize)
     {
-        int bits = MathHelper.log2DeBruijn(minSize);
+        int bits = MathUtils.log2DeBruijn(minSize);
         this.channelIdPalette = new HashMapPalette<>(bits, this::resizePalette);
     }
 

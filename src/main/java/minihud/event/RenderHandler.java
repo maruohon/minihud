@@ -24,7 +24,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DifficultyInstance;
@@ -46,6 +45,7 @@ import malilib.registry.Registry;
 import malilib.render.RenderContext;
 import malilib.render.RenderUtils;
 import malilib.render.inventory.InventoryRenderUtils;
+import malilib.util.MathUtils;
 import malilib.util.StringUtils;
 import malilib.util.game.BlockUtils;
 import malilib.util.game.WorldUtils;
@@ -597,7 +597,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         else if (type == InfoLineToggle.DISTANCE)
         {
             Vec3d ref = DataStorage.getInstance().getDistanceReferencePoint();
-            double dist = MathHelper.sqrt(ref.squareDistanceTo(x, y, z));
+            double dist = Math.sqrt(ref.squareDistanceTo(x, y, z));
             this.addLine(String.format("Distance: %.2f (x: %.2f y: %.2f z: %.2f) [to x: %.2f y: %.2f z: %.2f]",
                     dist, x - ref.x, y - ref.y, z - ref.z, ref.x, ref.y, ref.z));
         }
@@ -650,13 +650,13 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             if (InfoLineToggle.PLAYER_YAW_ROTATION.getBooleanValue())
             {
-                str.append(String.format("yaw: %.1f", MathHelper.wrapDegrees(EntityWrap.getYaw(entity))));
+                str.append(String.format("yaw: %.1f", MathUtils.wrapDegrees(EntityWrap.getYaw(entity))));
                 pre = " / ";
             }
 
             if (InfoLineToggle.PLAYER_PITCH_ROTATION.getBooleanValue())
             {
-                str.append(pre).append(String.format("pitch: %.1f", MathHelper.wrapDegrees(EntityWrap.getPitch(entity))));
+                str.append(pre).append(String.format("pitch: %.1f", MathUtils.wrapDegrees(EntityWrap.getPitch(entity))));
                 pre = " / ";
             }
 

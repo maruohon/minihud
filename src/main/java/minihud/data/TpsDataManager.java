@@ -5,10 +5,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 
+import malilib.util.MathUtils;
 import malilib.util.StringUtils;
 import malilib.util.game.wrap.GameUtils;
 
@@ -102,7 +102,7 @@ public class TpsDataManager
 
         if (server != null && GameUtils.getClientWorld() != null)
         {
-            double mspt = MathHelper.average(server.tickTimeArray) / 1000000.0;
+            double mspt = MathUtils.average(server.tickTimeArray) / 1000000.0;
             double tps = mspt <= 50.0 ? 20.0 : (1000.0 / mspt);
             this.localData.setValues(tps, mspt, GameUtils.getCurrentWorldTick());
         }

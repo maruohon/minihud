@@ -2,9 +2,9 @@ package minihud.renderer;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
+import malilib.util.MathUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import minihud.config.Configs;
@@ -21,8 +21,8 @@ public class OverlayRendererRegion extends MiniHudOverlayRenderer
     @Override
     public boolean needsUpdate(Entity entity)
     {
-        int ex = (int) Math.floor(EntityWrap.getX(entity));
-        int ez = (int) Math.floor(EntityWrap.getZ(entity));
+        int ex = MathUtils.floor(EntityWrap.getX(entity));
+        int ez = MathUtils.floor(EntityWrap.getZ(entity));
         int lx = this.lastUpdatePos.getX();
         int lz = this.lastUpdatePos.getZ();
 
@@ -33,8 +33,8 @@ public class OverlayRendererRegion extends MiniHudOverlayRenderer
     public void update(Vec3d cameraPos, Entity entity)
     {
         Color4f color = Configs.Colors.REGION_OVERLAY_COLOR.getColor();
-        int rx = MathHelper.floor(EntityWrap.getX(entity)) & ~0x1FF;
-        int rz = MathHelper.floor(EntityWrap.getZ(entity)) & ~0x1FF;
+        int rx = MathUtils.floor(EntityWrap.getX(entity)) & ~0x1FF;
+        int rz = MathUtils.floor(EntityWrap.getZ(entity)) & ~0x1FF;
         BlockPos pos1 = new BlockPos(rx,         0, rz      );
         BlockPos pos2 = new BlockPos(rx + 511, 256, rz + 511);
 

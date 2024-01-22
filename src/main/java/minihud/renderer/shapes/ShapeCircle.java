@@ -8,9 +8,9 @@ import com.google.gson.JsonPrimitive;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
+import malilib.util.MathUtils;
 import malilib.util.StringUtils;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
@@ -40,7 +40,7 @@ public class ShapeCircle extends ShapeCircleBase
 
     public void setHeight(int height)
     {
-        this.height = MathHelper.clamp(height, 1, 260);
+        this.height = MathUtils.clamp(height, 1, 260);
         this.setNeedsUpdate();
     }
 

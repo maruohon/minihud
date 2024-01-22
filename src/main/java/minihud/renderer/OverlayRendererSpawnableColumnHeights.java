@@ -4,11 +4,11 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import malilib.render.ShapeRenderUtils;
+import malilib.util.MathUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
@@ -84,7 +84,7 @@ public class OverlayRendererSpawnableColumnHeights extends MiniHudOverlayRendere
     public void update(Vec3d cameraPos, Entity entity)
     {
         final Color4f color = Configs.Colors.SPAWNABLE_COLUMNS_OVERLAY_COLOR.getColor();
-        final int radius = MathHelper.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
+        final int radius = MathUtils.clamp(Configs.Generic.SPAWNABLE_COLUMNS_OVERLAY_RADIUS.getIntegerValue(), 0, 128);
 
         final int xStart = (int) EntityWrap.getX(entity) - radius;
         final int zStart = (int) EntityWrap.getZ(entity) - radius;
@@ -102,7 +102,7 @@ public class OverlayRendererSpawnableColumnHeights extends MiniHudOverlayRendere
             for (int z = zStart; z <= zEnd; ++z)
             {
                 // See WorldEntitySpawner.getRandomChunkPosition()
-                int height = MathHelper.roundUp(world.getHeight(x, z) + 1, 16);
+                int height = MathUtils.roundUp(world.getHeight(x, z) + 1, 16);
 
                 if (height == 0)
                 {
