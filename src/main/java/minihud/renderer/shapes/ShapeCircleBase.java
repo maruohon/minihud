@@ -10,9 +10,6 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 import malilib.config.value.BaseOptionListConfigValue;
 import malilib.config.value.BlockSnap;
@@ -22,15 +19,16 @@ import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Direction;
 import malilib.util.position.LayerRange;
+import malilib.util.position.Vec3d;
 import minihud.util.value.ShapeRenderType;
 
 public abstract class ShapeCircleBase extends ShapeBase
 {
-    protected static final EnumFacing[] FACING_ALL = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
-
     protected BlockSnap snap = BlockSnap.CENTER;
-    protected EnumFacing mainAxis = EnumFacing.UP;
+    protected Direction mainAxis = Direction.UP;
     protected double radius;
     protected double radiusSq;
     protected double maxRadius = 1024.0; // TODO use per-chunk VBOs or something to allow bigger shapes?
@@ -84,12 +82,12 @@ public abstract class ShapeCircleBase extends ShapeBase
         }
     }
 
-    public EnumFacing getMainAxis()
+    public Direction getMainAxis()
     {
         return this.mainAxis;
     }
 
-    public void setMainAxis(EnumFacing mainAxis)
+    public void setMainAxis(Direction mainAxis)
     {
         this.mainAxis = mainAxis;
         this.setNeedsUpdate();
@@ -97,7 +95,7 @@ public abstract class ShapeCircleBase extends ShapeBase
 
     protected BlockPos getCenterBlock()
     {
-        return new BlockPos(this.center);
+        return BlockPos.ofFloored(this.center);
     }
 
     public BlockSnap getBlockSnap()
@@ -202,7 +200,7 @@ public abstract class ShapeCircleBase extends ShapeBase
 
         if (JsonUtils.hasString(obj, "main_axis"))
         {
-            EnumFacing facing = EnumFacing.valueOf(obj.get("main_axis").getAsString());
+            Direction facing = Direction.valueOf(obj.get("main_axis").getAsString());
 
             if (facing != null)
             {
@@ -243,21 +241,21 @@ public abstract class ShapeCircleBase extends ShapeBase
         return lines;
     }
 
-    protected void renderPositions(HashSet<BlockPos> positions, EnumFacing[] sides, EnumFacing mainAxis, Color4f color, Vec3d cameraPos)
+    protected void renderPositions(HashSet<BlockPos> positions, Direction[] sides, Direction mainAxis, Color4f color, Vec3d cameraPos)
     {
         boolean full = this.renderType == ShapeRenderType.FULL_BLOCK;
         boolean outer = this.renderType == ShapeRenderType.OUTER_EDGE;
         boolean inner = this.renderType == ShapeRenderType.INNER_EDGE;
         LayerRange range = this.layerRange;
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+        BlockPos.MutBlockPos posMutable = new BlockPos.MutBlockPos();
 
         for (BlockPos pos : positions)
         {
             if (range.isPositionWithinRange(pos))
             {
-                for (EnumFacing side : sides)
+                for (Direction side : sides)
                 {
-                    posMutable.setPos(pos.getX() + side.getXOffset(), pos.getY() + side.getYOffset(), pos.getZ() + side.getZOffset());
+                    posMutable.set(pos.getX() + side.getXOffset(), pos.getY() + side.getYOffset(), pos.getZ() + side.getZOffset());
 
                     if (positions.contains(posMutable) == false)
                     {
@@ -279,9 +277,9 @@ public abstract class ShapeCircleBase extends ShapeBase
         }
     }
 
-    protected void addPositionsOnHorizontalRing(HashSet<BlockPos> positions, BlockPos.MutableBlockPos posMutable, EnumFacing direction)
+    protected void addPositionsOnHorizontalRing(HashSet<BlockPos> positions, BlockPos.MutBlockPos posMutable, Direction direction)
     {
-        if (this.movePositionToRing(posMutable, direction, EnumFacing.UP))
+        if (this.movePositionToRing(posMutable, direction, Direction.UP))
         {
             BlockPos posFirst = posMutable.toImmutable();
             positions.add(posFirst);
@@ -302,7 +300,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         }
     }
 
-    protected void addPositionsOnVerticalRing(HashSet<BlockPos> positions, BlockPos.MutableBlockPos posMutable, EnumFacing direction, EnumFacing mainAxis)
+    protected void addPositionsOnVerticalRing(HashSet<BlockPos> positions, BlockPos.MutBlockPos posMutable, Direction direction, Direction mainAxis)
     {
         if (this.movePositionToRing(posMutable, direction, mainAxis))
         {
@@ -325,7 +323,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         }
     }
 
-    protected boolean movePositionToRing(BlockPos.MutableBlockPos posMutable, EnumFacing dir, EnumFacing mainAxis)
+    protected boolean movePositionToRing(BlockPos.MutBlockPos posMutable, Direction dir, Direction mainAxis)
     {
         int x = posMutable.getX();
         int y = posMutable.getY();
@@ -349,7 +347,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         // Successfully entered the loop at least once
         if (failsafe > 0)
         {
-            posMutable.setPos(x, y, z);
+            posMutable.set(x, y, z);
             return true;
         }
 
@@ -357,10 +355,10 @@ public abstract class ShapeCircleBase extends ShapeBase
     }
 
     @Nullable
-    protected EnumFacing getNextPositionOnHorizontalRing(BlockPos.MutableBlockPos posMutable, EnumFacing dir)
+    protected Direction getNextPositionOnHorizontalRing(BlockPos.MutBlockPos posMutable, Direction dir)
     {
-        EnumFacing dirOut = dir;
-        EnumFacing ccw90 = getNextDirRotating(dir);
+        Direction dirOut = dir;
+        Direction ccw90 = getNextDirRotating(dir);
         final int y = posMutable.getY();
 
         for (int i = 0; i < 4; ++i)
@@ -369,9 +367,9 @@ public abstract class ShapeCircleBase extends ShapeBase
             int z = posMutable.getZ() + dir.getZOffset();
 
             // First check the adjacent position
-            if (this.isPositionOnOrInsideRing(x, y, z, dir, EnumFacing.UP))
+            if (this.isPositionOnOrInsideRing(x, y, z, dir, Direction.UP))
             {
-                posMutable.setPos(x, y, z);
+                posMutable.set(x, y, z);
                 return dirOut;
             }
 
@@ -379,9 +377,9 @@ public abstract class ShapeCircleBase extends ShapeBase
             x += ccw90.getXOffset();
             z += ccw90.getZOffset();
 
-            if (this.isPositionOnOrInsideRing(x, y, z, dir, EnumFacing.UP))
+            if (this.isPositionOnOrInsideRing(x, y, z, dir, Direction.UP))
             {
-                posMutable.setPos(x, y, z);
+                posMutable.set(x, y, z);
                 return dirOut;
             }
 
@@ -395,10 +393,10 @@ public abstract class ShapeCircleBase extends ShapeBase
     }
 
     @Nullable
-    protected EnumFacing getNextPositionOnVerticalRing(BlockPos.MutableBlockPos posMutable, EnumFacing dir, EnumFacing mainAxis)
+    protected Direction getNextPositionOnVerticalRing(BlockPos.MutBlockPos posMutable, Direction dir, Direction mainAxis)
     {
-        EnumFacing dirOut = dir;
-        EnumFacing ccw90 = getNextDirRotatingVertical(dir, mainAxis);
+        Direction dirOut = dir;
+        Direction ccw90 = getNextDirRotatingVertical(dir, mainAxis);
 
         for (int i = 0; i < 4; ++i)
         {
@@ -409,7 +407,7 @@ public abstract class ShapeCircleBase extends ShapeBase
             // First check the adjacent position
             if (this.isPositionOnOrInsideRing(x, y, z, dir, mainAxis))
             {
-                posMutable.setPos(x, y, z);
+                posMutable.set(x, y, z);
                 return dirOut;
             }
 
@@ -420,7 +418,7 @@ public abstract class ShapeCircleBase extends ShapeBase
 
             if (this.isPositionOnOrInsideRing(x, y, z, dir, mainAxis))
             {
-                posMutable.setPos(x, y, z);
+                posMutable.set(x, y, z);
                 return dirOut;
             }
 
@@ -433,7 +431,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         return null;
     }
 
-    protected boolean isPositionOnOrInsideRing(int blockX, int blockY, int blockZ, EnumFacing outSide, EnumFacing mainAxis)
+    protected boolean isPositionOnOrInsideRing(int blockX, int blockY, int blockZ, Direction outSide, Direction mainAxis)
     {
         double x = (double) blockX + 0.5;
         double y = (double) blockY + 0.5;
@@ -455,7 +453,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         return diffAdj > 0 && Math.abs(diff) < Math.abs(diffAdj);
     }
 
-    protected boolean isAdjacentPositionOutside(BlockPos pos, EnumFacing dir, EnumFacing mainAxis)
+    protected boolean isAdjacentPositionOutside(BlockPos pos, Direction dir, Direction mainAxis)
     {
         return this.isPositionOnOrInsideRing(pos.getX() + dir.getXOffset(), pos.getY() + dir.getYOffset(), pos.getZ() + dir.getZOffset(), dir, mainAxis) == false;
     }
@@ -465,15 +463,15 @@ public abstract class ShapeCircleBase extends ShapeBase
      * @param dirIn
      * @return
      */
-    protected static EnumFacing getNextDirRotating(EnumFacing dirIn)
+    protected static Direction getNextDirRotating(Direction dirIn)
     {
         switch (dirIn)
         {
-            case NORTH: return EnumFacing.WEST;
-            case WEST:  return EnumFacing.SOUTH;
-            case SOUTH: return EnumFacing.EAST;
+            case NORTH: return Direction.WEST;
+            case WEST:  return Direction.SOUTH;
+            case SOUTH: return Direction.EAST;
             case EAST:
-            default:    return EnumFacing.NORTH;
+            default:    return Direction.NORTH;
         }
     }
 
@@ -482,7 +480,7 @@ public abstract class ShapeCircleBase extends ShapeBase
      * @param dirIn
      * @return
      */
-    protected static EnumFacing getNextDirRotatingVertical(EnumFacing dirIn, EnumFacing mainAxis)
+    protected static Direction getNextDirRotatingVertical(Direction dirIn, Direction mainAxis)
     {
         switch (mainAxis)
         {
@@ -490,36 +488,36 @@ public abstract class ShapeCircleBase extends ShapeBase
             case DOWN:
                 switch (dirIn)
                 {
-                    case NORTH: return EnumFacing.DOWN;
-                    case DOWN:  return EnumFacing.SOUTH;
-                    case SOUTH: return EnumFacing.UP;
+                    case NORTH: return Direction.DOWN;
+                    case DOWN:  return Direction.SOUTH;
+                    case SOUTH: return Direction.UP;
                     case UP:
-                    default:    return EnumFacing.NORTH;
+                    default:    return Direction.NORTH;
                 }
 
             case NORTH:
             case SOUTH:
                 switch (dirIn)
                 {
-                    case EAST:  return EnumFacing.DOWN;
-                    case DOWN:  return EnumFacing.WEST;
-                    case WEST:  return EnumFacing.UP;
+                    case EAST:  return Direction.DOWN;
+                    case DOWN:  return Direction.WEST;
+                    case WEST:  return Direction.UP;
                     case UP:
-                    default:    return EnumFacing.EAST;
+                    default:    return Direction.EAST;
                 }
 
             case WEST:
             case EAST:
                 switch (dirIn)
                 {
-                    case SOUTH: return EnumFacing.DOWN;
-                    case DOWN:  return EnumFacing.NORTH;
-                    case NORTH: return EnumFacing.UP;
+                    case SOUTH: return Direction.DOWN;
+                    case DOWN:  return Direction.NORTH;
+                    case NORTH: return Direction.UP;
                     case UP:
-                    default:    return EnumFacing.SOUTH;
+                    default:    return Direction.SOUTH;
                 }
         }
 
-        return EnumFacing.UP;
+        return Direction.UP;
     }
 }

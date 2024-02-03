@@ -3,8 +3,6 @@ package minihud.renderer;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import malilib.render.ShapeRenderUtils;
@@ -12,7 +10,9 @@ import malilib.util.MathUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.PositionUtils;
+import malilib.util.position.Vec3d;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 

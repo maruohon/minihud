@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
 
+import malilib.render.text.TextRendererUtils;
 import malilib.util.MathUtils;
 import malilib.util.StringUtils;
 import malilib.util.game.wrap.GameUtils;
@@ -114,7 +114,7 @@ public class TpsDataManager
             this.localData.isValid() == false &&
             textComponent.getFormattedText().isEmpty() == false)
         {
-            String text = TextFormatting.getTextWithoutFormattingCodes(textComponent.getUnformattedText());
+            String text = TextRendererUtils.stripVanillaFormattingCodes(textComponent.getUnformattedText());
             String[] lines = text.split("\n");
 
             for (String line : lines)

@@ -4,9 +4,6 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -15,7 +12,9 @@ import malilib.render.buffer.VertexBuilder;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
-import malilib.util.position.PositionUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Direction;
+import malilib.util.position.Vec3d;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 import minihud.util.value.BlockGridMode;
@@ -151,7 +150,7 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
         int lastCX = startX >> 4;
         int lastCZ = startZ >> 4;
         Chunk chunk = world.getChunk(lastCX, lastCZ);
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+        BlockPos.MutBlockPos posMutable = new BlockPos.MutBlockPos();
 
         for (int x = startX; x <= endX; ++x)
         {
@@ -176,7 +175,7 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
                         break;
                     }
 
-                    posMutable.setPos(x, y, z);
+                    posMutable.set(x, y, z);
 
                     if (chunk.getBlockState(x, y, z).getMaterial() != Material.AIR)
                     {
@@ -203,8 +202,8 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
         int lastCX = startX >> 4;
         int lastCZ = startZ >> 4;
         Chunk chunk = world.getChunk(lastCX, lastCZ);
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
-        BlockPos.MutableBlockPos posMutable2 = new BlockPos.MutableBlockPos();
+        BlockPos.MutBlockPos posMutable = new BlockPos.MutBlockPos();
+        BlockPos.MutBlockPos posMutable2 = new BlockPos.MutBlockPos();
 
         for (int x = startX; x <= endX; ++x)
         {
@@ -222,16 +221,15 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
 
                 for (int y = startY; y <= endY; ++y)
                 {
-                    posMutable.setPos(x, y, z);
+                    posMutable.set(x, y, z);
 
                     if (chunk.getBlockState(posMutable).getMaterial() == Material.AIR)
                     {
-                        for (EnumFacing side : PositionUtils.VERTICAL_DIRECTIONS)
+                        for (Direction side : Direction.VERTICAL_DIRECTIONS)
                         {
-                            posMutable2.setPos(
-                                    posMutable.getX() + side.getXOffset(),
-                                    posMutable.getY() + side.getYOffset(),
-                                    posMutable.getZ() + side.getZOffset());
+                            posMutable2.set(posMutable.getX() + side.getXOffset(),
+                                            posMutable.getY() + side.getYOffset(),
+                                            posMutable.getZ() + side.getZOffset());
 
                             if (chunk.getBlockState(posMutable2).getMaterial() != Material.AIR)
                             {
@@ -240,12 +238,11 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
                             }
                         }
 
-                        for (EnumFacing side : PositionUtils.HORIZONTAL_DIRECTIONS)
+                        for (Direction side : Direction.HORIZONTAL_DIRECTIONS)
                         {
-                            posMutable2.setPos(
-                                    posMutable.getX() + side.getXOffset(),
-                                    posMutable.getY() + side.getYOffset(),
-                                    posMutable.getZ() + side.getZOffset());
+                            posMutable2.set(posMutable.getX() + side.getXOffset(),
+                                            posMutable.getY() + side.getYOffset(),
+                                            posMutable.getZ() + side.getZOffset());
 
                             if (world.getBlockState(posMutable2).getMaterial() != Material.AIR)
                             {

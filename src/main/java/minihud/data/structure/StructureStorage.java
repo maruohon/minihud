@@ -4,10 +4,10 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
 import minihud.MiniHud;
 import minihud.data.structure.StructureDataUtils.StructureFileUtils;
 

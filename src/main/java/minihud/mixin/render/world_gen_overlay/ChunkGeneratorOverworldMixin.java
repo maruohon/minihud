@@ -20,7 +20,7 @@ public abstract class ChunkGeneratorOverworldMixin
     {
         if (RendererToggle.SPAWNER_POSITIONS.isRendererEnabled())
         {
-            DataStorage.INSTANCE.worldGenPositions.addDungeonSpawnerPosition(position);
+            DataStorage.INSTANCE.worldGenPositions.addDungeonSpawnerPosition(malilib.util.position.BlockPos.of(position));
         }
 
         return position;

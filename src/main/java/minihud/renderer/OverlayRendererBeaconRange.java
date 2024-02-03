@@ -8,15 +8,15 @@ import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBeacon;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import malilib.render.ShapeRenderUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
+import malilib.util.position.Vec3d;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 
@@ -112,7 +112,7 @@ public class OverlayRendererBeaconRange extends MiniHudOverlayRenderer
         {
             if (be instanceof TileEntityBeacon)
             {
-                BlockPos pos = be.getPos();
+                BlockPos pos = BlockPos.of(be.getPos());
                 int level = ((TileEntityBeacon) be).getLevels();
 
                 if (level >= 1 && level <= 4)

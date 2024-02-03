@@ -21,11 +21,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
@@ -52,6 +48,10 @@ import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.RegistryUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Direction;
+import malilib.util.position.HitResult;
+import malilib.util.position.Vec3d;
 import minihud.Reference;
 import minihud.config.Configs;
 import minihud.config.InfoLineToggle;
@@ -376,12 +376,12 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         Minecraft mc = GameUtils.getClient();
         Entity entity = mc.getRenderViewEntity();
         World world = entity.getEntityWorld();
-        RayTraceResult hitResult = GameUtils.getHitResult();
+        HitResult hitResult = GameUtils.getHitResult();
         double x = EntityWrap.getX(entity);
         double y = EntityWrap.getY(entity);
         double z = EntityWrap.getZ(entity);
         double bbY = entity.getEntityBoundingBox().minY;
-        BlockPos pos = new BlockPos(x, bbY, z);
+        BlockPos pos = BlockPos.ofFloored(x, bbY, z);
         DataStorage data = DataStorage.getInstance();
 
         if (type == InfoLineToggle.FPS)
@@ -603,7 +603,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
         else if (type == InfoLineToggle.PLAYER_FACING)
         {
-            EnumFacing facing = entity.getHorizontalFacing();
+            Direction facing = EntityWrap.getClosestHorizontalLookingDirection(entity);
             String str = "Invalid";
 
             switch (facing)
@@ -850,11 +850,10 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
         else if (type == InfoLineToggle.LOOKING_AT_ENTITY)
         {
-            if (hitResult != null &&
-                hitResult.typeOfHit == RayTraceResult.Type.ENTITY &&
-                hitResult.entityHit != null)
+            if (hitResult.type == HitResult.Type.ENTITY &&
+                hitResult.entity != null)
             {
-                Entity target = hitResult.entityHit;
+                Entity target = hitResult.entity;
 
                 if (target instanceof EntityLivingBase)
                 {
@@ -870,11 +869,10 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         }
         else if (type == InfoLineToggle.ENTITY_REG_NAME)
         {
-            if (hitResult != null &&
-                hitResult.typeOfHit == RayTraceResult.Type.ENTITY &&
-                hitResult.entityHit != null)
+            if (hitResult.type == HitResult.Type.ENTITY &&
+                hitResult.entity != null)
             {
-                ResourceLocation regName = EntityList.getKey(hitResult.entityHit);
+                ResourceLocation regName = EntityList.getKey(hitResult.entity);
 
                 if (regName != null)
                 {
@@ -892,11 +890,9 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
                 return;
             }
 
-            if (hitResult != null &&
-                hitResult.typeOfHit == RayTraceResult.Type.BLOCK &&
-                hitResult.getBlockPos() != null)
+            if (hitResult.type == HitResult.Type.BLOCK)
             {
-                BlockPos lookPos = hitResult.getBlockPos();
+                BlockPos lookPos = hitResult.blockPos;
                 String pre = "";
                 StringBuilder str = new StringBuilder(128);
 
@@ -927,13 +923,11 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
     private void getBlockProperties(Minecraft mc)
     {
-        RayTraceResult hitResult = GameUtils.getHitResult();
+        HitResult hitResult = GameUtils.getHitResult();
 
-        if (hitResult != null &&
-            hitResult.typeOfHit == RayTraceResult.Type.BLOCK &&
-            hitResult.getBlockPos() != null)
+        if (hitResult.type == HitResult.Type.BLOCK)
         {
-            BlockPos posLooking = hitResult.getBlockPos();
+            BlockPos posLooking = hitResult.blockPos;
             IBlockState state = mc.world.getBlockState(posLooking);
 
             if (mc.world.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES)

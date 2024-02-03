@@ -23,6 +23,6 @@ public abstract class WorldMixin
                      target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/IBlockState;"))
     public void onNeighborChanged(BlockPos pos, Block block, BlockPos fromPos, CallbackInfo ci)
     {
-        DebugInfoUtils.onNeighborNotify(pos, this.worldInfo.getWorldTotalTime());
+        DebugInfoUtils.onNeighborNotify(malilib.util.position.BlockPos.of(pos), this.worldInfo.getWorldTotalTime());
     }
 }

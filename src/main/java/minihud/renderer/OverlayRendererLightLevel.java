@@ -9,9 +9,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
@@ -26,6 +23,9 @@ import malilib.util.data.Color4f;
 import malilib.util.data.Identifier;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Direction;
+import malilib.util.position.Vec3d;
 import minihud.Reference;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
@@ -37,7 +37,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
     private static final Identifier NUMBER_TEXTURE = new Identifier(Reference.MOD_ID, "textures/misc/light_level_numbers.png");
 
     private final List<LightLevelInfo> lightInfoList = new ArrayList<>();
-    private EnumFacing lastDirection = EnumFacing.NORTH;
+    private Direction lastDirection = Direction.NORTH;
 
     public OverlayRendererLightLevel()
     {
@@ -58,7 +58,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
                Math.abs(EntityWrap.getY(entity) - this.lastUpdatePos.getY()) > 4 ||
                Math.abs(EntityWrap.getZ(entity) - this.lastUpdatePos.getZ()) > 4 ||
                (Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() &&
-                   this.lastDirection != entity.getHorizontalFacing());
+                   this.lastDirection != EntityWrap.getClosestHorizontalLookingDirection(entity));
     }
 
     @Override
@@ -73,7 +73,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
         this.renderLightLevels(cameraPos);
 
         this.uploadBuffers();
-        this.lastDirection = entity.getHorizontalFacing();
+        this.lastDirection = EntityWrap.getClosestHorizontalLookingDirection(entity);
         this.needsUpdate = false;
     }
 
@@ -99,7 +99,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
 
         if (count > 0)
         {
-            EnumFacing numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? entity.getHorizontalFacing() : EnumFacing.NORTH;
+            Direction numberFacing = Configs.Generic.LIGHT_LEVEL_NUMBER_ROTATION.getBooleanValue() ? EntityWrap.getClosestHorizontalLookingDirection(entity) : Direction.NORTH;
             LightLevelNumberMode numberMode = Configs.Generic.LIGHT_LEVEL_NUMBER_MODE.getValue();
             LightLevelMarkerMode markerMode = Configs.Generic.LIGHT_LEVEL_MARKER_MODE.getValue();
             boolean useColoredNumbers = Configs.Generic.LIGHT_LEVEL_COLORED_NUMBERS.getBooleanValue();
@@ -136,7 +136,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
 
     protected void renderNumbers(Vec3d cameraPos, LightLevelNumberMode mode, Vec2dConfig cfgOff,
                                  ColorConfig cfgColorLit, ColorConfig cfgColorDark, boolean useColoredNumbers,
-                                 int lightThreshold, EnumFacing numberFacing)
+                                 int lightThreshold, Direction numberFacing)
     {
         double ox = cfgOff.getValue().x;
         double oz = cfgOff.getValue().y;
@@ -192,7 +192,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
         }
     }
 
-    protected void renderLightLevelNumbers(double dx, double dy, double dz, EnumFacing facing,
+    protected void renderLightLevelNumbers(double dx, double dy, double dz, Direction facing,
                                            int lightThreshold, LightLevelNumberMode numberMode,
                                            Color4f colorLit, Color4f colorDark)
     {
@@ -209,7 +209,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
         }
     }
 
-    protected void renderLightLevelTextureColor(double x, double y, double z, EnumFacing facing,
+    protected void renderLightLevelTextureColor(double x, double y, double z, Direction facing,
                                                 int lightLevel, Color4f color, VertexBuilder builder)
     {
         float w = 0.25f;

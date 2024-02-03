@@ -1,12 +1,12 @@
 package minihud.renderer;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 import malilib.util.MathUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3d;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 
@@ -35,7 +35,7 @@ public class OverlayRendererRegion extends MiniHudOverlayRenderer
         Color4f color = Configs.Colors.REGION_OVERLAY_COLOR.getColor();
         int rx = MathUtils.floor(EntityWrap.getX(entity)) & ~0x1FF;
         int rz = MathUtils.floor(EntityWrap.getZ(entity)) & ~0x1FF;
-        BlockPos pos1 = new BlockPos(rx,         0, rz      );
+        BlockPos pos1 = new BlockPos(rx      ,   0, rz      );
         BlockPos pos2 = new BlockPos(rx + 511, 256, rz + 511);
 
         this.startBuffers();

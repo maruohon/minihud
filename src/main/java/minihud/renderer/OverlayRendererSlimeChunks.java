@@ -3,8 +3,6 @@ package minihud.renderer;
 import com.google.gson.JsonObject;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import malilib.render.ShapeRenderUtils;
@@ -12,6 +10,8 @@ import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3d;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 import minihud.data.DataStorage;
@@ -87,8 +87,8 @@ public class OverlayRendererSlimeChunks extends MiniHudOverlayRenderer
             final Color4f colorLines = Configs.Colors.SLIME_CHUNKS_OVERLAY_COLOR.getColor();
             final Color4f colorSides = colorLines.withAlpha(colorLines.a / 6);
             int r = Configs.Generic.SLIME_CHUNK_OVERLAY_RADIUS.getIntegerValue();
-            BlockPos.MutableBlockPos pos1 = new BlockPos.MutableBlockPos();
-            BlockPos.MutableBlockPos pos2 = new BlockPos.MutableBlockPos();
+            BlockPos.MutBlockPos pos1 = new BlockPos.MutBlockPos();
+            BlockPos.MutBlockPos pos2 = new BlockPos.MutBlockPos();
 
             if (r == -1)
             {
@@ -108,8 +108,8 @@ public class OverlayRendererSlimeChunks extends MiniHudOverlayRenderer
 
                     if (MiscUtils.canSlimeSpawnInChunk(cx, cz, this.seed))
                     {
-                        pos1.setPos( cx << 4,          0,  cz << 4);
-                        pos2.setPos((cx << 4) + 15, topY, (cz << 4) + 15);
+                        pos1.set( cx << 4,          0,  cz << 4);
+                        pos2.set((cx << 4) + 15, topY, (cz << 4) + 15);
                         ShapeRenderUtils.renderBoxSidesAndEdges(pos1, pos2, colorLines, colorSides, cameraPos,
                                                                 this.quadBuilder, this.lineBuilder);
                     }

@@ -3,14 +3,14 @@ package minihud.renderer;
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import malilib.render.ShapeRenderUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3d;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 import minihud.data.DataStorage;

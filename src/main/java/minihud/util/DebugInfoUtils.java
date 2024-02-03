@@ -17,12 +17,12 @@ import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 import minihud.mixin.debugrenderer.DebugRendererMixin;
@@ -276,7 +276,7 @@ public class DebugInfoUtils
 
         public BlockPos getPos()
         {
-            return BlockPos.fromLong(this.posLong);
+            return BlockPos.fromPacked(this.posLong);
         }
     }
 }

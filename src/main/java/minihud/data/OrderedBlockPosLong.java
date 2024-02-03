@@ -1,6 +1,6 @@
 package minihud.data;
 
-import net.minecraft.util.math.BlockPos;
+import malilib.util.position.BlockPos;
 
 public class OrderedBlockPosLong
 {
@@ -15,7 +15,7 @@ public class OrderedBlockPosLong
 
     public BlockPos getPos()
     {
-        return BlockPos.fromLong(this.posLong);
+        return BlockPos.fromPacked(this.posLong);
     }
 
     @Override

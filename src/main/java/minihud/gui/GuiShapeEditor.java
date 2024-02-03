@@ -7,8 +7,6 @@ import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
-import net.minecraft.util.EnumFacing;
-
 import malilib.config.option.OptionListConfig;
 import malilib.config.value.BlockSnap;
 import malilib.gui.BaseScreen;
@@ -31,7 +29,7 @@ import malilib.input.ActionResult;
 import malilib.util.ListUtils;
 import malilib.util.data.DualDoubleConsumer;
 import malilib.util.data.DualIntConsumer;
-import malilib.util.position.PositionUtils;
+import malilib.util.position.Direction;
 import minihud.Reference;
 import minihud.renderer.shapes.ShapeBase;
 import minihud.renderer.shapes.ShapeCircle;
@@ -233,8 +231,8 @@ public class GuiShapeEditor extends BaseLayerRangeEditScreen
         }
     }
 
-    private void createDirectionButton(int x, int y, Supplier<EnumFacing> supplier,
-                                       Consumer<EnumFacing> consumer, String translationKey)
+    private void createDirectionButton(int x, int y, Supplier<Direction> supplier,
+                                       Consumer<Direction> consumer, String translationKey)
     {
         LabelWidget label = new LabelWidget(translationKey);
         label.setPosition(x, y);
@@ -243,7 +241,7 @@ public class GuiShapeEditor extends BaseLayerRangeEditScreen
 
         String name = org.apache.commons.lang3.StringUtils.capitalize(supplier.get().toString().toLowerCase());
         GenericButton button = GenericButton.create(50, 20, name);
-        button.setActionListener((btn) -> { consumer.accept(PositionUtils.cycleDirection(supplier.get(), btn == 1)); this.initGui(); return true; });
+        button.setActionListener((btn) -> { consumer.accept(supplier.get().cycle(btn == 1)); this.initGui(); return true; });
         button.setPosition(x, y);
 
         this.addWidget(button);

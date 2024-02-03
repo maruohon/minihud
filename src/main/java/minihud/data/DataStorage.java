@@ -6,8 +6,6 @@ import java.util.OptionalLong;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import malilib.overlay.message.MessageUtils;
@@ -15,6 +13,8 @@ import malilib.util.data.json.JsonUtils;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3d;
 import minihud.data.structure.StructureDataUtils;
 import minihud.data.structure.StructureStorage;
 import minihud.event.RenderHandler;

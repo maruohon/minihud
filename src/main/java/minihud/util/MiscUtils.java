@@ -12,8 +12,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.management.PlayerChunkMapEntry;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 
@@ -25,6 +23,8 @@ import malilib.util.game.wrap.NbtWrap;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.nbt.PrettyNbtStringifier;
 import malilib.util.nbt.SimpleNbtStringifier;
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.IntBoundingBox;
 import minihud.MiniHud;
 import minihud.config.Configs;

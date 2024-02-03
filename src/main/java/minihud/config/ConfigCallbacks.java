@@ -1,8 +1,5 @@
 package minihud.config;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-
 import malilib.config.option.BooleanContainingConfig;
 import malilib.input.callback.AdjustableValueHotkeyCallback;
 import malilib.listener.EventListener;
@@ -11,10 +8,12 @@ import malilib.overlay.message.MessageUtils;
 import malilib.render.overlay.OverlayRendererContainer;
 import malilib.util.StringUtils;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3d;
+import minihud.MiniHudActions;
 import minihud.data.DataStorage;
 import minihud.data.WoolCounters;
 import minihud.data.structure.StructureDataUtils;
-import minihud.MiniHudActions;
 import minihud.network.carpet.CarpetPubsubPacketHandler;
 import minihud.network.servux.ServuxInfoSubDataPacketHandler;
 import minihud.renderer.RenderContainer;
@@ -127,7 +126,7 @@ public class ConfigCallbacks
         if (config.getBooleanValue())
         {
             Vec3d pos = EntityWrap.getCameraEntityPosition();
-            BlockPos b = new BlockPos(pos);
+            BlockPos b = BlockPos.ofFloored(pos);
             String name = config.getPrettyName();
             String key = "minihud.message.info.toggled_renderer_on_using_block_position";
 

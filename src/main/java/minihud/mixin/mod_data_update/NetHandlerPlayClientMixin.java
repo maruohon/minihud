@@ -13,8 +13,9 @@ import net.minecraft.network.play.server.SPacketMultiBlockChange;
 import net.minecraft.network.play.server.SPacketPlayerListHeaderFooter;
 import net.minecraft.network.play.server.SPacketSpawnPosition;
 import net.minecraft.network.play.server.SPacketTimeUpdate;
-import net.minecraft.util.math.ChunkPos;
 
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
 import minihud.data.DataStorage;
 import minihud.data.MobCapDataHandler;
 import minihud.data.TpsDataManager;
@@ -52,19 +53,19 @@ public abstract class NetHandlerPlayClientMixin
     @Inject(method = "handleBlockChange", at = @At("RETURN"))
     private void markChunkChangedBlockChange(SPacketBlockChange packet, CallbackInfo ci)
     {
-        NotificationUtils.onBlockChange(packet.getBlockPosition(), packet.getBlockState());
+        NotificationUtils.onBlockChange(BlockPos.of(packet.getBlockPosition()), packet.getBlockState());
     }
 
     @Inject(method = "handleMultiBlockChange", at = @At("RETURN"))
     private void markChunkChangedMultiBlockChange(SPacketMultiBlockChange packet, CallbackInfo ci)
     {
-        ChunkPos pos = ((SPacketMultiBlockChangeMixin) packet).minihud_getChunkPos();
-        NotificationUtils.onMultiBlockChange(pos, packet.getChangedBlocks());
+        net.minecraft.util.math.ChunkPos pos = ((SPacketMultiBlockChangeMixin) packet).minihud_getChunkPos();
+        NotificationUtils.onMultiBlockChange(new ChunkPos(pos.x, pos.z), packet.getChangedBlocks());
     }
 
     @Inject(method = "handleSpawnPosition", at = @At("RETURN"))
     private void onSetSpawn(SPacketSpawnPosition packet, CallbackInfo ci)
     {
-        DataStorage.getInstance().setWorldSpawnIfUnknown(packet.getSpawnPos());
+        DataStorage.getInstance().setWorldSpawnIfUnknown(BlockPos.of(packet.getSpawnPos()));
     }
 }

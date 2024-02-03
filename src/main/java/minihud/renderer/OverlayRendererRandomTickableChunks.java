@@ -5,14 +5,14 @@ import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
 
 import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.position.ChunkPos;
+import malilib.util.position.Direction;
 import malilib.util.position.PositionUtils;
+import malilib.util.position.Vec3d;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 
@@ -117,7 +117,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHudOverlayRenderer
 
     protected void renderChunkEdgesIfApplicable(long chunkPosLong, Vec3d cameraPos, LongOpenHashSet chunks, Color4f color)
     {
-        for (EnumFacing side : PositionUtils.HORIZONTAL_DIRECTIONS)
+        for (Direction side : Direction.HORIZONTAL_DIRECTIONS)
         {
             int cx = PositionUtils.getChunkPosX(chunkPosLong);
             int cz = PositionUtils.getChunkPosZ(chunkPosLong);
@@ -130,7 +130,7 @@ public class OverlayRendererRandomTickableChunks extends MiniHudOverlayRenderer
         }
     }
 
-    private void renderChunkEdge(long chunkPosLong, EnumFacing side, Vec3d cameraPos, Color4f color)
+    private void renderChunkEdge(long chunkPosLong, Direction side, Vec3d cameraPos, Color4f color)
     {
         int cx = PositionUtils.getChunkPosX(chunkPosLong);
         int cz = PositionUtils.getChunkPosZ(chunkPosLong);

@@ -1,10 +1,10 @@
 package minihud.util;
 
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 
 import malilib.overlay.message.MessageUtils;
+import malilib.util.position.BlockPos;
 import minihud.MiniHud;
 import minihud.config.Configs;
 import minihud.data.DataStorage;

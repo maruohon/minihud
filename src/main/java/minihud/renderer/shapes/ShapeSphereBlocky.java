@@ -3,12 +3,12 @@ package minihud.renderer.shapes;
 import java.util.HashSet;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Direction;
+import malilib.util.position.Vec3d;
 import minihud.config.Configs;
 
 public class ShapeSphereBlocky extends ShapeCircleBase
@@ -33,42 +33,40 @@ public class ShapeSphereBlocky extends ShapeCircleBase
     protected void renderSphereShape(Vec3d cameraPos)
     {
         BlockPos posCenter = this.getCenterBlock();
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+        BlockPos.MutBlockPos posMutable = new BlockPos.MutBlockPos();
         HashSet<BlockPos> spherePositions = new HashSet<>();
 
         this.startBuffers();
 
         //long before = System.nanoTime();
-        posMutable.setPos(posCenter);
-        this.addPositionsOnHorizontalRing(spherePositions, posMutable, EnumFacing.EAST);
+        posMutable.set(posCenter);
+        this.addPositionsOnHorizontalRing(spherePositions, posMutable, Direction.EAST);
 
-        posMutable.setPos(posCenter);
-        this.addPositionsOnVerticalRing(spherePositions, posMutable, EnumFacing.UP, EnumFacing.EAST);
+        posMutable.set(posCenter);
+        this.addPositionsOnVerticalRing(spherePositions, posMutable, Direction.UP, Direction.EAST);
 
         final int r = (int) this.radius + 2;
 
         for (int i = 1; i < r; ++i)
         {
             // Horizontal rings
-            posMutable.setPos(posCenter.getX(), posCenter.getY() - i, posCenter.getZ());
-            this.addPositionsOnHorizontalRing(spherePositions, posMutable, EnumFacing.EAST);
+            posMutable.set(posCenter.getX(), posCenter.getY() - i, posCenter.getZ());
+            this.addPositionsOnHorizontalRing(spherePositions, posMutable, Direction.EAST);
 
-            posMutable.setPos(posCenter.getX(), posCenter.getY() + i, posCenter.getZ());
-            this.addPositionsOnHorizontalRing(spherePositions, posMutable, EnumFacing.EAST);
+            posMutable.set(posCenter.getX(), posCenter.getY() + i, posCenter.getZ());
+            this.addPositionsOnHorizontalRing(spherePositions, posMutable, Direction.EAST);
 
             // Vertical rings
-            posMutable.setPos(posCenter.getX() - i, posCenter.getY(), posCenter.getZ());
-            this.addPositionsOnVerticalRing(spherePositions, posMutable, EnumFacing.UP, EnumFacing.EAST);
+            posMutable.set(posCenter.getX() - i, posCenter.getY(), posCenter.getZ());
+            this.addPositionsOnVerticalRing(spherePositions, posMutable, Direction.UP, Direction.EAST);
 
-            posMutable.setPos(posCenter.getX() + i, posCenter.getY(), posCenter.getZ());
-            this.addPositionsOnVerticalRing(spherePositions, posMutable, EnumFacing.UP, EnumFacing.EAST);
+            posMutable.set(posCenter.getX() + i, posCenter.getY(), posCenter.getZ());
+            this.addPositionsOnVerticalRing(spherePositions, posMutable, Direction.UP, Direction.EAST);
         }
         //System.out.printf("time: %.6f s - margin: %.4f\n", (double) (System.nanoTime() - before) / 1000000000D, this.margin);
         //System.out.printf("spherePositions: %d\n", spherePositions.size());
 
-        EnumFacing[] sides = FACING_ALL;
-
-        this.renderPositions(spherePositions, sides, this.mainAxis, this.color, cameraPos);
+        this.renderPositions(spherePositions, Direction.ALL_DIRECTIONS, this.mainAxis, this.color, cameraPos);
         //System.out.printf("rendered: %d\n", r);
 
         this.uploadBuffers();

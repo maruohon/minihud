@@ -7,15 +7,15 @@ import java.util.function.Supplier;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
 
 import malilib.render.RenderContext;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.TextRenderUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
+import malilib.util.position.Vec3d;
 import minihud.data.OrderedBlockPosLong;
 
 public abstract class BaseBlockPositionListOverlayRenderer extends MiniHudOverlayRenderer

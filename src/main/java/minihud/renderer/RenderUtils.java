@@ -1,14 +1,14 @@
 package minihud.renderer;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 import malilib.render.buffer.VertexBuilder;
 import malilib.util.MathUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3d;
 
 public class RenderUtils
 {

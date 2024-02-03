@@ -3,8 +3,7 @@ package minihud.data;
 import java.util.ArrayList;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
-import net.minecraft.util.math.BlockPos;
-
+import malilib.util.position.BlockPos;
 import minihud.MiniHud;
 import minihud.config.Configs;
 

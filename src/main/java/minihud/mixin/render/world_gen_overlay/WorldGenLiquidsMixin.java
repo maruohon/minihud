@@ -10,10 +10,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenLiquids;
 
+import malilib.util.position.BlockPos;
 import minihud.config.RendererToggle;
 import minihud.data.DataStorage;
 
@@ -23,11 +23,11 @@ public abstract class WorldGenLiquidsMixin
     @Shadow @Final private Block block;
 
     @Inject(method = "generate", at = @At("HEAD"))
-    private void minihud_onWaterfallGenerationAttempt(World worldIn, Random rand, BlockPos position, CallbackInfoReturnable<Boolean> cir)
+    private void minihud_onWaterfallGenerationAttempt(World worldIn, Random rand, net.minecraft.util.math.BlockPos position, CallbackInfoReturnable<Boolean> cir)
     {
         if (RendererToggle.WATER_FALLS.isRendererEnabled() && this.block == Blocks.FLOWING_WATER)
         {
-            DataStorage.INSTANCE.worldGenPositions.addWaterFallPosition(position);
+            DataStorage.INSTANCE.worldGenPositions.addWaterFallPosition(BlockPos.of(position));
         }
     }
 }

@@ -5,13 +5,12 @@ import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.Vec3d;
-
 import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
+import malilib.util.position.Direction;
 import malilib.util.position.Quadrant;
+import malilib.util.position.Vec3d;
 
 public class ShapeSpawnSphere extends ShapeSphereBlocky
 {
@@ -91,7 +90,7 @@ public class ShapeSpawnSphere extends ShapeSphereBlocky
     }
 
     @Override
-    protected boolean isPositionOnOrInsideRing(int x, int y, int z, EnumFacing outSide, EnumFacing mainAxis)
+    protected boolean isPositionOnOrInsideRing(int x, int y, int z, Direction outSide, Direction mainAxis)
     {
         final double maxDistSq = this.radiusSq;
         Vec3d quadrantCenter = this.quadrantCenters[Quadrant.getQuadrant(x, z, this.effectiveCenter).ordinal()];

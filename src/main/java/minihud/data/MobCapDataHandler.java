@@ -7,10 +7,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
+import malilib.render.text.TextRendererUtils;
 import malilib.util.StringUtils;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.GameUtils;
@@ -177,7 +177,7 @@ public class MobCapDataHandler
         if (this.shouldParsePlayerListData(worldTick) &&
             textComponent.getFormattedText().isEmpty() == false)
         {
-            String text = TextFormatting.getTextWithoutFormattingCodes(textComponent.getUnformattedText());
+            String text = TextRendererUtils.stripVanillaFormattingCodes(textComponent.getUnformattedText());
             String[] lines = text.split("\n");
 
             for (String line : lines)

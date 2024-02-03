@@ -5,9 +5,9 @@ import java.util.List;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.SPacketMultiBlockChange;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 import minihud.data.DataStorage;
@@ -30,7 +30,7 @@ public class NotificationUtils
         {
             for (SPacketMultiBlockChange.BlockUpdateData d : data)
             {
-                RenderContainer.BEACON_OVERLAY.checkNeedsUpdate(d.getPos(), d.getBlockState());
+                RenderContainer.BEACON_OVERLAY.checkNeedsUpdate(BlockPos.of(d.getPos()), d.getBlockState());
             }
         }
     }

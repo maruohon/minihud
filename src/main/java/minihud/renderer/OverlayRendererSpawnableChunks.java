@@ -5,12 +5,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3d;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 
@@ -89,8 +89,8 @@ public class OverlayRendererSpawnableChunks extends MiniHudOverlayRenderer
         this.lastUpdatePos = new BlockPos(centerX, 0, centerZ);
 
         int r = 7;
-        BlockPos pos1 = new BlockPos( (centerX - r    ) << 4,              0,  (centerZ - r    ) << 4     );
-        BlockPos pos2 = new BlockPos(((centerX + r + 1) << 4) - 1, this.topY, ((centerZ + r + 1) << 4) - 1);
+        BlockPos pos1 = new BlockPos(       (centerX - r    ) << 4,              0,  (centerZ - r    ) << 4     );
+        BlockPos pos2 = BlockPos.ofFloored(((centerX + r + 1) << 4) - 1, this.topY, ((centerZ + r + 1) << 4) - 1);
 
         this.startBuffers();
 
