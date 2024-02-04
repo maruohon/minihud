@@ -6,7 +6,7 @@ import malilib.render.buffer.VertexBuilder;
 import malilib.util.MathUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Vec3d;
 
@@ -22,7 +22,7 @@ public class RenderUtils
             Color4f color,
             VertexBuilder quadBuilder, VertexBuilder lineBuilder)
     {
-        Entity entity = GameUtils.getCameraEntity();
+        Entity entity = GameWrap.getCameraEntity();
         final int boxMinX = Math.min(posStart.getX(), posEnd.getX());
         final int boxMinZ = Math.min(posStart.getZ(), posEnd.getZ());
         final int boxMaxX = Math.max(posStart.getX(), posEnd.getX());
@@ -30,7 +30,7 @@ public class RenderUtils
 
         final int centerX = (int) Math.floor(EntityWrap.getX(entity));
         final int centerZ = (int) Math.floor(EntityWrap.getZ(entity));
-        final int maxDist = GameUtils.getRenderDistanceChunks() * 16 * 2; // double the view distance in blocks
+        final int maxDist = GameWrap.getRenderDistanceChunks() * 16 * 2; // double the view distance in blocks
         final int rangeMinX = centerX - maxDist;
         final int rangeMinZ = centerZ - maxDist;
         final int rangeMaxX = centerX + maxDist;

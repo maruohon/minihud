@@ -17,7 +17,7 @@ import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.RenderWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Direction;
@@ -42,7 +42,7 @@ public abstract class ShapeCircleBase extends ShapeBase
 
         this.setRadius(radius);
 
-        Entity entity = GameUtils.getCameraEntity();
+        Entity entity = GameWrap.getCameraEntity();
 
         if (entity != null)
         {

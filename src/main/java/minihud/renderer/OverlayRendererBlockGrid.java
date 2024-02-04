@@ -11,7 +11,7 @@ import malilib.render.ShapeRenderUtils;
 import malilib.render.buffer.VertexBuilder;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Direction;
 import malilib.util.position.Vec3d;
@@ -70,7 +70,7 @@ public class OverlayRendererBlockGrid extends MiniHudOverlayRenderer
     @Override
     public void update(Vec3d cameraPos, Entity entity)
     {
-        World world = GameUtils.getClientWorld();
+        World world = GameWrap.getClientWorld();
         Color4f color = Configs.Colors.BLOCK_GRID_OVERLAY_COLOR.getColor();
         BlockGridMode mode = Configs.Generic.BLOCK_GRID_OVERLAY_MODE.getValue();
         int radius = Configs.Generic.BLOCK_GRID_OVERLAY_RADIUS.getIntegerValue();

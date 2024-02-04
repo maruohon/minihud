@@ -21,7 +21,7 @@ import malilib.render.overlay.VboRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.data.Identifier;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.RenderWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Direction;
@@ -68,7 +68,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
 
         BlockPos pos = EntityWrap.getEntityBlockPos(entity);
         //long pre = System.nanoTime();
-        this.updateLightLevels(GameUtils.getClientWorld(), pos);
+        this.updateLightLevels(GameWrap.getClientWorld(), pos);
         //System.out.printf("LL markers: %d, time: %.3f s\n", LIGHT_INFOS.size(), (double) (System.nanoTime() - pre) / 1000000000D);
         this.renderLightLevels(cameraPos);
 
@@ -95,7 +95,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
     protected void renderLightLevels(Vec3d cameraPos)
     {
         final int count = this.lightInfoList.size();
-        Entity entity = GameUtils.getCameraEntity();
+        Entity entity = GameWrap.getCameraEntity();
 
         if (count > 0)
         {

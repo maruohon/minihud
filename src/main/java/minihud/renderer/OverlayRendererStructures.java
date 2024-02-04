@@ -9,7 +9,7 @@ import net.minecraft.entity.Entity;
 import malilib.render.ShapeRenderUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.Vec3d;
@@ -50,7 +50,7 @@ public class OverlayRendererStructures extends MiniHudOverlayRenderer
     protected void updateStructures(BlockPos playerPos, Vec3d cameraPos)
     {
         ArrayListMultimap<StructureType, StructureData> structures = StructureStorage.INSTANCE.getStructureDataAndClearDirtyFlag();
-        int maxRange = (GameUtils.getRenderDistanceChunks() + 2) * 16;
+        int maxRange = (GameWrap.getRenderDistanceChunks() + 2) * 16;
 
         for (StructureType type : structures.keySet())
         {

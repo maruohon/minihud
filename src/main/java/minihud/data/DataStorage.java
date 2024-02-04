@@ -10,9 +10,9 @@ import net.minecraft.world.World;
 
 import malilib.overlay.message.MessageUtils;
 import malilib.util.data.json.JsonUtils;
-import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.WorldWrap;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Vec3d;
 import minihud.data.structure.StructureDataUtils;
@@ -104,9 +104,9 @@ public class DataStorage
         {
             return true;
         }
-        else if (GameUtils.isSinglePlayer())
+        else if (GameWrap.isSinglePlayer())
         {
-            return GameUtils.getIntegratedServer().getWorld(WorldUtils.getDimensionId(world)) != null;
+            return GameWrap.getIntegratedServer().getWorld(WorldWrap.getDimensionId(world)) != null;
         }
 
         return false;
@@ -124,9 +124,9 @@ public class DataStorage
 
     public long getWorldSeed(World world)
     {
-        if (this.hasStoredWorldSeed() == false && GameUtils.isSinglePlayer())
+        if (this.hasStoredWorldSeed() == false && GameWrap.isSinglePlayer())
         {
-            World worldTmp = WorldUtils.getServerWorldForClientWorld(world);
+            World worldTmp = WorldWrap.getServerWorldForClientWorld(world);
 
             if (worldTmp != null)
             {
@@ -171,9 +171,9 @@ public class DataStorage
 
     public void clearBlockBreakCounter()
     {
-        if (GameUtils.getClientWorld() != null)
+        if (GameWrap.getClientWorld() != null)
         {
-            int worldTick = (int) (GameUtils.getCurrentWorldTick() & 0x7FFFFFFFL);
+            int worldTick = (int) (GameWrap.getCurrentWorldTick() & 0x7FFFFFFFL);
             int index = worldTick % this.blockBreakCounter.length;
             this.blockBreakCounter[index] = 0;
         }
@@ -181,9 +181,9 @@ public class DataStorage
 
     public void onPlayerBlockBreak()
     {
-        if (GameUtils.getClientWorld() != null)
+        if (GameWrap.getClientWorld() != null)
         {
-            int worldTick = (int) (GameUtils.getCurrentWorldTick() & 0x7FFFFFFFL);
+            int worldTick = (int) (GameWrap.getCurrentWorldTick() & 0x7FFFFFFFL);
             int index = worldTick % this.blockBreakCounter.length;
             ++this.blockBreakCounter[index];
         }

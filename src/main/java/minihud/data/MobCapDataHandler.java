@@ -12,8 +12,8 @@ import net.minecraft.world.WorldServer;
 
 import malilib.render.text.TextRendererUtils;
 import malilib.util.StringUtils;
-import malilib.util.game.WorldUtils;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.WorldWrap;
+import malilib.util.game.wrap.GameWrap;
 import minihud.data.MobCapData.EntityCategory;
 import minihud.util.MiscUtils;
 
@@ -25,7 +25,7 @@ public class MobCapDataHandler
     // Needs to be after the above initializations
     public static final MobCapDataHandler INSTANCE = new MobCapDataHandler();
 
-    protected final Minecraft mc = GameUtils.getClient();
+    protected final Minecraft mc = GameWrap.getClient();
     protected final MobCapData localData = new MobCapData();
     protected final MobCapData parsedServerData = new MobCapData();
     protected final MobCapData subscribedServerData = new MobCapData();
@@ -119,7 +119,7 @@ public class MobCapDataHandler
 
     protected long getWorldTick()
     {
-        return GameUtils.getCurrentWorldTick();
+        return GameWrap.getCurrentWorldTick();
     }
 
     private void setPlayerListParsedData(EntityCategory type, int currentValue, int capValue, long worldTick)
@@ -132,12 +132,12 @@ public class MobCapDataHandler
 
     public void updateIntegratedServerMobCaps()
     {
-        World clientWorld = GameUtils.getClientWorld();
+        World clientWorld = GameWrap.getClientWorld();
 
-        if (GameUtils.isSinglePlayer() && clientWorld != null)
+        if (GameWrap.isSinglePlayer() && clientWorld != null)
         {
-            MinecraftServer server = GameUtils.getIntegratedServer();
-            int dim = WorldUtils.getDimensionId(clientWorld);
+            MinecraftServer server = GameWrap.getIntegratedServer();
+            int dim = WorldWrap.getDimensionId(clientWorld);
 
             server.addScheduledTask(() -> {
                 WorldServer world = server.getWorld(dim);
@@ -167,7 +167,7 @@ public class MobCapDataHandler
 
     public void parsePlayerListFooterMobCapData(ITextComponent textComponent)
     {
-        if (GameUtils.getClientWorld() == null)
+        if (GameWrap.getClientWorld() == null)
         {
             return;
         }

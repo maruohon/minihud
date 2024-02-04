@@ -26,7 +26,7 @@ import malilib.network.ClientPacketChannelHandler;
 import malilib.network.PacketSplitter;
 import malilib.network.message.BasePacketHandler;
 import malilib.registry.Registry;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import minihud.MiniHud;
 import minihud.config.Configs;
 import minihud.config.InfoLineToggle;
@@ -172,7 +172,7 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
 
     protected void updateSubscriptions(int updateType, Collection<String> nodes)
     {
-        NetHandlerPlayClient handler = GameUtils.getClient().getConnection();
+        NetHandlerPlayClient handler = GameWrap.getClient().getConnection();
 
         if (handler != null)
         {
@@ -218,7 +218,7 @@ public class CarpetPubsubPacketHandler extends BasePacketHandler
 
     public void updatePubSubSubscriptions()
     {
-        World world = GameUtils.getClientWorld();
+        World world = GameWrap.getClientWorld();
 
         if (world != null)
         {

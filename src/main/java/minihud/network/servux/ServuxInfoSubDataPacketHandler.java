@@ -25,7 +25,7 @@ import malilib.util.MathUtils;
 import malilib.util.data.Constants;
 import malilib.util.data.palette.HashMapPalette;
 import malilib.util.data.palette.Palette;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.nbt.NbtUtils;
 import minihud.MiniHud;
@@ -205,7 +205,7 @@ public class ServuxInfoSubDataPacketHandler extends BasePacketHandler
 
     protected void updateSubscriptions(String action, Collection<String> channels)
     {
-        NetHandlerPlayClient handler = GameUtils.getClient().getConnection();
+        NetHandlerPlayClient handler = GameWrap.getClient().getConnection();
 
         if (handler != null)
         {

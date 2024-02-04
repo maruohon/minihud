@@ -6,7 +6,7 @@ import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.entity.Entity;
 
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import minihud.MiniHud;
 import minihud.data.structure.StructureDataUtils.StructureFileUtils;
@@ -79,7 +79,7 @@ public class StructureStorage
             this.structuresDirty = true;
             this.structuresNeedUpdating = false;
 
-            Entity player = GameUtils.getClientPlayer();
+            Entity player = GameWrap.getClientPlayer();
 
             if (player != null)
             {
@@ -90,11 +90,11 @@ public class StructureStorage
 
     public void updateStructureDataIfNeeded()
     {
-        if (GameUtils.getClientPlayer() != null)
+        if (GameWrap.getClientPlayer() != null)
         {
             BlockPos playerPos = EntityWrap.getPlayerBlockPos();
 
-            if (GameUtils.isSinglePlayer())
+            if (GameWrap.isSinglePlayer())
             {
                 if (this.structuresNeedUpdating(playerPos, 32))
                 {

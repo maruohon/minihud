@@ -43,9 +43,9 @@ import malilib.render.inventory.InventoryRenderUtils;
 import malilib.util.MathUtils;
 import malilib.util.StringUtils;
 import malilib.util.game.BlockUtils;
-import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.WorldWrap;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.game.wrap.RenderWrap;
 import malilib.util.position.BlockPos;
@@ -280,7 +280,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
         this.enabled = Configs.Generic.INFO_LINES_RENDERING_TOGGLE.getBooleanValue() &&
                        mc.gameSettings.showDebugInfo == false &&
-                       mc.player != null && mc.world != null && GameUtils.Options.hideGui() == false &&
+                       mc.player != null && mc.world != null && GameWrap.isHideGui() == false &&
                        (Configs.Generic.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
                         Configs.Hotkeys.REQUIRED_KEY.getKeyBind().isKeyBindHeld();
 
@@ -373,10 +373,10 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
     private void addLine(InfoLineToggle type)
     {
-        Minecraft mc = GameUtils.getClient();
+        Minecraft mc = GameWrap.getClient();
         Entity entity = mc.getRenderViewEntity();
         World world = entity.getEntityWorld();
-        HitResult hitResult = GameUtils.getHitResult();
+        HitResult hitResult = GameWrap.getHitResult();
         double x = EntityWrap.getX(entity);
         double y = EntityWrap.getY(entity);
         double z = EntityWrap.getZ(entity);
@@ -538,7 +538,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             if (InfoLineToggle.DIMENSION.getBooleanValue())
             {
-                str.append(String.format("%sDimType ID: %s", pre, WorldUtils.getDimensionIdAsString(world)));
+                str.append(String.format("%sDimType ID: %s", pre, WorldWrap.getDimensionIdAsString(world)));
             }
 
             this.addLine(str.toString());
@@ -719,7 +719,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
         else if (type == InfoLineToggle.LOADED_CHUNKS_COUNT)
         {
             String chunksClient = mc.world.getProviderName();
-            World worldServer = WorldUtils.getBestWorld();
+            World worldServer = WorldWrap.getBestWorld();
 
             if (worldServer != null && worldServer != mc.world)
             {
@@ -807,7 +807,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
             if (mc.isIntegratedServerRunning())
             {
-                World serverWorld = WorldUtils.getBestWorld();
+                World serverWorld = WorldWrap.getBestWorld();
 
                 if (serverWorld instanceof WorldServer)
                 {
@@ -923,7 +923,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
 
     private void getBlockProperties(Minecraft mc)
     {
-        HitResult hitResult = GameUtils.getHitResult();
+        HitResult hitResult = GameWrap.getHitResult();
 
         if (hitResult.type == HitResult.Type.BLOCK)
         {

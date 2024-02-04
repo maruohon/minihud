@@ -15,7 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import malilib.network.PacketSplitter;
 import malilib.network.message.BasePacketHandler;
 import malilib.util.data.Constants;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.position.IntBoundingBox;
 import minihud.MiniHud;
@@ -97,7 +97,7 @@ public class CarpetStructurePacketHandler extends BasePacketHandler
     {
         PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
         buf.writeInt(CARPET_ID_BOUNDINGBOX_MARKERS);
-        PacketSplitter.send(CHANNEL, buf, GameUtils.getNetworkConnection());
+        PacketSplitter.send(CHANNEL, buf, GameWrap.getNetworkConnection());
     }
 
     private static ArrayListMultimap<StructureType, StructureData> readStructureDataCarpetAllBoxes(NBTTagCompound tag)

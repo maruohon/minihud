@@ -31,7 +31,7 @@ import malilib.config.util.ConfigUtils;
 import malilib.registry.Registry;
 import malilib.util.StringUtils;
 import malilib.util.data.Constants;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.nbt.NbtUtils;
 import malilib.util.position.BlockPos;
@@ -53,11 +53,11 @@ public class StructureDataUtils
 {
     public static void requestStructureDataUpdates()
     {
-        if (GameUtils.getClientWorld() != null)
+        if (GameWrap.getClientWorld() != null)
         {
             boolean enabled = RendererToggle.STRUCTURE_BOUNDING_BOXES.isRendererEnabled();
 
-            if (GameUtils.isSinglePlayer() == false)
+            if (GameWrap.isSinglePlayer() == false)
             {
                 if (enabled)
                 {
@@ -87,11 +87,11 @@ public class StructureDataUtils
     {
         public static void updateStructureDataFromIntegratedServer(BlockPos playerPos)
         {
-            WorldServer world = GameUtils.getClientPlayersServerWorld();
+            WorldServer world = GameWrap.getClientPlayersServerWorld();
 
             if (world != null)
             {
-                int maxRange = (GameUtils.getRenderDistanceChunks() + 4) * 16;
+                int maxRange = (GameWrap.getRenderDistanceChunks() + 4) * 16;
                 world.addScheduledTask(() -> addStructureDataFromGenerator(world, playerPos, maxRange));
             }
         }
@@ -155,7 +155,7 @@ public class StructureDataUtils
                 }
             }
 
-            GameUtils.scheduleToClientThread(() -> StructureStorage.INSTANCE.addStructureDataFromIntegratedServer(mapOut));
+            GameWrap.scheduleToClientThread(() -> StructureStorage.INSTANCE.addStructureDataFromIntegratedServer(mapOut));
         }
 
         private static void addStructuresWithinRange(StructureType type,

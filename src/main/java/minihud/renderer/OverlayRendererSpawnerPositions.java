@@ -1,6 +1,6 @@
 package minihud.renderer;
 
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
 import minihud.data.DataStorage;
@@ -18,7 +18,7 @@ public class OverlayRendererSpawnerPositions extends BaseBlockPositionListOverla
     @Override
     public boolean shouldRender()
     {
-        boolean render = this.enabledSupplier.getAsBoolean() && GameUtils.getClientWorld().provider.isSurfaceWorld();
+        boolean render = this.enabledSupplier.getAsBoolean() && GameWrap.getClientWorld().provider.isSurfaceWorld();
         this.wasDisabled |= (render == false);
         return render;
     }

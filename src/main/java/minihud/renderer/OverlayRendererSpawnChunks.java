@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 import malilib.render.ShapeRenderUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Vec3d;
 import minihud.config.Configs;
@@ -27,7 +27,7 @@ public class OverlayRendererSpawnChunks extends MiniHudOverlayRenderer
     @Override
     public boolean shouldRender()
     {
-        World world = GameUtils.getClientWorld();
+        World world = GameWrap.getClientWorld();
 
         return this.toggle.isRendererEnabled() &&
                 (this.toggle == RendererToggle.SPAWN_CHUNKS_PLAYER ||

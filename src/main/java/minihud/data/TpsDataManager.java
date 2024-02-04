@@ -10,7 +10,7 @@ import net.minecraft.util.text.ITextComponent;
 import malilib.render.text.TextRendererUtils;
 import malilib.util.MathUtils;
 import malilib.util.StringUtils;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 
 public class TpsDataManager
 {
@@ -98,13 +98,13 @@ public class TpsDataManager
 
     public void updateIntegratedServerTps()
     {
-        MinecraftServer server = GameUtils.getIntegratedServer();
+        MinecraftServer server = GameWrap.getIntegratedServer();
 
-        if (server != null && GameUtils.getClientWorld() != null)
+        if (server != null && GameWrap.getClientWorld() != null)
         {
             double mspt = MathUtils.average(server.tickTimeArray) / 1000000.0;
             double tps = mspt <= 50.0 ? 20.0 : (1000.0 / mspt);
-            this.localData.setValues(tps, mspt, GameUtils.getCurrentWorldTick());
+            this.localData.setValues(tps, mspt, GameWrap.getCurrentWorldTick());
         }
     }
 

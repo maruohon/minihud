@@ -9,7 +9,7 @@ import malilib.render.ShapeRenderUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Vec3d;
 import minihud.config.Configs;
@@ -38,7 +38,7 @@ public class OverlayRendererSlimeChunks extends MiniHudOverlayRenderer
     @Override
     public boolean shouldRender()
     {
-        World world = GameUtils.getClientWorld();
+        World world = GameWrap.getClientWorld();
 
         return RendererToggle.SLIME_CHUNKS.isRendererEnabled() &&
                 DataStorage.INSTANCE.isWorldSeedKnown(world) &&
@@ -53,7 +53,7 @@ public class OverlayRendererSlimeChunks extends MiniHudOverlayRenderer
             return true;
         }
 
-        World world = GameUtils.getClientWorld();
+        World world = GameWrap.getClientWorld();
         boolean isSeedKnown = DataStorage.INSTANCE.isWorldSeedKnown(world);
         long seed = DataStorage.INSTANCE.getWorldSeed(world);
 
@@ -75,7 +75,7 @@ public class OverlayRendererSlimeChunks extends MiniHudOverlayRenderer
     public void update(Vec3d cameraPos, Entity entity)
     {
         DataStorage data = DataStorage.getInstance();
-        World world = GameUtils.getClientWorld();
+        World world = GameWrap.getClientWorld();
         this.topY = Configs.Internal.SLIME_CHUNKS_OVERLAY_TOP_Y.getDoubleValue();
         this.wasSeedKnown = data.isWorldSeedKnown(world);
         this.seed = data.getWorldSeed(world);
@@ -92,7 +92,7 @@ public class OverlayRendererSlimeChunks extends MiniHudOverlayRenderer
 
             if (r == -1)
             {
-                r = GameUtils.getRenderDistanceChunks();
+                r = GameWrap.getRenderDistanceChunks();
             }
 
             int topY = (int) Math.floor(this.topY);

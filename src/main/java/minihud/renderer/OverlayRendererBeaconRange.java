@@ -13,7 +13,7 @@ import net.minecraft.world.chunk.Chunk;
 
 import malilib.render.ShapeRenderUtils;
 import malilib.util.data.Color4f;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.ChunkPos;
 import malilib.util.position.Vec3d;
@@ -89,7 +89,7 @@ public class OverlayRendererBeaconRange extends MiniHudOverlayRenderer
 
         synchronized (this.beaconPositions)
         {
-            this.renderBeaconRanges(GameUtils.getClientWorld(), cameraPos);
+            this.renderBeaconRanges(GameWrap.getClientWorld(), cameraPos);
         }
 
         this.uploadBuffers();

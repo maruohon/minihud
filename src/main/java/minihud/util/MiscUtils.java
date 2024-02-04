@@ -17,7 +17,7 @@ import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 import malilib.util.StringUtils;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.game.wrap.RegistryUtils;
@@ -189,7 +189,7 @@ public class MiscUtils
         NBTTagCompound tag = ItemWrap.getTag(stack);
 
         // If the vanilla advanced tooltips are disabled, add them here, when showing a tooltip
-        if (GameUtils.getClient().gameSettings.advancedItemTooltips == false && (showPretty || showString))
+        if (GameWrap.getClient().gameSettings.advancedItemTooltips == false && (showPretty || showString))
         {
             if (stack.isItemDamaged())
             {

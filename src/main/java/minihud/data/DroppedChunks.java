@@ -2,7 +2,7 @@ package minihud.data;
 
 import net.minecraft.world.WorldServer;
 
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import minihud.config.Configs;
 import minihud.util.MiscUtils;
 
@@ -22,7 +22,7 @@ public class DroppedChunks
             return HashSizeType.CARPET;
         }
 
-        if (GameUtils.isSinglePlayer() && GameUtils.getClientWorld() != null)
+        if (GameWrap.isSinglePlayer() && GameWrap.getClientWorld() != null)
         {
             return HashSizeType.SINGLE_PLAYER;
         }
@@ -40,7 +40,7 @@ public class DroppedChunks
                 return Configs.Generic.DROPPED_CHUNKS_HASH_SIZE.getIntegerValue();
 
             case SINGLE_PLAYER:
-                WorldServer world = GameUtils.getClientPlayersServerWorld();
+                WorldServer world = GameWrap.getClientPlayersServerWorld();
                 return world != null ? MiscUtils.getCurrentHashSize(world) : 0xFFFF;
 
             case CARPET:

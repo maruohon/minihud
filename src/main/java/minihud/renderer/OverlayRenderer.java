@@ -16,7 +16,7 @@ import malilib.render.buffer.VanillaWrappingVertexBuilder;
 import malilib.render.buffer.VertexBuilder;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.RenderWrap;
 import malilib.util.inventory.InventoryUtils;
 import minihud.config.Configs;
@@ -36,7 +36,7 @@ public class OverlayRenderer
 
     public static void renderOverlays(RenderContext ctx, float tickDelta)
     {
-        Entity entity = GameUtils.getCameraEntity();
+        Entity entity = GameWrap.getCameraEntity();
 
         if (entity == null)
         {
@@ -77,7 +77,7 @@ public class OverlayRenderer
 
         if (RendererToggle.BEACON_RANGE.isRendererEnabled())
         {
-            renderBeaconBoxForPlayerIfHoldingItem(GameUtils.getClientPlayer(), dx, dy, dz);
+            renderBeaconBoxForPlayerIfHoldingItem(GameWrap.getClientPlayer(), dx, dy, dz);
         }
 
         if (RendererToggle.SPAWNER_POSITIONS.isRendererEnabled())
@@ -102,7 +102,7 @@ public class OverlayRenderer
 
         if (r == -1)
         {
-            r = GameUtils.getRenderDistanceChunks();
+            r = GameWrap.getRenderDistanceChunks();
         }
 
         for (int xOff = -r; xOff <= r; xOff++)

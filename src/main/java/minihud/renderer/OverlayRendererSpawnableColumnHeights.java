@@ -9,7 +9,7 @@ import malilib.render.ShapeRenderUtils;
 import malilib.util.MathUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.ChunkPos;
 import malilib.util.position.PositionUtils;
 import malilib.util.position.Vec3d;
@@ -90,7 +90,7 @@ public class OverlayRendererSpawnableColumnHeights extends MiniHudOverlayRendere
         final int zStart = (int) EntityWrap.getZ(entity) - radius;
         final int xEnd = xStart + radius * 2;
         final int zEnd = zStart + radius * 2;
-        final World world = GameUtils.getClientWorld();
+        final World world = GameWrap.getClientWorld();
 
         this.startBuffers();
 

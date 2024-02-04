@@ -19,9 +19,9 @@ import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
-import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.WorldWrap;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
@@ -142,7 +142,7 @@ public class DebugInfoUtils
 
         if (neighborUpdateEnabled)
         {
-            Minecraft mc = GameUtils.getClient();
+            Minecraft mc = GameWrap.getClient();
             List<NeighborUpdate> list = new ArrayList<>(NEIGHBOR_UPDATES);
             NEIGHBOR_UPDATES.clear();
 
@@ -162,7 +162,7 @@ public class DebugInfoUtils
         if (++tickCounter >= 10)
         {
             tickCounter = 0;
-            World world = WorldUtils.getServerWorldForClientWorld();
+            World world = WorldWrap.getServerWorldForClientWorld();
 
             if (world != null)
             {
@@ -232,7 +232,7 @@ public class DebugInfoUtils
 
     public static void toggleDebugRenderer(RendererToggle config)
     {
-        Minecraft mc = GameUtils.getClient();
+        Minecraft mc = GameWrap.getClient();
         boolean enabled = config.isRendererEnabled();
 
         if (config == RendererToggle.DEBUG_BLOCK_COLLISION_BOXES)
