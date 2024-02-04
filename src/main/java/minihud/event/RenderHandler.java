@@ -13,7 +13,6 @@ import javax.annotation.Nullable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -48,6 +47,7 @@ import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.RegistryUtils;
+import malilib.util.game.wrap.RenderWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Direction;
 import malilib.util.position.HitResult;
@@ -173,8 +173,8 @@ public class RenderHandler implements PostGameOverlayRenderer, PostItemTooltipRe
     {
         if (Configs.Generic.FIX_VANILLA_DEBUG_RENDERERS.getBooleanValue())
         {
-            GlStateManager.disableLighting();
-            //RenderUtils.color(1, 1, 1, 1);
+            RenderWrap.disableLighting();
+            //RenderWrap.color(1, 1, 1, 1);
             //OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f);
         }
     }

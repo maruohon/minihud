@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 
 import malilib.config.value.BaseOptionListConfigValue;
@@ -19,6 +18,7 @@ import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.RenderWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Direction;
 import malilib.util.position.LayerRange;
@@ -164,12 +164,12 @@ public abstract class ShapeCircleBase extends ShapeBase
         this.quadRenderer.draw();
 
         // Render the lines as quads with glPolygonMode(GL_LINE)
-        GlStateManager.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
-        GlStateManager.disableBlend();
+        RenderWrap.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+        RenderWrap.disableBlend();
         this.quadRenderer.draw();
 
-        GlStateManager.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
-        GlStateManager.enableBlend();
+        RenderWrap.polygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+        RenderWrap.enableBlend();
 
         this.postRender();
     }

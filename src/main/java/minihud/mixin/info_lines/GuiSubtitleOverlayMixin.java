@@ -8,8 +8,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiSubtitleOverlay;
-import net.minecraft.client.renderer.GlStateManager;
 
+import malilib.render.RenderContext;
+import malilib.util.game.wrap.RenderWrap;
 import minihud.config.Configs;
 import minihud.event.RenderHandler;
 
@@ -32,7 +33,7 @@ public abstract class GuiSubtitleOverlayMixin extends Gui
 
             if (offset != 0)
             {
-                GlStateManager.translate(0, offset, 0);
+                RenderWrap.translate(0, offset, 0, RenderContext.DUMMY);
             }
         }
     }

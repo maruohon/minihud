@@ -3,7 +3,6 @@ package minihud.renderer;
 import java.util.Collections;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -11,7 +10,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 
 import malilib.render.RenderContext;
-import malilib.render.RenderUtils;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.TextRenderUtils;
 import malilib.render.buffer.VanillaWrappingVertexBuilder;
@@ -19,6 +17,7 @@ import malilib.render.buffer.VertexBuilder;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.RenderWrap;
 import malilib.util.inventory.InventoryUtils;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
@@ -154,16 +153,16 @@ public class OverlayRenderer
         double maxZ = z + range + 1;
         Color4f color = OverlayRendererBeaconRange.getColorForLevel(level);
 
-        GlStateManager.enableAlpha();
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
-        GlStateManager.disableCull();
-        GlStateManager.disableLighting();
-        GlStateManager.enableDepth();
-        GlStateManager.depthMask(false);
-        GlStateManager.doPolygonOffset(-3f, -3f);
-        GlStateManager.enablePolygonOffset();
-        GlStateManager.glLineWidth(1f);
-        RenderUtils.color(1f, 1f, 1f, 1f);
+        RenderWrap.enableAlpha();
+        RenderWrap.alphaFunc(GL11.GL_GREATER, 0.01F);
+        RenderWrap.disableCull();
+        RenderWrap.disableLighting();
+        RenderWrap.enableDepthTest();
+        RenderWrap.depthMask(false);
+        RenderWrap.polygonOffset(-3f, -3f);
+        RenderWrap.enablePolygonOffset();
+        RenderWrap.lineWidth(1f);
+        RenderWrap.color(1f, 1f, 1f, 1f);
 
         VertexBuilder quadBuilder = VanillaWrappingVertexBuilder.coloredQuads();
         ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(0.3f), quadBuilder);
@@ -173,8 +172,8 @@ public class OverlayRenderer
         ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color.withAlpha(1f), lineBuilder);
         lineBuilder.draw();
 
-        GlStateManager.doPolygonOffset(0f, 0f);
-        GlStateManager.disablePolygonOffset();
-        GlStateManager.enableCull();
+        RenderWrap.polygonOffset(0f, 0f);
+        RenderWrap.disablePolygonOffset();
+        RenderWrap.enableCull();
     }
 }

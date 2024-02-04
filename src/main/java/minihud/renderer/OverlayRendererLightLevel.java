@@ -16,13 +16,13 @@ import net.minecraft.world.chunk.Chunk;
 
 import malilib.config.option.ColorConfig;
 import malilib.config.option.Vec2dConfig;
-import malilib.render.RenderUtils;
 import malilib.render.buffer.VertexBuilder;
 import malilib.render.overlay.VboRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.data.Identifier;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.RenderWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Direction;
 import malilib.util.position.Vec3d;
@@ -82,7 +82,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
     {
         super.preRender();
 
-        RenderUtils.bindTexture(NUMBER_TEXTURE);
+        RenderWrap.bindTexture(NUMBER_TEXTURE);
     }
 
     @Override
