@@ -1,7 +1,7 @@
 package minihud;
 
-import malilib.action.util.ActionUtils;
 import malilib.action.NamedAction;
+import malilib.action.util.ActionUtils;
 import malilib.listener.EventListener;
 import minihud.config.Configs;
 import minihud.config.InfoLineToggle;

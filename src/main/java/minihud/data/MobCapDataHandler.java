@@ -12,8 +12,8 @@ import net.minecraft.world.WorldServer;
 
 import malilib.render.text.TextRendererUtils;
 import malilib.util.StringUtils;
-import malilib.util.game.wrap.WorldWrap;
 import malilib.util.game.wrap.GameWrap;
+import malilib.util.game.wrap.WorldWrap;
 import minihud.data.MobCapData.EntityCategory;
 import minihud.util.MiscUtils;
 

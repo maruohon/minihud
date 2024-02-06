@@ -19,9 +19,9 @@ import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
-import malilib.util.game.wrap.WorldWrap;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameWrap;
+import malilib.util.game.wrap.WorldWrap;
 import malilib.util.position.BlockPos;
 import minihud.config.Configs;
 import minihud.config.RendererToggle;
