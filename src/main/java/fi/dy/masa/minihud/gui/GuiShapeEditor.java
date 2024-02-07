@@ -208,7 +208,7 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
         int x = xIn;
         int y = yIn + 4;
 
-        this.createBoxInputs(x, y, x, y + 82, 120, shape::getBox, shape::setBox);
+        this.createBoxInputs(x, y, x, y + 82, 120, shape);
 
         y += 160;
         this.createColorInput(x, y);
@@ -321,43 +321,26 @@ public class GuiShapeEditor extends GuiRenderLayerEditBase
     }
 
 
-    public void createBoxInputs(int x1, int y1, int x2, int y2, int textFieldWidth,
-                                Supplier<Box> supplier, Consumer<Box> consumer)
+    public void createBoxInputs(int x1, int y1, int x2, int y2, int textFieldWidth, ShapeBox shape)
     {
-        this.addLabel(x1, y1, -1, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.shape.box.minimum_coord"));
+        this.addLabel(x1, y1, -1, 14, 0xFFFFFFFF, "Corner 1");
         y1 += 12;
 
-        this.addLabel(x2, y2, -1, 14, 0xFFFFFFFF, StringUtils.translate("minihud.gui.label.shape.box.maximum_coord"));
+        this.addLabel(x2, y2, -1, 14, 0xFFFFFFFF, "Corner 2");
         y2 += 12;
 
-        int yInc = 16;
-        this.addLabel(x1, y1           , CoordinateType.X);
-        this.addLabel(x1, y1 + yInc    , CoordinateType.Y);
-        this.addLabel(x1, y1 + yInc * 2, CoordinateType.Z);
+        GuiUtils.createVec3dInputsVertical(x1, y1, textFieldWidth, shape.getCorner1(), new Vec3dEditor(shape::getCorner1, shape::setCorner1, this), true, this);
+        GuiUtils.createVec3dInputsVertical(x2, y2, textFieldWidth, shape.getCorner2(), new Vec3dEditor(shape::getCorner2, shape::setCorner2, this), true, this);
 
-        this.addLabel(x2, y2           , CoordinateType.X);
-        this.addLabel(x2, y2 + yInc    , CoordinateType.Y);
-        this.addLabel(x2, y2 + yInc * 2, CoordinateType.Z);
-
-        MutableWrapperBox mutableBox = new MutableWrapperBox(supplier.get(), consumer);
         int x = x1 + 12;
         
-        this.addBoxInput(x, y1            + 1, textFieldWidth, mutableBox::getMinX, mutableBox::setMinX);
-        this.addBoxInput(x, y1 + yInc     + 1, textFieldWidth, mutableBox::getMinY, mutableBox::setMinY);
-        this.addBoxInput(x, y1 + yInc * 2 + 1, textFieldWidth, mutableBox::getMinZ, mutableBox::setMinZ);
-
-        ButtonGeneric btn = new ButtonGeneric(x, y1 + yInc * 3 + 2, -1, 14, StringUtils.translate("malilib.gui.button.render_layers_gui.set_to_player"));
+        ButtonGeneric btn = new ButtonGeneric(x, y1 + 50, -1, 14, StringUtils.translate("malilib.gui.button.render_layers_gui.set_to_player"));
         btn.setRenderDefaultBackground(false);
-        this.addButton(btn, (b, mb) -> this.setPositionFromCamera(mutableBox::setMinCorner));
+        this.addButton(btn, (b, mb) -> this.setPositionFromCamera(shape::setCorner1));
 
-        x = x2 + 12;
-        this.addBoxInput(x, y2            + 1, textFieldWidth, mutableBox::getMaxX, mutableBox::setMaxX);
-        this.addBoxInput(x, y2 + yInc     + 1, textFieldWidth, mutableBox::getMaxY, mutableBox::setMaxY);
-        this.addBoxInput(x, y2 + yInc * 2 + 1, textFieldWidth, mutableBox::getMaxZ, mutableBox::setMaxZ);
-
-        btn = new ButtonGeneric(x, y2 + yInc * 3 + 2, -1, 14, StringUtils.translate("malilib.gui.button.render_layers_gui.set_to_player"));
+        btn = new ButtonGeneric(x, y2 + 50, -1, 14, StringUtils.translate("malilib.gui.button.render_layers_gui.set_to_player"));
         btn.setRenderDefaultBackground(false);
-        this.addButton(btn, (b, mb) -> this.setPositionFromCamera(mutableBox::setMaxCorner));
+        this.addButton(btn, (b, mb) -> this.setPositionFromCamera(shape::setCorner2));
     }
 
     protected void addBoxInput(int x, int y, int textFieldWidth, DoubleSupplier coordinateSource,

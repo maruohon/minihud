@@ -25,6 +25,8 @@ public class ShapeBox extends ShapeBase
 
     protected Box box = DEFAULT_BOX;
     protected Box renderPerimeter = DEFAULT_BOX;
+    protected Vec3d corner1 = Vec3d.ZERO;
+    protected Vec3d corner2 = Vec3d.ZERO;
     protected int enabledSidesMask = 0x3F;
     protected double maxDimensions = MAX_DIMENSIONS;
     protected boolean gridEnabled = true;
@@ -67,8 +69,31 @@ public class ShapeBox extends ShapeBase
         return this.gridEndOffset;
     }
 
-    public void setBox(Box box)
+    public Vec3d getCorner1()
     {
+        return this.corner1;
+    }
+
+    public Vec3d getCorner2()
+    {
+        return this.corner2;
+    }
+
+    public void setCorner1(Vec3d corner1)
+    {
+        this.corner1 = corner1;
+        this.setBoxFromCorners();
+    }
+
+    public void setCorner2(Vec3d corner2)
+    {
+        this.corner2 = corner2;
+        this.setBoxFromCorners();
+    }
+
+    protected void setBoxFromCorners()
+    {
+        Box box = new Box(this.corner1, this.corner2);
         this.box = this.clampBox(box, this.maxDimensions);
 
         double margin = MinecraftClient.getInstance().options.getViewDistance().getValue() * 16 * 2;
@@ -437,12 +462,8 @@ public class ShapeBox extends ShapeBase
         obj.add("grid_start_offset", JsonUtils.vec3dToJson(this.gridStartOffset));
         obj.add("grid_end_offset",   JsonUtils.vec3dToJson(this.gridEndOffset));
 
-        obj.addProperty("minX", this.box.minX);
-        obj.addProperty("minY", this.box.minY);
-        obj.addProperty("minZ", this.box.minZ);
-        obj.addProperty("maxX", this.box.maxX);
-        obj.addProperty("maxY", this.box.maxY);
-        obj.addProperty("maxZ", this.box.maxZ);
+        obj.add("corner1", JsonUtils.vec3dToJson(this.corner1));
+        obj.add("corner2", JsonUtils.vec3dToJson(this.corner2));
 
         return obj;
     }
@@ -462,13 +483,27 @@ public class ShapeBox extends ShapeBase
         if (this.gridStartOffset == null) { this.gridStartOffset = Vec3d.ZERO; }
         if (this.gridEndOffset == null)   { this.gridEndOffset = Vec3d.ZERO; }
 
-        double minX = JsonUtils.getDoubleOrDefault(obj, "minX", 0);
-        double minY = JsonUtils.getDoubleOrDefault(obj, "minY", 0);
-        double minZ = JsonUtils.getDoubleOrDefault(obj, "minZ", 0);
-        double maxX = JsonUtils.getDoubleOrDefault(obj, "maxX", 0);
-        double maxY = JsonUtils.getDoubleOrDefault(obj, "maxY", 0);
-        double maxZ = JsonUtils.getDoubleOrDefault(obj, "maxZ", 0);
+        Vec3d corner1 = JsonUtils.vec3dFromJson(obj, "corner1");
+        Vec3d corner2 = JsonUtils.vec3dFromJson(obj, "corner2");
 
-        this.setBox(new Box(minX, minY, minZ, maxX, maxY, maxZ));
+        if (corner1 != null && corner2 != null)
+        {
+            this.corner1 = corner1;
+            this.corner2 = corner2;
+        }
+        else
+        {
+            double minX = JsonUtils.getDoubleOrDefault(obj, "minX", 0);
+            double minY = JsonUtils.getDoubleOrDefault(obj, "minY", 0);
+            double minZ = JsonUtils.getDoubleOrDefault(obj, "minZ", 0);
+            double maxX = JsonUtils.getDoubleOrDefault(obj, "maxX", 0);
+            double maxY = JsonUtils.getDoubleOrDefault(obj, "maxY", 0);
+            double maxZ = JsonUtils.getDoubleOrDefault(obj, "maxZ", 0);
+
+            this.corner1 = new Vec3d(minX, minY, minZ);
+            this.corner2 = new Vec3d(maxX, maxY, maxZ);
+        }
+
+        this.setBoxFromCorners();
     }
 }
