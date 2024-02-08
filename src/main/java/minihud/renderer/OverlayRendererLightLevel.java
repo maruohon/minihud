@@ -6,7 +6,6 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.EnumSkyBlock;
@@ -17,6 +16,7 @@ import net.minecraft.world.chunk.Chunk;
 import malilib.config.option.ColorConfig;
 import malilib.config.option.Vec2dConfig;
 import malilib.render.buffer.VertexBuilder;
+import malilib.render.buffer.VertexFormats;
 import malilib.render.overlay.VboRenderObject;
 import malilib.util.data.Color4f;
 import malilib.util.data.Identifier;
@@ -88,7 +88,7 @@ public class OverlayRendererLightLevel extends MiniHudOverlayRenderer
     @Override
     public void allocateGlResources()
     {
-        this.quadRenderer = this.allocateBuffer(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR, VboRenderObject::setupArrayPointersPosUvColor);
+        this.quadRenderer = this.allocateBuffer(GL11.GL_QUADS, VertexFormats.POSITION_TEX_COLOR, VboRenderObject::setupArrayPointersPosUvColor);
         this.outlineRenderer = this.allocateBuffer(GL11.GL_LINES);
     }
 
