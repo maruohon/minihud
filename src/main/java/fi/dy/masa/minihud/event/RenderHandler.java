@@ -58,7 +58,6 @@ import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.minihud.config.Configs;
-import fi.dy.masa.minihud.config.Configs.Generic;
 import fi.dy.masa.minihud.config.InfoToggle;
 import fi.dy.masa.minihud.config.RendererToggle;
 import fi.dy.masa.minihud.data.MobCapDataHandler;
@@ -152,9 +151,10 @@ public class RenderHandler implements IRenderer
     {
         if (stack.getItem() instanceof FilledMapItem)
         {
-            if (Configs.Generic.MAP_PREVIEW.getBooleanValue())
+            if (Configs.Generic.MAP_PREVIEW.getBooleanValue() &&
+                (Configs.Generic.MAP_PREVIEW_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue());
+                fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue(), false);
             }
         }
         else if (Configs.Generic.SHULKER_BOX_PREVIEW.getBooleanValue())

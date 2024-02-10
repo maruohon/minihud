@@ -78,6 +78,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       LIGHT_LEVEL_UNDER_WATER             = new ConfigBoolean("lightLevelUnderWater", false, "Should the light level overlay render under water");
         public static final ConfigBooleanHotkeyed MAIN_RENDERING_TOGGLE             = new ConfigBooleanHotkeyed("mainRenderingToggle", true, "H", KeybindSettings.RELEASE_EXCLUSIVE, "The main rendering toggle for all MiniHUD rendering,\nincluding the info lines AND all the overlay renderers", "MiniHUD Main Rendering");
         public static final ConfigBoolean       MAP_PREVIEW                         = new ConfigBoolean("mapPreview", false, "Enables rendering a preview of the map,\nwhen you hold shift while hovering over a map item");
+        public static final ConfigBoolean       MAP_PREVIEW_REQUIRE_SHIFT           = new ConfigBoolean("mapPreviewRequireShift", true, "Whether holding shift is required for the Map Preview");
         public static final ConfigInteger       MAP_PREVIEW_SIZE                    = new ConfigInteger("mapPreviewSize", 160, 16, 512, "The size of the rendered map previews");
         public static final ConfigHotkey        MOVE_SHAPE_TO_PLAYER                = new ConfigHotkey("moveShapeToPlayer", "", "Move the currently selected shape to the player's\n(or the camera's) current location");
         public static final ConfigBoolean       OFFSET_SUBTITLE_HUD                 = new ConfigBoolean("offsetSubtitleHud", true, "If the Info Lines HUD is set to the bottom right corner,\nand subtitles are enabled, then the subtitles will\nbe offset to appear above the Info Lines text.");
@@ -120,6 +121,7 @@ public class Configs implements IConfigHandler
                 LIGHT_LEVEL_SKIP_BLOCK_CHECK,
                 LIGHT_LEVEL_UNDER_WATER,
                 MAP_PREVIEW,
+                MAP_PREVIEW_REQUIRE_SHIFT,
                 OFFSET_SUBTITLE_HUD,
                 REQUIRE_SNEAK,
                 SHULKER_BOX_PREVIEW,
