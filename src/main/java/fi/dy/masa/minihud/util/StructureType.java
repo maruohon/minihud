@@ -21,6 +21,7 @@ public enum StructureType
     STRONGHOLD          (StructureToggle.OVERLAY_STRUCTURE_STRONGHOLD,          "minecraft:stronghold"),
     VILLAGE             (StructureToggle.OVERLAY_STRUCTURE_VILLAGE,             "minecraft:village_desert", "minecraft:village_plains", "minecraft:village_savanna", "minecraft:village_snowy", "minecraft:village_taiga"),
     WITCH_HUT           (StructureToggle.OVERLAY_STRUCTURE_WITCH_HUT,           "minecraft:swamp_hut"),
+    TRAIL_RUINS         (StructureToggle.OVERLAY_STRUCTURE_TRAIL_RUINS,         "minecraft:trail_ruins"),
 
     BASTION_REMNANT     (StructureToggle.OVERLAY_STRUCTURE_BASTION_REMNANT,     "minecraft:bastion_remnant"),
     NETHER_FORTRESS     (StructureToggle.OVERLAY_STRUCTURE_NETHER_FORTRESS,     "minecraft:fortress"),
