@@ -130,6 +130,7 @@
 
     "minihud.message.error.invalid_dropped_chunks_hash_size": "Failed to parse the dropped chunks HashSet size from chat",
     "minihud.message.error.invalid_seed": "Failed to parse the world seed from chat",
+    "minihud.message.error.invalid_spawn_chunk_radius": "Failed to parse the spawn chunk radius from chat (0 < 32)",
     "minihud.message.error.shapes.select_shape_from_dropdown": "Select the Shape type to create from the dropdown widget",
 
     "minihud.message.distance_reference_point_set": "Set distance reference point to %s",
@@ -137,5 +138,7 @@
     "minihud.message.seed_is": "The world seed in MiniHUD is currently set to '%s'",
     "minihud.message.seed_set": "MiniHUD: Set the world seed to '%s'",
     "minihud.message.spawn_set": "MiniHUD: Set the world spawn to %s",
-    "minihud.message.spawn_chunk_radius_set": "MiniHUD: Set the World Spawn Chunk Radius to %s"
+    "minihud.message.no_spawn_chunk_radius": "MiniHUD: Spawn Chunk Radius is not known (Default 2)",
+    "minihud.message.spawn_chunk_radius_is": "The spawn chunk radius in MiniHUD is currently set to '%s'",
+    "minihud.message.spawn_chunk_radius_set": "MiniHUD: Set the Spawn Chunk Radius to %s"
 }

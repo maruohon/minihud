@@ -325,32 +325,20 @@ public class DataStorage
         this.worldSpawnValid = true;
     }
 
-    public void setSpawnChunkRadius(int radius)
+    public void setSpawnChunkRadius(int radius, boolean message)
     {
-        if (radius >= 0)
+        if (radius >= 0 && radius <= 32)
         {
             if (this.spawnChunkRadius != radius)
             {
-                String green = GuiBase.TXT_GREEN;
-                String red = GuiBase.TXT_RED;
-                String rst = GuiBase.TXT_RST;
-                String message;
-                String strRadius;
-
-                if (radius > 0)
+                if (message)
                 {
-                    strRadius = green + String.format("%d", radius);
+                    String strRadius = radius > 0 ? GuiBase.TXT_GREEN + String.format("%d", radius) + GuiBase.TXT_RST : GuiBase.TXT_RED + String.format("%d", radius) + GuiBase.TXT_RST;
+                    InfoUtils.printActionbarMessage(StringUtils.translate("minihud.message.spawn_chunk_radius_set", strRadius));
                 }
-                else
-                {
-                    strRadius = red + String.format("%d", radius);
-                }
-                message = StringUtils.translate("minihud.message.spawn_chunk_radius_set", strRadius) + rst;
 
-                InfoUtils.printActionbarMessage(message);
                 OverlayRendererSpawnChunks.setNeedsUpdate();
-
-                MiniHUD.printDebug("DataStorage#setSpawnChunkRadius(): set spawn radius [{}] -> [{}]", this.spawnChunkRadius, radius);
+                MiniHUD.printDebug("DataStorage#setSpawnChunkRadius(): set spawn chunk radius [{}] -> [{}]", this.spawnChunkRadius, radius);
             }
             this.spawnChunkRadius = radius;
             this.spawnChunkRadiusValid = true;
@@ -358,6 +346,7 @@ public class DataStorage
         else
         {
             this.spawnChunkRadius = -1;
+            this.spawnChunkRadiusValid = false;
         }
     }
 
@@ -374,7 +363,7 @@ public class DataStorage
     {
         if (this.spawnChunkRadiusValid == false)
         {
-            this.setSpawnChunkRadius(radius);
+            this.setSpawnChunkRadius(radius, true);
             OverlayRendererSpawnChunks.setNeedsUpdate();
         }
     }
@@ -620,6 +609,43 @@ public class DataStorage
 
             return true;
         }
+        else if (parts.length > 0 && (parts[0].equals("minihud-spawnchunkradius") || parts[0].equals("/minihud-spawnchunkradius")))
+        {
+            if (parts.length == 2)
+            {
+                try
+                {
+                    int radius = Integer.parseInt(parts[1]);
+
+                    if (radius >= 0 && radius <= 32)
+                    {
+                        this.setSpawnChunkRadius(radius, true);
+                    }
+                    else
+                    {
+                        InfoUtils.printActionbarMessage("minihud.message.error.invalid_spawn_chunk_radius");
+                    }
+                }
+                catch (NumberFormatException e)
+                {
+                    InfoUtils.printActionbarMessage("minihud.message.error.invalid_spawn_chunk_radius");
+                }
+            }
+            else if (parts.length == 1)
+            {
+                if (this.spawnChunkRadiusValid)
+                {
+                    String strRadius = this.spawnChunkRadius > 0 ? GuiBase.TXT_GREEN + String.format("%d", this.spawnChunkRadius) + GuiBase.TXT_RST : GuiBase.TXT_RED + String.format("%d", this.spawnChunkRadius) + GuiBase.TXT_RST;
+                    InfoUtils.printActionbarMessage(StringUtils.translate("minihud.message.spawn_chunk_radius_is", strRadius));
+                }
+                else
+                {
+                    InfoUtils.printActionbarMessage("minihud.message.no_spawn_chunk_radius");
+                }
+            }
+
+            return true;
+        }
 
         return false;
     }
@@ -669,7 +695,7 @@ public class DataStorage
                     MiniHUD.logger.warn("Failed to read the world seed from '{}'", text.getArgs()[1], e);
                 }
             }
-            else if ("commands.setworldspawn.success".equals(text.getKey()) && text.getArgs().length == 3)
+            else if ("commands.setworldspawn.success".equals(text.getKey()) && text.getArgs().length == 4)
             {
                 try
                 {
@@ -687,6 +713,34 @@ public class DataStorage
                 catch (Exception e)
                 {
                     MiniHUD.logger.warn("Failed to read the world spawn point from '{}'", text.getArgs(), e);
+                }
+            }
+            else if (("commands.gamerule.set".equals(text.getKey()) || "commands.gamerule.query".equals(text.getKey())) && text.getArgs().length == 2)
+            {
+                try
+                {
+                    Object[] o = text.getArgs();
+                    String rule = o[0].toString();
+
+                    if (rule.equals("spawnChunkRadius"))
+                    {
+                        int value = Integer.parseInt(o[1].toString());
+
+                        if (this.spawnChunkRadius != value)
+                        {
+                            MiniHUD.logger.info("Received spawn chunk radius from the vanilla /gamerule command: {}", this.spawnChunkRadius);
+                            this.setSpawnChunkRadius(value, true);
+                        }
+                        else
+                        {
+                            String strRadius = this.spawnChunkRadius > 0 ? GuiBase.TXT_GREEN + String.format("%d", this.spawnChunkRadius) + GuiBase.TXT_RST : GuiBase.TXT_RED + String.format("%d", this.spawnChunkRadius) + GuiBase.TXT_RST;
+                            InfoUtils.printActionbarMessage(StringUtils.translate("minihud.message.spawn_chunk_radius_is", strRadius));
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    MiniHUD.logger.warn("Failed to read the spawn chunk radius from '{}'", text.getArgs(), e);
                 }
             }
         }
@@ -834,7 +888,7 @@ public class DataStorage
             this.timeout = data.getInt("timeout");
             this.setServerVersion(data.getString("servux"));
             this.setWorldSpawn(new BlockPos(data.getInt("spawnPosX"), data.getInt("spawnPosY"), data.getInt("spawnPosZ")));
-            this.setSpawnChunkRadius(data.getInt("spawnChunkRadius"));
+            this.setSpawnChunkRadius(data.getInt("spawnChunkRadius"), true);
             this.setIsServuxServer();
 
             if (RendererToggle.OVERLAY_STRUCTURE_MAIN_TOGGLE.getBooleanValue())
@@ -859,7 +913,7 @@ public class DataStorage
 
             this.setServerVersion(data.getString("servux"));
             this.setWorldSpawn(new BlockPos(data.getInt("spawnPosX"), data.getInt("spawnPosY"), data.getInt("spawnPosZ")));
-            this.setSpawnChunkRadius(data.getInt("spawnChunkRadius"));
+            this.setSpawnChunkRadius(data.getInt("spawnChunkRadius"), true);
 
             if (this.hasInValidServux)
             {
@@ -909,9 +963,8 @@ public class DataStorage
 
         if (world != null)
         {
-
             MinecraftServer server = this.mc.getServer();
-            final int maxChunkRange = this.mc.options.getViewDistance().getValue() + 2;
+            final int maxChunkRange = this.mc.options.getClampedViewDistance();
 
             server.send(new ServerTask(server.getTicks(), () ->
             {
@@ -944,11 +997,11 @@ public class DataStorage
 
         if (structures.getHeldType() == Constants.NBT.TAG_COMPOUND)
         {
-            MiniHUD.printDebug("DataStorage#addOrUpdateStructuresFromServer(): list size: {}", structures.size());
-            this.structureDataTimeout = this.timeout + 300;
+            this.structureDataTimeout = this.timeout + 240;
 
             long currentTime = this.mc.world.getTime();
             final int count = structures.size();
+            final int oldCount = this.structures.size();
 
             this.removeExpiredStructures(currentTime, this.structureDataTimeout);
 
@@ -969,6 +1022,8 @@ public class DataStorage
                 }
             }
 
+            MiniHUD.printDebug("DataStorage#addOrUpdateStructuresFromServer(): received {} structures // total size {} -> {}", count, oldCount, this.structures.size());
+
             this.structureRendererNeedsUpdate = true;
             this.hasStructureDataFromServer = true;
         }
@@ -984,12 +1039,14 @@ public class DataStorage
 
         if (countBefore != countAfter)
         {
-            MiniHUD.printDebug("DataStorage#removeExpiredStructures(): before: {}, after: {}", countBefore, countAfter);
+            MiniHUD.printDebug("removeExpiredStructures from server: {} -> {} structures", countBefore, countAfter);
         }
     }
 
     private void addStructureDataFromGenerator(ServerWorld world, BlockPos playerPos, int maxChunkRange)
     {
+        int lastCount = this.structures.size();
+
         this.structures.clear();
 
         int minCX = (playerPos.getX() >> 4) - maxChunkRange;
@@ -1002,7 +1059,15 @@ public class DataStorage
             for (int cx = minCX; cx <= maxCX; ++cx)
             {
                 // Don't load the chunk
-                Chunk chunk = world.getChunk(cx, cz, ChunkStatus.FULL, false);
+                Chunk chunk;
+                try
+                {
+                     chunk = world.getChunk(cx, cz, ChunkStatus.FULL, false);
+                }
+                catch (Exception ignored)
+                {
+                    continue;
+                }
 
                 if (chunk == null)
                 {
@@ -1026,9 +1091,8 @@ public class DataStorage
             }
         }
 
+        MiniHUD.printDebug("Structure data updated from the integrated server: {} -> {} structures", lastCount, this.structures.size());
         this.structureRendererNeedsUpdate = true;
-
-        MiniHUD.printDebug("Structure data updated from the integrated server ({} structures)", this.structures.size());
     }
 
     public void handleCarpetServerTPSData(Text textComponent)
@@ -1068,10 +1132,6 @@ public class DataStorage
         {
             obj.add("seed", new JsonPrimitive(this.worldSeed));
         }
-        if (this.isWorldSpawnKnown())
-        {
-            obj.add("spawn_pos", JsonUtils.vec3dToJson(new Vec3d(this.worldSpawn.getX(), this.worldSpawn.getY(), this.worldSpawn.getZ())));
-        }
         if (this.isSpawnChunkRadiusKnown())
         {
             obj.add("spawn_chunk_radius", new JsonPrimitive(this.spawnChunkRadius));
@@ -1091,20 +1151,6 @@ public class DataStorage
 
         this.distanceReferencePoint = Objects.requireNonNullElse(pos, Vec3d.ZERO);
 
-        if (JsonUtils.hasVec3d(obj, "spawn_pos"))
-        {
-            Vec3d spawnVec3d = JsonUtils.vec3dFromJson(obj, "spawn_pos");
-            BlockPos spawnTmp = new BlockPos((int) spawnVec3d.getX(), (int) spawnVec3d.getY(), (int) spawnVec3d.getZ());
-
-            if (this.hasIntegratedServer && this.isWorldSpawnKnown() && spawnTmp.equals(this.worldSpawn) == false)
-            {
-                MiniHUD.printDebug("DataStorage#fromJson(): ignoring stale SpawnPos [{}], keeping [{}] as valid from the integrated server", spawnTmp.toShortString(), this.worldSpawn.toShortString());
-            }
-            else
-            {
-                this.setWorldSpawn(spawnTmp);
-            }
-        }
         if (JsonUtils.hasLong(obj, "seed"))
         {
             long seedTmp = JsonUtils.getLong(obj, "seed");
@@ -1128,7 +1174,7 @@ public class DataStorage
             }
             else
             {
-                this.setSpawnChunkRadius(spawnRadiusTmp);
+                this.setSpawnChunkRadius(spawnRadiusTmp, false);
             }
 
             // Force RenderToggle OFF if SPAWN_CHUNK_RADIUS is set to 0

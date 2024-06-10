@@ -131,7 +131,7 @@ public class RendererCallbacks
 
                 if (radius < 0)
                 {
-                    DataStorage.getInstance().setSpawnChunkRadius(2);   // 1.20.5 Vanilla Default
+                    DataStorage.getInstance().setSpawnChunkRadius(2, true);   // 1.20.5 Vanilla Default
                     radius = 2;
                 }
                 if (radius > 0)

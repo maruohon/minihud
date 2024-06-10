@@ -29,14 +29,7 @@ public abstract class MixinMinecraftServer
     private void onPrepareStartRegion(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci,
                                       ServerWorld serverWorld, BlockPos blockPos, ServerChunkManager serverChunkManager, int i)
     {
-        if (DataStorage.getInstance().getWorldSpawn().equals(blockPos) == false)
-        {
-            DataStorage.getInstance().setWorldSpawn(blockPos);
-        }
-
-        if (DataStorage.getInstance().isSpawnChunkRadiusKnown() == false || DataStorage.getInstance().getSpawnChunkRadius() != i)
-        {
-            DataStorage.getInstance().setSpawnChunkRadius(i);
-        }
+        DataStorage.getInstance().setWorldSpawn(blockPos);
+        DataStorage.getInstance().setSpawnChunkRadius(i, true);
     }
 }
