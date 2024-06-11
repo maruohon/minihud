@@ -18,5 +18,5 @@ public record ServuxStructuresPayload(NbtCompound data) implements CustomPayload
     private void write(PacketByteBuf buf) { buf.writeNbt(data); }
 
     @Override
-    public Id<? extends CustomPayload> getId() { return TYPE; }
+    public Id<ServuxStructuresPayload> getId() { return TYPE; }
 }
