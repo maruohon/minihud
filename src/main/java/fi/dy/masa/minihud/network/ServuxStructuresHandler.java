@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.random.Random;
 import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
-import fi.dy.masa.malilib.network.PayloadSplitter;
+import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.minihud.MiniHUD;
 import fi.dy.masa.minihud.util.DataStorage;
@@ -76,7 +76,7 @@ public abstract class ServuxStructuresHandler<T extends CustomPayload> implement
                     this.readingSessionKey = Random.create(Util.getMeasuringTimeMs()).nextLong();
                 }
 
-                PacketByteBuf fullPacket = PayloadSplitter.receive(this, this.readingSessionKey, packet.getBuffer());
+                PacketByteBuf fullPacket = PacketSplitter.receive(this, this.readingSessionKey, packet.getBuffer());
 
                 if (fullPacket != null)
                 {
