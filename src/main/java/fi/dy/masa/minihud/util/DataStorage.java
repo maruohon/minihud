@@ -60,7 +60,6 @@ public class DataStorage
 
     private static final DataStorage INSTANCE = new DataStorage();
     private final MobCapDataHandler mobCapData = new MobCapDataHandler();
-    //private final static ServuxStructuresHandlerOld<ServuxStructuresPayloadOld> OLD_HANDLER = ServuxStructuresHandlerOld.getInstance();
     private final static ServuxStructuresHandler<ServuxStructuresPacket.Payload> HANDLER = ServuxStructuresHandler.getInstance();
     private boolean worldSeedValid = false;
     private boolean carpetServer = false;
@@ -74,7 +73,8 @@ public class DataStorage
     private int structureDataTimeout = 30 * 20;
     private boolean serverTPSValid;
     private boolean hasSyncedTime;
-    private String serverVersion;
+    private String servuxVersion;
+    private int servuxTimeout;
     private boolean hasStructureDataFromServer;
     private boolean structureRendererNeedsUpdate;
     private boolean structuresNeedUpdating;
@@ -95,7 +95,6 @@ public class DataStorage
     private final PriorityBlockingQueue<ChunkTask> taskQueue = Queues.newPriorityBlockingQueue();
     private final Thread workerThread;
     private final ThreadWorker worker;
-    private int timeout;
 
     private DataStorage()
     {
@@ -111,18 +110,11 @@ public class DataStorage
 
     public void onGameInit()
     {
-        //ClientPlayHandler.getInstance().registerClientPlayHandler(OLD_HANDLER);
-        //OLD_HANDLER.registerPlayPayload(ServuxStructuresPayloadOld.TYPE, ServuxStructuresPayloadOld.CODEC, IPluginClientPlayHandler.BOTH_CLIENT);
-
         ClientPlayHandler.getInstance().registerClientPlayHandler(HANDLER);
         HANDLER.registerPlayPayload(ServuxStructuresPacket.Payload.ID, ServuxStructuresPacket.Payload.CODEC, IPluginClientPlayHandler.BOTH_CLIENT);
     }
 
-    //public Identifier getNetworkChannelOld() { return ServuxStructuresHandlerOld.CHANNEL_ID; }
-
     public Identifier getNetworkChannel() { return ServuxStructuresHandler.CHANNEL_ID; }
-
-    //public IPluginClientPlayHandler<ServuxStructuresPayloadOld> getPacketHandlerOld() { return OLD_HANDLER; }
 
     public IPluginClientPlayHandler<ServuxStructuresPacket.Payload> getPacketHandler() { return HANDLER; }
 
@@ -149,9 +141,6 @@ public class DataStorage
                 MiniHUD.logger.warn("Interrupted whilst waiting for worker thread to die", e);
             }
             */
-            //OLD_HANDLER.reset(this.getNetworkChannel());
-            //OLD_HANDLER.resetFailures(this.getNetworkChannel());
-
             HANDLER.reset(this.getNetworkChannel());
             HANDLER.resetFailures(this.getNetworkChannel());
 
@@ -181,7 +170,7 @@ public class DataStorage
         this.lastStructureUpdatePos = null;
         this.structures.clear();
         this.clearTasks();
-        this.timeout = -1;
+        this.servuxTimeout = -1;
 
         ShapeManager.INSTANCE.clear();
         OverlayRendererBeaconRange.INSTANCE.clear();
@@ -223,15 +212,15 @@ public class DataStorage
         }
     }
 
-    public void setServerVersion(String ver)
+    public void setServuxVersion(String ver)
     {
         if (ver != null && ver.isEmpty() == false)
         {
-            this.serverVersion = ver;
+            this.servuxVersion = ver;
         }
         else
         {
-            this.serverVersion = "unknown";
+            this.servuxVersion = "unknown";
         }
     }
 
@@ -246,7 +235,6 @@ public class DataStorage
     {
         if (this.hasIntegratedServer == false)
         {
-            //OLD_HANDLER.registerPlayReceiver(ServuxStructuresPayloadOld.TYPE, OLD_HANDLER::receivePlayPayload);
             HANDLER.registerPlayReceiver(ServuxStructuresPacket.Payload.ID, HANDLER::receivePlayPayload);
         }
     }
@@ -308,10 +296,8 @@ public class DataStorage
         if (this.hasIntegratedServer == false && this.hasServuxServer())
         {
             NbtCompound nbt = new NbtCompound();
-            //nbt.putInt("packetType", ServuxStructuresHandlerOld.PACKET_C2S_REQUEST_SPAWN_METADATA);
             nbt.putString("version", Reference.MOD_STRING);
 
-            //OLD_HANDLER.encodeNbtCompound(nbt);
             HANDLER.encodeStructuresPacket(new ServuxStructuresPacket(ServuxStructuresPacket.Type.PACKET_C2S_REQUEST_SPAWN_METADATA, nbt));
         }
     }
@@ -873,10 +859,8 @@ public class DataStorage
                 MiniHUD.printDebug("DataStorage#registerStructureChannel(): sending STRUCTURES_REGISTER to Servux");
 
                 NbtCompound nbt = new NbtCompound();
-                //nbt.putInt("packetType", ServuxStructuresHandlerOld.PACKET_C2S_STRUCTURES_REGISTER);
                 nbt.putString("version", Reference.MOD_STRING);
 
-                //OLD_HANDLER.encodeNbtCompound(nbt);
                 HANDLER.encodeStructuresPacket(new ServuxStructuresPacket(ServuxStructuresPacket.Type.PACKET_C2S_STRUCTURES_REGISTER, nbt));
             }
         }
@@ -884,7 +868,8 @@ public class DataStorage
         {
             this.shouldRegisterStructureChannel = false;
         }
-        // QuickCarpet doesn't exist for 1.20.5
+        // QuickCarpet doesn't exist for 1.20.5+,
+        // Will re-add if they update it
     }
 
     public boolean receiveServuxMetadata(NbtCompound data)
@@ -898,8 +883,8 @@ public class DataStorage
             {
                 MiniHUD.logger.warn("structureChannel: Mis-matched protocol version!");
             }
-            this.timeout = data.getInt("timeout");
-            this.setServerVersion(data.getString("servux"));
+            this.servuxTimeout = data.getInt("timeout");
+            this.setServuxVersion(data.getString("servux"));
             this.setWorldSpawn(new BlockPos(data.getInt("spawnPosX"), data.getInt("spawnPosY"), data.getInt("spawnPosZ")));
             this.setSpawnChunkRadius(data.getInt("spawnChunkRadius"), true);
             this.setIsServuxServer();
@@ -924,7 +909,7 @@ public class DataStorage
         {
             MiniHUD.printDebug("DataStorage#receiveSpawnMetadata(): from Servux");
 
-            this.setServerVersion(data.getString("servux"));
+            this.setServuxVersion(data.getString("servux"));
             this.setWorldSpawn(new BlockPos(data.getInt("spawnPosX"), data.getInt("spawnPosY"), data.getInt("spawnPosZ")));
             this.setSpawnChunkRadius(data.getInt("spawnChunkRadius"), true);
 
@@ -942,12 +927,7 @@ public class DataStorage
             this.servuxServer = false;
             if (this.hasInValidServux == false)
             {
-                MiniHUD.printDebug("DataStorage#unregisterStructureChannel(): for {}", this.serverVersion != null ? this.serverVersion : "<unknown>");
-
-                //NbtCompound nbt = new NbtCompound();
-                //nbt.putInt("packetType", ServuxStructuresHandlerOld.PACKET_C2S_STRUCTURES_UNREGISTER);
-                //OLD_HANDLER.encodeNbtCompound(nbt);
-                //OLD_HANDLER.reset(this.getNetworkChannel());
+                MiniHUD.printDebug("DataStorage#unregisterStructureChannel(): for {}", this.servuxVersion != null ? this.servuxVersion : "<unknown>");
 
                 HANDLER.encodeStructuresPacket(new ServuxStructuresPacket(ServuxStructuresPacket.Type.PACKET_C2S_STRUCTURES_UNREGISTER, new NbtCompound()));
                 HANDLER.reset(this.getNetworkChannel());
@@ -1013,7 +993,7 @@ public class DataStorage
 
         if (structures.getHeldType() == Constants.NBT.TAG_COMPOUND)
         {
-            this.structureDataTimeout = this.timeout + 300;
+            this.structureDataTimeout = this.servuxTimeout + 300;
 
             long currentTime = this.mc.world.getTime();
             final int count = structures.size();
