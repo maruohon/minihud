@@ -669,7 +669,7 @@ public class RenderHandler implements IRenderer
                 if (InfoToggle.HORSE_SPEED.getBooleanValue())
                 {
                     float speed = horse.getMovementSpeed();
-                    speed *= 42.163f;
+                    speed *= 43.17f;
                     this.addLine(String.format("Horse Speed: %.3f m/s", speed));
                 }
 
@@ -677,10 +677,9 @@ public class RenderHandler implements IRenderer
                 {
                     double jump = horse.getJumpStrength();
                     double calculatedJumpHeight =
-                            -0.1817584952d * jump * jump * jump +
-                            3.689713992d * jump * jump +
-                            2.128599134d * jump +
-                            -0.343930367;
+                            4.53680079 * jump * jump +
+                            1.61431730 * jump -
+                            0.22656224
                     this.addLine(String.format("Horse Jump: %.3f m", calculatedJumpHeight));
                 }
 
