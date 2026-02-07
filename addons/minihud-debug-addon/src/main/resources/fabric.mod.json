@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "minihud-debug-addon",
+  "version": "${version}",
+  "name": "MiniHUD Debug Addon",
+  "description": "Sends debug subscription requests based on MiniHUD debug toggles so servers can stream debug data.",
+  "authors": [
+    "lyntermint"
+  ],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.lyntermint.minihuddebug.MinihudDebugAddon"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "minecraft": "1.21.11",
+    "fabric-api": "*",
+    "minihud": ">=0.38.2",
+    "malilib": ">=0.27.2"
+  }
+}
