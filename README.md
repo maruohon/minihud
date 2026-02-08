@@ -1,3 +1,11 @@
+[![Upstream](https://img.shields.io/badge/upstream-maruohon%2Fminihud-blue)](https://github.com/maruohon/minihud)
+
+# Fork Notes (v1.0, MC 1.21.11)
+This is a fork of [MiniHUD](https://github.com/maruohon/minihud) with an added add-on project:
+- `addons/minihud-debug-addon` (MiniHUD Debug Addon v1.0 for Minecraft 1.21.11)
+
+Edits maintained by lyntermint. Upstream README follows.
+
 [![Curseforge](http://cf.way2muchnoise.eu/full_minihud_downloads.svg)](https://minecraft.curseforge.com/projects/minihud) [![Curseforge](http://cf.way2muchnoise.eu/versions/For%20MC_minihud_all.svg)](https://minecraft.curseforge.com/projects/minihud)
 
 ## MiniHUD
