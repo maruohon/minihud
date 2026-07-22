@@ -2,9 +2,9 @@ package minihud.util.value;
 
 import com.google.common.collect.ImmutableList;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 
-public class LightLevelNumberMode extends BaseOptionListConfigValue
+public class LightLevelNumberMode extends BaseOptionConfigValue
 {
     public static final LightLevelNumberMode NONE  = new LightLevelNumberMode("none",  "minihud.name.light_level_number_mode.none");
     public static final LightLevelNumberMode BLOCK = new LightLevelNumberMode("block", "minihud.name.light_level_number_mode.block");

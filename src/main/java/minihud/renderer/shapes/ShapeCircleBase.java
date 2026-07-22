@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.entity.Entity;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 import malilib.config.value.BlockSnap;
 import malilib.render.ShapeRenderUtils;
 import malilib.util.StringUtils;
@@ -195,7 +195,7 @@ public abstract class ShapeCircleBase extends ShapeBase
         // The snap value has to be set before the center
         if (JsonUtils.hasString(obj, "snap"))
         {
-            this.snap = BaseOptionListConfigValue.findValueByName(JsonUtils.getString(obj, "snap"), BlockSnap.VALUES);
+            this.snap = BaseOptionConfigValue.findValueByName(JsonUtils.getString(obj, "snap"), BlockSnap.VALUES);
         }
 
         if (JsonUtils.hasString(obj, "main_axis"))

@@ -2,9 +2,9 @@ package minihud.util.value;
 
 import com.google.common.collect.ImmutableList;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 
-public class LightLevelMarkerMode extends BaseOptionListConfigValue
+public class LightLevelMarkerMode extends BaseOptionConfigValue
 {
     public static final LightLevelMarkerMode SQUARE = new LightLevelMarkerMode("square", "minihud.name.light_level_marker_mode.square");
     public static final LightLevelMarkerMode CROSS  = new LightLevelMarkerMode("cross",  "minihud.name.light_level_marker_mode.cross");

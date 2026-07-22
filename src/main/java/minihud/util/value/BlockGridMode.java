@@ -2,9 +2,9 @@ package minihud.util.value;
 
 import com.google.common.collect.ImmutableList;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 
-public class BlockGridMode extends BaseOptionListConfigValue
+public class BlockGridMode extends BaseOptionConfigValue
 {
     public static final BlockGridMode NON_AIR  = new BlockGridMode("non_air",  "minihud.name.block_grid_mode.non_air");
     public static final BlockGridMode ADJACENT = new BlockGridMode("adjacent", "minihud.name.block_grid_mode.adjacent");

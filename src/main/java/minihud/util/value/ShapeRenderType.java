@@ -2,9 +2,9 @@ package minihud.util.value;
 
 import com.google.common.collect.ImmutableList;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 
-public class ShapeRenderType extends BaseOptionListConfigValue
+public class ShapeRenderType extends BaseOptionConfigValue
 {
     public static final ShapeRenderType FULL_BLOCK = new ShapeRenderType("full_block", "minihud.name.shape_render_type.full_block");
     public static final ShapeRenderType INNER_EDGE = new ShapeRenderType("inner_edge", "minihud.name.shape_render_type.inner_edge");

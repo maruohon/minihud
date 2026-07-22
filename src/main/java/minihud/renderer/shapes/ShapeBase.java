@@ -7,7 +7,7 @@ import com.google.gson.JsonPrimitive;
 
 import net.minecraft.entity.Entity;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 import malilib.listener.LayerRangeChangeListener;
 import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
@@ -180,7 +180,7 @@ public abstract class ShapeBase extends MiniHudOverlayRenderer implements LayerR
 
         if (JsonUtils.hasString(obj, "render_type"))
         {
-            ShapeRenderType type = BaseOptionListConfigValue.findValueByName(obj.get("render_type").getAsString(), ShapeRenderType.VALUES);
+            ShapeRenderType type = BaseOptionConfigValue.findValueByName(obj.get("render_type").getAsString(), ShapeRenderType.VALUES);
 
             if (type != null)
             {

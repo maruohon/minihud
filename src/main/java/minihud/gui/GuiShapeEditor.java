@@ -7,7 +7,7 @@ import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
-import malilib.config.option.OptionListConfig;
+import malilib.config.option.OptionConfig;
 import malilib.config.value.BlockSnap;
 import malilib.gui.BaseScreen;
 import malilib.gui.config.BaseConfigScreen;
@@ -41,14 +41,14 @@ import minihud.util.value.ShapeRenderType;
 public class GuiShapeEditor extends BaseLayerRangeEditScreen
 {
     private final ShapeBase shape;
-    private final OptionListConfig<BlockSnap> configBlockSnap;
+    private final OptionConfig<BlockSnap> configBlockSnap;
 
     public GuiShapeEditor(ShapeBase shape)
     {
         super("minihud_shape_editor", ConfigScreen.ALL_TABS, ConfigScreen.SHAPES, shape.getLayerRange());
 
         this.shape = shape;
-        this.configBlockSnap = new OptionListConfig<>("blockSnap", BlockSnap.NONE, BlockSnap.VALUES, "");
+        this.configBlockSnap = new OptionConfig<>("blockSnap", BlockSnap.NONE, BlockSnap.VALUES, "");
 
         this.setTitle("minihud.title.screen.shape_editor", Reference.MOD_VERSION);
     }

@@ -12,7 +12,7 @@ import malilib.config.option.DoubleConfig;
 import malilib.config.option.HotkeyConfig;
 import malilib.config.option.HotkeyedBooleanConfig;
 import malilib.config.option.IntegerConfig;
-import malilib.config.option.OptionListConfig;
+import malilib.config.option.OptionConfig;
 import malilib.config.option.StringConfig;
 import malilib.config.option.Vec2dConfig;
 import malilib.config.value.ScreenLocation;
@@ -77,9 +77,9 @@ public class Configs
         public static final BooleanConfig WOOL_COUNTER_ENABLE_ALL               = new BooleanConfig("woolCounterEnableAll", true);
         public static final StringConfig  WOOL_COUNTER_TYPES                    = new StringConfig( "woolCounterTypes", "0-15");
 
-        public static final OptionListConfig<BlockGridMode>         BLOCK_GRID_OVERLAY_MODE  = new OptionListConfig<>("blockGridOverlayMode", BlockGridMode.ALL, BlockGridMode.VALUES);
-        public static final OptionListConfig<LightLevelMarkerMode>  LIGHT_LEVEL_MARKER_MODE  = new OptionListConfig<>("lightLevelMarkers", LightLevelMarkerMode.SQUARE, LightLevelMarkerMode.VALUES);
-        public static final OptionListConfig<LightLevelNumberMode>  LIGHT_LEVEL_NUMBER_MODE  = new OptionListConfig<>("lightLevelNumbers", LightLevelNumberMode.BLOCK, LightLevelNumberMode.VALUES);
+        public static final OptionConfig<BlockGridMode> BLOCK_GRID_OVERLAY_MODE         = new OptionConfig<>("blockGridOverlayMode", BlockGridMode.ALL, BlockGridMode.VALUES);
+        public static final OptionConfig<LightLevelMarkerMode> LIGHT_LEVEL_MARKER_MODE  = new OptionConfig<>("lightLevelMarkers", LightLevelMarkerMode.SQUARE, LightLevelMarkerMode.VALUES);
+        public static final OptionConfig<LightLevelNumberMode> LIGHT_LEVEL_NUMBER_MODE  = new OptionConfig<>("lightLevelNumbers", LightLevelNumberMode.BLOCK, LightLevelNumberMode.VALUES);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 BEACON_RANGE_AUTO_UPDATE,
@@ -226,9 +226,9 @@ public class Configs
 
     public static class Internal
     {
-        public static final OptionListConfig<ScreenLocation> HUD_LOCATION   = new OptionListConfig<>("infoLinesHudLocation", ScreenLocation.TOP_LEFT, ScreenLocation.VALUES);
-        public static final DoubleConfig CHUNK_UNLOAD_BUCKET_OVERLAY_Y      = new DoubleConfig("chunkUnloadBucketOverlayY", 80);
-        public static final DoubleConfig SLIME_CHUNKS_OVERLAY_TOP_Y         = new DoubleConfig("slimeChunksOverlayTopY", 80);
+        public static final OptionConfig<ScreenLocation> HUD_LOCATION   = new OptionConfig<>("infoLinesHudLocation", ScreenLocation.TOP_LEFT, ScreenLocation.VALUES);
+        public static final DoubleConfig CHUNK_UNLOAD_BUCKET_OVERLAY_Y  = new DoubleConfig("chunkUnloadBucketOverlayY", 80);
+        public static final DoubleConfig SLIME_CHUNKS_OVERLAY_TOP_Y     = new DoubleConfig("slimeChunksOverlayTopY", 80);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 CHUNK_UNLOAD_BUCKET_OVERLAY_Y,

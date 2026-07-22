@@ -2,9 +2,9 @@ package minihud.util.value;
 
 import com.google.common.collect.ImmutableList;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 
-public class PrintMode extends BaseOptionListConfigValue
+public class PrintMode extends BaseOptionConfigValue
 {
     public static final PrintMode NONE    = new PrintMode("none",    "minihud.name.print_mode.none");
     public static final PrintMode FAIL    = new PrintMode("fail",    "minihud.name.print_mode.fail");
